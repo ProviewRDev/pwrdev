@@ -86,11 +86,7 @@ void CoLoginGtk::valchanged_usernamevalue(GtkWidget* w, gpointer data)
   gtk_widget_grab_focus(((CoLoginGtk*)loginctx)->widgets.passwordvalue);
 }
 
-static gboolean login_action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
-{
-  return FALSE;
-}
+static gboolean login_action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data) { return FALSE; }
 
 static gint login_delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
@@ -103,38 +99,32 @@ static gint login_delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
 //
 // Constructor
 //
-CoLoginGtk::CoLoginGtk(void* wl_parent_ctx, GtkWidget* wl_parent_wid,
-    const char* wl_name, const char* wl_groupname, void (*wl_bc_success)(void*),
-    void (*wl_bc_cancel)(void*), void* basewidget, pwr_tStatus* status)
-    : CoLogin(wl_parent_ctx, wl_name, wl_groupname, wl_bc_success, wl_bc_cancel,
-          status),
+CoLoginGtk::CoLoginGtk(void* wl_parent_ctx, GtkWidget* wl_parent_wid, const char* wl_name,
+                       const char* wl_groupname, void (*wl_bc_success)(void*), void (*wl_bc_cancel)(void*),
+                       void* basewidget, pwr_tStatus* status)
+    : CoLogin(wl_parent_ctx, wl_name, wl_groupname, wl_bc_success, wl_bc_cancel, status),
       parent_wid(wl_parent_wid)
 {
   const int window_width = 500;
   const int window_height = 200;
 
   // Create an input dialog
-  widgets.toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      window_height, "default-width", window_width, "title", "Proview Login",
-      NULL);
+  widgets.toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height,
+                                              "default-width", window_width, "title", "Proview Login", NULL);
 
-  g_signal_connect(
-      widgets.toplevel, "delete_event", G_CALLBACK(login_delete_event), this);
-  g_signal_connect(widgets.toplevel, "focus-in-event",
-      G_CALLBACK(login_action_inputfocus), this);
+  g_signal_connect(widgets.toplevel, "delete_event", G_CALLBACK(login_delete_event), this);
+  g_signal_connect(widgets.toplevel, "focus-in-event", G_CALLBACK(login_action_inputfocus), this);
 
   widgets.usernamevalue = gtk_entry_new();
   gtk_widget_set_size_request(widgets.usernamevalue, -1, 20);
-  g_signal_connect(widgets.usernamevalue, "activate",
-      G_CALLBACK(valchanged_usernamevalue), this);
+  g_signal_connect(widgets.usernamevalue, "activate", G_CALLBACK(valchanged_usernamevalue), this);
 
   GtkWidget* usernamelabel = gtk_label_new("Username");
   gtk_widget_set_size_request(usernamelabel, -1, 20);
 
   widgets.passwordvalue = gtk_entry_new();
   gtk_widget_set_size_request(widgets.passwordvalue, -1, 20);
-  g_signal_connect(widgets.passwordvalue, "activate",
-      G_CALLBACK(valchanged_passwordvalue), this);
+  g_signal_connect(widgets.passwordvalue, "activate", G_CALLBACK(valchanged_passwordvalue), this);
 
   GtkWidget* passwordlabel = gtk_label_new("Password");
   gtk_widget_set_size_request(passwordlabel, -1, 20);
@@ -153,7 +143,7 @@ CoLoginGtk::CoLoginGtk(void* wl_parent_ctx, GtkWidget* wl_parent_wid,
 
   widgets.label = gtk_label_new("");
 
-  GtkWidget *hbox = gtk_grid_new();
+  GtkWidget* hbox = gtk_grid_new();
   gtk_widget_set_margin_start(hbox, 40);
   gtk_grid_set_row_spacing(GTK_GRID(hbox), 20);
   gtk_grid_set_column_spacing(GTK_GRID(hbox), 40);
@@ -162,17 +152,15 @@ CoLoginGtk::CoLoginGtk(void* wl_parent_ctx, GtkWidget* wl_parent_wid,
   gtk_grid_attach(GTK_GRID(hbox), passwordlabel, 2, 2, 1, 1);
   gtk_grid_attach(GTK_GRID(hbox), widgets.usernamevalue, 3, 1, 3, 1);
   gtk_grid_attach(GTK_GRID(hbox), widgets.passwordvalue, 3, 2, 3, 1);
-    
+
   GtkWidget* india_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
-  gtk_box_pack_start(
-      GTK_BOX(india_hboxbuttons), widgets.okbutton, FALSE, FALSE, 40);
+  gtk_box_pack_start(GTK_BOX(india_hboxbuttons), widgets.okbutton, FALSE, FALSE, 40);
   gtk_box_pack_end(GTK_BOX(india_hboxbuttons), india_cancel, FALSE, FALSE, 40);
 
   GtkWidget* india_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(india_vbox), hbox, TRUE, TRUE, 30);
   gtk_box_pack_start(GTK_BOX(india_vbox), widgets.label, FALSE, FALSE, 5);
-  gtk_box_pack_start(
-      GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(india_vbox), india_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(widgets.toplevel), india_vbox);
 
@@ -180,8 +168,7 @@ CoLoginGtk::CoLoginGtk(void* wl_parent_ctx, GtkWidget* wl_parent_wid,
   gtk_widget_grab_focus(widgets.usernamevalue);
 
   if (basewidget)
-    gtk_window_set_transient_for(
-        GTK_WINDOW(widgets.toplevel), GTK_WINDOW(basewidget));
+    gtk_window_set_transient_for(GTK_WINDOW(widgets.toplevel), GTK_WINDOW(basewidget));
 
   *status = 1;
 }
@@ -224,7 +211,4 @@ pwr_tStatus CoLoginGtk::get_values()
 //
 //	Displays a message in the login window.
 //
-void CoLoginGtk::message(const char* new_label)
-{
-  gtk_label_set_text(GTK_LABEL(widgets.label), new_label);
-}
+void CoLoginGtk::message(const char* new_label) { gtk_label_set_text(GTK_LABEL(widgets.label), new_label); }

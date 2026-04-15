@@ -57,15 +57,9 @@ void WRev::message_cb(void* wrev, char severity, const char* message)
   ((WRev*)wrev)->message(severity, message);
 }
 
-void WRev::set_clock_cursor_cb(void* wrev)
-{
-  ((WRev*)wrev)->set_clock_cursor();
-}
+void WRev::set_clock_cursor_cb(void* wrev) { ((WRev*)wrev)->set_clock_cursor(); }
 
-void WRev::reset_cursor_cb(void* wrev)
-{
-  ((WRev*)wrev)->reset_cursor();
-}
+void WRev::reset_cursor_cb(void* wrev) { ((WRev*)wrev)->reset_cursor(); }
 
 //
 //  Callbackfunctions from menu entries
@@ -74,11 +68,13 @@ void WRev::store_ok_cb(WRev* wrev, char* text1, char* text2)
 {
   pwr_tStatus sts;
 
-  if (streq(text1, "")) {
+  if (streq(text1, ""))
+  {
     wrev->wow->DisplayError("Syntax Error", "Revision name is missing");
     return;
   }
-  if (streq(text2, "")) {
+  if (streq(text2, ""))
+  {
     wrev->wow->DisplayError("Syntax Error", "Description is missing");
     return;
   }
@@ -101,7 +97,8 @@ void WRev::activate_store()
 
   // Check if new revision is allowed
   sts = wrevnav->rev->create_check();
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     wow->DisplayError("New Revision Error", "New revision can't be "
                                             "created\nCurrent revision is not "
                                             "at end of branch");
@@ -111,8 +108,7 @@ void WRev::activate_store()
   // Get next revision number
   wrevnav->rev->next_name(name);
 
-  open_input_dialog(
-      "Revision name", "Description", "New Revision", name, "", store_ok_cb);
+  open_input_dialog("Revision name", "Description", "New Revision", name, "", store_ok_cb);
 }
 
 void WRev::activate_restore()
@@ -125,19 +121,21 @@ void WRev::activate_restore()
   message(' ', "");
 
   wb_session* session = (wb_session*)ldhses;
-  if (session->cid() != pwr_eClass_DirectoryVolume) {
-    wow->DisplayError(
-        "Restore Error", "Activate Restore from the Directory volume");
+  if (session->cid() != pwr_eClass_DirectoryVolume)
+  {
+    wow->DisplayError("Restore Error", "Activate Restore from the Directory volume");
     return;
   }
 
   sts = wrevnav->get_select(&itemlist, &item_count);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Select a revision");
     return;
   }
 
-  if (item_count != 1 || typeid(*itemlist[0]) != typeid(WItemRevision)) {
+  if (item_count != 1 || typeid(*itemlist[0]) != typeid(WItemRevision))
+  {
     message('E', "Select one revision");
     free(itemlist);
     return;
@@ -147,8 +145,7 @@ void WRev::activate_restore()
   strcat(text, itemlist[0]->name);
 
   dialog_count++;
-  wow->DisplayQuestion(
-      this, "Restore revision", text, restore_ok, restore_cancel, itemlist[0]);
+  wow->DisplayQuestion(this, "Restore revision", text, restore_ok, restore_cancel, itemlist[0]);
 
   free(itemlist);
 }
@@ -172,12 +169,12 @@ void WRev::restore_ok(void* ctx, void* data)
   if (EVEN(sts))
     wrev->wow->DisplayError("Restore Error", wnav_get_message(sts));
   else if (sts == REV__NOBRANCH)
-    wrev->wow->DisplayText(
-        "Restore Info", "No changes can be made to this revision");
+    wrev->wow->DisplayText("Restore Info", "No changes can be made to this revision");
   wrev->wrevnav->root_objects();
 
   wb_session* session = (wb_session*)wrev->ldhses;
-  if (session->cid() == pwr_eClass_DirectoryVolume) {
+  if (session->cid() == pwr_eClass_DirectoryVolume)
+  {
     wb_vrep* vrep = (wb_vrep*)(*session);
     ((wb_vrepmem*)vrep)->reloadWbl(&sts);
     if (((WUtility*)wrev->parent_ctx)->utype == wb_eUtility_WNav)
@@ -211,12 +208,14 @@ void WRev::activate_delete()
   message(' ', "");
 
   sts = wrevnav->get_select(&itemlist, &item_count);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message('E', "Select a revision");
     return;
   }
 
-  if (item_count != 1 || typeid(*itemlist[0]) != typeid(WItemRevision)) {
+  if (item_count != 1 || typeid(*itemlist[0]) != typeid(WItemRevision))
+  {
     message('E', "Select one revision");
     free(itemlist);
     return;
@@ -226,8 +225,7 @@ void WRev::activate_delete()
   strcat(text, itemlist[0]->name);
 
   dialog_count++;
-  wow->DisplayQuestion(
-      this, "Delete revision", text, delete_ok, delete_cancel, itemlist[0]);
+  wow->DisplayQuestion(this, "Delete revision", text, delete_ok, delete_cancel, itemlist[0]);
 }
 
 void WRev::activate_build()
@@ -260,10 +258,7 @@ void WRev::activate_zoom_out()
   wrevnav->zoom(1.0 / 1.18);
 }
 
-void WRev::activate_zoom_reset()
-{
-  wrevnav->unzoom();
-}
+void WRev::activate_zoom_reset() { wrevnav->unzoom(); }
 
 int WRev::rev_command_cb(void* ctx, char* cmd)
 {
@@ -274,12 +269,9 @@ int WRev::rev_command_cb(void* ctx, char* cmd)
   return 0;
 }
 
-WRev::~WRev()
-{
-}
+WRev::~WRev() {}
 
 WRev::WRev(void* wa_parent_ctx, ldh_tSession wa_ldhses)
-    : parent_ctx(wa_parent_ctx), ldhses(wa_ldhses), close_cb(0), command_cb(0),
-      dialog_count(0)
+    : parent_ctx(wa_parent_ctx), ldhses(wa_ldhses), close_cb(0), command_cb(0), dialog_count(0)
 {
 }

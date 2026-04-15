@@ -34,7 +34,8 @@
  * General Public License plus this exception.
  */
 
-extern "C" {
+extern "C"
+{
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
@@ -52,9 +53,11 @@ void wb_procom::put(vext_sAMsg* msg, int size, pwr_tStatus* sts)
 {
   *sts = LDH__SUCCESS;
   msg->Any.message_type = 1;
-  switch (m_type) {
+  switch (m_type)
+  {
   case procom_eType_Ipc:
-    if (msgsnd(m_msgsndid, (void*)msg, size, 0) == -1) {
+    if (msgsnd(m_msgsndid, (void*)msg, size, 0) == -1)
+    {
       *sts = LDH__MSGSND;
       return;
     }
@@ -66,12 +69,14 @@ void wb_procom::put(vext_sAMsg* msg, int size, pwr_tStatus* sts)
 
 void wb_procom::receive(vext_sQMsg* msg, int size, pwr_tStatus* sts)
 {
-  if (!m_connected) {
+  if (!m_connected)
+  {
     key_t key;
     int fd = -1;
 
     fd = open(m_key, O_RDWR | O_CREAT, 0777);
-    if (fd < 0) {
+    if (fd < 0)
+    {
       *sts = LDH__NOPROV;
       return;
     }
@@ -80,28 +85,31 @@ void wb_procom::receive(vext_sQMsg* msg, int size, pwr_tStatus* sts)
     key = ftok(m_key, 0);
 
     m_msgrcvid = msgget((key_t)key, 0666 | IPC_CREAT);
-    if (m_msgrcvid == -1) {
+    if (m_msgrcvid == -1)
+    {
       *sts = LDH__MSGGET;
       return;
     }
     m_msgsndid = msgget((key_t)(key + 1), 0666 | IPC_CREAT);
-    if (m_msgsndid == -1) {
+    if (m_msgsndid == -1)
+    {
       *sts = LDH__MSGGET;
       return;
     }
     m_connected = 1;
   }
 
-  if (msgrcv(m_msgrcvid, (void*)msg, size, 0, 0) == -1) {
+  if (msgrcv(m_msgrcvid, (void*)msg, size, 0, 0) == -1)
+  {
     *sts = LDH__MSGRCV;
     return;
   }
   *sts = LDH__SUCCESS;
 }
 
-void wb_procom::provideObject(pwr_tStatus sts, pwr_tOix oix, pwr_tOix fthoix,
-    pwr_tOix bwsoix, pwr_tOix fwsoix, pwr_tOix fchoix, pwr_tOix lchoix,
-    pwr_tCid cid, const char* name, const char* longname)
+void wb_procom::provideObject(pwr_tStatus sts, pwr_tOix oix, pwr_tOix fthoix, pwr_tOix bwsoix,
+                              pwr_tOix fwsoix, pwr_tOix fchoix, pwr_tOix lchoix, pwr_tCid cid,
+                              const char* name, const char* longname)
 {
   vext_sAMsg amsg;
   pwr_tStatus asts;
@@ -115,7 +123,8 @@ void wb_procom::provideObject(pwr_tStatus sts, pwr_tOix oix, pwr_tOix fthoix,
   amsg.Object.fchoix = fchoix;
   amsg.Object.lchoix = lchoix;
   amsg.Object.cid = cid;
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     strcpy(amsg.Object.name, name);
     strcpy(amsg.Object.longname, longname);
   }
@@ -151,7 +160,8 @@ void wb_procom::provideStatus(pwr_tStatus sts)
 
 void wb_procom::dispatch(vext_sQMsg* qmsg)
 {
-  switch (qmsg->Any.Type) {
+  switch (qmsg->Any.Type)
+  {
   case vext_eMsgType_Object:
     // printf( "Object\n");
     m_provider->object(this);
@@ -170,19 +180,17 @@ void wb_procom::dispatch(vext_sQMsg* qmsg)
     break;
   case vext_eMsgType_CreateObject:
     // printf( "CreateObject %s\n", qmsg->CreateObject.Name);
-    m_provider->createObject(this, qmsg->CreateObject.DestOix,
-        qmsg->CreateObject.DestType, qmsg->CreateObject.Cid,
-        qmsg->CreateObject.Name);
+    m_provider->createObject(this, qmsg->CreateObject.DestOix, qmsg->CreateObject.DestType,
+                             qmsg->CreateObject.Cid, qmsg->CreateObject.Name);
     break;
   case vext_eMsgType_MoveObject:
     // printf( "MoveObject %d\n", qmsg->Oid.Oix);
-    m_provider->moveObject(this, qmsg->MoveObject.Oix, qmsg->MoveObject.DestOix,
-        qmsg->MoveObject.DestType);
+    m_provider->moveObject(this, qmsg->MoveObject.Oix, qmsg->MoveObject.DestOix, qmsg->MoveObject.DestType);
     break;
   case vext_eMsgType_CopyObject:
     // printf( "CopyObject %d\n", qmsg->Oid.Oix);
-    m_provider->copyObject(this, qmsg->CopyObject.Oix, qmsg->CopyObject.DestOix,
-        qmsg->CopyObject.DestType, qmsg->CopyObject.Name);
+    m_provider->copyObject(this, qmsg->CopyObject.Oix, qmsg->CopyObject.DestOix, qmsg->CopyObject.DestType,
+                           qmsg->CopyObject.Name);
     break;
   case vext_eMsgType_DeleteObject:
     // printf( "DeleteObject %d\n", qmsg->Oid.Oix);
@@ -194,13 +202,12 @@ void wb_procom::dispatch(vext_sQMsg* qmsg)
     break;
   case vext_eMsgType_RenameObject:
     // printf( "RenameObject %d\n", qmsg->Oid.Oix);
-    m_provider->renameObject(
-        this, qmsg->RenameObject.Oix, qmsg->RenameObject.Name);
+    m_provider->renameObject(this, qmsg->RenameObject.Oix, qmsg->RenameObject.Name);
     break;
   case vext_eMsgType_WriteAttr:
     // printf( "WriteAttr %d\n", qmsg->Oid.Oix);
-    m_provider->writeAttribute(this, qmsg->WriteAttr.Oix,
-        qmsg->WriteAttr.Offset, qmsg->WriteAttr.Size, qmsg->WriteAttr.Buffer);
+    m_provider->writeAttribute(this, qmsg->WriteAttr.Oix, qmsg->WriteAttr.Offset, qmsg->WriteAttr.Size,
+                               qmsg->WriteAttr.Buffer);
     break;
   case vext_eMsgType_Commit:
     // printf( "Commit\n");
@@ -214,15 +221,13 @@ void wb_procom::dispatch(vext_sQMsg* qmsg)
   }
 }
 
-int wb_procom::lmsgsnd(
-    int msgid, const void* msg_ptr, size_t msg_sz, int msgflg)
+int wb_procom::lmsgsnd(int msgid, const void* msg_ptr, size_t msg_sz, int msgflg)
 {
   dispatch((vext_sQMsg*)msg_ptr);
   return 0;
 }
 
-int wb_procom::lmsgrcv(
-    int msgid, const void* msg_ptr, size_t msg_sz, int msgtype, int msgflg)
+int wb_procom::lmsgrcv(int msgid, const void* msg_ptr, size_t msg_sz, int msgtype, int msgflg)
 {
   memcpy((void*)msg_ptr, &m_msg, sizeof(m_msg));
   return 0;
@@ -233,7 +238,8 @@ void wb_procom::mainloop()
   vext_sQMsg qmsg;
   pwr_tStatus sts;
 
-  for (;;) {
+  for (;;)
+  {
     receive(&qmsg, sizeof(qmsg), &sts);
     dispatch(&qmsg);
   }

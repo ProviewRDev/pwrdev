@@ -55,12 +55,14 @@ class SubGraphs;
 
 /* ge.h -- Simple graphic editor */
 
-typedef enum {
+typedef enum
+{
   ge_mOption_EnableComment = 1 << 0,
   ge_mOption_IgnoreJournal = 1 << 1
 } ge_mOption;
 
-typedef struct {
+typedef struct
+{
   char name[40];
   char prev[40];
 } ge_tPrevPage;
@@ -72,7 +74,8 @@ class CoWow;
 class Attr;
 class GeDyn;
 
-class Ge {
+class Ge
+{
 public:
   void* parent_ctx;
   char name[80];
@@ -112,8 +115,7 @@ public:
   Attr* layernav;
   void (*close_cb)(void*);
 
-  Ge(void* parent_ctx, ldh_tSesContext ldhses, int exit_when_close,
-      unsigned int x_options);
+  Ge(void* parent_ctx, ldh_tSesContext ldhses, int exit_when_close, unsigned int x_options);
   virtual ~Ge();
   void open(char* name);
   void save(char* name);
@@ -121,58 +123,31 @@ public:
   int command(char* cmd);
   void message(pwr_tStatus sts);
 
-  virtual void set_title(char* title)
+  virtual void set_title(char* title) {}
+  virtual void open_input_dialog(const char* text, const char* title, const char* init_text,
+                                 void (*india_ok_cb)(Ge*, char*))
   {
   }
-  virtual void open_input_dialog(const char* text, const char* title,
-      const char* init_text, void (*india_ok_cb)(Ge*, char*))
-  {
-  }
-  virtual void message(char severity, const char* message)
-  {
-  }
-  virtual void pop()
-  {
-  }
-  virtual void status_msg(char* pos_str)
-  {
-  }
-  virtual void open_yesnodia(const char* text, const char* title,
-      void (*yes_cb)(Ge*), void (*no_cb)(Ge*))
-  {
-  }
-  virtual void set_prompt(const char* prompt)
-  {
-  }
-  virtual void subgraphs_new()
-  {
-  }
-  virtual void update()
-  {
-  }
-  virtual int get_plant_select(char* name, int size)
+  virtual void message(char severity, const char* message) {}
+  virtual void pop() {}
+  virtual void status_msg(char* pos_str) {}
+  virtual void open_yesnodia(const char* text, const char* title, void (*yes_cb)(Ge*), void (*no_cb)(Ge*)) {}
+  virtual void set_prompt(const char* prompt) {}
+  virtual void subgraphs_new() {}
+  virtual void update() {}
+  virtual int get_plant_select(char* name, int size) { return 0; }
+  virtual void* create_list(const char* title, const char* texts, void(action_cb)(void*, char*, int),
+                            void(cancel_cb)(void*), void* ctx)
   {
     return 0;
   }
-  virtual void* create_list(const char* title, const char* texts,
-      void(action_cb)(void*, char*, int), void(cancel_cb)(void*), void* ctx)
+  virtual int create_modal_dialog(const char* title, const char* text, const char* button1,
+                                  const char* button2, const char* button3, const char* image)
   {
     return 0;
   }
-  virtual int create_modal_dialog(const char* title, const char* text,
-      const char* button1, const char* button2, const char* button3,
-      const char* image)
-  {
-    return 0;
-  }
-  virtual void plant_del(void* plantctx)
-  {
-  }
-  virtual int plant_get_select(
-      void* plantctx, pwr_sAttrRef* attrref, int* is_attr)
-  {
-    return 0;
-  }
+  virtual void plant_del(void* plantctx) {}
+  virtual int plant_get_select(void* plantctx, pwr_sAttrRef* attrref, int* is_attr) { return 0; }
 
   void set_title();
   void prevtable_insert(char* name, char* prev);
@@ -324,8 +299,7 @@ public:
 
   static int get_plant_select_cb(void* ge_ctx, char* select_name, int size);
   static void refresh_objects_cb(void* ge_ctx, unsigned int type);
-  static void customcolors_selected_cb(
-      void* ctx, char* filename, wow_eFileSelType file_type);
+  static void customcolors_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type);
   static void customcolors_write_cb(Ge* gectx, char* name);
   static void load_graph_cb(void* ge_ctx, char* name);
   static void save_graph(Ge* gectx, char* name);
@@ -346,16 +320,16 @@ public:
   static void export_script(Ge* gectx, char* filename);
   static void rotate(Ge* gectx, char* value_str);
   static int subpalette_get_select(void* gectx, char* text, char* filename);
-  static void colorpalette_get_current(void* gectx, glow_eDrawType* fill_color,
-      glow_eDrawType* border_color, glow_eDrawType* text_color);
-  static void colorpalette_set_current(void* gectx, glow_eDrawType fill_color,
-      glow_eDrawType border_color, glow_eDrawType text_color);
+  static void colorpalette_get_current(void* gectx, glow_eDrawType* fill_color, glow_eDrawType* border_color,
+                                       glow_eDrawType* text_color);
+  static void colorpalette_set_current(void* gectx, glow_eDrawType fill_color, glow_eDrawType border_color,
+                                       glow_eDrawType text_color);
   static void colorpalette_get_current_tone(void* gectx, glow_eDrawType* tone);
   static void colorpalette_set_current_tone(void* gectx, glow_eDrawType tone);
   static void update_colorpalette(void* gectx);
   static void subgraphs_close_cb(SubGraphs* subgraphs);
   static void status_msg(void* ge_ctx, double x, double y);
-  static int command_cb(void* ge_ctx, char* command, char* script, char *scriptargs);
+  static int command_cb(void* ge_ctx, char* command, char* script, char* scriptargs);
   static void open_list_cb(void* ctx, char* text, int ok_pressed);
   static void open_cancel_cb(void* ctx);
   static int sort_files(const void* file1, const void* file2);
@@ -368,31 +342,24 @@ public:
   static int set_focus_cb(void* ctx, void* component);
   static void message_cb(void* ctx, char severity, const char* message);
   static void help_cb(void* ctx, char* topic, char* helpfile);
-  static int create_modal_dialog_cb(void* ge_ctx, const char* title,
-      const char* text, const char* button1, const char* button2,
-      const char* button3, const char* image);
+  static int create_modal_dialog_cb(void* ge_ctx, const char* title, const char* text, const char* button1,
+                                    const char* button2, const char* button3, const char* image);
   static void search_object_cb(void* ge_ctx, void* data, char* name);
-  static void graph_get_object_list_cb(void* g, unsigned int type,
-      grow_tObject** list, int* list_cnt, grow_tObject* parent, int parent_cnt);
+  static void graph_get_object_list_cb(void* g, unsigned int type, grow_tObject** list, int* list_cnt,
+                                       grow_tObject* parent, int parent_cnt);
   static void graph_attr_store_cb(void* g, grow_tObject object);
-  static int graph_attr_recall_cb(
-      void* g, grow_tObject object, int idx, GeDyn** old_dyn);
+  static int graph_attr_recall_cb(void* g, grow_tObject object, int idx, GeDyn** old_dyn);
   static int graph_get_plant_select_cb(void* g, char* value, int size);
-  static int graph_get_current_colors_cb(void* g, glow_eDrawType* fill_color,
-      glow_eDrawType* border_color, glow_eDrawType* text_color);
-  static int graph_get_current_color_tone_cb(
-      void* g, glow_eDrawType* color_tone);
-  static int graph_reconfigure_attr_cb(void* g, grow_tObject object,
-      attr_sItem** itemlist, int* itemlist_cnt, void** client_data);
+  static int graph_get_current_colors_cb(void* g, glow_eDrawType* fill_color, glow_eDrawType* border_color,
+                                         glow_eDrawType* text_color);
+  static int graph_get_current_color_tone_cb(void* g, glow_eDrawType* color_tone);
+  static int graph_reconfigure_attr_cb(void* g, grow_tObject object, attr_sItem** itemlist, int* itemlist_cnt,
+                                       void** client_data);
   static int graph_attr_set_data_cb(void* g, grow_tObject object, GeDyn* data);
-  static int graph_get_dyn_info_cb(
-      void* g, GeDyn* dyn, attr_sItem** itemlist, int* itemlist_cnt);
-  static int graph_get_subgraph_info_cb(
-      void* g, char* name, attr_sItem** itemlist, int* itemlist_cnt);
-  static void graph_attr_close_cb(
-      void* g, void* attrctx, grow_tObject o, void* info, int keep);
-  static void graph_attr_redraw_cb(
-      void* g, void* attrctx, grow_tObject o, void* info);
+  static int graph_get_dyn_info_cb(void* g, GeDyn* dyn, attr_sItem** itemlist, int* itemlist_cnt);
+  static int graph_get_subgraph_info_cb(void* g, char* name, attr_sItem** itemlist, int* itemlist_cnt);
+  static void graph_attr_close_cb(void* g, void* attrctx, grow_tObject o, void* info, int keep);
+  static void graph_attr_redraw_cb(void* g, void* attrctx, grow_tObject o, void* info);
   static void find_ge_cb(void* g, char* object, void* utility);
 };
 

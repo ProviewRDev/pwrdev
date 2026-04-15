@@ -68,7 +68,8 @@ static int copyBufferData(void* itp, qdb_sBuffer* bp, int offs, int size)
   pwr_Assert(bp != NULL);
   pwr_Assert(bp->c.type == qdb_eBuffer_base);
 
-  if (offs < bp->b.seg_size) {
+  if (offs < bp->b.seg_size)
+  {
     len = MIN(bp->b.seg_size - offs, size);
     fp = (char*)(bp + 1);
     fp += offs;
@@ -76,15 +77,19 @@ static int copyBufferData(void* itp, qdb_sBuffer* bp, int offs, int size)
     tp += len;
     size -= len;
     offs = 0;
-  } else {
+  }
+  else
+  {
     offs -= bp->b.size;
   }
 
   for (/* copy all segments, if segmented */
-      sl = pool_Qsucc(NULL, &qdb->pool, &bp->b.seg_lh);
-      sl != &bp->b.seg_lh && size > 0; sl = pool_Qsucc(NULL, &qdb->pool, sl)) {
+       sl = pool_Qsucc(NULL, &qdb->pool, &bp->b.seg_lh); sl != &bp->b.seg_lh && size > 0;
+       sl = pool_Qsucc(NULL, &qdb->pool, sl))
+  {
     sp = pool_Qitem(sl, qdb_sBuffer, s.seg_ll);
-    if (offs < sp->s.size) {
+    if (offs < sp->s.size)
+    {
       len = MIN(sp->s.size - offs, size);
       fp = (char*)(sp + 1);
       fp += offs;
@@ -92,7 +97,9 @@ static int copyBufferData(void* itp, qdb_sBuffer* bp, int offs, int size)
       tp += len;
       size -= len;
       offs = 0;
-    } else {
+    }
+    else
+    {
       offs -= sp->s.size;
     }
   }
@@ -125,8 +132,8 @@ static qdb_sInit* evaluateInit(qdb_sInit* ip)
      (a minimal system that need to extend the pool heavily) is
      600k + 255*300k = 146.5Mb.  */
 
-  ip->pool_isize = ip->nodes * sizeof(qdb_sNode) + ip->queues * sizeof(qdb_sQue)
-      + ip->appls * sizeof(qdb_sAppl);
+  ip->pool_isize =
+      ip->nodes * sizeof(qdb_sNode) + ip->queues * sizeof(qdb_sQue) + ip->appls * sizeof(qdb_sAppl);
 
   ip->pool_isize = MAX(ip->pool_isize, qdb_cMin_pool_isize);
   ip->pool_esize = ip->pool_isize / 2;
@@ -177,7 +184,8 @@ qdb_sAppl* qdb_AddAppl(pwr_tStatus* status, pwr_tBoolean system)
 
   qdb_AssumeLocked;
 
-  if (!system) {
+  if (!system)
+  {
     ap = hash_Search(sts, &qdb->aix_ht, &qdb->my_aix);
     if (ap != NULL)
       pwr_Return(NULL, sts, QDB__DUPLADD);
@@ -192,7 +200,8 @@ qdb_sAppl* qdb_AddAppl(pwr_tStatus* status, pwr_tBoolean system)
   pool_Qinit(NULL, &qdb->pool, &ap->out_lh);
   pool_Qinit(NULL, &qdb->pool, &ap->que_lh);
 
-  if (!system) {
+  if (!system)
+  {
     ap->aid = qdb->my_aid;
     ap->pid = qdb->my_pid;
 
@@ -203,7 +212,9 @@ qdb_sAppl* qdb_AddAppl(pwr_tStatus* status, pwr_tBoolean system)
     ap = hash_Insert(sts, &qdb->pid_ht, ap);
     if (ap == NULL)
       errh_Bugcheck(QCOM__WEIRD, "adding new application identifier");
-  } else {
+  }
+  else
+  {
     strcpy(ap->name, "pwr_system");
   }
 
@@ -220,7 +231,8 @@ qdb_sNode* qdb_AddNode(pwr_tStatus* status, pwr_tUInt32 nid, pwr_tBitMask flags)
   qdb_AssumeLocked;
 
   np = hash_Search(sts, &qdb->nid_ht, &nid);
-  if (np != NULL) {
+  if (np != NULL)
+  {
     if (flags & qdb_mAdd_failIfAdded)
       pwr_Return(NULL, sts, QDB__DUPLADD);
     else
@@ -321,7 +333,8 @@ qdb_sQbond* qdb_GetBond(pwr_tStatus* sts, qdb_sQue* sq, qdb_sQue* tq)
   qdb_AssumeLocked;
 
   for (bol = pool_Qsucc(NULL, &qdb->pool, &sq->tgt_lh); bol != &sq->tgt_lh;
-       bol = pool_Qsucc(NULL, &qdb->pool, bol)) {
+       bol = pool_Qsucc(NULL, &qdb->pool, bol))
+  {
     bop = pool_Qitem(bol, qdb_sQbond, tgt_ll);
     if (bop->tgtQix == tq->qix)
       return bop;
@@ -332,8 +345,7 @@ qdb_sQbond* qdb_GetBond(pwr_tStatus* sts, qdb_sQue* sq, qdb_sQue* tq)
 
 /* Allocate a buffer from the pool.  */
 
-qdb_sBuffer* qdb_Alloc(
-    pwr_tStatus* status, qdb_eBuffer btype, unsigned int size)
+qdb_sBuffer* qdb_Alloc(pwr_tStatus* status, qdb_eBuffer btype, unsigned int size)
 {
   qdb_sBuffer* bp;
   pwr_dStatus(sts, status, QCOM__SUCCESS);
@@ -349,7 +361,8 @@ qdb_sBuffer* qdb_Alloc(
 
   bp->c.type = btype;
 
-  switch (btype) {
+  switch (btype)
+  {
   case qdb_eBuffer_segment:
     bp->s.size = size;
     pool_QinsertPred(sts, &qdb->pool, &bp->c.ll, &qdb->ap->out_lh);
@@ -403,24 +416,31 @@ qdb_sBuffer* qdb_Deque(pwr_tStatus* status, qdb_sQue* qp, int tmo)
 
   qdb_AssumeLocked;
 
-  if (qp->flags.b.reply) {
+  if (qp->flags.b.reply)
+  {
     q_head = &qp->rep_lh;
     /* remove all buffers not matching current rid */
-    for (bl = pool_Qsucc(NULL, &qdb->pool, q_head); bl != q_head;) {
+    for (bl = pool_Qsucc(NULL, &qdb->pool, q_head); bl != q_head;)
+    {
       bp = pool_Qitem(bl, qdb_sBuffer, c.ll);
       bl = pool_Qsucc(NULL, &qdb->pool, bl);
-      if (bp->b.info.rid != qp->rid) {
+      if (bp->b.info.rid != qp->rid)
+      {
         qdb_Free(sts, bp);
         qp->in_lc--;
       }
     }
   }
 
-  if (pool_QisEmpty(sts, &qdb->pool, q_head)) {
-    if (tmo == qcom_cTmoNone) {
+  if (pool_QisEmpty(sts, &qdb->pool, q_head))
+  {
+    if (tmo == qcom_cTmoNone)
+    {
       *sts = QCOM__QEMPTY;
       return NULL;
-    } else if (!qos_WaitQue(sts, qp, tmo)) {
+    }
+    else if (!qos_WaitQue(sts, qp, tmo))
+    {
       return NULL;
     }
   }
@@ -440,21 +460,28 @@ pwr_tBoolean qdb_Enque(pwr_tStatus* status, qdb_sBuffer* bp, qdb_sQue* qp)
 
   qdb_AssumeLocked;
 
-  if (qp->in_quota && qp->in_lc >= qp->in_quota) {
+  if (qp->in_quota && qp->in_lc >= qp->in_quota)
+  {
     *status = QDB__QUOTAEXCEEDED;
     return 0;
   }
 
   pool_Qremove(sts, &qdb->pool, &bp->c.ll);
-  if (!bp->c.flags.b.remote && bp->c.flags.b.reply) {
-    if (qp->flags.b.reply && bp->b.info.rid == qp->rid) {
+  if (!bp->c.flags.b.remote && bp->c.flags.b.reply)
+  {
+    if (qp->flags.b.reply && bp->b.info.rid == qp->rid)
+    {
       pool_QinsertPred(sts, &qdb->pool, &bp->c.ll, &qp->rep_lh);
       qp->in_lc++;
       qos_SignalQue(sts, qp);
-    } else {
+    }
+    else
+    {
       qdb_Free(NULL, bp);
     }
-  } else {
+  }
+  else
+  {
     pool_QinsertPred(sts, &qdb->pool, &bp->c.ll, &qp->in_lh);
     qp->in_lc++;
     qos_SignalQue(sts, qp);
@@ -481,15 +508,16 @@ void qdb_Free(pwr_tStatus* status, qdb_sBuffer* bp)
 
   // printf( "qdb_Free  %u %ld\n", bp, pool_Reference(sts,&qdb->pool,bp));
 
-  switch (bp->c.type) {
+  switch (bp->c.type)
+  {
   case qdb_eBuffer_base:
     if (pool_QisLinked(sts, &qdb->pool, &bp->c.ll))
       pool_Qremove(sts, &qdb->pool, &bp->c.ll);
     if (pool_QisLinked(sts, &qdb->pool, &bp->b.ref_lh))
       break; /* buffer is still referenced by other buffers */
-    for (/* remove all segments, if segmented */
-        sl = pool_Qsucc(NULL, &qdb->pool, &bp->b.seg_lh);
-        sl != &bp->b.seg_lh;) {
+    for (    /* remove all segments, if segmented */
+         sl = pool_Qsucc(NULL, &qdb->pool, &bp->b.seg_lh); sl != &bp->b.seg_lh;)
+    {
       sbp = pool_Qitem(sl, qdb_sBuffer, s.seg_ll);
       sl = pool_Qsucc(NULL, &qdb->pool, sl);
       pool_Qremove(sts, &qdb->pool, &sbp->s.seg_ll);
@@ -503,8 +531,8 @@ void qdb_Free(pwr_tStatus* status, qdb_sBuffer* bp)
     if (pool_QisLinked(sts, &qdb->pool, &bp->r.ref_ll))
       pool_Qremove(sts, &qdb->pool, &bp->r.ref_ll);
     bbp = pool_Address(sts, &qdb->pool, bp->r.src);
-    if (!pool_QisLinked(sts, &qdb->pool, &bbp->b.ref_lh)
-        && !pool_QisLinked(sts, &qdb->pool, &bbp->c.ll)) {
+    if (!pool_QisLinked(sts, &qdb->pool, &bbp->b.ref_lh) && !pool_QisLinked(sts, &qdb->pool, &bbp->c.ll))
+    {
       qdb_Free(sts, bbp);
     }
     pool_Free(sts, &qdb->pool, bp);
@@ -565,8 +593,7 @@ qdb_sLocal* qdb_CreateDb(pwr_tStatus* status, qdb_sInit* ip)
 
   /* Create lock section.  */
 
-  sp = sect_Alloc(sts, &created, &qdb->lock, sizeof(sect_sMutex),
-      qdb_cNameDbLock, sect_mFlags_Create);
+  sp = sect_Alloc(sts, &created, &qdb->lock, sizeof(sect_sMutex), qdb_cNameDbLock, sect_mFlags_Create);
   if (sp == NULL)
     errh_Bugcheck(*sts, "creating db lock");
   if (!created)
@@ -576,13 +603,11 @@ qdb_sLocal* qdb_CreateDb(pwr_tStatus* status, qdb_sInit* ip)
 
   ip = evaluateInit(ip);
 
-  pp = pool_Create(
-      sts, &qdb->pool, qdb_cNamePool, ip->pool_isize, ip->pool_esize);
+  pp = pool_Create(sts, &qdb->pool, qdb_cNamePool, ip->pool_isize, ip->pool_esize);
   if (sp == NULL)
     errh_Bugcheck(*sts, "initating pool");
 
-  qdb->g = pool_AllocNamedSegment(
-      sts, &qdb->pool, sizeof(*qdb->g), qdb_cNameDatabase);
+  qdb->g = pool_AllocNamedSegment(sts, &qdb->pool, sizeof(*qdb->g), qdb_cNameDatabase);
   if (qdb->g == NULL)
     errh_Bugcheck(*sts, "database directory");
 
@@ -626,19 +651,17 @@ qdb_sLocal* qdb_CreateDb(pwr_tStatus* status, qdb_sInit* ip)
 
     /* Hash tables.  */
 
-    hash_Init(&qdb->g->qix_ht, ip->queues, sizeof(qcom_tQix), sizeof(qdb_sQue),
-        offsetof(qdb_sQue, qix), offsetof(qdb_sQue, qix_htl), hash_eKey_qix);
+    hash_Init(&qdb->g->qix_ht, ip->queues, sizeof(qcom_tQix), sizeof(qdb_sQue), offsetof(qdb_sQue, qix),
+              offsetof(qdb_sQue, qix_htl), hash_eKey_qix);
 
-    hash_Init(&qdb->g->nid_ht, ip->nodes, sizeof(pwr_tNodeId),
-        sizeof(qdb_sNode), offsetof(qdb_sNode, nid),
-        offsetof(qdb_sNode, nid_htl), hash_eKey_nid);
+    hash_Init(&qdb->g->nid_ht, ip->nodes, sizeof(pwr_tNodeId), sizeof(qdb_sNode), offsetof(qdb_sNode, nid),
+              offsetof(qdb_sNode, nid_htl), hash_eKey_nid);
 
-    hash_Init(&qdb->g->pid_ht, ip->appls, sizeof(pid_t), sizeof(qdb_sAppl),
-        offsetof(qdb_sAppl, pid), offsetof(qdb_sAppl, pid_htl), hash_eKey_pid);
+    hash_Init(&qdb->g->pid_ht, ip->appls, sizeof(pid_t), sizeof(qdb_sAppl), offsetof(qdb_sAppl, pid),
+              offsetof(qdb_sAppl, pid_htl), hash_eKey_pid);
 
-    hash_Init(&qdb->g->aix_ht, ip->appls, sizeof(qcom_tAix), sizeof(qdb_sAppl),
-        offsetof(qdb_sAppl, aid.aix), offsetof(qdb_sAppl, aix_htl),
-        hash_eKey_pid);
+    hash_Init(&qdb->g->aix_ht, ip->appls, sizeof(qcom_tAix), sizeof(qdb_sAppl), offsetof(qdb_sAppl, aid.aix),
+              offsetof(qdb_sAppl, aix_htl), hash_eKey_pid);
 
     lp = mapLocalDb(sts);
     if (lp == NULL)
@@ -701,7 +724,8 @@ static void unlinkPool(const char* name)
   sprintf(segname, "%s_%.3s", name, busid);
 
   fd = open(segname, flags, mode);
-  if (fd != -1) {
+  if (fd != -1)
+  {
     close(fd);
 
     key = ftok(segname, 'P');
@@ -709,7 +733,8 @@ static void unlinkPool(const char* name)
     shmctl(shm_id, IPC_RMID, &ds);
     unlink(segname);
 
-    for (i = 1; TRUE; i++) {
+    for (i = 1; TRUE; i++)
+    {
       sprintf(segname, "%.11s%4.4x_%.3s", name, i, busid);
       fd = open(segname, flags, mode);
 
@@ -777,8 +802,7 @@ qdb_sLocal* qdb_MapDb(pwr_tStatus* status)
 
   /* Map lock sections.  */
 
-  sp = sect_Alloc(
-      sts, &created, &qdb->lock, sizeof(sect_sMutex), qdb_cNameDbLock, 0);
+  sp = sect_Alloc(sts, &created, &qdb->lock, sizeof(sect_sMutex), qdb_cNameDbLock, 0);
   if (sp == NULL)
     errh_Bugcheck(*sts, "mapping db lock");
   if (created)
@@ -796,8 +820,7 @@ qdb_sLocal* qdb_MapDb(pwr_tStatus* status)
   if (pp == NULL)
     errh_Bugcheck(*sts, "initating pool");
 
-  qdb->g = pool_AllocNamedSegment(
-      sts, &qdb->pool, sizeof(*qdb->g), qdb_cNameDatabase);
+  qdb->g = pool_AllocNamedSegment(sts, &qdb->pool, sizeof(*qdb->g), qdb_cNameDatabase);
   if (qdb->g == NULL)
     errh_Bugcheck(*sts, "database directory");
 
@@ -817,8 +840,7 @@ qdb_sLocal* qdb_MapDb(pwr_tStatus* status)
   return qdb;
 }
 
-qdb_sBuffer* qdb_Get(pwr_tStatus* status, qdb_sQue* qp, int tmo, qcom_sGet* gp,
-    pwr_tBitMask flags)
+qdb_sBuffer* qdb_Get(pwr_tStatus* status, qdb_sQue* qp, int tmo, qcom_sGet* gp, pwr_tBitMask flags)
 {
   pwr_tStatus csts;
   qdb_sBuffer* bp;
@@ -838,8 +860,8 @@ qdb_sBuffer* qdb_Get(pwr_tStatus* status, qdb_sQue* qp, int tmo, qcom_sGet* gp,
   if (bp == NULL)
     return NULL;
 
-  if (bp->c.type == qdb_eBuffer_reference
-      && pool_QhasOne(sts, &qdb->pool, &bp->r.ref_ll)) {
+  if (bp->c.type == qdb_eBuffer_reference && pool_QhasOne(sts, &qdb->pool, &bp->r.ref_ll))
+  {
     /* we are the last reader, move base buffer to this que */
 
     sbp = pool_Address(sts, &qdb->pool, bp->r.src);
@@ -852,8 +874,10 @@ qdb_sBuffer* qdb_Get(pwr_tStatus* status, qdb_sQue* qp, int tmo, qcom_sGet* gp,
     bp = sbp;
   }
 
-  if (gp == NULL || gp->data == NULL) {
-    if (bp->c.type == qdb_eBuffer_reference) {
+  if (gp == NULL || gp->data == NULL)
+  {
+    if (bp->c.type == qdb_eBuffer_reference)
+    {
       sbp = pool_Address(sts, &qdb->pool, bp->r.src);
       nbp = qdb_CopyBuffer(&csts, sbp);
 
@@ -864,8 +888,9 @@ qdb_sBuffer* qdb_Get(pwr_tStatus* status, qdb_sQue* qp, int tmo, qcom_sGet* gp,
       qdb_Free(sts, bp);
 
       bp = nbp;
-
-    } else if (bp->c.flags.b.segmented) {
+    }
+    else if (bp->c.flags.b.segmented)
+    {
       nbp = qdb_CopyBuffer(&csts, bp);
 
       pool_Qremove(NULL, &qdb->pool, &nbp->c.ll);
@@ -878,8 +903,10 @@ qdb_sBuffer* qdb_Get(pwr_tStatus* status, qdb_sQue* qp, int tmo, qcom_sGet* gp,
     }
   }
 
-  if (gp != NULL) {
-    switch (bp->c.type) {
+  if (gp != NULL)
+  {
+    switch (bp->c.type)
+    {
     case qdb_eBuffer_base:
       qdb_GetInfo(gp, bp);
       break;
@@ -949,7 +976,8 @@ void qdb_Put(pwr_tStatus* status, qdb_sBuffer* bp, qdb_sQue* qp)
 
   qdb_AssumeLocked;
 
-  switch (qp->type) {
+  switch (qp->type)
+  {
   case qdb_eQue_private:
     qdb_Enque(sts, bp, qp);
     break;
@@ -958,8 +986,9 @@ void qdb_Put(pwr_tStatus* status, qdb_sBuffer* bp, qdb_sQue* qp)
       bp->c.flags.b.broadcast = 1;
 
     for (/* all bound queues */
-        bol = pool_Qsucc(NULL, &qdb->pool, &qp->tgt_lh); bol != &qp->tgt_lh;
-        bol = pool_Qsucc(NULL, &qdb->pool, bol)) {
+         bol = pool_Qsucc(NULL, &qdb->pool, &qp->tgt_lh); bol != &qp->tgt_lh;
+         bol = pool_Qsucc(NULL, &qdb->pool, bol))
+    {
       bop = pool_Qitem(bol, qdb_sQbond, tgt_ll);
       fqp = pool_Address(NULL, &qdb->pool, bop->tgtQ);
 
@@ -971,10 +1000,13 @@ void qdb_Put(pwr_tStatus* status, qdb_sBuffer* bp, qdb_sQue* qp)
       rbp->r.src = pool_ItemReference(sts, &qdb->pool, bp);
       qdb_Enque(sts, rbp, fqp);
     }
-    if (pool_QisLinked(sts, &qdb->pool, &bp->b.ref_lh)) {
+    if (pool_QisLinked(sts, &qdb->pool, &bp->b.ref_lh))
+    {
       /* buffer is forwarded, put base buffer in forward que */
       qdb_Enque(sts, bp, qp);
-    } else {
+    }
+    else
+    {
       /* buffer is not forwarded, throw it */
       qdb_Free(sts, bp);
     }
@@ -998,7 +1030,8 @@ void qdb_RemoveAppl(pwr_tStatus* status, qdb_sAppl* ap)
   qdb_ApplEvent(NULL, ap, qcom_eStype_applDisconnect);
 
   for (/* for all qwned queues */
-      ql = pool_Qsucc(NULL, &qdb->pool, &ap->que_lh); ql != &ap->que_lh;) {
+       ql = pool_Qsucc(NULL, &qdb->pool, &ap->que_lh); ql != &ap->que_lh;)
+  {
     qp = pool_Qitem(ql, qdb_sQue, que_ll);
     ql = pool_Qsucc(NULL, &qdb->pool, ql);
     qdb_RemoveQue(sts, qp);
@@ -1009,7 +1042,8 @@ void qdb_RemoveAppl(pwr_tStatus* status, qdb_sAppl* ap)
   pool_Qremove(sts, &qdb->pool, &ap->appl_ll);
 
   for (/* free all buffers allocated to be sent */
-      bl = pool_Qsucc(NULL, &qdb->pool, &ap->out_lh); bl != &ap->out_lh;) {
+       bl = pool_Qsucc(NULL, &qdb->pool, &ap->out_lh); bl != &ap->out_lh;)
+  {
     bp = pool_Qitem(bl, qdb_sBuffer, c.ll);
     bl = pool_Qsucc(NULL, &qdb->pool, bl);
     qdb_Free(sts, bp);
@@ -1018,8 +1052,8 @@ void qdb_RemoveAppl(pwr_tStatus* status, qdb_sAppl* ap)
   pool_Free(sts, &qdb->pool, ap);
 }
 
-void* qdb_Request(pwr_tStatus* status, qdb_sBuffer* pbp, qdb_sQue* pqp,
-    qdb_sQue* gqp, int tmo, qcom_sGet* gp, pwr_tBitMask flags)
+void* qdb_Request(pwr_tStatus* status, qdb_sBuffer* pbp, qdb_sQue* pqp, qdb_sQue* gqp, int tmo, qcom_sGet* gp,
+                  pwr_tBitMask flags)
 {
   qdb_sBuffer* gbp = NULL;
   qcom_tRid rid;
@@ -1030,11 +1064,13 @@ void* qdb_Request(pwr_tStatus* status, qdb_sBuffer* pbp, qdb_sQue* pqp,
 
   qdb_AssumeLocked;
 
-  if (tmo < 0) {
+  if (tmo < 0)
+  {
     pwr_Return(NULL, sts, QCOM__HIGHTMO);
   }
 
-  if (pqp->type != qdb_eQue_private) {
+  if (pqp->type != qdb_eQue_private)
+  {
     qdb_Free(NULL, pbp);
     pwr_Return(NULL, sts, QCOM__QTYPE);
   }
@@ -1050,7 +1086,8 @@ void* qdb_Request(pwr_tStatus* status, qdb_sBuffer* pbp, qdb_sQue* pqp,
   if (!pbp->c.flags.b.remote)
     return gbp;
 
-  if (gbp != NULL && EVEN(gbp->b.info.status)) {
+  if (gbp != NULL && EVEN(gbp->b.info.status))
+  {
     *sts = gbp->b.info.status;
     qdb_Free(NULL, gbp);
     gbp = NULL;
@@ -1070,12 +1107,15 @@ qdb_sQue* qdb_AddQue(pwr_tStatus* status, qcom_tQix qix)
 
   qdb_AssumeLocked;
 
-  if (qix != qcom_cNQix) {
+  if (qix != qcom_cNQix)
+  {
     /* Make sure queue does not exist.  */
     qp = hash_Search(sts, &qdb->qix_ht, &qix);
     if (qp != NULL)
       pwr_Return(NULL, sts, QCOM__QALLREXIST);
-  } else {
+  }
+  else
+  {
     if (qdb->g->qid.qix == qdb_cQix_ReservedMin)
       qdb->g->qid.qix = qdb_cQix_ReservedMax + 1;
     qix = qdb->g->qid.qix++;
@@ -1161,8 +1201,7 @@ void qdb_Eput(pwr_tStatus* status, qdb_sQue* ep)
 
 /* .  */
 
-void qdb_PutInfo(
-    qdb_sBuffer* bp, qcom_sPut* pp, const qcom_sQid* receiver, qcom_tRid rid)
+void qdb_PutInfo(qdb_sBuffer* bp, qcom_sPut* pp, const qcom_sQid* receiver, qcom_tRid rid)
 {
   qdb_sInfo* ip = &bp->b.info;
 
@@ -1186,21 +1225,24 @@ pwr_tBoolean qdb_RemoveQue(pwr_tStatus* status, qdb_sQue* qp)
   qdb_AssumeLocked;
 
   for (/* free all buffers to be read */
-      bl = pool_Qsucc(NULL, &qdb->pool, &qp->in_lh); bl != &qp->in_lh;) {
+       bl = pool_Qsucc(NULL, &qdb->pool, &qp->in_lh); bl != &qp->in_lh;)
+  {
     bp = pool_Qitem(bl, qdb_sBuffer, c.ll);
     bl = pool_Qsucc(NULL, &qdb->pool, bl);
     qdb_Free(sts, bp);
   }
 
   for (/* free all buffers allready read */
-      bl = pool_Qsucc(NULL, &qdb->pool, &qp->read_lh); bl != &qp->read_lh;) {
+       bl = pool_Qsucc(NULL, &qdb->pool, &qp->read_lh); bl != &qp->read_lh;)
+  {
     bp = pool_Qitem(bl, qdb_sBuffer, c.ll);
     bl = pool_Qsucc(NULL, &qdb->pool, bl);
     qdb_Free(sts, bp);
   }
 
   for (/* unbind from all source queues */
-      qbl = pool_Qsucc(NULL, &qdb->pool, &qp->src_lh); qbl != &qp->src_lh;) {
+       qbl = pool_Qsucc(NULL, &qdb->pool, &qp->src_lh); qbl != &qp->src_lh;)
+  {
     qbp = pool_Qitem(qbl, qdb_sQbond, src_ll);
     qbl = pool_Qsucc(NULL, &qdb->pool, qbl);
     pool_Qremove(sts, &qdb->pool, &qbp->src_ll);
@@ -1209,7 +1251,8 @@ pwr_tBoolean qdb_RemoveQue(pwr_tStatus* status, qdb_sQue* qp)
   }
 
   for (/* unbind from all target queues */
-      qbl = pool_Qsucc(NULL, &qdb->pool, &qp->tgt_lh); qbl != &qp->tgt_lh;) {
+       qbl = pool_Qsucc(NULL, &qdb->pool, &qp->tgt_lh); qbl != &qp->tgt_lh;)
+  {
     qbp = pool_Qitem(bl, qdb_sQbond, tgt_ll);
     qbl = pool_Qsucc(NULL, &qdb->pool, qbl);
     pool_Qremove(sts, &qdb->pool, &qbp->tgt_ll);
@@ -1218,7 +1261,7 @@ pwr_tBoolean qdb_RemoveQue(pwr_tStatus* status, qdb_sQue* qp)
   }
 
   for (/* unlink all event queues linked eve_lh */
-      qbl = pool_Qsucc(NULL, &qdb->pool, &qp->eve_lh); qbl->self != qbl->flink;)
+       qbl = pool_Qsucc(NULL, &qdb->pool, &qp->eve_lh); qbl->self != qbl->flink;)
     pool_Qremove(sts, &qdb->pool, qbl);
 
   /* unlink que from own_ll */
@@ -1298,7 +1341,8 @@ qdb_sQue* qdb_Que(pwr_tStatus* status, const qcom_sQid* qid, qdb_sNode** onp)
   if (q.pwr.nid == pwr_cNNodeId && q.pwr.qix != qcom_cNQix)
     q.pwr.nid = qdb->my_nid;
 
-  if (q.pwr.nid != pwr_cNNodeId && q.pwr.nid != qdb->g->nid) {
+  if (q.pwr.nid != pwr_cNNodeId && q.pwr.nid != qdb->g->nid)
+  {
     if (onp == NULL)
       pwr_Return(NULL, sts, QCOM__QNOTLOCAL);
 
@@ -1314,7 +1358,9 @@ qdb_sQue* qdb_Que(pwr_tStatus* status, const qcom_sQid* qid, qdb_sNode** onp)
     qp = qdb->exportque;
     if (qp == NULL)
       pwr_Return(NULL, sts, QCOM__NOEXPORT);
-  } else {
+  }
+  else
+  {
     np = qdb->my_node;
     qp = hash_Search(sts, &qdb->qix_ht, &q.pwr.qix);
     if (qp == NULL)
@@ -1336,14 +1382,18 @@ pwr_tBoolean qdb_Signal(pwr_tStatus* status, qdb_sQue* ep)
 
   qdb_AssumeLocked;
 
-  for (ql = pool_Qsucc(NULL, &qdb->pool, &ep->eve_lh); ql != &ep->eve_lh;) {
+  for (ql = pool_Qsucc(NULL, &qdb->pool, &ep->eve_lh); ql != &ep->eve_lh;)
+  {
     qp = pool_Qitem(ql, qdb_sQue, eve_ll);
     ql = pool_Qsucc(NULL, &qdb->pool, ql);
 
-    if (qp->or_event) {
+    if (qp->or_event)
+    {
       if (!(qp->mask & ep->mask))
         continue;
-    } else {
+    }
+    else
+    {
       if ((qp->mask & ep->mask) != qp->mask)
         continue;
     }

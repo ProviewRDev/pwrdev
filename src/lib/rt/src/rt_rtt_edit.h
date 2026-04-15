@@ -56,7 +56,8 @@
 #define DTT_MENUITEM_FILESPEC 17
 #define DTT_MENUITEM_COMMANDHOLD 18
 
-typedef struct {
+typedef struct
+{
   int number;
   char text[80];
   char type[80];
@@ -74,7 +75,8 @@ typedef struct {
   int y;
 } dtt_t_upd_item, *dtt_item;
 
-typedef struct {
+typedef struct
+{
   unsigned long ctx_type;
   void* parent_ctx;
   char title[80];
@@ -91,22 +93,24 @@ typedef struct {
   int display_mode;
 } dtt_t_edit_ctx, *edit_ctx;
 
-typedef struct {
+typedef struct
+{
   char key[80];
   int idx;
   edit_ctx ctx;
 } dtt_t_store_ctx;
 
-typedef struct {
+typedef struct
+{
   int key;
   menu_ctx ctx;
 } dtt_t_store_menuctx;
 
 int dtt_initialize();
 
-int dtt_edit_new(menu_ctx parent_ctx, unsigned long arg1, unsigned long arg2,
-    unsigned long index, unsigned long arg4);
+int dtt_edit_new(menu_ctx parent_ctx, unsigned long arg1, unsigned long arg2, unsigned long index,
+                 unsigned long arg4);
 
-int dtt_menu_new(menu_ctx parent_ctx, rtt_t_menu** menu_p, char* title,
-    unsigned long userdata, unsigned long flag);
+int dtt_menu_new(menu_ctx parent_ctx, rtt_t_menu** menu_p, char* title, unsigned long userdata,
+                 unsigned long flag);
 int dtt_start(char* programname);

@@ -39,7 +39,8 @@
 
 #include "wb_wnav_selformat.h"
 
-typedef struct {
+typedef struct
+{
   const char* TypeStr;
   pwr_eType Type;
   pwr_tInt16 Size;
@@ -49,26 +50,27 @@ static int wnav_type_to_string(pwr_eType type, char* type_buf, int* size)
 {
   int i;
 
-  static const wnav_sTypeStr type_table[]
-      = { { "Boolean", pwr_eType_Boolean, sizeof(pwr_tBoolean) },
-          { "Float32", pwr_eType_Float32, sizeof(pwr_tFloat32) },
-          { "Float64", pwr_eType_Float64, sizeof(pwr_tFloat64) },
-          { "Char", pwr_eType_Char, sizeof(pwr_tChar) },
-          { "Int8", pwr_eType_Int8, sizeof(pwr_tInt8) },
-          { "Int16", pwr_eType_Int16, sizeof(pwr_tInt16) },
-          { "Int32", pwr_eType_Int32, sizeof(pwr_tInt32) },
-          { "Int64", pwr_eType_Int64, sizeof(pwr_tInt64) },
-          { "UInt8", pwr_eType_UInt8, sizeof(pwr_tUInt8) },
-          { "UInt16", pwr_eType_UInt16, sizeof(pwr_tUInt16) },
-          { "UInt32", pwr_eType_UInt32, sizeof(pwr_tUInt32) },
-          { "UInt64", pwr_eType_UInt64, sizeof(pwr_tUInt64) },
-          { "Objid", pwr_eType_Objid, sizeof(pwr_tObjid) },
-          { "Time", pwr_eType_Time, sizeof(pwr_tTime) },
-          { "DeltaTime", pwr_eType_DeltaTime, sizeof(pwr_tDeltaTime) },
-          { "AttrRef", pwr_eType_AttrRef, sizeof(pwr_sAttrRef) } };
+  static const wnav_sTypeStr type_table[] = {{"Boolean", pwr_eType_Boolean, sizeof(pwr_tBoolean)},
+                                             {"Float32", pwr_eType_Float32, sizeof(pwr_tFloat32)},
+                                             {"Float64", pwr_eType_Float64, sizeof(pwr_tFloat64)},
+                                             {"Char", pwr_eType_Char, sizeof(pwr_tChar)},
+                                             {"Int8", pwr_eType_Int8, sizeof(pwr_tInt8)},
+                                             {"Int16", pwr_eType_Int16, sizeof(pwr_tInt16)},
+                                             {"Int32", pwr_eType_Int32, sizeof(pwr_tInt32)},
+                                             {"Int64", pwr_eType_Int64, sizeof(pwr_tInt64)},
+                                             {"UInt8", pwr_eType_UInt8, sizeof(pwr_tUInt8)},
+                                             {"UInt16", pwr_eType_UInt16, sizeof(pwr_tUInt16)},
+                                             {"UInt32", pwr_eType_UInt32, sizeof(pwr_tUInt32)},
+                                             {"UInt64", pwr_eType_UInt64, sizeof(pwr_tUInt64)},
+                                             {"Objid", pwr_eType_Objid, sizeof(pwr_tObjid)},
+                                             {"Time", pwr_eType_Time, sizeof(pwr_tTime)},
+                                             {"DeltaTime", pwr_eType_DeltaTime, sizeof(pwr_tDeltaTime)},
+                                             {"AttrRef", pwr_eType_AttrRef, sizeof(pwr_sAttrRef)}};
 
-  for (i = 0; i < int(sizeof(type_table) / sizeof(type_table[0])); i++) {
-    if (type_table[i].Type == type) {
+  for (i = 0; i < int(sizeof(type_table) / sizeof(type_table[0])); i++)
+  {
+    if (type_table[i].Type == type)
+    {
       strcpy(type_buf, type_table[i].TypeStr);
       if (size)
         *size = type_table[i].Size;
@@ -76,7 +78,8 @@ static int wnav_type_to_string(pwr_eType type, char* type_buf, int* size)
     }
   }
 
-  if (type == pwr_eType_String) {
+  if (type == pwr_eType_String)
+  {
     strcpy(type_buf, "String");
     if (size)
       *size = 1; /* This is not the real size */
@@ -85,9 +88,9 @@ static int wnav_type_to_string(pwr_eType type, char* type_buf, int* size)
   return 0;
 }
 
-pwr_tBoolean wnav_format_selection(ldh_tSesContext ldhses, pwr_sAttrRef attrref,
-    pwr_tBoolean is_class, pwr_tBoolean is_attr, int select_syntax,
-    int select_volume, int select_attr, int select_type, char* buff)
+pwr_tBoolean wnav_format_selection(ldh_tSesContext ldhses, pwr_sAttrRef attrref, pwr_tBoolean is_class,
+                                   pwr_tBoolean is_attr, int select_syntax, int select_volume,
+                                   int select_attr, int select_type, char* buff)
 {
   pwr_sAttrRef aref;
   int ret_len, size, sts;
@@ -108,30 +111,33 @@ pwr_tBoolean wnav_format_selection(ldh_tSesContext ldhses, pwr_sAttrRef attrref,
   else
     lses = ldhses;
 
-  if (select_syntax == wnav_eSelectionMode_Extern && !select_attr) {
-    sts = ldh_ObjidToName(
-        ldhses, object, ldh_eName_Objid, name, sizeof(name), &ret_len);
+  if (select_syntax == wnav_eSelectionMode_Extern && !select_attr)
+  {
+    sts = ldh_ObjidToName(ldhses, object, ldh_eName_Objid, name, sizeof(name), &ret_len);
     if (EVEN(sts))
       return FALSE;
 
     strcpy(buff, name);
     return TRUE;
-  } else if (select_syntax == wnav_eSelectionMode_Extern) {
-    sts = ldh_ObjidToName(
-        lses, object, ldh_eName_Default, name, sizeof(name), &ret_len);
+  }
+  else if (select_syntax == wnav_eSelectionMode_Extern)
+  {
+    sts = ldh_ObjidToName(lses, object, ldh_eName_Default, name, sizeof(name), &ret_len);
     if (EVEN(sts))
       return FALSE;
-  } else if (select_volume) {
-    sts = ldh_AttrRefToName(lses, &attrref,
-        cdh_mName_volume | cdh_mName_object | cdh_mName_attribute, &name_p,
-        &ret_len);
+  }
+  else if (select_volume)
+  {
+    sts = ldh_AttrRefToName(lses, &attrref, cdh_mName_volume | cdh_mName_object | cdh_mName_attribute,
+                            &name_p, &ret_len);
     if (EVEN(sts))
       return FALSE;
     strcpy(name, name_p);
-  } else {
-    sts = ldh_AttrRefToName(lses, &attrref,
-        cdh_mName_path | cdh_mName_object | cdh_mName_attribute, &name_p,
-        &ret_len);
+  }
+  else
+  {
+    sts = ldh_AttrRefToName(lses, &attrref, cdh_mName_path | cdh_mName_object | cdh_mName_attribute, &name_p,
+                            &ret_len);
     if (EVEN(sts))
       return FALSE;
 
@@ -147,16 +153,17 @@ pwr_tBoolean wnav_format_selection(ldh_tSesContext ldhses, pwr_sAttrRef attrref,
   // Fetch and add attribute name if necessary
 
   aref = attrref;
-  if (select_attr && !is_class) {
+  if (select_attr && !is_class)
+  {
     sts = ldh_GetAttrRefTid(lses, &attrref, &classid);
     if (EVEN(sts))
       return FALSE;
 
-    if (!is_attr || (cdh_tidIsCid(classid) && !attrref.Flags.b.Array)) {
+    if (!is_attr || (cdh_tidIsCid(classid) && !attrref.Flags.b.Array))
+    {
       // Get the debugparameter if there is one, else add ActualValue
 
-      sts = ldh_GetClassBody(lses, classid, "GraphPlcNode", &body_class,
-          (char**)&graph_body, &size);
+      sts = ldh_GetClassBody(lses, classid, "GraphPlcNode", &body_class, (char**)&graph_body, &size);
       if (ODD(sts))
         strcpy(attr_name, graph_body->debugpar);
       else
@@ -167,14 +174,15 @@ pwr_tBoolean wnav_format_selection(ldh_tSesContext ldhses, pwr_sAttrRef attrref,
 
       // Check if attribute exists
       sts = ldh_NameToAttrRef(lses, name, &aref);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         sts = ldh_GetAttrRefTid(lses, &aref, &classid);
         if (EVEN(sts))
           return FALSE;
 
-        if (select_syntax == wnav_eSelectionMode_Extern) {
-          sts = ldh_AttrRefToName(
-              lses, &aref, ldh_eName_ArefExport, &name_ptr, &ret_len);
+        if (select_syntax == wnav_eSelectionMode_Extern)
+        {
+          sts = ldh_AttrRefToName(lses, &aref, ldh_eName_ArefExport, &name_ptr, &ret_len);
           if (EVEN(sts))
             return FALSE;
           strcpy(buff, name_ptr);
@@ -185,17 +193,19 @@ pwr_tBoolean wnav_format_selection(ldh_tSesContext ldhses, pwr_sAttrRef attrref,
       strcat(buff, attr_name);
     }
 
-    if (select_type && !cdh_tidIsCid(classid)) {
+    if (select_type && !cdh_tidIsCid(classid))
+    {
       ldh_sAttrRefInfo info;
       int idx = 0;
 
       ldh_GetAttrRefInfo(lses, &aref, &info);
-      if (ODD(sts) && wnav_type_to_string(info.type, type_buff, NULL)) {
+      if (ODD(sts) && wnav_type_to_string(info.type, type_buff, NULL))
+      {
         char num[8];
         bool hasIndex = false;
 
-        if (buff[strlen(buff) - 1] == ']' && (p2 = strrchr(buff, '['))
-            && sscanf(p2 + 1, "%d", &idx) == 1) {
+        if (buff[strlen(buff) - 1] == ']' && (p2 = strrchr(buff, '[')) && sscanf(p2 + 1, "%d", &idx) == 1)
+        {
           hasIndex = true;
           *p2 = 0;
 
@@ -204,7 +214,8 @@ pwr_tBoolean wnav_format_selection(ldh_tSesContext ldhses, pwr_sAttrRef attrref,
           if (ODD(sts))
             sts = ldh_GetAttrRefInfo(lses, &aref, &info);
         }
-        if (info.type == pwr_eType_String) {
+        if (info.type == pwr_eType_String)
+        {
           sprintf(num, "%d", info.size / info.nElement);
           strcat(type_buff, num);
         }
@@ -212,15 +223,19 @@ pwr_tBoolean wnav_format_selection(ldh_tSesContext ldhses, pwr_sAttrRef attrref,
         strcat(buff, type_buff);
 
         // Check if array
-        if (hasIndex) {
+        if (hasIndex)
+        {
           sprintf(&buff[strlen(buff)], "#%d[%d]", info.nElement, idx);
-        } else if (info.nElement > 1) {
+        }
+        else if (info.nElement > 1)
+        {
           sprintf(&buff[strlen(buff)], "#%d", info.nElement);
         }
       }
     }
   }
-  if (select_syntax == wnav_eSelectionMode_Extern && select_attr) {
+  if (select_syntax == wnav_eSelectionMode_Extern && select_attr)
+  {
     sts = ldh_NameToAttrRef(lses, buff, &aref);
     if (EVEN(sts))
       return FALSE;

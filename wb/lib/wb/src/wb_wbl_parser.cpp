@@ -45,7 +45,8 @@
 #define WS " 	"
 #define WSEOL "$ 	"
 
-typedef enum {
+typedef enum
+{
   eState_StartDelim,
   eState_StartDelimFound,
   eState_InToken,
@@ -60,8 +61,7 @@ void wbl_ast_node::setText(char* t)
 }
 
 wb_wbl_parser::wb_wbl_parser()
-    : m_line_cnt(0), m_state(0), m_tree(0), m_current(0), m_object_level(0),
-      m_buffer_level(0)
+    : m_line_cnt(0), m_state(0), m_tree(0), m_current(0), m_object_level(0), m_buffer_level(0)
 {
 }
 
@@ -73,8 +73,7 @@ wb_wbl_parser::~wb_wbl_parser()
 
 void wb_wbl_parser::print_error(wb_error_str& e)
 {
-  std::cout << "** Error " << m_fname << " line " << m_line_cnt << ", "
-            << e.what() << '\n';
+  std::cout << "** Error " << m_fname << " line " << m_line_cnt << ", " << e.what() << '\n';
 }
 
 void wb_wbl_parser::print()
@@ -91,7 +90,8 @@ void wb_wbl_parser::print_node(wbl_ast_node* n, int level)
   for (int i = 0; i < level; i++)
     printf(" ");
   printf("%d %s\n", n->token, n->text);
-  for (nc = n->fch; nc; nc = nc->fws) {
+  for (nc = n->fch; nc; nc = nc->fws)
+  {
     print_node(nc, level + 1);
   }
 }
@@ -99,27 +99,31 @@ void wb_wbl_parser::print_node(wbl_ast_node* n, int level)
 //
 // Return 1 if token is found, 0 if no more token is found.
 //
-int wb_wbl_parser::next_token(std::ifstream& is, char* line,
-    const char* start_delim, const char* end_delim, wbl_eToken type,
-    char** start, unsigned int* len, int* allocated)
+int wb_wbl_parser::next_token(std::ifstream& is, char* line, const char* start_delim, const char* end_delim,
+                              wbl_eToken type, char** start, unsigned int* len, int* allocated)
 {
   char *s, *token = NULL;
   const char* d;
   int state = eState_StartDelim;
   bool in_string = false;
 
-  for (s = line; *s; s++) {
-    if (in_string) {
+  for (s = line; *s; s++)
+  {
+    if (in_string)
+    {
       if (*s == '\"' && *(s - 1) != '\\')
         in_string = false;
       else
         continue;
     }
 
-    switch (state) {
+    switch (state)
+    {
     case eState_StartDelim:
-      for (d = start_delim; *d; d++) {
-        if (*s == *d) {
+      for (d = start_delim; *d; d++)
+      {
+        if (*s == *d)
+        {
           state = eState_StartDelimFound;
           break;
         }
@@ -127,15 +131,19 @@ int wb_wbl_parser::next_token(std::ifstream& is, char* line,
       if (state != eState_StartDelimFound)
         throw wb_error_str("Unexpected end of token");
       break;
-    case eState_StartDelimFound: {
+    case eState_StartDelimFound:
+    {
       bool found = false;
-      for (d = start_delim; *d; d++) {
-        if (*s == *d) {
+      for (d = start_delim; *d; d++)
+      {
+        if (*s == *d)
+        {
           found = true;
           break;
         }
       }
-      if (!found) {
+      if (!found)
+      {
         state = eState_InToken;
         token = s;
 
@@ -145,11 +153,16 @@ int wb_wbl_parser::next_token(std::ifstream& is, char* line,
       break;
     }
     case eState_InToken:
-      for (d = end_delim; *d; d++) {
-        if (*s == *d) {
-          if (type == wbl_eToken_Date && *s == ' ' && (s - token) < 14) {
+      for (d = end_delim; *d; d++)
+      {
+        if (*s == *d)
+        {
+          if (type == wbl_eToken_Date && *s == ' ' && (s - token) < 14)
+          {
             // Space in date is Ok
-          } else {
+          }
+          else
+          {
             state = eState_EndDelimFound;
             break;
           }
@@ -161,9 +174,12 @@ int wb_wbl_parser::next_token(std::ifstream& is, char* line,
       break;
   }
 
-  if (*s == 0 && state == eState_InToken) {
-    for (d = end_delim; *d; d++) {
-      if (*d == '$') {
+  if (*s == 0 && state == eState_InToken)
+  {
+    for (d = end_delim; *d; d++)
+    {
+      if (*d == '$')
+      {
         state = eState_EndDelimFound;
         break;
       }
@@ -177,7 +193,8 @@ int wb_wbl_parser::next_token(std::ifstream& is, char* line,
 
   *allocated = 0;
 
-  if (in_string) {
+  if (in_string)
+  {
     // Find end of string on next lines
     bool found = false;
     char c, cold;
@@ -185,8 +202,10 @@ int wb_wbl_parser::next_token(std::ifstream& is, char* line,
     // Get size of string
     std::streampos fend, fstart = is.tellg();
     cold = 0;
-    while (is.get(c)) {
-      if (c == '\"' && cold != '\\') {
+    while (is.get(c))
+    {
+      if (c == '\"' && cold != '\\')
+      {
         fend = is.tellg();
         found = true;
         break;
@@ -207,7 +226,8 @@ int wb_wbl_parser::next_token(std::ifstream& is, char* line,
     m_line_cnt++;
     cold = 0;
     int i = s - token + 1;
-    while (is.get(c)) {
+    while (is.get(c))
+    {
       tp[i] = c;
       i++;
       if (c == '\"' && cold != '\\')
@@ -219,7 +239,8 @@ int wb_wbl_parser::next_token(std::ifstream& is, char* line,
     tp[size] = 0;
 
     // Read to end of line
-    while (is.get(c)) {
+    while (is.get(c))
+    {
       if (c == '\n')
         break;
     }
@@ -228,15 +249,16 @@ int wb_wbl_parser::next_token(std::ifstream& is, char* line,
     *allocated = 1;
     *start = tp;
     *len = size;
-  } else {
+  }
+  else
+  {
     *start = token;
     *len = s - token;
   }
   return 1;
 }
 
-int wb_wbl_parser::read_docblock(
-    std::ifstream& is, char* line, char** start, unsigned int* len)
+int wb_wbl_parser::read_docblock(std::ifstream& is, char* line, char** start, unsigned int* len)
 {
   bool found = false;
   char c, c1, c2;
@@ -244,8 +266,10 @@ int wb_wbl_parser::read_docblock(
 
   // Get size of docblock
   c1 = c2 = 0;
-  while (is.get(c)) {
-    if (c == '/' && c1 == '*' && c2 == '!') {
+  while (is.get(c))
+  {
+    if (c == '/' && c1 == '*' && c2 == '!')
+    {
       fend = is.tellg();
       found = true;
       break;
@@ -266,10 +290,12 @@ int wb_wbl_parser::read_docblock(
   m_line_cnt++;
   c1 = c2 = 0;
   int i = line_len + 1;
-  while (is.get(c)) {
+  while (is.get(c))
+  {
     tp[i] = c;
     i++;
-    if (c == '/' && c1 == '*' && c2 == '!') {
+    if (c == '/' && c1 == '*' && c2 == '!')
+    {
       m_state &= ~wbl_mState_InDocBlock;
       break;
     }
@@ -282,7 +308,8 @@ int wb_wbl_parser::read_docblock(
   // printf( "Docblock: %s\n", tp);
 
   // Read to end of line
-  while (is.get(c)) {
+  while (is.get(c))
+  {
     if (c == '\n')
       break;
   }
@@ -296,19 +323,22 @@ int wb_wbl_parser::read_docblock(
 
 void wb_wbl_parser::ast_node_insert_lch(wbl_ast_node* fth, wbl_ast_node* n)
 {
-  if (!fth->fch) {
+  if (!fth->fch)
+  {
     fth->fch = n;
     fth->lch = n;
     n->fth = fth;
-  } else {
+  }
+  else
+  {
     fth->lch->fws = n;
     fth->lch = n;
     n->fth = fth;
   }
 }
 
-wbl_ast_node* wb_wbl_parser::new_ast_node(wbl_eToken token, char* text,
-    unsigned int len, unsigned int line, int allocated)
+wbl_ast_node* wb_wbl_parser::new_ast_node(wbl_eToken token, char* text, unsigned int len, unsigned int line,
+                                          int allocated)
 {
   wbl_ast_node* n = (wbl_ast_node*)new wb_wblnode();
   if (!n)
@@ -316,7 +346,8 @@ wbl_ast_node* wb_wbl_parser::new_ast_node(wbl_eToken token, char* text,
 
   if (allocated)
     n->text = text;
-  else {
+  else
+  {
     n->text = (char*)malloc(len + 1);
     if (!n->text)
       throw wb_error_str("Out of memory");
@@ -339,10 +370,13 @@ void wb_wbl_parser::print_line()
 
 int wb_wbl_parser::check_operator(wbl_ast_node* n)
 {
-  if (streq(n->text, "=")) {
+  if (streq(n->text, "="))
+  {
     n->token = wbl_eToken_Operator_eq;
     return 1;
-  } else if (streq(n->text, "|=")) {
+  }
+  else if (streq(n->text, "|="))
+  {
     n->token = wbl_eToken_Operator_oreq;
     return 1;
   }
@@ -364,10 +398,12 @@ void wb_wbl_parser::parse(const char* filename)
   if (!is)
     throw wb_error_str("No such file");
 
-  while (is.getline(line, sizeof(line))) {
+  while (is.getline(line, sizeof(line)))
+  {
     m_line_cnt++;
 
-    if ((m_line_cnt % 1000) == 0 && m_line_cnt != last) {
+    if ((m_line_cnt % 1000) == 0 && m_line_cnt != last)
+    {
       print_line();
       last = m_line_cnt;
     }
@@ -377,7 +413,8 @@ void wb_wbl_parser::parse(const char* filename)
     if (streq(line, ""))
       continue;
 
-    if (str_StartsWith(line, "!/**")) {
+    if (str_StartsWith(line, "!/**"))
+    {
       if (m_state & wbl_mState_InDocBlock)
         throw wb_error_str("Already in documentation block");
       m_state |= wbl_mState_InDocBlock;
@@ -385,18 +422,21 @@ void wb_wbl_parser::parse(const char* filename)
       read_docblock(is, line, &token, &len);
       t1 = new_ast_node(wbl_eToken_DocBlock, token, len, m_line_cnt, 1);
       ast_node_insert_lch(m_current, t1);
-    } else if (line[0] == '!') {
+    }
+    else if (line[0] == '!')
+    {
       // Comment
       continue;
-    } else if (str_StartsWith(line, "Volume")) {
+    }
+    else if (str_StartsWith(line, "Volume"))
+    {
       if (m_state & wbl_mState_InVolume)
         throw wb_error_str("Volume already defined");
       if (m_tree)
         throw wb_error_str("Volume is not first");
       m_state |= wbl_mState_InVolume;
 
-      sts = next_token(
-          is, &line[6], WS, WS, wbl_eToken_Volume, &token, &len, &alloc);
+      sts = next_token(is, &line[6], WS, WS, wbl_eToken_Volume, &token, &len, &alloc);
       if (!sts)
         throw wb_error_str("Volume name is missing");
       t1 = new_ast_node(wbl_eToken_Volume, token, len, m_line_cnt, 0);
@@ -404,21 +444,21 @@ void wb_wbl_parser::parse(const char* filename)
       m_current = t1;
 
       // Volume class
-      sts = next_token(
-          is, token + len, WS, WS, wbl_eToken_Name, &token, &len, &alloc);
+      sts = next_token(is, token + len, WS, WS, wbl_eToken_Name, &token, &len, &alloc);
       if (!sts)
         throw wb_error_str("Volume class is missing");
       t2 = new_ast_node(wbl_eToken_Name, token, len, m_line_cnt, 0);
       ast_node_insert_lch(m_current, t2);
 
       // Volumeid
-      sts = next_token(
-          is, token + len, WS, WSEOL, wbl_eToken_Index, &token, &len, &alloc);
+      sts = next_token(is, token + len, WS, WSEOL, wbl_eToken_Index, &token, &len, &alloc);
       if (!sts)
         throw wb_error_str("Volume id is missing");
       t3 = new_ast_node(wbl_eToken_Index, token, len, m_line_cnt, 0);
       ast_node_insert_lch(m_current, t3);
-    } else if (str_StartsWith(line, "EndVolume")) {
+    }
+    else if (str_StartsWith(line, "EndVolume"))
+    {
       if (!(m_state & wbl_mState_InVolume))
         throw wb_error_str("Volume - EndVolume mismatch");
       if (m_state & wbl_mState_InBody)
@@ -426,19 +466,23 @@ void wb_wbl_parser::parse(const char* filename)
       if (m_state & wbl_mState_InObject)
         throw wb_error_str("Body not terminated");
       m_state &= ~wbl_mState_InVolume;
-    } else if (str_StartsWith(line, "SObject")) {
+    }
+    else if (str_StartsWith(line, "SObject"))
+    {
       if (m_state & wbl_mState_InSObject)
         throw wb_error_str("SObject already defined");
       m_state |= wbl_mState_InSObject;
 
       // SObject name
-      next_token(
-          is, &line[7], WS, WSEOL, wbl_eToken_Name, &token, &len, &alloc);
+      next_token(is, &line[7], WS, WSEOL, wbl_eToken_Name, &token, &len, &alloc);
       t1 = new_ast_node(wbl_eToken_SObject, token, len, m_line_cnt, 0);
-      if (!m_tree) {
+      if (!m_tree)
+      {
         m_tree = t1;
         m_current = t1;
-      } else {
+      }
+      else
+      {
         // Insert as last sibling to m_tree
         wbl_ast_node* n;
         for (n = m_tree; n->fws; n = n->fws)
@@ -446,7 +490,9 @@ void wb_wbl_parser::parse(const char* filename)
         n->fws = t1;
         m_current = t1;
       }
-    } else if (str_StartsWith(line, "EndSObject")) {
+    }
+    else if (str_StartsWith(line, "EndSObject"))
+    {
       if (!(m_state & wbl_mState_InSObject))
         throw wb_error_str("SObject - EndSObject mismatch");
       if (m_state & wbl_mState_InBody)
@@ -456,15 +502,16 @@ void wb_wbl_parser::parse(const char* filename)
       if (m_state & wbl_mState_InBuffer)
         throw wb_error_str("Buffer not terminated");
       m_state &= ~wbl_mState_InSObject;
-    } else if (str_StartsWith(line, "Object")) {
+    }
+    else if (str_StartsWith(line, "Object"))
+    {
       if (!(m_state & wbl_mState_InVolume || m_state & wbl_mState_InSObject))
         throw wb_error_str("Object defined outside volume");
       m_object_level++;
       m_state |= wbl_mState_InObject;
 
       // Object name
-      sts = next_token(
-          is, &line[6], WS, WS, wbl_eToken_Name, &token, &len, &alloc);
+      sts = next_token(is, &line[6], WS, WS, wbl_eToken_Name, &token, &len, &alloc);
       if (!sts)
         throw wb_error_str("Object syntax error");
       t1 = new_ast_node(wbl_eToken_Object, token, len, m_line_cnt, 0);
@@ -472,29 +519,31 @@ void wb_wbl_parser::parse(const char* filename)
       m_current = t1;
 
       // Object class
-      sts = next_token(
-          is, token + len, WS, WSEOL, wbl_eToken_Name, &token, &len, &alloc);
-      if (sts) {
+      sts = next_token(is, token + len, WS, WSEOL, wbl_eToken_Name, &token, &len, &alloc);
+      if (sts)
+      {
         t2 = new_ast_node(wbl_eToken_Name, token, len, m_line_cnt, 0);
         ast_node_insert_lch(m_current, t2);
       }
 
       // Object identity
-      sts = next_token(
-          is, token + len, WS, WSEOL, wbl_eToken_Index, &token, &len, &alloc);
-      if (sts) {
+      sts = next_token(is, token + len, WS, WSEOL, wbl_eToken_Index, &token, &len, &alloc);
+      if (sts)
+      {
         t3 = new_ast_node(wbl_eToken_Index, token, len, m_line_cnt, 0);
         ast_node_insert_lch(m_current, t3);
       }
 
       // Object time
-      sts = next_token(
-          is, token + len, WS, WSEOL, wbl_eToken_Date, &token, &len, &alloc);
-      if (sts) {
+      sts = next_token(is, token + len, WS, WSEOL, wbl_eToken_Date, &token, &len, &alloc);
+      if (sts)
+      {
         t4 = new_ast_node(wbl_eToken_Date, token, len, m_line_cnt, 0);
         ast_node_insert_lch(m_current, t4);
       }
-    } else if (str_StartsWith(line, "EndObject")) {
+    }
+    else if (str_StartsWith(line, "EndObject"))
+    {
       if (!(m_state & wbl_mState_InObject))
         throw wb_error_str("Object - EndObject mismatch");
       if (m_state & wbl_mState_InBody)
@@ -507,7 +556,9 @@ void wb_wbl_parser::parse(const char* filename)
       if (m_object_level == 0)
         m_state &= ~wbl_mState_InObject;
       m_current = m_current->fth;
-    } else if (str_StartsWith(line, "Body")) {
+    }
+    else if (str_StartsWith(line, "Body"))
+    {
       if (m_state & wbl_mState_InBody)
         throw wb_error_str("Body already defined");
       if (!(m_state & wbl_mState_InVolume || m_state & wbl_mState_InObject))
@@ -515,8 +566,7 @@ void wb_wbl_parser::parse(const char* filename)
       m_state |= wbl_mState_InBody;
 
       // Body name
-      sts = next_token(
-          is, &line[4], WS, WSEOL, wbl_eToken_Name, &token, &len, &alloc);
+      sts = next_token(is, &line[4], WS, WSEOL, wbl_eToken_Name, &token, &len, &alloc);
       if (!sts)
         throw wb_error_str("Body syntax error");
       t1 = new_ast_node(wbl_eToken_Body, token, len, m_line_cnt, 0);
@@ -524,18 +574,22 @@ void wb_wbl_parser::parse(const char* filename)
       m_current = t1;
 
       // Body time
-      sts = next_token(
-          is, token + len, WS, WSEOL, wbl_eToken_Date, &token, &len, &alloc);
-      if (sts) {
+      sts = next_token(is, token + len, WS, WSEOL, wbl_eToken_Date, &token, &len, &alloc);
+      if (sts)
+      {
         t2 = new_ast_node(wbl_eToken_Date, token, len, m_line_cnt, 0);
         ast_node_insert_lch(m_current, t2);
       }
-    } else if (str_StartsWith(line, "EndBody")) {
+    }
+    else if (str_StartsWith(line, "EndBody"))
+    {
       if (!(m_state & wbl_mState_InBody))
         throw wb_error_str("Body - EndBody mismatch");
       m_state &= ~wbl_mState_InBody;
       m_current = m_current->fth;
-    } else if (str_StartsWith(line, "Buffer")) {
+    }
+    else if (str_StartsWith(line, "Buffer"))
+    {
       if (!(m_state & wbl_mState_InBody))
         throw wb_error_str("Attr defined outside body");
       if (!(m_state & wbl_mState_InVolume || m_state & wbl_mState_InObject))
@@ -544,8 +598,7 @@ void wb_wbl_parser::parse(const char* filename)
       m_state |= wbl_mState_InBuffer;
 
       // Buffer name
-      sts = next_token(
-          is, &line[6], WS, WSEOL, wbl_eToken_Name, &token, &len, &alloc);
+      sts = next_token(is, &line[6], WS, WSEOL, wbl_eToken_Name, &token, &len, &alloc);
       if (!sts)
         throw wb_error_str("Buffer syntax error");
       t1 = new_ast_node(wbl_eToken_Buffer, token, len, m_line_cnt, 0);
@@ -553,26 +606,29 @@ void wb_wbl_parser::parse(const char* filename)
       m_current = t1;
 
       // Buffer time
-      sts = next_token(
-          is, token + len, WS, WSEOL, wbl_eToken_Date, &token, &len, &alloc);
-      if (sts) {
+      sts = next_token(is, token + len, WS, WSEOL, wbl_eToken_Date, &token, &len, &alloc);
+      if (sts)
+      {
         t2 = new_ast_node(wbl_eToken_Date, token, len, m_line_cnt, 0);
         ast_node_insert_lch(m_current, t2);
       }
-    } else if (str_StartsWith(line, "EndBuffer")) {
+    }
+    else if (str_StartsWith(line, "EndBuffer"))
+    {
       if (!(m_state & wbl_mState_InBuffer))
         throw wb_error_str("Buffer - EndBuffer mismatch");
       m_buffer_level--;
       if (m_buffer_level == 0)
         m_state &= ~wbl_mState_InBuffer;
       m_current = m_current->fth;
-    } else if (str_StartsWith(line, "Attr")) {
+    }
+    else if (str_StartsWith(line, "Attr"))
+    {
       if (!(m_state & wbl_mState_InBody))
         throw wb_error_str("Attr defined outside body");
 
       // Attr name
-      sts = next_token(
-          is, &line[4], WS, WS, wbl_eToken_Name, &token, &len, &alloc);
+      sts = next_token(is, &line[4], WS, WS, wbl_eToken_Name, &token, &len, &alloc);
       if (!sts)
         throw wb_error_str("Attr syntax error");
       t1 = new_ast_node(wbl_eToken_Attr, token, len, m_line_cnt, 0);
@@ -580,8 +636,7 @@ void wb_wbl_parser::parse(const char* filename)
       m_current = t1;
 
       // Attr operator
-      sts = next_token(
-          is, token + len, WS, WS, wbl_eToken_Operator, &token, &len, &alloc);
+      sts = next_token(is, token + len, WS, WS, wbl_eToken_Operator, &token, &len, &alloc);
       if (!sts)
         throw wb_error_str("Attr syntax error");
       t2 = new_ast_node(wbl_eToken_Operator, token, len, m_line_cnt, 0);
@@ -591,15 +646,16 @@ void wb_wbl_parser::parse(const char* filename)
       ast_node_insert_lch(m_current, t2);
 
       // Attr value
-      sts = next_token(is, token + len, WS "=", WSEOL, wbl_eToken_Value, &token,
-          &len, &alloc);
+      sts = next_token(is, token + len, WS "=", WSEOL, wbl_eToken_Value, &token, &len, &alloc);
       if (!sts)
         throw wb_error_str("Attr syntax error");
       t2 = new_ast_node(wbl_eToken_Value, token, len, m_line_cnt, alloc);
       ast_node_insert_lch(m_current, t2);
 
       m_current = m_current->fth;
-    } else {
+    }
+    else
+    {
       // Syntax error
       throw wb_error_str("Undefined token");
     }

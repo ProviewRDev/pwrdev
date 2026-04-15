@@ -47,29 +47,17 @@
 #include "cow_xhelp.h"
 #include "cow_logw.h"
 
-CoLogW::CoLogW(void* msg_parent_ctx, const char* logw_name, int l_show_item,
-    pwr_tStatus* status)
-    : parent_ctx(msg_parent_ctx), logwnav(NULL), size(0), max_size(500),
-      show_item(l_show_item), wow(0)
+CoLogW::CoLogW(void* msg_parent_ctx, const char* logw_name, int l_show_item, pwr_tStatus* status)
+    : parent_ctx(msg_parent_ctx), logwnav(NULL), size(0), max_size(500), show_item(l_show_item), wow(0)
 {
   *status = 1;
   strcpy(name, logw_name);
 }
 
-CoLogW::~CoLogW()
-{
-}
+CoLogW::~CoLogW() {}
 
-void CoLogW::print()
-{
-}
+void CoLogW::print() {}
 
-void CoLogW::show(char categories[][20], char* item)
-{
-  logwnav->show(categories, item);
-}
+void CoLogW::show(char categories[][20], char* item) { logwnav->show(categories, item); }
 
-void CoLogW::activate_print()
-{
-  print();
-}
+void CoLogW::activate_print() { print(); }

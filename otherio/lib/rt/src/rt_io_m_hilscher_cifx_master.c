@@ -68,12 +68,13 @@ static void get_diag(pwr_sClass_Hilscher_cifX_Diag* diag, CIFXHANDLE chan)
 
   CIFXHANDLE sysdevice = NULL;
   sts = xSysdeviceOpen(driver, CIFX_DEV, &sysdevice);
-  if (sts == CIFX_NO_ERROR) {
-    SYSTEM_CHANNEL_SYSTEM_STATUS_BLOCK statusblock = { 0 };
+  if (sts == CIFX_NO_ERROR)
+  {
+    SYSTEM_CHANNEL_SYSTEM_STATUS_BLOCK statusblock = {0};
 
-    sts = xSysdeviceInfo(sysdevice, CIFX_INFO_CMD_SYSTEM_STATUS_BLOCK,
-        sizeof(statusblock), &statusblock);
-    if (sts == CIFX_NO_ERROR) {
+    sts = xSysdeviceInfo(sysdevice, CIFX_INFO_CMD_SYSTEM_STATUS_BLOCK, sizeof(statusblock), &statusblock);
+    if (sts == CIFX_NO_ERROR)
+    {
       diag->SystemStatus = statusblock.ulSystemStatus;
       diag->SystemError = statusblock.ulSystemError;
       diag->TimeSinceStart.tv_sec = statusblock.ulTimeSinceStart;
@@ -81,28 +82,28 @@ static void get_diag(pwr_sClass_Hilscher_cifX_Diag* diag, CIFXHANDLE chan)
     }
   }
 
-  NETX_COMMON_STATUS_BLOCK csb = { 0 };
+  NETX_COMMON_STATUS_BLOCK csb = {0};
 
-  sts = xChannelCommonStatusBlock(
-      chan, CIFX_CMD_READ_DATA, 0, sizeof(csb), &csb);
-  if (sts == CIFX_NO_ERROR) {
+  sts = xChannelCommonStatusBlock(chan, CIFX_CMD_READ_DATA, 0, sizeof(csb), &csb);
+  if (sts == CIFX_NO_ERROR)
+  {
     diag->CommState = csb.ulCommunicationState;
     diag->CommError = csb.ulCommunicationError;
     diag->ErrorCount = csb.ulErrorCount;
-    diag->ConfigSlaves
-        = csb.uStackDepended.tMasterStatusBlock.ulNumOfConfigSlaves;
-    diag->ActiveSlaves
-        = csb.uStackDepended.tMasterStatusBlock.ulNumOfActiveSlaves;
+    diag->ConfigSlaves = csb.uStackDepended.tMasterStatusBlock.ulNumOfConfigSlaves;
+    diag->ActiveSlaves = csb.uStackDepended.tMasterStatusBlock.ulNumOfActiveSlaves;
     diag->SlaveState = csb.uStackDepended.tMasterStatusBlock.ulSlaveState;
   }
 
   sts = xChannelHostState(chan, CIFX_HOST_STATE_READ, &state, 0);
-  if (sts == CIFX_NO_ERROR) {
+  if (sts == CIFX_NO_ERROR)
+  {
     diag->HostState = state;
   }
 
   sts = xChannelBusState(chan, CIFX_BUS_STATE_GETSTATE, &state, 0);
-  if (sts == CIFX_NO_ERROR) {
+  if (sts == CIFX_NO_ERROR)
+  {
     diag->BusState = state;
   }
 }
@@ -111,14 +112,13 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 {
   io_sLocalHilscher_cifX_Master* local;
   int sts;
-  pwr_sClass_Hilscher_cifX_Master* op
-      = (pwr_sClass_Hilscher_cifX_Master*)ap->op;
+  pwr_sClass_Hilscher_cifX_Master* op = (pwr_sClass_Hilscher_cifX_Master*)ap->op;
 
-  local = (io_sLocalHilscher_cifX_Master*)calloc(
-      1, sizeof(io_sLocalHilscher_cifX_Master));
+  local = (io_sLocalHilscher_cifX_Master*)calloc(1, sizeof(io_sLocalHilscher_cifX_Master));
   ap->Local = local;
 
-  if (driver == 0) {
+  if (driver == 0)
+  {
     struct CIFX_LINUX_INIT init;
 
     memset(&init, 0, sizeof(init));
@@ -126,14 +126,16 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
     init.trace_level = 255;
 
     sts = cifXDriverInit(&init);
-    if (sts != CIFX_NO_ERROR) {
+    if (sts != CIFX_NO_ERROR)
+    {
       xDriverGetErrorDescription(sts, op->ErrorStr, sizeof(op->ErrorStr));
       op->Status = sts;
       return IO__INITFAIL;
     }
 
     sts = xDriverOpen(&driver);
-    if (sts != CIFX_NO_ERROR) {
+    if (sts != CIFX_NO_ERROR)
+    {
       xDriverGetErrorDescription(sts, op->ErrorStr, sizeof(op->ErrorStr));
       op->Status = sts;
       return IO__INITFAIL;
@@ -146,15 +148,17 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   boardinfo.lBoardError = 0;
   int found = 0;
 
-  while (xDriverEnumBoards(driver, board, sizeof(boardinfo), &boardinfo)
-      == CIFX_NO_ERROR) {
-    if (str_NoCaseStrcmp(boardinfo.abBoardAlias, op->Alias) == 0) {
+  while (xDriverEnumBoards(driver, board, sizeof(boardinfo), &boardinfo) == CIFX_NO_ERROR)
+  {
+    if (str_NoCaseStrcmp(boardinfo.abBoardAlias, op->Alias) == 0)
+    {
       found = 1;
       break;
     }
     board++;
   }
-  if (!found) {
+  if (!found)
+  {
     sprintf(op->ErrorStr, "Board with alias \"%s\" not found", op->Alias);
     return IO__INITFAIL;
   }
@@ -170,22 +174,21 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   local->chan = NULL;
 
   sts = xChannelOpen(NULL, CIFX_DEV, local->channel, &local->chan);
-  if (sts != CIFX_NO_ERROR) {
+  if (sts != CIFX_NO_ERROR)
+  {
     xDriverGetErrorDescription(sts, op->ErrorStr, sizeof(op->ErrorStr));
     op->Status = sts;
     return IO__INITFAIL;
   }
 
-  CHANNEL_INFORMATION channelinfo = { { 0 } };
-  sts = xDriverEnumChannels(
-      driver, board, local->channel, sizeof(channelinfo), &channelinfo);
-  if (sts == CIFX_NO_ERROR) {
-    strncpy(op->Diag.FirmwareName, (char*)channelinfo.abFWName,
-        sizeof(op->Diag.FirmwareName));
-    snprintf(op->Diag.FirmwareVersion, sizeof(op->Diag.FirmwareVersion),
-        "%u.%u.%u-%u (%4u-%02hu-%02hu)", channelinfo.usFWMajor,
-        channelinfo.usFWMinor, channelinfo.usFWBuild, channelinfo.usFWRevision,
-        channelinfo.usFWYear, channelinfo.bFWMonth, channelinfo.bFWDay);
+  CHANNEL_INFORMATION channelinfo = {{0}};
+  sts = xDriverEnumChannels(driver, board, local->channel, sizeof(channelinfo), &channelinfo);
+  if (sts == CIFX_NO_ERROR)
+  {
+    strncpy(op->Diag.FirmwareName, (char*)channelinfo.abFWName, sizeof(op->Diag.FirmwareName));
+    snprintf(op->Diag.FirmwareVersion, sizeof(op->Diag.FirmwareVersion), "%u.%u.%u-%u (%4u-%02hu-%02hu)",
+             channelinfo.usFWMajor, channelinfo.usFWMinor, channelinfo.usFWBuild, channelinfo.usFWRevision,
+             channelinfo.usFWYear, channelinfo.bFWMonth, channelinfo.bFWDay);
   }
 
   // Init the I/O area
@@ -196,17 +199,18 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   io_sRack* rp;
   io_sCard* cp;
 
-  for (rp = ap->racklist; rp; rp = rp->next) {
+  for (rp = ap->racklist; rp; rp = rp->next)
+  {
     rp->Local = calloc(1, sizeof(io_sLocalHilscher_cifX_Device));
 
     rp->MethodDisabled = 1;
 
     // Show device offset and size
-    if (rp->Class == pwr_cClass_Hilscher_cifX_Device && rp->op) {
-      ((pwr_sClass_Hilscher_cifX_Device*)rp->op)->InputAreaOffset
-          = input_area_offset + input_area_chansize;
-      ((pwr_sClass_Hilscher_cifX_Device*)rp->op)->OutputAreaOffset
-          = output_area_offset + output_area_chansize;
+    if (rp->Class == pwr_cClass_Hilscher_cifX_Device && rp->op)
+    {
+      ((pwr_sClass_Hilscher_cifX_Device*)rp->op)->InputAreaOffset = input_area_offset + input_area_chansize;
+      ((pwr_sClass_Hilscher_cifX_Device*)rp->op)->OutputAreaOffset =
+          output_area_offset + output_area_chansize;
     }
 
     // Get byte ordering
@@ -217,46 +221,46 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
     strcat(name, ".ByteOrdering");
     sts = gdh_GetObjectInfo(name, &byte_ordering, sizeof(byte_ordering));
     if (ODD(sts))
-      ((io_sLocalHilscher_cifX_Device*)rp->Local)->byte_ordering
-          = byte_ordering;
+      ((io_sLocalHilscher_cifX_Device*)rp->Local)->byte_ordering = byte_ordering;
     else
-      ((io_sLocalHilscher_cifX_Device*)rp->Local)->byte_ordering
-          = pwr_eByteOrderingEnum_LittleEndian;
+      ((io_sLocalHilscher_cifX_Device*)rp->Local)->byte_ordering = pwr_eByteOrderingEnum_LittleEndian;
 
-    for (cp = rp->cardlist; cp; cp = cp->next) {
+    for (cp = rp->cardlist; cp; cp = cp->next)
+    {
       cp->MethodDisabled = 1;
 
       // Show module offset and size
-      if (cp->Class == pwr_cClass_Hilscher_cifX_Module && cp->op) {
-        ((pwr_sClass_Hilscher_cifX_Module*)cp->op)->InputAreaOffset
-            = input_area_offset + input_area_chansize;
-        ((pwr_sClass_Hilscher_cifX_Module*)cp->op)->OutputAreaOffset
-            = output_area_offset + output_area_chansize;
+      if (cp->Class == pwr_cClass_Hilscher_cifX_Module && cp->op)
+      {
+        ((pwr_sClass_Hilscher_cifX_Module*)cp->op)->InputAreaOffset = input_area_offset + input_area_chansize;
+        ((pwr_sClass_Hilscher_cifX_Module*)cp->op)->OutputAreaOffset =
+            output_area_offset + output_area_chansize;
       }
 
-      io_bus_card_init(ctx, cp, &input_area_offset, &input_area_chansize,
-          &output_area_offset, &output_area_chansize, byte_ordering,
-          io_eAlignment_Packed);
+      io_bus_card_init(ctx, cp, &input_area_offset, &input_area_chansize, &output_area_offset,
+                       &output_area_chansize, byte_ordering, io_eAlignment_Packed);
 
       // Show module offset and size
-      if (cp->Class == pwr_cClass_Hilscher_cifX_Module && cp->op) {
-        ((pwr_sClass_Hilscher_cifX_Module*)cp->op)->InputAreaSize
-            = input_area_offset + input_area_chansize
-            - ((pwr_sClass_Hilscher_cifX_Module*)cp->op)->InputAreaOffset;
-        ((pwr_sClass_Hilscher_cifX_Module*)cp->op)->OutputAreaSize
-            = output_area_offset + output_area_chansize
-            - ((pwr_sClass_Hilscher_cifX_Module*)cp->op)->OutputAreaOffset;
+      if (cp->Class == pwr_cClass_Hilscher_cifX_Module && cp->op)
+      {
+        ((pwr_sClass_Hilscher_cifX_Module*)cp->op)->InputAreaSize =
+            input_area_offset + input_area_chansize -
+            ((pwr_sClass_Hilscher_cifX_Module*)cp->op)->InputAreaOffset;
+        ((pwr_sClass_Hilscher_cifX_Module*)cp->op)->OutputAreaSize =
+            output_area_offset + output_area_chansize -
+            ((pwr_sClass_Hilscher_cifX_Module*)cp->op)->OutputAreaOffset;
       }
     }
 
     // Show device offset and size
-    if (rp->Class == pwr_cClass_Hilscher_cifX_Device && rp->op) {
-      ((pwr_sClass_Hilscher_cifX_Device*)rp->op)->InputAreaSize
-          = input_area_offset + input_area_chansize
-          - ((pwr_sClass_Hilscher_cifX_Device*)rp->op)->InputAreaOffset;
-      ((pwr_sClass_Hilscher_cifX_Device*)rp->op)->OutputAreaSize
-          = output_area_offset + output_area_chansize
-          - ((pwr_sClass_Hilscher_cifX_Device*)rp->op)->OutputAreaOffset;
+    if (rp->Class == pwr_cClass_Hilscher_cifX_Device && rp->op)
+    {
+      ((pwr_sClass_Hilscher_cifX_Device*)rp->op)->InputAreaSize =
+          input_area_offset + input_area_chansize -
+          ((pwr_sClass_Hilscher_cifX_Device*)rp->op)->InputAreaOffset;
+      ((pwr_sClass_Hilscher_cifX_Device*)rp->op)->OutputAreaSize =
+          output_area_offset + output_area_chansize -
+          ((pwr_sClass_Hilscher_cifX_Device*)rp->op)->OutputAreaOffset;
     }
   }
 
@@ -285,10 +289,10 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap)
 {
   io_sRack* rp;
-  io_sLocalHilscher_cifX_Master* local
-      = (io_sLocalHilscher_cifX_Master*)ap->Local;
+  io_sLocalHilscher_cifX_Master* local = (io_sLocalHilscher_cifX_Master*)ap->Local;
 
-  if (driver) {
+  if (driver)
+  {
     xDriverClose(driver);
     driver = 0;
   }
@@ -308,10 +312,8 @@ static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap)
 
 static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 {
-  io_sLocalHilscher_cifX_Master* local
-      = (io_sLocalHilscher_cifX_Master*)ap->Local;
-  pwr_sClass_Hilscher_cifX_Master* op
-      = (pwr_sClass_Hilscher_cifX_Master*)ap->op;
+  io_sLocalHilscher_cifX_Master* local = (io_sLocalHilscher_cifX_Master*)ap->Local;
+  pwr_sClass_Hilscher_cifX_Master* op = (pwr_sClass_Hilscher_cifX_Master*)ap->op;
   io_sRack* rp;
   io_sCard* cp;
   int32_t sts;
@@ -323,34 +325,40 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
   else
     local->diag_cnt++;
 
-  sts = xChannelIORead(
-      local->chan, 0, 0, local->input_area_size, local->input_area, 10);
+  sts = xChannelIORead(local->chan, 0, 0, local->input_area_size, local->input_area, 10);
   op->Status = sts;
-  if (sts == CIFX_NO_ERROR) {
+  if (sts == CIFX_NO_ERROR)
+  {
     if (local->dev_init)
       local->dev_init = 0;
 
-    for (rp = ap->racklist; rp; rp = rp->next) {
-      for (cp = rp->cardlist; cp; cp = cp->next) {
+    for (rp = ap->racklist; rp; rp = rp->next)
+    {
+      for (cp = rp->cardlist; cp; cp = cp->next)
+      {
         io_bus_card_read(ctx, rp, cp, local->input_area, 0,
-            ((io_sLocalHilscher_cifX_Device*)rp->Local)->byte_ordering,
-            pwr_eFloatRepEnum_FloatIEEE);
+                         ((io_sLocalHilscher_cifX_Device*)rp->Local)->byte_ordering,
+                         pwr_eFloatRepEnum_FloatIEEE);
       }
     }
-  } else {
-    if (sts == CIFX_DEV_NO_COM_FLAG && local->dev_init
-        && local->dev_init_cnt < local->dev_init_limit)
+  }
+  else
+  {
+    if (sts == CIFX_DEV_NO_COM_FLAG && local->dev_init && local->dev_init_cnt < local->dev_init_limit)
       local->dev_init_cnt++;
-    else {
+    else
+    {
       xDriverGetErrorDescription(sts, op->ErrorStr, sizeof(op->ErrorStr));
       op->ErrorCount++;
     }
 
-    if (op->ErrorCount == op->ErrorSoftLimit && !local->softlimit_logged) {
+    if (op->ErrorCount == op->ErrorSoftLimit && !local->softlimit_logged)
+    {
       errh_Error("IO Error soft limit reached on agent '%s'", ap->Name);
       local->softlimit_logged = 1;
     }
-    if (op->ErrorCount >= op->ErrorHardLimit) {
+    if (op->ErrorCount >= op->ErrorHardLimit)
+    {
       ctx->Node->EmergBreakTrue = 1;
       return IO__ERRDEVICE;
     }
@@ -361,36 +369,39 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 
 static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
 {
-  io_sLocalHilscher_cifX_Master* local
-      = (io_sLocalHilscher_cifX_Master*)ap->Local;
+  io_sLocalHilscher_cifX_Master* local = (io_sLocalHilscher_cifX_Master*)ap->Local;
   io_sRack* rp;
   io_sCard* cp;
   int32_t sts;
-  pwr_sClass_Hilscher_cifX_Master* op
-      = (pwr_sClass_Hilscher_cifX_Master*)ap->op;
+  pwr_sClass_Hilscher_cifX_Master* op = (pwr_sClass_Hilscher_cifX_Master*)ap->op;
 
-  for (rp = ap->racklist; rp; rp = rp->next) {
-    for (cp = rp->cardlist; cp; cp = cp->next) {
+  for (rp = ap->racklist; rp; rp = rp->next)
+  {
+    for (cp = rp->cardlist; cp; cp = cp->next)
+    {
       io_bus_card_write(ctx, cp, local->output_area,
-          ((io_sLocalHilscher_cifX_Device*)rp->Local)->byte_ordering,
-          pwr_eFloatRepEnum_FloatIEEE);
+                        ((io_sLocalHilscher_cifX_Device*)rp->Local)->byte_ordering,
+                        pwr_eFloatRepEnum_FloatIEEE);
     }
   }
 
-  sts = xChannelIOWrite(
-      local->chan, 0, 0, local->output_area_size, local->output_area, 10);
+  sts = xChannelIOWrite(local->chan, 0, 0, local->output_area_size, local->output_area, 10);
   op->Status = sts;
-  if (sts != CIFX_NO_ERROR) {
-    if (!local->dev_init) {
+  if (sts != CIFX_NO_ERROR)
+  {
+    if (!local->dev_init)
+    {
       op->ErrorCount++;
       xDriverGetErrorDescription(sts, op->ErrorStr, sizeof(op->ErrorStr));
     }
 
-    if (op->ErrorCount == op->ErrorSoftLimit && !local->softlimit_logged) {
+    if (op->ErrorCount == op->ErrorSoftLimit && !local->softlimit_logged)
+    {
       errh_Error("IO Error soft limit reached on agent '%s'", ap->Name);
       local->softlimit_logged = 1;
     }
-    if (op->ErrorCount >= op->ErrorHardLimit) {
+    if (op->ErrorCount >= op->ErrorHardLimit)
+    {
       ctx->Node->EmergBreakTrue = 1;
       return IO__ERRDEVICE;
     }
@@ -400,27 +411,14 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
 }
 
 #else
-static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
-{
-  return IO__RELEASEBUILD;
-}
-static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap)
-{
-  return IO__RELEASEBUILD;
-}
-static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
-{
-  return IO__RELEASEBUILD;
-}
-static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
-{
-  return IO__RELEASEBUILD;
-}
+static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap) { return IO__RELEASEBUILD; }
+static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap) { return IO__RELEASEBUILD; }
+static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap) { return IO__RELEASEBUILD; }
+static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap) { return IO__RELEASEBUILD; }
 #endif
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(Hilscher_cifX_Master)
-    = { pwr_BindIoMethod(IoAgentInit), pwr_BindIoMethod(IoAgentClose),
-        pwr_BindIoMethod(IoAgentRead), pwr_BindIoMethod(IoAgentWrite),
-        pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Hilscher_cifX_Master) = {
+    pwr_BindIoMethod(IoAgentInit), pwr_BindIoMethod(IoAgentClose), pwr_BindIoMethod(IoAgentRead),
+    pwr_BindIoMethod(IoAgentWrite), pwr_NullMethod};

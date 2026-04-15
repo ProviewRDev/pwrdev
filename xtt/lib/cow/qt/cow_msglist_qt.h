@@ -43,7 +43,8 @@
 
 #include <QWidget>
 
-class MsgListQt : public MsgList {
+class MsgListQt : public MsgList
+{
 public:
   MsgListQt(void* ev_parent_ctx, QWidget** w);
   ~MsgListQt();

@@ -38,7 +38,7 @@
 #define wb_pwrb_h
 
 /* wb_pwrb.h -- work bench base class methods.
-*/
+ */
 
 #define pwrb_cBmdVersionStr "T2.7.2"
 

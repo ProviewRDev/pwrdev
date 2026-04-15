@@ -46,7 +46,8 @@
 
 class CLogQtWidget;
 
-class CLogQt : public CLog {
+class CLogQt : public CLog
+{
 public:
   CLogQt(void* clog_parent_ctx, const char* clog_name, pwr_tStatus* status);
   ~CLogQt();
@@ -65,7 +66,8 @@ private:
   CLogQtWidget* toplevel;
 };
 
-class CLogQtWidget : public QWidget {
+class CLogQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

@@ -36,8 +36,8 @@
 
 #include <stdio.h>
 
-#include "rt_rtt_menu.h"
 #include "rt_rtt_edit.h"
+#include "rt_rtt_menu.h"
 
 RTT_HELP_START
 RTT_HELP_SUBJ("PWR_RTT")
@@ -53,15 +53,11 @@ RTT_DB_CONTINUE
 RTT_DB_END
 
 RTT_MAINMENU_START("PWR_RTT")
-RTT_MENUITEM_EXIT("EXIT")
-{
-  "", 0, 0, 0, { 0, 0 }, 0, 0, 0, 0
-}
+RTT_MENUITEM_EXIT("EXIT"){"", 0, 0, 0, {0, 0}, 0, 0, 0, 0}
 }
 ;
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
   int sts;
   char buffername[80];
   char command[120];

@@ -74,8 +74,7 @@ LOCAL_DATA
 // ***************************************************************************
 
 #if defined(WIN32) || defined(_WIN32)
-FUNCTION PUBLIC BOOL ReadBoardRegistryEntries(IN USIGN8 BoardNumber,
-                                              OUT USIGN32* OperationMode)
+FUNCTION PUBLIC BOOL ReadBoardRegistryEntries(IN USIGN8 BoardNumber, OUT USIGN32* OperationMode)
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
 
@@ -99,23 +98,19 @@ return value:
 
   FUNCTION_BODY
 
-  if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-                                    REGPATH_PARAMETER_FROM_HLM, 0, KEY_READ,
-                                    &keyParameters))
+  if (ERROR_SUCCESS ==
+      RegOpenKeyEx(HKEY_LOCAL_MACHINE, REGPATH_PARAMETER_FROM_HLM, 0, KEY_READ, &keyParameters))
   {
     sprintf(szKeyBoard, "%s\\%d", REGPATH_PARAMETER_FROM_HLM, BoardNumber);
-    if (ERROR_SUCCESS ==
-        RegOpenKeyEx(HKEY_LOCAL_MACHINE, szKeyBoard, 0, KEY_READ, &keyBoard))
+    if (ERROR_SUCCESS == RegOpenKeyEx(HKEY_LOCAL_MACHINE, szKeyBoard, 0, KEY_READ, &keyBoard))
     {
       SizeofBoardType = sizeof(szBoardType);
       szBoardType[0] = '\0';
 
-      if ((RetVal = RegQueryValueEx(keyBoard, "Type", NULL, NULL,
-                                    (LPBYTE)szBoardType, &SizeofBoardType)) ==
+      if ((RetVal = RegQueryValueEx(keyBoard, "Type", NULL, NULL, (LPBYTE)szBoardType, &SizeofBoardType)) ==
           ERROR_SUCCESS)
       {
-        RetVal |= RegQueryValueEx(keyBoard, "OperationMode", NULL, NULL,
-                                  (LPBYTE)OperationMode, &sizeULONG);
+        RetVal |= RegQueryValueEx(keyBoard, "OperationMode", NULL, NULL, (LPBYTE)OperationMode, &sizeULONG);
 
         if (!RetVal)
           return (TRUE);
@@ -165,9 +160,8 @@ FUNCTION PUBLIC int kbhit(VOID)
 // * FUNCTIONs to convert data from LITTLE ENDIAN to BIG-ENDIAN format
 // ***************************************************************************
 
-FUNCTION PUBLIC USIGN16 swap_16_intel_motorola(
-    IN USIGN16 input16 /* value to swap */
-    )
+FUNCTION PUBLIC USIGN16 swap_16_intel_motorola(IN USIGN16 input16 /* value to swap */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -188,15 +182,14 @@ return value:
   FUNCTION_BODY
 
       ((USIGN8*)&inp16)
-      [0] = ((USIGN8*)&input16)[1];
+  [0] = ((USIGN8*)&input16)[1];
   ((USIGN8*)&inp16)[1] = ((USIGN8*)&input16)[0];
 
   return (inp16);
 }
 
-FUNCTION PUBLIC USIGN32 swap_32_intel_motorola(
-    IN USIGN32 input32 /* value to swap */
-    )
+FUNCTION PUBLIC USIGN32 swap_32_intel_motorola(IN USIGN32 input32 /* value to swap */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -217,7 +210,7 @@ return value:
   FUNCTION_BODY
 
       ((USIGN8*)&inp32)
-      [0] = ((USIGN8*)&input32)[3];
+  [0] = ((USIGN8*)&input32)[3];
   ((USIGN8*)&inp32)[1] = ((USIGN8*)&input32)[2];
   ((USIGN8*)&inp32)[2] = ((USIGN8*)&input32)[1];
   ((USIGN8*)&inp32)[3] = ((USIGN8*)&input32)[0];

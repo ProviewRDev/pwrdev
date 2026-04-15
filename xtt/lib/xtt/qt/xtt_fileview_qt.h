@@ -47,11 +47,12 @@
 
 class XttFileviewQtWidget;
 
-class XttFileviewQt : public XttFileview {
+class XttFileviewQt : public XttFileview
+{
 public:
-  XttFileviewQt(void* xn_parent_ctx, QWidget* xn_parent_wid, pwr_tOid xn_oid,
-      char* xn_title, char* xn_dir, char* xn_pattern, int xn_type,
-      char* xn_target_attr, char* xn_trigger_attr, char* xn_filetype);
+  XttFileviewQt(void* xn_parent_ctx, QWidget* xn_parent_wid, pwr_tOid xn_oid, char* xn_title, char* xn_dir,
+                char* xn_pattern, int xn_type, char* xn_target_attr, char* xn_trigger_attr,
+                char* xn_filetype);
 
   ~XttFileviewQt() {}
 
@@ -76,12 +77,14 @@ private:
   XttFileviewQtWidget* toplevel;
 };
 
-class XttFileviewQtWidget : public QFileDialog {
+class XttFileviewQtWidget : public QFileDialog
+{
   Q_OBJECT
 
 public:
-  XttFileviewQtWidget(XttFileviewQt* parent_ctx, QWidget* parent)
-      : QFileDialog(parent), fileview(parent_ctx) {}
+  XttFileviewQtWidget(XttFileviewQt* parent_ctx, QWidget* parent) : QFileDialog(parent), fileview(parent_ctx)
+  {
+  }
 
 protected:
   void closeEvent(QCloseEvent* event);

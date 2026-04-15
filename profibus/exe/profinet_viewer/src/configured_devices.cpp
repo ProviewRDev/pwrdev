@@ -43,14 +43,9 @@
 namespace ProfinetDCP
 {
 
-ConfiguredDeviceReader::ConfiguredDeviceReader()
-  : m_devices_loaded(false)
-{
-}
+ConfiguredDeviceReader::ConfiguredDeviceReader() : m_devices_loaded(false) {}
 
-ConfiguredDeviceReader::~ConfiguredDeviceReader()
-{
-}
+ConfiguredDeviceReader::~ConfiguredDeviceReader() {}
 
 std::string ConfiguredDeviceReader::getConfigFilePath(const std::string& interface_name)
 {
@@ -62,7 +57,8 @@ std::string ConfiguredDeviceReader::getConfigFilePath(const std::string& interfa
 
 bool ConfiguredDeviceReader::loadConfiguredDevices(const std::string& interface_name)
 {
-  if (interface_name.empty()) {
+  if (interface_name.empty())
+  {
     return false;
   }
 
@@ -70,11 +66,12 @@ bool ConfiguredDeviceReader::loadConfiguredDevices(const std::string& interface_
   m_devices_loaded = false;
 
   std::string config_file = getConfigFilePath(interface_name);
-  
+
   // Try to load XML file
   pugi::xml_parse_result result = m_xml_doc.load_file(config_file.c_str());
-  
-  if (!result) {
+
+  if (!result)
+  {
     // File doesn't exist or parse error - log message about distributing the file
     logMissingFileMessage(interface_name);
     return false;
@@ -82,8 +79,10 @@ bool ConfiguredDeviceReader::loadConfiguredDevices(const std::string& interface_
 
   // Validate XML structure
   pugi::xml_node devices_node = m_xml_doc.child("ProfinetDevices");
-  if (!devices_node) {
-    std::cerr << "Invalid XML structure in " << config_file << " - missing ProfinetDevices root node" << std::endl;
+  if (!devices_node)
+  {
+    std::cerr << "Invalid XML structure in " << config_file << " - missing ProfinetDevices root node"
+              << std::endl;
     return false;
   }
 
@@ -93,9 +92,11 @@ bool ConfiguredDeviceReader::loadConfiguredDevices(const std::string& interface_
 
 void ConfiguredDeviceReader::logMissingFileMessage(const std::string& interface_name) const
 {
-  if (m_activity_log_callback) {
+  if (m_activity_log_callback)
+  {
     m_activity_log_callback("No configuration file found for interface " + interface_name);
-    m_activity_log_callback("To configure devices for this interface, create: $pwrp_load/pwr_pnviewer_" + interface_name + ".xml");
+    m_activity_log_callback("To configure devices for this interface, create: $pwrp_load/pwr_pnviewer_" +
+                            interface_name + ".xml");
   }
 }
 

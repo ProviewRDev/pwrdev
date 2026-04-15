@@ -39,7 +39,8 @@
 
 class wb_import;
 
-class wb_export {
+class wb_export
+{
 public:
   virtual bool exportVolume(wb_import& e) = 0;
 

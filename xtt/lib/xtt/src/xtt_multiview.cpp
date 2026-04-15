@@ -46,16 +46,20 @@
 
 void MVRecall::insert(char* str, char* obj)
 {
-  if (current_idx == -1) {
+  if (current_idx == -1)
+  {
     current_idx = 0;
     first_idx = 0;
     last_idx = 0;
-  } else {
+  }
+  else
+  {
     current_idx++;
     if (current_idx >= MV_RECALL_SIZE)
       current_idx = 0;
     last_idx = current_idx;
-    if (current_idx == first_idx) {
+    if (current_idx == first_idx)
+    {
       first_idx++;
       if (first_idx >= MV_RECALL_SIZE)
         last_idx = 0;
@@ -93,19 +97,17 @@ void XttMultiView::eventlog_enable(int enable)
   // Graph::eventlog_enable( enable);
 }
 
-void XttMultiView::multiview_ge_close_cb(void* parent_ctx, void* client_data)
-{
-}
+void XttMultiView::multiview_ge_close_cb(void* parent_ctx, void* client_data) {}
 
-int XttMultiView::multiview_ge_command_cb(void* multiview_ctx, char* cmd, 
-    char* script, char *scriptargs, void* caller)
+int XttMultiView::multiview_ge_command_cb(void* multiview_ctx, char* cmd, char* script, char* scriptargs,
+                                          void* caller)
 {
   XttMultiView* multiview = (XttMultiView*)multiview_ctx;
   int sts;
 
-  if (multiview->command_cb) {
-    sts = (multiview->command_cb)(
-	multiview->parent_ctx, cmd, script, scriptargs, multiview_ctx);
+  if (multiview->command_cb)
+  {
+    sts = (multiview->command_cb)(multiview->parent_ctx, cmd, script, scriptargs, multiview_ctx);
     return sts;
   }
   return 0;
@@ -121,8 +123,7 @@ int XttMultiView::multiview_ge_sound_cb(void* multiview_ctx, pwr_tAttrRef* aref)
   return 0;
 }
 
-void XttMultiView::multiview_ge_display_in_xnav_cb(
-    void* multiview_ctx, pwr_sAttrRef* arp)
+void XttMultiView::multiview_ge_display_in_xnav_cb(void* multiview_ctx, pwr_sAttrRef* arp)
 {
   XttMultiView* multiview = (XttMultiView*)multiview_ctx;
 
@@ -130,32 +131,30 @@ void XttMultiView::multiview_ge_display_in_xnav_cb(
     (multiview->display_in_xnav_cb)(multiview->parent_ctx, arp);
 }
 
-void XttMultiView::multiview_ge_popup_menu_cb(void* multiview_ctx,
-    pwr_sAttrRef attrref, unsigned long item_type, unsigned long utility,
-    char* arg, int x, int y)
+void XttMultiView::multiview_ge_popup_menu_cb(void* multiview_ctx, pwr_sAttrRef attrref,
+                                              unsigned long item_type, unsigned long utility, char* arg,
+                                              int x, int y)
 {
   XttMultiView* multiview = (XttMultiView*)multiview_ctx;
 
   if (multiview->popup_menu_cb)
-    (multiview->popup_menu_cb)(
-        multiview->parent_ctx, attrref, item_type, utility, arg, x, y);
+    (multiview->popup_menu_cb)(multiview->parent_ctx, attrref, item_type, utility, arg, x, y);
 }
 
-int XttMultiView::multiview_ge_call_method_cb(void* multiview_ctx,
-    const char* method, const char* filter, pwr_sAttrRef attrref,
-    unsigned long item_type, unsigned long utility, char* arg)
+int XttMultiView::multiview_ge_call_method_cb(void* multiview_ctx, const char* method, const char* filter,
+                                              pwr_sAttrRef attrref, unsigned long item_type,
+                                              unsigned long utility, char* arg)
 {
   XttMultiView* multiview = (XttMultiView*)multiview_ctx;
 
   if (multiview->call_method_cb)
-    return (multiview->call_method_cb)(multiview->parent_ctx, method, filter,
-        attrref, item_type, utility, arg);
+    return (multiview->call_method_cb)(multiview->parent_ctx, method, filter, attrref, item_type, utility,
+                                       arg);
   else
     return 0;
 }
 
-int XttMultiView::multiview_ge_is_authorized_cb(
-    void* multiview_ctx, unsigned int access)
+int XttMultiView::multiview_ge_is_authorized_cb(void* multiview_ctx, unsigned int access)
 {
   XttMultiView* multiview = (XttMultiView*)multiview_ctx;
 
@@ -164,29 +163,26 @@ int XttMultiView::multiview_ge_is_authorized_cb(
   return 0;
 }
 
-int XttMultiView::multiview_ge_get_current_objects_cb(
-    void* multiview_ctx, pwr_sAttrRef** alist, int** is_alist)
+int XttMultiView::multiview_ge_get_current_objects_cb(void* multiview_ctx, pwr_sAttrRef** alist,
+                                                      int** is_alist)
 {
   XttMultiView* multiview = (XttMultiView*)multiview_ctx;
 
   if (multiview->get_current_objects_cb)
-    return (multiview->get_current_objects_cb)(
-        multiview->parent_ctx, alist, is_alist);
+    return (multiview->get_current_objects_cb)(multiview->parent_ctx, alist, is_alist);
   return 0;
 }
 
-void XttMultiView::multiview_ge_eventlog_cb(void* multiview_ctx, void* gectx,
-    int category, void* data, unsigned int size)
+void XttMultiView::multiview_ge_eventlog_cb(void* multiview_ctx, void* gectx, int category, void* data,
+                                            unsigned int size)
 {
   XttMultiView* multiview = (XttMultiView*)multiview_ctx;
 
   if (multiview->eventlog_cb)
-    (multiview->eventlog_cb)(
-        multiview->parent_ctx, gectx, category, data, size);
+    (multiview->eventlog_cb)(multiview->parent_ctx, gectx, category, data, size);
 }
 
-void XttMultiView::multiview_keyboard_cb(
-    void* multiview_ctx, void* ge_ctx, int action, int type)
+void XttMultiView::multiview_keyboard_cb(void* multiview_ctx, void* ge_ctx, int action, int type)
 {
   XttMultiView* multiview = (XttMultiView*)multiview_ctx;
 
@@ -202,16 +198,15 @@ void XttMultiView::multiview_ge_help_cb(void* multiview_ctx, const char* key)
     (multiview->help_cb)(multiview->parent_ctx, key);
 }
 
-void XttMultiView::multiview_trend_close_cb(void* ctx, XttTrend* trend)
-{
-}
+void XttMultiView::multiview_trend_close_cb(void* ctx, XttTrend* trend) {}
 
 void XttMultiView::multiview_trend_command_cb(void* ctx, const char* cmd)
 {
   XttMultiView* multiview = (XttMultiView*)ctx;
   int sts;
 
-  if (multiview->command_cb) {
+  if (multiview->command_cb)
+  {
     sts = (multiview->command_cb)(multiview->parent_ctx, (char*)cmd, 0, 0, ctx);
     return;
   }
@@ -225,8 +220,7 @@ void XttMultiView::multiview_trend_help_cb(void* ctx, const char* key)
     (multiview->help_cb)(multiview->parent_ctx, key);
 }
 
-int XttMultiView::multiview_sevhist_get_select_cb(
-    void* ctx, pwr_tOid* oid, char* aname, char* oname)
+int XttMultiView::multiview_sevhist_get_select_cb(void* ctx, pwr_tOid* oid, char* aname, char* oname)
 {
   XttMultiView* multiview = (XttMultiView*)ctx;
 
@@ -235,9 +229,7 @@ int XttMultiView::multiview_sevhist_get_select_cb(
   return 0;
 }
 
-void XttMultiView::multiview_strm_close_cb(void* ctx, XttStream* strm)
-{
-}
+void XttMultiView::multiview_strm_close_cb(void* ctx, XttStream* strm) {}
 
 void XttMultiView::message_cb(void* ctx, char severity, const char* msg)
 {
@@ -260,13 +252,9 @@ int XttMultiView::set_folder_index(const char* name, int idx)
   return 1; // graph->set_folder_index( name, idx);
 }
 
-XttMultiView::~XttMultiView()
-{
-}
+XttMultiView::~XttMultiView() {}
 
-void XttMultiView::swap(int mode)
-{
-}
+void XttMultiView::swap(int mode) {}
 
 int XttMultiView::find_graph(const char* name, const char* instance, void** ctx)
 {
@@ -282,8 +270,10 @@ int XttMultiView::name_to_idx(const char* name)
   if (EVEN(sts))
     return sts;
 
-  for (int i = 0; i < cols; i++) {
-    for (int j = 0; j < rows; j++) {
+  for (int i = 0; i < cols; i++)
+  {
+    for (int j = 0; j < rows; j++)
+    {
       if (str_NoCaseStrcmp(name, mv.Action[i * rows + j].Name) == 0)
         return i * rows + j;
     }
@@ -331,20 +321,16 @@ XNav* XttMultiView::get_xnav()
     return (XNav*)parent_ctx;
 }
 
-XttMultiView::XttMultiView(void* mv_parent_ctx, const char* mv_name,
-    pwr_tAttrRef* mv_aref, int mv_width, int mv_height, int mv_x, int mv_y,
-    unsigned int mv_options, int mv_color_theme,
-    int (*mv_command_cb)(void*, char*, char*, char *, void*),
-    int (*mv_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-    int (*mv_is_authorized_cb)(void*, unsigned int),
-    void (*mv_keyboard_cb)(void*, void*, int, int))
-    : parent_ctx(mv_parent_ctx), options(mv_options),
-      color_theme(mv_color_theme), command_cb(mv_command_cb), close_cb(0),
-      help_cb(0), display_in_xnav_cb(0), is_authorized_cb(mv_is_authorized_cb),
-      popup_menu_cb(0), call_method_cb(0),
-      get_current_objects_cb(mv_get_current_objects_cb), sound_cb(0),
-      eventlog_cb(0), get_select_cb(0), keyboard_cb(mv_keyboard_cb),
-      width(mv_width), height(mv_height)
+XttMultiView::XttMultiView(void* mv_parent_ctx, const char* mv_name, pwr_tAttrRef* mv_aref, int mv_width,
+                           int mv_height, int mv_x, int mv_y, unsigned int mv_options, int mv_color_theme,
+                           int (*mv_command_cb)(void*, char*, char*, char*, void*),
+                           int (*mv_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+                           int (*mv_is_authorized_cb)(void*, unsigned int),
+                           void (*mv_keyboard_cb)(void*, void*, int, int))
+    : parent_ctx(mv_parent_ctx), options(mv_options), color_theme(mv_color_theme), command_cb(mv_command_cb),
+      close_cb(0), help_cb(0), display_in_xnav_cb(0), is_authorized_cb(mv_is_authorized_cb), popup_menu_cb(0),
+      call_method_cb(0), get_current_objects_cb(mv_get_current_objects_cb), sound_cb(0), eventlog_cb(0),
+      get_select_cb(0), keyboard_cb(mv_keyboard_cb), width(mv_width), height(mv_height)
 {
   strcpy(name, mv_name);
   aref = *mv_aref;

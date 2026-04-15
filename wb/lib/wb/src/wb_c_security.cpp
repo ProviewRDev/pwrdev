@@ -40,8 +40,7 @@
 #include "wb_pwrs.h"
 #include "wb_pwrs_msg.h"
 
-static pwr_tStatus AnteCreate(
-    ldh_tSesContext Session, pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus AnteCreate(ldh_tSesContext Session, pwr_tObjid Father, pwr_tClassId Class)
 {
   pwr_tCid cid;
   pwr_tStatus sts;
@@ -66,8 +65,8 @@ static pwr_tStatus AnteCreate(
   return PWRS__SUCCESS;
 }
 
-static pwr_tStatus AnteMove(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tObjid OldFather)
+static pwr_tStatus AnteMove(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father,
+                            pwr_tObjid OldFather)
 {
   // Check that that the father is the same
   if (!(Father.oix == OldFather.oix && Father.vid == OldFather.vid))
@@ -75,8 +74,8 @@ static pwr_tStatus AnteMove(ldh_tSesContext Session, pwr_tObjid Object,
   return PWRS__SUCCESS;
 }
 
-static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father,
+                              pwr_tClassId Class)
 {
   pwr_tStatus sts;
 
@@ -88,5 +87,5 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
   return PWRS__SUCCESS;
 }
 
-pwr_dExport pwr_BindMethods($Security) = { pwr_BindMethod(AnteCreate),
-  pwr_BindMethod(AnteMove), pwr_BindMethod(PostCreate), pwr_NullMethod };
+pwr_dExport pwr_BindMethods($Security) = {pwr_BindMethod(AnteCreate), pwr_BindMethod(AnteMove),
+                                          pwr_BindMethod(PostCreate), pwr_NullMethod};

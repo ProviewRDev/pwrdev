@@ -47,28 +47,21 @@
 #include "glow_dashboard.h"
 #include "glow_exportscript.h"
 
-GrowNode::GrowNode(GrowCtx* glow_ctx, const char* name,
-    GlowNodeClass* node_class, double x1, double y1, int nodraw,
-    int rel_annot_pos)
-    : GlowNode(glow_ctx, name, node_class, x1, y1, nodraw, rel_annot_pos),
-      dynamic(0), dynamicsize(0), original_border_drawtype(glow_eDrawType_No),
-      original_text_drawtype(glow_eDrawType_No),
-      original_fill_drawtype(glow_eDrawType_No),
-      original_background_drawtype(glow_eDrawType_No),
-      fill_drawtype(glow_eDrawType_No), text_drawtype(glow_eDrawType_No),
-      draw_type(glow_eDrawType_No), level_fill_drawtype(glow_eDrawType_No),
-      background_drawtype(glow_eDrawType_No),
+GrowNode::GrowNode(GrowCtx* glow_ctx, const char* name, GlowNodeClass* node_class, double x1, double y1,
+                   int nodraw, int rel_annot_pos)
+    : GlowNode(glow_ctx, name, node_class, x1, y1, nodraw, rel_annot_pos), dynamic(0), dynamicsize(0),
+      original_border_drawtype(glow_eDrawType_No), original_text_drawtype(glow_eDrawType_No),
+      original_fill_drawtype(glow_eDrawType_No), original_background_drawtype(glow_eDrawType_No),
+      fill_drawtype(glow_eDrawType_No), text_drawtype(glow_eDrawType_No), draw_type(glow_eDrawType_No),
+      level_fill_drawtype(glow_eDrawType_No), background_drawtype(glow_eDrawType_No),
       original_color_tone(glow_eDrawTone_No), color_tone(glow_eDrawTone_No),
-      level_color_tone(glow_eDrawTone_No), original_color_lightness(0),
-      color_lightness(0), original_color_intensity(0), color_intensity(0),
-      original_color_shift(0), color_shift(0), color_inverse(0), line_width(0),
-      invisible(0), dimmed(0), object_type(glow_eObjectType_GrowNode),
+      level_color_tone(glow_eDrawTone_No), original_color_lightness(0), color_lightness(0),
+      original_color_intensity(0), color_intensity(0), original_color_shift(0), color_shift(0),
+      color_inverse(0), line_width(0), invisible(0), dimmed(0), object_type(glow_eObjectType_GrowNode),
       root_node(0), flip_horizontal(false), flip_vertical(false), fill_level(1),
-      level_direction(glow_eDirection_Right), shadow(0), input_position(0),
-      input_selected(0), gradient(glow_eGradient_No),
-      text_type(glow_eDrawType_TextHelvetica), text_font(glow_eFont_No),
-      disable_cb(0), annot_scrollingtext(-1), annot_offset_x(0),
-      annot_offset_y(0), transparency(0)
+      level_direction(glow_eDirection_Right), shadow(0), input_position(0), input_selected(0),
+      gradient(glow_eGradient_No), text_type(glow_eDrawType_TextHelvetica), text_font(glow_eFont_No),
+      disable_cb(0), annot_scrollingtext(-1), annot_offset_x(0), annot_offset_y(0), transparency(0)
 {
   memset(argv, 0, sizeof(argv));
   memset(argsize, 0, sizeof(argsize));
@@ -89,19 +82,22 @@ GrowNode::~GrowNode()
   if (!ctx->nodraw)
     ctx->set_defered_redraw();
   ctx->delete_node_cons(this);
-  if (!ctx->nodraw) {
+  if (!ctx->nodraw)
+  {
     draw();
     ctx->redraw_defered();
   }
   if (hot)
     ctx->gdraw->set_cursor(&ctx->mw, glow_eDrawCursor_Normal);
   //  delete nc;
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 10; i++)
+  {
     if (annotsize[i] > 0)
       free(annotv[i]);
   }
 
-  if (local_nc) {
+  if (local_nc)
+  {
     delete nc;
     nc = 0;
   }
@@ -109,22 +105,24 @@ GrowNode::~GrowNode()
 
 void GrowNode::copy_from(const GrowNode& n)
 {
-  memcpy((void *)this, (void *)&n, sizeof(n));
+  memcpy((void*)this, (void*)&n, sizeof(n));
   root_node = 0;
-  for (int i = 0; i < 10; i++) {
-    if (annotsize[i]) {
+  for (int i = 0; i < 10; i++)
+  {
+    if (annotsize[i])
+    {
       annotv[i] = (char*)calloc(1, annotsize[i]);
       memcpy(annotv[i], n.annotv[i], annotsize[i]);
     }
   }
-  if (n.dynamicsize) {
+  if (n.dynamicsize)
+  {
     dynamic = (char*)calloc(1, n.dynamicsize);
     memcpy(dynamic, n.nc->dynamic, n.dynamicsize);
   }
 
   if (ctx->userdata_copy_callback)
-    (ctx->userdata_copy_callback)(
-        this, user_data, &user_data, glow_eUserdataCbType_Node);
+    (ctx->userdata_copy_callback)(this, user_data, &user_data, glow_eUserdataCbType_Node);
   //  nc = new GlowNodeClass( *nc);
 }
 
@@ -134,46 +132,33 @@ void GrowNode::save(std::ofstream& fp, glow_eSaveMode mode)
   int i;
 
   fp << int(glow_eSave_GrowNode) << '\n';
-  fp << int(glow_eSave_GrowNode_original_border_drawtype) << FSPACE
-     << int(original_border_drawtype) << '\n';
-  fp << int(glow_eSave_GrowNode_original_fill_drawtype) << FSPACE
-     << int(original_fill_drawtype) << '\n';
-  fp << int(glow_eSave_GrowNode_original_background_drawtype) << FSPACE
-     << int(original_background_drawtype) << '\n';
-  fp << int(glow_eSave_GrowNode_original_text_drawtype) << FSPACE
-     << int(original_text_drawtype) << '\n';
-  fp << int(glow_eSave_GrowNode_fill_drawtype) << FSPACE << int(fill_drawtype)
+  fp << int(glow_eSave_GrowNode_original_border_drawtype) << FSPACE << int(original_border_drawtype) << '\n';
+  fp << int(glow_eSave_GrowNode_original_fill_drawtype) << FSPACE << int(original_fill_drawtype) << '\n';
+  fp << int(glow_eSave_GrowNode_original_background_drawtype) << FSPACE << int(original_background_drawtype)
      << '\n';
-  fp << int(glow_eSave_GrowNode_text_drawtype) << FSPACE << int(text_drawtype)
-     << '\n';
+  fp << int(glow_eSave_GrowNode_original_text_drawtype) << FSPACE << int(original_text_drawtype) << '\n';
+  fp << int(glow_eSave_GrowNode_fill_drawtype) << FSPACE << int(fill_drawtype) << '\n';
+  fp << int(glow_eSave_GrowNode_text_drawtype) << FSPACE << int(text_drawtype) << '\n';
   fp << int(glow_eSave_GrowNode_draw_type) << FSPACE << int(draw_type) << '\n';
-  fp << int(glow_eSave_GrowNode_background_drawtype) << FSPACE
-     << int(background_drawtype) << '\n';
-  fp << int(glow_eSave_GrowNode_original_color_tone) << FSPACE
-     << int(original_color_tone) << '\n';
-  fp << int(glow_eSave_GrowNode_color_tone) << FSPACE << int(color_tone)
-     << '\n';
-  fp << int(glow_eSave_GrowNode_original_color_lightness) << FSPACE
-     << original_color_lightness << '\n';
-  fp << int(glow_eSave_GrowNode_color_lightness) << FSPACE << color_lightness
-     << '\n';
-  fp << int(glow_eSave_GrowNode_original_color_intensity) << FSPACE
-     << original_color_intensity << '\n';
-  fp << int(glow_eSave_GrowNode_color_intensity) << FSPACE << color_intensity
-     << '\n';
-  fp << int(glow_eSave_GrowNode_original_color_shift) << FSPACE
-     << original_color_shift << '\n';
+  fp << int(glow_eSave_GrowNode_background_drawtype) << FSPACE << int(background_drawtype) << '\n';
+  fp << int(glow_eSave_GrowNode_original_color_tone) << FSPACE << int(original_color_tone) << '\n';
+  fp << int(glow_eSave_GrowNode_color_tone) << FSPACE << int(color_tone) << '\n';
+  fp << int(glow_eSave_GrowNode_original_color_lightness) << FSPACE << original_color_lightness << '\n';
+  fp << int(glow_eSave_GrowNode_color_lightness) << FSPACE << color_lightness << '\n';
+  fp << int(glow_eSave_GrowNode_original_color_intensity) << FSPACE << original_color_intensity << '\n';
+  fp << int(glow_eSave_GrowNode_color_intensity) << FSPACE << color_intensity << '\n';
+  fp << int(glow_eSave_GrowNode_original_color_shift) << FSPACE << original_color_shift << '\n';
   fp << int(glow_eSave_GrowNode_color_shift) << FSPACE << color_shift << '\n';
   fp << int(glow_eSave_GrowNode_invisible) << FSPACE << invisible << '\n';
-  fp << int(glow_eSave_GrowNode_flip_horizontal) << FSPACE << flip_horizontal
-     << '\n';
-  fp << int(glow_eSave_GrowNode_flip_vertical) << FSPACE << flip_vertical
-     << '\n';
+  fp << int(glow_eSave_GrowNode_flip_horizontal) << FSPACE << flip_horizontal << '\n';
+  fp << int(glow_eSave_GrowNode_flip_vertical) << FSPACE << flip_vertical << '\n';
   fp << int(glow_eSave_GrowNode_dynamicsize) << FSPACE << dynamicsize << '\n';
   fp << int(glow_eSave_GrowNode_dynamic) << '\n';
-  if (dynamic) {
+  if (dynamic)
+  {
     fp << "\"";
-    for (s = dynamic; *s; s++) {
+    for (s = dynamic; *s; s++)
+    {
       if (*s == '"')
         fp << "\\";
       fp << *s;
@@ -189,10 +174,13 @@ void GrowNode::save(std::ofstream& fp, glow_eSaveMode mode)
   for (i = 0; i < nc->arg_cnt; i++)
     fp << argsize[i] << '\n';
   fp << int(glow_eSave_GrowNode_argv) << '\n';
-  for (i = 0; i < nc->arg_cnt; i++) {
-    if (argsize[i]) {
+  for (i = 0; i < nc->arg_cnt; i++)
+  {
+    if (argsize[i])
+    {
       fp << "\"";
-      for (s = argv[i]; *s; s++) {
+      for (s = argv[i]; *s; s++)
+      {
         if (*s == '"')
           fp << "\\";
         fp << *s;
@@ -208,7 +196,8 @@ void GrowNode::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_GrowNode_transparency) << FSPACE << transparency << '\n';
   fp << int(glow_eSave_GrowNode_disable_cb) << FSPACE << disable_cb << '\n';
 
-  if (user_data && ctx->userdata_save_callback) {
+  if (user_data && ctx->userdata_save_callback)
+  {
     fp << int(glow_eSave_GrowNode_userdata_cb) << '\n';
     (ctx->userdata_save_callback)(&fp, this, glow_eUserdataCbType_Node);
   }
@@ -227,15 +216,18 @@ void GrowNode::open(std::ifstream& fp)
   int arg_cnt = 0;
   char* new_text;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowNode: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowNode:
       break;
     case glow_eSave_GrowNode_original_border_drawtype:
@@ -310,14 +302,18 @@ void GrowNode::open(std::ifstream& fp)
       break;
     case glow_eSave_GrowNode_dynamic:
       fp.getline(dummy, sizeof(dummy));
-      if (dynamicsize) {
+      if (dynamicsize)
+      {
         dynamic = (char*)calloc(1, dynamicsize);
         fp.get();
-        for (j = 0; j < dynamicsize; j++) {
-          if ((c = fp.get()) == '"') {
+        for (j = 0; j < dynamicsize; j++)
+        {
+          if ((c = fp.get()) == '"')
+          {
             if (dynamic[j - 1] == '\\')
               j--;
-            else {
+            else
+            {
               dynamic[j] = 0;
               break;
             }
@@ -342,15 +338,20 @@ void GrowNode::open(std::ifstream& fp)
       break;
     case glow_eSave_GrowNode_argv:
       fp.getline(dummy, sizeof(dummy));
-      for (i = 0; i < arg_cnt; i++) {
-        if (argsize[i]) {
+      for (i = 0; i < arg_cnt; i++)
+      {
+        if (argsize[i])
+        {
           argv[i] = (char*)calloc(1, argsize[i]);
           fp.get();
-          for (j = 0; j < argsize[i]; j++) {
-            if ((c = fp.get()) == '"') {
+          for (j = 0; j < argsize[i]; j++)
+          {
+            if ((c = fp.get()) == '"')
+            {
               if (argv[i][j - 1] == '\\')
                 j--;
-              else {
+              else
+              {
                 argv[i][j] = 0;
                 break;
               }
@@ -359,7 +360,8 @@ void GrowNode::open(std::ifstream& fp)
           }
           fp.getline(dummy, sizeof(dummy));
         }
-        if (i >= nc->arg_cnt) {
+        if (i >= nc->arg_cnt)
+        {
           // Argument obsolete
           argsize[i] = 0;
           free(argv[i]);
@@ -406,9 +408,12 @@ void GrowNode::open(std::ifstream& fp)
   }
 
   // Translate the annotation to current language
-  if (ctx->translate_on && ctx->event_callback[glow_eEvent_Translate]) {
-    for (i = 0; i < 10; i++) {
-      if (annotsize[i] && annotv[i]) {
+  if (ctx->translate_on && ctx->event_callback[glow_eEvent_Translate])
+  {
+    for (i = 0; i < 10; i++)
+    {
+      if (annotsize[i] && annotv[i])
+      {
         if (ctx->translate_cb(this, annotv[i], &new_text))
           set_annotation(i, new_text, strlen(new_text), 1);
       }
@@ -419,11 +424,10 @@ void GrowNode::open(std::ifstream& fp)
 void GrowNode::move_to(double x, double y)
 {
   ctx->set_defered_redraw();
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
 
   trf.move(x - x_left, y - y_low);
   get_node_borders();
@@ -435,24 +439,26 @@ void GrowNode::move_to(double x, double y)
 void GrowNode::move(double delta_x, double delta_y, int grid)
 {
   ctx->set_defered_redraw();
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  if (grid) {
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  if (grid)
+  {
     double x_grid, y_grid;
 
     /* Move to closest grid point */
     if (grid == 2)
-      ctx->dash->find_grid(x_left + delta_x / ctx->mw.zoom_factor_x,
-	  y_low + delta_y / ctx->mw.zoom_factor_y, &x_grid, &y_grid);
+      ctx->dash->find_grid(x_left + delta_x / ctx->mw.zoom_factor_x, y_low + delta_y / ctx->mw.zoom_factor_y,
+                           &x_grid, &y_grid);
     else
-      ctx->find_grid(x_left + delta_x / ctx->mw.zoom_factor_x,
-          y_low + delta_y / ctx->mw.zoom_factor_y, &x_grid, &y_grid);
+      ctx->find_grid(x_left + delta_x / ctx->mw.zoom_factor_x, y_low + delta_y / ctx->mw.zoom_factor_y,
+                     &x_grid, &y_grid);
     trf.move(x_grid - x_left, y_grid - y_low);
     get_node_borders();
-  } else {
+  }
+  else
+  {
     double dx, dy;
 
     dx = delta_x / ctx->mw.zoom_factor_x;
@@ -473,15 +479,18 @@ void GrowNode::move(double delta_x, double delta_y, int grid)
 
 void GrowNode::move_noerase(int delta_x, int delta_y, int grid)
 {
-  if (grid) {
+  if (grid)
+  {
     double x_grid, y_grid;
 
     /* Move to closest grid point */
     ctx->find_grid(x_left + double(delta_x) / ctx->mw.zoom_factor_x,
-        y_low + double(delta_y) / ctx->mw.zoom_factor_y, &x_grid, &y_grid);
+                   y_low + double(delta_y) / ctx->mw.zoom_factor_y, &x_grid, &y_grid);
     trf.move(x_grid - x_left, y_grid - y_low);
     get_node_borders();
-  } else {
+  }
+  else
+  {
     double dx, dy;
 
     dx = double(delta_x) / ctx->mw.zoom_factor_x;
@@ -492,16 +501,14 @@ void GrowNode::move_noerase(int delta_x, int delta_y, int grid)
     y_high += dy;
     y_low += dy;
   }
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
 void GrowNode::set_highlight(int on)
@@ -510,8 +517,7 @@ void GrowNode::set_highlight(int on)
   draw();
 }
 
-int GrowNode::event_handler(
-    GlowWind* w, glow_eEvent event, double fx, double fy)
+int GrowNode::event_handler(GlowWind* w, glow_eEvent event, double fx, double fy)
 {
   double x, y;
   int sts;
@@ -521,7 +527,8 @@ int GrowNode::event_handler(
 
   trf.reverse(fx, fy, &x, &y);
   sts = nc->event_handler(w, event, x, y);
-  if (ctx->trace_started && sts) {
+  if (ctx->trace_started && sts)
+  {
     // Register group members with click action
     if (is_sensitive())
       ctx->register_callback_object(glow_eObjectType_Node, this);
@@ -529,8 +536,7 @@ int GrowNode::event_handler(
   return sts;
 }
 
-int GrowNode::event_handler(
-    GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
+int GrowNode::event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
 {
   int sts;
   double distance;
@@ -542,16 +548,19 @@ int GrowNode::event_handler(
   if (invisible || dimmed)
     return 0;
 
-  switch (event) {
+  switch (event)
+  {
   case glow_eEvent_Key_Right:
   case glow_eEvent_Key_Left:
   case glow_eEvent_Key_BackSpace:
   case glow_eEvent_Key_Return:
   case glow_eEvent_Key_Ascii:
-    if (input_active) {
+    if (input_active)
+    {
       annot_input_event(event, x);
       return 1;
-    } else
+    }
+    else
       return 0;
   case glow_eEvent_Key_Up:
   case glow_eEvent_Key_Down:
@@ -563,93 +572,120 @@ int GrowNode::event_handler(
   trf.reverse(fx, fy, &rx, &ry);
 
   sts = 0;
-  if (event == ctx->event_move_node) {
-    if (object_type == glow_eObjectType_GrowDashCell && ctx->trace_started) {
+  if (event == ctx->event_move_node)
+  {
+    if (object_type == glow_eObjectType_GrowDashCell && ctx->trace_started)
+    {
       sts = nc->event_handler(w, event, rx, ry);
       return sts;
     }
     sts = nc->event_handler(w, event, rx, ry);
-    if (sts) {
+    if (sts)
+    {
       /* Register node for potential movement */
       ctx->move_insert(this);
       store_position();
     }
     return sts;
-  } else if (event == ctx->event_create_con) {
+  }
+  else if (event == ctx->event_create_con)
+  {
     sts = nc->event_handler(w, event, rx, ry);
-    if (sts) {
+    if (sts)
+    {
       int px, py;
 
       /* Find closest conpoint */
       distance = 1e10;
       conpoint = 0;
       nc->a.conpoint_select(&trf, x, y, &distance, (void**)&conpoint, &px, &py);
-      if (conpoint) {
+      if (conpoint)
+      {
         ctx->con_create_source(this, conpoint->number, px, py);
       }
     }
     return sts;
   }
-  switch (event) {
+  switch (event)
+  {
   case glow_eEvent_ButtonRelease:
-    if (ctx->con_create_active) {
+    if (ctx->con_create_active)
+    {
       sts = nc->event_handler(w, event, rx, ry);
-      if (sts) {
+      if (sts)
+      {
         int px, py;
 
         /* Find closest conpoint */
         distance = 1e10;
         conpoint = 0;
-        nc->a.conpoint_select(
-            &trf, x, y, &distance, (void**)&conpoint, &px, &py);
-        if (conpoint) {
+        nc->a.conpoint_select(&trf, x, y, &distance, (void**)&conpoint, &px, &py);
+        if (conpoint)
+        {
           ctx->con_create_dest(this, conpoint->number, event, x, y);
         }
       }
     }
     break;
-  case glow_eEvent_CursorMotion: {
+  case glow_eEvent_CursorMotion:
+  {
     int redraw = 0;
 
-    if (ctx->hot_mode == glow_eHotMode_TraceAction) {
+    if (ctx->hot_mode == glow_eHotMode_TraceAction)
+    {
       if (ctx->hot_found)
         sts = 0;
-      else {
-        if (!is_sensitive()) {
-          if (type() == glow_eObjectType_GrowGroup || nc->recursive_trace) {
+      else
+      {
+        if (!is_sensitive())
+        {
+          if (type() == glow_eObjectType_GrowGroup || nc->recursive_trace)
+          {
             sts = nc->a.event_handler(w, event, x, y, rx, ry);
             sts = 0;
-          } else
+          }
+          else
             sts = 0;
-        } else {
+        }
+        else
+        {
           sts = nc->event_handler(w, event, rx, ry);
           if (sts)
             ctx->hot_found = 1;
         }
       }
-    } else {
+    }
+    else
+    {
       if (ctx->hot_found)
         sts = 0;
-      else {
+      else
+      {
         sts = nc->event_handler(w, event, rx, ry);
         if (sts)
           ctx->hot_found = 1;
       }
     }
-    if (sts && !hot
-        && !(ctx->node_movement_active || ctx->node_movement_paste_active)) {
-      if ((hot_type = ctx->send_hot_request(this))) {
-        if (!ctx->trace_started) {
+    if (sts && !hot && !(ctx->node_movement_active || ctx->node_movement_paste_active))
+    {
+      if ((hot_type = ctx->send_hot_request(this)))
+      {
+        if (!ctx->trace_started)
+        {
           ctx->gdraw->set_cursor(w, glow_eDrawCursor_CrossHair);
           hot = 1;
           redraw = 1;
           ctx->tiptext_event(this, x, y);
-        } else if (hot_type & glow_mHotType_CursorCrossHair) {
+        }
+        else if (hot_type & glow_mHotType_CursorCrossHair)
+        {
           ctx->gdraw->set_cursor(w, glow_eDrawCursor_CrossHair);
           hot = 1;
           ctx->tiptext_event(this, x, y);
           redraw = 1;
-        } else if (hot_type & glow_mHotType_CursorHand) {
+        }
+        else if (hot_type & glow_mHotType_CursorHand)
+        {
           ctx->gdraw->set_cursor(w, glow_eDrawCursor_Hand);
           hot = 1;
           ctx->tiptext_event(this, x, y);
@@ -657,14 +693,16 @@ int GrowNode::event_handler(
         }
       }
     }
-    if (!sts && hot) {
+    if (!sts && hot)
+    {
       if (!ctx->hot_found)
         ctx->gdraw->set_cursor(w, glow_eDrawCursor_Normal);
       hot = 0;
       redraw = 1;
       ctx->tiptext->remove_text(this);
     }
-    if (redraw) {
+    if (redraw)
+    {
       draw();
     }
     break;
@@ -672,13 +710,15 @@ int GrowNode::event_handler(
   default:
     sts = nc->event_handler(w, event, rx, ry);
   }
-  if (sts) {
-    if ((ctx->trace_started && type() == glow_eObjectType_GrowGroup)
-        || nc->recursive_trace) {
+  if (sts)
+  {
+    if ((ctx->trace_started && type() == glow_eObjectType_GrowGroup) || nc->recursive_trace)
+    {
       // If group, only register i sensitive (group member might be sensitive)
       if (is_sensitive())
         ctx->register_callback_object(glow_eObjectType_Node, this);
-    } else
+    }
+    else
       ctx->register_callback_object(glow_eObjectType_Node, this);
   }
   return sts;
@@ -686,7 +726,8 @@ int GrowNode::event_handler(
 
 void GrowNode::set_hot(int on)
 {
-  if (hot != on) {
+  if (hot != on)
+  {
     hot = on;
     draw();
   }
@@ -694,10 +735,13 @@ void GrowNode::set_hot(int on)
 
 void GrowNode::set_dynamic(char* code, int size)
 {
-  if (!dynamic) {
+  if (!dynamic)
+  {
     dynamic = (char*)calloc(1, size + 1);
     dynamicsize = size + 1;
-  } else if (dynamicsize < size + 1) {
+  }
+  else if (dynamicsize < size + 1)
+  {
     free(dynamic);
     dynamic = (char*)calloc(1, size + 1);
     dynamicsize = size + 1;
@@ -734,16 +778,15 @@ void GrowNode::set_position(double x, double y)
   trf.move_from_stored(x, y);
   get_node_borders();
   call_redraw_node_cons();
-  ctx->draw(&ctx->mw,
-      old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->mw, old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
   draw();
 }
 
-void GrowNode::set_scale_pos(double x, double y, double scale_x, double scale_y,
-    double x0, double y0, glow_eScaleType type)
+void GrowNode::set_scale_pos(double x, double y, double scale_x, double scale_y, double x0, double y0,
+                             glow_eScaleType type)
 {
   double old_x_left, old_x_right, old_y_low, old_y_high;
 
@@ -759,38 +802,36 @@ void GrowNode::set_scale_pos(double x, double y, double scale_x, double scale_y,
   get_node_borders();
 
   ctx->set_defered_redraw();
-  ctx->draw(&ctx->mw,
-      old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      old_x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      old_y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      old_x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      old_y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, old_x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            old_y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            old_x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            old_y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
   draw();
   ctx->redraw_defered();
 }
 
-void GrowNode::set_scale(
-    double scale_x, double scale_y, double x0, double y0, glow_eScaleType type)
+void GrowNode::set_scale(double scale_x, double scale_y, double x0, double y0, glow_eScaleType type)
 {
   double old_x_left, old_x_right, old_y_low, old_y_high;
 
-  if (!((feq(scale_x, -1.0) && feq(scale_y, 1.0)) || (feq(scale_x, 1.0) && feq(scale_y, -1.0)))) {
+  if (!((feq(scale_x, -1.0) && feq(scale_y, 1.0)) || (feq(scale_x, 1.0) && feq(scale_y, -1.0))))
+  {
     if (scale_x < 0)
       scale_x = 0;
     if (scale_y < 0)
       scale_y = 0;
   }
 
-  if (trf.s_a11 && trf.s_a22
-      && fabs(scale_x - trf.a11 / trf.s_a11) < FLT_EPSILON
-      && fabs(scale_y - trf.a22 / trf.s_a22) < FLT_EPSILON)
+  if (trf.s_a11 && trf.s_a22 && fabs(scale_x - trf.a11 / trf.s_a11) < FLT_EPSILON &&
+      fabs(scale_y - trf.a22 / trf.s_a22) < FLT_EPSILON)
     return;
 
-  switch (type) {
+  switch (type)
+  {
   case glow_eScaleType_LowerLeft:
     x0 = s_x_left;
     y0 = s_y_low;
@@ -854,25 +895,21 @@ void GrowNode::set_scale(
 #endif
 
   call_redraw_node_cons();
-  ctx->draw(&ctx->mw,
-      old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
-void GrowNode::set_rotation(
-    double angel, double x0, double y0, glow_eRotationPoint type)
+void GrowNode::set_rotation(double angel, double x0, double y0, glow_eRotationPoint type)
 {
   double old_x_left, old_x_right, old_y_low, old_y_high;
   GlowTransform t;
@@ -880,7 +917,8 @@ void GrowNode::set_rotation(
   if (fabs(angel - trf.rotation + trf.s_rotation) < FLT_EPSILON)
     return;
 
-  switch (type) {
+  switch (type)
+  {
   case glow_eRotationPoint_LowerLeft:
     x0 = x_left;
     y0 = y_low;
@@ -917,15 +955,16 @@ void GrowNode::set_rotation(
   trf.set_from_stored(&t);
   get_node_borders();
   call_redraw_node_cons();
-  if (!parent) {
-    ctx->draw(&ctx->mw,
-        old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-        old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-        old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-        old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  if (!parent)
+  {
+    ctx->draw(&ctx->mw, old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+              old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+              old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+              old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
     draw();
- }
-  else {
+  }
+  else
+  {
     parent->draw();
   }
 }
@@ -934,45 +973,46 @@ void GrowNode::draw()
 {
   if (root_node)
     root_node->draw();
-  else {
+  else
+  {
     int draw_mp = DRAW_MP;
     if (annot_scrollingtext != -1)
       draw_mp = 1;
-    ctx->draw(&ctx->mw,
-        x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - draw_mp + 1,
-        y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - draw_mp,
-        x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + draw_mp,
-        y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + draw_mp);
+    ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - draw_mp + 1,
+              y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - draw_mp,
+              x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + draw_mp,
+              y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + draw_mp);
   }
 
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
 void GrowNode::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
 {
   int tmp;
 
-  if (ll_x > ur_x) {
+  if (ll_x > ur_x)
+  {
     /* Shift */
     tmp = ll_x;
     ll_x = ur_x;
     ur_x = tmp;
   }
-  if (ll_y > ur_y) {
+  if (ll_y > ur_y)
+  {
     /* Shift */
     tmp = ll_y;
     ll_y = ur_y;
     ur_y = tmp;
   }
 
-  if (x_right * w->zoom_factor_x - w->offset_x + 1 >= ll_x
-      && x_left * w->zoom_factor_x - w->offset_x <= ur_x
-      && y_high * w->zoom_factor_y - w->offset_y + 1 >= ll_y
-      && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
+  if (x_right * w->zoom_factor_x - w->offset_x + 1 >= ll_x &&
+      x_left * w->zoom_factor_x - w->offset_x <= ur_x &&
+      y_high * w->zoom_factor_y - w->offset_y + 1 >= ll_y && y_low * w->zoom_factor_y - w->offset_y <= ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, (void*)this, NULL, NULL);
   }
 }
@@ -985,21 +1025,23 @@ void GrowNode::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
   int obj_ur_y = int(y_high * w->zoom_factor_y) - w->offset_y;
   int obj_ll_y = int(y_low * w->zoom_factor_y) - w->offset_y;
 
-  if (*ll_x > *ur_x) {
+  if (*ll_x > *ur_x)
+  {
     /* Shift */
     tmp = *ll_x;
     *ll_x = *ur_x;
     *ur_x = tmp;
   }
-  if (*ll_y > *ur_y) {
+  if (*ll_y > *ur_y)
+  {
     /* Shift */
     tmp = *ll_y;
     *ll_y = *ur_y;
     *ur_y = tmp;
   }
 
-  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
-      && obj_ll_y <= *ur_y) {
+  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y && obj_ll_y <= *ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, (void*)this, NULL, NULL);
 
     // Increase the redraw area
@@ -1014,10 +1056,11 @@ void GrowNode::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
   }
 }
 
-void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode, void *transpnode)
+void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+                    void* transpnode)
 {
-  if (w == &ctx->navw) {
+  if (w == &ctx->navw)
+  {
     if (ctx->no_nav)
       return;
     hot = 0;
@@ -1029,37 +1072,39 @@ void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     node = (void*)this;
   if (!colornode)
     colornode = (void*)this;
-  else if (((GrowNode*)colornode)->fill_drawtype == glow_eDrawType_No
-      && ((GrowNode*)colornode)->color_tone == glow_eDrawTone_No)
+  else if (((GrowNode*)colornode)->fill_drawtype == glow_eDrawType_No &&
+           ((GrowNode*)colornode)->color_tone == glow_eDrawTone_No)
     colornode = (void*)this;
 
   if (((GrowNode*)node)->invisible || invisible)
     return;
 
-  if (input_focus) {
+  if (input_focus)
+  {
     GlowNodeClass* base_nc = nc->get_base_nc();
 
-    switch (base_nc->input_focus_mark) {
-    case glow_eInputFocusMark_Relief: {
+    switch (base_nc->input_focus_mark)
+    {
+    case glow_eInputFocusMark_Relief:
+    {
       hot = 1;
 
       int x1, x2, y1, y2;
       glow_eDrawType drawtype;
 
-      if (!t) {
+      if (!t)
+      {
         x1 = int(x_left * w->zoom_factor_x + 0.5) - w->offset_x - 2;
         y1 = int(y_low * w->zoom_factor_y + 0.5) - w->offset_y - 2;
         x2 = int(x_right * w->zoom_factor_x + 0.5) - w->offset_x + 2;
         y2 = int(y_high * w->zoom_factor_y + 0.5) - w->offset_y + 2;
-      } else {
-        x1 = int(t->x(x_left, y_low) * w->zoom_factor_x + 0.5) - w->offset_x
-            - 2;
-        y1 = int(t->y(x_left, y_low) * w->zoom_factor_y + 0.5) - w->offset_y
-            - 2;
-        x2 = int(t->x(x_right, y_high) * w->zoom_factor_x + 0.5) - w->offset_x
-            + 2;
-        y2 = int(t->y(x_right, y_high) * w->zoom_factor_y + 0.5) - w->offset_y
-            + 2;
+      }
+      else
+      {
+        x1 = int(t->x(x_left, y_low) * w->zoom_factor_x + 0.5) - w->offset_x - 2;
+        y1 = int(t->y(x_left, y_low) * w->zoom_factor_y + 0.5) - w->offset_y - 2;
+        x2 = int(t->x(x_right, y_high) * w->zoom_factor_x + 0.5) - w->offset_x + 2;
+        y2 = int(t->y(x_right, y_high) * w->zoom_factor_y + 0.5) - w->offset_y + 2;
       }
 
       drawtype = glow_eDrawType_DarkGray;
@@ -1075,15 +1120,16 @@ void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
 
   // If group member with click action, set hot
-  if (ctx->trace_started && this->hot && root_node
-      && ((((GrowNode*)root_node)->type() == glow_eObjectType_GrowGroup
-              && is_sensitive())
-             || ((GrowNode*)root_node)->type() == glow_eObjectType_GrowToolbar)
-      && !((GrowGroup*)root_node)->hot)
+  if (ctx->trace_started && this->hot && root_node &&
+      ((((GrowNode*)root_node)->type() == glow_eObjectType_GrowGroup && is_sensitive()) ||
+       ((GrowNode*)root_node)->type() == glow_eObjectType_GrowToolbar) &&
+      !((GrowGroup*)root_node)->hot)
     hot = 1;
 
-  if (feq(fill_level, 1.0)) {
-    if (t) {
+  if (feq(fill_level, 1.0))
+  {
+    if (t)
+    {
       GlowTransform trf_tot = *t * trf;
 
       if (!trace.p)
@@ -1091,57 +1137,66 @@ void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       else
         // If this node has a trace pointer, use colors for this node
         nc->draw(w, &trf_tot, highlight, hot, (void*)this, (void*)this, transpnode);
-    } else
+    }
+    else
       nc->draw(w, &trf, highlight, hot, node, node, transpnode);
-  } else {
+  }
+  else
+  {
     int x1, x2, y1, y2, x_level = 0, y_level = 0;
     int clip_sts = 0;
     glow_eDrawTone old_color_tone = glow_eDrawTone_No;
     glow_eDrawType old_fill_drawtype = glow_eDrawType_No;
 
-    if (!t) {
+    if (!t)
+    {
       x1 = int(x_left * w->zoom_factor_x + 0.5) - w->offset_x;
       y1 = int(y_low * w->zoom_factor_y + 0.5) - w->offset_y;
       x2 = int(x_right * w->zoom_factor_x + 0.5) - w->offset_x;
       y2 = int(y_high * w->zoom_factor_y + 0.5) - w->offset_y;
-    } else {
+    }
+    else
+    {
       x1 = int(t->x(x_left, y_low) * w->zoom_factor_x + 0.5) - w->offset_x;
       y1 = int(t->y(x_left, y_low) * w->zoom_factor_y + 0.5) - w->offset_y;
       x2 = int(t->x(x_right, y_high) * w->zoom_factor_x + 0.5) - w->offset_x;
       y2 = int(t->y(x_right, y_high) * w->zoom_factor_y + 0.5) - w->offset_y;
     }
 
-    switch (level_direction) {
+    switch (level_direction)
+    {
     case glow_eDirection_Right:
       x_level = int(fill_level * (x2 - x1) + 0.5);
-      clip_sts = ctx->gdraw->set_clip_rectangle(
-          w, x1 - 1, y1 - 1, x1 + x_level, y2 + 1);
+      clip_sts = ctx->gdraw->set_clip_rectangle(w, x1 - 1, y1 - 1, x1 + x_level, y2 + 1);
       break;
     case glow_eDirection_Left:
       x_level = int((1 - fill_level) * (x2 - x1) + 0.5);
-      clip_sts = ctx->gdraw->set_clip_rectangle(
-          w, x1 - 1, y1 - 1, x1 + x_level, y2 + 1);
-      if (level_color_tone != glow_eDrawTone_No) {
+      clip_sts = ctx->gdraw->set_clip_rectangle(w, x1 - 1, y1 - 1, x1 + x_level, y2 + 1);
+      if (level_color_tone != glow_eDrawTone_No)
+      {
         old_color_tone = color_tone;
         color_tone = level_color_tone;
-      } else if (level_fill_drawtype != glow_eDrawType_No) {
+      }
+      else if (level_fill_drawtype != glow_eDrawType_No)
+      {
         old_fill_drawtype = fill_drawtype;
         fill_drawtype = level_fill_drawtype;
       }
       break;
     case glow_eDirection_Up:
       y_level = int(fill_level * (y2 - y1) + 0.5);
-      clip_sts = ctx->gdraw->set_clip_rectangle(
-          w, x1 - 1, y1 - 1, x2 + 1, y1 + y_level);
+      clip_sts = ctx->gdraw->set_clip_rectangle(w, x1 - 1, y1 - 1, x2 + 1, y1 + y_level);
       break;
     case glow_eDirection_Down:
       y_level = int((1 - fill_level) * (y2 - y1) + 0.5);
-      clip_sts = ctx->gdraw->set_clip_rectangle(
-          w, x1 - 1, y1 - 1, x2 + 1, y1 + y_level);
-      if (level_color_tone != glow_eDrawTone_No) {
+      clip_sts = ctx->gdraw->set_clip_rectangle(w, x1 - 1, y1 - 1, x2 + 1, y1 + y_level);
+      if (level_color_tone != glow_eDrawTone_No)
+      {
         old_color_tone = color_tone;
         color_tone = level_color_tone;
-      } else if (level_fill_drawtype != glow_eDrawType_No) {
+      }
+      else if (level_fill_drawtype != glow_eDrawType_No)
+      {
         old_fill_drawtype = fill_drawtype;
         fill_drawtype = level_fill_drawtype;
       }
@@ -1149,7 +1204,8 @@ void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     default:;
     }
 
-    if (t) {
+    if (t)
+    {
       GlowTransform trf_tot = *t * trf;
 
       if (!trace.p)
@@ -1157,54 +1213,59 @@ void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       else
         // If this node has a trace pointer, use colors for this node
         nc->draw(w, &trf_tot, highlight, hot, (void*)this, (void*)this, transpnode);
-    } else
+    }
+    else
       nc->draw(w, &trf, highlight, hot, node, node, transpnode);
     if (ODD(clip_sts))
       ctx->gdraw->reset_clip_rectangle(w);
 
-    switch (level_direction) {
+    switch (level_direction)
+    {
     case glow_eDirection_Right:
-      if (level_color_tone != glow_eDrawTone_No) {
+      if (level_color_tone != glow_eDrawTone_No)
+      {
         old_color_tone = color_tone;
         color_tone = level_color_tone;
-      } else if (level_fill_drawtype != glow_eDrawType_No) {
+      }
+      else if (level_fill_drawtype != glow_eDrawType_No)
+      {
         old_fill_drawtype = fill_drawtype;
         fill_drawtype = level_fill_drawtype;
       }
-      clip_sts = ctx->gdraw->set_clip_rectangle(
-          w, x1 + x_level, y1 - 1, x2 + 1, y2 + 1);
+      clip_sts = ctx->gdraw->set_clip_rectangle(w, x1 + x_level, y1 - 1, x2 + 1, y2 + 1);
       break;
     case glow_eDirection_Left:
       if (level_color_tone != glow_eDrawTone_No)
         color_tone = old_color_tone;
       else if (level_fill_drawtype != glow_eDrawType_No)
         fill_drawtype = old_fill_drawtype;
-      clip_sts = ctx->gdraw->set_clip_rectangle(
-          w, x1 + x_level, y1 - 1, x2 + 1, y2 + 1);
+      clip_sts = ctx->gdraw->set_clip_rectangle(w, x1 + x_level, y1 - 1, x2 + 1, y2 + 1);
       break;
     case glow_eDirection_Up:
-      if (level_color_tone != glow_eDrawTone_No) {
+      if (level_color_tone != glow_eDrawTone_No)
+      {
         old_color_tone = color_tone;
         color_tone = level_color_tone;
-      } else if (level_fill_drawtype != glow_eDrawType_No) {
+      }
+      else if (level_fill_drawtype != glow_eDrawType_No)
+      {
         old_fill_drawtype = fill_drawtype;
         fill_drawtype = level_fill_drawtype;
       }
-      clip_sts = ctx->gdraw->set_clip_rectangle(
-          w, x1 - 1, y1 + y_level, x2 + 1, y2 + 1);
+      clip_sts = ctx->gdraw->set_clip_rectangle(w, x1 - 1, y1 + y_level, x2 + 1, y2 + 1);
       break;
     case glow_eDirection_Down:
       if (level_color_tone != glow_eDrawTone_No)
         color_tone = old_color_tone;
       else if (level_fill_drawtype != glow_eDrawType_No)
         fill_drawtype = old_fill_drawtype;
-      clip_sts = ctx->gdraw->set_clip_rectangle(
-          w, x1 - 1, y1 + y_level, x2 + 1, y2 + 1);
+      clip_sts = ctx->gdraw->set_clip_rectangle(w, x1 - 1, y1 + y_level, x2 + 1, y2 + 1);
       break;
     default:;
     }
 
-    if (t) {
+    if (t)
+    {
       GlowTransform trf_tot = *t * trf;
 
       if (!trace.p)
@@ -1212,12 +1273,14 @@ void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
       else
         // If this node has a trace pointer, use colors for this node
         nc->draw(w, &trf_tot, highlight, hot, (void*)this, (void*)this, transpnode);
-    } else
+    }
+    else
       nc->draw(w, &trf, highlight, hot, node, node, transpnode);
     if (ODD(clip_sts))
       ctx->gdraw->reset_clip_rectangle(w);
 
-    switch (level_direction) {
+    switch (level_direction)
+    {
     case glow_eDirection_Right:
       if (level_color_tone != glow_eDrawTone_No)
         color_tone = old_color_tone;
@@ -1239,8 +1302,8 @@ void GrowNode::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   }
 }
 
-void GrowNode::init_transform(double a11, double a12, double a13, double a21, 
-    double a22, double a23, double rotation)
+void GrowNode::init_transform(double a11, double a12, double a13, double a21, double a22, double a23,
+                              double rotation)
 {
   trf.init(a11, a12, a13, a21, a22, a23, rotation);
   get_node_borders();
@@ -1261,8 +1324,7 @@ int GrowNode::get_conpoint(int num, double* x, double* y, glow_eDirection* dir)
   return sts;
 }
 
-void GrowNode::set_annotation(
-    int num, const char* text, int size, int nodraw, int brief)
+void GrowNode::set_annotation(int num, const char* text, int size, int nodraw, int brief)
 {
   if (annotv_inputmode[num])
     return;
@@ -1270,13 +1332,15 @@ void GrowNode::set_annotation(
   set_annotation_input(num, text, size, nodraw, brief);
 }
 
-void GrowNode::set_annotation_input(
-    int num, const char* text, int size, int nodraw, int brief)
+void GrowNode::set_annotation_input(int num, const char* text, int size, int nodraw, int brief)
 {
-  if (!annotv[num]) {
+  if (!annotv[num])
+  {
     annotv[num] = (char*)calloc(1, size + 1);
     annotsize[num] = size + 1;
-  } else if (annotsize[num] < size + 1) {
+  }
+  else if (annotsize[num] < size + 1)
+  {
     free(annotv[num]);
     annotv[num] = (char*)calloc(1, size + 1);
     annotsize[num] = size + 1;
@@ -1285,28 +1349,35 @@ void GrowNode::set_annotation_input(
   if (nodraw || invisible)
     return;
 
-  if (!root_node) {
-    if (relative_annot_pos) {
-    } else {
+  if (!root_node)
+  {
+    if (relative_annot_pos)
+    {
+    }
+    else
+    {
       if (brief && !inverse)
         nc->draw_annotation(&trf, highlight, hot, (void*)this, num);
       draw();
     }
     nc->draw(&ctx->navw, &trf, highlight, 0, (void*)this, (void*)this, NULL);
-  } else {
+  }
+  else
+  {
     root_node->draw();
-    root_node->draw(
-		    &ctx->navw, (GlowTransform*)NULL, root_node->highlight, 0, NULL, NULL, NULL);
+    root_node->draw(&ctx->navw, (GlowTransform*)NULL, root_node->highlight, 0, NULL, NULL, NULL);
   }
 }
 
-void GrowNode::get_borders(GlowTransform* t, double* x1_right, double* x1_left,
-    double* y1_high, double* y1_low)
+void GrowNode::get_borders(GlowTransform* t, double* x1_right, double* x1_left, double* y1_high,
+                           double* y1_low)
 {
-  if (t) {
+  if (t)
+  {
     GlowTransform t2 = *t * trf;
     nc->get_borders(&t2, x1_right, x1_left, y1_high, y1_low);
-  } else
+  }
+  else
     nc->get_borders(&trf, x1_right, x1_left, y1_high, y1_low);
 }
 
@@ -1327,10 +1398,13 @@ int GrowNode::set_argument(int num, char* arg, int size)
   if (num >= nc->arg_cnt)
     return 0;
 
-  if (!argv[num]) {
+  if (!argv[num])
+  {
     argv[num] = (char*)calloc(1, size + 1);
     argsize[num] = size + 1;
-  } else if (argsize[num] < size + 1) {
+  }
+  else if (argsize[num] < size + 1)
+  {
     free(argv[num]);
     argv[num] = (char*)calloc(1, size + 1);
     argsize[num] = size + 1;
@@ -1351,10 +1425,13 @@ void GrowNode::get_node_borders()
   x_right = y_high = -1e37;
   nc->get_borders(&trf, &x_right, &x_left, &y_high, &y_low);
 
-  if (nc->no_con_obstacle) {
+  if (nc->no_con_obstacle)
+  {
     obst_x_left = obst_y_low = 1e37;
     obst_x_right = obst_y_high = -1e37;
-  } else {
+  }
+  else
+  {
     obst_x_left = x_left;
     obst_x_right = x_right;
     obst_y_low = y_low;
@@ -1368,7 +1445,8 @@ void GrowNode::align(double x, double y, glow_eAlignDirection direction)
 
   ctx->set_defered_redraw();
   draw();
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eAlignDirection_CenterVert:
     dx = x - (x_right + x_left) / 2;
     dy = 0;
@@ -1412,21 +1490,23 @@ void GrowNode::align(double x, double y, glow_eAlignDirection direction)
   ctx->redraw_defered();
 }
 
-void GrowNode::export_javabean(GlowTransform* t, void* node,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, int in_nc,
-    std::ofstream& fp)
+void GrowNode::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
+                               int node_cnt, int in_nc, std::ofstream& fp)
 {
   double x1, y1, x2, y2, rot;
   char java_name[40];
 
   get_node_borders();
-  if (!t) {
+  if (!t)
+  {
     x1 = x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y2 = y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     rot = trf.rot();
-  } else {
+  }
+  else
+  {
     x1 = t->x(x_left, y_low) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = t->y(x_left, y_low) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = t->x(x_right, y_high) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
@@ -1435,9 +1515,9 @@ void GrowNode::export_javabean(GlowTransform* t, void* node,
   }
 
   nc->get_java_name(java_name);
-  ctx->export_jbean->node(x1, y1, x2, y2, java_name, draw_type, fill_drawtype,
-      text_drawtype, color_tone, color_lightness, color_intensity, color_shift,
-      line_width, rot, shadow, gradient, pass, shape_cnt, node_cnt, in_nc, fp);
+  ctx->export_jbean->node(x1, y1, x2, y2, java_name, draw_type, fill_drawtype, text_drawtype, color_tone,
+                          color_lightness, color_intensity, color_shift, line_width, rot, shadow, gradient,
+                          pass, shape_cnt, node_cnt, in_nc, fp);
 }
 
 int GrowNode::get_next_nodeclass(GlowNodeClass** next)
@@ -1451,7 +1531,8 @@ int GrowNode::get_next_nodeclass(GlowNodeClass** next)
 
 int GrowNode::set_next_nodeclass()
 {
-  if (nc->next_nc) {
+  if (nc->next_nc)
+  {
     set_nodeclass((GlowNodeClass*)nc->next_nc);
     return 1;
   }
@@ -1461,8 +1542,7 @@ int GrowNode::set_next_nodeclass()
 void GrowNode::set_last_nodeclass()
 {
   GlowArrayElem* next;
-  for (next = nc_root; ((GlowNodeClass*)next)->next_nc;
-       next = ((GlowNodeClass*)next)->next_nc)
+  for (next = nc_root; ((GlowNodeClass*)next)->next_nc; next = ((GlowNodeClass*)next)->next_nc)
     ;
   if (next != nc)
     set_nodeclass((GlowNodeClass*)next);
@@ -1474,7 +1554,8 @@ int GrowNode::set_nodeclass_by_index(int idx)
   int i;
 
   next = nc_root;
-  for (i = 0; i < idx; i++) {
+  for (i = 0; i < idx; i++)
+  {
     if (!((GlowNodeClass*)next)->next_nc)
       return 0;
     next = ((GlowNodeClass*)next)->next_nc;
@@ -1486,7 +1567,8 @@ int GrowNode::set_nodeclass_by_index(int idx)
 
 int GrowNode::set_previous_nodeclass()
 {
-  if (nc->prev_nc) {
+  if (nc->prev_nc)
+  {
     set_nodeclass((GlowNodeClass*)nc->prev_nc);
     return 1;
   }
@@ -1517,16 +1599,14 @@ void GrowNode::set_nodeclass(GlowNodeClass* new_nc)
   if (root_node)
     root_node->draw();
   else
-    ctx->draw(&ctx->mw,
-        old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-        old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-        old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-        old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      old_x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      old_y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      old_x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      old_y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+    ctx->draw(&ctx->mw, old_x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+              old_y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+              old_x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+              old_y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, old_x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            old_y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            old_x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            old_y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
 void GrowNode::trace_close()
@@ -1542,18 +1622,14 @@ int GrowNode::find_nc(GlowArrayElem* nodeclass)
   if (nc == nodeclass)
     return 1;
 
-  for (next_nc = nc->next_nc; next_nc;
-       next_nc = ((GlowNodeClass*)next_nc)->next_nc)
+  for (next_nc = nc->next_nc; next_nc; next_nc = ((GlowNodeClass*)next_nc)->next_nc)
     if (nodeclass == next_nc)
       return 1;
 
   return nc->a.find_nc(nodeclass);
 }
 
-void GrowNode::set_last_group(char* name)
-{
-  strcpy(last_group, name);
-}
+void GrowNode::set_last_group(char* name) { strcpy(last_group, name); }
 
 int GrowNode::is_sensitive()
 {
@@ -1562,10 +1638,7 @@ int GrowNode::is_sensitive()
   return ctx->send_hot_request(this);
 }
 
-int GrowNode::is_click_sensitive()
-{
-  return 0;
-}
+int GrowNode::is_click_sensitive() { return 0; }
 
 int GrowNode::is_refobject_sensitive()
 {
@@ -1593,19 +1666,26 @@ int GrowNode::get_limits(double* min, double* max, glow_eDirection* direction)
 
   rotation = (trf.rot() / 360 - floor(trf.rot() / 360)) * 360;
 
-  if (45 >= rotation || rotation > 315) {
+  if (45 >= rotation || rotation > 315)
+  {
     *direction = glow_eDirection_Down;
     *min = y1;
     *max = y2;
-  } else if (45 < rotation && rotation <= 135) {
+  }
+  else if (45 < rotation && rotation <= 135)
+  {
     *direction = glow_eDirection_Right;
     *min = x2;
     *max = x1;
-  } else if (135 < rotation && rotation <= 225) {
+  }
+  else if (135 < rotation && rotation <= 225)
+  {
     *direction = glow_eDirection_Up;
     *min = y2;
     *max = y1;
-  } else if (225 < rotation && rotation <= 315) {
+  }
+  else if (225 < rotation && rotation <= 315)
+  {
     *direction = glow_eDirection_Left;
     *min = x1;
     *max = x2;
@@ -1613,8 +1693,7 @@ int GrowNode::get_limits(double* min, double* max, glow_eDirection* direction)
   return 1;
 }
 
-int GrowNode::get_limits_pixel(
-    double* pix_min, double* pix_max, glow_eDirection* direction)
+int GrowNode::get_limits_pixel(double* pix_min, double* pix_max, glow_eDirection* direction)
 {
   if (feq(nc->y0, 0.0) && feq(nc->y1, 0.0))
     return 0;
@@ -1639,25 +1718,33 @@ int GrowNode::get_limits_pixel(
   rotation = (trf.rot() / 360 - floor(trf.rot() / 360)) * 360;
   double min = 0.0, max = 0.0;
 
-  if (45 >= rotation || rotation > 315) {
+  if (45 >= rotation || rotation > 315)
+  {
     *direction = glow_eDirection_Down;
     min = y1 - y0;
     max = y2 - y0;
-  } else if (45 < rotation && rotation <= 135) {
+  }
+  else if (45 < rotation && rotation <= 135)
+  {
     *direction = glow_eDirection_Right;
     min = x0 - x1;
     max = x0 - x2;
-  } else if (135 < rotation && rotation <= 225) {
+  }
+  else if (135 < rotation && rotation <= 225)
+  {
     *direction = glow_eDirection_Up;
     min = y0 - y1;
     max = y0 - y2;
-  } else if (225 < rotation && rotation <= 315) {
+  }
+  else if (225 < rotation && rotation <= 315)
+  {
     *direction = glow_eDirection_Left;
     min = x1 - x0;
     max = x2 - x0;
   }
 
-  switch (*direction) {
+  switch (*direction)
+  {
   case glow_eDirection_Up:
   case glow_eDirection_Down:
     *pix_max = max * ctx->mw.zoom_factor_y;
@@ -1673,9 +1760,9 @@ int GrowNode::get_limits_pixel(
   return 1;
 }
 
-int GrowNode::get_background_object_limits(GlowTransform* t,
-    glow_eTraceType type, double x, double y, GlowArrayElem** background,
-    double* min, double* max, glow_eDirection* direction)
+int GrowNode::get_background_object_limits(GlowTransform* t, glow_eTraceType type, double x, double y,
+                                           GlowArrayElem** background, double* min, double* max,
+                                           glow_eDirection* direction)
 {
   int dyn_type;
   GlowNodeClass* base_nc = nc->get_base_nc();
@@ -1694,15 +1781,19 @@ int GrowNode::get_background_object_limits(GlowTransform* t,
   double y1_low = 10e37;
   get_borders(t, &x1_right, &x1_left, &y1_high, &y1_low);
 
-  if (x <= x1_right && x >= x1_left && y <= y1_high && y >= y1_low) {
+  if (x <= x1_right && x >= x1_left && y <= y1_high && y >= y1_low)
+  {
     // Hit, calculate max and min koordinates
 
-    if (!t) {
+    if (!t)
+    {
       x1 = trf.x(0, nc->y0);
       y1 = trf.y(0, nc->y0);
       x2 = trf.x(0, nc->y1);
       y2 = trf.y(0, nc->y1);
-    } else {
+    }
+    else
+    {
       x1 = trf.x(t, 0, nc->y0);
       y1 = trf.y(t, 0, nc->y0);
       x2 = trf.x(t, 0, nc->y1);
@@ -1713,19 +1804,26 @@ int GrowNode::get_background_object_limits(GlowTransform* t,
       rotation = (trf.rot(t) / 360 - floor(trf.rot(t) / 360)) * 360;
     else
       rotation = (trf.rot() / 360 - floor(trf.rot() / 360)) * 360;
-    if (45 >= rotation || rotation > 315) {
+    if (45 >= rotation || rotation > 315)
+    {
       *direction = glow_eDirection_Down;
       *min = y1;
       *max = y2;
-    } else if (45 < rotation && rotation <= 135) {
+    }
+    else if (45 < rotation && rotation <= 135)
+    {
       *direction = glow_eDirection_Left;
       *min = x2;
       *max = x1;
-    } else if (135 < rotation && rotation <= 225) {
+    }
+    else if (135 < rotation && rotation <= 225)
+    {
       *direction = glow_eDirection_Up;
       *min = y2;
       *max = y1;
-    } else if (225 < rotation && rotation <= 315) {
+    }
+    else if (225 < rotation && rotation <= 315)
+    {
       *direction = glow_eDirection_Right;
       *min = x1;
       *max = x2;
@@ -1738,21 +1836,21 @@ int GrowNode::get_background_object_limits(GlowTransform* t,
 
 void GrowNode::get_nodeclass_origo(GlowTransform* t, double* x, double* y)
 {
-  if (t) {
+  if (t)
+  {
     GlowTransform t2 = *t * trf;
     nc->get_origo(&t2, x, y);
-  } else
+  }
+  else
     nc->get_origo(&trf, x, y);
 }
 
-void GrowNode::call_redraw_node_cons()
-{
-  ctx->redraw_node_cons(this);
-}
+void GrowNode::call_redraw_node_cons() { ctx->redraw_node_cons(this); }
 
 void GrowNode::flip(double x0, double y0, glow_eFlipDirection dir)
 {
-  switch (dir) {
+  switch (dir)
+  {
   case glow_eFlipDirection_Horizontal:
     trf.store();
     set_scale(1, -1, x0, y0, glow_eScaleType_FixPoint);
@@ -1769,26 +1867,27 @@ void GrowNode::flip(double x0, double y0, glow_eFlipDirection dir)
 
 void GrowNode::convert(glow_eConvert version)
 {
-  switch (version) {
-  case glow_eConvert_V34: {
+  switch (version)
+  {
+  case glow_eConvert_V34:
+  {
     // Conversion of colors
     draw_type = GlowColor::convert(version, draw_type);
-    original_border_drawtype
-        = GlowColor::convert(version, original_border_drawtype);
-    original_fill_drawtype
-        = GlowColor::convert(version, original_fill_drawtype);
+    original_border_drawtype = GlowColor::convert(version, original_border_drawtype);
+    original_fill_drawtype = GlowColor::convert(version, original_fill_drawtype);
     fill_drawtype = GlowColor::convert(version, fill_drawtype);
-    if (trace.attr_type == 3 || trace.attr_type == 4 || trace.attr_type == 12
-        || trace.attr_type == 1010 || trace.attr_type == 1011
-        || trace.attr_type == 1012 || trace.attr_type == 1013
-        || trace.attr_type == 1014 || trace.attr_type == 1015
-        || trace.attr_type == 1016 || trace.attr_type == 1021
-        || trace.attr_type == 1023) {
+    if (trace.attr_type == 3 || trace.attr_type == 4 || trace.attr_type == 12 || trace.attr_type == 1010 ||
+        trace.attr_type == 1011 || trace.attr_type == 1012 || trace.attr_type == 1013 ||
+        trace.attr_type == 1014 || trace.attr_type == 1015 || trace.attr_type == 1016 ||
+        trace.attr_type == 1021 || trace.attr_type == 1023)
+    {
       if ((glow_eDrawTone)trace.color == glow_eDrawTone_YellowGreen)
         trace.color = (glow_eDrawType)glow_eDrawTone_Yellow;
       if ((glow_eDrawTone)trace.color2 == glow_eDrawTone_YellowGreen)
         trace.color2 = (glow_eDrawType)glow_eDrawTone_Yellow;
-    } else {
+    }
+    else
+    {
       trace.color = GlowColor::convert(version, trace.color);
       trace.color2 = GlowColor::convert(version, trace.color2);
     }
@@ -1809,12 +1908,15 @@ void GrowNode::convert(glow_eConvert version)
 
 void GrowNode::set_input_focus(int focus, glow_eEvent event)
 {
-  if (focus && !input_focus) {
+  if (focus && !input_focus)
+  {
     input_focus = 1;
     draw();
 
     ctx->register_inputfocus(this, 1);
-  } else if (!focus && input_focus) {
+  }
+  else if (!focus && input_focus)
+  {
     input_focus = 0;
     draw();
 
@@ -1850,7 +1952,8 @@ void GrowNode::close_annotation_input(int num)
 
 void GrowNode::close_annotation_input()
 {
-  if (input_active) {
+  if (input_active)
+  {
     input_active = 0;
     for (int i = 0; i < 10; i++)
       annotv_inputmode[i] = 0;
@@ -1863,10 +1966,13 @@ void GrowNode::set_annotation_selection(int selection)
   if (!input_active)
     return;
 
-  if (selection && !input_selected) {
+  if (selection && !input_selected)
+  {
     input_selected = 1;
     draw();
-  } else if (!selection && input_selected) {
+  }
+  else if (!selection && input_selected)
+  {
     input_selected = 0;
     draw();
   }
@@ -1878,8 +1984,10 @@ void GrowNode::annot_input_event(glow_eEvent event, int keycode)
   int idx = 0;
   char* s;
 
-  for (i = 0; i < 10; i++) {
-    if (annotv_inputmode[i]) {
+  for (i = 0; i < 10; i++)
+  {
+    if (annotv_inputmode[i])
+    {
       idx = i;
       break;
     }
@@ -1888,7 +1996,8 @@ void GrowNode::annot_input_event(glow_eEvent event, int keycode)
   if (!annotv[idx] && annotsize[idx] == 0)
     annotv[idx] = (char*)calloc(1, annotsize[idx] + 1);
 
-  switch (event) {
+  switch (event)
+  {
   case glow_eEvent_Key_Right:
     input_position++;
     if (input_position > (int)strlen(annotv[idx]))
@@ -1904,10 +2013,13 @@ void GrowNode::annot_input_event(glow_eEvent event, int keycode)
   case glow_eEvent_Key_BackSpace:
     if (input_position == 0)
       break;
-    if (input_selected) {
+    if (input_selected)
+    {
       annotv[idx][0] = 0;
       input_position = 0;
-    } else {
+    }
+    else
+    {
       for (s = &annotv[idx][input_position]; *s; s++)
         *(s - 1) = *s;
       *(s - 1) = 0;
@@ -1916,11 +2028,13 @@ void GrowNode::annot_input_event(glow_eEvent event, int keycode)
     input_selected = 0;
     break;
   case glow_eEvent_Key_Ascii:
-    if (input_selected) {
+    if (input_selected)
+    {
       annotv[idx][0] = 0;
       input_position = 0;
     }
-    if (annotsize[idx] < (int)strlen(annotv[idx]) + 2) {
+    if (annotsize[idx] < (int)strlen(annotv[idx]) + 2)
+    {
       // Increase size of annotv
       char* tmp = annotv[idx];
       if (annotsize[idx] == 0)
@@ -1946,10 +2060,9 @@ void GrowNode::annot_input_event(glow_eEvent event, int keycode)
   draw();
 }
 
-int GrowNode::get_annotation_info(int num, int* t_size,
-    glow_eDrawType* t_drawtype, glow_eDrawType* t_color,
-    glow_eDrawType* bg_color, double* scale, glow_eFont* t_font,
-    glow_eAnnotType* t_type)
+int GrowNode::get_annotation_info(int num, int* t_size, glow_eDrawType* t_drawtype, glow_eDrawType* t_color,
+                                  glow_eDrawType* bg_color, double* scale, glow_eFont* t_font,
+                                  glow_eAnnotType* t_type)
 {
   int sts;
 
@@ -1957,8 +2070,7 @@ int GrowNode::get_annotation_info(int num, int* t_size,
   if (EVEN(sts))
     *bg_color = glow_eDrawType_No;
 
-  sts = nc->get_annotation_info(
-      (void*)this, num, t_size, t_drawtype, t_color, t_font, t_type);
+  sts = nc->get_annotation_info((void*)this, num, t_size, t_drawtype, t_color, t_font, t_type);
   *scale = trf.vertical_scale(0);
   return sts;
 }
@@ -1972,15 +2084,15 @@ void GrowNode::set_annotation_text_offset(int num, double x, double y)
 {
   if (annot_scrollingtext == -1)
     annot_scrollingtext = num;
-  if (num == annot_scrollingtext) {
+  if (num == annot_scrollingtext)
+  {
     annot_offset_x = x;
     annot_offset_y = y;
     draw();
   }
 }
 
-void GrowNode::get_annotation_text_extent(
-    int num, double* width, double* height)
+void GrowNode::get_annotation_text_extent(int num, double* width, double* height)
 {
   nc->get_annotation_text_extent(&trf, (void*)this, num, width, height);
 }
@@ -1996,7 +2108,8 @@ glow_eVis GrowNode::get_visibility()
 
 void GrowNode::set_visibility(glow_eVis visibility)
 {
-  switch (visibility) {
+  switch (visibility)
+  {
   case glow_eVis_Visible:
     if (invisible == 0 && dimmed == 0)
       return;
@@ -2020,8 +2133,8 @@ void GrowNode::set_visibility(glow_eVis visibility)
 
 void GrowNode::set_textbold(int bold)
 {
-  if ((bold && text_type == glow_eDrawType_TextHelveticaBold)
-      || (!bold && text_type == glow_eDrawType_TextHelvetica))
+  if ((bold && text_type == glow_eDrawType_TextHelveticaBold) ||
+      (!bold && text_type == glow_eDrawType_TextHelvetica))
     return;
 
   if (bold)
@@ -2044,13 +2157,11 @@ void GrowNode::set_colortheme_lightness()
   if (!ctx->customcolors)
     return;
 
-  if (ctx->customcolors->colortheme_lightness != color_lightness) {
+  if (ctx->customcolors->colortheme_lightness != color_lightness)
+  {
     color_lightness = ctx->customcolors->colortheme_lightness;
     draw();
   }
 }
 
-int GrowNode::export_script(GlowExportScript* es, void* o, void* m)
-{
-  return es->node(this, o, m);
-}
+int GrowNode::export_script(GlowExportScript* es, void* o, void* m) { return es->node(this, o, m); }

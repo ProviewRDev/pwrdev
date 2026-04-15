@@ -39,28 +39,23 @@
 
 #include "flow_array_elem.h"
 
-class FlowArray {
+class FlowArray
+{
 public:
   FlowArray(int allocate, int incr);
-  FlowArray(){}
+  FlowArray() {}
   void new_array(const FlowArray& array);
   FlowArrayElem* operator[](int idx);
   void copy_from(const FlowArray& array);
   void copy_from_common_objects(FlowArray& array);
   void move_from(FlowArray& array);
-  int size()
-  {
-    return a_size;
-  }
+  int size() { return a_size; }
   int insert(FlowArrayElem* element);
   void remove(FlowArrayElem* element);
   int find(FlowArrayElem* element);
   int find_by_name(char* name, FlowArrayElem** element);
   int find_by_name_no_case(char* name, FlowArrayElem** element);
-  void clear()
-  {
-    a_size = 0;
-  }
+  void clear() { a_size = 0; }
   void zoom();
   void nav_zoom();
   void print_zoom();
@@ -73,11 +68,10 @@ public:
   void nav_draw(void* pos, int highlight, void* node);
   void nav_erase(void* pos, void* node);
   void traverse(int x, int y);
-  void get_borders(
-      double* x_right, double* x_left, double* y_high, double* y_low);
+  void get_borders(double* x_right, double* x_left, double* y_high, double* y_low);
   void get_borders();
-  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left,
-      double* y_high, double* y_low, void* node);
+  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,
+                   void* node);
   int event_handler(flow_eEvent event, int x, int y);
   int event_handler(void* pos, flow_eEvent event, int x, int y, void* node);
   int event_handler(void* pos, flow_eEvent event, int x, int y, int num);
@@ -87,23 +81,20 @@ public:
   void set_dimmed(int on);
   void set_hot(int on);
   void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y);
-  void shift(void* pos, double delta_x, double delta_y, int highlight,
-      int dimmed, int hot);
+  void shift(void* pos, double delta_x, double delta_y, int highlight, int dimmed, int hot);
   void move(int delta_x, int delta_y, int grid);
   void move_noerase(int delta_x, int delta_y, int grid);
   void conpoint_refcon_redraw(void* node, int conpoint);
   void conpoint_refcon_erase(void* node, int conpoint);
   void set_inverse(int on);
   void configure();
-  int brow_insert(
-      FlowArrayElem* element, FlowArrayElem* destination, flow_eDest code);
+  int brow_insert(FlowArrayElem* element, FlowArrayElem* destination, flow_eDest code);
   void brow_remove(void* ctx, FlowArrayElem* element);
   void brow_close(void* ctx, FlowArrayElem* element);
   int brow_get_parent(FlowArrayElem* element, FlowArrayElem** parent);
   int brow_get_child(FlowArrayElem* element, FlowArrayElem** child);
   int brow_get_next_sibling(FlowArrayElem* element, FlowArrayElem** sibling);
-  int brow_get_previous_sibling(
-      FlowArrayElem* element, FlowArrayElem** sibling);
+  int brow_get_previous_sibling(FlowArrayElem* element, FlowArrayElem** sibling);
   void move_widgets(int x, int y);
   int get_first(FlowArrayElem** first);
   int get_last(FlowArrayElem** last);
@@ -111,8 +102,7 @@ public:
   int get_next(FlowArrayElem* element, FlowArrayElem** next);
   int move_up(FlowArrayElem* element);
   int move_down(FlowArrayElem* element);
-  int sort_children(FlowArrayElem* element, int offset,
-      int (*comp)(const void*, const void*));
+  int sort_children(FlowArrayElem* element, int offset, int (*comp)(const void*, const void*));
   ~FlowArray();
   friend class FlowNodeClass;
   friend class FlowCtx;

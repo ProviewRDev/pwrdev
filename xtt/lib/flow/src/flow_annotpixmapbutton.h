@@ -39,21 +39,16 @@
 
 #include "flow_annotpixmap.h"
 
-class FlowAnnotPixmapButton : public FlowAnnotPixmap {
+class FlowAnnotPixmapButton : public FlowAnnotPixmap
+{
 public:
   FlowAnnotPixmapButton(FlowCtx* flow_ctx, int num, double x = 0, double y = 0,
-      flow_eDrawType d_type = flow_eDrawType_Line, int size = 2,
-      int rel_pos = 0)
+                        flow_eDrawType d_type = flow_eDrawType_Line, int size = 2, int rel_pos = 0)
       : FlowAnnotPixmap(flow_ctx, num, x, y, d_type, size, rel_pos)
   {
   }
-  FlowAnnotPixmapButton(const FlowAnnotPixmapButton& p) : FlowAnnotPixmap(p)
-  {
-  }
-  flow_eObjectType type()
-  {
-    return flow_eObjectType_AnnotPixmapButton;
-  }
+  FlowAnnotPixmapButton(const FlowAnnotPixmapButton& p) : FlowAnnotPixmap(p) {}
+  flow_eObjectType type() { return flow_eObjectType_AnnotPixmapButton; }
   int event_handler(void* pos, flow_eEvent event, int x, int y, void* node);
 };
 

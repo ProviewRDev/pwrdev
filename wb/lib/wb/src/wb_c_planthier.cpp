@@ -61,21 +61,19 @@ static pwr_tStatus Build(ldh_sMenuCall* ip)
 //
 // Syntax Check
 //
-static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
-    int* ErrorCount, int* WarningCount)
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, int* ErrorCount,
+                               int* WarningCount)
 {
   pwr_tStatus sts;
-  pwr_tCid defgraph_class[] = { pwr_cClass_XttGraph, 0 };
-  pwr_tCid deftrend_class[] = { pwr_cClass_DsTrend, pwr_cClass_DsFast,
-    pwr_cClass_DsFastCurve, pwr_cClass_PlotGroup, 0 };
+  pwr_tCid defgraph_class[] = {pwr_cClass_XttGraph, 0};
+  pwr_tCid deftrend_class[] = {pwr_cClass_DsTrend, pwr_cClass_DsFast, pwr_cClass_DsFastCurve,
+                               pwr_cClass_PlotGroup, 0};
 
-  sts = wsx_CheckAttrRef(
-      Session, Object, "DefGraph", defgraph_class, 1, ErrorCount, WarningCount);
+  sts = wsx_CheckAttrRef(Session, Object, "DefGraph", defgraph_class, 1, ErrorCount, WarningCount);
   if (EVEN(sts))
     return sts;
 
-  sts = wsx_CheckAttrRef(
-      Session, Object, "DefTrend", deftrend_class, 1, ErrorCount, WarningCount);
+  sts = wsx_CheckAttrRef(Session, Object, "DefTrend", deftrend_class, 1, ErrorCount, WarningCount);
   if (EVEN(sts))
     return sts;
 
@@ -86,5 +84,5 @@ static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods($PlantHier)
-    = { pwr_BindMethod(Build), pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods($PlantHier) = {pwr_BindMethod(Build), pwr_BindMethod(SyntaxCheck),
+                                           pwr_NullMethod};

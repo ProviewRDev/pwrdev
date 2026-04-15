@@ -44,13 +44,12 @@
 #include <QWidget>
 
 //! The navigation area of the attribute editor.
-class TreeNavQt : public TreeNav {
+class TreeNavQt : public TreeNav
+{
 public:
-  TreeNavQt(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist, int xn_item_cnt,
-      unsigned int xn_options, pwr_tStatus (*xn_get_object_info)(
-          void*, pwr_tAttrRef*, char*, int, char*, char*, int),
-      pwr_tStatus (*xn_get_node_info)(void*, char*, char*, int), QWidget** w,
-      pwr_tStatus* status);
+  TreeNavQt(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist, int xn_item_cnt, unsigned int xn_options,
+            pwr_tStatus (*xn_get_object_info)(void*, pwr_tAttrRef*, char*, int, char*, char*, int),
+            pwr_tStatus (*xn_get_node_info)(void*, char*, char*, int), QWidget** w, pwr_tStatus* status);
   ~TreeNavQt();
 
   QWidget* brow_widget;

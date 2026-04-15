@@ -63,17 +63,20 @@
 
 typedef pwr_tMask mb_tSendMask;
 
-typedef enum {
+typedef enum
+{
   mb_mSendMask_ReadReq = 1,
   mb_mSendMask_WriteReq = 2,
 } mb_mSendMask;
 
-typedef struct {
+typedef struct
+{
   int initialized;
   int fd;
 } io_sAgentLocal;
 
-typedef struct {
+typedef struct
+{
   int initialized;
   short int trans_id;
   int input_size;
@@ -83,7 +86,8 @@ typedef struct {
   int reset_inputs;
 } io_sRackLocal;
 
-typedef struct {
+typedef struct
+{
   void* input_area;
   void* output_area;
   int scancount[IO_MAXCHAN];
@@ -96,11 +100,13 @@ typedef struct {
   int has_read_method;
 } io_sCardLocalMsg;
 
-typedef struct {
+typedef struct
+{
   io_sCardLocalMsg msg[2];
 } io_sCardLocal;
 
-typedef struct {
+typedef struct
+{
   int initialized;
   int fd;
   int input_size;
@@ -110,7 +116,8 @@ typedef struct {
   thread_s receive_thread;
 } io_sServerLocal;
 
-typedef struct {
+typedef struct
+{
   void* input_area;
   void* output_area;
   int scancount[IO_MAXCHAN];
@@ -127,7 +134,8 @@ typedef struct {
 
 #pragma pack(1)
 
-typedef struct _read_req {
+typedef struct _read_req
+{
   unsigned char unit_id;
   unsigned char fc;
   short int addr;
@@ -135,13 +143,15 @@ typedef struct _read_req {
   short int crc;
 } read_req;
 
-typedef struct _rec_buf {
+typedef struct _rec_buf
+{
   unsigned char unit_id;
   unsigned char fc;
   unsigned char buf[255];
 } rec_buf;
 
-typedef struct _write_single_req {
+typedef struct _write_single_req
+{
   unsigned char unit_id;
   unsigned char fc;
   short int addr;
@@ -149,7 +159,8 @@ typedef struct _write_single_req {
   short int crc;
 } write_single_req;
 
-typedef struct _write_reg_req {
+typedef struct _write_reg_req
+{
   unsigned char unit_id;
   unsigned char fc;
   short int addr;
@@ -159,7 +170,8 @@ typedef struct _write_reg_req {
   short int crc;
 } write_reg_req;
 
-typedef struct _write_coils_req {
+typedef struct _write_coils_req
+{
   unsigned char unit_id;
   unsigned char fc;
   short int addr;
@@ -169,7 +181,8 @@ typedef struct _write_coils_req {
   short int crc;
 } write_coils_req;
 
-typedef struct _read_dev_id_req {
+typedef struct _read_dev_id_req
+{
   unsigned char unit_id;
   unsigned char fc;
   unsigned char mei_type;
@@ -178,7 +191,8 @@ typedef struct _read_dev_id_req {
   short int crc;
 } read_dev_id_req;
 
-typedef struct _res_write {
+typedef struct _res_write
+{
   unsigned char unit_id;
   unsigned char fc;
   short int addr;
@@ -187,7 +201,8 @@ typedef struct _res_write {
   short int crc;
 } res_write;
 
-typedef struct _res_read {
+typedef struct _res_read
+{
   unsigned char unit_id;
   unsigned char fc;
   unsigned char bc;
@@ -195,21 +210,24 @@ typedef struct _res_read {
   short int crc;
 } res_read;
 
-typedef struct _res_fault {
+typedef struct _res_fault
+{
   unsigned char unit_id;
   unsigned char fc;
   unsigned char ec;
   short int crc;
 } res_fault;
 
-typedef struct _rsp_fault {
+typedef struct _rsp_fault
+{
   unsigned char unit_id;
   unsigned char fc;
   unsigned char ec;
   short int crc;
 } rsp_fault;
 
-typedef struct _rsp_read {
+typedef struct _rsp_read
+{
   unsigned char unit_id;
   unsigned char fc;
   unsigned char bc;
@@ -217,7 +235,8 @@ typedef struct _rsp_read {
   short int crc;
 } rsp_read;
 
-typedef struct _rsp_write {
+typedef struct _rsp_write
+{
   unsigned char unit_id;
   unsigned char fc;
   short int addr;
@@ -225,7 +244,8 @@ typedef struct _rsp_write {
   short int crc;
 } rsp_write;
 
-typedef struct _rsp_single_write {
+typedef struct _rsp_single_write
+{
   unsigned char unit_id;
   unsigned char fc;
   short int addr;
@@ -233,7 +253,8 @@ typedef struct _rsp_single_write {
   short int crc;
 } rsp_single_write;
 
-typedef struct _rsp_dev_id {
+typedef struct _rsp_dev_id
+{
   unsigned char unit_id;
   unsigned char fc;
   unsigned char mei_type;
@@ -248,8 +269,7 @@ typedef struct _rsp_dev_id {
 
 #pragma pack(0)
 
-pwr_tStatus mb_recv_data(
-    io_sRackLocal* local, io_sRack* rp, pwr_sClass_Modbus_TCP_Slave* sp);
+pwr_tStatus mb_recv_data(io_sRackLocal* local, io_sRack* rp, pwr_sClass_Modbus_TCP_Slave* sp);
 
-pwr_tStatus mb_send_data(io_sRackLocal* local, io_sRack* rp,
-    pwr_sClass_Modbus_TCP_Slave* sp, mb_tSendMask mask);
+pwr_tStatus mb_send_data(io_sRackLocal* local, io_sRack* rp, pwr_sClass_Modbus_TCP_Slave* sp,
+                         mb_tSendMask mask);

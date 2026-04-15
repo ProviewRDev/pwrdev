@@ -48,15 +48,14 @@
 class NodelistQt;
 class NodelistQtWidget;
 
-class NodelistInputDialogQt : public QDialog {
+class NodelistInputDialogQt : public QDialog
+{
   Q_OBJECT
 
 public:
-  NodelistInputDialogQt(
-      NodelistQt* parent_ctx, QWidget* parent, const char* title,
-      const char* label1, const char* label2, const char* label3,
-      const char* txt1, const char* txt2 = "", const char* txt3 = "",
-      bool input_callback = true);
+  NodelistInputDialogQt(NodelistQt* parent_ctx, QWidget* parent, const char* title, const char* label1,
+                        const char* label2, const char* label3, const char* txt1, const char* txt2 = "",
+                        const char* txt3 = "", bool input_callback = true);
 
   QLabel* label;
   QLabel* label2;
@@ -74,11 +73,11 @@ private:
   NodelistQt* nodelist;
 };
 
-class NodelistQt : public Nodelist {
+class NodelistQt : public Nodelist
+{
 public:
-  NodelistQt(void* nodelist_parent_ctx, const char* nodelist_name,
-      int nodelist_mode, int nodelist_view_node_descr, int msgw_pop,
-      pwr_tStatus* status);
+  NodelistQt(void* nodelist_parent_ctx, const char* nodelist_name, int nodelist_mode,
+             int nodelist_view_node_descr, int msgw_pop, pwr_tStatus* status);
   ~NodelistQt();
 
   QWidget* nodelistnav_widget;
@@ -88,19 +87,18 @@ public:
   void pop();
   void set_clock_cursor();
   void reset_cursor();
-  void open_add_input_dialog(const char* text, const char* text2,
-      const char* text3, const char* title, const char* init_text,
-      void (*ok_cb)(Nodelist*, char*, char*, char*));
-  void open_mod_input_dialog(const char* text, const char* text2,
-      const char* text3, const char* title, const char* init_text,
-      const char* init_text2, const char* init_text3,
-      void (*ok_cb)(Nodelist*, char*, char*, char*));
+  void open_add_input_dialog(const char* text, const char* text2, const char* text3, const char* title,
+                             const char* init_text, void (*ok_cb)(Nodelist*, char*, char*, char*));
+  void open_mod_input_dialog(const char* text, const char* text2, const char* text3, const char* title,
+                             const char* init_text, const char* init_text2, const char* init_text3,
+                             void (*ok_cb)(Nodelist*, char*, char*, char*));
 
 private:
   NodelistQtWidget* toplevel;
 };
 
-class NodelistQtWidget : public QWidget {
+class NodelistQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

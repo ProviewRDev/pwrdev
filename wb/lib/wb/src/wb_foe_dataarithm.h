@@ -39,8 +39,7 @@
 
 #include "pwr.h"
 
-pwr_tStatus dataarithm_convert(char* str, char* newstr, char* object,
-    int bufsize, char* error_line, int* error_line_size, int* error_line_num,
-    int* outsize);
+pwr_tStatus dataarithm_convert(char* str, char* newstr, char* object, int bufsize, char* error_line,
+                               int* error_line_size, int* error_line_num, int* outsize);
 
 #endif

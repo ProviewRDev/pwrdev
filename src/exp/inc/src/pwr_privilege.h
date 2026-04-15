@@ -38,11 +38,12 @@
 #define pwr_privilege_h
 
 /* pwr_privilege.h -- pwr privileges
-*/
+ */
 
 /* Privilege mask */
 
-typedef enum {
+typedef enum
+{
   pwr_mPrv_RtRead = 1 << 0,
   pwr_mPrv_RtWrite = 1 << 1,
   pwr_mPrv_System = 1 << 2,
@@ -72,7 +73,8 @@ typedef enum {
   pwr_mPrv_SevAdmin = 1 << 28
 } pwr_mPrv;
 
-typedef enum {
+typedef enum
+{
   pwr_mAccess_RtRead = pwr_mPrv_RtRead,
   pwr_mAccess_RtWrite = pwr_mPrv_RtWrite,
   pwr_mAccess_System = pwr_mPrv_System,
@@ -100,50 +102,19 @@ typedef enum {
   pwr_mAccess_Administrator = pwr_mPrv_Administrator,
   pwr_mAccess_SevRead = pwr_mPrv_SevRead,
   pwr_mAccess_SevAdmin = pwr_mPrv_SevAdmin,
-  pwr_mAccess_AllRt = pwr_mPrv_System | pwr_mPrv_Maintenance | pwr_mPrv_Process
-      | pwr_mPrv_Instrument
-      | pwr_mPrv_RtRead
-      | pwr_mPrv_RtWrite
-      | pwr_mPrv_RtEventsBlock
-      | pwr_mPrv_RtEventsAck
-      | pwr_mPrv_RtPlc
-      | pwr_mPrv_RtNavigator
-      | pwr_mPrv_Operator1
-      | pwr_mPrv_Operator2
-      | pwr_mPrv_Operator3
-      | pwr_mPrv_Operator4
-      | pwr_mPrv_Operator5
-      | pwr_mPrv_Operator6
-      | pwr_mPrv_Operator7
-      | pwr_mPrv_Operator8
-      | pwr_mPrv_Operator9
-      | pwr_mPrv_Operator10,
-  pwr_mAccess_RtDefault = pwr_mPrv_System | pwr_mPrv_Maintenance
-      | pwr_mPrv_Process
-      | pwr_mPrv_Instrument
-      | pwr_mPrv_RtEventsBlock
-      | pwr_mPrv_RtEventsAck
-      | pwr_mPrv_RtPlc
-      | pwr_mPrv_RtNavigator
-      | pwr_mPrv_Operator1
-      | pwr_mPrv_Operator2
-      | pwr_mPrv_Operator3
-      | pwr_mPrv_Operator4
-      | pwr_mPrv_Operator5
-      | pwr_mPrv_Operator6
-      | pwr_mPrv_Operator7
-      | pwr_mPrv_Operator8
-      | pwr_mPrv_Operator9
-      | pwr_mPrv_Operator10,
-  pwr_mAccess_AllOperators = pwr_mPrv_Operator1 | pwr_mPrv_Operator2
-      | pwr_mPrv_Operator3
-      | pwr_mPrv_Operator4
-      | pwr_mPrv_Operator5
-      | pwr_mPrv_Operator6
-      | pwr_mPrv_Operator7
-      | pwr_mPrv_Operator8
-      | pwr_mPrv_Operator9
-      | pwr_mPrv_Operator10,
+  pwr_mAccess_AllRt = pwr_mPrv_System | pwr_mPrv_Maintenance | pwr_mPrv_Process | pwr_mPrv_Instrument |
+                      pwr_mPrv_RtRead | pwr_mPrv_RtWrite | pwr_mPrv_RtEventsBlock | pwr_mPrv_RtEventsAck |
+                      pwr_mPrv_RtPlc | pwr_mPrv_RtNavigator | pwr_mPrv_Operator1 | pwr_mPrv_Operator2 |
+                      pwr_mPrv_Operator3 | pwr_mPrv_Operator4 | pwr_mPrv_Operator5 | pwr_mPrv_Operator6 |
+                      pwr_mPrv_Operator7 | pwr_mPrv_Operator8 | pwr_mPrv_Operator9 | pwr_mPrv_Operator10,
+  pwr_mAccess_RtDefault = pwr_mPrv_System | pwr_mPrv_Maintenance | pwr_mPrv_Process | pwr_mPrv_Instrument |
+                          pwr_mPrv_RtEventsBlock | pwr_mPrv_RtEventsAck | pwr_mPrv_RtPlc |
+                          pwr_mPrv_RtNavigator | pwr_mPrv_Operator1 | pwr_mPrv_Operator2 |
+                          pwr_mPrv_Operator3 | pwr_mPrv_Operator4 | pwr_mPrv_Operator5 | pwr_mPrv_Operator6 |
+                          pwr_mPrv_Operator7 | pwr_mPrv_Operator8 | pwr_mPrv_Operator9 | pwr_mPrv_Operator10,
+  pwr_mAccess_AllOperators =
+      pwr_mPrv_Operator1 | pwr_mPrv_Operator2 | pwr_mPrv_Operator3 | pwr_mPrv_Operator4 | pwr_mPrv_Operator5 |
+      pwr_mPrv_Operator6 | pwr_mPrv_Operator7 | pwr_mPrv_Operator8 | pwr_mPrv_Operator9 | pwr_mPrv_Operator10,
   pwr_mAccess_AllSev = pwr_mPrv_SevRead | pwr_mPrv_SevAdmin,
   pwr_mAccess_AllPwr = ~(1 << 31),
   pwr_mAccess_Default = 1 << 31

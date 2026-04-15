@@ -36,99 +36,42 @@
 
 #include "cnv_wblto.h"
 
-CnvWblTo::~CnvWblTo()
-{
-}
+CnvWblTo::~CnvWblTo() {}
 
-int CnvWblTo::init(char*)
-{
-  return 1;
-}
+int CnvWblTo::init(char*) { return 1; }
 
-int CnvWblTo::close()
-{
-  return 1;
-}
+int CnvWblTo::close() { return 1; }
 
-int CnvWblTo::class_exec()
-{
-  return 1;
-}
+int CnvWblTo::class_exec() { return 1; }
 
-int CnvWblTo::class_close()
-{
-  return 1;
-}
+int CnvWblTo::class_close() { return 1; }
 
-int CnvWblTo::body_exec()
-{
-  return 1;
-}
+int CnvWblTo::body_exec() { return 1; }
 
-int CnvWblTo::body_close()
-{
-  return 1;
-}
+int CnvWblTo::body_close() { return 1; }
 
-int CnvWblTo::attribute_exec()
-{
-  return 1;
-}
+int CnvWblTo::attribute_exec() { return 1; }
 
-int CnvWblTo::typedef_exec()
-{
-  return 1;
-}
+int CnvWblTo::typedef_exec() { return 1; }
 
-int CnvWblTo::typedef_close()
-{
-  return 1;
-}
+int CnvWblTo::typedef_close() { return 1; }
 
-int CnvWblTo::bit_exec()
-{
-  return 1;
-}
+int CnvWblTo::bit_exec() { return 1; }
 
-int CnvWblTo::graphplcnode()
-{
-  return 1;
-}
+int CnvWblTo::graphplcnode() { return 1; }
 
-int CnvWblTo::graphplccon()
-{
-  return 1;
-}
+int CnvWblTo::graphplccon() { return 1; }
 
-int CnvWblTo::template_exec()
-{
-  return 1;
-}
+int CnvWblTo::template_exec() { return 1; }
 
-Cnv_eWblToType CnvWblTo::type()
-{
-  return Cnv_eWblToType_H;
-}
+Cnv_eWblToType CnvWblTo::type() { return Cnv_eWblToType_H; }
 
-int CnvWblTo::class_open()
-{
-  return 0;
-}
+int CnvWblTo::class_open() { return 0; }
 
-int CnvWblTo::index_open()
-{
-  return 0;
-}
+int CnvWblTo::index_open() { return 0; }
 
-bool CnvWblTo::confpass()
-{
-  return false;
-}
+bool CnvWblTo::confpass() { return false; }
 
-void CnvWblTo::set_confpass(bool conf)
-{
-}
+void CnvWblTo::set_confpass(bool conf) {}
 
-void CnvWblTo::add_depend(char*)
-{
-}
+void CnvWblTo::add_depend(char*) {}

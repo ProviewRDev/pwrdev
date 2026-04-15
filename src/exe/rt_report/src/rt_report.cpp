@@ -51,9 +51,8 @@
 static rt_report* report = 0;
 
 rt_report::rt_report()
-    : scan_time(1), conf(0), first_scan(1), old_sec(0), old_min(0), old_hour(0),
-      old_mday(0), old_wday(0), old_yday(0), now_sec(0), now_min(0),
-      now_hour(0), now_mday(0), now_wday(0), now_yday(0)
+    : scan_time(1), conf(0), first_scan(1), old_sec(0), old_min(0), old_hour(0), old_mday(0), old_wday(0),
+      old_yday(0), now_sec(0), now_min(0), now_hour(0), now_mday(0), now_wday(0), now_yday(0)
 {
   strcpy(display, "");
 }
@@ -66,20 +65,23 @@ void rt_report::open()
 
   // Open server configuration object ReportConfig
   sts = gdh_GetClassList(pwr_cClass_ReportConfig, &oid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_ObjidToPointer(oid, (void**)&conf);
     if (EVEN(sts))
       throw co_error(sts);
 
     aproc_RegisterObject(oid);
-  } else {
+  }
+  else
+  {
     errh_Info("No Report configuration");
     errh_SetStatus(0);
     exit(0);
   }
 
-  for (sts = gdh_GetClassList(pwr_cClass_Report, &oid); ODD(sts);
-       sts = gdh_GetNextObject(oid, &oid)) {
+  for (sts = gdh_GetClassList(pwr_cClass_Report, &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+  {
     report_sObject o;
     pwr_tAttrRef aref;
 
@@ -89,9 +91,9 @@ void rt_report::open()
     repv.push_back(o);
   }
 
-  sts = gdh_GetObjectInfo(
-      "pwrNode-System.SystemGroup", &systemgroup, sizeof(systemgroup));
-  if (EVEN(sts)) {
+  sts = gdh_GetObjectInfo("pwrNode-System.SystemGroup", &systemgroup, sizeof(systemgroup));
+  if (EVEN(sts))
+  {
     errh_Error("Report terminated: %m", sts);
     conf->Status = sts;
     exit(0);
@@ -104,17 +106,16 @@ void rt_report::open()
   conf->Status = PWR__SRUN;
 }
 
-void rt_report::close()
-{
-  repv.clear();
-}
+void rt_report::close() { repv.clear(); }
 
 void rt_report::scan()
 {
   periodic_scan();
 
-  for (unsigned int i = 0; i < repv.size(); i++) {
-    if (repv[i].p->Trigger || periodic_check(repv[i].p)) {
+  for (unsigned int i = 0; i < repv.size(); i++)
+  {
+    if (repv[i].p->Trigger || periodic_check(repv[i].p))
+    {
       repv[i].p->Trigger = 0;
 
       create_report(repv[i].p);
@@ -128,14 +129,17 @@ int rt_report::periodic_check(pwr_sClass_Report* o)
 {
   int offset = (int)time_DToFloat(0, &o->TimeOffset);
 
-  switch (o->Periodicity) {
+  switch (o->Periodicity)
+  {
   case pwr_ePeriodicEnum_No:
     return 0;
   case pwr_ePeriodicEnum_Hourly:
     if (now_min < old_min)
       o->Sent = 0;
-    if (!o->Sent) {
-      if (now_min >= offset) {
+    if (!o->Sent)
+    {
+      if (now_min >= offset)
+      {
         o->Sent = 1;
         if (now_min < offset + 60)
           return 1;
@@ -145,8 +149,10 @@ int rt_report::periodic_check(pwr_sClass_Report* o)
   case pwr_ePeriodicEnum_Daily:
     if (now_hour < old_hour)
       o->Sent = 0;
-    if (!o->Sent) {
-      if (now_hour >= offset) {
+    if (!o->Sent)
+    {
+      if (now_hour >= offset)
+      {
         o->Sent = 1;
         if (now_hour < offset + 60)
           return 1;
@@ -156,8 +162,10 @@ int rt_report::periodic_check(pwr_sClass_Report* o)
   case pwr_ePeriodicEnum_Weekly:
     if (now_wday < old_wday)
       o->Sent = 0;
-    if (!o->Sent) {
-      if (now_wday >= offset) {
+    if (!o->Sent)
+    {
+      if (now_wday >= offset)
+      {
         o->Sent = 1;
         if (now_wday < offset + 600)
           return 1;
@@ -167,8 +175,10 @@ int rt_report::periodic_check(pwr_sClass_Report* o)
   case pwr_ePeriodicEnum_Monthly:
     if (now_mday < old_mday)
       o->Sent = 0;
-    if (!o->Sent) {
-      if (now_mday >= offset) {
+    if (!o->Sent)
+    {
+      if (now_mday >= offset)
+      {
         o->Sent = 1;
         if (now_mday < offset + 3600)
           return 1;
@@ -178,8 +188,10 @@ int rt_report::periodic_check(pwr_sClass_Report* o)
   case pwr_ePeriodicEnum_Yearly:
     if (now_yday < old_yday)
       o->Sent = 0;
-    if (!o->Sent) {
-      if (now_yday >= offset) {
+    if (!o->Sent)
+    {
+      if (now_yday >= offset)
+      {
         o->Sent = 1;
         if (now_yday < offset + 3600)
           return 1;
@@ -236,28 +248,34 @@ void rt_report::create_report(pwr_sClass_Report* o)
 
   dcli_translate_filename(fname, o->TemplateFile);
   fin.open(fname);
-  if (!fin) {
+  if (!fin)
+  {
     // o->Status = GLOW__FILEOPEN;
     return;
   }
 
   dcli_translate_filename(fname, tmpfile);
   fout.open(fname);
-  if (!fout) {
+  if (!fout)
+  {
     // o->Status = GLOW__FILEOPEN;
     return;
   }
 
   fout << "<topic> index <style> report\n";
 
-  while (fin.getline(line, sizeof(line))) {
+  while (fin.getline(line, sizeof(line)))
+  {
     str_trim(newline, line);
     if (first && streq(newline, ""))
       continue;
 
-    if (str_NoCaseStrncmp(newline, "<execute>", 9) == 0) {
+    if (str_NoCaseStrncmp(newline, "<execute>", 9) == 0)
+    {
       parse(&line[9]);
-    } else {
+    }
+    else
+    {
       first = 0;
 
       replace_value(newline, sizeof(newline), line);
@@ -271,17 +289,18 @@ void rt_report::create_report(pwr_sClass_Report* o)
   fin.close();
   fout.close();
 
-  if (o->Media & pwr_mReportMediaMask_Email) {
+  if (o->Media & pwr_mReportMediaMask_Email)
+  {
     // Send email
     char text[400];
     pwr_tCmd cmd;
 
-    switch (o->DocumentFormat) {
+    switch (o->DocumentFormat)
+    {
     case pwr_eDocumentFormatEnum_PDF:
       // Convert to pdf
       if (!streq(display, ""))
-        sprintf(cmd, "export DISPLAY=%s;co_convert -f -d %s %s", display,
-            "$pwrp_lis", tmpfile);
+        sprintf(cmd, "export DISPLAY=%s;co_convert -f -d %s %s", display, "$pwrp_lis", tmpfile);
       else
         sprintf(cmd, "co_convert -f -d %s %s", "$pwrp_lis", tmpfile);
       system(cmd);
@@ -290,8 +309,7 @@ void rt_report::create_report(pwr_sClass_Report* o)
     case pwr_eDocumentFormatEnum_Html:
       // Convert to pdf
       if (!streq(display, ""))
-        sprintf(cmd, "export DISPLAY=%s;co_convert -s -d %s %s", display,
-            "$pwrp_lis", tmpfile);
+        sprintf(cmd, "export DISPLAY=%s;co_convert -s -d %s %s", display, "$pwrp_lis", tmpfile);
       else
         sprintf(cmd, "co_convert -s -d %s %s", "$pwrp_lis", tmpfile);
       system(cmd);
@@ -306,27 +324,32 @@ void rt_report::create_report(pwr_sClass_Report* o)
 
     replace_symbol(str, o->Recipient);
 
-    rcvnum = dcli_parse(str, ",", "", (char*)rcv_array,
-        sizeof(rcv_array) / sizeof(rcv_array[0]), sizeof(rcv_array[0]), 0);
+    rcvnum = dcli_parse(str, ",", "", (char*)rcv_array, sizeof(rcv_array) / sizeof(rcv_array[0]),
+                        sizeof(rcv_array[0]), 0);
 
-    for (int i = 0; i < rcvnum; i++) {
+    for (int i = 0; i < rcvnum; i++)
+    {
       str_trim(str, rcv_array[i]);
 
       s = strrchr(str, '.');
-      if (s) {
+      if (s)
+      {
         *s = 0;
         strncpy(group, systemgroup, sizeof(group));
         strncat(group, ".", sizeof(group) - strlen(group) - 1);
         strncat(group, str, sizeof(group) - strlen(group) - 1);
         strncpy(user, s + 1, sizeof(user));
-      } else {
+      }
+      else
+      {
         strncpy(group, systemgroup, sizeof(group));
         strncpy(user, str, sizeof(user));
       }
 
       SystemName* sn = new SystemName(group);
       sts = sn->parse();
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         delete sn;
         errh_Error("Report systemgroup parse error, %m", sts);
         continue;
@@ -334,13 +357,15 @@ void rt_report::create_report(pwr_sClass_Report* o)
 
       SystemList* sl = udb->find_system(sn);
       delete sn;
-      if (!sl) {
+      if (!sl)
+      {
         errh_Error("No such system group, %s", group);
         continue;
       }
 
       UserList* ul = (UserList*)sl->find_user(user);
-      if (!ul) {
+      if (!ul)
+      {
         errh_Error("No such user, %s", user);
         continue;
       }
@@ -355,8 +380,7 @@ void rt_report::create_report(pwr_sClass_Report* o)
       if (streq(conf_cmd, ""))
         strncpy(conf_cmd, conf->EmailCmd, sizeof(conf_cmd));
 
-      format_cmd(
-          cmd, sizeof(cmd), conf_cmd, address, text, subject, cnvfile, 0);
+      format_cmd(cmd, sizeof(cmd), conf_cmd, address, text, subject, cnvfile, 0);
 
       if (conf->Options & pwr_mPostOptionsMask_Log)
         errh_Info("Email: %s", cmd);
@@ -369,7 +393,8 @@ void rt_report::create_report(pwr_sClass_Report* o)
     }
   }
 
-  if (o->Media & pwr_mReportMediaMask_SMS) {
+  if (o->Media & pwr_mReportMediaMask_SMS)
+  {
     // Send SMS
     char text[1000];
     char cmd[1000];
@@ -381,27 +406,32 @@ void rt_report::create_report(pwr_sClass_Report* o)
 
     replace_symbol(str, o->Recipient);
 
-    rcvnum = dcli_parse(str, ",", "", (char*)rcv_array,
-        sizeof(rcv_array) / sizeof(rcv_array[0]), sizeof(rcv_array[0]), 0);
+    rcvnum = dcli_parse(str, ",", "", (char*)rcv_array, sizeof(rcv_array) / sizeof(rcv_array[0]),
+                        sizeof(rcv_array[0]), 0);
 
-    for (int i = 0; i < rcvnum; i++) {
+    for (int i = 0; i < rcvnum; i++)
+    {
       str_trim(str, rcv_array[i]);
 
       s = strrchr(str, '.');
-      if (s) {
+      if (s)
+      {
         *s = 0;
         strncpy(group, systemgroup, sizeof(group));
         strncat(group, ".", sizeof(group) - strlen(group) - 1);
         strncat(group, str, sizeof(group) - strlen(group) - 1);
         strncpy(user, s + 1, sizeof(user));
-      } else {
+      }
+      else
+      {
         strncpy(group, systemgroup, sizeof(group));
         strncpy(user, str, sizeof(user));
       }
 
       SystemName* sn = new SystemName(group);
       sts = sn->parse();
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         delete sn;
         errh_Error("Report systemgroup parse error, %m", sts);
         continue;
@@ -409,13 +439,15 @@ void rt_report::create_report(pwr_sClass_Report* o)
 
       SystemList* sl = udb->find_system(sn);
       delete sn;
-      if (!sl) {
+      if (!sl)
+      {
         errh_Error("No such system group, %s", group);
         continue;
       }
 
       UserList* ul = (UserList*)sl->find_user(user);
-      if (!ul) {
+      if (!ul)
+      {
         errh_Error("No such user, %s", user);
         continue;
       }
@@ -426,13 +458,15 @@ void rt_report::create_report(pwr_sClass_Report* o)
 
       std::ifstream ftext;
       ftext.open(fname);
-      if (!ftext) {
+      if (!ftext)
+      {
         // o->Status = GLOW__FILEOPEN;
         return;
       }
 
       unsigned int j = 0;
-      while (ftext.good() && j < sizeof(text) - 1) {
+      while (ftext.good() && j < sizeof(text) - 1)
+      {
         text[j++] = ftext.get();
       }
       ftext.close();
@@ -449,14 +483,15 @@ void rt_report::create_report(pwr_sClass_Report* o)
       if (streq(conf_cmd, ""))
         strncpy(conf_cmd, conf->SMS_Cmd, sizeof(conf_cmd));
 
-      format_cmd(
-          cmd, sizeof(cmd), conf_cmd, address, subject, text, cnvfile, 0);
+      format_cmd(cmd, sizeof(cmd), conf_cmd, address, subject, text, cnvfile, 0);
 
       if (conf->Options & pwr_mPostOptionsMask_Log)
         errh_Info("SMS: %s", cmd);
 
-      if (conf->Options & pwr_mPostOptionsMask_SingleLineSMS) {
-        for (char* s = cmd; *s; s++) {
+      if (conf->Options & pwr_mPostOptionsMask_SingleLineSMS)
+      {
+        for (char* s = cmd; *s; s++)
+        {
           // Replace LF with space
           if (*s == 10)
             *s = ' ';
@@ -470,25 +505,27 @@ void rt_report::create_report(pwr_sClass_Report* o)
       system(cmd);
     }
   }
-  if (o->Media & pwr_mReportMediaMask_Printer) {
+  if (o->Media & pwr_mReportMediaMask_Printer)
+  {
     // Convert to postscript
     char cmd[520];
     pwr_tFileName target_file;
 
     if (!streq(display, ""))
-      sprintf(cmd, "export DISPLAY=%s;co_convert -n -d %s %s", display,
-          "$pwrp_lis", tmpfile);
+      sprintf(cmd, "export DISPLAY=%s;co_convert -n -d %s %s", display, "$pwrp_lis", tmpfile);
     else
       sprintf(cmd, "co_convert -n -d %s %s", "$pwrp_lis", tmpfile);
     system(cmd);
 
     strcpy(cnvfile, "$pwrp_lis/report.ps");
 
-    if (!streq(o->TargetFile, "")) {
+    if (!streq(o->TargetFile, ""))
+    {
       strcpy(target_file, o->TargetFile);
       snprintf(cmd, sizeof(cmd), "mv %s %s", cnvfile, target_file);
       system(cmd);
-    } else
+    }
+    else
       strcpy(target_file, cnvfile);
 
     str_trim(conf_cmd, o->PrintCmd);
@@ -505,16 +542,17 @@ void rt_report::create_report(pwr_sClass_Report* o)
     sprintf(cmd, "rm %s", tmpfile);
     system(cmd);
   }
-  if (o->Media & pwr_mReportMediaMask_File) {
+  if (o->Media & pwr_mReportMediaMask_File)
+  {
     // Print to file
     pwr_tCmd cmd;
 
-    switch (o->DocumentFormat) {
+    switch (o->DocumentFormat)
+    {
     case pwr_eDocumentFormatEnum_PDF:
       // Convert to pdf
       if (!streq(display, ""))
-        sprintf(cmd, "export DISPLAY=%s;co_convert -f -d %s %s", display,
-            "$pwrp_lis", tmpfile);
+        sprintf(cmd, "export DISPLAY=%s;co_convert -f -d %s %s", display, "$pwrp_lis", tmpfile);
       else
         sprintf(cmd, "co_convert -f -d %s %s", "$pwrp_lis", tmpfile);
       system(cmd);
@@ -523,8 +561,7 @@ void rt_report::create_report(pwr_sClass_Report* o)
     case pwr_eDocumentFormatEnum_Html:
       // Convert to pdf
       if (!streq(display, ""))
-        sprintf(cmd, "export DISPLAY=%s;co_convert -s -d %s %s", display,
-            "$pwrp_lis", tmpfile);
+        sprintf(cmd, "export DISPLAY=%s;co_convert -s -d %s %s", display, "$pwrp_lis", tmpfile);
       else
         sprintf(cmd, "co_convert -t -d %s %s", "$pwrp_lis", tmpfile);
       system(cmd);
@@ -533,8 +570,7 @@ void rt_report::create_report(pwr_sClass_Report* o)
     case pwr_eDocumentFormatEnum_Postscript:
       // Convert to Postscript
       if (!streq(display, ""))
-        sprintf(cmd, "export DISPLAY=%s;co_convert -n -d %s %s", display,
-            "$pwrp_lis", tmpfile);
+        sprintf(cmd, "export DISPLAY=%s;co_convert -n -d %s %s", display, "$pwrp_lis", tmpfile);
       else
         sprintf(cmd, "co_convert -n -d %s %s", "$pwrp_lis", tmpfile);
       system(cmd);
@@ -548,15 +584,16 @@ void rt_report::create_report(pwr_sClass_Report* o)
     }
 
     // Rename file to target filename
-    if (!streq(o->TargetFile, "")) {
+    if (!streq(o->TargetFile, ""))
+    {
       snprintf(cmd, sizeof(cmd), "mv %s %s", cnvfile, o->TargetFile);
 
-      if (strstr(o->TargetFile, "$date") != 0) {
+      if (strstr(o->TargetFile, "$date") != 0)
+      {
         char timstr[40];
         pwr_tCmd conf_cmd;
 
-        sts = time_AtoAscii(
-            0, time_eFormat_FileDateAndTime, timstr, sizeof(timstr));
+        sts = time_AtoAscii(0, time_eFormat_FileDateAndTime, timstr, sizeof(timstr));
         strcpy(conf_cmd, cmd);
         format_cmd(cmd, sizeof(cmd), conf_cmd, 0, 0, 0, 0, timstr);
       }
@@ -595,7 +632,8 @@ int rt_report::replace_value(char* out, unsigned int size, char* in)
   char timstr[40];
 
   s1 = in;
-  while ((s2 = strstr(s1, "<value"))) {
+  while ((s2 = strstr(s1, "<value")))
+  {
     for (t = s2; *t != '>' && *t != 0; t++)
       ;
     if (*t != '>')
@@ -611,14 +649,14 @@ int rt_report::replace_value(char* out, unsigned int size, char* in)
     valstr[len] = 0;
 
     // Parse value string
-    nr = dcli_parse(valstr, " 	=", "", (char*)vvect,
-        sizeof(vvect) / sizeof(vvect[0]), sizeof(vvect[0]), 0);
+    nr = dcli_parse(valstr, " 	=", "", (char*)vvect, sizeof(vvect) / sizeof(vvect[0]), sizeof(vvect[0]), 0);
     int format_found = 0;
     int value_found = 0;
-    for (int i = 0; i < nr; i++) {
-      if (str_NoCaseStrcmp(vvect[i], "attr") == 0 && nr > i + 1) {
-        sts = gdh_GetAttributeCharacteristics(
-            vvect[i + 1], &a_tid, &a_size, &a_offs, &a_elem);
+    for (int i = 0; i < nr; i++)
+    {
+      if (str_NoCaseStrcmp(vvect[i], "attr") == 0 && nr > i + 1)
+      {
+        sts = gdh_GetAttributeCharacteristics(vvect[i + 1], &a_tid, &a_size, &a_offs, &a_elem);
 
         sts = gdh_GetObjectInfo(vvect[i + 1], buf, sizeof(buf));
         if (EVEN(sts))
@@ -627,7 +665,8 @@ int rt_report::replace_value(char* out, unsigned int size, char* in)
         i++;
         value_found = 1;
       }
-      if (str_NoCaseStrcmp(vvect[i], "format") == 0 && nr > i + 1) {
+      if (str_NoCaseStrcmp(vvect[i], "format") == 0 && nr > i + 1)
+      {
         strncpy(format, vvect[i + 1], sizeof(format));
 
         i++;
@@ -639,8 +678,7 @@ int rt_report::replace_value(char* out, unsigned int size, char* in)
       return 0;
 
     a_type = (pwr_eType)pwr_TypeId(pwr_Tix(a_tid));
-    sts = gdh_AttrValueToString(
-        a_type, a_tid, buf, fstr, sizeof(fstr), &flen, format);
+    sts = gdh_AttrValueToString(a_type, a_tid, buf, fstr, sizeof(fstr), &flen, format);
     if (EVEN(sts))
       return sts;
 
@@ -653,7 +691,8 @@ int rt_report::replace_value(char* out, unsigned int size, char* in)
 
   s1 = str;
   slen = 0;
-  if ((s2 = strstr(str, "<date"))) {
+  if ((s2 = strstr(str, "<date")))
+  {
     for (t = s2; *t != '>' && *t != 0; t++)
       ;
     if (*t != '>')
@@ -669,11 +708,12 @@ int rt_report::replace_value(char* out, unsigned int size, char* in)
     valstr[len] = 0;
 
     // Parse value string
-    nr = dcli_parse(valstr, " 	=", "", (char*)vvect,
-        sizeof(vvect) / sizeof(vvect[0]), sizeof(vvect[0]), 0);
+    nr = dcli_parse(valstr, " 	=", "", (char*)vvect, sizeof(vvect) / sizeof(vvect[0]), sizeof(vvect[0]), 0);
     int format_found = 0;
-    for (int i = 0; i < nr; i++) {
-      if (str_NoCaseStrcmp(vvect[i], "format") == 0 && nr > i + 1) {
+    for (int i = 0; i < nr; i++)
+    {
+      if (str_NoCaseStrcmp(vvect[i], "format") == 0 && nr > i + 1)
+      {
         strncpy(format, vvect[i + 1], sizeof(format));
 
         i++;
@@ -681,8 +721,10 @@ int rt_report::replace_value(char* out, unsigned int size, char* in)
       }
     }
 
-    if (format_found) {
-      switch (format[1]) {
+    if (format_found)
+    {
+      switch (format[1])
+      {
       case '1':
         // Format %1t, only time, no hundredth
         sts = time_AtoAscii(0, time_eFormat_Time, timstr, sizeof(timstr));
@@ -694,27 +736,25 @@ int rt_report::replace_value(char* out, unsigned int size, char* in)
         break;
       case '3':
         // Format %3t, compressed date and time, no hundredth
-        sts = time_AtoAscii(
-            0, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
+        sts = time_AtoAscii(0, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
         timstr[17] = 0;
         break;
       case '4':
         // Format %4t, date only
-        sts = time_AtoAscii(
-            0, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+        sts = time_AtoAscii(0, time_eFormat_DateAndTime, timstr, sizeof(timstr));
         timstr[11] = 0;
         break;
       case '5':
         // Format %5t, compressed date only
-        sts = time_AtoAscii(
-            0, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
+        sts = time_AtoAscii(0, time_eFormat_ComprDateAndTime, timstr, sizeof(timstr));
         timstr[8] = 0;
         break;
       default:
-        sts = time_AtoAscii(
-            0, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+        sts = time_AtoAscii(0, time_eFormat_DateAndTime, timstr, sizeof(timstr));
       }
-    } else {
+    }
+    else
+    {
       sts = time_AtoAscii(0, time_eFormat_DateAndTime, timstr, sizeof(timstr));
     }
     strcat(str2, timstr);
@@ -735,7 +775,8 @@ void rt_report::init(qcom_sQid* qid)
   pwr_tStatus sts;
 
   sts = gdh_Init("rt_report");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     exit(sts);
   }
@@ -743,7 +784,8 @@ void rt_report::init(qcom_sQid* qid)
   errh_Init("pwr_report", errh_eAnix_report);
   errh_SetStatus(PWR__SRVSTARTUP);
 
-  if (!qcom_Init(&sts, 0, "pwr_report")) {
+  if (!qcom_Init(&sts, 0, "pwr_report"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -751,14 +793,16 @@ void rt_report::init(qcom_sQid* qid)
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, qid, &qini)) {
+  if (!qcom_Bind(&sts, qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
@@ -777,9 +821,12 @@ void rt_report::replace_symbol(char* outstr, char* instr)
   s = instr;
   t = outstr;
 
-  while (1) {
-    if (symbolmode) {
-      if (*s == ',' || *s == ' ' || *s == '	' || *s == 0) {
+  while (1)
+  {
+    if (symbolmode)
+    {
+      if (*s == ',' || *s == ' ' || *s == '	' || *s == 0)
+      {
         // End of symbol
         size = (long int)s - (long int)(u + 1);
         strncpy(symbol, u + 1, size);
@@ -787,10 +834,11 @@ void rt_report::replace_symbol(char* outstr, char* instr)
 
         // Find the symbol
         found = 0;
-        for (unsigned int j = 0;
-             j < sizeof(conf->Symbols) / sizeof(conf->Symbols[0]); j++) {
+        for (unsigned int j = 0; j < sizeof(conf->Symbols) / sizeof(conf->Symbols[0]); j++)
+        {
           str_trim(csymbol, conf->Symbols[j].Name);
-          if (streq(symbol, csymbol)) {
+          if (streq(symbol, csymbol))
+          {
             // Found, insert the value
             strcpy(t, conf->Symbols[j].Value);
             t += strlen(conf->Symbols[j].Value);
@@ -798,7 +846,8 @@ void rt_report::replace_symbol(char* outstr, char* instr)
             break;
           }
         }
-        if (!found) {
+        if (!found)
+        {
           // Not found
           strcpy(t, "$");
           t++;
@@ -809,11 +858,16 @@ void rt_report::replace_symbol(char* outstr, char* instr)
         *t = *s;
         t++;
       }
-    } else {
-      if (*s == '$') {
+    }
+    else
+    {
+      if (*s == '$')
+      {
         symbolmode = 1;
         u = s;
-      } else {
+      }
+      else
+      {
         *t = *s;
         t++;
       }
@@ -824,9 +878,8 @@ void rt_report::replace_symbol(char* outstr, char* instr)
   }
 }
 
-void rt_report::format_cmd(char* cmd, int cmd_size, const char* format,
-    const char* address, const char* subject, const char* text,
-    const char* reportfile, const char* date)
+void rt_report::format_cmd(char* cmd, int cmd_size, const char* format, const char* address,
+                           const char* subject, const char* text, const char* reportfile, const char* date)
 {
   char* s1;
   pwr_tCmd str;
@@ -834,9 +887,11 @@ void rt_report::format_cmd(char* cmd, int cmd_size, const char* format,
   strncpy(cmd, format, cmd_size);
 
   // Replace $address with address
-  if (address) {
+  if (address)
+  {
     s1 = strstr(cmd, "$address");
-    if (s1) {
+    if (s1)
+    {
       strncpy(str, s1 + strlen("$address"), sizeof(str));
       *s1 = 0;
       strncat(cmd, address, cmd_size);
@@ -845,9 +900,11 @@ void rt_report::format_cmd(char* cmd, int cmd_size, const char* format,
   }
 
   // Replace $text with text
-  if (text) {
+  if (text)
+  {
     s1 = strstr(cmd, "$text");
-    if (s1) {
+    if (s1)
+    {
       strncpy(str, s1 + strlen("$text"), sizeof(str));
       *s1 = 0;
       strncat(cmd, text, cmd_size);
@@ -856,9 +913,11 @@ void rt_report::format_cmd(char* cmd, int cmd_size, const char* format,
   }
 
   // Replace $subject with subject
-  if (subject) {
+  if (subject)
+  {
     s1 = strstr(cmd, "$subject");
-    if (s1) {
+    if (s1)
+    {
       strncpy(str, s1 + strlen("$subject"), sizeof(str));
       *s1 = 0;
       strncat(cmd, subject, cmd_size);
@@ -867,9 +926,11 @@ void rt_report::format_cmd(char* cmd, int cmd_size, const char* format,
   }
 
   // Replace $reportfile with reportfile
-  if (reportfile) {
+  if (reportfile)
+  {
     s1 = strstr(cmd, "$reportfile");
-    if (s1) {
+    if (s1)
+    {
       strncpy(str, s1 + strlen("$reportfile"), sizeof(str));
       *s1 = 0;
       strncat(cmd, reportfile, cmd_size);
@@ -878,9 +939,11 @@ void rt_report::format_cmd(char* cmd, int cmd_size, const char* format,
   }
 
   // Replace $date with date
-  if (date) {
+  if (date)
+  {
     s1 = strstr(cmd, "$date");
-    if (s1) {
+    if (s1)
+    {
       strncpy(str, s1 + strlen("$date"), sizeof(str));
       *s1 = 0;
       strncat(cmd, date, cmd_size);
@@ -899,11 +962,13 @@ int rt_report::parse(char* line)
   replace_value(rline, sizeof(rline), line);
   str_trim(aline, rline);
 
-  num = dcli_parse(line, " 	", "", (char*)line_array,
-      sizeof(line_array) / sizeof(line_array[0]), sizeof(line_array[0]), 0);
+  num = dcli_parse(line, " 	", "", (char*)line_array, sizeof(line_array) / sizeof(line_array[0]),
+                   sizeof(line_array[0]), 0);
 
-  if (num > 0 && str_NoCaseStrcmp(line_array[0], "print") == 0) {
-    if (num > 1 && str_NoCaseStrcmp(line_array[1], "graph") == 0) {
+  if (num > 0 && str_NoCaseStrcmp(line_array[0], "print") == 0)
+  {
+    if (num > 1 && str_NoCaseStrcmp(line_array[1], "graph") == 0)
+    {
       std::ofstream fout;
       pwr_tFileName fname;
       pwr_tFileName tmpfile = "$pwrp_lis/report_print.rtt_com";
@@ -920,19 +985,27 @@ int rt_report::parse(char* line)
         return 0;
 
       argcnt = 0;
-      for (int i = 2; i < num; i++) {
-        if (str_NoCaseStrncmp(line_array[i], "btime=", 6) == 0) {
+      for (int i = 2; i < num; i++)
+      {
+        if (str_NoCaseStrncmp(line_array[i], "btime=", 6) == 0)
+        {
           sts = sscanf(&line_array[i][6], "%f", &btime);
           if (sts != 1)
             btime = 2;
-        } else if (str_NoCaseStrncmp(line_array[i], "atime=", 6) == 0) {
+        }
+        else if (str_NoCaseStrncmp(line_array[i], "atime=", 6) == 0)
+        {
           sts = sscanf(&line_array[i][6], "%f", &atime);
           if (sts != 1)
             atime = 2;
-        } else if (str_NoCaseStrncmp(line_array[i], "object=", 6) == 0) {
+        }
+        else if (str_NoCaseStrncmp(line_array[i], "object=", 6) == 0)
+        {
           strncpy(object_str, line_array[i], sizeof(object_str));
           argcnt++; // Replaces graph
-        } else {
+        }
+        else
+        {
           if (argcnt == 0)
             strncpy(graph_str, line_array[i], sizeof(graph_str));
           else if (argcnt == 1)
@@ -955,22 +1028,22 @@ int rt_report::parse(char* line)
       if (!feqf(btime, 0.0f))
         fout << "  wait " << btime << '\n';
       if (streq(graph_str, ""))
-        fout << "  export graph /" << object_str << " /file=\"" << line_array[3]
-             << "\"\n";
+        fout << "  export graph /" << object_str << " /file=\"" << line_array[3] << "\"\n";
       else
-        fout << "  export graph /graph=" << graph_str << " /file=\""
-             << image_str << "\"\n";
+        fout << "  export graph /graph=" << graph_str << " /file=\"" << image_str << "\"\n";
       if (!feqf(atime, 0.0f))
         fout << "  wait " << atime << '\n';
       fout << "endmain\n";
       fout.close();
 
       strcpy(cmd, "rt_xtt_cmd ");
-      if (!streq(display, "")) {
+      if (!streq(display, ""))
+      {
         strcpy(cmd, "export DISPLAY=");
         strcat(cmd, display);
         strcat(cmd, ";");
-      } else
+      }
+      else
         strcpy(cmd, "");
       strcat(cmd, "rt_xtt_cmd ");
       strcat(cmd, " -i -q  @");
@@ -979,13 +1052,16 @@ int rt_report::parse(char* line)
       system(cmd);
       sprintf(cmd, "rm %s", fname);
       system(cmd);
-    } else
+    }
+    else
       return 0;
-  } else if (str_StartsWith(aline, "system(")
-      && aline[strlen(aline) - 1] == ')') {
+  }
+  else if (str_StartsWith(aline, "system(") && aline[strlen(aline) - 1] == ')')
+  {
     aline[strlen(aline) - 1] = 0;
     system(&aline[7]);
-  } else
+  }
+  else
     return 0;
 
   return 1;
@@ -1004,14 +1080,18 @@ int main(int argc, char* argv[])
   report = new rt_report();
   report->init(&qid);
 
-  if (argc > 1) {
+  if (argc > 1)
+  {
     if (streq(argv[1], "-d") && argc > 2)
       strcpy(report->display, argv[2]);
   }
 
-  try {
+  try
+  {
     report->open();
-  } catch (co_error& e) {
+  }
+  catch (co_error& e)
+  {
     errh_Error((char*)e.what().c_str());
     errh_Fatal("rt_report aborting");
     errh_SetStatus(PWR__SRVTERM);
@@ -1022,33 +1102,43 @@ int main(int argc, char* argv[])
   errh_SetStatus(PWR__SRUN);
 
   first_scan = true;
-  for (;;) {
-    if (first_scan) {
+  for (;;)
+  {
+    if (first_scan)
+    {
       tmo = (int)(report->scantime() * 1000 - 1);
     }
 
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &qid, &get, tmo);
-    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+    {
       if (!swap)
         report->scan();
-    } else {
+    }
+    else
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop && !swap) {
+      if (new_event.b.oldPlcStop && !swap)
+      {
         errh_SetStatus(PWR__SRVRESTART);
         report->conf->Status = PWR__SRVRESTART;
         swap = 1;
         report->close();
-      } else if (new_event.b.swapDone && swap) {
+      }
+      else if (new_event.b.swapDone && swap)
+      {
         swap = 0;
         report->open();
         errh_SetStatus(PWR__SRUN);
         report->conf->Status = PWR__SRUN;
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         exit(0);
       }
     }

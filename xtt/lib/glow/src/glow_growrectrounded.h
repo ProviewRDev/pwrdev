@@ -49,7 +49,8 @@
   bordercolor, linewidth, fill and fillcolor.
   Detection of event when the object is clicked on, moved etc.
 */
-class GrowRectRounded : public GlowRect {
+class GrowRectRounded : public GlowRect
+{
 public:
   //! Constuctor
   /*!
@@ -69,12 +70,11 @@ public:
     \param fill_d_type	Fill color.
     \param nodraw	Don't draw the object now.
   */
-  GrowRectRounded(GrowCtx* glow_ctx, const char* name, double x = 0,
-      double y = 0, double w = 0, double h = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      int fix_line_w = 0, glow_mDisplayLevel display_lev = glow_mDisplayLevel_1,
-      int fill_rect = 0, int display_border = 1, int display_shadow = 0,
-      glow_eDrawType fill_d_type = glow_eDrawType_Line, int nodraw = 0);
+  GrowRectRounded(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0, double w = 0, double h = 0,
+                  glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1, int fix_line_w = 0,
+                  glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int fill_rect = 0,
+                  int display_border = 1, int display_shadow = 0,
+                  glow_eDrawType fill_d_type = glow_eDrawType_Line, int nodraw = 0);
 
   //! Event handler
   /*!
@@ -91,8 +91,7 @@ public:
     as
     current callback object.
   */
-  int event_handler(
-      GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
 
   //! Detects if the object is hit by an event in transformed coordinates
   /*!
@@ -135,8 +134,7 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(GlowTransform* t, double* x1_right, double* x1_left,
-      double* y1_high, double* y1_low);
+  void get_borders(GlowTransform* t, double* x1_right, double* x1_left, double* y1_high, double* y1_low);
 
   //! Calculate the border for a set of objects, without transformation.
   /*!
@@ -148,8 +146,7 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(
-      double* x1_right, double* x1_left, double* y1_high, double* y1_low)
+  void get_borders(double* x1_right, double* x1_left, double* y1_high, double* y1_low)
   {
     get_borders((GlowTransform*)NULL, x1_right, x1_left, y1_high, y1_low);
   }
@@ -165,7 +162,7 @@ public:
   }
 
   //! Not implemented
-  void print(double ll_x, double ll_y, double ur_x, double ur_y){}
+  void print(double ll_x, double ll_y, double ur_x, double ur_y) {}
 
   //! Save the content of the object to file.
   /*!
@@ -229,24 +226,18 @@ public:
   /*!
     \return Return 1 if object is highlighted, else 0.
   */
-  int get_highlight()
-  {
-    return highlight;
-  }
+  int get_highlight() { return highlight; }
 
   //! Not implemented.
-  void set_inverse(int on){}
+  void set_inverse(int on) {}
 
   //! Not implemented.
-  int get_inverse()
-  {
-    return inverse;
-  }
+  int get_inverse() { return inverse; }
 
   //! Not used.
-  void set_hot(int on){}
+  void set_hot(int on) {}
 
-  int get_hot(){return hot;}
+  int get_hot() { return hot; }
 
   //! Insert object in select list, if it is inside the selection area.
   /*!
@@ -257,16 +248,13 @@ public:
     \param select_policy Current select policy.
   */
   void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
-      glow_eSelectPolicy select_policy);
+                            glow_eSelectPolicy select_policy);
 
   //! Get the object type
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowRectRounded;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowRectRounded; }
 
   //! Measure the extent of the object.
   /*!
@@ -291,59 +279,53 @@ public:
   */
   void align(double x, double y, glow_eAlignDirection direction);
 
-  double x_right; //!< Right border of object.
-  double x_left; //!< Left border of object.
-  double y_high; //!< High border of object.
-  double y_low; //!< Low border of object.
-  int hot; //!< Object is hot, i.e. the cursor is currently on the object.
-  GlowPoint pzero; //!< Not used.
-  GlowPoint stored_pos; //!< Not used.
-  int highlight; //!< Object is highlighted, i.e. painted with red color.
-  int inverse; //!< Not implemented.
-  void* user_data; //!< User data.
+  double x_right;                          //!< Right border of object.
+  double x_left;                           //!< Left border of object.
+  double y_high;                           //!< High border of object.
+  double y_low;                            //!< Low border of object.
+  int hot;                                 //!< Object is hot, i.e. the cursor is currently on the object.
+  GlowPoint pzero;                         //!< Not used.
+  GlowPoint stored_pos;                    //!< Not used.
+  int highlight;                           //!< Object is highlighted, i.e. painted with red color.
+  int inverse;                             //!< Not implemented.
+  void* user_data;                         //!< User data.
   glow_eDrawType original_border_drawtype; //!< The original border color, i.e.
   //! color drawn at edit time.
   glow_eDrawType original_fill_drawtype; //!< The original fill color, i.e.
   //! color drawn at edit time.
   glow_eDrawType fill_drawtype; //!< Fill color.
-  int border; //!< Display border.
-  char* dynamic; //!< Dynamic code.
-  int dynamicsize; //!< Size of dynamic code.
-  GlowTransform trf; //!< Transformation matrix of object.
-  char last_group[32]; //!< The last group the object was a member of.
-  double round_amount; //!< The size of the roudness of the corners. In perctage
+  int border;                   //!< Display border.
+  char* dynamic;                //!< Dynamic code.
+  int dynamicsize;              //!< Size of dynamic code.
+  GlowTransform trf;            //!< Transformation matrix of object.
+  char last_group[32];          //!< The last group the object was a member of.
+  double round_amount;          //!< The size of the roudness of the corners. In perctage
   //! of the minimum of width an height.
-  int shadow; //!< Draw shadow.
+  int shadow;          //!< Draw shadow.
   double shadow_width; //!< Width of shadow, in percentage of minimum of width
   //! and height.
-  glow_eRelief relief; //!< Type of relief.
-  int shadow_contrast; //!< Shadow contrast.
-  int disable_shadow; //!< Disable shadow, even if parent node has shadow.
+  glow_eRelief relief;     //!< Type of relief.
+  int shadow_contrast;     //!< Shadow contrast.
+  int disable_shadow;      //!< Disable shadow, even if parent node has shadow.
   glow_eGradient gradient; //!< Type of gradient.
-  int gradient_contrast; //!< Gradient contrast.
-  int disable_gradient; //!< Disable gradient, even if parent node has gradient.
-  int fixposition; //!< Can't be moved.
-  double transparency; //!< Border and fill color transparency.
-  int thin_shadow; //!< Shadow drawn with lines.
-  int fixcolor; //!< Color independent of node color.
+  int gradient_contrast;   //!< Gradient contrast.
+  int disable_gradient;    //!< Disable gradient, even if parent node has gradient.
+  int fixposition;         //!< Can't be moved.
+  double transparency;     //!< Border and fill color transparency.
+  int thin_shadow;         //!< Shadow drawn with lines.
+  int fixcolor;            //!< Color independent of node color.
 
   //! Set user data.
   /*!
     \param data User data.
   */
-  void set_user_data(void* data)
-  {
-    user_data = data;
-  }
+  void set_user_data(void* data) { user_data = data; }
 
   //! Get user data.
   /*!
     \param data User data.
   */
-  void get_user_data(void** data)
-  {
-    *data = user_data;
-  }
+  void get_user_data(void** data) { *data = user_data; }
 
   //! Set dynamic code
   /*!
@@ -367,10 +349,7 @@ public:
   /*!
     \return The context.
   */
-  void* get_ctx()
-  {
-    return this->ctx;
-  }
+  void* get_ctx() { return this->ctx; }
 
   //! Execute the dynamic code.
   void exec_dynamic();
@@ -391,8 +370,7 @@ public:
     \param y0		y coordinate of scale point.
     \param type		Type of scaling.
   */
-  void set_scale(double scale_x, double scale_y, double x0, double y0,
-      glow_eScaleType type);
+  void set_scale(double scale_x, double scale_y, double x0, double y0, glow_eScaleType type);
 
   //! Rotate the object. The rotation is made form the last stored transform.
   /*!
@@ -401,8 +379,7 @@ public:
     \param y0		y coordinate of rotation point.
     \param type		Type of rotation point.
   */
-  void set_rotation(
-      double angle, double x0, double y0, glow_eRotationPoint type);
+  void set_rotation(double angle, double x0, double y0, glow_eRotationPoint type);
 
   //! Set the fill color.
   /*!
@@ -472,8 +449,8 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  virtual void draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-      void* node, void* colornode, void *transpnode);
+  virtual void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+                    void* transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();
@@ -494,19 +471,13 @@ public:
     The transform is multiplied with the stored transform, to give to new
     transform for the object.
   */
-  void set_transform_from_stored(GlowTransform* t)
-  {
-    trf.set_from_stored(t), get_node_borders();
-  }
+  void set_transform_from_stored(GlowTransform* t) { trf.set_from_stored(t), get_node_borders(); }
 
   //! Store the current transform
   /*! The stored transform can be used as starting point for future scaling or
    * rotations.
    */
-  void store_transform()
-  {
-    trf.store();
-  }
+  void store_transform() { trf.store(); }
 
   //! Set the linewidth.
   /*!
@@ -560,10 +531,7 @@ public:
     draw();
   }
 
-  void get_ctx(void** c)
-  {
-    *c = (void*)ctx;
-  } //!< Should be replace by get_ctx() !!
+  void get_ctx(void** c) { *c = (void*)ctx; } //!< Should be replace by get_ctx() !!
 
   //! Redraw the background to an annotation.
   /*!
@@ -591,8 +559,7 @@ public:
     The first GrowRect object of a node that has fill is regarded as the
     annotation background.
   */
-  int get_annot_background(
-      GlowTransform* t, void* node, glow_eDrawType* background);
+  int get_annot_background(GlowTransform* t, void* node, glow_eDrawType* background);
 
   int export_script(GlowExportScript* es, void* o, void* m);
 
@@ -612,8 +579,8 @@ public:
     used to generate
     java code for the shape.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ofstream& fp);
 
   //! Register the name of the last group
   /*!
@@ -623,19 +590,13 @@ public:
     The last group is used to recover data for a group that is desolved, when
     the members are regrouped.
   */
-  void set_last_group(char* name)
-  {
-    strcpy(last_group, name);
-  }
+  void set_last_group(char* name) { strcpy(last_group, name); }
 
   //! Return the name of the last group the object was a member of
   /*!
     \return The name of the last group the object was a member of.
   */
-  char* get_last_group()
-  {
-    return last_group;
-  }
+  char* get_last_group() { return last_group; }
 
   //! Mirror the object around a horizontal or vertical mirror line.
   /*!

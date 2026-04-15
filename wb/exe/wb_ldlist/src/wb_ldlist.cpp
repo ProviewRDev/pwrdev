@@ -45,13 +45,9 @@
 #include "wb_erep.h"
 #include "wb_vrepdbs.h"
 
-static void usage(const char* txt)
-{
-  std::cout << txt << '\n';
-}
+static void usage(const char* txt) { std::cout << txt << '\n'; }
 
-void ldlist_print(const char* text, pwr_tVid vid, pwr_tCid cid,
-    const char* name, pwr_tTime* time)
+void ldlist_print(const char* text, pwr_tVid vid, pwr_tCid cid, const char* name, pwr_tTime* time)
 {
   char timestr[40];
 
@@ -76,10 +72,12 @@ void ldlist_print(const char* text, pwr_tVid vid, pwr_tCid cid,
     std::cout << " ";
   std::cout << " ";
 
-  if (cid) {
+  if (cid)
+  {
     pwr_tObjName cname;
 
-    switch (cid) {
+    switch (cid)
+    {
     case pwr_eClass_RootVolume:
       strcpy(cname, "RootVolume");
       break;
@@ -102,7 +100,8 @@ void ldlist_print(const char* text, pwr_tVid vid, pwr_tCid cid,
       strcpy(cname, "Unknown class");
     }
     std::cout << " " << cname << '\n';
-  } else
+  }
+  else
     std::cout << '\n';
 }
 
@@ -114,9 +113,12 @@ int main(int argc, char* argv[])
   pwr_tTime time;
   pwr_tFileName fname;
 
-  while (--argc > 0 && (*++argv)[0] == '-') {
-    while ((c = *++argv[0])) {
-      switch (c) {
+  while (--argc > 0 && (*++argv)[0] == '-')
+  {
+    while ((c = *++argv[0]))
+    {
+      switch (c)
+      {
       case 'o':
         ++oflag;
         break;
@@ -144,10 +146,10 @@ int main(int argc, char* argv[])
 
   ldlist_print("Volume", vrep->vid(), vrep->cid(), vrep->name(), &time);
 
-  for (int i = 0; i < (int)vrep->m_dbsmep->nVolRef + 1; i++) {
+  for (int i = 0; i < (int)vrep->m_dbsmep->nVolRef + 1; i++)
+  {
     time = vrep->m_dbsmep->venv[i].vp->time;
-    ldlist_print("VolRef", vrep->m_dbsmep->venv[i].vp->vid,
-        vrep->m_dbsmep->venv[i].vp->cid, vrep->m_dbsmep->venv[i].vp->name,
-        &time);
+    ldlist_print("VolRef", vrep->m_dbsmep->venv[i].vp->vid, vrep->m_dbsmep->venv[i].vp->cid,
+                 vrep->m_dbsmep->venv[i].vp->name, &time);
   }
 }

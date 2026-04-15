@@ -43,12 +43,12 @@
 
 #include "cow_wow_gtk.h"
 
-class NodelistGtk : public Nodelist {
+class NodelistGtk : public Nodelist
+{
 public:
-  NodelistGtk(void* nodelist_parent_ctx, GtkWidget* nodelist_parent_wid,
-      const char* nodelist_name, int nodelist_mode,
-      nl_mLayout nodelist_layout, int msgw_pop, char *nodelist_conf_file,
-      pwr_tStatus* status);
+  NodelistGtk(void* nodelist_parent_ctx, GtkWidget* nodelist_parent_wid, const char* nodelist_name,
+              int nodelist_mode, nl_mLayout nodelist_layout, int msgw_pop, char* nodelist_conf_file,
+              pwr_tStatus* status);
   ~NodelistGtk();
 
   GtkWidget* parent_wid;
@@ -93,29 +93,24 @@ public:
   void free_cursor();
   void create_add_input_dialog();
   void create_mod_input_dialog();
-  void open_add_input_dialog(const char* text, const char* text2,
-      const char* text3, const char* text4, const char* text5, const char* title, 
-      const char* init_text,
-      void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*));
-  void open_mod_input_dialog(const char* text, const char* text2,
-      const char* text3, const char* text4, const char* text5,const char* title, 
-      const char* init_text, const char* init_text2, const char* init_text3, 
-      const char* init_text4, const char* init_text5,
-      void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*));
-  CowGe* ge_new(const char* name, const char* filename,
-      int scrollbar, int menu, int navigator, int width, int height, int x, int y,
-      double scan_time, const char* object_name, int use_default_access,
-      unsigned int access, unsigned int options, void* basewidget,
-      double* borders, int color_theme, int dashboard,
-      int (*command_cb)(void*, char*, char*, char *, void*),
-      int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-      int (*is_authorized_cb)(void*, unsigned int),
-      void (*keyboard_cb)(void*, void*, int, int),
-      int (*extern_connect_cb)(void*, char*, void**, pwr_tRefId*));
+  void open_add_input_dialog(const char* text, const char* text2, const char* text3, const char* text4,
+                             const char* text5, const char* title, const char* init_text,
+                             void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*));
+  void open_mod_input_dialog(const char* text, const char* text2, const char* text3, const char* text4,
+                             const char* text5, const char* title, const char* init_text,
+                             const char* init_text2, const char* init_text3, const char* init_text4,
+                             const char* init_text5,
+                             void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*));
+  CowGe* ge_new(const char* name, const char* filename, int scrollbar, int menu, int navigator, int width,
+                int height, int x, int y, double scan_time, const char* object_name, int use_default_access,
+                unsigned int access, unsigned int options, void* basewidget, double* borders, int color_theme,
+                int dashboard, int (*command_cb)(void*, char*, char*, char*, void*),
+                int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+                int (*is_authorized_cb)(void*, unsigned int), void (*keyboard_cb)(void*, void*, int, int),
+                int (*extern_connect_cb)(void*, char*, void**, pwr_tRefId*));
   void set_prompt(const char* prompt);
 
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void valchanged_cmd_input(GtkWidget* w, gpointer data);
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_add_node(GtkWidget* w, gpointer data);

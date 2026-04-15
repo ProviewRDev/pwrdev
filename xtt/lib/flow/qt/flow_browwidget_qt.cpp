@@ -55,7 +55,8 @@ static int brow_init_proc(QWidget* w, FlowCtx* fctx, void* client_data)
   QtScrollWidgetFlow* brow = ((QtScrollWidgetFlow*)w);
   BrowCtx* ctx = ((BrowCtx*)brow->parent_ctx);
 
-  if (brow->scroll_h) {
+  if (brow->scroll_h)
+  {
     widget_sScroll* scroll_data = new widget_sScroll();
     scroll_data->parent = w;
     scroll_data->scroll_h = brow->scroll_h;
@@ -68,18 +69,13 @@ static int brow_init_proc(QWidget* w, FlowCtx* fctx, void* client_data)
   return (brow->init_proc)(ctx, client_data);
 }
 
-QWidget* scrolledbrowwidgetqt_new(
-    int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
-    QWidget** browwidget)
+QWidget* scrolledbrowwidgetqt_new(int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
+                                  QWidget** browwidget)
 {
   QtScrollWidgetFlow* w = new QtScrollWidgetFlow();
-  QWidget* form = w->initScroll(
-      flow_eCtxType_Brow, init_proc, client_data, brow_init_proc);
+  QWidget* form = w->initScroll(flow_eCtxType_Brow, init_proc, client_data, brow_init_proc);
   *browwidget = w;
   return form;
 }
 
-void browwidgetqt_modify_ctx(QWidget* w, void* ctx)
-{
-  ((QtScrollWidgetFlow*)w)->parent_ctx = ctx;
-}
+void browwidgetqt_modify_ctx(QWidget* w, void* ctx) { ((QtScrollWidgetFlow*)w)->parent_ctx = ctx; }

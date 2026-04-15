@@ -62,11 +62,10 @@
 #include "wb_dblock.h"
 #include "wb_revision.h"
 
-class build_dir {
+class build_dir
+{
 public:
-  build_dir()
-  {
-  }
+  build_dir() {}
   build_dir(const build_dir& x)
   {
     strcpy(src_dir, x.src_dir);
@@ -76,14 +75,9 @@ public:
   pwr_tFileName dest_dir;
 };
 
-wb_build::wb_build(wb_session ses, WNav* wnav)
-    : m_session(ses), m_wnav(wnav), m_hierarchy(pwr_cNOid)
-{
-}
+wb_build::wb_build(wb_session ses, WNav* wnav) : m_session(ses), m_wnav(wnav), m_hierarchy(pwr_cNOid) {}
 
-wb_build::~wb_build()
-{
-}
+wb_build::~wb_build() {}
 
 void wb_build::classlist(pwr_tCid cid)
 {
@@ -91,9 +85,11 @@ void wb_build::classlist(pwr_tCid cid)
 
   // Build all objects of specified class
   sumsts = PWRB__NOBUILT;
-  for (wb_object o = m_session.object(cid); o.oddSts(); o = o.next()) {
+  for (wb_object o = m_session.object(cid); o.oddSts(); o = o.next())
+  {
     // Call build method for object
-    switch (cid) {
+    switch (cid)
+    {
     case pwr_cClass_plc:
       plcpgm(o.oid());
       break;
@@ -126,8 +122,7 @@ void wb_build::classlist(pwr_tCid cid)
     }
     if (evenSts())
       sumsts = m_sts;
-    else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-        && m_sts != PWRB__INLIBHIER)
+    else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
       sumsts = m_sts;
   }
   m_sts = sumsts;
@@ -151,8 +146,10 @@ void wb_build::all(int no_export, int no_classvolumes, int no_flowfiles)
   sts = lfu_GetVolumeCnfAll(vol);
 
   // Check that no volume is locked
-  for (unsigned int i = 0; i < vol.size(); i++) {
-    switch (vol[i].cid) {
+  for (unsigned int i = 0; i < vol.size(); i++)
+  {
+    switch (vol[i].cid)
+    {
     case pwr_eClass_RootVolume:
     case pwr_eClass_SubVolume:
     case pwr_eClass_SharedVolume:
@@ -165,7 +162,8 @@ void wb_build::all(int no_export, int no_classvolumes, int no_flowfiles)
       else
         sprintf(fname, "%s/%s.db.lock", db_dir, cdh_Low(vol[i].name));
 
-      if (ODD(dcli_file_time(fname, &t))) {
+      if (ODD(dcli_file_time(fname, &t)))
+      {
         char msg[200];
         sprintf(msg, "Build:    Volume is locked %s.", vol[i].name);
         MsgWindow::message('E', msg, msgw_ePop_Yes);
@@ -195,40 +193,44 @@ void wb_build::all(int no_export, int no_classvolumes, int no_flowfiles)
   import_files(bld_ePass_BeforeNode);
   if (evenSts())
     sumsts = m_sts;
-  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-      && m_sts != PWRB__INLIBHIER)
+  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
     sumsts = m_sts;
 
   directories(0, bld_ePass_BeforeNode);
-  if (m_sts == PWRB__MAKEUPDATED) {
+  if (m_sts == PWRB__MAKEUPDATED)
+  {
     rebuild = 1;
     m_sts = PWRB__SUCCESS;
-  } else if (evenSts())
+  }
+  else if (evenSts())
     sumsts = m_sts;
-  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-      && m_sts != PWRB__INLIBHIER)
+  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
     sumsts = m_sts;
 
-  if (!no_export) {
+  if (!no_export)
+  {
     export_files(bld_ePass_BeforeNode);
     if (evenSts())
       sumsts = m_sts;
-    else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-        && m_sts != PWRB__INLIBHIER)
+    else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
       sumsts = m_sts;
   }
   opt.force = force;
 
   // Build class volumes
-  if (!no_classvolumes) {
-    for (unsigned int i = 0; i < vol.size(); i++) {
-      switch (vol[i].cid) {
+  if (!no_classvolumes)
+  {
+    for (unsigned int i = 0; i < vol.size(); i++)
+    {
+      switch (vol[i].cid)
+      {
       case pwr_eClass_ClassVolume:
       case pwr_eClass_DetachedClassVolume:
-        sprintf(cmd, "create "
-                     "snapshot/file=\"$pwrp_db/%s.wb_load\"/out=\"$pwrp_load/"
-                     "%s.dbs\"",
-            cdh_Low(vol[i].name), cdh_Low(vol[i].name));
+        sprintf(cmd,
+                "create "
+                "snapshot/file=\"$pwrp_db/%s.wb_load\"/out=\"$pwrp_load/"
+                "%s.dbs\"",
+                cdh_Low(vol[i].name), cdh_Low(vol[i].name));
         m_wnav->command(cmd);
         break;
       default:;
@@ -236,22 +238,27 @@ void wb_build::all(int no_export, int no_classvolumes, int no_flowfiles)
     }
   }
 
-  if (!no_flowfiles) {
-    for (unsigned int i = 0; i < vol.size(); i++) {
-      switch (vol[i].cid) {
+  if (!no_flowfiles)
+  {
+    for (unsigned int i = 0; i < vol.size(); i++)
+    {
+      switch (vol[i].cid)
+      {
       case pwr_eClass_ClassVolume:
-      case pwr_eClass_DetachedClassVolume: {
+      case pwr_eClass_DetachedClassVolume:
+      {
         bool lock = false;
-        if (wb_dblock::is_locked((char*)"$pwrp_db/directory.wb_load")) {
+        if (wb_dblock::is_locked((char*)"$pwrp_db/directory.wb_load"))
+        {
           wb_dblock::dbunlock((char*)"$pwrp_db/directory.wb_load");
           lock = true;
         }
-        sprintf(
-            cmd, "wb_cmd -c %s create flow/templ/all", cdh_Low(vol[i].name));
+        sprintf(cmd, "wb_cmd -c %s create flow/templ/all", cdh_Low(vol[i].name));
         sts = system(cmd);
         if (lock)
           wb_dblock::dblock((char*)"$pwrp_db/directory.wb_load");
-        if (sts != 0) {
+        if (sts != 0)
+        {
           printf("** Create flow for classvolume %s error\n", vol[i].name);
         }
         break;
@@ -262,30 +269,31 @@ void wb_build::all(int no_export, int no_classvolumes, int no_flowfiles)
   }
 
   // Build root, sub and shared volumes
-  for (unsigned int i = 0; i < vol.size(); i++) {
-    switch (vol[i].cid) {
+  for (unsigned int i = 0; i < vol.size(); i++)
+  {
+    switch (vol[i].cid)
+    {
     case pwr_eClass_RootVolume:
     case pwr_eClass_SubVolume:
     case pwr_eClass_SharedVolume:
       if (!no_classvolumes)
-        sprintf(cmd, "wb_cmd -v %s update classes\\;build volume/name=%s/force",
-            cdh_Low(vol[i].name), vol[i].name);
+        sprintf(cmd, "wb_cmd -v %s update classes\\;build volume/name=%s/force", cdh_Low(vol[i].name),
+                vol[i].name);
       else
-        sprintf(cmd, "wb_cmd -v %s build volume/name=%s/force",
-            cdh_Low(vol[i].name), vol[i].name);
+        sprintf(cmd, "wb_cmd -v %s build volume/name=%s/force", cdh_Low(vol[i].name), vol[i].name);
       sts = system(cmd);
-      if (sts != 0) {
+      if (sts != 0)
+      {
         char msg[200];
-        sprintf(msg, "Build:    Volume build error %s, build all terminated",
-            vol[i].name);
+        sprintf(msg, "Build:    Volume build error %s, build all terminated", vol[i].name);
         MsgWindow::message('E', msg, msgw_ePop_Yes);
         m_sts = 0;
         wb_log::pull();
         return;
       }
-      if (!no_flowfiles) {
-        sprintf(cmd, "wb_cmd -v %s create flow/all\\; create cross",
-            cdh_Low(vol[i].name));
+      if (!no_flowfiles)
+      {
+        sprintf(cmd, "wb_cmd -v %s create flow/all\\; create cross", cdh_Low(vol[i].name));
         system(cmd);
       }
       break;
@@ -295,7 +303,8 @@ void wb_build::all(int no_export, int no_classvolumes, int no_flowfiles)
 
   // Build all nodes
   m_sts = lfu_create_bootfiles(0, 0, 1);
-  if (EVEN(m_sts)) {
+  if (EVEN(m_sts))
+  {
     char msg[200];
     sprintf(msg, "Build node error. Build all terminated");
     MsgWindow::message('E', msg, msgw_ePop_Yes);
@@ -310,22 +319,19 @@ void wb_build::all(int no_export, int no_classvolumes, int no_flowfiles)
   import_files(bld_ePass_AfterNode);
   if (evenSts())
     sumsts = m_sts;
-  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-      && m_sts != PWRB__INLIBHIER)
+  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
     sumsts = m_sts;
 
   directories(0, bld_ePass_AfterNode);
   if (evenSts())
     sumsts = m_sts;
-  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-      && m_sts != PWRB__INLIBHIER)
+  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
     sumsts = m_sts;
 
   export_files(bld_ePass_AfterNode);
   if (evenSts())
     sumsts = m_sts;
-  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-      && m_sts != PWRB__INLIBHIER)
+  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
     sumsts = m_sts;
 
   opt.force = force;
@@ -335,8 +341,7 @@ void wb_build::all(int no_export, int no_classvolumes, int no_flowfiles)
   m_sts = sumsts;
 }
 
-void wb_build::node(
-    char* nodename, int nodetype, void* volumelist, int volumecnt)
+void wb_build::node(char* nodename, int nodetype, void* volumelist, int volumecnt)
 {
   lfu_t_volumelist* vlist = (lfu_t_volumelist*)volumelist;
   pwr_tTime vtime;
@@ -360,25 +365,24 @@ void wb_build::node(
   import_files(bld_ePass_BeforeNode);
   if (evenSts())
     sumsts = m_sts;
-  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-      && m_sts != PWRB__INLIBHIER)
+  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
     sumsts = m_sts;
 
   directories(0, bld_ePass_BeforeNode);
-  if (m_sts == PWRB__MAKEUPDATED) {
+  if (m_sts == PWRB__MAKEUPDATED)
+  {
     rebuild = 1;
     m_sts = PWRB__SUCCESS;
-  } else if (evenSts())
+  }
+  else if (evenSts())
     sumsts = m_sts;
-  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-      && m_sts != PWRB__INLIBHIER)
+  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
     sumsts = m_sts;
 
   export_files(bld_ePass_BeforeNode);
   if (evenSts())
     sumsts = m_sts;
-  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-      && m_sts != PWRB__INLIBHIER)
+  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
     sumsts = m_sts;
 
   cnf(nodename, volumelist, volumecnt);
@@ -387,11 +391,15 @@ void wb_build::node(
   else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT)
     sumsts = m_sts;
 
-  if (!opt.manual) {
+  if (!opt.manual)
+  {
     // Check if there is any new dbsfile
-    for (int i = 0; i < volumecnt; i++) {
-      if (str_NoCaseStrcmp(nodename, vlist[i].p1) == 0) {
-        if (bussid == -1) {
+    for (int i = 0; i < volumecnt; i++)
+    {
+      if (str_NoCaseStrcmp(nodename, vlist[i].p1) == 0)
+      {
+        if (bussid == -1)
+        {
           char systemname[80], systemgroup[80];
           pwr_tVid* vl;
           pwr_tString40* vnl;
@@ -399,37 +407,41 @@ void wb_build::node(
 
           // Get time for current bootfile
           status = sscanf(vlist[i].p3, "%d", &bussid);
-          if (status != 1) {
+          if (status != 1)
+          {
             // Bussid error
           }
 
           sprintf(fname, pwr_cNameBoot, load_cDirectory, vlist[i].p2, bussid);
           str_ToLower(fname, fname);
           dcli_translate_filename(fname, fname);
-          status = lfu_ReadBootFile(
-              fname, &btime, systemname, systemgroup, &vl, &vnl, &vcnt, 0, 0);
-          if (EVEN(status)) {
+          status = lfu_ReadBootFile(fname, &btime, systemname, systemgroup, &vl, &vnl, &vcnt, 0, 0);
+          if (EVEN(status))
+          {
             rebuild = 1;
           }
           strcpy(node, vlist[i].p2);
         }
 
-        if (vlist[i].volume_id == m_session.vid()) {
+        if (vlist[i].volume_id == m_session.vid())
+        {
           // Build current volume
           volume();
-          if (evenSts()) {
+          if (evenSts())
+          {
             wb_log::pull();
             return;
           }
         }
 
         str_ToLower(vname, vlist[i].volume_name);
-        if (vlist[i].volume_id >= cdh_cUserVolMin
-            && vlist[i].volume_id <= cdh_cUserVolMax) {
+        if (vlist[i].volume_id >= cdh_cUserVolMin && vlist[i].volume_id <= cdh_cUserVolMax)
+        {
           sprintf(fname, "$pwrp_load/%s.dbs", vname);
           dcli_translate_filename(fname, fname);
           m_sts = dcli_file_time(fname, &vtime);
-          if (evenSts()) {
+          if (evenSts())
+          {
             // Dbs file is missing
             char msg[200];
             sprintf(msg, "Loadfile for volume %s not created", vname);
@@ -444,7 +456,8 @@ void wb_build::node(
     }
   }
 
-  if (m_wnav && m_wnav->ldhses) {
+  if (m_wnav && m_wnav->ldhses)
+  {
     wb_erep* erep = *(wb_env*)ldh_SessionToWB(m_wnav->ldhses);
     erep->checkVolumes(&m_sts, nodename);
 
@@ -452,12 +465,13 @@ void wb_build::node(
       return;
   }
 
-  if (opt.force || opt.manual || rebuild) {
-    m_sts = lfu_create_bootfile(nodename, nodetype,
-        (lfu_t_volumelist*)volumelist, volumecnt, opt.debug);
+  if (opt.force || opt.manual || rebuild)
+  {
+    m_sts = lfu_create_bootfile(nodename, nodetype, (lfu_t_volumelist*)volumelist, volumecnt, opt.debug);
     if (ODD(m_sts))
       wb_log::log(wlog_eCategory_NodeBuild, nodename, 0);
-  } else
+  }
+  else
     m_sts = PWRB__NOBUILT;
 
   if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT)
@@ -468,25 +482,23 @@ void wb_build::node(
   import_files(bld_ePass_AfterNode);
   if (evenSts())
     sumsts = m_sts;
-  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-      && m_sts != PWRB__INLIBHIER)
+  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
     sumsts = m_sts;
 
   directories(0, bld_ePass_AfterNode);
   if (evenSts())
     sumsts = m_sts;
-  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-      && m_sts != PWRB__INLIBHIER)
+  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
     sumsts = m_sts;
 
   export_files(bld_ePass_AfterNode);
   if (evenSts())
     sumsts = m_sts;
-  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT
-      && m_sts != PWRB__INLIBHIER)
+  else if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT && m_sts != PWRB__INLIBHIER)
     sumsts = m_sts;
 
-  if (ODD(sumsts) && sumsts != PWRB__NOBUILT) {
+  if (ODD(sumsts) && sumsts != PWRB__NOBUILT)
+  {
     char msg[200];
 
     sprintf(msg, "Build:    Node     %s", nodename);
@@ -514,30 +526,32 @@ void wb_build::cnf(char* nodename, void* volumelist, int volumecnt)
   char node[80];
 
   bool found = false;
-  for (int i = 0; i < volumecnt; i++) {
-    if (str_NoCaseStrcmp(nodename, vlist[i].p1) == 0) {
+  for (int i = 0; i < volumecnt; i++)
+  {
+    if (str_NoCaseStrcmp(nodename, vlist[i].p1) == 0)
+    {
       found = true;
       strncpy(node, vlist[i].p2, sizeof(node));
       status = sscanf(vlist[i].p3, "%d", &bussid);
-      if (status != 1) {
+      if (status != 1)
+      {
         m_sts = PWRB__NOSUCHNODE;
         return;
       }
     }
   }
-  if (!found) {
+  if (!found)
+  {
     m_sts = PWRB__NOSUCHNODE;
     return;
   }
 
   sprintf(node_dir.src_dir, "$pwrp_cnf/%s", node);
-  src_sts = dcli_search_directory(
-      node_dir.src_dir, found_src_dir, DCLI_DIR_SEARCH_INIT);
+  src_sts = dcli_search_directory(node_dir.src_dir, found_src_dir, DCLI_DIR_SEARCH_INIT);
   dcli_search_directory(node_dir.src_dir, found_src_dir, DCLI_DIR_SEARCH_END);
 
   sprintf(node_dir.dest_dir, "$pwrp_load/%s", node);
-  dest_sts = dcli_search_directory(
-      node_dir.dest_dir, found_dest_dir, DCLI_DIR_SEARCH_INIT);
+  dest_sts = dcli_search_directory(node_dir.dest_dir, found_dest_dir, DCLI_DIR_SEARCH_INIT);
   dcli_search_directory(node_dir.dest_dir, found_dest_dir, DCLI_DIR_SEARCH_END);
 
   if (ODD(src_sts) && EVEN(dest_sts))
@@ -548,10 +562,9 @@ void wb_build::cnf(char* nodename, void* volumelist, int volumecnt)
     dcli_delete_directory(node_dir.dest_dir, 1);
 
   sprintf(src_dir, "%s/*", node_dir.src_dir);
-  for (src_sts
-       = dcli_search_directory(src_dir, found_src_dir, DCLI_DIR_SEARCH_INIT);
-       ODD(src_sts); src_sts
-       = dcli_search_directory(src_dir, found_src_dir, DCLI_DIR_SEARCH_NEXT)) {
+  for (src_sts = dcli_search_directory(src_dir, found_src_dir, DCLI_DIR_SEARCH_INIT); ODD(src_sts);
+       src_sts = dcli_search_directory(src_dir, found_src_dir, DCLI_DIR_SEARCH_NEXT))
+  {
     build_dir dir;
 
     char* s = strrchr(found_src_dir, '/');
@@ -626,11 +639,10 @@ void wb_build::cnf(char* nodename, void* volumelist, int volumecnt)
   if (sumsts == PWRB__NOBUILT && m_sts != PWRB__NOBUILT)
     sumsts = m_sts;
 
-  for (unsigned int i = 0; i < users_dirv.size(); i++) {
-    dest_sts = dcli_search_directory(
-        users_dirv[i].dest_dir, found_dest_dir, DCLI_DIR_SEARCH_INIT);
-    dcli_search_directory(
-        users_dirv[i].dest_dir, found_dest_dir, DCLI_DIR_SEARCH_END);
+  for (unsigned int i = 0; i < users_dirv.size(); i++)
+  {
+    dest_sts = dcli_search_directory(users_dirv[i].dest_dir, found_dest_dir, DCLI_DIR_SEARCH_INIT);
+    dcli_search_directory(users_dirv[i].dest_dir, found_dest_dir, DCLI_DIR_SEARCH_END);
 
     if (EVEN(dest_sts))
       // Create destination directory
@@ -677,7 +689,8 @@ void wb_build::cnf(char* nodename, void* volumelist, int volumecnt)
 
 void wb_build::volume()
 {
-  switch (m_session.cid()) {
+  switch (m_session.cid())
+  {
   case pwr_eClass_RootVolume:
   case pwr_eClass_SubVolume:
   case pwr_eClass_SharedVolume:
@@ -704,13 +717,15 @@ void wb_build::rootvolume(pwr_tVid vid)
 
   wb_log::push();
 
-  if (opt.syntax) {
+  if (opt.syntax)
+  {
     int errorcount, warningcount;
 
     m_sts = ldh_SyntaxCheck((ldh_tSession*)&m_session, &errorcount, &warningcount);
     if (evenSts())
       return;
-    if (errorcount) {
+    if (errorcount)
+    {
       m_sts = WSX__ERRORS;
       return;
     }
@@ -718,7 +733,8 @@ void wb_build::rootvolume(pwr_tVid vid)
       m_sts = WSX__WARNINGS;
   }
 
-  if (!opt.manual) {
+  if (!opt.manual)
+  {
     // Build all plcpgm
     m_sts = gcg_comp_plcembed_all((ldh_tSession*)&m_session, opt.force);
     if (evenSts())
@@ -780,13 +796,15 @@ void wb_build::rootvolume(pwr_tVid vid)
   oid.oix = 0;
   oid.vid = m_session.vid();
   wb_attribute a = m_session.attribute(oid, "SysBody", "Modified");
-  if (!a) {
+  if (!a)
+  {
     m_sts = a.sts();
     return;
   }
 
   a.value(&modtime);
-  if (!a) {
+  if (!a)
+  {
     m_sts = a.sts();
     return;
   }
@@ -801,16 +819,16 @@ void wb_build::rootvolume(pwr_tVid vid)
   pwr_tTime mtime = pwr_cNTime;
   pwr_tTime t;
   pwr_tStatus sts;
-  for (wb_mvrep* mvrep = merep->volume(&sts); ODD(sts);
-       mvrep = merep->nextVolume(&sts, mvrep->vid())) {
+  for (wb_mvrep* mvrep = merep->volume(&sts); ODD(sts); mvrep = merep->nextVolume(&sts, mvrep->vid()))
+  {
     mvrep->time(&t);
     if (time_Acomp(&t, &mtime) == 1)
       mtime = t;
   }
 
-  if (opt.force || opt.manual || evenSts()
-      || time_Acomp(&modtime, &dbs_time) == 1
-      || time_Acomp(&mtime, &dbs_time) == 1 || plcsts != PWRB__NOBUILT) {
+  if (opt.force || opt.manual || evenSts() || time_Acomp(&modtime, &dbs_time) == 1 ||
+      time_Acomp(&mtime, &dbs_time) == 1 || plcsts != PWRB__NOBUILT)
+  {
     m_sts = lfu_create_loadfile((ldh_tSession*)&m_session);
     if (evenSts())
       return;
@@ -819,23 +837,23 @@ void wb_build::rootvolume(pwr_tVid vid)
     if (evenSts())
       return;
 
-    sprintf(msg, "Build:    Volume   Loadfiles created volume %s",
-        m_session.name());
+    sprintf(msg, "Build:    Volume   Loadfiles created volume %s", m_session.name());
     MsgWindow::message('I', msg, msgw_ePop_No);
 
     wb_log::log(&m_session, wlog_eCategory_VolumeBuild, m_session.vid());
 
     sumsts = PWRB__SUCCESS;
-  } else
+  }
+  else
     m_sts = sumsts;
 
   cdh_uVolumeId uvid;
   uvid.pwr = m_session.vid();
-  sprintf(fname, "$pwrp_load/" pwr_cNameRttCrr, uvid.v.vid_3, uvid.v.vid_2,
-      uvid.v.vid_1, uvid.v.vid_0);
+  sprintf(fname, "$pwrp_load/" pwr_cNameRttCrr, uvid.v.vid_3, uvid.v.vid_2, uvid.v.vid_1, uvid.v.vid_0);
   dcli_translate_filename(fname, fname);
   m_sts = dcli_file_time(fname, &rtt_time);
-  if (opt.crossref && (evenSts() || time_Acomp(&modtime, &rtt_time) == 1)) {
+  if (opt.crossref && (evenSts() || time_Acomp(&modtime, &rtt_time) == 1))
+  {
     strcpy(cmd, "create crossreferencefiles");
     if (opt.crossref_graph)
       strcat(cmd, "/graph");
@@ -846,8 +864,7 @@ void wb_build::rootvolume(pwr_tVid vid)
     if (ODD(sumsts))
       sumsts = PWRB__SUCCESS;
 
-    sprintf(msg, "Build:    Volume   Crossreference file generated volume %s",
-        m_session.name());
+    sprintf(msg, "Build:    Volume   Crossreference file generated volume %s", m_session.name());
     MsgWindow::message('I', msg, msgw_ePop_No);
   }
 
@@ -867,7 +884,8 @@ void wb_build::classvolume(pwr_tVid vid)
 
   wb_log::push();
 
-  if (!opt.manual) {
+  if (!opt.manual)
+  {
     // Build all ClassDef
     classlist(pwr_eClass_ClassDef);
     if (evenSts())
@@ -878,13 +896,17 @@ void wb_build::classvolume(pwr_tVid vid)
 
   wb_log::pull();
 
-  if (vid == 0) {
+  if (vid == 0)
+  {
     // Build current volume
     str_ToLower(name, m_session.name());
-  } else {
+  }
+  else
+  {
     wb_env env = m_session.env();
     wb_volume v = env.volume(vid);
-    if (!v) {
+    if (!v)
+    {
       m_sts = v.sts();
       return;
     }
@@ -908,14 +930,13 @@ void wb_build::classvolume(pwr_tVid vid)
   pwr_tTime mtime = pwr_cNTime;
   pwr_tTime t;
   pwr_tStatus sts;
-  for (wb_mvrep* mvrep = merep->volume(&sts); ODD(sts);
-       mvrep = merep->nextVolume(&sts, mvrep->vid())) {
+  for (wb_mvrep* mvrep = merep->volume(&sts); ODD(sts); mvrep = merep->nextVolume(&sts, mvrep->vid()))
+  {
     if (m_session.vid() == mvrep->vid())
       continue;
     // Check only system class and manufact class volumes
-    if (mvrep->vid() > cdh_cSystemClassVolMax
-        && (mvrep->vid() < cdh_cManufactClassVolMin
-               || mvrep->vid() > cdh_cManufactClassVolMax))
+    if (mvrep->vid() > cdh_cSystemClassVolMax &&
+        (mvrep->vid() < cdh_cManufactClassVolMin || mvrep->vid() > cdh_cManufactClassVolMax))
       continue;
 
     mvrep->time(&t);
@@ -924,12 +945,13 @@ void wb_build::classvolume(pwr_tVid vid)
   }
 
   // Create new loadfile
-  if (opt.force || EVEN(fsts) || wbl_time.tv_sec > dbs_time.tv_sec
-      || mtime.tv_sec > dbs_time.tv_sec) {
+  if (opt.force || EVEN(fsts) || wbl_time.tv_sec > dbs_time.tv_sec || mtime.tv_sec > dbs_time.tv_sec)
+  {
     sprintf(cmd, "create snapshot/file=\"$pwrp_db/%s.wb_load\"", name);
     m_sts = m_wnav->command(cmd);
     sumsts = m_sts;
-  } else
+  }
+  else
     m_sts = sumsts;
 
   // Get time for struct file
@@ -938,14 +960,17 @@ void wb_build::classvolume(pwr_tVid vid)
   fsts = dcli_file_time(fname, &h_time);
 
   // Create new struct file
-  if (opt.force || EVEN(fsts) || wbl_time.tv_sec > h_time.tv_sec) {
+  if (opt.force || EVEN(fsts) || wbl_time.tv_sec > h_time.tv_sec)
+  {
     sprintf(cmd, "create struct/file=\"$pwrp_db/%s.wb_load\"", name);
     m_sts = m_wnav->command(cmd);
     sumsts = m_sts;
-  } else
+  }
+  else
     m_sts = sumsts;
 
-  if (sumsts != PWRB__NOBUILT) {
+  if (sumsts != PWRB__NOBUILT)
+  {
     char msg[80];
 
     sprintf(msg, "Build:    Volume   %s", name);
@@ -1031,14 +1056,17 @@ void wb_build::plcpgm(pwr_tOid oid)
   int hierarchy_found = 0;
 
   wb_object o = m_session.object(oid);
-  if (!o) {
+  if (!o)
+  {
     m_sts = o.sts();
     return;
   }
 
   // Check that no ancestor is a LibHier
-  for (wb_object p = o.parent(); p.oddSts(); p = p.parent()) {
-    if (p.cid() == pwr_eClass_LibHier) {
+  for (wb_object p = o.parent(); p.oddSts(); p = p.parent())
+  {
+    if (p.cid() == pwr_eClass_LibHier)
+    {
       m_sts = PWRB__INLIBHIER;
       return;
     }
@@ -1046,29 +1074,31 @@ void wb_build::plcpgm(pwr_tOid oid)
       hierarchy_found = 1;
   }
 
-  if (check_hierarchy && !hierarchy_found) {
+  if (check_hierarchy && !hierarchy_found)
+  {
     m_sts = PWRB__NOBUILT;
     return;
   }
 
-  m_sts = utl_compile((ldh_tSession*)&m_session,
-      ldh_SessionToWB((ldh_tSession*)&m_session),
-      o.longName().name(cdh_mName_volumeStrict), 0, 0, 0, !opt.force, opt.debug,
-      0, 0);
-  if (oddSts() && m_sts != GSX__NOMODIF) {
+  m_sts = utl_compile((ldh_tSession*)&m_session, ldh_SessionToWB((ldh_tSession*)&m_session),
+                      o.longName().name(cdh_mName_volumeStrict), 0, 0, 0, !opt.force, opt.debug, 0, 0);
+  if (oddSts() && m_sts != GSX__NOMODIF)
+  {
     char msg[200];
 
-    sprintf(msg, "Build:    PlcPgm    %s",
-        o.longName().name(cdh_mName_path | cdh_mName_object));
+    sprintf(msg, "Build:    PlcPgm    %s", o.longName().name(cdh_mName_path | cdh_mName_object));
     MsgWindow::message('I', msg, msgw_ePop_No, oid);
-  } else if (m_sts == GSX__NOMODIF) {
+  }
+  else if (m_sts == GSX__NOMODIF)
+  {
     m_sts = PWRB__NOBUILT;
-  } else {
+  }
+  else
+  {
     char msg[500];
     char msg2[256];
     msg_GetMsg(m_sts, msg, sizeof(msg));
-    sprintf(msg2, ", PlcPgm %s",
-        o.longName().name(cdh_mName_path | cdh_mName_object));
+    sprintf(msg2, ", PlcPgm %s", o.longName().name(cdh_mName_path | cdh_mName_object));
     strcat(msg, msg2);
     MsgWindow::message('E', msg, msgw_ePop_Yes, oid, msgw_eRow_Plc);
   }
@@ -1086,14 +1116,17 @@ void wb_build::xttgraph(pwr_tOid oid)
   char* s;
 
   wb_object o = m_session.object(oid);
-  if (!o) {
+  if (!o)
+  {
     m_sts = o.sts();
     return;
   }
 
   // Check that no ancestor is a LibHier
-  for (wb_object p = o.parent(); p.oddSts(); p = p.parent()) {
-    if (p.cid() == pwr_eClass_LibHier) {
+  for (wb_object p = o.parent(); p.oddSts(); p = p.parent())
+  {
+    if (p.cid() == pwr_eClass_LibHier)
+    {
       m_sts = PWRB__INLIBHIER;
       return;
     }
@@ -1101,29 +1134,34 @@ void wb_build::xttgraph(pwr_tOid oid)
       hierarchy_found = 1;
   }
 
-  if (check_hierarchy && !hierarchy_found) {
+  if (check_hierarchy && !hierarchy_found)
+  {
     m_sts = PWRB__NOBUILT;
     return;
   }
 
   wb_attribute a = m_session.attribute(oid, "RtBody", "Action");
-  if (!a) {
+  if (!a)
+  {
     m_sts = a.sts();
     return;
   }
 
   a.value(&action);
-  if (!a) {
+  if (!a)
+  {
     m_sts = a.sts();
     return;
   }
 
-  if (strstr(action, ".pwg")) {
+  if (strstr(action, ".pwg"))
+  {
     strcpy(src_fname, "$pwrp_pop/");
     strcat(src_fname, action);
     dcli_translate_filename(src_fname, src_fname);
     m_sts = dcli_file_time(src_fname, &src_time);
-    if (evenSts()) {
+    if (evenSts())
+    {
       m_sts = PWRB__NOBUILT;
       return;
     }
@@ -1132,8 +1170,8 @@ void wb_build::xttgraph(pwr_tOid oid)
     strcat(dest_fname, action);
     dcli_translate_filename(dest_fname, dest_fname);
     m_sts = dcli_file_time(dest_fname, &dest_time);
-    if (!opt.nocopy
-        && (opt.force || evenSts() || src_time.tv_sec > dest_time.tv_sec)) {
+    if (!opt.nocopy && (opt.force || evenSts() || src_time.tv_sec > dest_time.tv_sec))
+    {
       sprintf(cmd, "cp %s %s", src_fname, dest_fname);
       system(cmd);
       sprintf(cmd, "Build:    XttGraph copy $pwrp_pop/%s -> $pwrp_exe", action);
@@ -1146,13 +1184,14 @@ void wb_build::xttgraph(pwr_tOid oid)
       wb_revision::check_add_file(src_fname);
       wb_log::log(wlog_eCategory_GeBuild, name, 0);
       m_sts = PWRB__SUCCESS;
-    } else {
+    }
+    else
+    {
       m_sts = PWRB__NOBUILT;
     }
   }
   else
     m_sts = PWRB__NOBUILT;
-
 }
 
 void wb_build::webgraph(pwr_tOid oid)
@@ -1169,14 +1208,17 @@ void wb_build::webgraph(pwr_tOid oid)
   char* s;
 
   wb_object o = m_session.object(oid);
-  if (!o) {
+  if (!o)
+  {
     m_sts = o.sts();
     return;
   }
 
   // Check that no ancestor is a LibHier
-  for (wb_object p = o.parent(); p.oddSts(); p = p.parent()) {
-    if (p.cid() == pwr_eClass_LibHier) {
+  for (wb_object p = o.parent(); p.oddSts(); p = p.parent())
+  {
+    if (p.cid() == pwr_eClass_LibHier)
+    {
       m_sts = PWRB__INLIBHIER;
       return;
     }
@@ -1184,19 +1226,22 @@ void wb_build::webgraph(pwr_tOid oid)
       hierarchy_found = 1;
   }
 
-  if (check_hierarchy && !hierarchy_found) {
+  if (check_hierarchy && !hierarchy_found)
+  {
     m_sts = PWRB__NOBUILT;
     return;
   }
 
   wb_attribute a = m_session.attribute(oid, "RtBody", "Name");
-  if (!a) {
+  if (!a)
+  {
     m_sts = a.sts();
     return;
   }
 
   a.value(java_name);
-  if (!a) {
+  if (!a)
+  {
     m_sts = a.sts();
     return;
   }
@@ -1215,7 +1260,8 @@ void wb_build::webgraph(pwr_tOid oid)
 
   dcli_translate_filename(src_fname, src_fname);
   m_sts = dcli_file_time(src_fname, &src_time);
-  if (evenSts()) {
+  if (evenSts())
+  {
     m_sts = PWRB__NOBUILT;
     return;
   }
@@ -1228,12 +1274,11 @@ void wb_build::webgraph(pwr_tOid oid)
 
   dcli_translate_filename(dest_fname, dest_fname);
   m_sts = dcli_file_time(dest_fname, &dest_time);
-  if (!opt.nocopy
-      && (opt.force || evenSts() || src_time.tv_sec > dest_time.tv_sec)) {
+  if (!opt.nocopy && (opt.force || evenSts() || src_time.tv_sec > dest_time.tv_sec))
+  {
     sprintf(cmd, "cp %s %s", src_fname, dest_fname);
     system(cmd);
-    sprintf(
-	cmd, "Build:    WebGraph copy $pwrp_pop/%s -> $pwrp_web", graph_name);
+    sprintf(cmd, "Build:    WebGraph copy $pwrp_pop/%s -> $pwrp_web", graph_name);
     MsgWindow::message('I', cmd, msgw_ePop_No, oid);
 
     strcpy(name, graph_name);
@@ -1243,7 +1288,8 @@ void wb_build::webgraph(pwr_tOid oid)
     wb_revision::check_add_file(src_fname);
     wb_log::log(wlog_eCategory_GeBuild, name, 0);
     m_sts = PWRB__SUCCESS;
-  } else
+  }
+  else
     m_sts = PWRB__NOBUILT;
 }
 
@@ -1263,14 +1309,17 @@ void wb_build::appgraph(pwr_tOid oid)
     return;
 
   wb_object o = m_session.object(oid);
-  if (!o) {
+  if (!o)
+  {
     m_sts = o.sts();
     return;
   }
 
   // Check that no ancestor is a LibHier
-  for (wb_object p = o.parent(); p.oddSts(); p = p.parent()) {
-    if (p.cid() == pwr_eClass_LibHier) {
+  for (wb_object p = o.parent(); p.oddSts(); p = p.parent())
+  {
+    if (p.cid() == pwr_eClass_LibHier)
+    {
       m_sts = PWRB__INLIBHIER;
       return;
     }
@@ -1278,19 +1327,22 @@ void wb_build::appgraph(pwr_tOid oid)
       hierarchy_found = 1;
   }
 
-  if (check_hierarchy && !hierarchy_found) {
+  if (check_hierarchy && !hierarchy_found)
+  {
     m_sts = PWRB__NOBUILT;
     return;
   }
 
   wb_attribute a = m_session.attribute(oid, "RtBody", "Name");
-  if (!a) {
+  if (!a)
+  {
     m_sts = a.sts();
     return;
   }
 
   a.value(graph_name);
-  if (!a) {
+  if (!a)
+  {
     m_sts = a.sts();
     return;
   }
@@ -1305,7 +1357,8 @@ void wb_build::appgraph(pwr_tOid oid)
 
   dcli_translate_filename(src_fname, src_fname);
   m_sts = dcli_file_time(src_fname, &src_time);
-  if (evenSts()) {
+  if (evenSts())
+  {
     m_sts = PWRB__NOBUILT;
     return;
   }
@@ -1318,12 +1371,11 @@ void wb_build::appgraph(pwr_tOid oid)
 
   dcli_translate_filename(dest_fname, dest_fname);
   m_sts = dcli_file_time(dest_fname, &dest_time);
-  if (!opt.nocopy
-      && (opt.force || evenSts() || src_time.tv_sec > dest_time.tv_sec)) {
+  if (!opt.nocopy && (opt.force || evenSts() || src_time.tv_sec > dest_time.tv_sec))
+  {
     sprintf(cmd, "cp %s %s", src_fname, dest_fname);
     system(cmd);
-    sprintf(
-        cmd, "Build:    AppGraph copy $pwrp_pop/%s -> $pwrp_exe", graph_name);
+    sprintf(cmd, "Build:    AppGraph copy $pwrp_pop/%s -> $pwrp_exe", graph_name);
     MsgWindow::message('I', cmd, msgw_ePop_No, oid);
 
     strcpy(name, graph_name);
@@ -1332,7 +1384,8 @@ void wb_build::appgraph(pwr_tOid oid)
     wb_revision::check_add_file(src_fname);
     wb_log::log(wlog_eCategory_GeBuild, name, 0);
     m_sts = PWRB__SUCCESS;
-  } else
+  }
+  else
     m_sts = PWRB__NOBUILT;
 }
 
@@ -1353,14 +1406,17 @@ void wb_build::opplaceweb(pwr_tOid oid)
   int hierarchy_found = 0;
 
   wb_object o = m_session.object(oid);
-  if (!o) {
+  if (!o)
+  {
     m_sts = o.sts();
     return;
   }
 
   // Check that no ancestor is a LibHier
-  for (wb_object p = o.parent(); p.oddSts(); p = p.parent()) {
-    if (p.cid() == pwr_eClass_LibHier) {
+  for (wb_object p = o.parent(); p.oddSts(); p = p.parent())
+  {
+    if (p.cid() == pwr_eClass_LibHier)
+    {
       m_sts = PWRB__INLIBHIER;
       return;
     }
@@ -1368,7 +1424,8 @@ void wb_build::opplaceweb(pwr_tOid oid)
       hierarchy_found = 1;
   }
 
-  if (check_hierarchy && !hierarchy_found) {
+  if (check_hierarchy && !hierarchy_found)
+  {
     m_sts = PWRB__NOBUILT;
     return;
   }
@@ -1376,18 +1433,19 @@ void wb_build::opplaceweb(pwr_tOid oid)
   modtime = o.modTime();
 
   wb_attribute a = m_session.attribute(oid, "RtBody", "FileName");
-  if (!a) {
+  if (!a)
+  {
     m_sts = a.sts();
     return;
   }
   a.value(&file_name);
-  if (!a) {
+  if (!a)
+  {
     m_sts = a.sts();
     return;
   }
   // Parse the name of the start page
-  if ((s = strrchr(file_name, '/')) || (s = strrchr(file_name, '<'))
-      || (s = strrchr(file_name, ':')))
+  if ((s = strrchr(file_name, '/')) || (s = strrchr(file_name, '<')) || (s = strrchr(file_name, ':')))
     strcpy(name, s + 1);
   else
     strcpy(name, file_name);
@@ -1400,7 +1458,8 @@ void wb_build::opplaceweb(pwr_tOid oid)
   fsts = dcli_file_time(fname, &ftime);
 
   m_sts = PWRB__NOBUILT;
-  if (opt.force || EVEN(fsts) || time_Acomp(&modtime, &ftime) == 1) {
+  if (opt.force || EVEN(fsts) || time_Acomp(&modtime, &ftime) == 1)
+  {
     // modtime > ftime
     m_sts = Graph::generate_web((ldh_tSession*)&m_session, oid);
     if (evenSts())
@@ -1419,7 +1478,8 @@ void wb_build::opplaceweb(pwr_tOid oid)
 
   dcli_translate_filename(fname, "$pwrp_web/xtt_help_index.html");
   fsts = dcli_file_time(fname, &html_time);
-  if (opt.force || EVEN(fsts) || time_Acomp(&xtthelp_time, &html_time) == 1) {
+  if (opt.force || EVEN(fsts) || time_Acomp(&xtthelp_time, &html_time) == 1)
+  {
     system("co_convert -d $pwrp_web -t " pwr_cNameProjectXttHelp);
 
     char msg[200];
@@ -1433,12 +1493,14 @@ void wb_build::opplaceweb(pwr_tOid oid)
   dcli_translate_filename(fname, fname);
 
   std::ifstream fpm(fname, std::ios::in);
-  if (!fpm) {
+  if (!fpm)
+  {
     m_sts = 0;
     return;
   }
 
-  while (fpm.getline(line, sizeof(line))) {
+  while (fpm.getline(line, sizeof(line)))
+  {
     int nr;
     char vol_array[7][80];
     pwr_tVid vid;
@@ -1446,38 +1508,41 @@ void wb_build::opplaceweb(pwr_tOid oid)
     if (line[0] == '#')
       continue;
 
-    nr = dcli_parse(line, " ", "", (char*)vol_array,
-        sizeof(vol_array) / sizeof(vol_array[0]), sizeof(vol_array[0]), 0);
+    nr = dcli_parse(line, " ", "", (char*)vol_array, sizeof(vol_array) / sizeof(vol_array[0]),
+                    sizeof(vol_array[0]), 0);
 
-    if (str_NoCaseStrcmp(vol_array[2], "RootVolume") == 0
-        || str_NoCaseStrcmp(vol_array[2], "SubVolume") == 0
-        || str_NoCaseStrcmp(vol_array[2], "SharedVolume") == 0) {
+    if (str_NoCaseStrcmp(vol_array[2], "RootVolume") == 0 ||
+        str_NoCaseStrcmp(vol_array[2], "SubVolume") == 0 ||
+        str_NoCaseStrcmp(vol_array[2], "SharedVolume") == 0)
+    {
       sts = cdh_StringToVolumeId(vol_array[1], &vid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         m_sts = 0;
         return;
       }
 
-      sprintf(srcname, pwr_cNamePlcXttHelp,
-          cdh_VolumeIdToFnString(volstr, sizeof(volstr), vid));
+      sprintf(srcname, pwr_cNamePlcXttHelp, cdh_VolumeIdToFnString(volstr, sizeof(volstr), vid));
       dcli_translate_filename(fname, srcname);
       fsts = dcli_file_time(fname, &xtthelp_time);
-      if (ODD(fsts)) {
+      if (ODD(fsts))
+      {
         sprintf(fname, "$pwrp_web/xtthelp_%s_plc_index.html",
-            cdh_VolumeIdToFnString(volstr, sizeof(volstr), vid));
+                cdh_VolumeIdToFnString(volstr, sizeof(volstr), vid));
         dcli_translate_filename(fname, fname);
         fsts = dcli_file_time(fname, &html_time);
-        if (opt.force || EVEN(fsts)
-            || time_Acomp(&xtthelp_time, &html_time) == 1) {
+        if (opt.force || EVEN(fsts) || time_Acomp(&xtthelp_time, &html_time) == 1)
+        {
           char msg[200];
           pwr_tCmd cmd;
 
           sprintf(cmd, "co_convert -d $pwrp_web -t %s", srcname);
           system(cmd);
 
-          sprintf(msg, "Build:    OpPlaceWeb plc xtthelp-file for volume %s "
-                       "converted to html",
-              vol_array[0]);
+          sprintf(msg,
+                  "Build:    OpPlaceWeb plc xtthelp-file for volume %s "
+                  "converted to html",
+                  vol_array[0]);
           MsgWindow::message('I', msg, msgw_ePop_No, oid);
           m_sts = PWRB__SUCCESS;
         }
@@ -1501,14 +1566,17 @@ void wb_build::application(pwr_tOid oid)
   int sts;
 
   wb_object o = m_session.object(oid);
-  if (!o) {
+  if (!o)
+  {
     m_sts = o.sts();
     return;
   }
 
   // Check that no ancestor is a LibHier
-  for (wb_object p = o.parent(); p.oddSts(); p = p.parent()) {
-    if (p.cid() == pwr_eClass_LibHier) {
+  for (wb_object p = o.parent(); p.oddSts(); p = p.parent())
+  {
+    if (p.cid() == pwr_eClass_LibHier)
+    {
       m_sts = PWRB__INLIBHIER;
       return;
     }
@@ -1516,23 +1584,27 @@ void wb_build::application(pwr_tOid oid)
       hierarchy_found = 1;
   }
 
-  if (check_hierarchy && !hierarchy_found) {
+  if (check_hierarchy && !hierarchy_found)
+  {
     m_sts = PWRB__NOBUILT;
     return;
   }
 
   wb_attribute a = m_session.attribute(oid, "DevBody", "BuildCmd");
-  if (!a) {
+  if (!a)
+  {
     m_sts = a.sts();
     return;
   }
   a.value(&buildcmd);
-  if (!a) {
+  if (!a)
+  {
     m_sts = a.sts();
     return;
   }
 
-  if (streq(buildcmd, "")) {
+  if (streq(buildcmd, ""))
+  {
     m_sts = PWRB__NOBUILT;
     return;
   }
@@ -1540,14 +1612,16 @@ void wb_build::application(pwr_tOid oid)
   // Exectute the build command
   dcli_translate_filename(cmd, buildcmd);
   sts = system(cmd);
-  if (sts != 0) {
+  if (sts != 0)
+  {
     char msg[300];
 
-    sprintf(msg, "Build Application error %s",
-        o.longName().name(cdh_mName_path | cdh_mName_object));
+    sprintf(msg, "Build Application error %s", o.longName().name(cdh_mName_path | cdh_mName_object));
     MsgWindow::message('E', msg, msgw_ePop_Yes, oid);
     m_sts = PWRB__SUCCESS;
-  } else {
+  }
+  else
+  {
     m_sts = PWRB__NOBUILT;
   }
 }
@@ -1569,7 +1643,8 @@ void wb_build::webbrowserconfig(pwr_tOid oid)
   strncpy(vname, m_session.name(), sizeof(vname));
 
   wb_object o = m_session.object(oid);
-  if (!o) {
+  if (!o)
+  {
     m_sts = o.sts();
     return;
   }
@@ -1581,10 +1656,10 @@ void wb_build::webbrowserconfig(pwr_tOid oid)
   fsts = dcli_file_time(fname, &ftime);
 
   m_sts = PWRB__NOBUILT;
-  if (opt.force || EVEN(fsts) || time_Acomp(&modtime, &ftime) == 1) {
+  if (opt.force || EVEN(fsts) || time_Acomp(&modtime, &ftime) == 1)
+  {
     pwr_sClass_WebBrowserConfig body;
-    int url_symbols_size
-        = sizeof(body.URL_Symbols) / sizeof(body.URL_Symbols[0]);
+    int url_symbols_size = sizeof(body.URL_Symbols) / sizeof(body.URL_Symbols[0]);
     char sym_vect[MAXSYMBOLS][80];
     char value_vect[MAXSYMBOLS][80];
     char volume_vect[MAXSYMBOLS][80];
@@ -1593,12 +1668,14 @@ void wb_build::webbrowserconfig(pwr_tOid oid)
     char elemv[3][80];
 
     wb_attribute a = m_session.attribute(oid, "RtBody", "URL_Symbols");
-    if (!a) {
+    if (!a)
+    {
       m_sts = a.sts();
       return;
     }
     a.value(body.URL_Symbols);
-    if (!a) {
+    if (!a)
+    {
       m_sts = a.sts();
       return;
     }
@@ -1607,10 +1684,11 @@ void wb_build::webbrowserconfig(pwr_tOid oid)
     // the project
     vect_cnt = 0;
     fp = fopen(fname, "r");
-    if (fp) {
-      while (dcli_read_line(line, sizeof(line), fp)) {
-        nr = dcli_parse(line, " ", "", (char*)elemv,
-            sizeof(elemv) / sizeof(elemv[0]), sizeof(elemv[0]), 0);
+    if (fp)
+    {
+      while (dcli_read_line(line, sizeof(line), fp))
+      {
+        nr = dcli_parse(line, " ", "", (char*)elemv, sizeof(elemv) / sizeof(elemv[0]), sizeof(elemv[0]), 0);
         if (nr != 3)
           continue;
 
@@ -1626,23 +1704,28 @@ void wb_build::webbrowserconfig(pwr_tOid oid)
       fclose(fp);
     }
 
-    for (i = 0; i < url_symbols_size; i++) {
-      nr = dcli_parse(body.URL_Symbols[i], " ", "", (char*)elemv,
-          sizeof(elemv) / sizeof(elemv[0]), sizeof(elemv[0]), 0);
+    for (i = 0; i < url_symbols_size; i++)
+    {
+      nr = dcli_parse(body.URL_Symbols[i], " ", "", (char*)elemv, sizeof(elemv) / sizeof(elemv[0]),
+                      sizeof(elemv[0]), 0);
       if (nr != 2)
         continue;
 
       found = 0;
-      for (j = 0; j < vect_cnt; j++) {
-        if (str_NoCaseStrcmp(elemv[0], sym_vect[j]) == 0) {
+      for (j = 0; j < vect_cnt; j++)
+      {
+        if (str_NoCaseStrcmp(elemv[0], sym_vect[j]) == 0)
+        {
           strcpy(value_vect[j], elemv[1]);
           found = 1;
           break;
         }
       }
-      if (!found) {
+      if (!found)
+      {
         // Insert first
-        for (j = MIN(vect_cnt, MAXSYMBOLS - 1); j > 0; j--) {
+        for (j = MIN(vect_cnt, MAXSYMBOLS - 1); j > 0; j--)
+        {
           strcpy(volume_vect[j], volume_vect[j - 1]);
           strcpy(sym_vect[j], sym_vect[j - 1]);
           strcpy(value_vect[j], value_vect[j - 1]);
@@ -1658,7 +1741,8 @@ void wb_build::webbrowserconfig(pwr_tOid oid)
 
     // Write the file
     fp = fopen(fname, "w");
-    if (!fp) {
+    if (!fp)
+    {
       char tmp[300];
       sprintf(tmp, "Build:    Unable to open file \"%s\"", fname);
       MsgWindow::message('E', tmp, msgw_ePop_No, oid);
@@ -1683,14 +1767,17 @@ void wb_build::classdef(pwr_tOid oid)
   char* s;
 
   wb_object o = m_session.object(oid);
-  if (!o) {
+  if (!o)
+  {
     m_sts = o.sts();
     return;
   }
 
   // Check that no ancestor is a LibHier
-  for (wb_object p = o.parent(); p.oddSts(); p = p.parent()) {
-    if (p.cid() == pwr_eClass_LibHier) {
+  for (wb_object p = o.parent(); p.oddSts(); p = p.parent())
+  {
+    if (p.cid() == pwr_eClass_LibHier)
+    {
       m_sts = PWRB__INLIBHIER;
       return;
     }
@@ -1698,7 +1785,8 @@ void wb_build::classdef(pwr_tOid oid)
       hierarchy_found = 1;
   }
 
-  if (check_hierarchy && !hierarchy_found) {
+  if (check_hierarchy && !hierarchy_found)
+  {
     m_sts = PWRB__NOBUILT;
     return;
   }
@@ -1710,7 +1798,8 @@ void wb_build::classdef(pwr_tOid oid)
   strcat(src_fname, action);
   dcli_translate_filename(src_fname, src_fname);
   m_sts = dcli_file_time(src_fname, &src_time);
-  if (evenSts()) {
+  if (evenSts())
+  {
     m_sts = PWRB__NOBUILT;
     return;
   }
@@ -1719,8 +1808,8 @@ void wb_build::classdef(pwr_tOid oid)
   strcat(dest_fname, action);
   dcli_translate_filename(dest_fname, dest_fname);
   m_sts = dcli_file_time(dest_fname, &dest_time);
-  if (!opt.nocopy
-      && (opt.force || evenSts() || src_time.tv_sec > dest_time.tv_sec)) {
+  if (!opt.nocopy && (opt.force || evenSts() || src_time.tv_sec > dest_time.tv_sec))
+  {
     sprintf(cmd, "cp %s %s", src_fname, dest_fname);
     system(cmd);
     sprintf(cmd, "Build:    ClassDef copy $pwrp_pop/%s -> $pwrp_exe", action);
@@ -1731,7 +1820,8 @@ void wb_build::classdef(pwr_tOid oid)
       *s = 0;
     wb_log::log(wlog_eCategory_GeBuild, name, 0);
     m_sts = PWRB__SUCCESS;
-  } else
+  }
+  else
     m_sts = PWRB__NOBUILT;
 }
 
@@ -1752,54 +1842,54 @@ void wb_build::directories(char* dir, bld_ePass pass)
 
   m_sts = PWRB__NOBUILT;
 
-  while (is.getline(line, sizeof(line))) {
+  while (is.getline(line, sizeof(line)))
+  {
     line_cnt++;
 
     str_trim(line, line);
     if (line[0] == '#' || line[0] == '!')
       continue;
 
-    num = dcli_parse(line, " 	", "", (char*)line_item,
-        sizeof(line_item) / sizeof(line_item[0]), sizeof(line_item[0]), 0);
+    num = dcli_parse(line, " 	", "", (char*)line_item, sizeof(line_item) / sizeof(line_item[0]),
+                     sizeof(line_item[0]), 0);
     if (!num)
       continue;
 
     if (dir && str_NoCaseStrcmp(dir, line_item[1]) != 0)
       continue;
 
-    if (streq(cdh_Low(line_item[0]), "builddir")) {
-      if (num != 4) {
+    if (streq(cdh_Low(line_item[0]), "builddir"))
+    {
+      if (num != 4)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
       int sts = sscanf(line_item[2], "%d", &current_options);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         current_options = 0;
       }
-      if (!((pass == bld_ePass_BeforeNode
-                && !(current_options & pwr_mBuildDirectoryMask_BuildBeforeNode))
-              || (pass == bld_ePass_AfterNode
-                     && !(current_options
-                            & pwr_mBuildDirectoryMask_BuildAfterNode))))
+      if (!((pass == bld_ePass_BeforeNode && !(current_options & pwr_mBuildDirectoryMask_BuildBeforeNode)) ||
+            (pass == bld_ePass_AfterNode && !(current_options & pwr_mBuildDirectoryMask_BuildAfterNode))))
         wb_log::log(wlog_eCategory_DirectoryBuild, line_item[1], 0);
-    } else if (streq(cdh_Low(line_item[0]), "buildcopy")) {
-      if (num != 4) {
+    }
+    else if (streq(cdh_Low(line_item[0]), "buildcopy"))
+    {
+      if (num != 4)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
-      if ((pass == bld_ePass_BeforeNode
-              && !(current_options & pwr_mBuildDirectoryMask_BuildBeforeNode))
-          || (pass == bld_ePass_AfterNode
-                 && !(current_options
-                        & pwr_mBuildDirectoryMask_BuildAfterNode)))
+      if ((pass == bld_ePass_BeforeNode && !(current_options & pwr_mBuildDirectoryMask_BuildBeforeNode)) ||
+          (pass == bld_ePass_AfterNode && !(current_options & pwr_mBuildDirectoryMask_BuildAfterNode)))
         continue;
 
-      for (sts
-           = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_INIT);
-           ODD(sts); sts
-           = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_NEXT)) {
+      for (sts = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_INIT); ODD(sts);
+           sts = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_NEXT))
+      {
         // Check if file should be updated
         int update = 0;
         pwr_tFileName source, target;
@@ -1812,7 +1902,8 @@ void wb_build::directories(char* dir, bld_ePass pass)
 
         sts = dcli_file_time(source, &source_time);
 
-        if (target[strlen(target) - 1] == '/') {
+        if (target[strlen(target) - 1] == '/')
+        {
           // Target is a directory, add file name
           char* s = strrchr(source, '/');
           if (!s)
@@ -1832,13 +1923,16 @@ void wb_build::directories(char* dir, bld_ePass pass)
         if (!opt.force && !update)
           continue;
 
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           // Check that directory exist, create if it doesn't
           strcpy(target_dir, target);
-          if ((s = strrchr(target_dir, '/'))) {
+          if ((s = strrchr(target_dir, '/')))
+          {
             *s = 0;
             sts = dcli_file_time(target_dir, &target_time);
-            if (EVEN(sts)) {
+            if (EVEN(sts))
+            {
               sprintf(cmd, "mkdir -p %s", target_dir);
               system(cmd);
             }
@@ -1846,8 +1940,7 @@ void wb_build::directories(char* dir, bld_ePass pass)
         }
         sprintf(cmd, "cp %s %s", source, target);
         system(cmd);
-        sprintf(
-            cmd, "Build:    copy %s %s -> %s", line_item[1], source, target);
+        sprintf(cmd, "Build:    copy %s %s -> %s", line_item[1], source, target);
         MsgWindow::message('I', cmd, msgw_ePop_No);
 
         // wb_log::log( wlog_eCategory_GeBuild, name, 0);
@@ -1856,32 +1949,30 @@ void wb_build::directories(char* dir, bld_ePass pass)
       }
 
       dcli_search_file(line_item[1], found_file, DCLI_DIR_SEARCH_END);
-    } else if (streq(cdh_Low(line_item[0]), "buildconvert")) {
+    }
+    else if (streq(cdh_Low(line_item[0]), "buildconvert"))
+    {
       pwr_tFileConvertEnum conversion;
 
-      if (num != 5) {
+      if (num != 5)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
-      if (sscanf(line_item[2], "%d", &conversion) != 1) {
+      if (sscanf(line_item[2], "%d", &conversion) != 1)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
-      if ((pass == bld_ePass_BeforeNode
-              && !(current_options & pwr_mBuildDirectoryMask_BuildBeforeNode))
-          || (pass == bld_ePass_AfterNode
-                 && !(current_options
-                        & pwr_mBuildDirectoryMask_BuildAfterNode)))
+      if ((pass == bld_ePass_BeforeNode && !(current_options & pwr_mBuildDirectoryMask_BuildBeforeNode)) ||
+          (pass == bld_ePass_AfterNode && !(current_options & pwr_mBuildDirectoryMask_BuildAfterNode)))
         continue;
 
-      
-
-      for (sts
-           = dcli_search_file(line_item[3], found_file, DCLI_DIR_SEARCH_INIT);
-           ODD(sts); sts
-           = dcli_search_file(line_item[3], found_file, DCLI_DIR_SEARCH_NEXT)) {
+      for (sts = dcli_search_file(line_item[3], found_file, DCLI_DIR_SEARCH_INIT); ODD(sts);
+           sts = dcli_search_file(line_item[3], found_file, DCLI_DIR_SEARCH_NEXT))
+      {
         // Check if file should be updated
         int update = 0;
         pwr_tFileName source, target;
@@ -1894,7 +1985,8 @@ void wb_build::directories(char* dir, bld_ePass pass)
 
         sts = dcli_file_time(source, &source_time);
 
-        if (target[strlen(target) - 1] == '/') {
+        if (target[strlen(target) - 1] == '/')
+        {
           // Target is a directory, add file name
           char* s = strrchr(source, '/');
           if (!s)
@@ -1914,29 +2006,32 @@ void wb_build::directories(char* dir, bld_ePass pass)
         if (!opt.force && !update)
           continue;
 
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           // Check that directory exist, create if it doesn't
           strcpy(target_dir, target);
-          if ((s = strrchr(target_dir, '/'))) {
+          if ((s = strrchr(target_dir, '/')))
+          {
             *s = 0;
             sts = dcli_file_time(target_dir, &target_time);
-            if (EVEN(sts)) {
+            if (EVEN(sts))
+            {
               sprintf(cmd, "mkdir -p %s", target_dir);
               system(cmd);
             }
           }
         }
-	switch (conversion) {
-	case pwr_eFileConvertEnum_No:
-	  sprintf(cmd, "cp %s %s", source, target);
-	  break;
-	case pwr_eFileConvertEnum_ISO88591_UTF8:
-	  sprintf(cmd, "iconv -f ISO-8859-1 -t UTF-8 < %s > %s", source, target);
-	  break;
-	}
+        switch (conversion)
+        {
+        case pwr_eFileConvertEnum_No:
+          sprintf(cmd, "cp %s %s", source, target);
+          break;
+        case pwr_eFileConvertEnum_ISO88591_UTF8:
+          sprintf(cmd, "iconv -f ISO-8859-1 -t UTF-8 < %s > %s", source, target);
+          break;
+        }
         system(cmd);
-        sprintf(
-            cmd, "Build:    convert %s %s -> %s", line_item[2], source, target);
+        sprintf(cmd, "Build:    convert %s %s -> %s", line_item[2], source, target);
         MsgWindow::message('I', cmd, msgw_ePop_No);
 
         // wb_log::log( wlog_eCategory_GeBuild, name, 0);
@@ -1945,17 +2040,17 @@ void wb_build::directories(char* dir, bld_ePass pass)
       }
 
       dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_END);
-    } else if (streq(cdh_Low(line_item[0]), "buildmake")) {
-      if (num != 4) {
+    }
+    else if (streq(cdh_Low(line_item[0]), "buildmake"))
+    {
+      if (num != 4)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
-      if ((pass == bld_ePass_BeforeNode
-              && !(current_options & pwr_mBuildDirectoryMask_BuildBeforeNode))
-          || (pass == bld_ePass_AfterNode
-                 && !(current_options
-                        & pwr_mBuildDirectoryMask_BuildAfterNode)))
+      if ((pass == bld_ePass_BeforeNode && !(current_options & pwr_mBuildDirectoryMask_BuildBeforeNode)) ||
+          (pass == bld_ePass_AfterNode && !(current_options & pwr_mBuildDirectoryMask_BuildAfterNode)))
         continue;
 
       int update = 0;
@@ -1972,40 +2067,46 @@ void wb_build::directories(char* dir, bld_ePass pass)
         continue;
 
       // Needs update
-      if (opt.force) {
+      if (opt.force)
+      {
         // Execute make with -B, unconditionally make all targets
         if (streq(line_item[3], ""))
           sprintf(cmd, "cd %s;make -B", line_item[2]);
         else
           sprintf(cmd, "cd %s;make -B -f %s", line_item[2], line_item[3]);
-      } else {
+      }
+      else
+      {
         if (streq(line_item[3], ""))
           sprintf(cmd, "cd %s;make", line_item[2]);
         else
           sprintf(cmd, "cd %s;make -f %s", line_item[2], line_item[3]);
       }
       sts = system(cmd);
-      if (WEXITSTATUS(sts) != 0) {
+      if (WEXITSTATUS(sts) != 0)
+      {
         sprintf(cmd, "Build:    make error %s %s", line_item[2], line_item[3]);
         MsgWindow::message('E', cmd, msgw_ePop_Yes);
         m_sts = PWRB__MAKEERROR;
-      } else {
+      }
+      else
+      {
         sprintf(cmd, "Build:    executed %s %s", line_item[2], line_item[3]);
         MsgWindow::message('I', cmd, msgw_ePop_No);
         m_sts = PWRB__MAKEUPDATED;
       }
       // wb_log::log( wlog_eCategory_GeBuild, name, 0);
-    } else if (streq(cdh_Low(line_item[0]), "buildexec")) {
-      if (num != 4) {
+    }
+    else if (streq(cdh_Low(line_item[0]), "buildexec"))
+    {
+      if (num != 4)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
-      if ((pass == bld_ePass_BeforeNode
-              && !(current_options & pwr_mBuildDirectoryMask_BuildBeforeNode))
-          || (pass == bld_ePass_AfterNode
-                 && !(current_options
-                        & pwr_mBuildDirectoryMask_BuildAfterNode)))
+      if ((pass == bld_ePass_BeforeNode && !(current_options & pwr_mBuildDirectoryMask_BuildBeforeNode)) ||
+          (pass == bld_ePass_AfterNode && !(current_options & pwr_mBuildDirectoryMask_BuildAfterNode)))
         continue;
 
       sprintf(cmd, "cd %s;%s", line_item[2], line_item[3]);
@@ -2045,50 +2146,46 @@ void wb_build::export_import_files(int type, bld_ePass pass)
 
   m_sts = PWRB__NOBUILT;
 
-  while (is.getline(line, sizeof(line))) {
+  while (is.getline(line, sizeof(line)))
+  {
     line_cnt++;
     str_trim(line, line);
     if (line[0] == '#' || line[0] == '!')
       continue;
 
-    num = dcli_parse(line, " 	", "", (char*)line_item,
-        sizeof(line_item) / sizeof(line_item[0]), sizeof(line_item[0]), 0);
+    num = dcli_parse(line, " 	", "", (char*)line_item, sizeof(line_item) / sizeof(line_item[0]),
+                     sizeof(line_item[0]), 0);
     if (!num)
       continue;
 
-    if (streq(cdh_Low(line_item[0]), tag)) {
-      if (num != 4) {
+    if (streq(cdh_Low(line_item[0]), tag))
+    {
+      if (num != 4)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         continue;
       }
 
       sts = sscanf(line_item[1], "%d", &current_options);
-      if (sts != 1) {
+      if (sts != 1)
+      {
         printf("File corrupt " pwr_cNameDistribute ", line %d", line_cnt);
         current_options = 0;
       }
 
-      if (type == bld_eType_Import && pass == bld_ePass_BeforeNode
-          && ((pass == bld_ePass_BeforeNode
-                  && !(current_options
-                         & pwr_mBuildDirectoryMask_BuildBeforeNode))
-                 || (pass == bld_ePass_AfterNode
-                        && !(current_options
-                               & pwr_mBuildDirectoryMask_BuildAfterNode))))
+      if (type == bld_eType_Import && pass == bld_ePass_BeforeNode &&
+          ((pass == bld_ePass_BeforeNode && !(current_options & pwr_mBuildDirectoryMask_BuildBeforeNode)) ||
+           (pass == bld_ePass_AfterNode && !(current_options & pwr_mBuildDirectoryMask_BuildAfterNode))))
         continue;
 
-      if (type == bld_eType_Export
-          && ((pass == bld_ePass_BeforeNode
-                  && !(current_options & pwr_mBuildExportMask_BuildBeforeNode))
-                 || (pass == bld_ePass_AfterNode
-                        && !(current_options
-                               & pwr_mBuildExportMask_BuildAfterNode))))
+      if (type == bld_eType_Export &&
+          ((pass == bld_ePass_BeforeNode && !(current_options & pwr_mBuildExportMask_BuildBeforeNode)) ||
+           (pass == bld_ePass_AfterNode && !(current_options & pwr_mBuildExportMask_BuildAfterNode))))
         continue;
 
-      for (sts
-           = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_INIT);
-           ODD(sts); sts
-           = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_NEXT)) {
+      for (sts = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_INIT); ODD(sts);
+           sts = dcli_search_file(line_item[2], found_file, DCLI_DIR_SEARCH_NEXT))
+      {
         // Check if file should be updated
         int update = 0;
         pwr_tFileName source, target;
@@ -2099,7 +2196,8 @@ void wb_build::export_import_files(int type, bld_ePass pass)
 
         sts = dcli_file_time(source, &source_time);
 
-        if (target[strlen(target) - 1] == '/') {
+        if (target[strlen(target) - 1] == '/')
+        {
           // Target is a directory, add file name
           char* s = strrchr(source, '/');
           if (!s)
@@ -2141,25 +2239,30 @@ void wb_build::update_file(char* dest, char* src)
   pwr_tFileName src_fname, dest_fname;
   pwr_tTime dest_time, src_time;
 
-  if (opt.nocopy) {
+  if (opt.nocopy)
+  {
     m_sts = PWRB__NOBUILT;
     return;
   }
 
   dcli_translate_filename(src_fname, src);
   m_sts = dcli_file_time(src_fname, &src_time);
-  if (oddSts()) {
+  if (oddSts())
+  {
     dcli_translate_filename(dest_fname, dest);
     m_sts = dcli_file_time(dest_fname, &dest_time);
-    if (opt.force || evenSts() || src_time.tv_sec > dest_time.tv_sec) {
+    if (opt.force || evenSts() || src_time.tv_sec > dest_time.tv_sec)
+    {
       char cmd[520];
       sprintf(cmd, "cp %s %s", src_fname, dest_fname);
       system(cmd);
       sprintf(cmd, "Build:    Copy %s -> %s", src, dest);
       MsgWindow::message('I', cmd, msgw_ePop_No);
       m_sts = PWRB__SUCCESS;
-    } else
+    }
+    else
       m_sts = PWRB__NOBUILT;
-  } else
+  }
+  else
     m_sts = PWRB__NOBUILT;
 }

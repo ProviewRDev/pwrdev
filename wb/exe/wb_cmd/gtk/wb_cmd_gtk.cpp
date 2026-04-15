@@ -68,8 +68,8 @@ CmdGtk::CmdGtk(int argc, char* argv[])
   // Attach to history log
   new wb_log_gtk(0);
 
-  wnav = new WNavGtk((void*)this, (GtkWidget*)0, "", "", &w, ldhses,
-      (wnav_sStartMenu*)0, wnav_eWindowType_No, &sts);
+  wnav = new WNavGtk((void*)this, (GtkWidget*)0, "", "", &w, ldhses, (wnav_sStartMenu*)0, wnav_eWindowType_No,
+                     &sts);
   wnav->attach_volume_cb = attach_volume_cb;
   wnav->detach_volume_cb = detach_volume_cb;
   wnav->get_wbctx_cb = get_wbctx;

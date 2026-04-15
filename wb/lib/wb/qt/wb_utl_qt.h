@@ -41,7 +41,8 @@
 
 #include <QWidget>
 
-class wb_utl_qt : public wb_utl {
+class wb_utl_qt : public wb_utl
+{
 public:
   QWidget* widget;
 
@@ -51,14 +52,12 @@ public:
 
   int create_mainwindow(int argc, char** argv);
   int destroy_mainwindow();
-  int utl_foe_new(const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx,
-      ldh_tSesContext ldhsesctx, WFoe** foectx, int map_window,
-      ldh_eAccess access);
-  int utl_foe_new_local(WFoe* foectx, const char* name, pwr_tOid plcpgm,
-      ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
-      vldh_t_node nodeobject, unsigned long windowindex,
-      unsigned long new_window, WFoe** return_foectx, int map_window,
-      ldh_eAccess access, foe_eFuncAccess function_access);
+  int utl_foe_new(const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
+                  WFoe** foectx, int map_window, ldh_eAccess access);
+  int utl_foe_new_local(WFoe* foectx, const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx,
+                        ldh_tSesContext ldhsesctx, vldh_t_node nodeobject, unsigned long windowindex,
+                        unsigned long new_window, WFoe** return_foectx, int map_window, ldh_eAccess access,
+                        foe_eFuncAccess function_access);
 };
 
 #endif

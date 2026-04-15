@@ -57,7 +57,8 @@ class GlowArrayElem;
   The text is visible until the remove_text() or remove() function are called.
 */
 
-class GlowTipText {
+class GlowTipText
+{
 public:
   //! Constructor
   /*!
@@ -73,27 +74,24 @@ public:
    */
   ~GlowTipText();
 
-  GrowCtx* ctx; //!< Glow context.
-  int text_x; //!< x coordinate in pixels for text.
-  int text_y; //!< y coordinate in pixels for text.
-  int text_width; //!< Text width in pixels.
-  int text_height; //!< Text height in pixels.
-  int text_descent; //!< Text descent in pixels.
+  GrowCtx* ctx;               //!< Glow context.
+  int text_x;                 //!< x coordinate in pixels for text.
+  int text_y;                 //!< y coordinate in pixels for text.
+  int text_width;             //!< Text width in pixels.
+  int text_height;            //!< Text height in pixels.
+  int text_descent;           //!< Text descent in pixels.
   GlowArrayElem* text_object; //!< Object that activated the current tip text.
-  char tiptext[200]; //!< Current tip text.
-  bool active; //!< Tip text is active, i.e. timer is running or text is
+  char tiptext[200];          //!< Current tip text.
+  bool active;                //!< Tip text is active, i.e. timer is running or text is
   //! displayed.
   void* timer_id; //!< Timer id.
-  int text_size; //!< Text size.
+  int text_size;  //!< Text size.
 
   //! Set text size.
   /*!
     \param tsize	Text size.
   */
-  void set_size(int tsize)
-  {
-    text_size = tsize;
-  }
+  void set_size(int tsize) { text_size = tsize; }
 
   //! Activate tooltip.
   /*!

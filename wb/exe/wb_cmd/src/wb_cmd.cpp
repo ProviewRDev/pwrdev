@@ -47,9 +47,12 @@ int main(int argc, char* argv[])
 {
   pwr_tFileName file;
 
-  for (int i = 1; i < argc; i++) {
-    if (streq(argv[i], "-f")) {
-      if (i + 1 >= argc) {
+  for (int i = 1; i < argc; i++)
+  {
+    if (streq(argv[i], "-f"))
+    {
+      if (i + 1 >= argc)
+      {
         // Wb::usage();
         exit(0);
       }
@@ -59,13 +62,15 @@ int main(int argc, char* argv[])
 
   dcli_execute_flavour(argv);
 
-  const char* flavours[] = { "qt", "gtk" };
-  for (int i = 0; i < 2; i++) {
+  const char* flavours[] = {"qt", "gtk"};
+  for (int i = 0; i < 2; i++)
+  {
     strcpy(file, "$pwr_eexe/wb_cmd_");
     strcat(file, flavours[i]);
     dcli_translate_filename(file, file);
     struct stat st;
-    if (stat(file, &st) == 0) {
+    if (stat(file, &st) == 0)
+    {
       execvp(file, argv);
       exit(0);
     }

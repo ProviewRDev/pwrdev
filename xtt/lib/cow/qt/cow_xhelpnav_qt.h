@@ -43,10 +43,11 @@
 
 #include <QWidget>
 
-class CoXHelpNavQt : public CoXHelpNav {
+class CoXHelpNavQt : public CoXHelpNav
+{
 public:
-  CoXHelpNavQt(void* xn_parent_ctx, char* xn_name, xhelp_eUtility xn_utility,
-      QWidget** w, pwr_tStatus* status);
+  CoXHelpNavQt(void* xn_parent_ctx, char* xn_name, xhelp_eUtility xn_utility, QWidget** w,
+               pwr_tStatus* status);
   ~CoXHelpNavQt();
 
   QWidget* brow_widget;

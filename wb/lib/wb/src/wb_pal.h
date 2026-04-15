@@ -41,10 +41,10 @@
 
 #include "wb_palfile.h"
 
-class Pal {
+class Pal
+{
 public:
-  Pal(void* parent_ctx, const char* name, ldh_tSesContext ldhses,
-      const char* root_name, pwr_tStatus* status);
+  Pal(void* parent_ctx, const char* name, ldh_tSesContext ldhses, const char* root_name, pwr_tStatus* status);
   virtual ~Pal();
 
   void* parent_ctx;
@@ -107,15 +107,9 @@ public:
   flow_sAnnotPixmap* pixmap_wait;
   flow_sAnnotPixmap* pixmap_warning;
 
-  virtual void set_inputfocus(int focus)
-  {
-  }
-  virtual void set_selection_owner()
-  {
-  }
-  virtual void create_popup_menu(pwr_tCid cid, int x, int y)
-  {
-  }
+  virtual void set_inputfocus(int focus) {}
+  virtual void set_selection_owner() {}
+  virtual void create_popup_menu(pwr_tCid cid, int x, int y) {}
 
   void zoom(double zoom_factor);
   void unzoom();
@@ -123,8 +117,7 @@ public:
   void free_pixmaps();
   void allocate_pixmaps();
   void create_nodeclasses();
-  int create_item(pwr_tObjid objid, brow_tNode dest, flow_eDest dest_code,
-      void** item, int is_root);
+  int create_item(pwr_tObjid objid, brow_tNode dest, flow_eDest dest_code, void** item, int is_root);
   int object_exist(brow_tObject object);
   int session_opened(ldh_tSesContext pal_ldhses, char* pal_root_name);
   int session_closed();
@@ -149,9 +142,14 @@ public:
 //			- it's own children.
 //
 
-typedef enum { pal_mOpen_All = ~0, pal_mOpen_Children = 1 << 0 } pal_mOpen;
+typedef enum
+{
+  pal_mOpen_All = ~0,
+  pal_mOpen_Children = 1 << 0
+} pal_mOpen;
 
-typedef enum {
+typedef enum
+{
   pal_ePalItemType_Object,
   pal_ePalItemType_Class,
   pal_ePalItemType_ClassVolume,
@@ -159,57 +157,55 @@ typedef enum {
   pal_ePalItemType_ClassMenu
 } pal_ePalItemType;
 
-class PalItem {
+class PalItem
+{
 public:
   PalItem(pwr_tObjid item_objid, int item_is_root)
-      : type(pal_ePalItemType_Object), objid(item_objid), is_root(item_is_root),
-        node(NULL)
+      : type(pal_ePalItemType_Object), objid(item_objid), is_root(item_is_root), node(NULL)
   {
   }
   pal_ePalItemType type;
   pwr_tObjid objid;
   int is_root;
   brow_tNode node;
-  int open(Pal* pal, double x, double y)
-  {
-    return 1;
-  }
+  int open(Pal* pal, double x, double y) { return 1; }
 };
 
-class PalItemClassVolume : public PalItem {
+class PalItemClassVolume : public PalItem
+{
 public:
-  PalItemClassVolume(Pal* pal, char* item_name, brow_tNode dest,
-      flow_eDest dest_code, int item_is_root);
+  PalItemClassVolume(Pal* pal, char* item_name, brow_tNode dest, flow_eDest dest_code, int item_is_root);
   int open(Pal* pal, double x, double y);
   char name[120];
 };
 
-class PalItemClass : public PalItem {
+class PalItemClass : public PalItem
+{
 public:
-  PalItemClass(Pal* pal, char* item_name, brow_tNode dest, flow_eDest dest_code,
-      int item_is_root);
+  PalItemClass(Pal* pal, char* item_name, brow_tNode dest, flow_eDest dest_code, int item_is_root);
   int open(Pal* pal, double x, double y);
   char name[120];
 };
 
-class PalItemObject : public PalItem {
+class PalItemObject : public PalItem
+{
 public:
-  PalItemObject(Pal* pal, pwr_tObjid item_objid, brow_tNode dest,
-      flow_eDest dest_code, int item_is_root);
+  PalItemObject(Pal* pal, pwr_tObjid item_objid, brow_tNode dest, flow_eDest dest_code, int item_is_root);
 };
 
-class PalItemClassMenu : public PalItem {
+class PalItemClassMenu : public PalItem
+{
 public:
-  PalItemClassMenu(
-      Pal* pal, pwr_tObjid item_objid, brow_tNode dest, flow_eDest dest_code);
+  PalItemClassMenu(Pal* pal, pwr_tObjid item_objid, brow_tNode dest, flow_eDest dest_code);
   int open(Pal* pal, double x, double y);
   int close(Pal* pal, double x, double y);
 };
 
-class PalItemMenu : public PalItem {
+class PalItemMenu : public PalItem
+{
 public:
-  PalItemMenu(Pal* pal, char* item_name, brow_tNode dest, flow_eDest dest_code,
-      PalFileMenu** item_child_list, int item_is_root);
+  PalItemMenu(Pal* pal, char* item_name, brow_tNode dest, flow_eDest dest_code, PalFileMenu** item_child_list,
+              int item_is_root);
   char name[120];
   PalFileMenu** child_list;
   int open(Pal* pal, double x, double y);

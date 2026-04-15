@@ -49,11 +49,10 @@
 #include "xtt_fast_gtk.h"
 #include "xtt_xnav.h"
 
-XttFastGtk::XttFastGtk(void* parent_ctx, GtkWidget* parent_wid, char* name,
-    GtkWidget** w, pwr_sAttrRef* fast_arp, int width, int height,
-    unsigned int options, int xn_color_theme, void* basewidget, int* sts)
-    : XttFast(parent_ctx, name, fast_arp, xn_color_theme, sts),
-      parent_widget(parent_wid)
+XttFastGtk::XttFastGtk(void* parent_ctx, GtkWidget* parent_wid, char* name, GtkWidget** w,
+                       pwr_sAttrRef* fast_arp, int width, int height, unsigned int options,
+                       int xn_color_theme, void* basewidget, int* sts)
+    : XttFast(parent_ctx, name, fast_arp, xn_color_theme, sts), parent_widget(parent_wid)
 {
   char title[250];
 
@@ -67,8 +66,8 @@ XttFastGtk::XttFastGtk(void* parent_ctx, GtkWidget* parent_wid, char* name,
   else
     gdh_AttrrefToName(fast_arp, title, sizeof(title), cdh_mNName);
 
-  curve = new GeCurveGtk(this, parent_widget, title, NULL, gcd, 0, width,
-      height, options, color_theme, basewidget);
+  curve = new GeCurveGtk(this, parent_widget, title, NULL, gcd, 0, width, height, options, color_theme,
+                         basewidget);
   curve->close_cb = fast_close_cb;
   curve->help_cb = fast_help_cb;
   curve->export_cb = fast_export_cb;
@@ -80,11 +79,9 @@ XttFastGtk::XttFastGtk(void* parent_ctx, GtkWidget* parent_wid, char* name,
   timerid->add(1000, fast_scan, this);
 }
 
-XttFastGtk::XttFastGtk(void* parent_ctx, GtkWidget* parent_wid,
-    const char* name, GtkWidget** w, char* filename, int xn_color_theme,
-    void* basewidget, int* sts)
-    : XttFast(parent_ctx, name, filename, xn_color_theme, sts),
-      parent_widget(parent_wid)
+XttFastGtk::XttFastGtk(void* parent_ctx, GtkWidget* parent_wid, const char* name, GtkWidget** w,
+                       char* filename, int xn_color_theme, void* basewidget, int* sts)
+    : XttFast(parent_ctx, name, filename, xn_color_theme, sts), parent_widget(parent_wid)
 {
   char title[250];
   strncpy(title, filename, sizeof(title));
@@ -95,8 +92,7 @@ XttFastGtk::XttFastGtk(void* parent_ctx, GtkWidget* parent_wid,
 
   *sts = XNAV__SUCCESS;
 
-  curve = new GeCurveGtk(this, parent_widget, title, NULL, gcd, 1, 0, 0, 0,
-      color_theme, basewidget);
+  curve = new GeCurveGtk(this, parent_widget, title, NULL, gcd, 1, 0, 0, 0, color_theme, basewidget);
   curve->close_cb = fast_close_cb;
   curve->help_cb = fast_help_cb;
   curve->enable(0);
@@ -112,7 +108,8 @@ XttFastGtk::~XttFastGtk()
   if (timerid)
     timerid->remove();
 
-  for (int i = 0; i < fast_cnt; i++) {
+  for (int i = 0; i < fast_cnt; i++)
+  {
     gdh_UnrefObjectInfo(new_subid);
   }
   if (curve)

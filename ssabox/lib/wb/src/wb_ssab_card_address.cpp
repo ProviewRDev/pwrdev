@@ -49,34 +49,35 @@
 
 static bool addressTypeIsEqual(pwr_tCid cid1, pwr_tCid cid2)
 {
-  pwr_tCid groups[][5] = { { pwr_cClass_Ssab_DO32DKS,
-                               pwr_cClass_Ssab_DO32DKS_Stall,
-                               pwr_cClass_Do_HVDO32, 0, 0 },
-    { pwr_cClass_Ssab_DI32D, pwr_cClass_Di_DIX2, 0, 0, 0 },
-    { pwr_cClass_Ssab_CO4uP, pwr_cClass_Co_CO4uP, pwr_cClass_Co_PI24BO, 0, 0 },
-    { pwr_cClass_Ssab_AI32uP, pwr_cClass_Ssab_AI16uP, pwr_cClass_Ssab_AI8uP, 0,
-        0 },
-    { pwr_cClass_Ssab_AO8uP, pwr_cClass_Ssab_AO8uPL, 0, 0, 0 } };
+  pwr_tCid groups[][5] = {
+      {pwr_cClass_Ssab_DO32DKS, pwr_cClass_Ssab_DO32DKS_Stall, pwr_cClass_Do_HVDO32, 0, 0},
+      {pwr_cClass_Ssab_DI32D, pwr_cClass_Di_DIX2, 0, 0, 0},
+      {pwr_cClass_Ssab_CO4uP, pwr_cClass_Co_CO4uP, pwr_cClass_Co_PI24BO, 0, 0},
+      {pwr_cClass_Ssab_AI32uP, pwr_cClass_Ssab_AI16uP, pwr_cClass_Ssab_AI8uP, 0, 0},
+      {pwr_cClass_Ssab_AO8uP, pwr_cClass_Ssab_AO8uPL, 0, 0, 0}};
 
   if (cid1 == cid2)
     return 1;
 
   unsigned int group;
-  for (unsigned int i = 0; i < sizeof(groups) / sizeof(groups[0]); i++) {
+  for (unsigned int i = 0; i < sizeof(groups) / sizeof(groups[0]); i++)
+  {
     // Check if cid1 is member of any group
     int found = 0;
-    for (unsigned int j = 0; j < sizeof(groups[0]) / sizeof(groups[0][0]);
-         j++) {
-      if (cid1 == groups[i][j]) {
+    for (unsigned int j = 0; j < sizeof(groups[0]) / sizeof(groups[0][0]); j++)
+    {
+      if (cid1 == groups[i][j])
+      {
         found = 1;
         group = j;
         break;
       }
     }
-    if (found) {
+    if (found)
+    {
       // Check if cid2 is in the same group
-      for (unsigned int j = 0; j < sizeof(groups[0]) / sizeof(groups[0][0]);
-           j++) {
+      for (unsigned int j = 0; j < sizeof(groups[0]) / sizeof(groups[0][0]); j++)
+      {
         if (cid2 == groups[i][j])
           return 1;
       }
@@ -97,15 +98,18 @@ pwr_tStatus ssab_SetAddress(wb_session* sp, pwr_tOid oid)
   pwr_tUInt32 offset = 0;
 
   int no = 1;
-  for (wb_object child = parent.first(); child; child = child.after()) {
-    if (addressTypeIsEqual(o.cid(), child.cid())) {
+  for (wb_object child = parent.first(); child; child = child.after())
+  {
+    if (addressTypeIsEqual(o.cid(), child.cid()))
+    {
       if (child.oid().oix == o.oid().oix)
         break;
       no++;
     }
   }
 
-  switch (o.cid()) {
+  switch (o.cid())
+  {
   case pwr_cClass_Ssab_DO32DKS:
   case pwr_cClass_Ssab_DO32DKS_Stall:
   case pwr_cClass_Do_HVDO32:
@@ -167,7 +171,8 @@ pwr_tStatus ssab_SetAddress(wb_session* sp, pwr_tOid oid)
 
   pwr_tUInt32 bits = 0;
   pwr_tUInt32 mask;
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 8; i++)
+  {
     mask = 1 << i;
     if (bitno & mask)
       bits += (int)(pow(10, i) + 0.1);
@@ -177,11 +182,14 @@ pwr_tStatus ssab_SetAddress(wb_session* sp, pwr_tOid oid)
   if (!a)
     return a.sts();
 
-  try {
+  try
+  {
     sp->writeAttribute(a, (char*)&lynxno, sizeof(lynxno));
     if (EVEN(sp->sts()))
       return sp->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 
@@ -189,11 +197,14 @@ pwr_tStatus ssab_SetAddress(wb_session* sp, pwr_tOid oid)
   if (!a)
     return a.sts();
 
-  try {
+  try
+  {
     sp->writeAttribute(a, (char*)&bits, sizeof(bits));
     if (EVEN(sp->sts()))
       return sp->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 

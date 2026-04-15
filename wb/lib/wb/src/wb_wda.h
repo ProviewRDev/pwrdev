@@ -48,11 +48,11 @@
 class WdaNav;
 class CoWow;
 
-class Wda {
+class Wda
+{
 public:
-  Wda(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_tObjid wa_objid,
-      pwr_tClassId wa_classid, const char* wa_attribute, int wa_editmode,
-      int wa_advanced_user, int wa_display_objectname);
+  Wda(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_tObjid wa_objid, pwr_tClassId wa_classid,
+      const char* wa_attribute, int wa_editmode, int wa_advanced_user, int wa_display_objectname);
   virtual ~Wda();
   void* parent_ctx;
   ldh_tSesContext ldhses;
@@ -77,30 +77,14 @@ public:
   int attrobjects;
   CoWow* wow;
 
-  virtual void message(char severity, const char* message)
-  {
-  }
-  virtual void set_prompt(const char* prompt)
-  {
-  }
-  virtual void open_class_dialog(char* hierstr, char* classstr, char* namestr)
-  {
-  }
-  virtual void change_value(int set_focus)
-  {
-  }
-  virtual void change_value_close()
-  {
-  }
-  virtual void pop()
-  {
-  }
-  virtual void print(const char* title)
-  {
-  }
-  virtual void update_title()
-  {
-  }
+  virtual void message(char severity, const char* message) {}
+  virtual void set_prompt(const char* prompt) {}
+  virtual void open_class_dialog(char* hierstr, char* classstr, char* namestr) {}
+  virtual void change_value(int set_focus) {}
+  virtual void change_value_close() {}
+  virtual void pop() {}
+  virtual void print(const char* title) {}
+  virtual void update_title() {}
 
   int open_changevalue(char* name);
   void set_editmode(int editmode, ldh_tSesContext ldhses);

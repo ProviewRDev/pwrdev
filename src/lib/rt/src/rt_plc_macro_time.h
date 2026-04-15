@@ -45,9 +45,9 @@
   store absolute time value
   @aref stoatv StoATv
 */
-#define StoATv_exec(obj, in)                                                   \
-  lck_LockTime;                                                                \
-  obj->ActualValue = in;                                                       \
+#define StoATv_exec(obj, in)                                                                                 \
+  lck_LockTime;                                                                                              \
+  obj->ActualValue = in;                                                                                     \
   lck_UnlockTime;
 
 /*_*
@@ -55,9 +55,9 @@
   store delta time value
   @aref stodtv StoDTv
 */
-#define StoDTv_exec(obj, in)                                                   \
-  lck_LockTime;                                                                \
-  obj->ActualValue = in;                                                       \
+#define StoDTv_exec(obj, in)                                                                                 \
+  lck_LockTime;                                                                                              \
+  obj->ActualValue = in;                                                                                     \
   lck_UnlockTime;
 
 /*_*
@@ -65,11 +65,12 @@
   store conditionally into absolute time value
   @aref cstoatv CStoATv
 */
-#define CStoATv_exec(obj, in, cond)                                            \
-  if (cond) {                                                                  \
-    lck_LockTime;                                                              \
-    obj->ActualValue = in;                                                     \
-    lck_UnlockTime;                                                            \
+#define CStoATv_exec(obj, in, cond)                                                                          \
+  if (cond)                                                                                                  \
+  {                                                                                                          \
+    lck_LockTime;                                                                                            \
+    obj->ActualValue = in;                                                                                   \
+    lck_UnlockTime;                                                                                          \
   }
 
 /*_*
@@ -77,11 +78,12 @@
   store conditionally into delta time value
   @aref cstodtv CStoDTv
 */
-#define CStoDTv_exec(obj, in, cond)                                            \
-  if (cond) {                                                                  \
-    lck_LockTime;                                                              \
-    obj->ActualValue = in;                                                     \
-    lck_UnlockTime;                                                            \
+#define CStoDTv_exec(obj, in, cond)                                                                          \
+  if (cond)                                                                                                  \
+  {                                                                                                          \
+    lck_LockTime;                                                                                            \
+    obj->ActualValue = in;                                                                                   \
+    lck_UnlockTime;                                                                                          \
   }
 
 /*_*
@@ -89,9 +91,9 @@
   Store into absolute time attribute
   @aref stoatp StoATp
 */
-#define StoATp_exec(ut, in)                                                    \
-  lck_LockTime;                                                                \
-  ut = in;                                                                     \
+#define StoATp_exec(ut, in)                                                                                  \
+  lck_LockTime;                                                                                              \
+  ut = in;                                                                                                   \
   lck_UnlockTime;
 
 /*_*
@@ -99,9 +101,9 @@
   Store into delta time attribute
   @aref stodtp StoDTp
 */
-#define StoDTp_exec(ut, in)                                                    \
-  lck_LockTime;                                                                \
-  ut = in;                                                                     \
+#define StoDTp_exec(ut, in)                                                                                  \
+  lck_LockTime;                                                                                              \
+  ut = in;                                                                                                   \
   lck_UnlockTime;
 
 /*_*
@@ -109,11 +111,12 @@
   Store conditionally into absolute time attribute
   @aref cstoatp CStoATp
 */
-#define CStoATp_exec(ut, in, cond)                                             \
-  if (cond) {                                                                  \
-    lck_LockTime;                                                              \
-    ut = in;                                                                   \
-    lck_UnlockTime;                                                            \
+#define CStoATp_exec(ut, in, cond)                                                                           \
+  if (cond)                                                                                                  \
+  {                                                                                                          \
+    lck_LockTime;                                                                                            \
+    ut = in;                                                                                                 \
+    lck_UnlockTime;                                                                                          \
   }
 
 /*_*
@@ -121,11 +124,12 @@
   Store conditionally into delta time attribute
   @aref cstodtp CStoDTp
 */
-#define CStoDTp_exec(ut, in, cond)                                             \
-  if (cond) {                                                                  \
-    lck_LockTime;                                                              \
-    ut = in;                                                                   \
-    lck_UnlockTime;                                                            \
+#define CStoDTp_exec(ut, in, cond)                                                                           \
+  if (cond)                                                                                                  \
+  {                                                                                                          \
+    lck_LockTime;                                                                                            \
+    ut = in;                                                                                                 \
+    lck_UnlockTime;                                                                                          \
   }
 
 /*_*
@@ -133,9 +137,9 @@
   Get absolute time attribute
   @aref getatp GetATp
 */
-#define GetATp_exec(object, in)                                                \
-  lck_LockTime;                                                                \
-  object->ActVal = in;                                                         \
+#define GetATp_exec(object, in)                                                                              \
+  lck_LockTime;                                                                                              \
+  object->ActVal = in;                                                                                       \
   lck_UnlockTime;
 
 /*_*
@@ -143,9 +147,9 @@
   Get delta time attribute
   @aref getatp GetDTp
 */
-#define GetDTp_exec(object, in)                                                \
-  lck_LockTime;                                                                \
-  object->ActVal = in;                                                         \
+#define GetDTp_exec(object, in)                                                                              \
+  lck_LockTime;                                                                                              \
+  object->ActVal = in;                                                                                       \
   lck_UnlockTime;
 
 /*_*
@@ -202,15 +206,13 @@
   ATGREATERTHAN
   @aref atgreaterthan AtGreaterThan
 */
-#define AtGreaterThan_exec(obj, t1, t2)                                        \
-  obj->Status = (time_Acomp_NE(&t1, &t2) == 1);
+#define AtGreaterThan_exec(obj, t1, t2) obj->Status = (time_Acomp_NE(&t1, &t2) == 1);
 
 /*_*
   ATLESSTHAN
   @aref atlessthan AtLessThan
 */
-#define AtLessThan_exec(obj, t1, t2)                                           \
-  obj->Status = (time_Acomp_NE(&t1, &t2) == -1);
+#define AtLessThan_exec(obj, t1, t2) obj->Status = (time_Acomp_NE(&t1, &t2) == -1);
 
 /*_*
   ATEQUAL
@@ -222,15 +224,13 @@
   DTGREATERTHAN
   @aref dtgreaterthan DtGreaterThan
 */
-#define DtGreaterThan_exec(obj, t1, t2)                                        \
-  obj->Status = (time_Dcomp_NE(&t1, &t2) == 1);
+#define DtGreaterThan_exec(obj, t1, t2) obj->Status = (time_Dcomp_NE(&t1, &t2) == 1);
 
 /*_*
   DTLESSTHAN
   @aref dtlessthan DtLessThan
 */
-#define DtLessThan_exec(obj, t1, t2)                                           \
-  obj->Status = (time_Dcomp_NE(&t1, &t2) == -1);
+#define DtLessThan_exec(obj, t1, t2) obj->Status = (time_Dcomp_NE(&t1, &t2) == -1);
 
 /*_*
   DTEQUAL
@@ -242,18 +242,18 @@
   LOCALTIME
   @aref localtime LocalTime
 */
-#define LocalTime_exec(obj, t)                                                 \
-  {                                                                            \
-    struct tm tm;                                                              \
-    time_t time = t.tv_sec;                                                    \
-                                                                               \
-    localtime_r(&time, &tm);                                                   \
-    obj->Second = tm.tm_sec;                                                   \
-    obj->Minute = tm.tm_min;                                                   \
-    obj->Hour = tm.tm_hour;                                                    \
-    obj->MDay = tm.tm_mday;                                                    \
-    obj->Month = tm.tm_mon;                                                    \
-    obj->Year = tm.tm_year;                                                    \
-    obj->WDay = tm.tm_wday;                                                    \
-    obj->YDay = tm.tm_yday;                                                    \
+#define LocalTime_exec(obj, t)                                                                               \
+  {                                                                                                          \
+    struct tm tm;                                                                                            \
+    time_t time = t.tv_sec;                                                                                  \
+                                                                                                             \
+    localtime_r(&time, &tm);                                                                                 \
+    obj->Second = tm.tm_sec;                                                                                 \
+    obj->Minute = tm.tm_min;                                                                                 \
+    obj->Hour = tm.tm_hour;                                                                                  \
+    obj->MDay = tm.tm_mday;                                                                                  \
+    obj->Month = tm.tm_mon;                                                                                  \
+    obj->Year = tm.tm_year;                                                                                  \
+    obj->WDay = tm.tm_wday;                                                                                  \
+    obj->YDay = tm.tm_yday;                                                                                  \
   }

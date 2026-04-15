@@ -41,7 +41,8 @@
 
 #define xttlog_cLogFile "$pwrp_log/xtt_%s.log"
 
-typedef enum {
+typedef enum
+{
   xttlog_eCategory_,
   xttlog_eCategory_Command,
   xttlog_eCategory_OpenGraph,
@@ -57,12 +58,16 @@ typedef enum {
   xttlog_eCategory__
 } xttlog_eCategory;
 
-typedef enum { xttlog_mOption_Binary = 1 << 0 } xttlog_mOption;
+typedef enum
+{
+  xttlog_mOption_Binary = 1 << 0
+} xttlog_mOption;
 
 class XttLog;
 class XNav;
 
-class XttLog {
+class XttLog
+{
   pwr_tFileName m_filename;
   int m_event;
   int m_level;
@@ -70,10 +75,7 @@ class XttLog {
   static XttLog* m_default_log;
 
 public:
-  void push()
-  {
-    m_level++;
-  }
+  void push() { m_level++; }
   void pull()
   {
     m_level--;
@@ -88,15 +90,11 @@ public:
       m_default_log = 0;
   }
 
-  void set_default()
-  {
-    m_default_log = this;
-  }
-  void log(const char* category, const char* str, const char* value,
-      unsigned int opt, unsigned int size);
+  void set_default() { m_default_log = this; }
+  void log(const char* category, const char* str, const char* value, unsigned int opt, unsigned int size);
 
-  static void dlog(xttlog_eCategory category, const char* str,
-      const char* value, unsigned int opt = 0, unsigned int size = 0);
+  static void dlog(xttlog_eCategory category, const char* str, const char* value, unsigned int opt = 0,
+                   unsigned int size = 0);
   static void category_to_string(xttlog_eCategory category, char* str);
   static void string_to_category(char* str, xttlog_eCategory* category);
   static void dpush()
@@ -109,10 +107,9 @@ public:
     if (m_default_log)
       m_default_log->pull();
   }
-  static void value_to_octstring(const void* value, unsigned int value_size,
-      char* str, unsigned int str_size);
-  static void octstring_to_value(
-      char* str, void* value, unsigned int size, unsigned int* value_size);
+  static void value_to_octstring(const void* value, unsigned int value_size, char* str,
+                                 unsigned int str_size);
+  static void octstring_to_value(char* str, void* value, unsigned int size, unsigned int* value_size);
   static void gdh_log_bc(char* name, void* buf, unsigned int bufsize);
   static int play(XNav* xnav, char* filename, double speed, int pid);
   static void delete_default();

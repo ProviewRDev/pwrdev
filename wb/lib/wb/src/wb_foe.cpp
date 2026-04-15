@@ -88,11 +88,14 @@ void WFoe::activate_save()
   wind = gre->wind;
   plc = wind->hw.plc;
   parent_node = wind->hw.parent_node_pointer;
-  if (parent_node != 0) {
+  if (parent_node != 0)
+  {
     /* Parent is node, not a plc */
-    if (parent_ctx != 0) {
+    if (parent_ctx != 0)
+    {
       /* parent is alive */
-      if ((parent_node->hn.status & VLDH_CREATE) != 0) {
+      if ((parent_node->hn.status & VLDH_CREATE) != 0)
+      {
         /* Parentnode is not saved, then it's not allowed to save
            the window */
         msgbox("UNABLE TO SAVE \nSave the parent window first.");
@@ -111,20 +114,21 @@ void WFoe::activate_save()
 
   normal_cursor();
 
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     unsigned int opt;
     if (options & foe_mOption_EnableComment)
       opt = log_mOption_Comment;
     else
       opt = 0;
 
-    wb_log::log((wb_session*)gre->wind->hw.ldhses, wlog_eCategory_PlcSave,
-        gre->wind->lw.oid, opt);
+    wb_log::log((wb_session*)gre->wind->hw.ldhses, wlog_eCategory_PlcSave, gre->wind->lw.oid, opt);
     message("Window saved");
-  } else if (sts == VLDH__PLCNOTSAVED)
-    msgbox(
-        "UNABLE TO SAVE \nSave the plcprogram in the hierarchy editor first.");
-  else if (EVEN(sts)) {
+  }
+  else if (sts == VLDH__PLCNOTSAVED)
+    msgbox("UNABLE TO SAVE \nSave the plcprogram in the hierarchy editor first.");
+  else if (EVEN(sts))
+  {
     char msg[256];
 
     msg_GetMsg(sts, msg, sizeof(msg));
@@ -136,9 +140,7 @@ void WFoe::activate_save()
 //	The routine first checks that the parent node of the window
 //	is saved, and then saves the window and quits.
 
-void WFoe::activate_exit()
-{
-}
+void WFoe::activate_exit() {}
 
 //	Callback from the menu.
 //	It is not allowed to delete orderwindows due to problems with
@@ -167,7 +169,8 @@ void WFoe::activate_winddelete()
   wind = gre->wind;
   sts = ldh_GetObjectClass(wind->hw.ldhses, wind->lw.poid, &cid);
   error_msg(sts);
-  if ((cid == pwr_cClass_order) && ((wind->hw.status & VLDH_CREATE) != 0)) {
+  if ((cid == pwr_cClass_order) && ((wind->hw.status & VLDH_CREATE) != 0))
+  {
     message("Operation not allowed, save session first");
     return;
   }
@@ -178,17 +181,17 @@ void WFoe::activate_winddelete()
   error_msg(sts);
   node_ptr = nodelist;
   subwind_count = 0;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     if ((*node_ptr)->ln.subwindow != 0)
       /* Subwindow */
-      subwind_count += (((*node_ptr)->ln.subwindow & 1) != 0)
-          + (((*node_ptr)->ln.subwindow & 2) != 0);
+      subwind_count += (((*node_ptr)->ln.subwindow & 1) != 0) + (((*node_ptr)->ln.subwindow & 2) != 0);
     node_ptr++;
   }
-  if (subwind_count > 0) {
+  if (subwind_count > 0)
+  {
     /* Created subwindows found, inform and break */
-    sprintf(msg, " %d subwindow found in this window\nDelete them first",
-        subwind_count);
+    sprintf(msg, " %d subwindow found in this window\nDelete them first", subwind_count);
     msgbox(msg);
     return;
   }
@@ -198,17 +201,13 @@ void WFoe::activate_winddelete()
   /* You should take care of inconscious users.
      Ask them to confirm the action */
 
-  popupmsg(
-      "Do you really want to delete this window ?", deletewind_ok, NULL, NULL);
+  popupmsg("Do you really want to delete this window ?", deletewind_ok, NULL, NULL);
 }
 
 //
 // Backcall function to popupmsg for activate_winddelete
 //
-void WFoe::deletewind_ok(WFoe* foe)
-{
-  foe->foe_delete();
-}
+void WFoe::deletewind_ok(WFoe* foe) { foe->foe_delete(); }
 
 //
 //	Callback from the menu.
@@ -243,8 +242,10 @@ void WFoe::activate_quit()
   wind_ptr = windlist;
   w_create_count = 0;
   create_count = 0;
-  for (i = 0; i < (int)wind_count; i++) {
-    if ((*wind_ptr)->hw.foe != 0) {
+  for (i = 0; i < (int)wind_count; i++)
+  {
+    if ((*wind_ptr)->hw.foe != 0)
+    {
       /* Subwindow created, check if parentnode also is created and
          not saved */
       create_count++;
@@ -254,7 +255,8 @@ void WFoe::activate_quit()
   if (wind_count > 0)
     free((char*)windlist);
 
-  if (create_count > 0 && access != ldh_eAccess_SharedReadWrite) {
+  if (create_count > 0 && access != ldh_eAccess_SharedReadWrite)
+  {
     /* Created subwindows found, inform and break */
     sprintf(msg, "Exit subwindows first, %d subwindow found", create_count);
     msgbox(msg);
@@ -262,7 +264,8 @@ void WFoe::activate_quit()
   }
 
   /* If trace or view, exit without confirm */
-  if ((function == TRACE) || (function == VIEW) || (function == SIMULATE)) {
+  if ((function == TRACE) || (function == VIEW) || (function == SIMULATE))
+  {
     /* If session is not empty revert it first */
     trace_stop(this);
     quit();
@@ -274,9 +277,11 @@ void WFoe::activate_quit()
   error_msg(sts);
   sts = vldh_get_wind_modification(wind, &vldh_mod);
 
-  if (!info.Empty || vldh_mod) {
+  if (!info.Empty || vldh_mod)
+  {
     popupmsg("Do you want to save changes", exit_save, exit_nosave, NULL);
-  } else
+  }
+  else
     /* Dont bother to ask */
     quit();
 }
@@ -319,7 +324,8 @@ void WFoe::activate_print()
     message("");
 
   sts = print_document();
-  if (sts == FOE__NOOBJFOUND) {
+  if (sts == FOE__NOOBJFOUND)
+  {
     message("No documents found");
   }
 }
@@ -340,7 +346,8 @@ void WFoe::activate_printoverv()
     message("");
 
   sts = print_overview();
-  if (sts == FOE__NOOBJFOUND) {
+  if (sts == FOE__NOOBJFOUND)
+  {
     message("Less than two documents, no overview printed");
   }
 }
@@ -361,7 +368,8 @@ void WFoe::activate_printpdf()
     message("");
 
   sts = print_pdf_overview();
-  if (sts == FOE__NOOBJFOUND) {
+  if (sts == FOE__NOOBJFOUND)
+  {
     message("No documents found");
   }
 }
@@ -377,7 +385,8 @@ void WFoe::activate_printselect()
   int sts;
 
   sts = print_selected_document();
-  if (sts == FOE__NOOBJFOUND) {
+  if (sts == FOE__NOOBJFOUND)
+  {
     message("No documents found");
   }
 }
@@ -395,27 +404,36 @@ void WFoe::activate_syntax()
   char msg[80];
 
   sts = gcg_plcwindow_compile(gre->wind, 0, &errcount, &warncount, 0, 0);
-  if (sts == GSX__AMBIGOUS_EXECUTEORDER) {
+  if (sts == GSX__AMBIGOUS_EXECUTEORDER)
+  {
     message("Execute order error");
     BEEP;
     return;
-  } else if (sts == GSX__PLCWIND_ERRORS) {
+  }
+  else if (sts == GSX__PLCWIND_ERRORS)
+  {
     /* Errors found, inform the user*/
     sprintf(msg, "Syntax %ld errors  %ld warnings", errcount, warncount);
     message(msg);
     BEEP;
-  } else if (EVEN(sts)) {
+  }
+  else if (EVEN(sts))
+  {
     message("Error in class definition, syntax aborted");
     BEEP;
     error_msg(sts);
     return;
-  } else {
-    if (warncount > 0) {
+  }
+  else
+  {
+    if (warncount > 0)
+    {
       /* Errors found, inform the user*/
       sprintf(msg, "Syntax %ld warnings", warncount);
       message(msg);
       BEEP;
-    } else
+    }
+    else
       message("Syntax successful completion");
   }
 
@@ -448,13 +466,15 @@ void WFoe::activate_compile()
 
   sts = vldh_get_wind_modification(wind, &vldh_mod);
 
-  if (vldh_mod) {
+  if (vldh_mod)
+  {
     message("Session is not saved");
     BEEP;
     return;
   }
 
-  if (get_build_options_cb) {
+  if (get_build_options_cb)
+  {
     wb_build_opt* buildopt;
 
     (get_build_options_cb)(parent_ctx, &buildopt);
@@ -464,46 +484,55 @@ void WFoe::activate_compile()
   disable_ldh_cb();
   sts = gcg_plcwindow_compile(wind, 1, &errcount, &warncount, 0, debug);
   enable_ldh_cb();
-  if (sts == GSX__AMBIGOUS_EXECUTEORDER) {
+  if (sts == GSX__AMBIGOUS_EXECUTEORDER)
+  {
     message("Execute order error");
     BEEP;
     return;
-  } else if (sts == GSX__NOTSAVED) {
+  }
+  else if (sts == GSX__NOTSAVED)
+  {
     /* Session is not saved */
     message("Session not saved, no objectfile created");
     BEEP;
     return;
-  } else if (sts == GSX__PLCWIND_ERRORS) {
+  }
+  else if (sts == GSX__PLCWIND_ERRORS)
+  {
     /* Errors found, inform the user*/
-    sprintf(msg, "Compile %ld errors  %ld warnings, no objectfile created",
-        errcount, warncount);
+    sprintf(msg, "Compile %ld errors  %ld warnings, no objectfile created", errcount, warncount);
     message(msg);
     BEEP;
     return;
-  } else if (EVEN(sts)) {
+  }
+  else if (EVEN(sts))
+  {
     message("Ldh error");
     BEEP;
     error_msg(sts);
     return;
   }
 
-  sts = gcg_plc_compile(
-      wind->hw.plc, 1, &plc_errcount, &plc_warncount, 0, debug);
+  sts = gcg_plc_compile(wind->hw.plc, 1, &plc_errcount, &plc_warncount, 0, debug);
   warncount += plc_warncount;
   errcount += plc_errcount;
-  if (sts == GSX__PLCPGM_ERRORS) {
+  if (sts == GSX__PLCPGM_ERRORS)
+  {
     /* Errors found, inform the user*/
-    sprintf(msg, "Compile %ld errors  %ld warnings, no objectfile created",
-        errcount, warncount);
+    sprintf(msg, "Compile %ld errors  %ld warnings, no objectfile created", errcount, warncount);
     message(msg);
     BEEP;
     return;
-  } else if (EVEN(sts)) {
+  }
+  else if (EVEN(sts))
+  {
     message("Ldh error");
     BEEP;
     error_msg(sts);
     return;
-  } else if (warncount > 0) {
+  }
+  else if (warncount > 0)
+  {
     /* Errors found, inform the user*/
     sprintf(msg, "Compile %ld warnings", warncount);
     message(msg);
@@ -549,9 +578,11 @@ void WFoe::activate_delete_confirm()
   char msg[200];
 
   gre->get_selnodes(&node_count, &nodelist);
-  if (!node_count) {
+  if (!node_count)
+  {
     gre->get_selcons(&con_count, &conlist);
-    if (!con_count) {
+    if (!con_count)
+    {
       message("Nothing to delete");
       return;
     }
@@ -588,18 +619,21 @@ void WFoe::delete_subwindow_ok_cb(void* ctx, void* data)
 
   /* Check that subwindow is not open */
   sts = vldh_get_wind_subwindows(foe->gre->wind, &wind_count, &windlist);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->error_msg(sts);
     return;
   }
 
   for (sts = ldh_GetChild(wind->hw.ldhses, node->ln.oid, &child); ODD(sts);
-       sts = ldh_GetNextSibling(wind->hw.ldhses, child, &child)) {
+       sts = ldh_GetNextSibling(wind->hw.ldhses, child, &child))
+  {
     wind_ptr = windlist;
-    for (i = 0; i < (int)wind_count; i++) {
-      if (cdh_ObjidIsEqual((*wind_ptr)->lw.oid, child)) {
-        foe->wow->DisplayError(
-            "Window open", "Subwindow is open\nClose subwindow first");
+    for (i = 0; i < (int)wind_count; i++)
+    {
+      if (cdh_ObjidIsEqual((*wind_ptr)->lw.oid, child))
+      {
+        foe->wow->DisplayError("Window open", "Subwindow is open\nClose subwindow first");
         free((char*)windlist);
         return;
       }
@@ -609,12 +643,13 @@ void WFoe::delete_subwindow_ok_cb(void* ctx, void* data)
   if (wind_count > 0)
     free((char*)windlist);
 
-  for (sts = ldh_GetChild(wind->hw.ldhses, node->ln.oid, &child); ODD(sts);
-       child = nextchild) {
+  for (sts = ldh_GetChild(wind->hw.ldhses, node->ln.oid, &child); ODD(sts); child = nextchild)
+  {
     sts = ldh_GetNextSibling(wind->hw.ldhses, child, &nextchild);
 
     rsts = ldh_DeleteObjectTree(wind->hw.ldhses, child, 0);
-    if (EVEN(rsts)) {
+    if (EVEN(rsts))
+    {
       foe->error_msg(rsts);
       return;
     }
@@ -638,23 +673,28 @@ void WFoe::delete_subwindows_ok_cb(void* ctx, void* data)
 
   foe->gre->get_selnodes(&node_count, &nodelist);
 
-  for (unsigned int j = 0; j < node_count; j++) {
+  for (unsigned int j = 0; j < node_count; j++)
+  {
     vldh_t_node node = nodelist[j];
-    if (node->ln.subwindow != 0) {
+    if (node->ln.subwindow != 0)
+    {
       /* Check that subwindow is not open */
       sts = vldh_get_wind_subwindows(foe->gre->wind, &wind_count, &windlist);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         foe->error_msg(sts);
         return;
       }
 
       for (sts = ldh_GetChild(wind->hw.ldhses, node->ln.oid, &child); ODD(sts);
-           sts = ldh_GetNextSibling(wind->hw.ldhses, child, &child)) {
+           sts = ldh_GetNextSibling(wind->hw.ldhses, child, &child))
+      {
         wind_ptr = windlist;
-        for (i = 0; i < (int)wind_count; i++) {
-          if (cdh_ObjidIsEqual((*wind_ptr)->lw.oid, child)) {
-            foe->wow->DisplayError(
-                "Window open", "Subwindow is open\nClose subwindow first");
+        for (i = 0; i < (int)wind_count; i++)
+        {
+          if (cdh_ObjidIsEqual((*wind_ptr)->lw.oid, child))
+          {
+            foe->wow->DisplayError("Window open", "Subwindow is open\nClose subwindow first");
             free((char*)windlist);
             free((char*)nodelist);
             return;
@@ -667,16 +707,19 @@ void WFoe::delete_subwindows_ok_cb(void* ctx, void* data)
     }
   }
 
-  for (unsigned int j = 0; j < node_count; j++) {
+  for (unsigned int j = 0; j < node_count; j++)
+  {
     vldh_t_node node = nodelist[j];
 
-    if (node->ln.subwindow != 0) {
-      for (sts = ldh_GetChild(wind->hw.ldhses, node->ln.oid, &child); ODD(sts);
-           child = nextchild) {
+    if (node->ln.subwindow != 0)
+    {
+      for (sts = ldh_GetChild(wind->hw.ldhses, node->ln.oid, &child); ODD(sts); child = nextchild)
+      {
         sts = ldh_GetNextSibling(wind->hw.ldhses, child, &nextchild);
 
         rsts = ldh_DeleteObjectTree(wind->hw.ldhses, child, 0);
-        if (EVEN(rsts)) {
+        if (EVEN(rsts))
+        {
           foe->error_msg(rsts);
           return;
         }
@@ -703,21 +746,20 @@ void WFoe::activate_delete()
   /* Check that any node doesn't contain a subwindow */
   gre->get_selnodes(&node_count, &nodelist);
 
-  if (node_count == 1 && (*nodelist)->ln.subwindow != 0) {
+  if (node_count == 1 && (*nodelist)->ln.subwindow != 0)
+  {
     /* Single node that has subwindow */
     char msg[200];
-    sprintf(msg,
-        "Object \"%s\" has subwindow\n Do you want to delete the subwindow?",
-        (*nodelist)->hn.name);
-    wow->DisplayQuestion(
-        this, "Delete subwindow", msg, delete_subwindow_ok_cb, 0, *nodelist);
+    sprintf(msg, "Object \"%s\" has subwindow\n Do you want to delete the subwindow?", (*nodelist)->hn.name);
+    wow->DisplayQuestion(this, "Delete subwindow", msg, delete_subwindow_ok_cb, 0, *nodelist);
     popupmenu_node = 0;
     return;
   }
 
   node_ptr = nodelist;
   int subwind_cnt = 0;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     if ((*node_ptr)->ln.subwindow != 0)
       subwind_cnt++;
     node_ptr++;
@@ -725,13 +767,11 @@ void WFoe::activate_delete()
   if (node_count > 0)
     free((char*)nodelist);
 
-  if (subwind_cnt) {
+  if (subwind_cnt)
+  {
     char msg[200];
-    sprintf(msg,
-        "%d objects have subwindows\n Do you want to delete the subwindows?",
-        subwind_cnt);
-    wow->DisplayQuestion(
-        this, "Delete subwindows", msg, delete_subwindows_ok_cb, 0, 0);
+    sprintf(msg, "%d objects have subwindows\n Do you want to delete the subwindows?", subwind_cnt);
+    wow->DisplayQuestion(this, "Delete subwindows", msg, delete_subwindows_ok_cb, 0, 0);
     popupmenu_node = 0;
     return;
   }
@@ -741,10 +781,7 @@ void WFoe::activate_delete()
   popupmenu_node = 0;
 }
 
-void WFoe::activate_createobject(float x, float y)
-{
-  gre_node_created(gre, 0, x, y);
-}
+void WFoe::activate_createobject(float x, float y) { gre_node_created(gre, 0, x, y); }
 
 void WFoe::activate_createobject_cid(pwr_tCid cid, int option)
 {
@@ -760,37 +797,41 @@ void WFoe::activate_createobject_cid(pwr_tCid cid, int option)
   disable_ldh_cb();
   sts = gre->create_node_floating(cid, 0, 0, &node);
   enable_ldh_cb();
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     error_msg(sts);
     return;
   }
 
   ldhses = (node->hn.wind)->hw.ldhses;
 
-  switch (cid) {
-  case pwr_cClass_Document: {
+  switch (cid)
+  {
+  case pwr_cClass_Document:
+  {
     pwr_tEnum doc_size = pwr_eDocumentSizeEnum_A3;
     pwr_tEnum doc_orient = pwr_eDocumentOrientEnum_Landscape;
 
     disable_ldh_cb();
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DocumentSize",
-        (char*)&doc_size, sizeof(doc_size));
+    sts =
+        ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DocumentSize", (char*)&doc_size, sizeof(doc_size));
     if (option == 1)
-      sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody",
-          "DocumentOrientation", (char*)&doc_orient, sizeof(doc_orient));
+      sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DocumentOrientation", (char*)&doc_orient,
+                             sizeof(doc_orient));
     enable_ldh_cb();
     sts = gre->node_update_floating(node);
     break;
   }
-  case pwr_cClass_Text: {
+  case pwr_cClass_Text:
+  {
     pwr_tEnum text_attr = pwr_eTextAttrEnum_Small;
     pwr_tEnum frame_attr = pwr_eFrameAttrEnum_No;
 
     disable_ldh_cb();
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "TextAttribute",
-        (char*)&text_attr, sizeof(text_attr));
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "FrameAttribute",
-        (char*)&frame_attr, sizeof(frame_attr));
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "TextAttribute", (char*)&text_attr,
+                           sizeof(text_attr));
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "FrameAttribute", (char*)&frame_attr,
+                           sizeof(frame_attr));
     enable_ldh_cb();
     sts = gre->node_update_floating(node);
     break;
@@ -817,13 +858,15 @@ void WFoe::activate_changetext()
   /* Delete the selected nodes and connections */
   /* Check that any node doesn't contain a subwindow */
   gre->get_selnodes(&node_count, &nodelist);
-  if (node_count != 1) {
+  if (node_count != 1)
+  {
     message("Select one text object");
     BEEP;
     return;
   }
 
-  switch (nodelist[0]->ln.cid) {
+  switch (nodelist[0]->ln.cid)
+  {
   case pwr_cClass_BodyText:
   case pwr_cClass_HelpText:
   case pwr_cClass_HelpTextL:
@@ -866,8 +909,10 @@ void WFoe::activate_cut()
   gre->get_selnodes(&node_count, &nodelist);
   node_ptr = nodelist;
   subwind_found = FALSE;
-  for (i = 0; i < (int)node_count; i++) {
-    if ((*node_ptr)->ln.subwindow != 0) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    if ((*node_ptr)->ln.subwindow != 0)
+    {
       subwind_found = TRUE;
       break;
     }
@@ -875,16 +920,21 @@ void WFoe::activate_cut()
   }
   if (node_count > 0)
     free((char*)nodelist);
-  if (subwind_found) {
+  if (subwind_found)
+  {
     message("Subwindow found, use copy or delete the subwindow first");
     BEEP;
-  } else {
+  }
+  else
+  {
     /* Cut selected nodes */
     sts = gre->cut();
-    if (sts == GRE__NOREGSEL) {
+    if (sts == GRE__NOREGSEL)
+    {
       message("Select region before cutting");
       BEEP;
-    } else if (EVEN(sts))
+    }
+    else if (EVEN(sts))
       error_msg(sts);
     popupmenu_node = 0;
   }
@@ -903,10 +953,12 @@ void WFoe::activate_copy()
 
   /* Copy */
   sts = gre->copy();
-  if (sts == GRE__NOREGSEL) {
+  if (sts == GRE__NOREGSEL)
+  {
     message("Select region before copying");
     BEEP;
-  } else if (EVEN(sts))
+  }
+  else if (EVEN(sts))
     error_msg(sts);
   else
     message("Region copied");
@@ -926,35 +978,17 @@ void WFoe::activate_paste()
   enable_ldh_cb();
 }
 
-void WFoe::activate_select_nextobject(flow_eDirection dir)
-{
-  gre->select_nextobject(dir, 0);
-}
+void WFoe::activate_select_nextobject(flow_eDirection dir) { gre->select_nextobject(dir, 0); }
 
-void WFoe::activate_select_addnextobject(flow_eDirection dir)
-{
-  gre->select_nextobject(dir, 1);
-}
+void WFoe::activate_select_addnextobject(flow_eDirection dir) { gre->select_nextobject(dir, 1); }
 
-void WFoe::activate_scroll(flow_eDirection dir)
-{
-  gre->scroll(dir);
-}
+void WFoe::activate_scroll(flow_eDirection dir) { gre->scroll(dir); }
 
-void WFoe::activate_select_nextconpoint(flow_eDirection dir)
-{
-  gre->select_next_conpoint(dir);
-}
+void WFoe::activate_select_nextconpoint(flow_eDirection dir) { gre->select_next_conpoint(dir); }
 
-void WFoe::activate_conpoint_lock()
-{
-  gre->conpoint_lock(1);
-}
+void WFoe::activate_conpoint_lock() { gre->conpoint_lock(1); }
 
-void WFoe::activate_move_object(flow_eDirection dir)
-{
-  gre->move_object(dir);
-}
+void WFoe::activate_move_object(flow_eDirection dir) { gre->move_object(dir); }
 
 //
 //	Callback from the menu.
@@ -977,7 +1011,8 @@ void WFoe::activate_attribute()
 
   gre->get_selnodes(&node_count, &nodelist);
 
-  if (node_count == 1) {
+  if (node_count == 1)
+  {
     /* Create attribute editor */
     if (msg_label_id != 0)
       message("");
@@ -985,7 +1020,8 @@ void WFoe::activate_attribute()
     sts = attrlist_get_by_node(object, foe_eAttr_WAtt, (void**)&watt);
     if (ODD(sts))
       watt->pop();
-    else {
+    else
+    {
       clock_cursor();
       attr_create(object);
       normal_cursor();
@@ -996,10 +1032,13 @@ void WFoe::activate_attribute()
   if (node_count > 0)
     free((char*)nodelist);
 
-  if (node_count == 0) {
+  if (node_count == 0)
+  {
     message("Select an object to edit attributes");
     BEEP;
-  } else if (node_count > 1) {
+  }
+  else if (node_count > 1)
+  {
     message("Unable to open object, more than one object selected");
     BEEP;
   }
@@ -1021,7 +1060,8 @@ void WFoe::activate_editcode()
 
   gre->get_selnodes(&node_count, &nodelist);
 
-  if (node_count == 1) {
+  if (node_count == 1)
+  {
     /* Create attribute editor */
     if (msg_label_id != 0)
       message("");
@@ -1029,9 +1069,11 @@ void WFoe::activate_editcode()
     sts = attrlist_get_by_node(object, foe_eAttr_WAttText, (void**)&watttext);
     if (ODD(sts))
       watttext->pop();
-    else {
+    else
+    {
       clock_cursor();
-      switch (object->ln.cid) {
+      switch (object->ln.cid)
+      {
       case pwr_cClass_BodyText:
       case pwr_cClass_HelpText:
       case pwr_cClass_HelpTextL:
@@ -1048,10 +1090,13 @@ void WFoe::activate_editcode()
   if (node_count > 0)
     free((char*)nodelist);
 
-  if (node_count == 0) {
+  if (node_count == 0)
+  {
     message("Select an object to edit attributes");
     BEEP;
-  } else if (node_count > 1) {
+  }
+  else if (node_count > 1)
+  {
     message("Unable to open object, more than one object selected");
     BEEP;
   }
@@ -1077,7 +1122,8 @@ void WFoe::activate_subwindow()
   /* Get selected nodes */
   gre->get_selnodes(&node_count, &nodelist);
 
-  if (node_count == 1) {
+  if (node_count == 1)
+  {
     if (msg_label_id != 0)
       message("");
     /* Create subwindow, take the first windowindex */
@@ -1092,10 +1138,13 @@ void WFoe::activate_subwindow()
   if (node_count > 0)
     free((char*)nodelist);
 
-  if (node_count == 0) {
+  if (node_count == 0)
+  {
     message("Select an object to create a subwindow");
     BEEP;
-  } else if (node_count > 1) {
+  }
+  else if (node_count > 1)
+  {
     message("Can't create a subwindow, more than one object selected");
     BEEP;
   }
@@ -1144,7 +1193,8 @@ void WFoe::activate_createnode()
   /* Get selected nodes from palette */
   sts = node_palctx->get_select(&cid);
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     message("Choose an object from the palette");
     BEEP;
     return;
@@ -1175,16 +1225,19 @@ void WFoe::activate_createconnection()
     message("");
 
   gre->get_conpoint_select(&node_count, &nodelist, &numlist);
-  if (!node_count) {
+  if (!node_count)
+  {
     message("No connectionpoint is selected");
     return;
   }
-  if (node_count == 1) {
+  if (node_count == 1)
+  {
     double x, y;
     flow_eDirection dir;
 
     gre->get_conpoint(nodelist[0], numlist[0], &x, &y, &dir);
-    switch (dir) {
+    switch (dir)
+    {
     case flow_eDirection_Up:
       y += 0.15;
       break;
@@ -1202,12 +1255,14 @@ void WFoe::activate_createconnection()
     }
 
     gre_con_created(gre, x, y, nodelist[0], numlist[0], 0, 0, 1, &sts);
-  } else {
-    gre_con_created(
-        gre, 0, 0, nodelist[0], numlist[0], nodelist[1], numlist[1], 0, &sts);
+  }
+  else
+  {
+    gre_con_created(gre, 0, 0, nodelist[0], numlist[0], nodelist[1], numlist[1], 0, &sts);
     gre->unselect();
   }
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     gre->conpoint_unselect();
     gre->conpoint_lock(0);
   }
@@ -1286,16 +1341,20 @@ void WFoe::activate_showexeord(int set)
 
   show_execorder = set;
 
-  if (show_execorder) {
+  if (show_execorder)
+  {
     sts = exo_wind_exec(gre->wind);
-    if (sts == GSX__AMBIGOUS_EXECUTEORDER) {
+    if (sts == GSX__AMBIGOUS_EXECUTEORDER)
+    {
       message("Execute order error");
       BEEP;
-    } else if (EVEN(sts))
+    }
+    else if (EVEN(sts))
       error_msg(sts);
     else
       show_executeorder();
-  } else
+  }
+  else
     gre->undisplay();
 }
 
@@ -1314,18 +1373,12 @@ void WFoe::activate_plcattribute()
 //
 //	Callback from the menu.
 //
-void WFoe::activate_searchobject()
-{
-  get_textinput("Enter object : ", &search_object);
-}
+void WFoe::activate_searchobject() { get_textinput("Enter object : ", &search_object); }
 
 //
 //	Callback from the menu.
 //
-void WFoe::activate_searchstring()
-{
-  get_textinput("Enter string: ", &search_string);
-}
+void WFoe::activate_searchstring() { get_textinput("Enter string: ", &search_string); }
 
 //
 //	Callback from the menu.
@@ -1357,7 +1410,8 @@ void WFoe::activate_getobj()
   /* Get selected nodes */
   gre->get_selnodes(&node_count, &nodelist);
 
-  if (node_count == 1) {
+  if (node_count == 1)
+  {
     if (msg_label_id != 0)
       message("");
 
@@ -1370,10 +1424,13 @@ void WFoe::activate_getobj()
   if (node_count > 0)
     free((char*)nodelist);
 
-  if (node_count == 0) {
+  if (node_count == 0)
+  {
     message("Select an object first ");
     BEEP;
-  } else if (node_count > 1) {
+  }
+  else if (node_count > 1)
+  {
     message("Unable to connect, more than one object selected");
     BEEP;
   }
@@ -1394,7 +1451,8 @@ void WFoe::activate_expand()
   /* Get selected nodes */
   gre->get_selnodes(&node_count, &nodelist);
 
-  if (node_count == 1) {
+  if (node_count == 1)
+  {
     if (msg_label_id != 0)
       message("");
 
@@ -1406,10 +1464,13 @@ void WFoe::activate_expand()
   if (node_count > 0)
     free((char*)nodelist);
 
-  if (node_count == 0) {
+  if (node_count == 0)
+  {
     message("Select an object first ");
     BEEP;
-  } else if (node_count > 1) {
+  }
+  else if (node_count > 1)
+  {
     message("Unable to expand, more than one object selected");
     BEEP;
   }
@@ -1430,7 +1491,8 @@ void WFoe::activate_compress()
   /* Get selected nodes */
   gre->get_selnodes(&node_count, &nodelist);
 
-  if (node_count == 1) {
+  if (node_count == 1)
+  {
     if (msg_label_id != 0)
       message("");
 
@@ -1442,10 +1504,13 @@ void WFoe::activate_compress()
   if (node_count > 0)
     free((char*)nodelist);
 
-  if (node_count == 0) {
+  if (node_count == 0)
+  {
     message("Select an object first ");
     BEEP;
-  } else if (node_count > 1) {
+  }
+  else if (node_count > 1)
+  {
     message("Unable to expand, more than one object selected");
     BEEP;
   }
@@ -1454,10 +1519,7 @@ void WFoe::activate_compress()
 //
 //	Display help window for topic plc editor
 //
-void WFoe::activate_help()
-{
-  CoXHelp::dhelp("plceditor_refman", 0, navh_eHelpFile_Base, 0, 1);
-}
+void WFoe::activate_help() { CoXHelp::dhelp("plceditor_refman", 0, navh_eHelpFile_Base, 0, 1); }
 
 void WFoe::activate_helpplc()
 {
@@ -1466,7 +1528,7 @@ void WFoe::activate_helpplc()
   char volstr[20];
 
   sprintf(filename, pwr_cNamePlcXttHelp,
-      cdh_VolumeIdToFnString(volstr, sizeof(volstr), gre->wind->lw.oid.vid));
+          cdh_VolumeIdToFnString(volstr, sizeof(volstr), gre->wind->lw.oid.vid));
   sprintf(key, "plcw_%s", cdh_ObjidToFnString(0, gre->wind->lw.oid));
 
   CoXHelp::dhelp(key, 0, navh_eHelpFile_Other, filename, 1);
@@ -1478,7 +1540,7 @@ void WFoe::activate_helpplclist()
   char volstr[20];
 
   sprintf(filename, pwr_cNamePlcXttHelp,
-      cdh_VolumeIdToFnString(volstr, sizeof(volstr), gre->wind->lw.oid.vid));
+          cdh_VolumeIdToFnString(volstr, sizeof(volstr), gre->wind->lw.oid.vid));
   CoXHelp::dhelp("index", 0, navh_eHelpFile_Other, filename, 1);
 }
 
@@ -1497,13 +1559,13 @@ void WFoe::activate_helpclass()
   wind = gre->wind;
 
   gre->get_selnodes(&node_count, &nodelist);
-  if (node_count != 1) {
+  if (node_count != 1)
+  {
     message("Select one object");
     BEEP;
   }
 
-  sts = ldh_ClassIdToName(
-      wind->hw.ldhses, nodelist[0]->ln.cid, cname, sizeof(cname), &size);
+  sts = ldh_ClassIdToName(wind->hw.ldhses, nodelist[0]->ln.cid, cname, sizeof(cname), &size);
   if (EVEN(sts))
     return;
 
@@ -1530,7 +1592,8 @@ void WFoe::activate_trace_togg(int set)
   if (msg_label_id != 0)
     message("");
 
-  if (set == 1) {
+  if (set == 1)
+  {
     sts = change_mode(TRACE);
   }
 }
@@ -1558,7 +1621,8 @@ void WFoe::activate_view_togg(int set)
   if (msg_label_id != 0)
     message("");
 
-  if (set == 1) {
+  if (set == 1)
+  {
     sts = change_mode(VIEW);
   }
 }
@@ -1590,11 +1654,14 @@ void WFoe::exit_save(WFoe* foe)
   /* Check that the parent node is saved */
   wind = foe->gre->wind;
   parent_node = wind->hw.parent_node_pointer;
-  if (parent_node != 0) {
+  if (parent_node != 0)
+  {
     /* Parent is node, not a plc */
-    if (foe->parent_ctx != 0) {
+    if (foe->parent_ctx != 0)
+    {
       /* parent is alive */
-      if ((parent_node->hn.status & VLDH_CREATE) != 0) {
+      if ((parent_node->hn.status & VLDH_CREATE) != 0)
+      {
         /* Parentnode is not saved, then its not allowed to save
            the window */
         foe->msgbox("Save the parent window first");
@@ -1610,23 +1677,27 @@ void WFoe::exit_save(WFoe* foe)
   sts = foe->create_xtthelpfile();
 
   foe->normal_cursor();
-  if (sts == VLDH__PLCNOTSAVED) {
+  if (sts == VLDH__PLCNOTSAVED)
+  {
     foe->msgbox("Save the plcprogram in the hierarchy editor first");
     return;
-  } else if (EVEN(sts)) {
+  }
+  else if (EVEN(sts))
+  {
     char msg[256];
 
     msg_GetMsg(sts, msg, sizeof(msg));
     foe->msgbox(msg);
     return;
-  } else {
+  }
+  else
+  {
     unsigned int opt;
     if (foe->options & foe_mOption_EnableComment)
       opt = log_mOption_Comment;
     else
       opt = 0;
-    wb_log::log((wb_session*)foe->gre->wind->hw.ldhses, wlog_eCategory_PlcSave,
-        foe->gre->wind->lw.oid, opt);
+    wb_log::log((wb_session*)foe->gre->wind->hw.ldhses, wlog_eCategory_PlcSave, foe->gre->wind->lw.oid, opt);
   }
 
   foe->foe_exit();
@@ -1646,7 +1717,8 @@ void WFoe::exit_nosave(WFoe* foe)
   /* BUGGFIX, quit on suborder windows not allowed */
   /*************************************************/
   ldh_GetObjectClass(wind->hw.ldhses, wind->lw.poid, &cid);
-  if (cid == pwr_cClass_order) {
+  if (cid == pwr_cClass_order)
+  {
     foe->message("Operationen not allowed, do save !!");
     return;
   }
@@ -1661,10 +1733,7 @@ void WFoe::exit_nosave(WFoe* foe)
 //
 // Description: Backcall from the controlled gre module
 //
-void WFoe::gre_setup_window(WGre* gre)
-{
-  /* not in use at this time */
-}
+void WFoe::gre_setup_window(WGre* gre) { /* not in use at this time */ }
 
 //
 // Description: Backcall from the controlled gre module
@@ -1672,8 +1741,7 @@ void WFoe::gre_setup_window(WGre* gre)
 // Fetches the current class from the palette and
 // creates a node of this class.
 //
-void WFoe::gre_node_created(
-    WGre* gre, unsigned long current_node_type, float x, float y)
+void WFoe::gre_node_created(WGre* gre, unsigned long current_node_type, float x, float y)
 {
   pwr_tClassId cid;
   WFoe* foe;
@@ -1686,7 +1754,8 @@ void WFoe::gre_node_created(
   /* Get selected nodes from palette */
   sts = foe->node_palctx->get_select(&cid);
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     /* SG 20.03.91 Inform the user that he has to choose a node*/
     foe->message("Choose an object from the palette");
     BEEP;
@@ -1700,7 +1769,8 @@ void WFoe::gre_node_created(
   if (EVEN(sts))
     return;
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_BodyText:
   case pwr_cClass_HelpText:
   case pwr_cClass_HelpTextL:
@@ -1727,7 +1797,8 @@ void WFoe::gre_node_floating_created(WGre* gre, vldh_t_node node)
 
   foe = (WFoe*)gre->parent_ctx;
 
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_BodyText:
   case pwr_cClass_HelpText:
   case pwr_cClass_HelpTextL:
@@ -1750,25 +1821,19 @@ void WFoe::gre_node_floating_created(WGre* gre, vldh_t_node node)
 // Description: Backcall from the controlled gre module when
 // a node is moved. Does nothing.
 //
-void WFoe::gre_node_moved(WGre* gre)
-{
-}
+void WFoe::gre_node_moved(WGre* gre) {}
 
 //
 // Description: Backcall from the controlled gre module
 // when a node is selected. Does nothing.
 //
-void WFoe::gre_node_selected(WGre* gre)
-{
-}
+void WFoe::gre_node_selected(WGre* gre) {}
 
 //
 // Description: Backcall from the controlled gre module
 // when a connection is selected. Does nothing.
 //
-void WFoe::gre_con_selected(WGre* gre)
-{
-}
+void WFoe::gre_con_selected(WGre* gre) {}
 
 //
 // Description: Backcall from the controlled gre module when
@@ -1777,10 +1842,8 @@ void WFoe::gre_con_selected(WGre* gre)
 //	If foe->con_palette_managed is set the class is fetched
 //	from the connection palette. Creates a connection.
 //
-void WFoe::gre_con_created(WGre* gre, double x, double y,
-    vldh_t_node source_obj, unsigned long source_point,
-    vldh_t_node destination_obj, unsigned long destination_point, int select,
-    int* sts)
+void WFoe::gre_con_created(WGre* gre, double x, double y, vldh_t_node source_obj, unsigned long source_point,
+                           vldh_t_node destination_obj, unsigned long destination_point, int select, int* sts)
 {
   pwr_tClassId con_class;
   pwr_tClassId user_class;
@@ -1790,10 +1853,13 @@ void WFoe::gre_con_created(WGre* gre, double x, double y,
 
   foe = (WFoe*)gre->parent_ctx;
 
-  if (gre->trace_started) {
-    if (!destination_obj) {
+  if (gre->trace_started)
+  {
+    if (!destination_obj)
+    {
       *sts = trace_create_analyse(gre, x, y, source_obj, source_point);
-      if (EVEN(*sts)) {
+      if (EVEN(*sts))
+      {
         foe->message("Unable to find trace attribute");
         BEEP;
         return;
@@ -1811,9 +1877,11 @@ void WFoe::gre_con_created(WGre* gre, double x, double y,
   */
   if (foe->con_palette_managed == 0)
     user_class = 0;
-  else {
+  else
+  {
     *sts = foe->con_palctx->get_select(&user_class);
-    if (EVEN(*sts)) {
+    if (EVEN(*sts))
+    {
       /* SG 20.03.91 Inform the user that he has to choose a conn */
       foe->message("Choose a connection from the palette");
       BEEP;
@@ -1821,10 +1889,10 @@ void WFoe::gre_con_created(WGre* gre, double x, double y,
     }
   }
 
-  if (!destination_obj) {
+  if (!destination_obj)
+  {
     foe->disable_ldh_cb();
-    *sts = gsx_auto_create(
-        foe, x, y, source_obj, source_point, &dest, &destpoint);
+    *sts = gsx_auto_create(foe, x, y, source_obj, source_point, &dest, &destpoint);
     foe->enable_ldh_cb();
     if (EVEN(*sts))
       return;
@@ -1832,14 +1900,16 @@ void WFoe::gre_con_created(WGre* gre, double x, double y,
     if (select)
       gre->select_node(dest);
     foe->gre->set_node_visible(dest);
-  } else {
+  }
+  else
+  {
     dest = destination_obj;
     destpoint = destination_point;
   }
   /* Check connection syntax */
-  *sts = gsx_check_connection(
-      foe, source_obj, source_point, dest, destpoint, &con_class, user_class);
-  if (*sts == GSX__CONTYPE) {
+  *sts = gsx_check_connection(foe, source_obj, source_point, dest, destpoint, &con_class, user_class);
+  if (*sts == GSX__CONTYPE)
+  {
     foe->message("Connected attributes are not of the same type");
     BEEP;
     return;
@@ -1848,7 +1918,8 @@ void WFoe::gre_con_created(WGre* gre, double x, double y,
   if (EVEN(*sts))
     return;
 
-  if (foe->use_feedback_con) {
+  if (foe->use_feedback_con)
+  {
     // Change to corresponding feedback connection
 
     if (con_class == pwr_cClass_ConDigital)
@@ -1860,8 +1931,7 @@ void WFoe::gre_con_created(WGre* gre, double x, double y,
   if (user_class)
     con_class = user_class;
 
-  *sts = gre->create_con(
-      con_class, source_obj, source_point, dest, destpoint, foe->con_drawtype);
+  *sts = gre->create_con(con_class, source_obj, source_point, dest, destpoint, foe->con_drawtype);
   foe->error_msg(*sts);
   if (EVEN(*sts))
     return;
@@ -1873,18 +1943,14 @@ void WFoe::gre_con_created(WGre* gre, double x, double y,
 //	Backcall from the controlled gre module when
 //	a region is selected. Does nothing.
 //
-void WFoe::gre_region_selected(WGre* gre)
-{
-}
+void WFoe::gre_region_selected(WGre* gre) {}
 
 //
 //	Backcall from the controlled gre module when
 //	the cursor enters or leaves the neted widget.
 //	Does nothing.
 //
-void WFoe::gre_enter_leave(WGre* gre)
-{
-}
+void WFoe::gre_enter_leave(WGre* gre) {}
 
 //
 //	Backcall from the controlled gre module.
@@ -1901,13 +1967,16 @@ void WFoe::gre_delete(WGre* gre, void* object, unsigned long object_type)
   vldh_t_node* node_ptr;
   int i, subwind_found;
 
-  if (object == 0) {
+  if (object == 0)
+  {
     /* Check that any node doesn't contain a subwindow */
     gre->get_selnodes(&node_count, &nodelist);
     node_ptr = nodelist;
     subwind_found = FALSE;
-    for (i = 0; i < (int)node_count; i++) {
-      if ((*node_ptr)->ln.subwindow != 0) {
+    for (i = 0; i < (int)node_count; i++)
+    {
+      if ((*node_ptr)->ln.subwindow != 0)
+      {
         subwind_found = TRUE;
         break;
       }
@@ -1915,23 +1984,30 @@ void WFoe::gre_delete(WGre* gre, void* object, unsigned long object_type)
     }
     if (node_count > 0)
       free((char*)nodelist);
-    if (subwind_found) {
-      ((WFoe*)gre->parent_ctx)
-          ->message("Subwindow found, delete the subwindow first");
+    if (subwind_found)
+    {
+      ((WFoe*)gre->parent_ctx)->message("Subwindow found, delete the subwindow first");
       BEEP;
-    } else
+    }
+    else
       /* Delete selected nodes */
       gre->delete_selected();
-  } else {
-    if (object_type == VLDH_NODE) {
+  }
+  else
+  {
+    if (object_type == VLDH_NODE)
+    {
       /* Check that the node doesn't have any subwindow!!!! */
-      if (((vldh_t_node)object)->ln.subwindow != 0) {
-        ((WFoe*)gre->parent_ctx)
-            ->message("Subwindow found, delete the subwindow first");
+      if (((vldh_t_node)object)->ln.subwindow != 0)
+      {
+        ((WFoe*)gre->parent_ctx)->message("Subwindow found, delete the subwindow first");
         BEEP;
-      } else
+      }
+      else
         gre->delete_node((vldh_t_node)object);
-    } else if (object_type == VLDH_CON) {
+    }
+    else if (object_type == VLDH_CON)
+    {
       /* Delete the connection */
       gre->delete_con((vldh_t_con)object);
     }
@@ -1956,13 +2032,16 @@ void WFoe::gre_cut(WGre* gre, void* object, unsigned long object_type)
   int sts;
   WFoe* foe = NULL;
 
-  if (object == 0) {
+  if (object == 0)
+  {
     /* Check that any node doesn't contain a subwindow */
     gre->get_selnodes(&node_count, &nodelist);
     node_ptr = nodelist;
     subwind_found = FALSE;
-    for (i = 0; i < (int)node_count; i++) {
-      if ((*node_ptr)->ln.subwindow != 0) {
+    for (i = 0; i < (int)node_count; i++)
+    {
+      if ((*node_ptr)->ln.subwindow != 0)
+      {
         subwind_found = TRUE;
         break;
       }
@@ -1970,30 +2049,40 @@ void WFoe::gre_cut(WGre* gre, void* object, unsigned long object_type)
     }
     if (node_count > 0)
       free((char*)nodelist);
-    if (subwind_found) {
-      ((WFoe*)gre->parent_ctx)
-          ->message("Subwindow found, delete the subwindow first");
+    if (subwind_found)
+    {
+      ((WFoe*)gre->parent_ctx)->message("Subwindow found, delete the subwindow first");
       BEEP;
-    } else {
+    }
+    else
+    {
       /* Cut selected nodes */
       sts = gre->cut();
 
-      if (sts == GRE__NOREGSEL) {
+      if (sts == GRE__NOREGSEL)
+      {
         foe = (WFoe*)gre->parent_ctx;
         foe->message("Select region before cutting");
         BEEP;
-      } else if (EVEN(sts))
+      }
+      else if (EVEN(sts))
         foe->error_msg(sts);
     }
-  } else {
-    if (object_type == VLDH_NODE) {
+  }
+  else
+  {
+    if (object_type == VLDH_NODE)
+    {
       /* Check that the node doesn't have any subwindow!!!! */
-      if (((vldh_t_node)object)->ln.subwindow != 0) {
-        ((WFoe*)gre->parent_ctx)
-            ->message("Subwindow found, delete the subwindow first");
-      } else
+      if (((vldh_t_node)object)->ln.subwindow != 0)
+      {
+        ((WFoe*)gre->parent_ctx)->message("Subwindow found, delete the subwindow first");
+      }
+      else
         gre->cut_node((vldh_t_node)object);
-    } else if (object_type == VLDH_CON) {
+    }
+    else if (object_type == VLDH_CON)
+    {
       /* Just delete the connection */
       gre->delete_con((vldh_t_con)object);
     }
@@ -2010,13 +2099,17 @@ void WFoe::gre_copy(WGre* gre, void* object, unsigned long object_type)
 {
   int sts;
 
-  if (object == 0) {
+  if (object == 0)
+  {
     /* Copy selected region */
     sts = gre->copy();
     if (ODD(sts))
       ((WFoe*)gre->parent_ctx)->message("Region copied");
-  } else {
-    if (object_type == VLDH_NODE) {
+  }
+  else
+  {
+    if (object_type == VLDH_NODE)
+    {
       sts = gre->copy_node((vldh_t_node)object);
       if (ODD(sts))
         ((WFoe*)gre->parent_ctx)->message("Object copied");
@@ -2045,17 +2138,13 @@ void WFoe::gre_paste(WGre* gre, float x, float y)
 //	Starts the attribute editor for the object.
 //
 
-void WFoe::gre_attribute(WGre* gre, vldh_t_node object)
-{
-  ((WFoe*)gre->parent_ctx)->attr_create(object);
-}
+void WFoe::gre_attribute(WGre* gre, vldh_t_node object) { ((WFoe*)gre->parent_ctx)->attr_create(object); }
 
 //
 //	Backcall from the controlled gre module
 //	Create a subwindow with the specified windowindex or the object.
 //
-void WFoe::gre_subwindow(
-    WGre* gre, vldh_t_node object, unsigned long subwindow_nr)
+void WFoe::gre_subwindow(WGre* gre, vldh_t_node object, unsigned long subwindow_nr)
 {
   int sts;
 
@@ -2066,27 +2155,30 @@ void WFoe::gre_subwindow(
 //
 //	Backcall from the controlled gre module
 //
-void WFoe::gre_popupmenu(WGre* gre, int x_pix, int y_pix, int popupmenu_type,
-    vldh_t_node node, int unselect)
+void WFoe::gre_popupmenu(WGre* gre, int x_pix, int y_pix, int popupmenu_type, vldh_t_node node, int unselect)
 {
   WFoe* foe;
 
   foe = (WFoe*)gre->parent_ctx;
 
   foe->popupmenu_node = 0;
-  if (foe->function == EDIT) {
-    if (popupmenu_type == GRE_POPUPMENUMODE_OBJECT) {
-      if (node != 0) {
+  if (foe->function == EDIT)
+  {
+    if (popupmenu_type == GRE_POPUPMENUMODE_OBJECT)
+    {
+      if (node != 0)
+      {
         gre->node_select(node);
         if (unselect)
           foe->popupmenu_node = node;
       }
 
-      unsigned int mask = foe_ePopupmenu_attribute | foe_ePopupmenu_subwindow
-          | foe_ePopupmenu_connect | foe_ePopupmenu_delete
-          | foe_ePopupmenu_helpclass;
-      if (node) {
-        switch (node->ln.cid) {
+      unsigned int mask = foe_ePopupmenu_attribute | foe_ePopupmenu_subwindow | foe_ePopupmenu_connect |
+                          foe_ePopupmenu_delete | foe_ePopupmenu_helpclass;
+      if (node)
+      {
+        switch (node->ln.cid)
+        {
         case pwr_cClass_dataarithm:
         case pwr_cClass_dataarithml:
         case pwr_cClass_dataarithmt:
@@ -2103,20 +2195,23 @@ void WFoe::gre_popupmenu(WGre* gre, int x_pix, int y_pix, int popupmenu_type,
         }
       }
       foe->modify_popup(mask, x_pix + 5, y_pix);
-    } else {
-      foe->modify_popup(foe_ePopupmenu_delete | foe_ePopupmenu_copy
-              | foe_ePopupmenu_cut | foe_ePopupmenu_printselect
-              | foe_ePopupmenu_createobject,
-          x_pix + 5, y_pix);
     }
-  } else {
-    if (node != 0) {
+    else
+    {
+      foe->modify_popup(foe_ePopupmenu_delete | foe_ePopupmenu_copy | foe_ePopupmenu_cut |
+                            foe_ePopupmenu_printselect | foe_ePopupmenu_createobject,
+                        x_pix + 5, y_pix);
+    }
+  }
+  else
+  {
+    if (node != 0)
+    {
       gre->node_select(node);
       foe->popupmenu_node = node;
     }
-    foe->modify_popup(foe_ePopupmenu_attribute | foe_ePopupmenu_subwindow
-            | foe_ePopupmenu_helpclass,
-        x_pix + 5, y_pix);
+    foe->modify_popup(foe_ePopupmenu_attribute | foe_ePopupmenu_subwindow | foe_ePopupmenu_helpclass,
+                      x_pix + 5, y_pix);
   }
 }
 
@@ -2138,31 +2233,23 @@ void WFoe::gre_getobj(WGre* gre, vldh_t_node node, unsigned long index)
 //
 //	Backcall from the controlled gre module.
 //
-void WFoe::gre_undelete(WGre* gre)
-{
-}
+void WFoe::gre_undelete(WGre* gre) {}
 
 //
 // Description: Backcall from the controlled gre module
 //
-void WFoe::gre_unselect(WGre* gre)
-{
-}
+void WFoe::gre_unselect(WGre* gre) {}
 
 //
 //	Backcall from the controlled gre module
 //	Starts the helpwidget with the passed subject ( class of an object).
 //
-void WFoe::gre_help(WGre* gre, char* help_title)
-{
-}
+void WFoe::gre_help(WGre* gre, char* help_title) {}
 
 //
 //	Backcall from the controlled gre module
 //
-void WFoe::gre_regionmoved(WGre* gre)
-{
-}
+void WFoe::gre_regionmoved(WGre* gre) {}
 
 //
 //	Backcall from the controlled gre module
@@ -2200,15 +2287,9 @@ void WFoe::gre_message(WGre* gre, const char* message)
 //
 //
 
-void WFoe::enable_ldh_cb()
-{
-  ldh_cb_enabled = 1;
-}
+void WFoe::enable_ldh_cb() { ldh_cb_enabled = 1; }
 
-void WFoe::disable_ldh_cb()
-{
-  ldh_cb_enabled = 0;
-}
+void WFoe::disable_ldh_cb() { ldh_cb_enabled = 0; }
 
 pwr_tStatus WFoe::ldh_this_session_cb(void* ctx, ldh_sEvent* event)
 {
@@ -2220,9 +2301,11 @@ pwr_tStatus WFoe::ldh_this_session_cb(void* ctx, ldh_sEvent* event)
   if (!foe->ldh_cb_enabled)
     return 1;
 
-  while (event) {
+  while (event)
+  {
     next = event->nep;
-    switch (event->Event) {
+    switch (event->Event)
+    {
     case ldh_eEvent_AttributeModified:
     case ldh_eEvent_ObjectRenamed:
     case ldh_eEvent_BodyModified:
@@ -2247,7 +2330,8 @@ void WFoe::error_msg(unsigned long sts)
 {
   char msg[256];
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     msg_GetMsg(sts, msg, sizeof(msg));
     printf("%s\n", msg);
   }
@@ -2260,7 +2344,8 @@ void WFoe::info_msg(unsigned long sts)
 {
   char msg[256];
 
-  if ((EVEN(sts)) || ((sts & 1) && (sts & 2))) {
+  if ((EVEN(sts)) || ((sts & 1) && (sts & 2)))
+  {
     msg_GetMsg(sts, msg, sizeof(msg));
     printf("%s\n", msg);
   }
@@ -2282,22 +2367,24 @@ int WFoe::attr_create(vldh_t_node node)
 
   ate_mode = (function == EDIT);
 
-  if (node == 0) {
+  if (node == 0)
+  {
     /* This is a plc object calling */
     wind = gre->wind;
     plc = wind->hw.plc;
 
     aref = cdh_ObjidToAref(plc->lp.oid);
     watt = watt_new(this, plc->hp.ldhsesctx, aref, 0, advanced_user, 0);
-
-  } else {
+  }
+  else
+  {
     sts = attrlist_get_by_node(node, foe_eAttr_WAtt, (void**)&watt);
     if (ODD(sts))
       watt->pop();
-    else {
+    else
+    {
       aref = cdh_ObjidToAref(node->ln.oid);
-      watt = watt_new(
-          this, (node->hn.wind)->hw.ldhses, aref, ate_mode, advanced_user, 1);
+      watt = watt_new(this, (node->hn.wind)->hw.ldhses, aref, ate_mode, advanced_user, 1);
       watt->close_cb = attr_quit;
 
       /* Store in the array */
@@ -2319,14 +2406,14 @@ int WFoe::attredit_create(vldh_t_node node, const char* aname)
   sts = attrlist_get_by_node(node, foe_eAttr_WAttText, (void**)&watttext);
   if (ODD(sts))
     watttext->pop();
-  else {
+  else
+  {
     aref = cdh_ObjidToAref(node->ln.oid);
     sts = ldh_ArefANameToAref((node->hn.wind)->hw.ldhses, &aref, aname, &aaref);
     if (EVEN(sts))
       return sts;
 
-    watttext
-        = watttext_new(this, (node->hn.wind)->hw.ldhses, aaref, ate_mode, &sts);
+    watttext = watttext_new(this, (node->hn.wind)->hw.ldhses, aaref, ate_mode, &sts);
     watttext->close_cb = attredit_quit;
 
     /* Store in the array */
@@ -2341,14 +2428,14 @@ int WFoe::attredit_create(vldh_t_node node, const char* aname)
 //	To assosiate this with a foe and a node the context is stored in
 //	the attribute list when ate is created.
 //
-int WFoe::attrlist_get(
-    void* a_ctx, foe_eAttr type, WFoe** foe, vldh_t_node* node)
+int WFoe::attrlist_get(void* a_ctx, foe_eAttr type, WFoe** foe, vldh_t_node* node)
 {
   int i;
 
-  for (i = 0; i < attr_count; i++) {
-    if ((attr_pointer + i)->a_ctx == a_ctx
-        && (attr_pointer + i)->type == type) {
+  for (i = 0; i < attr_count; i++)
+  {
+    if ((attr_pointer + i)->a_ctx == a_ctx && (attr_pointer + i)->type == type)
+    {
       /* This is it */
       *foe = (attr_pointer + i)->foe;
       *node = (attr_pointer + i)->node;
@@ -2362,8 +2449,10 @@ int WFoe::attrlist_get_by_node(vldh_t_node node, foe_eAttr type, void** a_ctx)
 {
   int i;
 
-  for (i = 0; i < attr_count; i++) {
-    if ((attr_pointer + i)->node == node && type == (attr_pointer + i)->type) {
+  for (i = 0; i < attr_count; i++)
+  {
+    if ((attr_pointer + i)->node == node && type == (attr_pointer + i)->type)
+    {
       /* This is it */
       *a_ctx = (attr_pointer + i)->a_ctx;
       return FOE__SUCCESS;
@@ -2372,8 +2461,7 @@ int WFoe::attrlist_get_by_node(vldh_t_node node, foe_eAttr type, void** a_ctx)
   return FOE__OBJECT;
 }
 
-int WFoe::attrlist_insert(
-    void* a_ctx, WFoe* foe, vldh_t_node node, foe_eAttr type)
+int WFoe::attrlist_insert(void* a_ctx, WFoe* foe, vldh_t_node node, foe_eAttr type)
 {
   int sts;
   WFoe* dum_foe;
@@ -2381,9 +2469,10 @@ int WFoe::attrlist_insert(
 
   /* Check that it doesn't exist */
   sts = attrlist_get(a_ctx, type, &dum_foe, &dum_node);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     sts = utl_realloc((char**)&attr_pointer, attr_count * sizeof(foe_sAttr),
-        (attr_count + 1) * sizeof(foe_sAttr));
+                      (attr_count + 1) * sizeof(foe_sAttr));
     if (EVEN(sts))
       return sts;
 
@@ -2406,8 +2495,10 @@ int WFoe::attrlist_delete(void* a_ctx)
 
   /* Find this atectx in the attrlist */
   found = 0;
-  for (i = 0; i < attr_count; i++) {
-    if ((attr_pointer + i)->a_ctx == a_ctx) {
+  for (i = 0; i < attr_count; i++)
+  {
+    if ((attr_pointer + i)->a_ctx == a_ctx)
+    {
       /* This is it */
       found = 1;
       break;
@@ -2434,8 +2525,10 @@ int WFoe::attr_delete()
   int i;
 
   /* Get the foe in the attributectx array and reset it*/
-  for (i = 0; i < attr_count; i++) {
-    if (this == (attr_pointer + i)->foe) {
+  for (i = 0; i < attr_count; i++)
+  {
+    if (this == (attr_pointer + i)->foe)
+    {
       if ((attr_pointer + i)->type == foe_eAttr_WAtt)
         delete (WAtt*)(attr_pointer + i)->a_ctx;
       else if ((attr_pointer + i)->type == foe_eAttr_WAttText)
@@ -2455,8 +2548,10 @@ void WFoe::attr_set_editmode(int mode)
 {
   int i;
 
-  for (i = 0; i < attr_count; i++) {
-    if (this == (attr_pointer + i)->foe) {
+  for (i = 0; i < attr_count; i++)
+  {
+    if (this == (attr_pointer + i)->foe)
+    {
       if ((attr_pointer + i)->type == foe_eAttr_WAtt)
         ((WAtt*)(attr_pointer + i)->a_ctx)->set_editmode(mode, 0);
       else if ((attr_pointer + i)->type == foe_eAttr_WAttText)
@@ -2484,7 +2579,8 @@ int WFoe::parent_quit()
     return sts;
   wind_ptr = windlist;
 
-  for (i = 0; i < (int)wind_count; i++) {
+  for (i = 0; i < (int)wind_count; i++)
+  {
     subw_foe = (WFoe*)(*wind_ptr)->hw.foe;
     subw_foe->parent_ctx = 0;
     wind_ptr++;
@@ -2507,7 +2603,8 @@ int WFoe::child_quit(vldh_t_node node, unsigned long windowindex)
   /* Check if the window is created and not saved,
      if it is saved don't do anything */
 
-  if (((node->hn.subwindowobject[windowindex])->hw.status & VLDH_CREATE) != 0) {
+  if (((node->hn.subwindowobject[windowindex])->hw.status & VLDH_CREATE) != 0)
+  {
     /* The subwindow in the node will not be saved until the
        subwindow itself is saved so just take away all
        tracks of the window and redraw the node, don't care
@@ -2556,19 +2653,22 @@ int WFoe::child_delete(vldh_t_node node, vldh_t_wind subwind)
   /* Redraw without subwindowmark */
   gre->subwindow_mark(node);
 
-  if ((subwind->hw.status & VLDH_CREATE) != 0) {
+  if ((subwind->hw.status & VLDH_CREATE) != 0)
+  {
     /* The subwindow is not saved so we don't have to worry
        about ldh */
-  } else {
+  }
+  else
+  {
     /* The subwindow should be taken away in ldh,
        open a new session for this purpos */
     plc = subwind->hw.plc;
-    sts = ldh_OpenSession(&ldhsession, ldh_SessionToVol(plc->hp.ldhsesctx),
-        ldh_eAccess_SharedReadWrite, ldh_eUtility_PlcEditor);
+    sts = ldh_OpenSession(&ldhsession, ldh_SessionToVol(plc->hp.ldhsesctx), ldh_eAccess_SharedReadWrite,
+                          ldh_eUtility_PlcEditor);
     if (EVEN(sts))
       return sts;
-    sts = ldh_GetObjectBuffer(ldhsession, subwind->lw.poid, "DevBody",
-        "PlcNode", (pwr_eClass*)&cid, (char**)&nodebuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhsession, subwind->lw.poid, "DevBody", "PlcNode", (pwr_eClass*)&cid,
+                              (char**)&nodebuffer, &size);
     if (EVEN(sts))
       return sts;
     if ((nodebuffer->subwindow & (windowindex + 1)) != 0)
@@ -2576,8 +2676,7 @@ int WFoe::child_delete(vldh_t_node node, vldh_t_wind subwind)
     if ((nodebuffer->subwindow & (1 << windowindex)) != 0)
       nodebuffer->subwindow -= (1 << windowindex);
     nodebuffer->subwind_oid[windowindex] = pwr_cNObjid;
-    sts = ldh_SetObjectBuffer(
-        ldhsession, subwind->lw.poid, "DevBody", "PlcNode", (char*)nodebuffer);
+    sts = ldh_SetObjectBuffer(ldhsession, subwind->lw.poid, "DevBody", "PlcNode", (char*)nodebuffer);
     if (EVEN(sts))
       return sts;
     free((char*)nodebuffer);
@@ -2602,8 +2701,7 @@ void WFoe::quit()
   /* Tell my parent that his child is quitting, if parent is a node */
   wind = gre->wind;
   if (wind->hw.parent_node_pointer != 0)
-    ((WFoe*)parent_ctx)
-        ->child_quit(wind->hw.parent_node_pointer, wind->lw.subwindowindex);
+    ((WFoe*)parent_ctx)->child_quit(wind->hw.parent_node_pointer, wind->lw.subwindowindex);
 
   /* Get my children and tell them that their parent is quitting */
   sts = parent_quit();
@@ -2675,7 +2773,8 @@ void WFoe::foe_delete()
   if (EVEN(sts))
     return;
 
-  if (wind->hw.parent_node_pointer != 0) {
+  if (wind->hw.parent_node_pointer != 0)
+  {
     sts = ((WFoe*)parent_ctx)->child_delete(wind->hw.parent_node_pointer, wind);
     error_msg(sts);
   }
@@ -2683,11 +2782,14 @@ void WFoe::foe_delete()
   /* Avoid any pending backcall from a attribute editor */
   attr_delete();
 
-  if ((wind->hw.status & VLDH_CREATE) != 0) {
+  if ((wind->hw.status & VLDH_CREATE) != 0)
+  {
     /* The window is not saved in ldh, just quit in vldh */
     sts = vldh_wind_quit_all(wind);
     error_msg(sts);
-  } else {
+  }
+  else
+  {
     /* Delete in ldh as well */
     sts = vldh_wind_delete_all(wind);
     error_msg(sts);
@@ -2714,15 +2816,15 @@ int WFoe::init_window()
   /* Get the classinformation for this window */
   wind = gre->wind;
 
-  sts = ldh_GetClassBody(wind->hw.ldhses, wind->lw.cid, "GraphPlcWindow",
-      &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(wind->hw.ldhses, wind->lw.cid, "GraphPlcWindow", &bodyclass, (char**)&graphbody,
+                         &size);
   if (EVEN(sts))
     return sts;
 
   /* Create the nodes specified there */
-  for (i = 0; i < (int)graphbody->defaultobjects; i++) {
-    sts = gre->create_node(graphbody->defobj_class[i], graphbody->defobj_x[i],
-        graphbody->defobj_y[i], &node);
+  for (i = 0; i < (int)graphbody->defaultobjects; i++)
+  {
+    sts = gre->create_node(graphbody->defobj_class[i], graphbody->defobj_x[i], graphbody->defobj_y[i], &node);
   }
   return FOE__SUCCESS;
 }
@@ -2748,7 +2850,8 @@ int WFoe::subwindow_create(vldh_t_node object, unsigned long subwindow_nr)
   sts = gsx_check_subwindow(object, &subwindow_nr, &function_access);
 
   /* Check if the window exists */
-  if (object->hn.subwindowobject[subwindow_nr - 1] != 0) {
+  if (object->hn.subwindowobject[subwindow_nr - 1] != 0)
+  {
     /* Yes, there is already a window */
     message("Window already exists");
     /* GS 11.04.91 Little trick to put the window
@@ -2761,22 +2864,24 @@ int WFoe::subwindow_create(vldh_t_node object, unsigned long subwindow_nr)
   }
 
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody((object->hn.wind)->hw.ldhses, object->ln.cid,
-      "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody((object->hn.wind)->hw.ldhses, object->ln.cid, "GraphPlcNode", &bodyclass,
+                         (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
   /* Get number of subwindows for this object */
   subwindow_count = graphbody->subwindows;
 
-  if (subwindow_count == 0) {
+  if (subwindow_count == 0)
+  {
     /* Sorry, no subwindow in this class, message and return */
     message("No subwindow in this object");
     BEEP;
     return FOE__SUCCESS;
   }
 
-  if (subwindow_count == 1) {
+  if (subwindow_count == 1)
+  {
     /* Get the subwindow type */
 
     /* Is this a new window ? */
@@ -2787,20 +2892,23 @@ int WFoe::subwindow_create(vldh_t_node object, unsigned long subwindow_nr)
 
     /* Create subwindow */
     plcobject = (object->hn.wind)->hw.plc;
-    newfoe = subwindow_new(this, object->hn.name, pwr_cNObjid, 0,
-        plcobject->hp.ldhsesctx, object, 0, new_window, map_window, access,
-        function_access, options, &sts);
-    if (sts == FOE__WINDNOTFOUND) {
+    newfoe = subwindow_new(this, object->hn.name, pwr_cNObjid, 0, plcobject->hp.ldhsesctx, object, 0,
+                           new_window, map_window, access, function_access, options, &sts);
+    if (sts == FOE__WINDNOTFOUND)
+    {
       message("Subwindow does not exist");
       BEEP;
       return FOE__SUCCESS;
-    } else if (EVEN(sts))
+    }
+    else if (EVEN(sts))
       return sts;
 
     /* Draw subwindowmark in node */
     if (new_window)
       gre->subwindow_mark(object);
-  } else if (subwindow_count == 2) {
+  }
+  else if (subwindow_count == 2)
+  {
     /* Is this a new window ? */
     if ((object->ln.subwindow & subwindow_nr) == 0)
       new_window = TRUE;
@@ -2809,14 +2917,16 @@ int WFoe::subwindow_create(vldh_t_node object, unsigned long subwindow_nr)
 
     /* Create subwindow */
     plcobject = (object->hn.wind)->hw.plc;
-    newfoe = subwindow_new(this, object->hn.name, pwr_cNObjid, 0,
-        plcobject->hp.ldhsesctx, object, (subwindow_nr - 1), new_window,
-        map_window, access, function_access, options, &sts);
-    if (sts == FOE__WINDNOTFOUND) {
+    newfoe =
+        subwindow_new(this, object->hn.name, pwr_cNObjid, 0, plcobject->hp.ldhsesctx, object,
+                      (subwindow_nr - 1), new_window, map_window, access, function_access, options, &sts);
+    if (sts == FOE__WINDNOTFOUND)
+    {
       message("Subwindow does not exist");
       BEEP;
       return FOE__SUCCESS;
-    } else if (EVEN(sts))
+    }
+    else if (EVEN(sts))
       return sts;
 
     /* Draw subwindowmark in node */
@@ -2860,19 +2970,16 @@ void WFoe::attredit_quit(void* a_ctx)
 //
 // Constructor
 //
-WFoe::WFoe(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram,
-    ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, vldh_t_node nodeobject,
-    unsigned long windowindex, unsigned long new_window, int f_map_window,
-    ldh_eAccess f_access, foe_eFuncAccess function_access,
-    unsigned int f_options, pwr_tStatus* sts)
-    : WUtility(wb_eUtility_PlcEditor), parent_ctx(f_parent_ctx), node_palctx(0),
-      con_palctx(0), navctx(0), tractx(0), gre(0), get_build_options_cb(0),
-      msg_label_id(0), function(0), wanted_function(0), plcobject(0),
-      con_palette_managed(0), node_palette_managed(0), nav_palette_managed(0),
-      con_drawtype(GOEN_CONDRAW), show_execorder(0), searchindex(0),
-      popupmenu_mask(~0), popupmenu_node(0), access(f_access),
-      map_window(f_map_window), advanced_user(1), ldh_cb_enabled(0),
-      classeditor(0), options(f_options), use_feedback_con(0)
+WFoe::WFoe(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
+           ldh_tSesContext ldhsesctx, vldh_t_node nodeobject, unsigned long windowindex,
+           unsigned long new_window, int f_map_window, ldh_eAccess f_access, foe_eFuncAccess function_access,
+           unsigned int f_options, pwr_tStatus* sts)
+    : WUtility(wb_eUtility_PlcEditor), parent_ctx(f_parent_ctx), node_palctx(0), con_palctx(0), navctx(0),
+      tractx(0), gre(0), get_build_options_cb(0), msg_label_id(0), function(0), wanted_function(0),
+      plcobject(0), con_palette_managed(0), node_palette_managed(0), nav_palette_managed(0),
+      con_drawtype(GOEN_CONDRAW), show_execorder(0), searchindex(0), popupmenu_mask(~0), popupmenu_node(0),
+      access(f_access), map_window(f_map_window), advanced_user(1), ldh_cb_enabled(0), classeditor(0),
+      options(f_options), use_feedback_con(0)
 {
   strcpy(name, f_name);
 }
@@ -2880,113 +2987,76 @@ WFoe::WFoe(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram,
 //
 // Constructor
 //
-WFoe::WFoe(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram,
-    ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, int f_map_window,
-    ldh_eAccess f_access, unsigned int f_options, pwr_tStatus* sts)
-    : WUtility(wb_eUtility_PlcEditor), parent_ctx(f_parent_ctx), node_palctx(0),
-      con_palctx(0), navctx(0), tractx(0), gre(0), msg_label_id(0), function(0),
-      wanted_function(0), plcobject(0), con_palette_managed(0),
-      node_palette_managed(0), nav_palette_managed(0),
-      con_drawtype(GOEN_CONDRAW), show_execorder(0), searchindex(0),
-      popupmenu_mask(~0), popupmenu_node(0), access(f_access),
-      map_window(f_map_window), advanced_user(1), ldh_cb_enabled(0),
-      classeditor(0), options(f_options), use_feedback_con(0)
+WFoe::WFoe(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
+           ldh_tSesContext ldhsesctx, int f_map_window, ldh_eAccess f_access, unsigned int f_options,
+           pwr_tStatus* sts)
+    : WUtility(wb_eUtility_PlcEditor), parent_ctx(f_parent_ctx), node_palctx(0), con_palctx(0), navctx(0),
+      tractx(0), gre(0), msg_label_id(0), function(0), wanted_function(0), plcobject(0),
+      con_palette_managed(0), node_palette_managed(0), nav_palette_managed(0), con_drawtype(GOEN_CONDRAW),
+      show_execorder(0), searchindex(0), popupmenu_mask(~0), popupmenu_node(0), access(f_access),
+      map_window(f_map_window), advanced_user(1), ldh_cb_enabled(0), classeditor(0), options(f_options),
+      use_feedback_con(0)
 {
   strcpy(name, f_name);
 }
 
-WFoe::~WFoe()
-{
-}
+WFoe::~WFoe() {}
 
-void WFoe::pop()
-{
-}
+void WFoe::pop() {}
 
-WAtt* WFoe::watt_new(void* a_parent_ctx, ldh_tSesContext a_ldhses,
-    pwr_sAttrRef a_aref, int a_editmode, int a_advanced_user,
-    int a_display_objectname)
+WAtt* WFoe::watt_new(void* a_parent_ctx, ldh_tSesContext a_ldhses, pwr_sAttrRef a_aref, int a_editmode,
+                     int a_advanced_user, int a_display_objectname)
 {
   return 0;
 }
 
-WAttText* WFoe::watttext_new(void* a_parent_ctx, ldh_tSesContext a_ldhses,
-    pwr_sAttrRef a_aref, int a_editmode, pwr_tStatus* status)
+WAttText* WFoe::watttext_new(void* a_parent_ctx, ldh_tSesContext a_ldhses, pwr_sAttrRef a_aref,
+                             int a_editmode, pwr_tStatus* status)
 {
   *status = 0;
   return 0;
 }
 
-WFoe* WFoe::subwindow_new(void* f_parent_ctx, char* f_name,
-    pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
-    vldh_t_node nodeobject, unsigned long windowindex, unsigned long new_window,
-    int f_map_window, ldh_eAccess f_access, foe_eFuncAccess function_access,
-    unsigned int f_options, pwr_tStatus* sts)
+WFoe* WFoe::subwindow_new(void* f_parent_ctx, char* f_name, pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
+                          ldh_tSesContext ldhsesctx, vldh_t_node nodeobject, unsigned long windowindex,
+                          unsigned long new_window, int f_map_window, ldh_eAccess f_access,
+                          foe_eFuncAccess function_access, unsigned int f_options, pwr_tStatus* sts)
 {
   return 0;
 }
 
-void WFoe::destroy()
-{
-}
+void WFoe::destroy() {}
 
-void WFoe::set_title()
-{
-}
+void WFoe::set_title() {}
 
-void WFoe::message(const char* new_label)
-{
-}
+void WFoe::message(const char* new_label) {}
 
-void WFoe::msgbox(const char* new_label)
-{
-}
+void WFoe::msgbox(const char* new_label) {}
 
-int WFoe::create_window(int x_top, int y_top, int width_adb, int height_adb,
-    ldh_tSesContext ldhsession, foe_eFuncAccess function_access)
+int WFoe::create_window(int x_top, int y_top, int width_adb, int height_adb, ldh_tSesContext ldhsession,
+                        foe_eFuncAccess function_access)
 {
   return 0;
 }
 
-int WFoe::get_textinput(const char* message, int (*function)(WFoe*, char*))
-{
-  return 0;
-}
+int WFoe::get_textinput(const char* message, int (*function)(WFoe*, char*)) { return 0; }
 
-int WFoe::edit_set_entries()
-{
-  return 0;
-}
+int WFoe::edit_set_entries() { return 0; }
 
-int WFoe::view_set_entries()
-{
-  return 0;
-}
+int WFoe::view_set_entries() { return 0; }
 
-void WFoe::set_mode_button_state(int mode, int state)
-{
-}
+void WFoe::set_mode_button_state(int mode, int state) {}
 
-int WFoe::modify_popup(unsigned long popupmenu_mask, int x, int y)
-{
-  return 0;
-}
+int WFoe::modify_popup(unsigned long popupmenu_mask, int x, int y) { return 0; }
 
-void WFoe::clock_cursor()
-{
-}
+void WFoe::clock_cursor() {}
 
-void WFoe::normal_cursor()
-{
-}
+void WFoe::normal_cursor() {}
 
-int WFoe::get_selection(char* str, int len)
-{
-  return 0;
-}
+int WFoe::get_selection(char* str, int len) { return 0; }
 
-void WFoe::popupmsg(const char* new_label, void (*yes_procedure)(WFoe*),
-    void (*no_procedure)(WFoe*), void (*cancel_procedure)(WFoe*))
+void WFoe::popupmsg(const char* new_label, void (*yes_procedure)(WFoe*), void (*no_procedure)(WFoe*),
+                    void (*cancel_procedure)(WFoe*))
 {
 }
 
@@ -3013,10 +3083,9 @@ WFoe* WFoe::get(pwr_tOid oid)
 // 	SG : 09.02.91  Define a pixmap for the icon
 //	SG : 24.02.91  change the call to create_window
 //
-int WFoe::new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
-    ldh_tSesContext ldhsesctx, vldh_t_node nodeobject,
-    unsigned long windowindex, unsigned long new_window,
-    foe_eFuncAccess function_access)
+int WFoe::new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
+                    vldh_t_node nodeobject, unsigned long windowindex, unsigned long new_window,
+                    foe_eFuncAccess function_access)
 {
   WFoe* old_foe;
   pwr_tObjid windowobjdid;
@@ -3037,13 +3106,14 @@ int WFoe::new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
   int plc_loaded;
   pwr_tClassId classid;
 
-  if (cdh_ObjidIsNotNull(plcprogram)) {
+  if (cdh_ObjidIsNotNull(plcprogram))
+  {
     if (!ldh_LocalObject(ldhsesctx, plcprogram))
       function_access = foe_eFuncAccess_View;
 
     /* This is probably a plcprogram, check that it really is */
-    sts = ldh_GetObjectBuffer(ldhsesctx, plcprogram, "DevBody", "PlcProgram",
-        (pwr_eClass*)&plcclass, &plcbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhsesctx, plcprogram, "DevBody", "PlcProgram", (pwr_eClass*)&plcclass,
+                              &plcbuffer, &size);
     if (EVEN(sts))
       /* This is not a plcprogram object, return */
       return FOE__NOPLC;
@@ -3055,39 +3125,44 @@ int WFoe::new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
       return sts;
 
     /* Get the windowtype for this plcprogram */
-    sts = ldh_GetClassBody(ldhsesctx, plcclass, "GraphPlcPgm", &bodyclass,
-        (char**)&plcgraphbody, &size);
+    sts = ldh_GetClassBody(ldhsesctx, plcclass, "GraphPlcPgm", &bodyclass, (char**)&plcgraphbody, &size);
     if (EVEN(sts))
       return sts;
     wind_class = plcgraphbody->subwindow_class;
 
     /* Get graphbody for the window */
-    sts = ldh_GetClassBody(ldhsesctx, wind_class, "GraphPlcWindow", &bodyclass,
-        (char**)&windgraphbody, &size);
+    sts =
+        ldh_GetClassBody(ldhsesctx, wind_class, "GraphPlcWindow", &bodyclass, (char**)&windgraphbody, &size);
     if (EVEN(sts))
       return sts;
 
     /* Check if this plcprogram already is loaded in vldh */
     plc_loaded = 0;
     sts = vldh_get_plc_objdid(plcprogram, &plc);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* Loaded in vldh, do nothing */
-      if ((plc->hp.wind)->hw.foe != 0) {
+      if ((plc->hp.wind)->hw.foe != 0)
+      {
         // Already loaded, this should not happen
         return FOE__WINDEXIST;
-      } else
+      }
+      else
         plc_loaded = 1;
     }
-    if ((sts == VLDH__OBJNOTFOUND) || plc_loaded) {
+    if ((sts == VLDH__OBJNOTFOUND) || plc_loaded)
+    {
       /* Check if windowobject in ldh exists */
       /* Get the first child to the plc */
       sts = ldh_GetChild(ldhsesctx, plcprogram, &windowobjdid);
       window_found = 0;
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         /* Check if window */
-        sts = ldh_GetObjectBuffer(ldhsesctx, windowobjdid, "DevBody",
-            "PlcWindow", &windclass, &windbuffer, &size);
-        if (ODD(sts)) {
+        sts = ldh_GetObjectBuffer(ldhsesctx, windowobjdid, "DevBody", "PlcWindow", &windclass, &windbuffer,
+                                  &size);
+        if (ODD(sts))
+        {
           free((char*)windbuffer);
           window_found = 1;
           break;
@@ -3095,29 +3170,33 @@ int WFoe::new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
         sts = ldh_GetNextSibling(ldhsesctx, windowobjdid, &windowobjdid);
       }
 
-      if (window_found) {
+      if (window_found)
+      {
         /* Window exists in ldh, load the plcprogram to vldh */
-        if (!plc_loaded) {
+        if (!plc_loaded)
+        {
           sts = vldh_plc_load(plcprogram, ldhwbctx, ldhsesctx, &plc);
           if (EVEN(sts))
             return sts;
         }
         sts = vldh_get_wind_objdid(windowobjdid, &windowobject);
-        if (sts == VLDH__OBJNOTFOUND) {
+        if (sts == VLDH__OBJNOTFOUND)
+        {
           sts = vldh_wind_load(plc, 0, windowobjdid, 0, &windowobject, access);
           if (EVEN(sts))
             return sts;
 
           sts = vldh_wind_load_all(windowobject);
-          if (sts == VLDH__WINDCORRUPT) {
-          } else if (EVEN(sts))
+          if (sts == VLDH__WINDCORRUPT)
+          {
+          }
+          else if (EVEN(sts))
             return sts;
         }
         /* Create the foe context */
         /* SG 02.05.91 by default give the view function */
         function = VIEW;
-        sts = create_window(
-            0, 50, 920, 750, windowobject->hw.ldhses, function_access);
+        sts = create_window(0, 50, 920, 750, windowobject->hw.ldhses, function_access);
         if (EVEN(sts))
           return sts;
 
@@ -3130,11 +3209,14 @@ int WFoe::new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
         plcobject->hp.wind = windowobject;
         plcobject->hp.hinactx = parent_ctx;
         windowobject->hw.foe = this;
-      } else {
+      }
+      else
+      {
         /* This is a brandnew plcprogram */
 
         /* Check authorization to open a new plcpgm */
-        if (!(CoLogin::privilege() & pwr_mPrv_DevPlc)) {
+        if (!(CoLogin::privilege() & pwr_mPrv_DevPlc))
+        {
           return LOGIN__USERNOTAU;
         }
         access = ldh_eAccess_ReadWrite;
@@ -3144,16 +3226,16 @@ int WFoe::new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
 
         /* Create window object in vldh */
         sts = vldh_wind_create(plc, 0, 0, wind_class, 0, &windowobject, access);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           vldh_plc_delete(plc);
           return sts;
         }
 
         /* Create the foe context */
         function = EDIT;
-        sts = create_window(windgraphbody->x, windgraphbody->y,
-            windgraphbody->width, windgraphbody->height,
-            windowobject->hw.ldhses, function_access);
+        sts = create_window(windgraphbody->x, windgraphbody->y, windgraphbody->width, windgraphbody->height,
+                            windowobject->hw.ldhses, function_access);
         if (EVEN(sts))
           return sts;
 
@@ -3173,28 +3255,29 @@ int WFoe::new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
           return sts;
       }
     }
-  } else {
+  }
+  else
+  {
     /* This is a subwindow to a node in gre */
     plcobject = (nodeobject->hn.wind)->hw.plc;
     /* Get the windowtype for this plcprogram */
-    sts = ldh_GetClassBody(plcobject->hp.ldhsesctx, nodeobject->ln.cid,
-        "GraphPlcNode", &bodyclass, (char**)&nodegraphbody, &size);
+    sts = ldh_GetClassBody(plcobject->hp.ldhsesctx, nodeobject->ln.cid, "GraphPlcNode", &bodyclass,
+                           (char**)&nodegraphbody, &size);
     if (EVEN(sts))
       return sts;
     wind_class = nodegraphbody->subwindow_class[windowindex];
 
     /* Get graphname for the window and add to the nodename */
-    sts = ldh_GetClassBody(plcobject->hp.ldhsesctx, wind_class,
-        "GraphPlcWindow", &bodyclass, (char**)&windgraphbody, &size);
+    sts = ldh_GetClassBody(plcobject->hp.ldhsesctx, wind_class, "GraphPlcWindow", &bodyclass,
+                           (char**)&windgraphbody, &size);
     if (EVEN(sts))
       return sts;
-    sprintf(
-        subwind_name, "%s  %s", nodeobject->hn.name, windgraphbody->graphname);
+    sprintf(subwind_name, "%s  %s", nodeobject->hn.name, windgraphbody->graphname);
 
-    if (new_window) {
-      if (access == ldh_eAccess_ReadOnly
-          || function_access == foe_eFuncAccess_View
-          || !ldh_LocalObject(plcobject->hp.ldhsesctx, nodeobject->ln.oid))
+    if (new_window)
+    {
+      if (access == ldh_eAccess_ReadOnly || function_access == foe_eFuncAccess_View ||
+          !ldh_LocalObject(plcobject->hp.ldhsesctx, nodeobject->ln.oid))
         /* A subwindow can not be created */
         return FOE__WINDNOTFOUND;
 
@@ -3203,24 +3286,25 @@ int WFoe::new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
       /* Create the foe module */
       old_foe = (WFoe*)parent_ctx;
       function = old_foe->function;
-      if (function_access == foe_eFuncAccess_View) {
+      if (function_access == foe_eFuncAccess_View)
+      {
         if (function == EDIT)
           function = VIEW;
         if (function == SIMULATE)
           function = TRACE;
-      } else
+      }
+      else
         function = VIEW;
 
       /* Create window object in vldh */
-      sts = vldh_wind_create((nodeobject->hn.wind)->hw.plc, nodeobject, 0,
-          wind_class, windowindex, &windowobject, access);
+      sts = vldh_wind_create((nodeobject->hn.wind)->hw.plc, nodeobject, 0, wind_class, windowindex,
+                             &windowobject, access);
       if (EVEN(sts))
         return sts;
 
       strcpy(name, subwind_name);
-      sts = create_window(windgraphbody->x, windgraphbody->y,
-          windgraphbody->width, windgraphbody->height, windowobject->hw.ldhses,
-          function_access);
+      sts = create_window(windgraphbody->x, windgraphbody->y, windgraphbody->width, windgraphbody->height,
+                          windowobject->hw.ldhses, function_access);
       if (EVEN(sts))
         return sts;
 
@@ -3241,43 +3325,48 @@ int WFoe::new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
       sts = ldh_SetSession(windowobject->hw.ldhses, ldh_eAccess_ReadOnly);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       /* Subwindow already exists, check if window exists */
-      if (nodeobject->hn.subwindowobject[windowindex] == 0) {
+      if (nodeobject->hn.subwindowobject[windowindex] == 0)
+      {
         /* No, create new foe window and load the window */
         old_foe = (WFoe*)parent_ctx;
 
         if (access == ldh_eAccess_ReadWrite)
           access = ldh_eAccess_ReadOnly;
 
-        sts = vldh_get_wind_objdid(
-            nodeobject->ln.subwind_oid[windowindex], &windowobject);
-        if (sts == VLDH__OBJNOTFOUND) {
+        sts = vldh_get_wind_objdid(nodeobject->ln.subwind_oid[windowindex], &windowobject);
+        if (sts == VLDH__OBJNOTFOUND)
+        {
           sts = vldh_wind_load((nodeobject->hn.wind)->hw.plc, nodeobject,
-              nodeobject->ln.subwind_oid[windowindex], 0, &windowobject,
-              access);
+                               nodeobject->ln.subwind_oid[windowindex], 0, &windowobject, access);
           if (EVEN(sts))
             return sts;
 
           sts = vldh_wind_load_all(windowobject);
-          if (sts == VLDH__WINDCORRUPT) {
-          } else if (EVEN(sts))
+          if (sts == VLDH__WINDCORRUPT)
+          {
+          }
+          else if (EVEN(sts))
             return sts;
         }
 
         function = old_foe->function;
-        if (function_access == foe_eFuncAccess_View) {
+        if (function_access == foe_eFuncAccess_View)
+        {
           if (function == EDIT)
             function = VIEW;
           if (function == SIMULATE)
             function = TRACE;
-        } else
+        }
+        else
           function = VIEW;
 
         strcpy(name, subwind_name);
-        sts = create_window(windgraphbody->x, windgraphbody->y,
-            windgraphbody->width, windgraphbody->height,
-            windowobject->hw.ldhses, function_access);
+        sts = create_window(windgraphbody->x, windgraphbody->y, windgraphbody->width, windgraphbody->height,
+                            windowobject->hw.ldhses, function_access);
         if (EVEN(sts))
           return sts;
 
@@ -3287,33 +3376,33 @@ int WFoe::new_local(pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
         plcobject = 0;
         windowobject->hw.foe = this;
         nodeobject->hn.subwindowobject[windowindex] = windowobject;
-      } else {
+      }
+      else
+      {
         /* foewindow exists, do nothing */
         return FOE__WINDEXIST;
       }
     }
   }
-  ldh_AddThisSessionCallback(
-      windowobject->hw.ldhses, this, ldh_this_session_cb);
+  ldh_AddThisSessionCallback(windowobject->hw.ldhses, this, ldh_this_session_cb);
   enable_ldh_cb();
 
   /* SG 22.05.91 is this the good position to start trace ??? */
   if (function == TRACE)
     trace_start(this);
-  else if (function == SIMULATE) {
+  else if (function == SIMULATE)
+  {
     trace_start(this);
     gre->disable_button_events();
     trace_simsetup(this);
   }
 
   // Check if class editor
-  sts = ldh_GetVolumeClass(ldh_SessionToWB(windowobject->hw.ldhses),
-      windowobject->lw.oid.vid, &classid);
+  sts = ldh_GetVolumeClass(ldh_SessionToWB(windowobject->hw.ldhses), windowobject->lw.oid.vid, &classid);
   if (EVEN(sts))
     return sts;
 
-  if (ldh_VolRepType(windowobject->hw.ldhses) == ldh_eVolRep_Mem
-      && cdh_isClassVolumeClass(classid))
+  if (ldh_VolRepType(windowobject->hw.ldhses) == ldh_eVolRep_Mem && cdh_isClassVolumeClass(classid))
     classeditor = 1;
   if (function == EDIT)
     edit_set_entries();
@@ -3337,11 +3426,10 @@ int WFoe::view_setup()
 
   gre->view_setup();
 
-  sts = gre->setup_backcalls(gre_setup_window, gre_node_created,
-      gre_node_floating_created, gre_con_created, gre_node_moved, gre_delete,
-      gre_cut, gre_copy, gre_paste, gre_attribute, gre_subwindow, 0,
-      gre_popupmenu, gre_getobj, gre_undelete, gre_unselect, gre_help,
-      gre_regionmoved, gre_message);
+  sts = gre->setup_backcalls(gre_setup_window, gre_node_created, gre_node_floating_created, gre_con_created,
+                             gre_node_moved, gre_delete, gre_cut, gre_copy, gre_paste, gre_attribute,
+                             gre_subwindow, 0, gre_popupmenu, gre_getobj, gre_undelete, gre_unselect,
+                             gre_help, gre_regionmoved, gre_message);
 
   return sts;
 }
@@ -3362,11 +3450,10 @@ int WFoe::edit_setup()
   gre->edit_setup();
 
   /* setup the backcalls from gre */
-  sts = gre->setup_backcalls(gre_setup_window, gre_node_created,
-      gre_node_floating_created, gre_con_created, gre_node_moved, gre_delete,
-      gre_cut, gre_copy, gre_paste, gre_attribute, gre_subwindow, 0,
-      gre_popupmenu, gre_getobj, gre_undelete, gre_unselect, gre_help,
-      gre_regionmoved, gre_message);
+  sts = gre->setup_backcalls(gre_setup_window, gre_node_created, gre_node_floating_created, gre_con_created,
+                             gre_node_moved, gre_delete, gre_cut, gre_copy, gre_paste, gre_attribute,
+                             gre_subwindow, 0, gre_popupmenu, gre_getobj, gre_undelete, gre_unselect,
+                             gre_help, gre_regionmoved, gre_message);
 
   return FOE__SUCCESS;
 }
@@ -3388,8 +3475,10 @@ int WFoe::show_executeorder()
     return sts;
   node_ptr = node_list;
 
-  for (i = 0; i < (int)node_count; i++) {
-    if ((*node_ptr)->hn.executeorder > 0) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    if ((*node_ptr)->hn.executeorder > 0)
+    {
       sprintf(text, "%ld", (*node_ptr)->hn.executeorder);
       gre->set_display_value(*node_ptr, text);
     }
@@ -3423,7 +3512,8 @@ int WFoe::search_string_next()
   wind = gre->wind;
   strcpy(searchstr, searchstring);
 
-  if (searchstr[0] == 0) {
+  if (searchstr[0] == 0)
+  {
     message("Start with SearchString");
     BEEP;
     return FOE__SUCCESS;
@@ -3435,10 +3525,10 @@ int WFoe::search_string_next()
     return sts;
 
   found = 0;
-  for (j = searchindex; j < (int)node_count; j++) {
+  for (j = searchindex; j < (int)node_count; j++)
+  {
     node_ptr = node_list + j;
-    sts = gre->node_annot_message(
-        *node_ptr, annotations, sizeof(annotations) - 200, 8192);
+    sts = gre->node_annot_message(*node_ptr, annotations, sizeof(annotations) - 200, 8192);
     strcat(annotations, " ");
     strcat(annotations, (*node_ptr)->hn.name);
     strcat(annotations, " ");
@@ -3446,8 +3536,8 @@ int WFoe::search_string_next()
     if (EVEN(sts))
       return sts;
     class_objid = cdh_ClassIdToObjid(cid);
-    sts = ldh_ObjidToName(wind->hw.ldhses, class_objid, ldh_eName_Object,
-        class_name, sizeof(class_name), &size);
+    sts = ldh_ObjidToName(wind->hw.ldhses, class_objid, ldh_eName_Object, class_name, sizeof(class_name),
+                          &size);
     if (EVEN(sts))
       return sts;
     strcat(annotations, class_name);
@@ -3458,9 +3548,12 @@ int WFoe::search_string_next()
     len1 = strlen(annotations);
     len2 = strlen(searchstr);
 
-    if (len1 >= len2) {
-      for (i = 0; i <= (len1 - len2); i++) {
-        if (str_StartsWith(&annotations[i], searchstr)) {
+    if (len1 >= len2)
+    {
+      for (i = 0; i <= (len1 - len2); i++)
+      {
+        if (str_StartsWith(&annotations[i], searchstr))
+        {
           /* the string matches */
           searchindex = j + 1;
           node = *node_ptr;
@@ -3475,7 +3568,8 @@ int WFoe::search_string_next()
   if (node_count > 0)
     free((char*)node_list);
 
-  if (!found) {
+  if (!found)
+  {
     gre->unselect();
     message("String not found");
     BEEP;
@@ -3521,21 +3615,23 @@ int WFoe::search_object(WFoe* foe, char* searchstr)
   vldh_t_node node;
 
   wind = foe->gre->wind;
-  sts = ldh_ObjidToName(wind->hw.ldhses, wind->lw.oid, ldh_eName_Hierarchy,
-      hiername, sizeof(hiername), &size);
+  sts =
+      ldh_ObjidToName(wind->hw.ldhses, wind->lw.oid, ldh_eName_Hierarchy, hiername, sizeof(hiername), &size);
   if (EVEN(sts))
     return sts;
 
   strcat(hiername, "-");
   strcat(hiername, searchstr);
   sts = ldh_NameToObjid(wind->hw.ldhses, &objdid, hiername);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Object does not exist");
     BEEP;
     return FOE__SUCCESS;
   }
   sts = vldh_get_node_objdid(objdid, wind, &node);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Object not found in this window");
     BEEP;
     return FOE__SUCCESS;
@@ -3608,8 +3704,10 @@ int WFoe::print_overview()
 
   doc_count = 0;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
-    if (vldh_check_document(wind->hw.ldhses, (*node_ptr)->ln.oid)) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    if (vldh_check_document(wind->hw.ldhses, (*node_ptr)->ln.oid))
+    {
       /* Calculate coordinates for an overview */
       gre->measure_object(*node_ptr, &ll_x, &ll_y, &width, &height);
       ll_x_min = MIN(ll_x_min, ll_x);
@@ -3622,7 +3720,8 @@ int WFoe::print_overview()
     node_ptr++;
   }
 
-  if (doc_count > 1) {
+  if (doc_count > 1)
+  {
     /* Print the overview */
     strcpy(file_id, vldh_IdToStr(0, wind->lw.oid));
     gre->print_rectangle(ll_x_min, ll_y_min, ur_x_max, ur_y_max, file_id);
@@ -3674,8 +3773,10 @@ int WFoe::print_pdf_overview()
 
   doc_count = 0;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
-    if (vldh_check_document(wind->hw.ldhses, (*node_ptr)->ln.oid)) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    if (vldh_check_document(wind->hw.ldhses, (*node_ptr)->ln.oid))
+    {
       /* Calculate coordinates for an overview */
       gre->measure_object(*node_ptr, &ll_x, &ll_y, &width, &height);
       ll_x_min = MIN(ll_x_min, ll_x);
@@ -3688,7 +3789,8 @@ int WFoe::print_pdf_overview()
     node_ptr++;
   }
 
-  if (doc_count >= 1) {
+  if (doc_count >= 1)
+  {
     /* Print the overview */
     strcpy(file_id, vldh_IdToStr(0, wind->lw.oid));
     gre->print_pdf_rectangle(ll_x_min, ll_y_min, ur_x_max, ur_y_max, file_id);
@@ -3712,19 +3814,26 @@ void WFoe::function_setup()
 {
   /* SG 02.05.91 set the default toggel button corresponding to the mode on */
 
-  if (function == EDIT) {
+  if (function == EDIT)
+  {
     set_mode_button_state(EDIT, 1);
     edit_setup();
-  } else if (function == TRACE) {
+  }
+  else if (function == TRACE)
+  {
     set_mode_button_state(TRACE, 1);
     /* SG 22.05.91
     It is more that a setup: we want also to initialise the tracing.
     For this the differents contexts have to be defined.
     so trace_Start is not called here */
-  } else if (function == VIEW) {
+  }
+  else if (function == VIEW)
+  {
     set_mode_button_state(VIEW, 1);
     view_setup();
-  } else if (function == SIMULATE) {
+  }
+  else if (function == SIMULATE)
+  {
     set_mode_button_state(SIMULATE, 1);
   }
 }
@@ -3751,8 +3860,10 @@ int WFoe::print_document()
 
   doc_count = 0;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
-    if (vldh_check_document(wind->hw.ldhses, (*node_ptr)->ln.oid)) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    if (vldh_check_document(wind->hw.ldhses, (*node_ptr)->ln.oid))
+    {
       gre->print_docobj(*node_ptr);
       doc_count++;
     }
@@ -3791,8 +3902,10 @@ int WFoe::print_selected_document()
 
   doc_count = 0;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
-    if (vldh_check_document(wind->hw.ldhses, (*node_ptr)->ln.oid)) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    if (vldh_check_document(wind->hw.ldhses, (*node_ptr)->ln.oid))
+    {
       gre->print_docobj(*node_ptr);
       doc_count++;
     }
@@ -3819,9 +3932,11 @@ int WFoe::change_mode(int new_mode)
 
   wind = gre->wind;
 
-  switch (new_mode) {
+  switch (new_mode)
+  {
   case VIEW:
-    switch (function) {
+    switch (function)
+    {
     case VIEW:
       /* Mode unchanged, set togglebutton */
       set_mode_button_state(VIEW, 1);
@@ -3838,14 +3953,16 @@ int WFoe::change_mode(int new_mode)
         return sts;
       sts = vldh_get_wind_modification(wind, &vldh_mod);
 
-      if (!info.Empty || vldh_mod) {
+      if (!info.Empty || vldh_mod)
+      {
         /* Assume mode change is not successful */
         wanted_function = VIEW;
         set_mode_button_state(VIEW, 0);
         set_mode_button_state(EDIT, 1);
-        popupmsg("Do you want to save changes", edit_exit_save,
-            edit_exit_nosave, NULL);
-      } else {
+        popupmsg("Do you want to save changes", edit_exit_save, edit_exit_nosave, NULL);
+      }
+      else
+      {
         /* Change funktion */
         set_mode_button_state(EDIT, 0);
         set_mode_button_state(VIEW, 1);
@@ -3888,17 +4005,20 @@ int WFoe::change_mode(int new_mode)
     }
     break;
   case EDIT:
-    if (!(CoLogin::privilege() & pwr_mPrv_DevPlc)) {
+    if (!(CoLogin::privilege() & pwr_mPrv_DevPlc))
+    {
       message("No privilege to enter Edit");
       BEEP;
       set_mode_button_state(EDIT, 0);
       return FOE__SUCCESS;
     }
 
-    switch (function) {
+    switch (function)
+    {
     case VIEW:
       sts = ldh_SetSession(wind->hw.ldhses, ldh_eAccess_ReadWrite);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         message("No access to edit, close other session");
         BEEP;
         set_mode_button_state(VIEW, 1);
@@ -3940,11 +4060,13 @@ int WFoe::change_mode(int new_mode)
     break;
   case TRACE:
 
-    switch (function) {
+    switch (function)
+    {
     case VIEW:
       /* Change funktion */
       sts = ldh_SetSession(wind->hw.ldhses, ldh_eAccess_ReadWrite);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         message("No access to trace, close other session");
         BEEP;
         set_mode_button_state(VIEW, 1);
@@ -3956,7 +4078,8 @@ int WFoe::change_mode(int new_mode)
       access = ldh_eAccess_ReadWrite;
       gre->disable_button_events();
       sts = trace_start(this);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         /* Return to view */
         view_setup();
         set_mode_button_state(VIEW, 1);
@@ -3980,17 +4103,20 @@ int WFoe::change_mode(int new_mode)
         return sts;
       sts = vldh_get_wind_modification(wind, &vldh_mod);
 
-      if (!info.Empty || vldh_mod) {
+      if (!info.Empty || vldh_mod)
+      {
         /* Assume mode change is not successful */
         wanted_function = TRACE;
         set_mode_button_state(TRACE, 0);
         set_mode_button_state(EDIT, 1);
-        popupmsg("Do you want to save changes", edit_exit_save,
-            edit_exit_nosave, NULL);
-      } else {
+        popupmsg("Do you want to save changes", edit_exit_save, edit_exit_nosave, NULL);
+      }
+      else
+      {
         /* Change function */
         sts = trace_start(this);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           /* Return to view */
           edit_setup();
           set_mode_button_state(EDIT, 1);
@@ -4016,17 +4142,20 @@ int WFoe::change_mode(int new_mode)
     break;
   case SIMULATE:
 
-    if (!(CoLogin::privilege() & pwr_mPrv_DevPlc)) {
+    if (!(CoLogin::privilege() & pwr_mPrv_DevPlc))
+    {
       message("No privilege to enter Simulate");
       BEEP;
       set_mode_button_state(SIMULATE, 0);
       return FOE__SUCCESS;
     }
-    switch (function) {
+    switch (function)
+    {
     case VIEW:
       /* Change funktion */
       sts = ldh_SetSession(wind->hw.ldhses, ldh_eAccess_ReadWrite);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         message("No access to simulate, close other session");
         BEEP;
         set_mode_button_state(VIEW, 1);
@@ -4038,7 +4167,8 @@ int WFoe::change_mode(int new_mode)
       access = ldh_eAccess_ReadWrite;
       gre->disable_button_events();
       sts = trace_start(this);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         /* Return to view */
         view_setup();
         set_mode_button_state(VIEW, 1);
@@ -4063,18 +4193,21 @@ int WFoe::change_mode(int new_mode)
         return sts;
       sts = vldh_get_wind_modification(wind, &vldh_mod);
 
-      if (!info.Empty || vldh_mod) {
+      if (!info.Empty || vldh_mod)
+      {
         /* Assume mode change is not successful */
         wanted_function = SIMULATE;
         set_mode_button_state(SIMULATE, 0);
         set_mode_button_state(EDIT, 1);
-        popupmsg("Do you want to save changes", edit_exit_save,
-            edit_exit_nosave, NULL);
-      } else {
+        popupmsg("Do you want to save changes", edit_exit_save, edit_exit_nosave, NULL);
+      }
+      else
+      {
         /* Change function */
         gre->disable_button_events();
         sts = trace_start(this);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           /* Return to view */
           view_setup();
           set_mode_button_state(EDIT, 1);
@@ -4119,11 +4252,14 @@ void WFoe::edit_exit_save(WFoe* foe)
   /* Check that the parent node is saved */
   wind = foe->gre->wind;
   parent_node = wind->hw.parent_node_pointer;
-  if (parent_node != 0) {
+  if (parent_node != 0)
+  {
     /* Parent is node, not a plc */
-    if (foe->parent_ctx != 0) {
+    if (foe->parent_ctx != 0)
+    {
       /* parent is alive */
-      if ((parent_node->hn.status & VLDH_CREATE) != 0) {
+      if ((parent_node->hn.status & VLDH_CREATE) != 0)
+      {
         /* Parentnode is not saved, then its not allowed to save
            the window */
         foe->msgbox("Save the parent window first");
@@ -4134,11 +4270,14 @@ void WFoe::edit_exit_save(WFoe* foe)
   foe->disable_ldh_cb();
   sts = vldh_wind_save(foe->gre->wind);
   foe->error_msg(sts);
-  if (sts == VLDH__PLCNOTSAVED) {
+  if (sts == VLDH__PLCNOTSAVED)
+  {
     foe->msgbox("Save the plcprogram in the hierarchy editor first");
     foe->enable_ldh_cb();
     return;
-  } else if (EVEN(sts)) {
+  }
+  else if (EVEN(sts))
+  {
     char msg[256];
 
     msg_GetMsg(sts, msg, sizeof(msg));
@@ -4155,15 +4294,16 @@ void WFoe::edit_exit_save(WFoe* foe)
     opt = log_mOption_Comment;
   else
     opt = 0;
-  wb_log::log((wb_session*)foe->gre->wind->hw.ldhses, wlog_eCategory_PlcSave,
-      foe->gre->wind->lw.oid, opt);
+  wb_log::log((wb_session*)foe->gre->wind->hw.ldhses, wlog_eCategory_PlcSave, foe->gre->wind->lw.oid, opt);
 
   /* Change the function */
-  switch (foe->wanted_function) {
+  switch (foe->wanted_function)
+  {
   case SIMULATE:
     foe->gre->disable_button_events();
     sts = trace_start(foe);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       /* Return to edit */
       foe->edit_setup();
       return;
@@ -4178,7 +4318,8 @@ void WFoe::edit_exit_save(WFoe* foe)
   case TRACE:
     foe->gre->disable_button_events();
     sts = trace_start(foe);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       /* Return to edit */
       foe->edit_setup();
       return;
@@ -4247,8 +4388,7 @@ int WFoe::redraw_and_save()
   if (EVEN(sts))
     return sts;
 
-  wb_log::log((wb_session*)gre->wind->hw.ldhses, wlog_eCategory_PlcSave,
-      gre->wind->lw.oid);
+  wb_log::log((wb_session*)gre->wind->hw.ldhses, wlog_eCategory_PlcSave, gre->wind->lw.oid);
 
   return FOE__SUCCESS;
 }
@@ -4260,10 +4400,13 @@ int WFoe::create_flow()
 {
   int sts;
 
-  if (!classeditor) {
+  if (!classeditor)
+  {
     sts = gre->set_trace_attributes(0);
     sts = gre->save(0);
-  } else {
+  }
+  else
+  {
     vldh_t_wind wind;
     int size;
     pwr_tOName name;
@@ -4275,8 +4418,7 @@ int WFoe::create_flow()
     wind = gre->wind;
     plc = wind->hw.plc;
 
-    sts = ldh_ObjidToName(wind->hw.ldhses, plc->lp.oid, ldh_eName_Hierarchy,
-        name, sizeof(name), &size);
+    sts = ldh_ObjidToName(wind->hw.ldhses, plc->lp.oid, ldh_eName_Hierarchy, name, sizeof(name), &size);
     if (EVEN(sts))
       return sts;
 
@@ -4284,8 +4426,7 @@ int WFoe::create_flow()
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_ObjidToName(wind->hw.ldhses, classdef, ldh_eName_Object,
-        classname, sizeof(classname), &size);
+    sts = ldh_ObjidToName(wind->hw.ldhses, classdef, ldh_eName_Object, classname, sizeof(classname), &size);
     if (EVEN(sts))
       return sts;
     str_ToLower(classname, classname);
@@ -4323,14 +4464,16 @@ int WFoe::create_xtthelpfile()
   if (!nodecnt)
     return FOE__SUCCESS;
 
-  for (unsigned int i = 0; i < nodecnt; i++) {
-    if (nodelist[i]->ln.cid == pwr_cClass_HelpText
-        || nodelist[i]->ln.cid == pwr_cClass_HelpTextL) {
+  for (unsigned int i = 0; i < nodecnt; i++)
+  {
+    if (nodelist[i]->ln.cid == pwr_cClass_HelpText || nodelist[i]->ln.cid == pwr_cClass_HelpTextL)
+    {
       objcnt++;
     }
   }
 
-  if (!objcnt) {
+  if (!objcnt)
+  {
     free(nodelist);
     return FOE__SUCCESS;
   }
@@ -4338,15 +4481,15 @@ int WFoe::create_xtthelpfile()
   objlist = (pwr_tOid*)calloc(objcnt, sizeof(pwr_tOid));
 
   objcnt = 0;
-  for (unsigned int i = 0; i < nodecnt; i++) {
-    if (nodelist[i]->ln.cid == pwr_cClass_HelpText
-        || nodelist[i]->ln.cid == pwr_cClass_HelpTextL) {
+  for (unsigned int i = 0; i < nodecnt; i++)
+  {
+    if (nodelist[i]->ln.cid == pwr_cClass_HelpText || nodelist[i]->ln.cid == pwr_cClass_HelpTextL)
+    {
       objlist[objcnt++] = nodelist[i]->ln.oid;
     }
   }
 
-  sts = ldh_ObjidToName(wind->hw.ldhses, wind->lw.oid, ldh_eName_Hierarchy,
-      name, sizeof(name), &size);
+  sts = ldh_ObjidToName(wind->hw.ldhses, wind->lw.oid, ldh_eName_Hierarchy, name, sizeof(name), &size);
   if (EVEN(sts))
     goto error;
 
@@ -4354,7 +4497,8 @@ int WFoe::create_xtthelpfile()
   dcli_translate_filename(fname, fname);
 
   fp = fopen(fname, "w");
-  if (!fp) {
+  if (!fp)
+  {
     free(nodelist);
     free(objlist);
     return FOE__NOFILE;
@@ -4365,44 +4509,46 @@ int WFoe::create_xtthelpfile()
 
   // Create links to subwindows
   subw_found = 0;
-  for (unsigned int i = 0; i < nodecnt; i++) {
-    if (nodelist[i]->ln.subwindow & 1 || nodelist[i]->ln.subwindow & 2) {
+  for (unsigned int i = 0; i < nodecnt; i++)
+  {
+    if (nodelist[i]->ln.subwindow & 1 || nodelist[i]->ln.subwindow & 2)
+    {
       subw_found = 1;
       break;
     }
   }
 
-  if (subw_found) {
+  if (subw_found)
+  {
     // fprintf( fp, "<h2>Subwindows\n");
-    for (unsigned int i = 0; i < nodecnt; i++) {
-      if (nodelist[i]->ln.subwindow & 1) {
-        sts = ldh_ObjidToName(wind->hw.ldhses, nodelist[i]->ln.subwind_oid[0],
-            ldh_eName_Hierarchy, subw_name, sizeof(subw_name), &size);
+    for (unsigned int i = 0; i < nodecnt; i++)
+    {
+      if (nodelist[i]->ln.subwindow & 1)
+      {
+        sts = ldh_ObjidToName(wind->hw.ldhses, nodelist[i]->ln.subwind_oid[0], ldh_eName_Hierarchy, subw_name,
+                              sizeof(subw_name), &size);
         if (EVEN(sts))
           goto error;
 
-        fprintf(fp, "%s <link>plcw_%s,," pwr_cNamePlcXttHelp "\n",
-            &subw_name[strlen(name) + 1],
-            vldh_IdToStr(0, nodelist[i]->ln.subwind_oid[0]),
-            vldh_VolumeIdToStr(wind->lw.oid.vid));
+        fprintf(fp, "%s <link>plcw_%s,," pwr_cNamePlcXttHelp "\n", &subw_name[strlen(name) + 1],
+                vldh_IdToStr(0, nodelist[i]->ln.subwind_oid[0]), vldh_VolumeIdToStr(wind->lw.oid.vid));
       }
-      if (nodelist[i]->ln.subwindow & 2) {
-        sts = ldh_ObjidToName(wind->hw.ldhses, nodelist[i]->ln.subwind_oid[1],
-            ldh_eName_Hierarchy, subw_name, sizeof(subw_name), &size);
+      if (nodelist[i]->ln.subwindow & 2)
+      {
+        sts = ldh_ObjidToName(wind->hw.ldhses, nodelist[i]->ln.subwind_oid[1], ldh_eName_Hierarchy, subw_name,
+                              sizeof(subw_name), &size);
         if (EVEN(sts))
           goto error;
 
-        fprintf(fp, "%s <link>plcw_%s,," pwr_cNamePlcXttHelp "\n",
-            &subw_name[strlen(name) + 1],
-            vldh_IdToStr(0, nodelist[i]->ln.subwind_oid[1]),
-            vldh_VolumeIdToStr(wind->lw.oid.vid));
+        fprintf(fp, "%s <link>plcw_%s,," pwr_cNamePlcXttHelp "\n", &subw_name[strlen(name) + 1],
+                vldh_IdToStr(0, nodelist[i]->ln.subwind_oid[1]), vldh_VolumeIdToStr(wind->lw.oid.vid));
       }
     }
     fprintf(fp, "\n");
   }
-  for (int i = 0; i < objcnt; i++) {
-    sts = ldh_GetObjectPar(
-        wind->hw.ldhses, objlist[i], "DevBody", "Text", &textp, &size);
+  for (int i = 0; i < objcnt; i++)
+  {
+    sts = ldh_GetObjectPar(wind->hw.ldhses, objlist[i], "DevBody", "Text", &textp, &size);
     if (EVEN(sts))
       goto error;
 
@@ -4457,16 +4603,18 @@ int WFoe::create_volume_xtthelpfile(ldh_tSession ldhses, pwr_tVid vid)
   // Insert a list of all PlcPgm
   fprintf(fp, "<topic> index\nPlcPgm List\n");
   for (sts = ldh_GetClassList(ldhses, pwr_cClass_plc, &oid); ODD(sts);
-       sts = ldh_GetNextObject(ldhses, oid, &oid)) {
-    sts = ldh_ObjidToName(
-        ldhses, oid, ldh_eName_Hierarchy, name, sizeof(name), &size);
-    if (EVEN(sts)) {
+       sts = ldh_GetNextObject(ldhses, oid, &oid))
+  {
+    sts = ldh_ObjidToName(ldhses, oid, ldh_eName_Hierarchy, name, sizeof(name), &size);
+    if (EVEN(sts))
+    {
       fclose(fp);
       return sts;
     }
 
     sts = ldh_GetObjectPar(ldhses, oid, "RtBody", "Description", &desc, &size);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       fclose(fp);
       return sts;
     }
@@ -4475,8 +4623,8 @@ int WFoe::create_volume_xtthelpfile(ldh_tSession ldhses, pwr_tVid vid)
     if (EVEN(sts))
       continue;
 
-    fprintf(fp, "%s <t><t>%s<link> plcw_%s,," pwr_cNamePlcXttHelp "\n", name,
-        desc, vldh_IdToStr(0, woid), vldh_VolumeIdToStr(vid));
+    fprintf(fp, "%s <t><t>%s<link> plcw_%s,," pwr_cNamePlcXttHelp "\n", name, desc, vldh_IdToStr(0, woid),
+            vldh_VolumeIdToStr(vid));
     free(desc);
   }
   fprintf(fp, "</topic>\n\n");
@@ -4485,14 +4633,14 @@ int WFoe::create_volume_xtthelpfile(ldh_tSession ldhses, pwr_tVid vid)
   for (sts = ldh_GetClassList(ldhses, pwr_cClass_windowplc, &woid); ODD(sts);
        sts = ldh_GetNextObject(ldhses, woid, &woid))
     copy_helpfile(fp, woid);
-  for (sts = ldh_GetClassList(ldhses, pwr_cClass_windoworderact, &woid);
-       ODD(sts); sts = ldh_GetNextObject(ldhses, woid, &woid))
+  for (sts = ldh_GetClassList(ldhses, pwr_cClass_windoworderact, &woid); ODD(sts);
+       sts = ldh_GetNextObject(ldhses, woid, &woid))
     copy_helpfile(fp, woid);
   for (sts = ldh_GetClassList(ldhses, pwr_cClass_windowcond, &woid); ODD(sts);
        sts = ldh_GetNextObject(ldhses, woid, &woid))
     copy_helpfile(fp, woid);
-  for (sts = ldh_GetClassList(ldhses, pwr_cClass_windowsubstep, &woid);
-       ODD(sts); sts = ldh_GetNextObject(ldhses, woid, &woid))
+  for (sts = ldh_GetClassList(ldhses, pwr_cClass_windowsubstep, &woid); ODD(sts);
+       sts = ldh_GetNextObject(ldhses, woid, &woid))
     copy_helpfile(fp, woid);
 
   fclose(fp);
@@ -4525,8 +4673,10 @@ int WFoe::cmd_delete_node(pwr_tOid oid)
   if (EVEN(sts))
     return sts;
 
-  for (i = 0; i < (int)node_count; i++) {
-    if (cdh_ObjidIsEqual(nodelist[i]->ln.oid, oid)) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    if (cdh_ObjidIsEqual(nodelist[i]->ln.oid, oid))
+    {
       gre->delete_node(nodelist[i]);
       break;
     }
@@ -4535,9 +4685,9 @@ int WFoe::cmd_delete_node(pwr_tOid oid)
   return FOE__SUCCESS;
 }
 
-int WFoe::cmd_create_node(char* name, pwr_tCid cid, pwr_tOid* destoid, float x,
-    float y, int use_default_masks, unsigned int inputmask,
-    unsigned int outputmask, unsigned int invertmask)
+int WFoe::cmd_create_node(char* name, pwr_tCid cid, pwr_tOid* destoid, float x, float y,
+                          int use_default_masks, unsigned int inputmask, unsigned int outputmask,
+                          unsigned int invertmask)
 {
   vldh_t_node node;
   int sts;
@@ -4545,7 +4695,8 @@ int WFoe::cmd_create_node(char* name, pwr_tCid cid, pwr_tOid* destoid, float x,
   pwr_eClass eclass;
   int size;
 
-  if (destoid) {
+  if (destoid)
+  {
     // Coordinates are relative to destination node
     vldh_t_node* nodelist;
     unsigned long node_count;
@@ -4557,14 +4708,17 @@ int WFoe::cmd_create_node(char* name, pwr_tCid cid, pwr_tOid* destoid, float x,
       return sts;
 
     int found = 0;
-    for (int i = 0; i < (int)node_count; i++) {
-      if (cdh_ObjidIsEqual(nodelist[i]->ln.oid, *destoid)) {
+    for (int i = 0; i < (int)node_count; i++)
+    {
+      if (cdh_ObjidIsEqual(nodelist[i]->ln.oid, *destoid))
+      {
         destnode = nodelist[i];
         found = 1;
         break;
       }
     }
-    if (found) {
+    if (found)
+    {
       gre->measure_object(destnode, &ll_x, &ll_y, &width, &height);
       x += ll_x;
       y += ll_y;
@@ -4580,17 +4734,17 @@ int WFoe::cmd_create_node(char* name, pwr_tCid cid, pwr_tOid* destoid, float x,
 
   sts = ldh_SetObjectName(gre->wind->hw.ldhses, node->ln.oid, name);
 
-  if (!use_default_masks) {
-    sts = ldh_GetObjectBuffer(gre->wind->hw.ldhses, node->ln.oid, "DevBody",
-        "PlcNode", &eclass, (char**)&nodebuffer, &size);
+  if (!use_default_masks)
+  {
+    sts = ldh_GetObjectBuffer(gre->wind->hw.ldhses, node->ln.oid, "DevBody", "PlcNode", &eclass,
+                              (char**)&nodebuffer, &size);
     if (EVEN(sts))
       return sts;
     nodebuffer->mask[0] = inputmask;
     nodebuffer->mask[1] = outputmask;
     nodebuffer->mask[2] = invertmask;
 
-    sts = ldh_SetObjectBuffer(gre->wind->hw.ldhses, node->ln.oid, "DevBody",
-        "PlcNode", (char*)nodebuffer);
+    sts = ldh_SetObjectBuffer(gre->wind->hw.ldhses, node->ln.oid, "DevBody", "PlcNode", (char*)nodebuffer);
     free((char*)nodebuffer);
   }
   gre->node_update(node);
@@ -4598,8 +4752,7 @@ int WFoe::cmd_create_node(char* name, pwr_tCid cid, pwr_tOid* destoid, float x,
   return FOE__SUCCESS;
 }
 
-int WFoe::cmd_create_con(pwr_tOid srcoid, char* srcattr, pwr_tOid destoid,
-    char* destattr, int feedback)
+int WFoe::cmd_create_con(pwr_tOid srcoid, char* srcattr, pwr_tOid destoid, char* destattr, int feedback)
 {
   vldh_t_node srcnode = NULL, destnode = NULL;
   vldh_t_node* nodelist;
@@ -4616,13 +4769,17 @@ int WFoe::cmd_create_con(pwr_tOid srcoid, char* srcattr, pwr_tOid destoid,
 
   int src_found = 0;
   int dest_found = 0;
-  for (i = 0; i < (int)node_count; i++) {
-    if (cdh_ObjidIsEqual(nodelist[i]->ln.oid, srcoid)) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    if (cdh_ObjidIsEqual(nodelist[i]->ln.oid, srcoid))
+    {
       srcnode = nodelist[i];
       src_found = 1;
       if (dest_found)
         break;
-    } else if (cdh_ObjidIsEqual(nodelist[i]->ln.oid, destoid)) {
+    }
+    else if (cdh_ObjidIsEqual(nodelist[i]->ln.oid, destoid))
+    {
       destnode = nodelist[i];
       dest_found = 1;
       if (src_found)
@@ -4637,8 +4794,7 @@ int WFoe::cmd_create_con(pwr_tOid srcoid, char* srcattr, pwr_tOid destoid,
   user_class = 0;
 
   // Get conpoints
-  sts = ldh_GetObjectBodyDef(
-      gre->wind->hw.ldhses, srcnode->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(gre->wind->hw.ldhses, srcnode->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
@@ -4647,17 +4803,22 @@ int WFoe::cmd_create_con(pwr_tOid srcoid, char* srcattr, pwr_tOid destoid,
   int src_point = -1;
   unsigned int inputmask = 1;
   unsigned int outputmask = 1;
-  for (int i = 0; i < rows; i++) {
-    if (bodydef[i].ParClass == pwr_eClass_Input) {
+  for (int i = 0; i < rows; i++)
+  {
+    if (bodydef[i].ParClass == pwr_eClass_Input)
+    {
       if (inputmask & srcnode->ln.mask[0])
         src_point++;
       inputmask = inputmask << 1;
-    } else if (bodydef[i].ParClass == pwr_eClass_Output) {
+    }
+    else if (bodydef[i].ParClass == pwr_eClass_Output)
+    {
       if (outputmask & srcnode->ln.mask[1])
         src_point++;
       outputmask = outputmask << 1;
     }
-    if (str_NoCaseStrcmp(srcattr, bodydef[i].ParName) == 0) {
+    if (str_NoCaseStrcmp(srcattr, bodydef[i].ParName) == 0)
+    {
       src_found = 1;
       break;
     }
@@ -4668,8 +4829,7 @@ int WFoe::cmd_create_con(pwr_tOid srcoid, char* srcattr, pwr_tOid destoid,
     return 0;
 
   // Find destination connection point number
-  sts = ldh_GetObjectBodyDef(
-      gre->wind->hw.ldhses, destnode->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(gre->wind->hw.ldhses, destnode->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
@@ -4677,17 +4837,22 @@ int WFoe::cmd_create_con(pwr_tOid srcoid, char* srcattr, pwr_tOid destoid,
   int dest_point = -1;
   inputmask = 1;
   outputmask = 1;
-  for (int i = 0; i < rows; i++) {
-    if (bodydef[i].ParClass == pwr_eClass_Input) {
+  for (int i = 0; i < rows; i++)
+  {
+    if (bodydef[i].ParClass == pwr_eClass_Input)
+    {
       if (inputmask & destnode->ln.mask[0])
         dest_point++;
       inputmask = inputmask << 1;
-    } else if (bodydef[i].ParClass == pwr_eClass_Output) {
+    }
+    else if (bodydef[i].ParClass == pwr_eClass_Output)
+    {
       if (outputmask & destnode->ln.mask[1])
         dest_point++;
       outputmask = outputmask << 1;
     }
-    if (str_NoCaseStrcmp(destattr, bodydef[i].ParName) == 0) {
+    if (str_NoCaseStrcmp(destattr, bodydef[i].ParName) == 0)
+    {
       dest_found = 1;
       break;
     }
@@ -4697,12 +4862,12 @@ int WFoe::cmd_create_con(pwr_tOid srcoid, char* srcattr, pwr_tOid destoid,
   if (!dest_found || dest_point == -1)
     return 0;
 
-  sts = gsx_check_connection(
-      this, srcnode, src_point, destnode, dest_point, &con_class, user_class);
+  sts = gsx_check_connection(this, srcnode, src_point, destnode, dest_point, &con_class, user_class);
   if (EVEN(sts))
     return sts;
 
-  if (feedback) {
+  if (feedback)
+  {
     // Change to corresponding feedback connection
 
     if (con_class == pwr_cClass_ConDigital)
@@ -4711,8 +4876,7 @@ int WFoe::cmd_create_con(pwr_tOid srcoid, char* srcattr, pwr_tOid destoid,
       con_class = pwr_cClass_ConFeedbackAnalog;
   }
 
-  sts = gre->create_con(
-      con_class, srcnode, src_point, destnode, dest_point, con_drawtype);
+  sts = gre->create_con(con_class, srcnode, src_point, destnode, dest_point, con_drawtype);
   return sts;
 }
 
@@ -4729,8 +4893,10 @@ int WFoe::cmd_connect(pwr_tAttrRef* aref, pwr_tOid plcnode)
     return sts;
 
   int found = 0;
-  for (int i = 0; i < (int)node_count; i++) {
-    if (cdh_ObjidIsEqual(nodelist[i]->ln.oid, plcnode)) {
+  for (int i = 0; i < (int)node_count; i++)
+  {
+    if (cdh_ObjidIsEqual(nodelist[i]->ln.oid, plcnode))
+    {
       node = nodelist[i];
       found = 1;
       break;

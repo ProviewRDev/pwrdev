@@ -57,48 +57,45 @@
 #define BEEP putchar('\7');
 
 /*************************************************************************
-*
-* Name:		int	vsel_new()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* void 		*parent_ctx	I	Parent context adress
-* Widget	parent_wid	I	Parent Widget adress
-* char *	name		I	Name of the created object
-*
-* Description:
-*	Create a new login window
-**************************************************************************/
+ *
+ * Name:		int	vsel_new()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * void 		*parent_ctx	I	Parent context adress
+ * Widget	parent_wid	I	Parent Widget adress
+ * char *	name		I	Name of the created object
+ *
+ * Description:
+ *	Create a new login window
+ **************************************************************************/
 
-WVsel::WVsel(pwr_tStatus* status, void* wv_parent_ctx, const char* wv_name,
-    ldh_tWBContext wv_wbctx, char* volumename,
-    int (*bc_success)(void*, pwr_tVolumeId*, int), void (*bc_cancel)(),
-    int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wv_wb_type)
-    : parent_ctx(wv_parent_ctx), wbctx(wv_wbctx), vsel_bc_success(bc_success),
-      vsel_bc_cancel(bc_cancel), vsel_bc_time_to_exit(bc_time_to_exit),
-      volume_count(0), all(0), write_priv(0), wb_type(wv_wb_type), wow(0)
+WVsel::WVsel(pwr_tStatus* status, void* wv_parent_ctx, const char* wv_name, ldh_tWBContext wv_wbctx,
+             char* volumename, int (*bc_success)(void*, pwr_tVolumeId*, int), void (*bc_cancel)(),
+             int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wv_wb_type)
+    : parent_ctx(wv_parent_ctx), wbctx(wv_wbctx), vsel_bc_success(bc_success), vsel_bc_cancel(bc_cancel),
+      vsel_bc_time_to_exit(bc_time_to_exit), volume_count(0), all(0), write_priv(0), wb_type(wv_wb_type),
+      wow(0)
 {
   strcpy(name, wv_name);
   *status = LOGIN__SUCCESS;
 }
 
-WVsel::~WVsel()
-{
-}
+WVsel::~WVsel() {}
 
 /*************************************************************************
-*
-* Name:		load_list()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Load the volumelist.
-*
-**************************************************************************/
+ *
+ * Name:		load_list()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Load the volumelist.
+ *
+ **************************************************************************/
 
 pwr_tStatus WVsel::load_volumelist()
 {
@@ -119,16 +116,19 @@ pwr_tStatus WVsel::load_volumelist()
     sts = ldh_GetVolumeList(wbctx, &volume);
   else
     sts = ldh_GetBufferList(wbctx, &volume);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetVolumeClass(wbctx, volume, &classid);
     if (EVEN(sts))
       return sts;
 
-    if (!all) {
-      if ((cdh_isClassVolumeClass(classid) && 
-	   (volume < cdh_cUserClassVolMin || volume > cdh_cUserClassVolMax)) 
+    if (!all)
+    {
+      if ((cdh_isClassVolumeClass(classid) &&
+           (volume < cdh_cUserClassVolMin || volume > cdh_cUserClassVolMax))
 
-          || classid == pwr_eClass_WorkBenchVolume || volume == ldh_cRtVolume) {
+          || classid == pwr_eClass_WorkBenchVolume || volume == ldh_cRtVolume)
+      {
         sts = ldh_GetNextVolume(wbctx, volume, &volume);
         continue;
       }
@@ -147,7 +147,8 @@ pwr_tStatus WVsel::load_volumelist()
     if (EVEN(sts))
       return sts;
 
-    switch (info.VolRep) {
+    switch (info.VolRep)
+    {
     case ldh_eVolRep_Db:
       strcat(str, "Db     ");
       break;
@@ -174,7 +175,8 @@ pwr_tStatus WVsel::load_volumelist()
       break;
     }
 
-    switch (classid) {
+    switch (classid)
+    {
     case pwr_eClass_RootVolume:
       strcat(str, "RootVolume");
       break;
@@ -211,7 +213,8 @@ pwr_tStatus WVsel::load_volumelist()
       break;
 
     sts = ldh_GetNextVolume(wbctx, volume, &volume);
-    if (EVEN(sts) && all) {
+    if (EVEN(sts) && all)
+    {
       // Look for local workbench volume
       volume = ldh_cWBVolLocal;
       sts = ldh_VolumeIdToName(wbctx, volume, name, sizeof(name), &size);
@@ -222,17 +225,17 @@ pwr_tStatus WVsel::load_volumelist()
 }
 
 /*************************************************************************
-*
-* Name:		check_volumelist()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Load the volumelist.
-*
-**************************************************************************/
+ *
+ * Name:		check_volumelist()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Load the volumelist.
+ *
+ **************************************************************************/
 
 pwr_tStatus WVsel::check_volumelist(int quiet, int* display_window)
 {
@@ -263,18 +266,22 @@ pwr_tStatus WVsel::check_volumelist(int quiet, int* display_window)
 
   // Load the configured volume list
   sts = lfu_volumelist_load(pwr_cNameVolumeList, &volumelist, &volumecount);
-  if (sts == FOE__NOFILE) {
-    if (!quiet) {
+  if (sts == FOE__NOFILE)
+  {
+    if (!quiet)
+    {
       printf("** Error, project is not configured\n");
       BEEP;
       *display_window = 1;
     }
     return 1;
-  } else if (EVEN(sts))
+  }
+  else if (EVEN(sts))
     return 1;
 
   sts = ldh_GetVolumeList(wbctx, &volume);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetVolumeClass(wbctx, volume, &classid);
     if (EVEN(sts))
       return sts;
@@ -283,16 +290,18 @@ pwr_tStatus WVsel::check_volumelist(int quiet, int* display_window)
     if (EVEN(sts))
       return sts;
 
-    if (classid == pwr_eClass_RootVolume || classid == pwr_eClass_SubVolume
-        || (classid == pwr_eClass_SharedVolume && volume != ldh_cRtVolume)
-        || (cdh_isClassVolumeClass(classid)
-               && (cdh_cUserClassVolMin <= volume
-                      && volume <= cdh_cUserClassVolMax))) {
+    if (classid == pwr_eClass_RootVolume || classid == pwr_eClass_SubVolume ||
+        (classid == pwr_eClass_SharedVolume && volume != ldh_cRtVolume) ||
+        (cdh_isClassVolumeClass(classid) &&
+         (cdh_cUserClassVolMin <= volume && volume <= cdh_cUserClassVolMax)))
+    {
       // This volume should be configured
       volume_found = 0;
       volumelist_ptr = volumelist;
-      for (i = 0; i < volumecount; i++) {
-        if (volumelist_ptr->volume_id == volume) {
+      for (i = 0; i < volumecount; i++)
+      {
+        if (volumelist_ptr->volume_id == volume)
+        {
           // Mark that volume is found
           volume_found = 1;
           strcpy(volumelist_ptr->p3, "Found");
@@ -300,12 +309,13 @@ pwr_tStatus WVsel::check_volumelist(int quiet, int* display_window)
           // Check volume name
           utl_toupper(volname_conf, volumelist_ptr->volume_name);
           utl_toupper(volname_db, name);
-          if (strcmp(volname_db, volname_conf)) {
+          if (strcmp(volname_db, volname_conf))
+          {
             // Volume name differs
-            if (!quiet && errlen < (int)(sizeof(errstr) - 100)) {
-              errlen += sprintf(&errstr[errlen],
-                  "** Error, Volume %s is configured with another name '%s'\n",
-                  name, volumelist_ptr->volume_name);
+            if (!quiet && errlen < (int)(sizeof(errstr) - 100))
+            {
+              errlen += sprintf(&errstr[errlen], "** Error, Volume %s is configured with another name '%s'\n",
+                                name, volumelist_ptr->volume_name);
               MsgWindow::message('E', &errstr[errlen_old], msgw_ePop_No);
               errlen_old = errlen;
               BEEP;
@@ -313,7 +323,8 @@ pwr_tStatus WVsel::check_volumelist(int quiet, int* display_window)
             error_count++;
           }
           class_error = 0;
-          switch (classid) {
+          switch (classid)
+          {
           case pwr_eClass_RootVolume:
             if (strcmp(volumelist_ptr->p1, "RootVolume"))
               class_error = 1;
@@ -335,11 +346,13 @@ pwr_tStatus WVsel::check_volumelist(int quiet, int* display_window)
               class_error = 1;
             break;
           }
-          if (class_error) {
-            if (!quiet && errlen < (int)(sizeof(errstr) - 100)) {
-              errlen += sprintf(&errstr[errlen],
-                  "** Error, Volume %s is configured with another class '%s'\n",
-                  name, volumelist_ptr->p1);
+          if (class_error)
+          {
+            if (!quiet && errlen < (int)(sizeof(errstr) - 100))
+            {
+              errlen +=
+                  sprintf(&errstr[errlen], "** Error, Volume %s is configured with another class '%s'\n",
+                          name, volumelist_ptr->p1);
               MsgWindow::message('E', &errstr[errlen_old], msgw_ePop_No);
               errlen_old = errlen;
               BEEP;
@@ -350,12 +363,14 @@ pwr_tStatus WVsel::check_volumelist(int quiet, int* display_window)
         }
         volumelist_ptr++;
       }
-      if (!volume_found) {
-        if (!quiet && errlen < (int)(sizeof(errstr) - 100)) {
+      if (!volume_found)
+      {
+        if (!quiet && errlen < (int)(sizeof(errstr) - 100))
+        {
           errlen += sprintf(&errstr[errlen],
-              "** Error, Volume %s (%s) is not configured in the "
-              "ProjectVolume\nCheck volume name and identity\n",
-              name, cdh_VolumeIdToString(0, 0, volume, 1, 0));
+                            "** Error, Volume %s (%s) is not configured in the "
+                            "ProjectVolume\nCheck volume name and identity\n",
+                            name, cdh_VolumeIdToString(0, 0, volume, 1, 0));
           MsgWindow::message('E', &errstr[errlen_old], msgw_ePop_No);
           errlen_old = errlen;
           BEEP;
@@ -366,11 +381,13 @@ pwr_tStatus WVsel::check_volumelist(int quiet, int* display_window)
     sts = ldh_GetNextVolume(wbctx, volume, &volume);
   }
 
-  if (error_count) {
+  if (error_count)
+  {
     *display_window = 1;
-    if (!quiet) {
-      errlen += sprintf(&errstr[errlen], "\n   %d syntax error%s found\n",
-          error_count, (error_count == 1) ? "" : "s");
+    if (!quiet)
+    {
+      errlen += sprintf(&errstr[errlen], "\n   %d syntax error%s found\n", error_count,
+                        (error_count == 1) ? "" : "s");
       MsgWindow::message('E', &errstr[errlen_old], msgw_ePop_No);
       errlen_old = errlen;
       wow->DisplayError("Syntax control", errstr);

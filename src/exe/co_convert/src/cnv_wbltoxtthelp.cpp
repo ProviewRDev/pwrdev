@@ -36,7 +36,8 @@
 
 #include <stdio.h>
 
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 }
 #include "co_lng.h"
@@ -52,12 +53,9 @@ static int get_class_link(char* typeref, char* volume, char* file)
 
   str_ToLower(v, volume);
 
-  if (streq(v, "pwrs") || streq(v, "pwrb")
-      || streq(v, "basecomponent") || streq(v, "miscellaneous")
-      || streq(v, "nmps") || streq(v, "opc")
-      || streq(v, "otherio") || streq(v, "othermanufacturer")
-      || streq(v, "profibus") || streq(v, "remote")
-      || streq(v, "siemens") || streq(v, "abb"))
+  if (streq(v, "pwrs") || streq(v, "pwrb") || streq(v, "basecomponent") || streq(v, "miscellaneous") ||
+      streq(v, "nmps") || streq(v, "opc") || streq(v, "otherio") || streq(v, "othermanufacturer") ||
+      streq(v, "profibus") || streq(v, "remote") || streq(v, "siemens") || streq(v, "abb"))
     sprintf(file, "$pwr_lang/%s_xtthelp.dat", v);
   else
     sprintf(file, "$pwrp_exe/%s_xtthelp.dat", v);
@@ -73,24 +71,15 @@ static int get_class_link(char* typeref, char* volume, char* file)
     return 0;
   if (str_StartsWith(tr, "text"))
     return 0;
-  if (streq(tr, "boolean") || streq(tr, "float32")
-      || streq(tr, "float64") || streq(tr, "char")
-      || streq(tr, "int8") || streq(tr, "int16")
-      || streq(tr, "int32") || streq(tr, "uint8")
-      || streq(tr, "uint16") || streq(tr, "uint32")
-      || streq(tr, "objid") || streq(tr, "buffer")
-      || streq(tr, "string") || streq(tr, "enum")
-      || streq(tr, "struct") || streq(tr, "mask")
-      || streq(tr, "array") || streq(tr, "time")
-      || streq(tr, "text") || streq(tr, "attrref")
-      || streq(tr, "uint64") || streq(tr, "int64")
-      || streq(tr, "classid") || streq(tr, "typeid")
-      || streq(tr, "volumeid") || streq(tr, "objectix")
-      || streq(tr, "refid") || streq(tr, "deltatime")
-      || streq(tr, "status") || streq(tr, "netstatus")
-      || streq(tr, "castid") || streq(tr, "prostring")
-      || streq(tr, "disableattr") || streq(tr, "dataref")
-      || streq(tr, "void"))
+  if (streq(tr, "boolean") || streq(tr, "float32") || streq(tr, "float64") || streq(tr, "char") ||
+      streq(tr, "int8") || streq(tr, "int16") || streq(tr, "int32") || streq(tr, "uint8") ||
+      streq(tr, "uint16") || streq(tr, "uint32") || streq(tr, "objid") || streq(tr, "buffer") ||
+      streq(tr, "string") || streq(tr, "enum") || streq(tr, "struct") || streq(tr, "mask") ||
+      streq(tr, "array") || streq(tr, "time") || streq(tr, "text") || streq(tr, "attrref") ||
+      streq(tr, "uint64") || streq(tr, "int64") || streq(tr, "classid") || streq(tr, "typeid") ||
+      streq(tr, "volumeid") || streq(tr, "objectix") || streq(tr, "refid") || streq(tr, "deltatime") ||
+      streq(tr, "status") || streq(tr, "netstatus") || streq(tr, "castid") || streq(tr, "prostring") ||
+      streq(tr, "disableattr") || streq(tr, "dataref") || streq(tr, "void"))
     return 0;
 
   return 1;
@@ -153,9 +142,8 @@ int CnvWblToXtthelp::class_exec()
   strcat(full_class_name, ctx->rw->class_name);
 
   // Add into index file
-  fp_xtthelp_index << ctx->rw->class_name << "<T><T> "
-                   << ctx->rw->doc_summary << " <LINK> " << ctx->rw->class_name
-                   << '\n';
+  fp_xtthelp_index << ctx->rw->class_name << "<T><T> " << ctx->rw->doc_summary << " <LINK> "
+                   << ctx->rw->class_name << '\n';
 
   // Add to class file
   if (xtthelp_in_topic)
@@ -169,66 +157,81 @@ int CnvWblToXtthelp::class_exec()
   if (!lng_sts)
     fp_tmp << "(" << Lng::translate("English text not available") << ")\n\n";
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_author, "")) {
-    fp_tmp << "<B>" << Lng::translate("Author") << "<T>" << ctx->rw->doc_author
-           << '\n';
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_author, ""))
+  {
+    fp_tmp << "<B>" << Lng::translate("Author") << "<T>" << ctx->rw->doc_author << '\n';
   }
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_creator, "")) {
-    fp_tmp << "<B>" << Lng::translate("Creator") << "<T>"
-           << ctx->rw->doc_creator << '\n';
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_creator, ""))
+  {
+    fp_tmp << "<B>" << Lng::translate("Creator") << "<T>" << ctx->rw->doc_creator << '\n';
   }
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_version, "")) {
-    fp_tmp << "<B>" << Lng::translate("Version") << "<T>"
-           << ctx->rw->doc_version << '\n';
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_version, ""))
+  {
+    fp_tmp << "<B>" << Lng::translate("Version") << "<T>" << ctx->rw->doc_version << '\n';
   }
 
   fp_tmp << "<H1>" << Lng::translate("Description") << '\n';
 
-  if (ctx->rw->doc_fresh) {
-    for (i = 0; i < ctx->rw->doc_cnt; i++) {
+  if (ctx->rw->doc_fresh)
+  {
+    for (i = 0; i < ctx->rw->doc_cnt; i++)
+    {
       str_trim(txt, ctx->rw->doc_text[i]);
-      if (str_StartsWith(CnvCtx::low(txt), "@image")) {
+      if (str_StartsWith(CnvCtx::low(txt), "@image"))
+      {
         char imagefile[80];
 
         str_trim(imagefile, txt + 7);
         fp_tmp << "<IMAGE> " << imagefile << '\n';
-      } else if (str_StartsWith(CnvCtx::low(txt), "@b")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@b"))
+      {
         fp_tmp << "<B> " << txt + 3 << '\n';
-      } else if (str_StartsWith(CnvCtx::low(txt), "@h1")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@h1"))
+      {
         fp_tmp << "<H1> " << txt + 4 << '\n';
-      } else if (str_StartsWith(CnvCtx::low(txt), "@h2")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@h2"))
+      {
         fp_tmp << "<H2> " << txt + 4 << '\n';
-      } else if (str_StartsWith(CnvCtx::low(txt), "@i")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@i"))
+      {
         fp_tmp << "<i> " << txt + 3 << '\n';
-      } else
+      }
+      else
         fp_tmp << ctx->rw->doc_text[i] << '\n';
     }
   }
-  for (i = 0; i < ctx->rw->doc_xlink_cnt; i++) {
+  for (i = 0; i < ctx->rw->doc_xlink_cnt; i++)
+  {
     if (str_StartsWith(ctx->rw->doc_xlink_ref[i], "../../en_us/man_exlib_"))
-      strncpy(link_ref,
-          &ctx->rw->doc_xlink_ref[i][0] + strlen("../../en_us/man_exlib_"),
-          sizeof(link_ref));
+      strncpy(link_ref, &ctx->rw->doc_xlink_ref[i][0] + strlen("../../en_us/man_exlib_"), sizeof(link_ref));
     else
       strncpy(link_ref, ctx->rw->doc_xlink_ref[i], sizeof(link_ref));
 
     if ((s = strrchr(link_ref, '.')))
       *s = 0;
     strcat(link_ref, ", ,$pwr_exe/en_us/man_exlib.dat");
-    fp_tmp << "      " << ctx->rw->doc_xlink_text[i] << " <LINK>" << link_ref
-           << '\n';
+    fp_tmp << "      " << ctx->rw->doc_xlink_text[i] << " <LINK>" << link_ref << '\n';
   }
-  for (i = 0; i < ctx->rw->doc_clink_cnt; i++) {
+  for (i = 0; i < ctx->rw->doc_clink_cnt; i++)
+  {
     strcpy(prefix, CnvCtx::low(ctx->rw->volume_name));
     strcat(prefix, "_");
-    if (str_StartsWith(ctx->rw->doc_clink_ref[i], prefix)) {
+    if (str_StartsWith(ctx->rw->doc_clink_ref[i], prefix))
+    {
       strcpy(link_ref, &ctx->rw->doc_clink_ref[i][strlen(prefix)]);
       if ((s = strrchr(link_ref, '.')))
         *s = 0;
-    } else {
-      if ((s = strchr(ctx->rw->doc_clink_ref[i], '_'))) {
+    }
+    else
+    {
+      if ((s = strchr(ctx->rw->doc_clink_ref[i], '_')))
+      {
         int len = s - ctx->rw->doc_clink_ref[i];
         memset(link_ref, 0, sizeof(link_ref));
         strcpy(link_ref, &ctx->rw->doc_clink_ref[i][len + 1]);
@@ -237,14 +240,15 @@ int CnvWblToXtthelp::class_exec()
         strcat(link_ref, ", ,$pwr_lang/");
         strncat(link_ref, ctx->rw->doc_clink_ref[i], len);
         strcat(link_ref, "_xtthelp.dat");
-      } else {
+      }
+      else
+      {
         strcpy(link_ref, ctx->rw->doc_clink_ref[i]);
         if ((s = strrchr(link_ref, '.')))
           *s = 0;
       }
     }
-    fp_tmp << "      " << ctx->rw->doc_clink_text[i] << " <LINK>" << link_ref
-           << '\n';
+    fp_tmp << "      " << ctx->rw->doc_clink_text[i] << " <LINK>" << link_ref << '\n';
   }
   return 1;
 }
@@ -277,7 +281,8 @@ int CnvWblToXtthelp::bit_exec()
   if (Lng::current() != lng_eLanguage_en_US)
     lng_sts = ctx->rw->read_lng(ctx->rw->typedef_name, ctx->rw->bit_name);
 
-  if (first_bit) {
+  if (first_bit)
+  {
     if (strstr(ctx->rw->typedef_name, "Enum"))
       fp_tmp << "<H1>" << Lng::translate("Enumerations") << '\n';
     else
@@ -291,35 +296,52 @@ int CnvWblToXtthelp::bit_exec()
   // fp_tmp << "  pwr_" << bitchar << ctx->rw->typedef_name << "_" <<
   // ctx->rw->bit_pgmname << '\n';
 
-  if (ctx->rw->doc_fresh) {
-    for (i = 0; i < ctx->rw->doc_cnt; i++) {
+  if (ctx->rw->doc_fresh)
+  {
+    for (i = 0; i < ctx->rw->doc_cnt; i++)
+    {
       str_trim(txt, ctx->rw->doc_text[i]);
-      if (str_StartsWith(CnvCtx::low(txt), "@image")) {
+      if (str_StartsWith(CnvCtx::low(txt), "@image"))
+      {
         char imagefile[80];
 
         str_trim(imagefile, txt + 6);
         fp_tmp << "<IMAGE> " << imagefile << '\n';
-      } else if (str_StartsWith(CnvCtx::low(txt), "@b")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@b"))
+      {
         fp_tmp << "<B> " << txt + 2 << '\n';
-      } else if (str_StartsWith(CnvCtx::low(txt), "@h1")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@h1"))
+      {
         fp_tmp << "<H1> " << txt + 3 << '\n';
-      } else if (str_StartsWith(CnvCtx::low(txt), "@h2")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@h2"))
+      {
         fp_tmp << "<H2> " << txt + 3 << '\n';
-      } else if (str_StartsWith(CnvCtx::low(txt), "@i")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@i"))
+      {
         fp_tmp << "<i>" << txt + 2 << '\n';
-      } else
+      }
+      else
         fp_tmp << ctx->rw->doc_text[i] << '\n';
     }
   }
-  for (i = 0; i < ctx->rw->doc_clink_cnt; i++) {
+  for (i = 0; i < ctx->rw->doc_clink_cnt; i++)
+  {
     strcpy(prefix, CnvCtx::low(ctx->rw->volume_name));
     strcat(prefix, "_");
-    if (str_StartsWith(ctx->rw->doc_clink_ref[i], prefix)) {
+    if (str_StartsWith(ctx->rw->doc_clink_ref[i], prefix))
+    {
       strcpy(link_ref, &ctx->rw->doc_clink_ref[i][strlen(prefix)]);
       if ((s = strrchr(link_ref, '.')))
         *s = 0;
-    } else {
-      if ((s = strchr(ctx->rw->doc_clink_ref[i], '_'))) {
+    }
+    else
+    {
+      if ((s = strchr(ctx->rw->doc_clink_ref[i], '_')))
+      {
         int len = s - ctx->rw->doc_clink_ref[i];
         memset(link_ref, 0, sizeof(link_ref));
         strcpy(link_ref, &ctx->rw->doc_clink_ref[i][len + 1]);
@@ -328,14 +350,15 @@ int CnvWblToXtthelp::bit_exec()
         strcat(link_ref, ", ,$pwr_lang/");
         strncat(link_ref, ctx->rw->doc_clink_ref[i], len);
         strcat(link_ref, "_xtthelp.dat");
-      } else {
+      }
+      else
+      {
         strcpy(link_ref, ctx->rw->doc_clink_ref[i]);
         if ((s = strrchr(link_ref, '.')))
           *s = 0;
       }
     }
-    fp_tmp << "      " << ctx->rw->doc_clink_text[i] << " <LINK>" << link_ref
-           << '\n';
+    fp_tmp << "      " << ctx->rw->doc_clink_text[i] << " <LINK>" << link_ref << '\n';
   }
   fp_tmp << '\n';
 
@@ -349,28 +372,22 @@ int CnvWblToXtthelp::attribute_exec()
   int lng_sts = 1;
   pwr_tFileName link_file;
 
-  if (streq(ctx->rw->attr_typeref, "CastId")
-      || streq(ctx->rw->attr_typeref, "DisableAttr"))
+  if (streq(ctx->rw->attr_typeref, "CastId") || streq(ctx->rw->attr_typeref, "DisableAttr"))
     return 1;
 
   if (Lng::current() != lng_eLanguage_en_US)
     lng_sts = ctx->rw->read_lng(ctx->rw->class_name, ctx->rw->attr_name);
 
   if (streq(ctx->rw->attr_graphname, ""))
-    fp_tmp << '\n'
-           << "<H2>" << ctx->rw->attr_name << "<BOOKMARK>" << ctx->rw->attr_name
-           << '\n';
+    fp_tmp << '\n' << "<H2>" << ctx->rw->attr_name << "<BOOKMARK>" << ctx->rw->attr_name << '\n';
   else
     fp_tmp << '\n'
-           << "<H2>" << ctx->rw->attr_name << "       "
-           << ctx->rw->attr_graphname << "<BOOKMARK>" << ctx->rw->attr_name
-           << '\n';
+           << "<H2>" << ctx->rw->attr_name << "       " << ctx->rw->attr_graphname << "<BOOKMARK>"
+           << ctx->rw->attr_name << '\n';
   if (ctx->rw->attr_array && ctx->rw->attr_pointer)
-    fp_tmp << "<B>Array[" << ctx->rw->attr_elements << "] of pointers to "
-           << ctx->rw->attr_typeref << "   ";
+    fp_tmp << "<B>Array[" << ctx->rw->attr_elements << "] of pointers to " << ctx->rw->attr_typeref << "   ";
   else if (ctx->rw->attr_array)
-    fp_tmp << "<B>Array[" << ctx->rw->attr_elements << "] of "
-           << ctx->rw->attr_typeref << "   ";
+    fp_tmp << "<B>Array[" << ctx->rw->attr_elements << "] of " << ctx->rw->attr_typeref << "   ";
   else if (ctx->rw->attr_pointer)
     fp_tmp << "<B>Pointer to " << ctx->rw->attr_typeref << "   ";
   else
@@ -381,19 +398,22 @@ int CnvWblToXtthelp::attribute_exec()
   if (!streq(ctx->rw->attr_flags, ""))
     fp_tmp << "Flags[" << ctx->rw->attr_flags << "]";
 
-  if (get_class_link(
-          ctx->rw->attr_typeref, ctx->rw->attr_typeref_volume, link_file))
+  if (get_class_link(ctx->rw->attr_typeref, ctx->rw->attr_typeref_volume, link_file))
     fp_tmp << " <LINK>" << ctx->rw->attr_typeref << ",," << link_file;
   fp_tmp << '\n';
 
-  if (ctx->rw->doc_fresh) {
-    for (i = 0; i < ctx->rw->doc_cnt; i++) {
-      if ((s = strstr(CnvCtx::low(ctx->rw->doc_text[i]), "@image")) != 0) {
+  if (ctx->rw->doc_fresh)
+  {
+    for (i = 0; i < ctx->rw->doc_cnt; i++)
+    {
+      if ((s = strstr(CnvCtx::low(ctx->rw->doc_text[i]), "@image")) != 0)
+      {
         char imagefile[80];
 
         str_trim(imagefile, s + 6);
         fp_tmp << "<IMAGE> " << imagefile << '\n';
-      } else
+      }
+      else
         fp_tmp << ctx->rw->doc_text[i] << '\n';
     }
   }
@@ -420,9 +440,8 @@ int CnvWblToXtthelp::typedef_exec()
   strcat(full_class_name, ctx->rw->class_name);
 
   // Add into index file
-  fp_xtthelp_index << ctx->rw->class_name << "<T><T> "
-                   << ctx->rw->doc_summary << " <LINK> " << ctx->rw->class_name
-                   << '\n';
+  fp_xtthelp_index << ctx->rw->class_name << "<T><T> " << ctx->rw->doc_summary << " <LINK> "
+                   << ctx->rw->class_name << '\n';
 
   // Add to class file
   if (xtthelp_in_topic)
@@ -437,52 +456,69 @@ int CnvWblToXtthelp::typedef_exec()
   if (!lng_sts)
     fp_tmp << "(" << Lng::translate("English text not available") << ")\n\n";
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_author, "")) {
-    fp_tmp << "<B>" << Lng::translate("Author") << "<T>" << ctx->rw->doc_author
-           << '\n';
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_author, ""))
+  {
+    fp_tmp << "<B>" << Lng::translate("Author") << "<T>" << ctx->rw->doc_author << '\n';
   }
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_creator, "")) {
-    fp_tmp << "<B>" << Lng::translate("Creator") << "<T>"
-           << ctx->rw->doc_creator << '\n';
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_creator, ""))
+  {
+    fp_tmp << "<B>" << Lng::translate("Creator") << "<T>" << ctx->rw->doc_creator << '\n';
   }
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_version, "")) {
-    fp_tmp << "<B>" << Lng::translate("Version") << "<T>"
-           << ctx->rw->doc_version << '\n';
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_version, ""))
+  {
+    fp_tmp << "<B>" << Lng::translate("Version") << "<T>" << ctx->rw->doc_version << '\n';
   }
 
   fp_tmp << "<H1>" << Lng::translate("Description") << '\n';
 
-  if (ctx->rw->doc_fresh) {
-    for (i = 0; i < ctx->rw->doc_cnt; i++) {
+  if (ctx->rw->doc_fresh)
+  {
+    for (i = 0; i < ctx->rw->doc_cnt; i++)
+    {
       str_trim(txt, ctx->rw->doc_text[i]);
-      if (str_StartsWith(CnvCtx::low(txt), "@image")) {
+      if (str_StartsWith(CnvCtx::low(txt), "@image"))
+      {
         char imagefile[80];
 
         str_trim(imagefile, txt + 7);
         fp_tmp << "<IMAGE> " << imagefile << '\n';
-      } else if (str_StartsWith(CnvCtx::low(txt), "@b")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@b"))
+      {
         fp_tmp << "<B> " << txt + 3 << '\n';
-      } else if (str_StartsWith(CnvCtx::low(txt), "@h1")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@h1"))
+      {
         fp_tmp << "<H1> " << txt + 4 << '\n';
-      } else if (str_StartsWith(CnvCtx::low(txt), "@h2")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@h2"))
+      {
         fp_tmp << "<H2> " << txt + 4 << '\n';
-      } else if (str_StartsWith(CnvCtx::low(txt), "@i")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@i"))
+      {
         fp_tmp << "<i> " << txt + 3 << '\n';
-      } else
+      }
+      else
         fp_tmp << ctx->rw->doc_text[i] << '\n';
     }
   }
-  for (i = 0; i < ctx->rw->doc_clink_cnt; i++) {
+  for (i = 0; i < ctx->rw->doc_clink_cnt; i++)
+  {
     strcpy(prefix, CnvCtx::low(ctx->rw->volume_name));
     strcat(prefix, "_");
-    if (str_StartsWith(ctx->rw->doc_clink_ref[i], prefix)) {
+    if (str_StartsWith(ctx->rw->doc_clink_ref[i], prefix))
+    {
       strcpy(link_ref, &ctx->rw->doc_clink_ref[i][strlen(prefix)]);
       if ((s = strrchr(link_ref, '.')))
         *s = 0;
-    } else {
-      if ((s = strchr(ctx->rw->doc_clink_ref[i], '_'))) {
+    }
+    else
+    {
+      if ((s = strchr(ctx->rw->doc_clink_ref[i], '_')))
+      {
         int len = s - ctx->rw->doc_clink_ref[i];
         memset(link_ref, 0, sizeof(link_ref));
         strcpy(link_ref, &ctx->rw->doc_clink_ref[i][len + 1]);
@@ -491,14 +527,15 @@ int CnvWblToXtthelp::typedef_exec()
         strcat(link_ref, ", ,$pwr_lang/");
         strncat(link_ref, ctx->rw->doc_clink_ref[i], len);
         strcat(link_ref, "_xtthelp.dat");
-      } else {
+      }
+      else
+      {
         strcpy(link_ref, ctx->rw->doc_clink_ref[i]);
         if ((s = strrchr(link_ref, '.')))
           *s = 0;
       }
     }
-    fp_tmp << "      " << ctx->rw->doc_clink_text[i] << " <LINK>" << link_ref
-           << '\n';
+    fp_tmp << "      " << ctx->rw->doc_clink_text[i] << " <LINK>" << link_ref << '\n';
   }
   first_bit = 1;
   return 1;

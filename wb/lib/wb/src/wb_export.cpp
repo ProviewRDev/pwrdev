@@ -36,6 +36,4 @@
 
 #include "wb_export.h"
 
-wb_export::~wb_export()
-{
-}
+wb_export::~wb_export() {}

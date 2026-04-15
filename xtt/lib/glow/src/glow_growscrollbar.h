@@ -53,7 +53,8 @@
   object is clicked on, moved etc.
 */
 
-class GrowScrollBar : public GrowRect {
+class GrowScrollBar : public GrowRect
+{
 public:
   //! Constuctor
   /*!
@@ -71,12 +72,11 @@ public:
     \param bar_d_type	Bar color.
     \param nodraw	Don't draw the object now.
   */
-  GrowScrollBar(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0,
-      double w = 0, double h = 0, glow_eDir dir = glow_eDir_Vertical,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1,
-      glow_eDrawType fill_d_type = glow_eDrawType_Line,
-      glow_eDrawType bar_d_type = glow_eDrawType_LightGray, int nodraw = 0);
+  GrowScrollBar(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0, double w = 0, double h = 0,
+                glow_eDir dir = glow_eDir_Vertical, glow_eDrawType border_d_type = glow_eDrawType_Line,
+                int line_w = 1, glow_mDisplayLevel display_lev = glow_mDisplayLevel_1,
+                glow_eDrawType fill_d_type = glow_eDrawType_Line,
+                glow_eDrawType bar_d_type = glow_eDrawType_LightGray, int nodraw = 0);
 
   //! Destructor
   /*! Remove the object from context, and erase it from the screen.
@@ -106,32 +106,27 @@ public:
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowScrollBar;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowScrollBar; }
 
-  double max_value; //!< Max value for bar value
-  double min_value; //!< Min value for bar value
-  double bar_value; //!< Bar value
-  double bar_length; //!< Bar length
-  void* user_data; //!< User data.
-  glow_eDir direction; //!< Vertical or horizontal direction.
-  int movement_active; //!< The scrollbar i currently moved.
-  double start_pos; //!< Cursor start position for movement.
-  double start_value; //!< Bar value when movement is started.
-  void* callback_userdata; //!< Userdata in value change callback.
+  double max_value;                        //!< Max value for bar value
+  double min_value;                        //!< Min value for bar value
+  double bar_value;                        //!< Bar value
+  double bar_length;                       //!< Bar length
+  void* user_data;                         //!< User data.
+  glow_eDir direction;                     //!< Vertical or horizontal direction.
+  int movement_active;                     //!< The scrollbar i currently moved.
+  double start_pos;                        //!< Cursor start position for movement.
+  double start_value;                      //!< Bar value when movement is started.
+  void* callback_userdata;                 //!< Userdata in value change callback.
   void (*value_changed_cb)(void*, double); //!< Callback when value is changed
-  glow_eDrawType bar_color; //!< Color of bar.
+  glow_eDrawType bar_color;                //!< Color of bar.
 
-  void register_value_changed_cb(
-      void* userdata, void (*value_changed)(void*, double))
+  void register_value_changed_cb(void* userdata, void (*value_changed)(void*, double))
   {
     callback_userdata = userdata, value_changed_cb = value_changed;
   }
 
-  int event_handler(
-      GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
 
   //! Draw the object.
   /*!
@@ -147,8 +142,8 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();
@@ -172,19 +167,13 @@ public:
   /*!
     \param data User data.
   */
-  void set_user_data(void* data)
-  {
-    user_data = data;
-  }
+  void set_user_data(void* data) { user_data = data; }
 
   //! Get user data.
   /*!
     \param data User data.
   */
-  void get_user_data(void** data)
-  {
-    *data = user_data;
-  }
+  void get_user_data(void** data) { *data = user_data; }
 
   //! Export the object as a javabean.
   /*!
@@ -202,8 +191,8 @@ public:
     used to generate
     java code for the bean.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ofstream& fp);
 
   //! Conversion between different versions of Glow
   /*!
@@ -223,10 +212,7 @@ public:
     bar_color = b_color;
   }
 
-  void set_shadow(int shadowval)
-  {
-    shadow = shadowval;
-  }
+  void set_shadow(int shadowval) { shadow = shadowval; }
 };
 
 /*@}*/

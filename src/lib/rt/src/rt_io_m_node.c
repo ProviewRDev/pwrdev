@@ -50,10 +50,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   return 1;
 }
 
-static pwr_tStatus IoAgentSwap(io_tCtx ctx, io_sAgent* ap)
-{
-  return 1;
-}
+static pwr_tStatus IoAgentSwap(io_tCtx ctx, io_sAgent* ap) { return 1; }
 
 /*----------------------------------------------------------------------------*\
 
@@ -63,5 +60,5 @@ static pwr_tStatus IoAgentSwap(io_tCtx ctx, io_sAgent* ap)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Node) = { pwr_BindIoMethod(IoAgentInit),
-  pwr_BindIoMethod(IoAgentSwap), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Node) = {pwr_BindIoMethod(IoAgentInit), pwr_BindIoMethod(IoAgentSwap),
+                                       pwr_NullMethod};

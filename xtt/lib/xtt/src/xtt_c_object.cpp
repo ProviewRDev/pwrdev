@@ -58,8 +58,7 @@ static pwr_tStatus OpenObject(xmenu_sMenuCall* ip)
 {
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -74,7 +73,8 @@ static pwr_tStatus OpenObjectFilter(xmenu_sMenuCall* ip)
   int sts;
   pwr_tClassId classid;
 
-  if (ip->Caller == xmenu_mUtility_Ge) {
+  if (ip->Caller == xmenu_mUtility_Ge)
+  {
     sts = gdh_GetObjectClass(ip->Pointed.Objid, &classid);
     if (EVEN(sts))
       return sts;
@@ -92,8 +92,7 @@ static pwr_tStatus OpenCrossref(xmenu_sMenuCall* ip)
 {
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -111,8 +110,7 @@ static pwr_tStatus OpenCrossrefFilter(xmenu_sMenuCall* ip)
   pwr_tStatus sts;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -139,8 +137,7 @@ static pwr_tStatus HistEvent(xmenu_sMenuCall* ip)
   pwr_tCid cid;
   pwr_tAttrRef aref;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -149,9 +146,11 @@ static pwr_tStatus HistEvent(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_DSup:
-  case pwr_cClass_ASup: {
+  case pwr_cClass_ASup:
+  {
     // Show events for Attribute instead
     sts = gdh_ArefANameToAref(objar, "Attribute", &aref);
     if (EVEN(sts))
@@ -187,8 +186,7 @@ static pwr_tStatus HistEventFilter(xmenu_sMenuCall* ip)
   if (!((XNav*)ip->EditorContext)->eventlog_enabled())
     return XNAV__INVISIBLE;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -214,28 +212,28 @@ static pwr_tStatus OpenTrace(xmenu_sMenuCall* ip)
   pwr_sAttrRef plcconnect;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
 
-  if (!((XNav*)ip->EditorContext)
-           ->is_authorized(pwr_mAccess_RtPlc | pwr_mAccess_System, 0))
+  if (!((XNav*)ip->EditorContext)->is_authorized(pwr_mAccess_RtPlc | pwr_mAccess_System, 0))
     return 1;
 
   // Check if object reside in plc
-  for (sts = gdh_GetParent(objar->Objid, &parent); ODD(sts);
-       sts = gdh_GetParent(parent, &parent)) {
+  for (sts = gdh_GetParent(objar->Objid, &parent); ODD(sts); sts = gdh_GetParent(parent, &parent))
+  {
     gdh_GetObjectClass(parent, &classid);
-    if (classid == pwr_cClass_plc) {
+    if (classid == pwr_cClass_plc)
+    {
       in_plc = true;
       oid = objar->Objid;
       gdh_GetParent(oid, &parent);
       break;
     }
   }
-  if (!in_plc) {
+  if (!in_plc)
+  {
     pwr_tAName aname;
     sts = gdh_AttrrefToName(objar, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
@@ -243,12 +241,15 @@ static pwr_tStatus OpenTrace(xmenu_sMenuCall* ip)
     strcpy(aname, name);
     strcat(aname, ".PlcConnect");
     sts = gdh_GetObjectInfo(aname, (void*)&plcconnect, sizeof(plcconnect));
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       oid = plcconnect.Objid;
       sts = gdh_GetParent(oid, &parent);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       pwr_tOid plcoid;
 
       strcpy(aname, name);
@@ -268,8 +269,7 @@ static pwr_tStatus OpenTrace(xmenu_sMenuCall* ip)
     }
   }
 
-  sts = gdh_ObjidToName(
-      parent, parent_name, sizeof(parent_name), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(parent, parent_name, sizeof(parent_name), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
   sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_object);
@@ -292,22 +292,19 @@ static pwr_tStatus OpenTraceFilter(xmenu_sMenuCall* ip)
   pwr_tAName name, aname;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
 
-  if (ip->Caller == xmenu_mUtility_Trace
-      || ip->Caller == xmenu_mUtility_Simulate)
+  if (ip->Caller == xmenu_mUtility_Trace || ip->Caller == xmenu_mUtility_Simulate)
     return XNAV__INVISIBLE;
 
-  if (!((XNav*)ip->EditorContext)
-           ->is_authorized(pwr_mAccess_RtPlc | pwr_mAccess_System, 0))
+  if (!((XNav*)ip->EditorContext)->is_authorized(pwr_mAccess_RtPlc | pwr_mAccess_System, 0))
     return XNAV__INVISIBLE;
 
-  for (sts = gdh_GetParent(objar->Objid, &parent); ODD(sts);
-       sts = gdh_GetParent(parent, &parent)) {
+  for (sts = gdh_GetParent(objar->Objid, &parent); ODD(sts); sts = gdh_GetParent(parent, &parent))
+  {
     gdh_GetObjectClass(parent, &classid);
     if (classid == pwr_cClass_plc)
       return XNAV__SUCCESS;
@@ -320,9 +317,10 @@ static pwr_tStatus OpenTraceFilter(xmenu_sMenuCall* ip)
   strcpy(aname, name);
   strcat(aname, ".PlcConnect");
   sts = gdh_GetObjectInfo(aname, (void*)&plcconnect, sizeof(plcconnect));
-  if (ODD(sts) && cdh_ObjidIsNotNull(plcconnect.Objid)) {
-    for (sts = gdh_GetParent(plcconnect.Objid, &parent); ODD(sts);
-         sts = gdh_GetParent(parent, &parent)) {
+  if (ODD(sts) && cdh_ObjidIsNotNull(plcconnect.Objid))
+  {
+    for (sts = gdh_GetParent(plcconnect.Objid, &parent); ODD(sts); sts = gdh_GetParent(parent, &parent))
+    {
       gdh_GetObjectClass(parent, &classid);
       if (classid == pwr_cClass_plc)
         return XNAV__SUCCESS;
@@ -333,7 +331,8 @@ static pwr_tStatus OpenTraceFilter(xmenu_sMenuCall* ip)
   strcpy(aname, name);
   strcat(aname, ".PlcEmbed.PlcObject");
   sts = gdh_GetObjectInfo(aname, (void*)&plcoid, sizeof(plcoid));
-  if (ODD(sts) && cdh_ObjidIsNotNull(plcoid)) {
+  if (ODD(sts) && cdh_ObjidIsNotNull(plcoid))
+  {
     gdh_GetObjectClass(plcoid, &classid);
     if (classid == pwr_cClass_plc)
       return XNAV__SUCCESS;
@@ -356,8 +355,7 @@ static pwr_tStatus OpenTrend(xmenu_sMenuCall* ip)
   pwr_sAttrRef deftrend;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -366,10 +364,9 @@ static pwr_tStatus OpenTrend(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  if (classid == pwr_cClass_DsTrend || classid == pwr_cClass_DsTrendCurve
-      || classid == pwr_cClass_PlotGroup) {
-    sts = gdh_AttrrefToName(
-        &ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
+  if (classid == pwr_cClass_DsTrend || classid == pwr_cClass_DsTrendCurve || classid == pwr_cClass_PlotGroup)
+  {
+    sts = gdh_AttrrefToName(&ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
@@ -386,14 +383,14 @@ static pwr_tStatus OpenTrend(xmenu_sMenuCall* ip)
 
   strcat(name, ".DefTrend");
   sts = gdh_GetObjectInfo(name, (void*)&deftrend, sizeof(deftrend));
-  if (ODD(sts) && cdh_ObjidIsNotNull(deftrend.Objid)) {
+  if (ODD(sts) && cdh_ObjidIsNotNull(deftrend.Objid))
+  {
     // Default Trend found
     sts = gdh_GetAttrRefTid(&deftrend, &classid);
-    if (ODD(sts)
-        && (classid == pwr_cClass_DsTrend || classid == pwr_cClass_DsTrendCurve
-               || classid == pwr_cClass_PlotGroup)) {
-      sts = gdh_AttrrefToName(
-          &deftrend, name, sizeof(name), cdh_mName_volumeStrict);
+    if (ODD(sts) && (classid == pwr_cClass_DsTrend || classid == pwr_cClass_DsTrendCurve ||
+                     classid == pwr_cClass_PlotGroup))
+    {
+      sts = gdh_AttrrefToName(&deftrend, name, sizeof(name), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
 
@@ -410,12 +407,14 @@ static pwr_tStatus OpenTrend(xmenu_sMenuCall* ip)
 
   found = 0;
   sts = gdh_GetChild(objar->Objid, &child);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(child, &classid);
     if (EVEN(sts))
       return sts;
 
-    if (classid == pwr_cClass_DsTrend || classid == pwr_cClass_DsTrendCurve) {
+    if (classid == pwr_cClass_DsTrend || classid == pwr_cClass_DsTrendCurve)
+    {
       found = 1;
       break;
     }
@@ -445,8 +444,7 @@ static pwr_tStatus OpenTrendFilter(xmenu_sMenuCall* ip)
   pwr_tAName name;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -455,18 +453,21 @@ static pwr_tStatus OpenTrendFilter(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_DsTrend:
   case pwr_cClass_DsTrendCurve:
     return XNAV__SUCCESS;
-  case pwr_cClass_PlotGroup: {
+  case pwr_cClass_PlotGroup:
+  {
     sts = gdh_AttrrefToName(objar, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
     strcat(name, ".YObjectName[0]");
     sts = gdh_GetObjectInfo(name, (void*)&deftrend, sizeof(deftrend));
-    if (ODD(sts) && cdh_ObjidIsNotNull(deftrend.Objid)) {
+    if (ODD(sts) && cdh_ObjidIsNotNull(deftrend.Objid))
+    {
       // Default Trend found
       sts = gdh_GetAttrRefTid(&deftrend, &classid);
       if (ODD(sts) && classid == pwr_cClass_DsTrend)
@@ -483,12 +484,12 @@ static pwr_tStatus OpenTrendFilter(xmenu_sMenuCall* ip)
 
   strcat(name, ".DefTrend");
   sts = gdh_GetObjectInfo(name, (void*)&deftrend, sizeof(deftrend));
-  if (ODD(sts) && cdh_ObjidIsNotNull(deftrend.Objid)) {
+  if (ODD(sts) && cdh_ObjidIsNotNull(deftrend.Objid))
+  {
     // Default Trend found
     sts = gdh_GetAttrRefTid(&deftrend, &classid);
-    if (ODD(sts)
-        && (classid == pwr_cClass_DsTrend || classid == pwr_cClass_DsTrendCurve
-               || classid == pwr_cClass_PlotGroup))
+    if (ODD(sts) && (classid == pwr_cClass_DsTrend || classid == pwr_cClass_DsTrendCurve ||
+                     classid == pwr_cClass_PlotGroup))
       return XNAV__SUCCESS;
   }
 
@@ -500,7 +501,8 @@ static pwr_tStatus OpenTrendFilter(xmenu_sMenuCall* ip)
     return XNAV__INVISIBLE;
 
   sts = gdh_GetChild(objar->Objid, &child);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(child, &classid);
     if (EVEN(sts))
       return sts;
@@ -527,8 +529,7 @@ static pwr_tStatus Camera(xmenu_sMenuCall* ip)
   pwr_sAttrRef defcamera;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -537,9 +538,9 @@ static pwr_tStatus Camera(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  if (classid == pwr_cClass_CameraPosition) {
-    sts = gdh_AttrrefToName(
-        &ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
+  if (classid == pwr_cClass_CameraPosition)
+  {
+    sts = gdh_AttrrefToName(&ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
@@ -556,12 +557,13 @@ static pwr_tStatus Camera(xmenu_sMenuCall* ip)
 
   strcat(name, ".DefCamera");
   sts = gdh_GetObjectInfo(name, (void*)&defcamera, sizeof(defcamera));
-  if (ODD(sts) && cdh_ObjidIsNotNull(defcamera.Objid)) {
+  if (ODD(sts) && cdh_ObjidIsNotNull(defcamera.Objid))
+  {
     // Default camera found
     sts = gdh_GetAttrRefTid(&defcamera, &classid);
-    if (ODD(sts) && classid == pwr_cClass_CameraPosition) {
-      sts = gdh_AttrrefToName(
-          &defcamera, name, sizeof(name), cdh_mName_volumeStrict);
+    if (ODD(sts) && classid == pwr_cClass_CameraPosition)
+    {
+      sts = gdh_AttrrefToName(&defcamera, name, sizeof(name), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
 
@@ -578,12 +580,14 @@ static pwr_tStatus Camera(xmenu_sMenuCall* ip)
 
   found = 0;
   sts = gdh_GetChild(objar->Objid, &child);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(child, &classid);
     if (EVEN(sts))
       return sts;
 
-    if (classid == pwr_cClass_CameraPosition) {
+    if (classid == pwr_cClass_CameraPosition)
+    {
       found = 1;
       break;
     }
@@ -613,8 +617,7 @@ static pwr_tStatus CameraFilter(xmenu_sMenuCall* ip)
   pwr_tAName name;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -623,7 +626,8 @@ static pwr_tStatus CameraFilter(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_CameraPosition:
     return XNAV__SUCCESS;
   }
@@ -635,7 +639,8 @@ static pwr_tStatus CameraFilter(xmenu_sMenuCall* ip)
 
   strcat(name, ".DefCamera");
   sts = gdh_GetObjectInfo(name, (void*)&defcamera, sizeof(defcamera));
-  if (ODD(sts) && cdh_ObjidIsNotNull(defcamera.Objid)) {
+  if (ODD(sts) && cdh_ObjidIsNotNull(defcamera.Objid))
+  {
     // Default Camera found
     sts = gdh_GetAttrRefTid(&defcamera, &classid);
     if (ODD(sts) && classid == pwr_cClass_CameraPosition)
@@ -650,7 +655,8 @@ static pwr_tStatus CameraFilter(xmenu_sMenuCall* ip)
     return XNAV__INVISIBLE;
 
   sts = gdh_GetChild(objar->Objid, &child);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(child, &classid);
     if (EVEN(sts))
       return sts;
@@ -677,8 +683,7 @@ static pwr_tStatus OpenHistory(xmenu_sMenuCall* ip)
   pwr_sAttrRef defhist;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -687,10 +692,9 @@ static pwr_tStatus OpenHistory(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  if (classid == pwr_cClass_SevHist || classid == pwr_cClass_SevHistObject
-      || classid == pwr_cClass_PlotGroup) {
-    sts = gdh_AttrrefToName(
-        &ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
+  if (classid == pwr_cClass_SevHist || classid == pwr_cClass_SevHistObject || classid == pwr_cClass_PlotGroup)
+  {
+    sts = gdh_AttrrefToName(&ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
@@ -707,14 +711,14 @@ static pwr_tStatus OpenHistory(xmenu_sMenuCall* ip)
 
   strcat(name, ".DefHistory");
   sts = gdh_GetObjectInfo(name, (void*)&defhist, sizeof(defhist));
-  if (ODD(sts) && cdh_ObjidIsNotNull(defhist.Objid)) {
+  if (ODD(sts) && cdh_ObjidIsNotNull(defhist.Objid))
+  {
     // Default History found
     sts = gdh_GetAttrRefTid(&defhist, &classid);
-    if (ODD(sts)
-        && (classid == pwr_cClass_SevHist || classid == pwr_cClass_SevHistObject
-               || classid == pwr_cClass_PlotGroup)) {
-      sts = gdh_AttrrefToName(
-          &defhist, name, sizeof(name), cdh_mName_volumeStrict);
+    if (ODD(sts) && (classid == pwr_cClass_SevHist || classid == pwr_cClass_SevHistObject ||
+                     classid == pwr_cClass_PlotGroup))
+    {
+      sts = gdh_AttrrefToName(&defhist, name, sizeof(name), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
 
@@ -731,12 +735,14 @@ static pwr_tStatus OpenHistory(xmenu_sMenuCall* ip)
 
   found = 0;
   sts = gdh_GetChild(objar->Objid, &oid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(oid, &classid);
     if (EVEN(sts))
       return sts;
 
-    if (classid == pwr_cClass_SevHist || classid == pwr_cClass_SevHistObject) {
+    if (classid == pwr_cClass_SevHist || classid == pwr_cClass_SevHistObject)
+    {
       found++;
       if (found == 1)
         child = oid;
@@ -746,7 +752,8 @@ static pwr_tStatus OpenHistory(xmenu_sMenuCall* ip)
   if (!found)
     return 1;
 
-  if (found == 1) {
+  if (found == 1)
+  {
     sts = gdh_ObjidToName(child, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
@@ -754,10 +761,11 @@ static pwr_tStatus OpenHistory(xmenu_sMenuCall* ip)
     // Open history
     sprintf(cmd, "open history /name=%s /title=\"%s\"", name, name);
     ((XNav*)ip->EditorContext)->command(cmd);
-  } else {
+  }
+  else
+  {
     // Open history selection
-    sts = gdh_AttrrefToName(
-        &ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
+    sts = gdh_AttrrefToName(&ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
@@ -777,8 +785,7 @@ static pwr_tStatus OpenHistoryFilter(xmenu_sMenuCall* ip)
   pwr_tAName name;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -787,8 +794,8 @@ static pwr_tStatus OpenHistoryFilter(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  if (classid == pwr_cClass_SevHist || classid == pwr_cClass_SevHistObject
-      || classid == pwr_cClass_PlotGroup) {
+  if (classid == pwr_cClass_SevHist || classid == pwr_cClass_SevHistObject || classid == pwr_cClass_PlotGroup)
+  {
     return XNAV__SUCCESS;
   }
 
@@ -799,12 +806,12 @@ static pwr_tStatus OpenHistoryFilter(xmenu_sMenuCall* ip)
 
   strcat(name, ".DefHist");
   sts = gdh_GetObjectInfo(name, (void*)&defhist, sizeof(defhist));
-  if (ODD(sts) && cdh_ObjidIsNotNull(defhist.Objid)) {
+  if (ODD(sts) && cdh_ObjidIsNotNull(defhist.Objid))
+  {
     // Default History found
     sts = gdh_GetAttrRefTid(&defhist, &classid);
-    if (ODD(sts)
-        && (classid == pwr_cClass_SevHist || classid == pwr_cClass_SevHistObject
-               || classid == pwr_cClass_PlotGroup))
+    if (ODD(sts) && (classid == pwr_cClass_SevHist || classid == pwr_cClass_SevHistObject ||
+                     classid == pwr_cClass_PlotGroup))
       return XNAV__SUCCESS;
   }
 
@@ -813,7 +820,8 @@ static pwr_tStatus OpenHistoryFilter(xmenu_sMenuCall* ip)
     return XNAV__INVISIBLE;
 
   sts = gdh_GetChild(objar->Objid, &child);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(child, &classid);
     if (EVEN(sts))
       return sts;
@@ -840,8 +848,7 @@ static pwr_tStatus OpenFast(xmenu_sMenuCall* ip)
   pwr_sAttrRef deffast;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -850,7 +857,8 @@ static pwr_tStatus OpenFast(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  if (classid == pwr_cClass_DsFastCurve) {
+  if (classid == pwr_cClass_DsFastCurve)
+  {
     sts = gdh_AttrrefToName(objar, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
@@ -868,12 +876,13 @@ static pwr_tStatus OpenFast(xmenu_sMenuCall* ip)
 
   strcat(name, ".DefFast");
   sts = gdh_GetObjectInfo(name, (void*)&deffast, sizeof(deffast));
-  if (ODD(sts) && cdh_ObjidIsNotNull(deffast.Objid)) {
+  if (ODD(sts) && cdh_ObjidIsNotNull(deffast.Objid))
+  {
     // Default Fast found
     sts = gdh_GetAttrRefTid(&deffast, &classid);
-    if (ODD(sts) && classid == pwr_cClass_DsFastCurve) {
-      sts = gdh_AttrrefToName(
-          &deffast, name, sizeof(name), cdh_mName_volumeStrict);
+    if (ODD(sts) && classid == pwr_cClass_DsFastCurve)
+    {
+      sts = gdh_AttrrefToName(&deffast, name, sizeof(name), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
 
@@ -890,12 +899,14 @@ static pwr_tStatus OpenFast(xmenu_sMenuCall* ip)
 
   found = 0;
   sts = gdh_GetChild(objar->Objid, &child);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(child, &classid);
     if (EVEN(sts))
       return sts;
 
-    if (classid == pwr_cClass_DsFastCurve) {
+    if (classid == pwr_cClass_DsFastCurve)
+    {
       found = 1;
       break;
     }
@@ -925,8 +936,7 @@ static pwr_tStatus OpenFastFilter(xmenu_sMenuCall* ip)
   pwr_tAName name;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -945,7 +955,8 @@ static pwr_tStatus OpenFastFilter(xmenu_sMenuCall* ip)
 
   strcat(name, ".DefFast");
   sts = gdh_GetObjectInfo(name, (void*)&deffast, sizeof(deffast));
-  if (ODD(sts) && cdh_ObjidIsNotNull(deffast.Objid)) {
+  if (ODD(sts) && cdh_ObjidIsNotNull(deffast.Objid))
+  {
     // Default Fast found
     sts = gdh_GetAttrRefTid(&deffast, &classid);
     if (ODD(sts) && classid == pwr_cClass_DsFastCurve)
@@ -957,7 +968,8 @@ static pwr_tStatus OpenFastFilter(xmenu_sMenuCall* ip)
     return XNAV__INVISIBLE;
 
   sts = gdh_GetChild(objar->Objid, &child);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(child, &classid);
     if (EVEN(sts))
       return sts;
@@ -975,12 +987,10 @@ static pwr_tStatus RtNavigator(xmenu_sMenuCall* ip)
 {
   pwr_sAttrRef* objar;
 
-  if (!((XNav*)ip->EditorContext)
-           ->is_authorized(pwr_mAccess_RtNavigator | pwr_mAccess_System, 0))
+  if (!((XNav*)ip->EditorContext)->is_authorized(pwr_mAccess_RtNavigator | pwr_mAccess_System, 0))
     return 1;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -994,13 +1004,11 @@ static pwr_tStatus RtNavigator(xmenu_sMenuCall* ip)
 // Open runtime navigator filter
 static pwr_tStatus RtNavigatorFilter(xmenu_sMenuCall* ip)
 {
-  if (!((XNav*)ip->EditorContext)
-           ->is_authorized(pwr_mAccess_RtNavigator | pwr_mAccess_System, 0))
+  if (!((XNav*)ip->EditorContext)->is_authorized(pwr_mAccess_RtNavigator | pwr_mAccess_System, 0))
     return XNAV__INVISIBLE;
 
-  if (ip->Caller == xmenu_mUtility_XNav
-      && cdh_ObjidIsEqual(ip->Pointed.Objid,
-             ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (ip->Caller == xmenu_mUtility_XNav &&
+      cdh_ObjidIsEqual(ip->Pointed.Objid, ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     return XNAV__INVISIBLE;
   return XNAV__SUCCESS;
 }
@@ -1014,8 +1022,7 @@ static pwr_tStatus OpenObjectGraph(xmenu_sMenuCall* ip)
   pwr_sAttrRef aref;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1026,7 +1033,8 @@ static pwr_tStatus OpenObjectGraph(xmenu_sMenuCall* ip)
 
   // Check if object is mounted with other name
   sts = gdh_NameToAttrref(pwr_cNObjid, name, &aref);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     sts = gdh_AttrrefToName(objar, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
@@ -1048,16 +1056,15 @@ static pwr_tStatus OpenObjectGraphFilter(xmenu_sMenuCall* ip)
   pwr_tFileName found_file;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
 
   for (sts = gdh_GetAttrRefTid(objar, &classid); ODD(sts);
-       sts = gdh_GetSuperClass(classid, &classid, pwr_cNObjid)) {
-    sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname,
-        sizeof(classname), cdh_mName_object);
+       sts = gdh_GetSuperClass(classid, &classid, pwr_cNObjid))
+  {
+    sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname, sizeof(classname), cdh_mName_object);
     if (EVEN(sts))
       return sts;
     str_ToLower(classname, classname);
@@ -1068,14 +1075,16 @@ static pwr_tStatus OpenObjectGraphFilter(xmenu_sMenuCall* ip)
       sprintf(fname, "$pwr_exe/pwr_c_%s.pwg", classname);
     sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
     dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       sprintf(fname, "$pwrp_exe/%s.pwg", classname);
       sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
       dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
-      if (EVEN(sts)) {
-	sprintf(fname, "$pwrp_exe/pwr_c_%s.pwg", classname);
-	sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
-	dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
+      if (EVEN(sts))
+      {
+        sprintf(fname, "$pwrp_exe/pwr_c_%s.pwg", classname);
+        sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
+        dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
       }
     }
     if (ODD(sts))
@@ -1094,8 +1103,7 @@ static pwr_tStatus OpenParentObjectGraph(xmenu_sMenuCall* ip)
   pwr_sAttrRef* objar;
   pwr_tAttrRef pobjar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1113,9 +1121,9 @@ static pwr_tStatus OpenParentObjectGraph(xmenu_sMenuCall* ip)
 
   // Check if object is mounted with other name
   sts = gdh_NameToAttrref(pwr_cNObjid, name, &aref);
-  if (EVEN(sts)) {
-    sts = gdh_AttrrefToName(
-        &pobjar, name, sizeof(name), cdh_mName_volumeStrict);
+  if (EVEN(sts))
+  {
+    sts = gdh_AttrrefToName(&pobjar, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
   }
@@ -1137,8 +1145,7 @@ static pwr_tStatus OpenParentObjectGraphFilter(xmenu_sMenuCall* ip)
   pwr_sAttrRef* objar;
   pwr_tAttrRef pobjar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1151,9 +1158,9 @@ static pwr_tStatus OpenParentObjectGraphFilter(xmenu_sMenuCall* ip)
     return XNAV__INVISIBLE;
 
   for (sts = gdh_GetAttrRefTid(&pobjar, &classid); ODD(sts);
-       sts = gdh_GetSuperClass(classid, &classid, pwr_cNObjid)) {
-    sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname,
-        sizeof(classname), cdh_mName_object);
+       sts = gdh_GetSuperClass(classid, &classid, pwr_cNObjid))
+  {
+    sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname, sizeof(classname), cdh_mName_object);
     if (EVEN(sts))
       return sts;
     str_ToLower(classname, classname);
@@ -1164,7 +1171,8 @@ static pwr_tStatus OpenParentObjectGraphFilter(xmenu_sMenuCall* ip)
       sprintf(fname, "$pwr_exe/pwr_c_%s.pwg", classname);
     sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
     dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       sprintf(fname, "$pwrp_exe/%s.pwg", classname);
       sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
       dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
@@ -1187,8 +1195,7 @@ static pwr_tStatus OpenGraph(xmenu_sMenuCall* ip)
   char cmd[400];
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1200,19 +1207,24 @@ static pwr_tStatus OpenGraph(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  if (classid == pwr_cClass_XttGraph) {
+  if (classid == pwr_cClass_XttGraph)
+  {
     sts = gdh_AttrrefToName(objar, name, sizeof(name), cdh_mNName);
     strcpy(cmd, "ope gra/obj=");
     strcat(cmd, name);
     sts = ((XNav*)ip->EditorContext)->command(cmd);
     return XNAV__SUCCESS;
-  } else if (classid == pwr_cClass_XttMultiView) {
+  }
+  else if (classid == pwr_cClass_XttMultiView)
+  {
     sts = gdh_AttrrefToName(objar, name, sizeof(name), cdh_mNName);
     strcpy(cmd, "ope mult/name=");
     strcat(cmd, name);
     sts = ((XNav*)ip->EditorContext)->command(cmd);
     return XNAV__SUCCESS;
-  } else if (classid == pwr_cClass_XttCamera) {
+  }
+  else if (classid == pwr_cClass_XttCamera)
+  {
     sts = gdh_AttrrefToName(objar, name, sizeof(name), cdh_mNName);
     strcpy(cmd, "ope camera/obj=");
     strcat(cmd, name);
@@ -1220,32 +1232,39 @@ static pwr_tStatus OpenGraph(xmenu_sMenuCall* ip)
     return XNAV__SUCCESS;
   }
 
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
     strcat(name, ".DefGraph");
     sts = gdh_GetObjectInfo(name, (void*)&defgraph, sizeof(defgraph));
-    if (ODD(sts) && cdh_ObjidIsNotNull(defgraph.Objid)) {
+    if (ODD(sts) && cdh_ObjidIsNotNull(defgraph.Objid))
+    {
       // Default XttGraph found
       sts = gdh_GetAttrRefTid(&defgraph, &classid);
       if (EVEN(sts))
         return sts;
 
-      if (classid == pwr_cClass_XttGraph) {
+      if (classid == pwr_cClass_XttGraph)
+      {
         sts = gdh_AttrrefToName(&defgraph, name, sizeof(name), cdh_mNName);
         strcpy(cmd, "ope gra/obj=");
         strcat(cmd, name);
         sts = ((XNav*)ip->EditorContext)->command(cmd);
         break;
-      } else if (classid == pwr_cClass_XttMultiView) {
+      }
+      else if (classid == pwr_cClass_XttMultiView)
+      {
         sts = gdh_AttrrefToName(&defgraph, name, sizeof(name), cdh_mNName);
         strcpy(cmd, "ope mult/name=");
         strcat(cmd, name);
         sts = ((XNav*)ip->EditorContext)->command(cmd);
         break;
-      } else if (classid == pwr_cClass_XttCamera) {
+      }
+      else if (classid == pwr_cClass_XttCamera)
+      {
         sts = gdh_AttrrefToName(&defgraph, name, sizeof(name), cdh_mNName);
         strcpy(cmd, "ope vide/obj=");
         strcat(cmd, name);
@@ -1254,10 +1273,12 @@ static pwr_tStatus OpenGraph(xmenu_sMenuCall* ip)
       }
     }
 
-    if (aref.Flags.b.Object) {
+    if (aref.Flags.b.Object)
+    {
       sts = gdh_GetParent(aref.Objid, &objid);
       aref = cdh_ObjidToAref(objid);
-    } else
+    }
+    else
       sts = gdh_AttrArefToObjectAref(&aref, &aref);
   }
 
@@ -1277,8 +1298,7 @@ static pwr_tStatus OpenGraphFilter(xmenu_sMenuCall* ip)
   char* s;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1290,28 +1310,30 @@ static pwr_tStatus OpenGraphFilter(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  if (classid == pwr_cClass_XttGraph || classid == pwr_cClass_XttMultiView
-      || classid == pwr_cClass_XttCamera)
+  if (classid == pwr_cClass_XttGraph || classid == pwr_cClass_XttMultiView || classid == pwr_cClass_XttCamera)
     return XNAV__SUCCESS;
 
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_AttrrefToName(&aref, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
     strcat(name, ".DefGraph");
     sts = gdh_GetObjectInfo(name, (void*)&defgraph, sizeof(defgraph));
-    if (ODD(sts) && cdh_ObjidIsNotNull(defgraph.Objid)) {
+    if (ODD(sts) && cdh_ObjidIsNotNull(defgraph.Objid))
+    {
       // Default XttGraph found
       sts = gdh_GetAttrRefTid(&defgraph, &classid);
       if (EVEN(sts))
         return sts;
 
-      if (classid == pwr_cClass_XttGraph) {
-        if (ip->Caller == xmenu_mUtility_Ge) {
+      if (classid == pwr_cClass_XttGraph)
+      {
+        if (ip->Caller == xmenu_mUtility_Ge)
+        {
           // Check that graph is not the same as caller
-          sts = gdh_AttrrefToName(
-              &defgraph, name, sizeof(name), cdh_mName_volumeStrict);
+          sts = gdh_AttrrefToName(&defgraph, name, sizeof(name), cdh_mName_volumeStrict);
           if (EVEN(sts))
             return sts;
 
@@ -1326,16 +1348,19 @@ static pwr_tStatus OpenGraphFilter(xmenu_sMenuCall* ip)
             return XNAV__INVISIBLE;
         }
         return XNAV__SUCCESS;
-      } else if (classid == pwr_cClass_XttMultiView)
+      }
+      else if (classid == pwr_cClass_XttMultiView)
         return XNAV__SUCCESS;
       else if (classid == pwr_cClass_XttCamera)
         return XNAV__SUCCESS;
     }
 
-    if (aref.Flags.b.Object) {
+    if (aref.Flags.b.Object)
+    {
       sts = gdh_GetParent(aref.Objid, &objid);
       aref = cdh_ObjidToAref(objid);
-    } else
+    }
+    else
       sts = gdh_AttrArefToObjectAref(&aref, &aref);
   }
 
@@ -1349,15 +1374,15 @@ static pwr_tStatus Collect(xmenu_sMenuCall* ip)
   pwr_sAttrRef aref;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
 
   aref = *objar;
   sts = ((XNav*)ip->EditorContext)->collect_insert(&aref);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     ((XNav*)ip->EditorContext)
         ->wow->DisplayError("Collect error", XNav::get_message(sts), lng_eCoding_ISO8859_1, 0);
   }
@@ -1373,14 +1398,13 @@ static pwr_tStatus CollectFilter(xmenu_sMenuCall* ip)
   pwr_sAttrRef aref;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
 
-  if (ip->ItemType == xmenu_eItemType_Object
-      || ip->ItemType == xmenu_eItemType_AttrObject) {
+  if (ip->ItemType == xmenu_eItemType_Object || ip->ItemType == xmenu_eItemType_AttrObject)
+  {
     aref = *objar;
     // Note, get_trace_attr replaces the value in aref for channels
     sts = XNav::get_trace_attr(&aref, attr);
@@ -1397,8 +1421,7 @@ static pwr_tStatus Dashboard(xmenu_sMenuCall* ip)
   pwr_sAttrRef aref;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1406,7 +1429,8 @@ static pwr_tStatus Dashboard(xmenu_sMenuCall* ip)
   aref = *objar;
 
   sts = ((XNav*)ip->EditorContext)->dashboard_insert(&aref);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     ((XNav*)ip->EditorContext)
         ->wow->DisplayError("Dashboard error", XNav::get_message(sts), lng_eCoding_ISO8859_1, 0);
   }
@@ -1422,14 +1446,13 @@ static pwr_tStatus DashboardFilter(xmenu_sMenuCall* ip)
   pwr_sAttrRef aref;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
 
-  if (ip->ItemType == xmenu_eItemType_Object
-      || ip->ItemType == xmenu_eItemType_AttrObject) {
+  if (ip->ItemType == xmenu_eItemType_Object || ip->ItemType == xmenu_eItemType_AttrObject)
+  {
     pwr_tCid cid;
     pwr_tObjName cname;
     pwr_tFileName fname;
@@ -1449,14 +1472,15 @@ static pwr_tStatus DashboardFilter(xmenu_sMenuCall* ip)
     sprintf(fname, "$pwrp_exe/dash_%s.ge_com", cdh_Low(cname));
     dcli_translate_filename(fname, fname);
     sts = dcli_file_time(fname, &time);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       sprintf(fname, "$pwr_exe/dash_c_%s.ge_com", cdh_Low(cname));
       dcli_translate_filename(fname, fname);
       sts = dcli_file_time(fname, &time);
     }
     if (ODD(sts))
-       return XNAV__SUCCESS;
-	
+      return XNAV__SUCCESS;
+
     // Note, get_trace_attr replaces the value in aref for channels
     sts = XNav::get_trace_attr(&aref, attr);
     if (EVEN(sts))
@@ -1475,8 +1499,7 @@ static pwr_tStatus Help(xmenu_sMenuCall* ip)
   pwr_sAttrRef* objar;
   pwr_tCid cid;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1485,8 +1508,10 @@ static pwr_tStatus Help(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  switch (cid) {
-  case pwr_cClass_plc: {
+  switch (cid)
+  {
+  case pwr_cClass_plc:
+  {
     pwr_tOid woid;
     char volstr[20];
 
@@ -1494,9 +1519,8 @@ static pwr_tStatus Help(xmenu_sMenuCall* ip)
     if (EVEN(sts))
       return XNAV__SUCCESS;
 
-    sprintf(cmd, "help plcw_%s /helpfile=\"" pwr_cNamePlcXttHelp "\"",
-        cdh_ObjidToFnString(0, woid),
-        cdh_VolumeIdToFnString(volstr, sizeof(volstr), woid.vid));
+    sprintf(cmd, "help plcw_%s /helpfile=\"" pwr_cNamePlcXttHelp "\"", cdh_ObjidToFnString(0, woid),
+            cdh_VolumeIdToFnString(volstr, sizeof(volstr), woid.vid));
 
     break;
   }
@@ -1529,8 +1553,7 @@ static pwr_tStatus HelpFilter(xmenu_sMenuCall* ip)
   pwr_sAttrRef* objar;
   pwr_tCid cid;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1539,7 +1562,8 @@ static pwr_tStatus HelpFilter(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_plc:
     return XNAV__SUCCESS;
   default:
@@ -1566,8 +1590,7 @@ static pwr_tStatus DataSheet(xmenu_sMenuCall* ip)
   pwr_tURL datasheet;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1596,8 +1619,7 @@ static pwr_tStatus DataSheetFilter(xmenu_sMenuCall* ip)
   pwr_tURL datasheet;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1625,8 +1647,7 @@ static pwr_tStatus Photo(xmenu_sMenuCall* ip)
   pwr_tURL photo;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1645,7 +1666,8 @@ static pwr_tStatus Photo(xmenu_sMenuCall* ip)
 
   if (strchr(photo, '.'))
     xnav_open_URL(photo);
-  else {
+  else
+  {
     pwr_tCmd cmd;
 
     sprintf(cmd, "help %s", photo);
@@ -1662,8 +1684,7 @@ static pwr_tStatus PhotoFilter(xmenu_sMenuCall* ip)
   pwr_tURL photo;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1693,25 +1714,25 @@ static pwr_tStatus CircuitDiagram(xmenu_sMenuCall* ip)
   bool is_parent = false;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
 
   objid = objar->Objid;
   sts = XNAV__SUCCESS;
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
     strcat(name, ".CircuitDiagram");
-    sts = gdh_GetObjectInfo(
-        name, (void*)circuitdiagram, sizeof(circuitdiagram));
+    sts = gdh_GetObjectInfo(name, (void*)circuitdiagram, sizeof(circuitdiagram));
     if (ODD(sts) && str_NoCaseStrcmp(circuitdiagram, "disabled") == 0)
       break;
-    if (ODD(sts) && !streq(circuitdiagram, "")) {
+    if (ODD(sts) && !streq(circuitdiagram, ""))
+    {
       // CircuitDiagram found
       xnav_open_URL(circuitdiagram);
       break;
@@ -1736,25 +1757,25 @@ static pwr_tStatus CircuitDiagramFilter(xmenu_sMenuCall* ip)
   bool is_parent = false;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
 
   objid = objar->Objid;
   sts = XNAV__SUCCESS;
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_ObjidToName(objid, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
     strcat(name, ".CircuitDiagram");
-    sts = gdh_GetObjectInfo(
-        name, (void*)circuitdiagram, sizeof(circuitdiagram));
+    sts = gdh_GetObjectInfo(name, (void*)circuitdiagram, sizeof(circuitdiagram));
     if (ODD(sts) && str_NoCaseStrcmp(circuitdiagram, "disabled") == 0)
       break;
-    if (ODD(sts) && !streq(circuitdiagram, "")) {
+    if (ODD(sts) && !streq(circuitdiagram, ""))
+    {
       // CircuitDiagram found
       return XNAV__SUCCESS;
     }
@@ -1776,8 +1797,7 @@ static pwr_tStatus Note(xmenu_sMenuCall* ip)
   char cmd[430];
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1800,8 +1820,7 @@ static pwr_tStatus NoteFilter(xmenu_sMenuCall* ip)
   pwr_tURL datasheet;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1825,8 +1844,7 @@ static pwr_tStatus BlockEvents(xmenu_sMenuCall* ip)
   pwr_tOName name;
   pwr_tStatus sts;
 
-  sts = gdh_ObjidToName(
-      ip->Pointed.Objid, name, sizeof(name), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(ip->Pointed.Objid, name, sizeof(name), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -1839,8 +1857,7 @@ static pwr_tStatus BlockEvents(xmenu_sMenuCall* ip)
 // Block Events Filter
 static pwr_tStatus BlockEventsFilter(xmenu_sMenuCall* ip)
 {
-  if (!((XNav*)ip->EditorContext)
-           ->is_authorized(pwr_mAccess_RtEventsBlock | pwr_mAccess_System, 0))
+  if (!((XNav*)ip->EditorContext)->is_authorized(pwr_mAccess_RtEventsBlock | pwr_mAccess_System, 0))
     return XNAV__INVISIBLE;
 
   return XNAV__SUCCESS;
@@ -1857,8 +1874,7 @@ static pwr_tStatus HelpClass(xmenu_sMenuCall* ip)
   pwr_tCmd cmd;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1867,21 +1883,21 @@ static pwr_tStatus HelpClass(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname,
-      sizeof(classname), cdh_mName_object);
+  sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname, sizeof(classname), cdh_mName_object);
   if (EVEN(sts))
     return sts;
 
   vid = cdh_CidToVid(classid);
-  if (cdh_cManufactClassVolMin <= vid && vid <= cdh_cManufactClassVolMax) {
+  if (cdh_cManufactClassVolMin <= vid && vid <= cdh_cManufactClassVolMax)
+  {
     /* Get help file for this volume */
     sts = gdh_VolumeIdToName(vid, vname, sizeof(vname));
     if (EVEN(sts))
       return sts;
 
     str_ToLower(vname, vname);
-    sprintf(cmd, "help %s /helpfile=\"$pwr_exe/%s/%s_xtthelp.dat\"", classname,
-        Lng::get_language_str(), vname);
+    sprintf(cmd, "help %s /helpfile=\"$pwr_exe/%s/%s_xtthelp.dat\"", classname, Lng::get_language_str(),
+            vname);
 
     sts = ((XNav*)ip->EditorContext)->command(cmd);
     return XNAV__SUCCESS;
@@ -1903,13 +1919,13 @@ static pwr_tStatus HelpClassFilter(xmenu_sMenuCall* ip)
   pwr_tClassId classid;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
 
-  if (ip->Caller == xmenu_mUtility_Ge) {
+  if (ip->Caller == xmenu_mUtility_Ge)
+  {
     sts = gdh_GetAttrRefTid(objar, &classid);
     if (EVEN(sts))
       return sts;
@@ -1930,8 +1946,7 @@ static pwr_tStatus Simulate(xmenu_sMenuCall* ip)
   char cmd[830];
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -1942,7 +1957,8 @@ static pwr_tStatus Simulate(xmenu_sMenuCall* ip)
 
   strcat(name, ".SimConnect");
   sts = gdh_GetObjectInfo(name, (void*)&simconnect, sizeof(simconnect));
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Look for sim graph to main object
     pwr_tClassId classid;
     pwr_tObjName classname;
@@ -1951,9 +1967,9 @@ static pwr_tStatus Simulate(xmenu_sMenuCall* ip)
     char* s;
 
     for (sts = gdh_GetAttrRefTid(objar, &classid); ODD(sts);
-         sts = gdh_GetSuperClass(classid, &classid, pwr_cNObjid)) {
-      sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname,
-          sizeof(classname), cdh_mName_object);
+         sts = gdh_GetSuperClass(classid, &classid, pwr_cNObjid))
+    {
+      sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname, sizeof(classname), cdh_mName_object);
       if (EVEN(sts))
         return sts;
       str_ToLower(classname, classname);
@@ -1964,7 +1980,8 @@ static pwr_tStatus Simulate(xmenu_sMenuCall* ip)
         sprintf(fname, "$pwr_exe/pwr_c_%ssim.pwg", classname);
       sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
       dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         sprintf(fname, "$pwrp_exe/%ssim.pwg", classname);
         sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
         dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
@@ -1985,24 +2002,26 @@ static pwr_tStatus Simulate(xmenu_sMenuCall* ip)
 
     // Check if object is mounted with other name
     sts = gdh_NameToAttrref(pwr_cNObjid, name, &aref);
-    if (EVEN(sts)) {
-      sts = gdh_AttrrefToName(
-          objar, name, sizeof(name), cdh_mName_volumeStrict);
+    if (EVEN(sts))
+    {
+      sts = gdh_AttrrefToName(objar, name, sizeof(name), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
     }
 
     sprintf(cmd, "open graph %s/inst=%s/name=\"%s\"", s + 1, name, name);
-  } else {
+  }
+  else
+  {
     sts = gdh_AttrrefToName(&simconnect, name, sizeof(name), cdh_mNName);
     if (EVEN(sts))
       return sts;
 
     // Check if object is mounted with other name
     sts = gdh_NameToAttrref(pwr_cNObjid, name, &aref);
-    if (EVEN(sts)) {
-      sts = gdh_AttrrefToName(
-          &simconnect, name, sizeof(name), cdh_mName_volumeStrict);
+    if (EVEN(sts))
+    {
+      sts = gdh_AttrrefToName(&simconnect, name, sizeof(name), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
     }
@@ -2026,8 +2045,7 @@ static pwr_tStatus SimulateFilter(xmenu_sMenuCall* ip)
   pwr_sClass_IOHandler* iohandler_p;
   pwr_sAttrRef* objar;
 
-  if (!ip->ItemList
-      || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
+  if (!ip->ItemList || cdh_ObjidIsNull(ip->ItemList[ip->ChosenItem].CurrentObject.Objid))
     objar = &ip->Pointed;
   else
     objar = &ip->ItemList[ip->ChosenItem].CurrentObject;
@@ -2049,12 +2067,13 @@ static pwr_tStatus SimulateFilter(xmenu_sMenuCall* ip)
 
   strcat(name, ".SimConnect");
   sts = gdh_GetObjectInfo(name, (void*)&simconnect, sizeof(simconnect));
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // Look for sim graph to main object
     for (sts = gdh_GetAttrRefTid(objar, &classid); ODD(sts);
-         sts = gdh_GetSuperClass(classid, &classid, pwr_cNObjid)) {
-      sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname,
-          sizeof(classname), cdh_mName_object);
+         sts = gdh_GetSuperClass(classid, &classid, pwr_cNObjid))
+    {
+      sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname, sizeof(classname), cdh_mName_object);
       if (EVEN(sts))
         return sts;
       str_ToLower(classname, classname);
@@ -2065,7 +2084,8 @@ static pwr_tStatus SimulateFilter(xmenu_sMenuCall* ip)
         sprintf(fname, "$pwr_exe/pwr_c_%ssim.pwg", classname);
       sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
       dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         sprintf(fname, "$pwrp_exe/%ssim.pwg", classname);
         sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
         dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
@@ -2074,7 +2094,8 @@ static pwr_tStatus SimulateFilter(xmenu_sMenuCall* ip)
         return XNAV__SUCCESS;
     }
     return XNAV__INVISIBLE;
-  } else if (cdh_ObjidIsNull(simconnect.Objid))
+  }
+  else if (cdh_ObjidIsNull(simconnect.Objid))
     return XNAV__INVISIBLE;
 
   // Simconnect found
@@ -2082,8 +2103,7 @@ static pwr_tStatus SimulateFilter(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return XNAV__INVISIBLE;
 
-  sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname,
-      sizeof(classname), cdh_mName_object);
+  sts = gdh_ObjidToName(cdh_ClassIdToObjid(classid), classname, sizeof(classname), cdh_mName_object);
   if (EVEN(sts))
     return sts;
   str_ToLower(classname, classname);
@@ -2094,7 +2114,8 @@ static pwr_tStatus SimulateFilter(xmenu_sMenuCall* ip)
     sprintf(fname, "$pwr_exe/pwr_c_%s.pwg", classname);
   sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
   dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     sprintf(fname, "$pwrp_exe/%s.pwg", classname);
     sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
     dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
@@ -2127,22 +2148,21 @@ static pwr_tStatus OpenTypeGraph(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_GetAttributeCharacteristics(
-      name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
-  if (EVEN(sts)) {
+  sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+  if (EVEN(sts))
+  {
     // Try volume strict name
-    sts = gdh_AttrrefToName(
-        &ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
+    sts = gdh_AttrrefToName(&ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_GetAttributeCharacteristics(
-        name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+    sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
     if (EVEN(sts))
       return sts;
   }
 
-  switch (attr_type) {
+  switch (attr_type)
+  {
   case pwr_eType_Float32:
     sprintf(filename, "pwr_exe:pwr_t_float32.pwg");
     break;
@@ -2177,22 +2197,21 @@ static pwr_tStatus OpenTypeGraphFilter(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_GetAttributeCharacteristics(
-      name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
-  if (EVEN(sts)) {
+  sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+  if (EVEN(sts))
+  {
     // Try volume strict name
-    sts = gdh_AttrrefToName(
-        &ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
+    sts = gdh_AttrrefToName(&ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_GetAttributeCharacteristics(
-        name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+    sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
     if (EVEN(sts))
       return sts;
   }
 
-  switch (attr_type) {
+  switch (attr_type)
+  {
   case pwr_eType_Float32:
   case pwr_eType_Boolean:
   case pwr_eType_Int32:
@@ -2218,27 +2237,26 @@ static pwr_tStatus RefOpenObject(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_GetAttributeCharacteristics(
-      name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
-  if (EVEN(sts)) {
+  sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+  if (EVEN(sts))
+  {
     // Try volume strict name
-    sts = gdh_AttrrefToName(
-        &ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
+    sts = gdh_AttrrefToName(&ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_GetAttributeCharacteristics(
-        name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+    sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
     if (EVEN(sts))
       return sts;
   }
 
-  switch (attr_type) {
-  case pwr_eType_Objid: {
+  switch (attr_type)
+  {
+  case pwr_eType_Objid:
+  {
     pwr_sAttrRef aref = pwr_cNAttrRef;
 
-    sts = gdh_GetObjectInfoAttrref(
-        &ip->Pointed, (void*)&aref.Objid, sizeof(aref.Objid));
+    sts = gdh_GetObjectInfoAttrref(&ip->Pointed, (void*)&aref.Objid, sizeof(aref.Objid));
     if (EVEN(sts))
       return sts;
     if (cdh_ObjidIsNull(aref.Objid))
@@ -2247,11 +2265,11 @@ static pwr_tStatus RefOpenObject(xmenu_sMenuCall* ip)
     ((XNav*)ip->EditorContext)->open_object(&aref);
     break;
   }
-  case pwr_eType_AttrRef: {
+  case pwr_eType_AttrRef:
+  {
     pwr_sAttrRef attrref;
 
-    sts = gdh_GetObjectInfoAttrref(
-        &ip->Pointed, (void*)&attrref, sizeof(attrref));
+    sts = gdh_GetObjectInfoAttrref(&ip->Pointed, (void*)&attrref, sizeof(attrref));
     if (EVEN(sts))
       return sts;
     if (cdh_ObjidIsNull(attrref.Objid))
@@ -2279,23 +2297,23 @@ static pwr_tStatus RefRtNavigator(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_GetAttributeCharacteristics(
-      name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
-  if (EVEN(sts)) {
+  sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+  if (EVEN(sts))
+  {
     // Try volume strict name
-    sts = gdh_AttrrefToName(
-        &ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
+    sts = gdh_AttrrefToName(&ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_GetAttributeCharacteristics(
-        name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+    sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
     if (EVEN(sts))
       return sts;
   }
 
-  switch (attr_type) {
-  case pwr_eType_Objid: {
+  switch (attr_type)
+  {
+  case pwr_eType_Objid:
+  {
     pwr_tObjid objid;
 
     sts = gdh_GetObjectInfoAttrref(&ip->Pointed, (void*)&objid, sizeof(objid));
@@ -2309,11 +2327,11 @@ static pwr_tStatus RefRtNavigator(xmenu_sMenuCall* ip)
       ((XNav*)ip->EditorContext)->pop();
     break;
   }
-  case pwr_eType_AttrRef: {
+  case pwr_eType_AttrRef:
+  {
     pwr_sAttrRef attrref;
 
-    sts = gdh_GetObjectInfoAttrref(
-        &ip->Pointed, (void*)&attrref, sizeof(attrref));
+    sts = gdh_GetObjectInfoAttrref(&ip->Pointed, (void*)&attrref, sizeof(attrref));
     if (EVEN(sts))
       return sts;
     if (cdh_ObjidIsNull(attrref.Objid))
@@ -2344,24 +2362,25 @@ static pwr_tStatus OpenURL(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_GetAttributeCharacteristics(
-      name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
-  if (EVEN(sts)) {
+  sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+  if (EVEN(sts))
+  {
     // Try volume strict name
-    sts = gdh_AttrrefToName(
-        &ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
+    sts = gdh_AttrrefToName(&ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_GetAttributeCharacteristics(
-        name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+    sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
     if (EVEN(sts))
       return sts;
   }
 
-  switch (attr_type) {
-  case pwr_eType_String: {
-    if (attr_size == sizeof(pwr_tURL)) {
+  switch (attr_type)
+  {
+  case pwr_eType_String:
+  {
+    if (attr_size == sizeof(pwr_tURL))
+    {
       sts = gdh_GetObjectInfoAttrref(&ip->Pointed, (void*)url, sizeof(url));
       if (EVEN(sts))
         return sts;
@@ -2391,22 +2410,21 @@ static pwr_tStatus IsRefAttribute(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_GetAttributeCharacteristics(
-      name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
-  if (EVEN(sts)) {
+  sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+  if (EVEN(sts))
+  {
     // Try volume strict name
-    sts = gdh_AttrrefToName(
-        &ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
+    sts = gdh_AttrrefToName(&ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_GetAttributeCharacteristics(
-        name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+    sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
     if (EVEN(sts))
       return sts;
   }
 
-  switch (attr_type) {
+  switch (attr_type)
+  {
   case pwr_eType_Objid:
   case pwr_eType_AttrRef:
     return XNAV__SUCCESS;
@@ -2429,22 +2447,21 @@ static pwr_tStatus IsURLAttribute(xmenu_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_GetAttributeCharacteristics(
-      name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
-  if (EVEN(sts)) {
+  sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+  if (EVEN(sts))
+  {
     // Try volume strict name
-    sts = gdh_AttrrefToName(
-        &ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
+    sts = gdh_AttrrefToName(&ip->Pointed, name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_GetAttributeCharacteristics(
-        name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+    sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
     if (EVEN(sts))
       return sts;
   }
 
-  switch (attr_type) {
+  switch (attr_type)
+  {
   case pwr_eType_String:
     if (attr_size == sizeof(pwr_tURL))
       return XNAV__SUCCESS;
@@ -2463,8 +2480,7 @@ static pwr_tStatus IsURLAttribute(xmenu_sMenuCall* ip)
 // Open trace
 static pwr_tStatus CrrOpenTrace(xmenu_sMenuCall* ip)
 {
-  if (!((XNav*)ip->EditorContext)
-           ->is_authorized(pwr_mAccess_RtPlc | pwr_mAccess_System, 0))
+  if (!((XNav*)ip->EditorContext)->is_authorized(pwr_mAccess_RtPlc | pwr_mAccess_System, 0))
     return XNAV__INVISIBLE;
 
   ((XNav*)ip->EditorContext)->start_trace(ip->Pointed.Objid, ip->Arg);
@@ -2477,8 +2493,7 @@ static pwr_tStatus CrrOpenTraceFilter(xmenu_sMenuCall* ip)
   pwr_tStatus sts;
   pwr_tCid cid;
 
-  if (!((XNav*)ip->EditorContext)
-           ->is_authorized(pwr_mAccess_RtPlc | pwr_mAccess_System, 0))
+  if (!((XNav*)ip->EditorContext)->is_authorized(pwr_mAccess_RtPlc | pwr_mAccess_System, 0))
     return XNAV__INVISIBLE;
 
   sts = gdh_GetObjectClass(ip->Pointed.Objid, &cid);
@@ -2491,8 +2506,7 @@ static pwr_tStatus CrrOpenTraceFilter(xmenu_sMenuCall* ip)
 // Open graph
 static pwr_tStatus CrrOpenGraph(xmenu_sMenuCall* ip)
 {
-  ((XNav*)ip->EditorContext)
-      ->exec_xttgraph(ip->Pointed.Objid, 0, 0, 0, 0, 0, 0, 0);
+  ((XNav*)ip->EditorContext)->exec_xttgraph(ip->Pointed.Objid, 0, 0, 0, 0, 0, 0, 0);
   return XNAV__SUCCESS;
 }
 
@@ -2513,33 +2527,59 @@ static pwr_tStatus CrrOpenGraphFilter(xmenu_sMenuCall* ip)
   Every method to be exported to xtt should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindXttMethods($Object) = { pwr_BindXttMethod(OpenObject),
-  pwr_BindXttMethod(OpenObjectFilter), pwr_BindXttMethod(OpenCrossref),
-  pwr_BindXttMethod(OpenCrossrefFilter), pwr_BindXttMethod(HistEvent),
-  pwr_BindXttMethod(HistEventFilter), pwr_BindXttMethod(OpenTrace),
-  pwr_BindXttMethod(OpenTraceFilter), pwr_BindXttMethod(OpenTrend),
-  pwr_BindXttMethod(OpenTrendFilter), pwr_BindXttMethod(Camera),
-  pwr_BindXttMethod(CameraFilter), pwr_BindXttMethod(OpenHistory),
-  pwr_BindXttMethod(OpenHistoryFilter), pwr_BindXttMethod(OpenFast),
-  pwr_BindXttMethod(OpenFastFilter), pwr_BindXttMethod(RtNavigator),
-  pwr_BindXttMethod(RtNavigatorFilter), pwr_BindXttMethod(OpenObjectGraph),
-  pwr_BindXttMethod(OpenObjectGraphFilter),
-  pwr_BindXttMethod(OpenParentObjectGraph),
-  pwr_BindXttMethod(OpenParentObjectGraphFilter), pwr_BindXttMethod(OpenGraph),
-  pwr_BindXttMethod(OpenGraphFilter), pwr_BindXttMethod(Collect),
-  pwr_BindXttMethod(CollectFilter), pwr_BindXttMethod(Dashboard),
-  pwr_BindXttMethod(DashboardFilter), pwr_BindXttMethod(Help),
-  pwr_BindXttMethod(HelpFilter), pwr_BindXttMethod(DataSheet),
-  pwr_BindXttMethod(DataSheetFilter), pwr_BindXttMethod(Photo),
-  pwr_BindXttMethod(PhotoFilter), pwr_BindXttMethod(CircuitDiagram),
-  pwr_BindXttMethod(CircuitDiagramFilter), pwr_BindXttMethod(Note),
-  pwr_BindXttMethod(NoteFilter), pwr_BindXttMethod(BlockEvents),
-  pwr_BindXttMethod(BlockEventsFilter), pwr_BindXttMethod(HelpClass),
-  pwr_BindXttMethod(HelpClassFilter), pwr_BindXttMethod(Simulate),
-  pwr_BindXttMethod(SimulateFilter), pwr_BindXttMethod(OpenTypeGraph),
-  pwr_BindXttMethod(OpenTypeGraphFilter), pwr_BindXttMethod(RefOpenObject),
-  pwr_BindXttMethod(RefRtNavigator), pwr_BindXttMethod(OpenURL),
-  pwr_BindXttMethod(IsRefAttribute), pwr_BindXttMethod(IsURLAttribute),
-  pwr_BindXttMethod(CrrOpenTrace), pwr_BindXttMethod(CrrOpenTraceFilter),
-  pwr_BindXttMethod(CrrOpenGraph), pwr_BindXttMethod(CrrOpenGraphFilter),
-  pwr_NullMethod };
+pwr_dExport pwr_BindXttMethods($Object) = {pwr_BindXttMethod(OpenObject),
+                                           pwr_BindXttMethod(OpenObjectFilter),
+                                           pwr_BindXttMethod(OpenCrossref),
+                                           pwr_BindXttMethod(OpenCrossrefFilter),
+                                           pwr_BindXttMethod(HistEvent),
+                                           pwr_BindXttMethod(HistEventFilter),
+                                           pwr_BindXttMethod(OpenTrace),
+                                           pwr_BindXttMethod(OpenTraceFilter),
+                                           pwr_BindXttMethod(OpenTrend),
+                                           pwr_BindXttMethod(OpenTrendFilter),
+                                           pwr_BindXttMethod(Camera),
+                                           pwr_BindXttMethod(CameraFilter),
+                                           pwr_BindXttMethod(OpenHistory),
+                                           pwr_BindXttMethod(OpenHistoryFilter),
+                                           pwr_BindXttMethod(OpenFast),
+                                           pwr_BindXttMethod(OpenFastFilter),
+                                           pwr_BindXttMethod(RtNavigator),
+                                           pwr_BindXttMethod(RtNavigatorFilter),
+                                           pwr_BindXttMethod(OpenObjectGraph),
+                                           pwr_BindXttMethod(OpenObjectGraphFilter),
+                                           pwr_BindXttMethod(OpenParentObjectGraph),
+                                           pwr_BindXttMethod(OpenParentObjectGraphFilter),
+                                           pwr_BindXttMethod(OpenGraph),
+                                           pwr_BindXttMethod(OpenGraphFilter),
+                                           pwr_BindXttMethod(Collect),
+                                           pwr_BindXttMethod(CollectFilter),
+                                           pwr_BindXttMethod(Dashboard),
+                                           pwr_BindXttMethod(DashboardFilter),
+                                           pwr_BindXttMethod(Help),
+                                           pwr_BindXttMethod(HelpFilter),
+                                           pwr_BindXttMethod(DataSheet),
+                                           pwr_BindXttMethod(DataSheetFilter),
+                                           pwr_BindXttMethod(Photo),
+                                           pwr_BindXttMethod(PhotoFilter),
+                                           pwr_BindXttMethod(CircuitDiagram),
+                                           pwr_BindXttMethod(CircuitDiagramFilter),
+                                           pwr_BindXttMethod(Note),
+                                           pwr_BindXttMethod(NoteFilter),
+                                           pwr_BindXttMethod(BlockEvents),
+                                           pwr_BindXttMethod(BlockEventsFilter),
+                                           pwr_BindXttMethod(HelpClass),
+                                           pwr_BindXttMethod(HelpClassFilter),
+                                           pwr_BindXttMethod(Simulate),
+                                           pwr_BindXttMethod(SimulateFilter),
+                                           pwr_BindXttMethod(OpenTypeGraph),
+                                           pwr_BindXttMethod(OpenTypeGraphFilter),
+                                           pwr_BindXttMethod(RefOpenObject),
+                                           pwr_BindXttMethod(RefRtNavigator),
+                                           pwr_BindXttMethod(OpenURL),
+                                           pwr_BindXttMethod(IsRefAttribute),
+                                           pwr_BindXttMethod(IsURLAttribute),
+                                           pwr_BindXttMethod(CrrOpenTrace),
+                                           pwr_BindXttMethod(CrrOpenTraceFilter),
+                                           pwr_BindXttMethod(CrrOpenGraph),
+                                           pwr_BindXttMethod(CrrOpenGraphFilter),
+                                           pwr_NullMethod};

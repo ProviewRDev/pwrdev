@@ -47,54 +47,59 @@ class CoWow;
 class MsgWindow;
 class CowGe;
 
-class NlApplListElem {
- public:
+class NlApplListElem
+{
+public:
   char name[80];
   CowGe* gectx;
 
-  NlApplListElem() : gectx(0) {
-    strcpy(name, "");
-  }
-  NlApplListElem(const NlApplListElem& x) : gectx(x.gectx) {
-    strcpy(name, x.name);
-  }
+  NlApplListElem() : gectx(0) { strcpy(name, ""); }
+  NlApplListElem(const NlApplListElem& x) : gectx(x.gectx) { strcpy(name, x.name); }
 };
 
-class NlApplList {
- public:
+class NlApplList
+{
+public:
   std::vector<NlApplListElem> list;
-  void add(NlApplListElem& e) {
-    list.push_back(e);
-  }
-  CowGe* find(char *name) {
-    for (int i = 0; i < list.size(); i++) {
+  void add(NlApplListElem& e) { list.push_back(e); }
+  CowGe* find(char* name)
+  {
+    for (int i = 0; i < list.size(); i++)
+    {
       if (strcmp(list[i].name, name) == 0)
-	return list[i].gectx;
+        return list[i].gectx;
     }
     return 0;
   }
-  void remove(char* name) {
-    for (int i = 0; i < list.size(); i++) {
-      if (strcmp(list[i].name, name) == 0) {
-	list.erase(list.begin() + i);
-	return;
+  void remove(char* name)
+  {
+    for (int i = 0; i < list.size(); i++)
+    {
+      if (strcmp(list[i].name, name) == 0)
+      {
+        list.erase(list.begin() + i);
+        return;
       }
     }
   }
-  void remove(CowGe* gectx) {
-    for (int i = 0; i < list.size(); i++) {
-      if (gectx == list[i].gectx) {
-	list.erase(list.begin() + i);
-	return;
+  void remove(CowGe* gectx)
+  {
+    for (int i = 0; i < list.size(); i++)
+    {
+      if (gectx == list[i].gectx)
+      {
+        list.erase(list.begin() + i);
+        return;
       }
     }
   }
 };
 
-class Nodelist {
+class Nodelist
+{
 public:
-  Nodelist(void* nodelist_parent_ctx, const char* nodelist_name,
-      int nodelist_mode, nl_mLayout nodelist_layout, pwr_tStatus* status);
+  Nodelist(void* nodelist_parent_ctx, const char* nodelist_name, int nodelist_mode,
+           nl_mLayout nodelist_layout, pwr_tStatus* status);
   virtual ~Nodelist();
 
   void* parent_ctx;
@@ -111,54 +116,42 @@ public:
   int mode;
   nl_mLayout layout;
   int selected_idx;
-  CowGe *map_gectx;
+  CowGe* map_gectx;
   int scriptmode;
   int verify;
   int ccm_func_registred;
   NlApplList appl;
   int command_open;
 
-  virtual void pop()
+  virtual void pop() {}
+  virtual void set_clock_cursor() {}
+  virtual void reset_cursor() {}
+  virtual void free_cursor() {}
+  virtual void open_add_input_dialog(const char* text, const char* text2, const char* text3,
+                                     const char* text4, const char* text5, const char* title,
+                                     const char* init_text,
+                                     void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*))
   {
   }
-  virtual void set_clock_cursor()
-  {
-  }
-  virtual void reset_cursor()
-  {
-  }
-  virtual void free_cursor()
-  {
-  }
-  virtual void open_add_input_dialog(const char* text, const char* text2,
-      const char* text3, const char* text4, const char *text5, const char* title, 
-      const char* init_text,
-      void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*))
-  {
-  }
-  virtual void open_mod_input_dialog(const char* text, const char* text2,
-      const char* text3, const char* text4, const char *text5, const char* title, 
-      const char* init_text, const char* init_text2, const char* init_text3, 
-      const char* init_text4,const char* init_text5,
-      void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*))
+  virtual void open_mod_input_dialog(const char* text, const char* text2, const char* text3,
+                                     const char* text4, const char* text5, const char* title,
+                                     const char* init_text, const char* init_text2, const char* init_text3,
+                                     const char* init_text4, const char* init_text5,
+                                     void (*ok_cb)(Nodelist*, char*, char*, char*, char*, char*))
   {
   }
 
-  void set_scantime(float scantime)
-  {
-    nodelistnav->scantime = int(scantime * 1000);
-  }
+  void set_scantime(float scantime) { nodelistnav->scantime = int(scantime * 1000); }
 
-  virtual CowGe* ge_new(const char* name, const char* filename,
-      int scrollbar, int menu, int navigator, int width, int height, int x, int y,
-      double scan_time, const char* object_name, int use_default_access,
-      unsigned int access, unsigned int options, void* basewidget,
-      double* borders, int color_theme, int dashboard,
-      int (*command_cb)(void*, char*, char*, char *, void*),
-      int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-      int (*is_authorized_cb)(void*, unsigned int),
-      void (*keyboard_cb)(void*, void*, int, int),
-      int (*extern_connect_cb)(void*, char*, void**, pwr_tRefId*))
+  virtual CowGe* ge_new(const char* name, const char* filename, int scrollbar, int menu, int navigator,
+                        int width, int height, int x, int y, double scan_time, const char* object_name,
+                        int use_default_access, unsigned int access, unsigned int options, void* basewidget,
+                        double* borders, int color_theme, int dashboard,
+                        int (*command_cb)(void*, char*, char*, char*, void*),
+                        int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+                        int (*is_authorized_cb)(void*, unsigned int),
+                        void (*keyboard_cb)(void*, void*, int, int),
+                        int (*extern_connect_cb)(void*, char*, void**, pwr_tRefId*))
   {
     return 0;
   }
@@ -174,17 +167,15 @@ public:
   void activate_save();
   void activate_reconnect();
   static void find_node_cb(void* ctx, pwr_tOid oid);
-  static void add_node_ok(
-      Nodelist* nodelist, char* node_name, char *address, char *busid, char* description, 
-      char* opplace);
-  static void mod_node_ok(
-      Nodelist* nodelist, char* node_name, char *address, char* busid, char* description, 
-      char* opplace);
+  static void add_node_ok(Nodelist* nodelist, char* node_name, char* address, char* busid, char* description,
+                          char* opplace);
+  static void mod_node_ok(Nodelist* nodelist, char* node_name, char* address, char* busid, char* description,
+                          char* opplace);
 
-  virtual void message(char severity, const char *msg);
+  virtual void message(char severity, const char* msg);
   int command(char* input_str);
-  int readcmdfile(char* incommand, char *script);
-  int open_graph(char *name, char *title, int width, int height);
+  int readcmdfile(char* incommand, char* script);
+  int open_graph(char* name, char* title, int width, int height);
 };
 
 #endif

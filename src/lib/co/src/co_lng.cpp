@@ -43,24 +43,20 @@
 #include "co_string.h"
 
 // Note, this is matched with lng_eLanguage
-static char lng_cLanguageStr[lng_eLanguage__][6]
-    = { "", "af_ZA", "ar_AE", "ar_BH", "ar_DZ", "ar_EG", "ar_IN", "ar_IQ",
-        "ar_JO", "ar_KW", "ar_LB", "ar_LY", "ar_MA", "ar_OM", "ar_QA", "ar_SA",
-        "ar_SD", "ar_SY", "ar_TN", "ar_YE", "be_BY", "bg_BG", "br_FR", "bs_BA",
-        "ca_ES", "cs_CZ", "cy_GB", "da_DK", "de_AT", "de_BE", "de_CH", "de_DE",
-        "de_LU", "el_GR", "en_AU", "en_BW", "en_CA", "en_DK", "en_GB", "en_HK",
-        "en_IE", "en_IN", "en_NZ", "en_PH", "en_SG", "en_US", "en_ZA", "en_ZW",
-        "es_AR", "es_BO", "es_CL", "es_CO", "es_CR", "es_DO", "es_EC", "es_ES",
-        "es_GT", "es_HN", "es_MX", "es_NI", "es_PA", "es_PE", "es_PR", "es_PY",
-        "es_SV", "es_US", "es_UY", "es_VE", "et_EE", "eu_ES", "fa_IR", "fi_FI",
-        "fo_FO", "fr_BE", "fr_CA", "fr_CH", "fr_FR", "fr_LU", "ga_IE", "gl_ES",
-        "gv_GB", "he_IL", "hi_IN", "hr_HR", "hu_HU", "id_ID", "is_IS", "it_CH",
-        "it_IT", "iw_IL", "ja_JP", "ka_GE", "kl_GL", "ko_KR", "kw_GB", "lt_LT",
-        "lv_LV", "mi_NZ", "mk_MK", "mr_IN", "ms_MY", "mt_MT", "nl_BE", "nl_NL",
-        "nn_NO", "no_NO", "oc_FR", "pl_PL", "pt_BR", "pt_PT", "ro_RO", "ru_RU",
-        "ru_UA", "se_NO", "sk_SK", "sl_SI", "sq_AL", "sr_YU", "sv_FI", "sv_SE",
-        "ta_IN", "te_IN", "tg_TJ", "th_TH", "tl_PH", "tr_TR", "uk_UA", "ur_PK",
-        "uz_UZ", "vi_VN", "wa_BE", "yi_US", "zh_CN", "zh_HK", "zh_TW" };
+static char lng_cLanguageStr[lng_eLanguage__][6] = {
+    "",      "af_ZA", "ar_AE", "ar_BH", "ar_DZ", "ar_EG", "ar_IN", "ar_IQ", "ar_JO", "ar_KW", "ar_LB",
+    "ar_LY", "ar_MA", "ar_OM", "ar_QA", "ar_SA", "ar_SD", "ar_SY", "ar_TN", "ar_YE", "be_BY", "bg_BG",
+    "br_FR", "bs_BA", "ca_ES", "cs_CZ", "cy_GB", "da_DK", "de_AT", "de_BE", "de_CH", "de_DE", "de_LU",
+    "el_GR", "en_AU", "en_BW", "en_CA", "en_DK", "en_GB", "en_HK", "en_IE", "en_IN", "en_NZ", "en_PH",
+    "en_SG", "en_US", "en_ZA", "en_ZW", "es_AR", "es_BO", "es_CL", "es_CO", "es_CR", "es_DO", "es_EC",
+    "es_ES", "es_GT", "es_HN", "es_MX", "es_NI", "es_PA", "es_PE", "es_PR", "es_PY", "es_SV", "es_US",
+    "es_UY", "es_VE", "et_EE", "eu_ES", "fa_IR", "fi_FI", "fo_FO", "fr_BE", "fr_CA", "fr_CH", "fr_FR",
+    "fr_LU", "ga_IE", "gl_ES", "gv_GB", "he_IL", "hi_IN", "hr_HR", "hu_HU", "id_ID", "is_IS", "it_CH",
+    "it_IT", "iw_IL", "ja_JP", "ka_GE", "kl_GL", "ko_KR", "kw_GB", "lt_LT", "lv_LV", "mi_NZ", "mk_MK",
+    "mr_IN", "ms_MY", "mt_MT", "nl_BE", "nl_NL", "nn_NO", "no_NO", "oc_FR", "pl_PL", "pt_BR", "pt_PT",
+    "ro_RO", "ru_RU", "ru_UA", "se_NO", "sk_SK", "sl_SI", "sq_AL", "sr_YU", "sv_FI", "sv_SE", "ta_IN",
+    "te_IN", "tg_TJ", "th_TH", "tl_PH", "tr_TR", "uk_UA", "ur_PK", "uz_UZ", "vi_VN", "wa_BE", "yi_US",
+    "zh_CN", "zh_HK", "zh_TW"};
 
 lng_eCoding Lng::translfile_coding = lng_eCoding_ISO8859_1;
 lng_eLanguage Lng::lang = lng_eLanguage_en_US;
@@ -72,14 +68,12 @@ Row::Row(std::ifstream& f, char* filename) : row(0), fp(f)
   strncpy(fname, filename, sizeof(fname));
 }
 
-char* Lng::get_language_str()
-{
-  return lang_to_str(lang);
-}
+char* Lng::get_language_str() { return lang_to_str(lang); }
 
 lng_eLanguage Lng::str_to_lang(char* str)
 {
-  for (int i = 1; i < lng_eLanguage__; i++) {
+  for (int i = 1; i < lng_eLanguage__; i++)
+  {
     if (str_NoCaseStrcmp(lng_cLanguageStr[i], str) == 0)
       return (lng_eLanguage)i;
   }
@@ -120,17 +114,19 @@ static int compKey(tree_sTable* tp, tree_sNode* x, tree_sNode* y)
   lang_sKey* yKey = (lang_sKey*)(tp->keyOffset + (char*)y);
 
   char type = (xKey->type == 0) ? yKey->type : xKey->type;
-  switch (type) {
+  switch (type)
+  {
   case 'E':
     return strcmp(xKey->text, yKey->text);
-  case 'B': {
+  case 'B':
+  {
     char* s = strrchr(xKey->text, ',');
     if (s)
-      return strncmp(
-          xKey->text, yKey->text, (unsigned long)s - (unsigned long)xKey->text);
+      return strncmp(xKey->text, yKey->text, (unsigned long)s - (unsigned long)xKey->text);
     return strcmp(xKey->text, yKey->text);
   }
-  case 'C': {
+  case 'C':
+  {
     return strncmp(xKey->text, yKey->text, strlen(yKey->text));
   }
   }
@@ -145,7 +141,8 @@ char* Lng::translate(const char* text)
   int sts;
   char* in_p;
 
-  if (lang == lng_eLanguage_en_US || tree == 0) {
+  if (lang == lng_eLanguage_en_US || tree == 0)
+  {
     // No translation is needed
     strncpy(result, text, sizeof(result));
     result[sizeof(result) - 1] = 0;
@@ -159,24 +156,32 @@ char* Lng::translate(const char* text)
   strncpy(key.text, text, sizeof(key.text));
   key.type = 0;
   record = (lang_sRecord*)tree_Find(&sts, tree, &key);
-  if (ODD(sts)) {
-    switch (record->key.type) {
-    case 'B': {
+  if (ODD(sts))
+  {
+    switch (record->key.type)
+    {
+    case 'B':
+    {
       char* s = strrchr(record->transl, ',');
-      if (s) {
+      if (s)
+      {
         const char* t = strrchr(text, ',');
-        if (t) {
+        if (t)
+        {
           long int len = (unsigned long)s - (unsigned long)record->transl + 1;
           strncpy(result, record->transl, len);
           result[len] = 0;
           strcat(result, t + 1);
-        } else
+        }
+        else
           strcpy(result, record->transl);
-      } else
+      }
+      else
         strcpy(result, record->transl);
       break;
     }
-    case 'C': {
+    case 'C':
+    {
       int len = strlen(record->key.text);
       strcpy(result, record->transl);
       strcat(result, &text[len]);
@@ -185,7 +190,9 @@ char* Lng::translate(const char* text)
     default:
       strcpy(result, record->transl);
     }
-  } else {
+  }
+  else
+  {
     strncpy(result, text, sizeof(result));
     result[sizeof(result) - 1] = 0;
   }
@@ -200,7 +207,8 @@ int Lng::translate(char* text, char* out)
   int sts;
   char* in_p;
 
-  if (lang == lng_eLanguage_en_US || tree == 0) {
+  if (lang == lng_eLanguage_en_US || tree == 0)
+  {
     // No translation is needed
     return 0;
   }
@@ -212,23 +220,30 @@ int Lng::translate(char* text, char* out)
   strncpy(key.text, text, sizeof(key.text));
   key.type = 0;
   record = (lang_sRecord*)tree_Find(&sts, tree, &key);
-  if (ODD(sts)) {
-    switch (record->key.type) {
-    case 'B': {
+  if (ODD(sts))
+  {
+    switch (record->key.type)
+    {
+    case 'B':
+    {
       char* s = strrchr(record->transl, ',');
-      if (s) {
+      if (s)
+      {
         char* t = strrchr(text, ',');
-        if (t) {
-          strncpy(result, record->transl,
-              (unsigned long)s - (unsigned long)record->transl + 1);
+        if (t)
+        {
+          strncpy(result, record->transl, (unsigned long)s - (unsigned long)record->transl + 1);
           strcat(result, t + 1);
-        } else
+        }
+        else
           strcpy(result, record->transl);
-      } else
+      }
+      else
         strcpy(result, record->transl);
       break;
     }
-    case 'C': {
+    case 'C':
+    {
       int len = strlen(record->key.text);
       strcpy(result, record->transl);
       strcat(result, &text[len]);
@@ -263,8 +278,8 @@ bool Lng::read()
   if (tree)
     tree_DeleteTable(&sts, tree);
 
-  tree = tree_CreateTable(&sts, sizeof(lang_sKey), offsetof(lang_sRecord, key),
-      sizeof(lang_sRecord), 100, compKey);
+  tree = tree_CreateTable(&sts, sizeof(lang_sKey), offsetof(lang_sRecord, key), sizeof(lang_sRecord), 100,
+                          compKey);
 
   // Read base files
   strcpy(fname1, "$pwr_exe/en_us/xtt_lng.dat");
@@ -284,8 +299,7 @@ bool Lng::read()
   return true;
 }
 
-bool Lng::read_files(
-    char* fname1, char* fname2, bool first_set, pwr_tStatus* sts)
+bool Lng::read_files(char* fname1, char* fname2, bool first_set, pwr_tStatus* sts)
 {
   pwr_tFileName filename1, filename2;
 
@@ -295,32 +309,40 @@ bool Lng::read_files(
   dcli_translate_filename(filename2, filename2);
 
   std::ifstream fp1(filename1);
-  if (!fp1 && streq(fname1, "$pwr_exe/en_us/xtt_lng.dat")) {
+  if (!fp1 && streq(fname1, "$pwr_exe/en_us/xtt_lng.dat"))
+  {
     // Try $pwr_eexe
     strcpy(fname1, "$pwr_eexe/en_us/xtt_lng.dat");
     dcli_translate_filename(filename1, fname1);
     fp1.open(filename1);
-    if (!fp1) {
+    if (!fp1)
+    {
       *sts = LNG__FILE;
       return false;
     }
-  } else if (!fp1) {
+  }
+  else if (!fp1)
+  {
     *sts = LNG__FILE;
     return false;
   }
 
   std::ifstream fp2(filename2);
-  if (!fp2 && streq(fname2, "$pwr_exe/%s/xtt_lng.dat")) {
+  if (!fp2 && streq(fname2, "$pwr_exe/%s/xtt_lng.dat"))
+  {
     // Try $pwr_eexe
     strcpy(fname2, "$pwr_eexe/%s/xtt_lng.dat");
     sprintf(filename2, fname2, get_language_str());
     dcli_translate_filename(filename2, filename2);
     fp2.open(filename2);
-    if (!fp2) {
+    if (!fp2)
+    {
       *sts = LNG__FILE;
       return false;
     }
-  } else if (!fp2) {
+  }
+  else if (!fp2)
+  {
     *sts = LNG__FILE;
     return false;
   }
@@ -334,17 +356,23 @@ bool Lng::read_files(
   read_include(fp1, fp2, false, sts);
 
   bool hit = true;
-  for (;;) {
-    if (hit) {
+  for (;;)
+  {
+    if (hit)
+    {
       if (!read_line(r1))
         break;
 
       if (!read_line(r2))
         break;
-    } else if (r1.lt(r2)) {
+    }
+    else if (r1.lt(r2))
+    {
       if (!read_line(r1))
         break;
-    } else {
+    }
+    else
+    {
       if (!read_line(r2))
         break;
     }
@@ -352,7 +380,8 @@ bool Lng::read_files(
     hit = false;
     if (r1.eq(r2))
       hit = true;
-    if (hit) {
+    if (hit)
+    {
       lang_sKey key;
       lang_sRecord* record;
 
@@ -375,7 +404,8 @@ bool Lng::read_line(Row& r)
   char line[200];
   char *s, *t;
 
-  for (;;) {
+  for (;;)
+  {
     if (!r.fp.getline(line, sizeof(line)))
       return false;
 
@@ -384,26 +414,32 @@ bool Lng::read_line(Row& r)
       continue;
 
     nr = sscanf(line, "%c%d.%d.%d", &r.type, &r.n1, &r.n2, &r.n3);
-    if (nr != 4) {
+    if (nr != 4)
+    {
       printf("Error in line %d, file %s\n", r.row, r.fname);
       continue;
     }
 
     bool in_text = false;
-    for (s = line, t = r.text; *s; s++) {
-      if (in_text) {
-        if (*s == '\"') {
+    for (s = line, t = r.text; *s; s++)
+    {
+      if (in_text)
+      {
+        if (*s == '\"')
+        {
           if (*(s - 1) == '\\')
             *(t - 1) = '\"';
           else
             break;
-        } else
+        }
+        else
           *t++ = *s;
         ;
       }
       if (!in_text && *s == '\"')
         in_text = 1;
-      if (t > r.text + sizeof(r.text) - 1) {
+      if (t > r.text + sizeof(r.text) - 1)
+      {
         printf("Error in line %d, file %s\n", r.row, r.fname);
         break;
       }
@@ -428,7 +464,8 @@ pwr_tStatus Lng::set(char* language)
   pwr_tStatus sts;
 
   lng_eLanguage l = str_to_lang(language);
-  if (l != lng_eLanguage_) {
+  if (l != lng_eLanguage_)
+  {
     sts = set(l);
     if (EVEN(sts))
       return sts;
@@ -445,10 +482,13 @@ pwr_tStatus Lng::set(lng_eLanguage language)
   if (lang == language)
     return LNG__ALREADYSET;
 
-  if (language == lng_eLanguage_en_US) {
+  if (language == lng_eLanguage_en_US)
+  {
     lang = language;
     unload();
-  } else {
+  }
+  else
+  {
     if (!is_installed(language))
       return 0;
     lang = language;
@@ -509,8 +549,10 @@ void Lng::read_metadata(std::ifstream& fp2, bool first_set, pwr_tStatus* sts)
 {
   char line[200];
 
-  for (;;) {
-    if (!fp2.getline(line, sizeof(line))) {
+  for (;;)
+  {
+    if (!fp2.getline(line, sizeof(line)))
+    {
       *sts = LNG__EOF;
       return;
     }
@@ -518,17 +560,22 @@ void Lng::read_metadata(std::ifstream& fp2, bool first_set, pwr_tStatus* sts)
       break;
   }
 
-  if (str_StartsWith(line, "Coding:UTF-8")) {
+  if (str_StartsWith(line, "Coding:UTF-8"))
+  {
     if (first_set)
       translfile_coding = lng_eCoding_UTF_8;
     else if (translfile_coding != lng_eCoding_UTF_8)
       *sts = LNG__DIFFCODING;
-  } else if (str_StartsWith(line, "Coding:ISO8859-1")) {
+  }
+  else if (str_StartsWith(line, "Coding:ISO8859-1"))
+  {
     if (first_set)
       translfile_coding = lng_eCoding_ISO8859_1;
     else if (translfile_coding != lng_eCoding_ISO8859_1)
       *sts = LNG__DIFFCODING;
-  } else {
+  }
+  else
+  {
     fp2.seekg(0, std::ios::beg);
     if (first_set)
       translfile_coding = lng_eCoding_ISO8859_1;
@@ -538,18 +585,20 @@ void Lng::read_metadata(std::ifstream& fp2, bool first_set, pwr_tStatus* sts)
   *sts = LNG__SUCCESS;
 }
 
-void Lng::read_include(
-    std::ifstream& fp1, std::ifstream& fp2, bool first_set, pwr_tStatus* sts)
+void Lng::read_include(std::ifstream& fp1, std::ifstream& fp2, bool first_set, pwr_tStatus* sts)
 {
   char line1[200];
   char line2[200];
   std::streampos pos1;
   pwr_tFileName fname1, fname2;
 
-  for (;;) {
+  for (;;)
+  {
     pos1 = fp1.tellg();
-    for (;;) {
-      if (!fp1.getline(line1, sizeof(line1))) {
+    for (;;)
+    {
+      if (!fp1.getline(line1, sizeof(line1)))
+      {
         *sts = LNG__EOF;
         return;
       }
@@ -557,9 +606,12 @@ void Lng::read_include(
         break;
     }
 
-    if (str_StartsWith(line1, "Include:")) {
-      for (;;) {
-        if (!fp2.getline(line2, sizeof(line2))) {
+    if (str_StartsWith(line1, "Include:"))
+    {
+      for (;;)
+      {
+        if (!fp2.getline(line2, sizeof(line2)))
+        {
           *sts = LNG__EOF;
           return;
         }
@@ -567,7 +619,8 @@ void Lng::read_include(
           break;
       }
 
-      if (!str_StartsWith(line2, "Include:")) {
+      if (!str_StartsWith(line2, "Include:"))
+      {
         *sts = LNG__INCLUDEMISMATCH;
         return;
       }
@@ -576,7 +629,9 @@ void Lng::read_include(
       str_trim(fname2, &line2[8]);
       if (!read_files(fname1, fname2, first_set, sts))
         return;
-    } else {
+    }
+    else
+    {
       fp1.seekg(pos1);
       break;
     }

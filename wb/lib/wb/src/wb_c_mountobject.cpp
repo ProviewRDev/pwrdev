@@ -46,8 +46,8 @@
 //  Syntax check.
 //
 
-static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
-    int* ErrorCount, int* WarningCount)
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, int* ErrorCount,
+                               int* WarningCount)
 {
   wb_session* sp = (wb_session*)Session;
   pwr_tOid mount_oid;
@@ -61,9 +61,9 @@ static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
   if (!a)
     return a.sts();
 
-  if (cdh_ObjidIsNull(mount_oid)) {
-    wsx_error_msg_str(Session, "Mounted object is missing", Object, 'E',
-        ErrorCount, WarningCount);
+  if (cdh_ObjidIsNull(mount_oid))
+  {
+    wsx_error_msg_str(Session, "Mounted object is missing", Object, 'E', ErrorCount, WarningCount);
   }
   return PWRS__SUCCESS;
 }
@@ -71,5 +71,4 @@ static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
 //
 //  Every method to be exported to the workbench should be registred here.
 //
-pwr_dExport pwr_BindMethods($MountObject)
-    = { pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods($MountObject) = {pwr_BindMethod(SyntaxCheck), pwr_NullMethod};

@@ -64,91 +64,99 @@ class GeDyn;
 #define glow_cJBean_Offset 2
 
 //! Type of attributes. Should not collide with glow_eType
-typedef enum {
-  ge_eAttrType_DynType1 = glow_eType_DynType1, //!< DynType.
-  ge_eAttrType_DynTypeTone = 1001, //!< DynType with color tone.
+typedef enum
+{
+  ge_eAttrType_DynType1 = glow_eType_DynType1,       //!< DynType.
+  ge_eAttrType_DynTypeTone = 1001,                   //!< DynType with color tone.
   ge_eAttrType_ActionType1 = glow_eType_ActionType1, //!< ActionType.
-  ge_eAttrType_AnimSequence = 1003, //!< Animation sequence.
-  ge_eAttrType_LimitType = 1004, //!< Limit type (Gt or Lt).
-  ge_eAttrType_InstanceMask = 1005, //!< Instance mask.
-  ge_eAttrType_InputFocus = 1006, //!< Initial input focus mask.
-  ge_eAttrType_Dyn = 1007, //!< Dynamic data.
-  ge_eAttrType_ScaleType = 1008, //!< Scale type.
-  ge_eAttrType_CurveDataType = 1009, //!< Data type for XY_Curve.
-  ge_eAttrType_OptionMenuType = 1010, //!< OptionMenu type.
-  ge_eAttrType_MethodsMenuType = 1011, //!< MethodsMenu type.
-  ge_eAttrType_MethodToolbarType = 1012, //!< MethodToolbar type.
-  ge_eAttrType_KeyboardType = 1013, //!< Virtual keyboard type.
-  ge_eAttrType_DashType = 1014, //!< Dash cell type.
-  ge_eAttrType_DashElements = 1015, //!< Dash elements type.
-  ge_eAttrType_IndicatorColor = 1016, //!< Indicator color type.
-  ge_eAttrType_ScriptTriggerEvent = 1017, //!< Script trigger event.
-  ge_eAttrType_UcEntity = 1018, //!< Unit conversion, units.
-  ge_eAttrType_UcAcceleration = 1019, //!< Unit conversion, acceleration.
-  ge_eAttrType_UcAngle = 1020, //!< Unit conversion, angle.
-  ge_eAttrType_UcArea = 1021, //!< Unit conversion, area.
-  ge_eAttrType_UcEnergy = 1022, //!< Unit conversion, energy.
-  ge_eAttrType_UcForce = 1023, //!< Unit conversion, force.
-  ge_eAttrType_UcFrequency = 1024, //!< Unit conversion, frequency.
-  ge_eAttrType_UcGeneral = 1025, //!< Unit conversion, general.
-  ge_eAttrType_UcLength = 1026, //!< Unit conversion, length.
-  ge_eAttrType_UcMass = 1027, //!< Unit conversion, mass.
-  ge_eAttrType_UcMassFlow = 1028, //!< Unit conversion, mass flow.
-  ge_eAttrType_UcPower = 1029, //!< Unit conversion, power.
-  ge_eAttrType_UcPressure = 1030, //!< Unit conversion, pressure.
-  ge_eAttrType_UcSpeed = 1031, //!< Unit conversion, speed.
-  ge_eAttrType_UcTemperature = 1032, //!< Unit conversion, temperature.
-  ge_eAttrType_UcTime = 1033, //!< Unit conversion, time.
-  ge_eAttrType_UcVolume = 1034, //!< Unit conversion, volume.
-  ge_eAttrType_UcVolumeFlow = 1035, //!< Unit conversion, volume flow.
-  ge_eAttrType_DynType2 = glow_eType_DynType2, //!< DynType mask 2.
+  ge_eAttrType_AnimSequence = 1003,                  //!< Animation sequence.
+  ge_eAttrType_LimitType = 1004,                     //!< Limit type (Gt or Lt).
+  ge_eAttrType_InstanceMask = 1005,                  //!< Instance mask.
+  ge_eAttrType_InputFocus = 1006,                    //!< Initial input focus mask.
+  ge_eAttrType_Dyn = 1007,                           //!< Dynamic data.
+  ge_eAttrType_ScaleType = 1008,                     //!< Scale type.
+  ge_eAttrType_CurveDataType = 1009,                 //!< Data type for XY_Curve.
+  ge_eAttrType_OptionMenuType = 1010,                //!< OptionMenu type.
+  ge_eAttrType_MethodsMenuType = 1011,               //!< MethodsMenu type.
+  ge_eAttrType_MethodToolbarType = 1012,             //!< MethodToolbar type.
+  ge_eAttrType_KeyboardType = 1013,                  //!< Virtual keyboard type.
+  ge_eAttrType_DashType = 1014,                      //!< Dash cell type.
+  ge_eAttrType_DashElements = 1015,                  //!< Dash elements type.
+  ge_eAttrType_IndicatorColor = 1016,                //!< Indicator color type.
+  ge_eAttrType_ScriptTriggerEvent = 1017,            //!< Script trigger event.
+  ge_eAttrType_UcEntity = 1018,                      //!< Unit conversion, units.
+  ge_eAttrType_UcAcceleration = 1019,                //!< Unit conversion, acceleration.
+  ge_eAttrType_UcAngle = 1020,                       //!< Unit conversion, angle.
+  ge_eAttrType_UcArea = 1021,                        //!< Unit conversion, area.
+  ge_eAttrType_UcEnergy = 1022,                      //!< Unit conversion, energy.
+  ge_eAttrType_UcForce = 1023,                       //!< Unit conversion, force.
+  ge_eAttrType_UcFrequency = 1024,                   //!< Unit conversion, frequency.
+  ge_eAttrType_UcGeneral = 1025,                     //!< Unit conversion, general.
+  ge_eAttrType_UcLength = 1026,                      //!< Unit conversion, length.
+  ge_eAttrType_UcMass = 1027,                        //!< Unit conversion, mass.
+  ge_eAttrType_UcMassFlow = 1028,                    //!< Unit conversion, mass flow.
+  ge_eAttrType_UcPower = 1029,                       //!< Unit conversion, power.
+  ge_eAttrType_UcPressure = 1030,                    //!< Unit conversion, pressure.
+  ge_eAttrType_UcSpeed = 1031,                       //!< Unit conversion, speed.
+  ge_eAttrType_UcTemperature = 1032,                 //!< Unit conversion, temperature.
+  ge_eAttrType_UcTime = 1033,                        //!< Unit conversion, time.
+  ge_eAttrType_UcVolume = 1034,                      //!< Unit conversion, volume.
+  ge_eAttrType_UcVolumeFlow = 1035,                  //!< Unit conversion, volume flow.
+  ge_eAttrType_DynType2 = glow_eType_DynType2,       //!< DynType mask 2.
   ge_eAttrType_ActionType2 = glow_eType_ActionType2, //!< ActionType mask 2.
 } ge_eAttrType;
 
 //! Graph mode.
-typedef enum {
+typedef enum
+{
   graph_eMode_Development, //!< Editing mode.
-  graph_eMode_Runtime //!< Runtime mode.
+  graph_eMode_Runtime      //!< Runtime mode.
 } graph_eMode;
 
-typedef enum {
+typedef enum
+{
   graph_mOption_IgnoreJournal = 1 << 0,
   graph_mOption_ResizeReconfigure = 1 << 1
 } graph_mOption;
 
 //! Databases
-typedef enum {
-  graph_eDatabase_Gdh, //!< Database rtdb.
-  graph_eDatabase_User, //!< User defined database.
+typedef enum
+{
+  graph_eDatabase_Gdh,   //!< Database rtdb.
+  graph_eDatabase_User,  //!< User defined database.
   graph_eDatabase_Local, //!< Graph local database.
-  graph_eDatabase_Ccm, //!< Scrip external variable database.
+  graph_eDatabase_Ccm,   //!< Scrip external variable database.
   graph_eDatabase__
 } graph_eDatabase;
 
 //! Keyboards
-typedef enum {
-  graph_eKeyboard_Standard, //!< Keyboard standad.
+typedef enum
+{
+  graph_eKeyboard_Standard,        //!< Keyboard standad.
   graph_eKeyboard_StandardShifted, //!< Keyboard standard opened in shifted
   //! mode.
-  graph_eKeyboard_Numeric, //!< Keyboard numeric.
-  graph_eKeyboard_Alphabetic, //!< Keyboard alphabetic.
+  graph_eKeyboard_Numeric,           //!< Keyboard numeric.
+  graph_eKeyboard_Alphabetic,        //!< Keyboard alphabetic.
   graph_eKeyboard_AlphabeticShifted, //!< Keyboard alphabetic opened in shifted
   //! mode.
 } graph_eKeyboard;
 
 //! Parse options
-typedef enum {
+typedef enum
+{
   graph_mParseOpt_None = 0,
   graph_mParseOpt_KeepIndex = 1 << 0
 } graph_mParseOpt;
 
 //! Extension of proview type pwr_eType. Should not collide with any pwr_eType.
-typedef enum {
-  graph_eType_Bit = (1 << 15) + 1, //!< Type for a bit in a bitmask
+typedef enum
+{
+  graph_eType_Bit = (1 << 15) + 1,   //!< Type for a bit in a bitmask
   graph_eType_NodeId = (1 << 15) + 2 //!< Type for node id
 } graph_eType;
 
-typedef enum {
+typedef enum
+{
   graph_eTrace_Inherit = 0,
   graph_eTrace_Dig = 1,
   graph_eTrace_DigWithError = 2,
@@ -202,12 +210,14 @@ typedef enum {
   graph_eTrace_DigShiftWithToggleDig = 1026
 } graph_eTrace;
 
-typedef struct {
+typedef struct
+{
   char item_text[10][40];
   char item_action[10][120];
 } ge_sContextMenuData;
 
-typedef struct {
+typedef struct
+{
   pwr_tFloat32* pres_max_limit_p;
   pwr_tFloat32* pres_min_limit_p;
   pwr_tFloat32 pres_max_limit_old;
@@ -227,7 +237,8 @@ typedef struct {
   int* slider_disable_p;
 } graph_sObjectTrend;
 
-typedef struct {
+typedef struct
+{
   pwr_tSubid subid[6];
   char format[16];
   graph_eTrace type;
@@ -261,12 +272,13 @@ typedef struct {
 } graph_sTraceData;
 
 //! Variable item in local database.
-typedef struct s_LocalDb {
-  char name[80]; //!< Variable name.
-  int type; //!< Variable type (pwr_eType).
-  char value[80]; //!< Value.
+typedef struct s_LocalDb
+{
+  char name[80];      //!< Variable name.
+  int type;           //!< Variable type (pwr_eType).
+  char value[80];     //!< Value.
   char old_value[80]; //!< Old value.
-  s_LocalDb* next; //!< Next item.
+  s_LocalDb* next;    //!< Next item.
 } graph_sLocalDb;
 
 #define RECALL_BUFF_SIZE 20
@@ -275,16 +287,16 @@ typedef struct s_LocalDb {
 /*! Buffer used to store dynamics for groups when they are dissolved.
   Also used for store and recall of dynamics in attribute editor.
  */
-class GraphRecallBuff {
+class GraphRecallBuff
+{
 public:
   //! Constructor
   GraphRecallBuff();
   GeDyn* buff[RECALL_BUFF_SIZE]; //!< Buffer with pointers to stored dynamic.
   GeDyn* temporary;
-  char key[RECALL_BUFF_SIZE]
-          [80]; //!< Key to stored dynamic. Group or object name.
-  int cnt; //!< Number or stored dynamics.
-  int size; //!< Size of buffer.
+  char key[RECALL_BUFF_SIZE][80]; //!< Key to stored dynamic. Group or object name.
+  int cnt;                        //!< Number or stored dynamics.
+  int size;                       //!< Size of buffer.
 
   //! Store dynamics
   /*!
@@ -317,18 +329,18 @@ public:
   The attribute editor is one type of application that is stored in the
   application list.
 */
-class GraphApplList {
+class GraphApplList
+{
 public:
   //! Constructor
   /*!
     \param appl_key	Application key.
     \param appl_ctx	Application object.
   */
-  GraphApplList(void* appl_key, void* appl_ctx)
-      : key(appl_key), ctx(appl_ctx), prev(NULL), next(NULL){}
+  GraphApplList(void* appl_key, void* appl_ctx) : key(appl_key), ctx(appl_ctx), prev(NULL), next(NULL) {}
 
-  void* key; //!< Key.
-  void* ctx; //!< Application object.
+  void* key;           //!< Key.
+  void* ctx;           //!< Application object.
   GraphApplList* prev; //!< Previous element in list.
   GraphApplList* next; //!< Next element in list.
 
@@ -356,17 +368,18 @@ public:
 };
 
 //! Not used
-class GraphGbl {
+class GraphGbl
+{
 public:
   GraphGbl();
   char version[10];
   int load_config(void* graph);
 };
 
-class GraphRef {
+class GraphRef
+{
 public:
-  GraphRef(pwr_tAName name, pwr_tRefId* id, int size, glow_eCycle cycle,
-      grow_tObject object, void** data);
+  GraphRef(pwr_tAName name, pwr_tRefId* id, int size, glow_eCycle cycle, grow_tObject object, void** data);
   pwr_tAName m_name;
   pwr_tRefId* m_id;
   int m_size;
@@ -379,29 +392,29 @@ public:
 /*! This class is originally made to handle multiple grow contexts in a stack,
   but for the moment graph only handles one context.
 */
-class GraphGrow {
+class GraphGrow
+{
 public:
   //! Constructor.
   /*!
     \param grow_ctx	Grow context.
     \param xn		Graph.
   */
-  GraphGrow(GrowCtx* grow_ctx, void* xn)
-      : ctx(grow_ctx), graph(xn), stack_cnt(0){}
+  GraphGrow(GrowCtx* grow_ctx, void* xn) : ctx(grow_ctx), graph(xn), stack_cnt(0) {}
 
-    GraphGrow(const GraphGrow& x)
-      : ctx(x.ctx), graph(x.graph), stack_cnt(x.stack_cnt) {
-      for (int i = 0; i < stack_cnt; i++)
-	ctx_stack[i] = x.ctx_stack[i];
-    }
+  GraphGrow(const GraphGrow& x) : ctx(x.ctx), graph(x.graph), stack_cnt(x.stack_cnt)
+  {
+    for (int i = 0; i < stack_cnt; i++)
+      ctx_stack[i] = x.ctx_stack[i];
+  }
 
   //! Destructor.
   ~GraphGrow();
 
-  GrowCtx* ctx; //!< Grow context.
+  GrowCtx* ctx;           //!< Grow context.
   GrowCtx* ctx_stack[10]; //!< Base grow context.
-  void* graph; //!< Graph than owns the GraphGrow.
-  int stack_cnt; //!< Graph context is pushed.
+  void* graph;            //!< Graph than owns the GraphGrow.
+  int stack_cnt;          //!< Graph context is pushed.
 
   //! Setup grow for editmode.
   /*! Set attribute and enable events for edit mode. */
@@ -413,7 +426,8 @@ public:
 
   void pop(GrowCtx* context)
   {
-    if (stack_cnt >= 10) {
+    if (stack_cnt >= 10)
+    {
       printf("** Graph->grow stack overflow\n");
       return;
     }
@@ -436,9 +450,10 @@ public:
 
 //! Class for the drawing area of Ge.
 /*! ...
-*/
+ */
 
-class Graph {
+class Graph
+{
 public:
   //! Constructor
   /*!
@@ -456,47 +471,37 @@ public:
     access of the current user.
   */
   Graph(void* xn_parent_ctx, const char* xn_name, const char* xn_default_path,
-      graph_eMode graph_mode = graph_eMode_Development,
-      int xn_gdh_init_done = 0, const char* xn_object_name = 0,
-      int xn_use_default_access = 0, unsigned int xn_default_access = 0,
-      unsigned int xn_options = 0, int xn_color_theme = 0, int xn_dashboard = 0,
-      void (*xn_keyboard_cb)(void*, int, int) = 0);
+        graph_eMode graph_mode = graph_eMode_Development, int xn_gdh_init_done = 0,
+        const char* xn_object_name = 0, int xn_use_default_access = 0, unsigned int xn_default_access = 0,
+        unsigned int xn_options = 0, int xn_color_theme = 0, int xn_dashboard = 0,
+        void (*xn_keyboard_cb)(void*, int, int) = 0);
 
-  virtual void trace_timer_remove()
-  {
-  }
-  virtual void trace_timer_add(int time)
-  {
-  }
-  virtual Attr* attr_new(void* parent_ctx, attr_eType type, void* object,
-      attr_sItem* itemlist, int item_cnt)
+  virtual void trace_timer_remove() {}
+  virtual void trace_timer_add(int time) {}
+  virtual Attr* attr_new(void* parent_ctx, attr_eType type, void* object, attr_sItem* itemlist, int item_cnt)
   {
     return 0;
   }
-  virtual void popup_position(int event_x, int event_y, int* x, int* y)
-  {
-  }
+  virtual void popup_position(int event_x, int event_y, int* x, int* y) {}
   static void trace_scan(Graph* graph);
 
   GraphGbl gbl;
-  GraphApplList attr_list; //! List of opened applications, i.e. Attr windows.
-  GraphRecallBuff recall; //! Recall buffer for dynamics.
-  void* parent_ctx; //! Parent context.
-  char name[300]; //! Name.
-  pwr_tAName object_name[4]; //! Name of object for class graphs.
-  GraphGrow* grow; //! GraphGrow
+  GraphApplList attr_list;               //! List of opened applications, i.e. Attr windows.
+  GraphRecallBuff recall;                //! Recall buffer for dynamics.
+  void* parent_ctx;                      //! Parent context.
+  char name[300];                        //! Name.
+  pwr_tAName object_name[4];             //! Name of object for class graphs.
+  GraphGrow* grow;                       //! GraphGrow
   GraphGrow* grow_stack[GRAPH_GROW_MAX]; //! Grow stack. Not used.
-  int grow_cnt; //! Number of grow in stack. Not used.
-  ldh_tSesContext ldhses; //! Ldh session.
-  GraphJournal* journal; //! Journal file.
+  int grow_cnt;                          //! Number of grow in stack. Not used.
+  ldh_tSesContext ldhses;                //! Ldh session.
+  GraphJournal* journal;                 //! Journal file.
 
   void (*message_cb)(void*, char, const char*);
   int (*get_current_subgraph_cb)(void*, char*, char*);
   int (*close_cb)(void*);
-  void (*get_current_colors_cb)(
-      void*, glow_eDrawType*, glow_eDrawType*, glow_eDrawType*);
-  void (*set_current_colors_cb)(
-      void*, glow_eDrawType, glow_eDrawType, glow_eDrawType);
+  void (*get_current_colors_cb)(void*, glow_eDrawType*, glow_eDrawType*, glow_eDrawType*);
+  void (*set_current_colors_cb)(void*, glow_eDrawType, glow_eDrawType, glow_eDrawType);
   void (*get_current_color_tone_cb)(void*, glow_eDrawType*);
   void (*set_current_color_tone_cb)(void*, glow_eDrawType);
   void (*init_cb)(void*);
@@ -516,88 +521,83 @@ public:
   int (*get_ldhses_cb)(void*, ldh_tSesContext*, int);
   int (*check_ldh_object_cb)(void*, char*, pwr_eType*);
   int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**);
-  void (*popup_menu_cb)(
-      void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
-  void (*context_menu_cb)(
-      void*, void*, unsigned long, char*, int x, int y);
-  int (*call_method_cb)(
-      void*, char*, char*, pwr_sAttrRef, unsigned long, unsigned long, char*);
+  void (*popup_menu_cb)(void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  void (*context_menu_cb)(void*, void*, unsigned long, char*, int x, int y);
+  int (*call_method_cb)(void*, char*, char*, pwr_sAttrRef, unsigned long, unsigned long, char*);
   int (*sound_cb)(void*, pwr_tAttrRef*);
-  int (*create_modal_dialog_cb)(void*, const char*, const char*, const char*,
-      const char*, const char*, const char*);
+  int (*create_modal_dialog_cb)(void*, const char*, const char*, const char*, const char*, const char*,
+                                const char*);
   void (*eventlog_cb)(void*, void*, unsigned int);
   void (*update_colorpalette_cb)(void*);
   void (*keyboard_cb)(void*, int, int);
   void (*refresh_objects_cb)(void*, unsigned int);
   void (*resize_cb)(void*, int, int);
-  int (*get_rtplant_select_cb)(void*, char* attr_name, int size, pwr_tTypeId *type);
-  int (*extern_connect_cb)(void*, char* name, void** p, pwr_tRefId *id);
-  int linewidth; //!< Selected linewidth.
-  glow_eLineType linetype; //!< Selected linetype.
-  int textsize; //!< Selected text size.
-  int textbold; //!< Text bold selected.
-  glow_eFont textfont; //!< Text font selected.
-  int border_color; //!< Selected border color.
-  int fill_color; //!< Selected fill color.
-  int fill; //!< Fill selected.
-  int border; //!< Border selected.
-  int shadow; //!< Shadow selected.
-  int grid; //!< Snap to grid selected.
-  double grid_size_x; //!< Grid size in x direction.
-  double grid_size_y; //!< Grid size in y direction.
-  glow_eConType con_type; //!< Selected connection type.
-  glow_eCorner con_corner; //!< Selected connection corner style.
+  int (*get_rtplant_select_cb)(void*, char* attr_name, int size, pwr_tTypeId* type);
+  int (*extern_connect_cb)(void*, char* name, void** p, pwr_tRefId* id);
+  int linewidth;                      //!< Selected linewidth.
+  glow_eLineType linetype;            //!< Selected linetype.
+  int textsize;                       //!< Selected text size.
+  int textbold;                       //!< Text bold selected.
+  glow_eFont textfont;                //!< Text font selected.
+  int border_color;                   //!< Selected border color.
+  int fill_color;                     //!< Selected fill color.
+  int fill;                           //!< Fill selected.
+  int border;                         //!< Border selected.
+  int shadow;                         //!< Shadow selected.
+  int grid;                           //!< Snap to grid selected.
+  double grid_size_x;                 //!< Grid size in x direction.
+  double grid_size_y;                 //!< Grid size in y direction.
+  glow_eConType con_type;             //!< Selected connection type.
+  glow_eCorner con_corner;            //!< Selected connection corner style.
   glow_eDirection conpoint_direction; //!< Default conpoint direction.
-  grow_tObject current_polyline; //!< Currently created polyline.
-  grow_tObject current_slider; //!< Currnetly moved slider.
-  int trace_started; //!< Trace is started.
-  int gdh_init_done; //!< Gdh is initialized.
+  grow_tObject current_polyline;      //!< Currently created polyline.
+  grow_tObject current_slider;        //!< Currnetly moved slider.
+  int trace_started;                  //!< Trace is started.
+  int gdh_init_done;                  //!< Gdh is initialized.
   gccm_s_arglist arglist_stack[20];
   int arglist_cnt;
   double corner_round_amount; //!< Selected corner round amount.
-  graph_eMode mode; //!< Current edit mode.
-  double scan_time; //!< Scantime for slow cycle.
-  double fast_scan_time; //!< Scantime for fast cycle.
+  graph_eMode mode;           //!< Current edit mode.
+  double scan_time;           //!< Scantime for slow cycle.
+  double fast_scan_time;      //!< Scantime for fast cycle.
   double animation_scan_time; //!< Scantime for animations.
-  char default_path[80]; //!< Default path for .pwg files.
+  char default_path[80];      //!< Default path for .pwg files.
   char filename[120];
-  int closing_down; //!< Desctructor is called.
-  grow_tObject current_mb1_down; //!< Object for last MB1 down.
-  int slow_scan_cnt; //!< Counter to calculate next slow scan.
-  int fast_scan_cnt; //!< Counter to calculate next fast scan.
-  int displayed; //!< Window is mapped.
-  int ccm_func_registred; //!< ccm functions are registred.
-  int verify; //!< Execute commandfiles with verify.
-  int scriptmode; //!< Script is executed.
-  grow_tObject current_cmd_object; //!< Current command object.
-  void* graph_object_data; //!< Data for an object graph.
-  void (*graph_object_scan)(
-      Graph* graph); //!< Scan backcall for an object graph.
-  void (*graph_object_close)(
-      Graph* graph); //!< Close backcall for an object graph.
-  graph_sLocalDb* local_db; //!< Local database.
-  char systemname[80]; //!< System name
-  int use_default_access; //!< Use default access an not the access of the
+  int closing_down;                         //!< Desctructor is called.
+  grow_tObject current_mb1_down;            //!< Object for last MB1 down.
+  int slow_scan_cnt;                        //!< Counter to calculate next slow scan.
+  int fast_scan_cnt;                        //!< Counter to calculate next fast scan.
+  int displayed;                            //!< Window is mapped.
+  int ccm_func_registred;                   //!< ccm functions are registred.
+  int verify;                               //!< Execute commandfiles with verify.
+  int scriptmode;                           //!< Script is executed.
+  grow_tObject current_cmd_object;          //!< Current command object.
+  void* graph_object_data;                  //!< Data for an object graph.
+  void (*graph_object_scan)(Graph* graph);  //!< Scan backcall for an object graph.
+  void (*graph_object_close)(Graph* graph); //!< Close backcall for an object graph.
+  graph_sLocalDb* local_db;                 //!< Local database.
+  char systemname[80];                      //!< System name
+  int use_default_access;                   //!< Use default access an not the access of the
   //! current user.
   unsigned int default_access; //!< Default access. Can be used to override the
   //! access of the current user.
-  bool keep_mode; //!< Do not reset the edit mode when an object is created.
-  char confirm_text[200]; //!< Stored confirm text.
-  GeDyn* subgraph_dyn; //!< Subgraph default dynamics.
-  int was_subgraph; //!< Parameter to detect graph<->subgraph change.
-  char java_path[80]; //!< Path for generated java code for baseclasses
-  char java_package[80]; //!< Package for generated java code for baseclasses
+  bool keep_mode;                //!< Do not reset the edit mode when an object is created.
+  char confirm_text[200];        //!< Stored confirm text.
+  GeDyn* subgraph_dyn;           //!< Subgraph default dynamics.
+  int was_subgraph;              //!< Parameter to detect graph<->subgraph change.
+  char java_path[80];            //!< Path for generated java code for baseclasses
+  char java_package[80];         //!< Package for generated java code for baseclasses
   std::vector<GraphRef> reflist; //!< List with stored references
-  int disable_log; //!< Disable wb log window
-  double* pending_borders; //!< Stored initial borders
-  int color_theme; //!< Color theme
-  char* syntax_instance; //!< Instance for syntax check of object graphs
-  bool connect_now; //!< Don't delay trace connect
-  int dashboard; //!< Graph is a dashboard.
-  int mode_scriptmodule; //!< Fix to create scriptmodules instead of rects
-  unsigned int options; //!< Graph options  
-  int reconfigure_width; //!< Window width at last reconfiguration
-  int reconfigure_height; //!< Window height at last reconfiguration
+  int disable_log;               //!< Disable wb log window
+  double* pending_borders;       //!< Stored initial borders
+  int color_theme;               //!< Color theme
+  char* syntax_instance;         //!< Instance for syntax check of object graphs
+  bool connect_now;              //!< Don't delay trace connect
+  int dashboard;                 //!< Graph is a dashboard.
+  int mode_scriptmodule;         //!< Fix to create scriptmodules instead of rects
+  unsigned int options;          //!< Graph options
+  int reconfigure_width;         //!< Window width at last reconfiguration
+  int reconfigure_height;        //!< Window height at last reconfiguration
 
   //! Print to postscript file.
   /*! \param filename	Name of postscript file. */
@@ -629,10 +629,7 @@ public:
   /*!
     \return	Edit mode.
   */
-  grow_eMode get_mode()
-  {
-    return grow->ctx->mode();
-  }
+  grow_eMode get_mode() { return grow->ctx->mode(); }
 
   //! Print a message
   /*!
@@ -656,9 +653,7 @@ public:
   /*!
     \param focus	1 set focus, 0 focus is removed.
   */
-  virtual void set_inputfocus(int focus)
-  {
-  }
+  virtual void set_inputfocus(int focus) {}
 
   int setup();
 
@@ -668,73 +663,43 @@ public:
 
   //! Set linewidth.
   /*! \param width	Line width. */
-  void set_linewidth(int width)
-  {
-    linewidth = width;
-  }
+  void set_linewidth(int width) { linewidth = width; }
 
   //! Set linetype.
   /*! \param type	Line type. */
-  void set_linetype(glow_eLineType type)
-  {
-    linetype = type;
-  }
+  void set_linetype(glow_eLineType type) { linetype = type; }
 
   //! Set textsize.
   /*! \param size	Text size. */
-  void set_textsize(int size)
-  {
-    textsize = size;
-  }
+  void set_textsize(int size) { textsize = size; }
 
   //! Set text bold.
   /*! \param bold	Bold text. */
-  void set_textbold(int bold)
-  {
-    textbold = bold;
-  }
+  void set_textbold(int bold) { textbold = bold; }
 
   //! Set text font.
   /*! \param font	Text font. */
-  void set_textfont(glow_eFont font)
-  {
-    textfont = font;
-  }
+  void set_textfont(glow_eFont font) { textfont = font; }
 
   //! Set border color.
   /*! \param color_idx	Border color. */
-  void set_border_color(int color_idx)
-  {
-    border_color = color_idx;
-  }
+  void set_border_color(int color_idx) { border_color = color_idx; }
 
   //! Set fill color.
   /*! \param color_idx	Fill color. */
-  void set_fill_color(int color_idx)
-  {
-    fill_color = color_idx;
-  }
+  void set_fill_color(int color_idx) { fill_color = color_idx; }
 
   //! Set fill.
   /*! \param fill_on	Fill. */
-  void set_fill(int fill_on)
-  {
-    fill = fill_on;
-  }
+  void set_fill(int fill_on) { fill = fill_on; }
 
   //! Set border.
   /*! \param border_on	Border. */
-  void set_border(int border_on)
-  {
-    border = border_on;
-  }
+  void set_border(int border_on) { border = border_on; }
 
   //! Set shadow.
   /*! \param shadow_on	Draw object with shadow. */
-  void set_shadow(int shadow_on)
-  {
-    shadow = shadow_on;
-  }
+  void set_shadow(int shadow_on) { shadow = shadow_on; }
 
   //! Set fill color on all selected objects.
   /*! Set currently selected fillcolor on all selected objects. */
@@ -828,8 +793,7 @@ public:
   void set_nav_background_color();
 
   //! Modify a custom color.
-  int set_custom_color(
-      glow_eDrawType color, double red, double green, double blue);
+  int set_custom_color(glow_eDrawType color, double red, double green, double blue);
 
   //! Get custom colors.
   void* get_custom_colors();
@@ -886,9 +850,8 @@ public:
     \param round_amount	Size of arc in rounded corners.
     \param cc		Found or created connections class.
   */
-  int get_conclass(glow_eDrawType drawtype, int linewidth,
-      glow_eConType contype, glow_eCorner corner, double round_amount,
-      grow_tConClass* cc);
+  int get_conclass(glow_eDrawType drawtype, int linewidth, glow_eConType contype, glow_eCorner corner,
+                   double round_amount, grow_tConClass* cc);
 
   //! Get the selected border color.
   /*! \return 	The selected border color. */
@@ -904,31 +867,19 @@ public:
 
   //! Set connectionpoint direction.
   /*! \param dir	Connectionpoint direction. */
-  void set_condir(glow_eDirection dir)
-  {
-    conpoint_direction = dir;
-  }
+  void set_condir(glow_eDirection dir) { conpoint_direction = dir; }
 
   //! Set connection type.
   /*! \param type	Connection type. */
-  void set_contype(glow_eConType type)
-  {
-    con_type = type;
-  }
+  void set_contype(glow_eConType type) { con_type = type; }
 
   //! Set connection corner.
   /*! \param corner	Connection corner, rounded or straight. */
-  void set_concorner(glow_eCorner corner)
-  {
-    con_corner = corner;
-  }
+  void set_concorner(glow_eCorner corner) { con_corner = corner; }
 
   //! Set connection corner round amount.
   /*! \param round_amount	Size of the arc in rounded corner. */
-  void set_corner_round_amount(double round_amount)
-  {
-    corner_round_amount = round_amount;
-  }
+  void set_corner_round_amount(double round_amount) { corner_round_amount = round_amount; }
 
   //! Open attribute editor for an object.
   /*! \param object	Object. */
@@ -941,8 +892,7 @@ public:
     \param item_cnt	Number of attributes in list.
     \param client_data	Pointer to grow info list.
   */
-  int get_attr_items(grow_tObject object, attr_sItem** itemlist, int* item_cnt,
-      void** client_data);
+  int get_attr_items(grow_tObject object, attr_sItem** itemlist, int* item_cnt, void** client_data);
 
   //! Get list of attributes for a subgraph.
   /*!
@@ -950,8 +900,7 @@ public:
     \param item_cnt	Number of attributes in list.
     \param client_data	Pointer to grow info list.
   */
-  int get_subgraph_attr_items(
-      attr_sItem** itemlist, int* item_cnt, void** client_data);
+  int get_subgraph_attr_items(attr_sItem** itemlist, int* item_cnt, void** client_data);
 
   //! Get list of attributes for a graph.
   /*!
@@ -959,8 +908,7 @@ public:
     \param item_cnt	Number of attributes in list.
     \param client_data	Pointer to grow info list.
   */
-  int get_graph_attr_items(
-      attr_sItem** itemlist, int* item_cnt, void** client_data);
+  int get_graph_attr_items(attr_sItem** itemlist, int* item_cnt, void** client_data);
 
   //! Open attribute editor for a subgraph.
   /*! /return 	Always 1 */
@@ -1042,7 +990,7 @@ public:
 
   //! Clear selection.
   void select_clear(int jstore = 0);
-  
+
   //! Select all connections.
   /*! Select all connection objects in the graph. */
   void select_all_cons();
@@ -1102,10 +1050,7 @@ public:
 
   //! Get current movement restrictions.
   /*! \return	Type of restriction. */
-  glow_eMoveRestriction get_move_restriction()
-  {
-    return grow_GetMoveRestrictions(grow->ctx);
-  }
+  glow_eMoveRestriction get_move_restriction() { return grow_GetMoveRestrictions(grow->ctx); }
 
   //! Set or reset scaletype to equal scale.
   /*!
@@ -1121,10 +1066,7 @@ public:
   /*!
     \return	If 1, scaleing of objects are equal in x and y direction.
   */
-  int get_scale_equal()
-  {
-    return grow_GetScaleEqual(grow->ctx);
-  }
+  int get_scale_equal() { return grow_GetScaleEqual(grow->ctx); }
 
   //! Check if object is a subgraph.
   /*! \return 		Returns 1 if object is a subgraph, else 0. */
@@ -1165,17 +1107,11 @@ public:
   /*! \return 	1 if modified, 0 if not modified. */
   int is_modified();
 
-  void set_modified(int mod)
-  {
-    grow_SetModified(grow->ctx, mod);
-  }
+  void set_modified(int mod) { grow_SetModified(grow->ctx, mod); }
 
   //! Set scantime for slow cycle.
   /*! \param time	Scantime in seconds. */
-  void set_scantime(double time)
-  {
-    scan_time = time;
-  }
+  void set_scantime(double time) { scan_time = time; }
 
   //! Parse a reference to a database attribute.
   /*!
@@ -1189,9 +1125,8 @@ public:
     The attribute reference is of type !VKV-P1-Str1.ActualValue##String80 which
     is inverted (!), of type pwr_eType_String with size 80.
   */
-  graph_eDatabase parse_attr_name(char* name, char* parsed_name, int* inverted,
-      int* type, int* size, int* elem = 0,
-      graph_mParseOpt options = graph_mParseOpt_None);
+  graph_eDatabase parse_attr_name(char* name, char* parsed_name, int* inverted, int* type, int* size,
+                                  int* elem = 0, graph_mParseOpt options = graph_mParseOpt_None);
 
   //! Get the default window size
   /*!
@@ -1219,8 +1154,7 @@ public:
     \param size		Size of type.
     \param elements	Elements.
   */
-  void string_to_type(
-      char* type_str, pwr_eType* type, int* size, int* elements);
+  void string_to_type(char* type_str, pwr_eType* type, int* size, int* elements);
 
   //! Get the stored system name.
   /*! \param name	System name. */
@@ -1245,8 +1179,7 @@ public:
     \param object	Object.
     \param cnt		Index for javabean name.
   */
-  int export_GejavaObjectTraceAttr(
-      std::ofstream& fp, grow_tObject object, int cnt);
+  int export_GejavaObjectTraceAttr(std::ofstream& fp, grow_tObject object, int cnt);
 
   //! Export java code for an object's dynamics and annotations in a java frame.
   //! Needs update.
@@ -1347,24 +1280,15 @@ public:
     After reset_nodraw() the function redraw() should be called to update the
     window.
   */
-  void set_nodraw()
-  {
-    grow_SetNodraw(grow->ctx);
-  }
+  void set_nodraw() { grow_SetNodraw(grow->ctx); }
 
   //! Reset no draw.
   /*! Reset of a previos call to set_nodraw. */
-  void reset_nodraw()
-  {
-    grow_ResetNodraw(grow->ctx);
-  }
+  void reset_nodraw() { grow_ResetNodraw(grow->ctx); }
 
   //! Redraw the window.
   /*! Redraw the background and all objects. */
-  void redraw()
-  {
-    grow_Redraw(grow->ctx);
-  }
+  void redraw() { grow_Redraw(grow->ctx); }
 
   //! Group the selected objects.
   /*!
@@ -1396,9 +1320,9 @@ public:
 
   //! Replace the string $object and get references in attribute connection
   //! string.
-  int get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[],
-      int ref_size[], int* ref_cnt, pwr_tAName idx_ref[],
-      pwr_tTid idx_ref_tid[], int idx_ref_size[], int* idx_ref_cnt, GeDyn* dyn);
+  int get_refupdate(char* in, pwr_tAName ref[], pwr_tTid ref_tid[], int ref_size[], int* ref_cnt,
+                    pwr_tAName idx_ref[], pwr_tTid idx_ref_tid[], int idx_ref_size[], int* idx_ref_cnt,
+                    GeDyn* dyn);
 
   //! Replace the string $object with the object name for the graph.
   /*!
@@ -1431,9 +1355,8 @@ public:
     \param subid	Subid.
     \param size		Size of the attribute.
   */
-  int ref_object_info(glow_eCycle cycle, char* name, void** data,
-      pwr_tSubid* subid, unsigned int size, grow_tObject object,
-      bool now = false);
+  int ref_object_info(glow_eCycle cycle, char* name, void** data, pwr_tSubid* subid, unsigned int size,
+                      grow_tObject object, bool now = false);
 
   //! Subscribe all stored subscriptions.
   int ref_object_info_all();
@@ -1450,8 +1373,8 @@ public:
     \param dyn_type	Dyntype of the created object.
     \param colortheme	Use colortheme colors.
   */
-  void create_trend(grow_tObject* object, double x, double y,
-      unsigned int dyn_type1, unsigned int dyn_type2, int colortheme);
+  void create_trend(grow_tObject* object, double x, double y, unsigned int dyn_type1, unsigned int dyn_type2,
+                    int colortheme);
 
   //! Create a xy curve object.
   /*!
@@ -1462,8 +1385,8 @@ public:
     \param dyn_type2	Dyntype2 of the created object.
     \param colortheme	Use colortheme colors.
   */
-  void create_xycurve(
-      grow_tObject* object, double x, double y, unsigned int dyn_type1, unsigned int dyn_type2, int colortheme);
+  void create_xycurve(grow_tObject* object, double x, double y, unsigned int dyn_type1,
+                      unsigned int dyn_type2, int colortheme);
 
   //! Create a bar object.
   /*!
@@ -1521,10 +1444,8 @@ public:
     \param x		x coordinate for object.
     \param y		y coordinate for object.
   */
-  void create_axis(
-      grow_tObject* object, double x, double y, int dynamic, int colortheme);
-  void create_axisarc(
-      grow_tObject* object, double x, double y, int dynamic, int colortheme);
+  void create_axis(grow_tObject* object, double x, double y, int dynamic, int colortheme);
+  void create_axisarc(grow_tObject* object, double x, double y, int dynamic, int colortheme);
   void create_pie(grow_tObject* object, double x, double y, int colortheme);
   void create_barchart(grow_tObject* object, double x, double y, int colortheme);
   void create_layer();
@@ -1534,11 +1455,9 @@ public:
   void merge_all_layers();
   void move_select_to_layer();
   void create_dashcell(grow_tObject* object, double x, double y, int colortheme);
-  int create_dashcell_next(grow_tObject *object, int colortheme, int select, char *attr, 
-      pwr_tTypeId atype);
+  int create_dashcell_next(grow_tObject* object, int colortheme, int select, char* attr, pwr_tTypeId atype);
   int merge_dashcells();
   int dashboard_connect(grow_tObject o, int idx, char* attr, pwr_tTypeId atype);
-
 
   int create_node_floating(double x, double y);
 
@@ -1600,45 +1519,32 @@ public:
   void signal_send(char* signalname);
   void refresh_objects(unsigned int type);
   void syntax_check(char* instance);
-  int syntax_check_list(
-      grow_tObject* list, int list_cnt, int* error_cnt, int* warning_cnt);
+  int syntax_check_list(grow_tObject* list, int list_cnt, int* error_cnt, int* warning_cnt);
   void syntax_msg(int severity, grow_tObject object, const char* msg);
   int check_ldh_object(char* name, pwr_eType* type);
   void set_subgraph_extern_all(int sg_extern);
-  void disable_subwindow_events(int disable) 
-  {
-    grow_DisableSubwindowEvents(grow->ctx, disable);
-  }
+  void disable_subwindow_events(int disable) { grow_DisableSubwindowEvents(grow->ctx, disable); }
 
   static int get_colortheme_colors(char* file, double** colors, int* size);
 
   //! Enable event logging
-  static void eventlog_enable(int enable)
-  {
-    grow_EventLogEnable(enable);
-  }
+  static void eventlog_enable(int enable) { grow_EventLogEnable(enable); }
 
   static void graph_attr_store_cb(void* g, grow_tObject object);
-  static int graph_attr_recall_cb(
-      void* g, grow_tObject object, int idx, GeDyn** old_dyn);
+  static int graph_attr_recall_cb(void* g, grow_tObject object, int idx, GeDyn** old_dyn);
   static int graph_get_plant_select_cb(void* g, char* value, int size);
-  static int graph_get_current_colors_cb(void* g, glow_eDrawType* fill_color,
-      glow_eDrawType* border_color, glow_eDrawType* text_color);
-  static int graph_get_current_color_tone_cb(
-      void* g, glow_eDrawType* color_tone);
-  static int graph_reconfigure_attr_cb(void* g, grow_tObject object,
-      attr_sItem** itemlist, int* itemlist_cnt, void** client_data);
+  static int graph_get_current_colors_cb(void* g, glow_eDrawType* fill_color, glow_eDrawType* border_color,
+                                         glow_eDrawType* text_color);
+  static int graph_get_current_color_tone_cb(void* g, glow_eDrawType* color_tone);
+  static int graph_reconfigure_attr_cb(void* g, grow_tObject object, attr_sItem** itemlist, int* itemlist_cnt,
+                                       void** client_data);
   static int graph_attr_set_data_cb(void* g, grow_tObject object, GeDyn* data);
-  static int graph_get_dyn_info_cb(
-      void* g, GeDyn* dyn, attr_sItem** itemlist, int* itemlist_cnt);
-  static int graph_get_subgraph_info_cb(
-      void* g, char* name, attr_sItem** itemlist, int* itemlist_cnt);
-  static void graph_attr_redraw_cb(
-      void* gctx, void* attrctx, grow_tObject object, void* info);
-  static void graph_attr_close_cb(
-      void* gctx, void* attrctx, grow_tObject object, void* info, int keep);
-  static void graph_get_object_list_cb(void* g, unsigned int type,
-      grow_tObject** list, int* list_cnt, grow_tObject* parent, int parent_cnt);
+  static int graph_get_dyn_info_cb(void* g, GeDyn* dyn, attr_sItem** itemlist, int* itemlist_cnt);
+  static int graph_get_subgraph_info_cb(void* g, char* name, attr_sItem** itemlist, int* itemlist_cnt);
+  static void graph_attr_redraw_cb(void* gctx, void* attrctx, grow_tObject object, void* info);
+  static void graph_attr_close_cb(void* gctx, void* attrctx, grow_tObject object, void* info, int keep);
+  static void graph_get_object_list_cb(void* g, unsigned int type, grow_tObject** list, int* list_cnt,
+                                       grow_tObject* parent, int parent_cnt);
 
   //
   // Command module
@@ -1654,7 +1560,7 @@ public:
 
   //! Execute a script buffer.
   /*!  \param script		Script buffer. */
-  int script_buffer_exec(char *script);
+  int script_buffer_exec(char* script);
 
   //
   // Object graph module
@@ -1743,13 +1649,11 @@ public:
     \param y2		y coordinate of upper right corner.
     \param node		Created node object.
   */
-  int create_node(const char* node_name, const char* subgraph_str, double x1,
-      double y1, double x2, double y2, grow_tNode* node);
+  int create_node(const char* node_name, const char* subgraph_str, double x1, double y1, double x2, double y2,
+                  grow_tNode* node);
 
-  static void get_filename(char* inname, const char* def_path, int dashboard,
-      char* outname);
-  static int get_dimension(
-      char* filename, const char* def_path, int dashboard, int* width, int* height);
+  static void get_filename(char* inname, const char* def_path, int dashboard, char* outname);
+  static int get_dimension(char* filename, const char* def_path, int dashboard, int* width, int* height);
 
   //
   // Web module
@@ -1784,19 +1688,12 @@ public:
   int ccm_get_variable(char* name, int type, void* data);
   int ccm_ref_variable(char* name, int type, void** data);
 
-  void event_exec(void* event, unsigned int size)
-  {
-    grow_EventExec(grow->ctx, event, size);
-  }
+  void event_exec(void* event, unsigned int size) { grow_EventExec(grow->ctx, event, size); }
 
   int read_scriptfile(char* incommand);
   int script_func_register(void);
   void script_store_graph();
-  int is_dashboard() 
-  {
-    return grow_IsDashboard(grow->ctx);
-  }
-
+  int is_dashboard() { return grow_IsDashboard(grow->ctx); }
 
   //! Destructor
   /*! Stop trace (if started), delete open attribute editors, free local
@@ -1817,8 +1714,8 @@ int graph_init_grow_base_cb(GlowCtx* fctx, void* client_data);
   \param buff_size	Size of buffer.
   \param attr_size	Attribute size.
 */
-int graph_attr_string_to_value(int type_id, const char* value_str,
-    void* buffer_ptr, int buff_size, int attr_size);
+int graph_attr_string_to_value(int type_id, const char* value_str, void* buffer_ptr, int buff_size,
+                               int attr_size);
 
 /*@}*/
 #endif

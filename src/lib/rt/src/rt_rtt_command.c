@@ -43,8 +43,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "pwr_privilege.h"
 #include "pwr_baseclasses.h"
+#include "pwr_privilege.h"
 
 #include "co_api_user.h"
 #include "co_ccm_msg.h"
@@ -52,14 +52,14 @@
 #include "co_string.h"
 #include "co_time.h"
 
+#include "dtt_rttsys_functions.h"
 #include "rt_ini_alias.h"
 #include "rt_rtt_global.h"
 #include "rt_rtt_msg.h"
-#include "dtt_rttsys_functions.h"
 
 #include "rt_gdh_msg.h"
-#include "rt_rtt_helptext.h"
 #include "rt_load.h"
+#include "rt_rtt_helptext.h"
 
 #define IF_NOGDH_RETURN                                                        \
   if (!rtt_gdh_started) {                                                      \
@@ -70,109 +70,115 @@
 static int zero = 0;
 static int one = 1;
 char rtt_searchbuffer[80] = "";
-static FILE* rtt_learn_file;
-static void* rtt_ccmctx = 0;
+static FILE *rtt_learn_file;
+static void *rtt_ccmctx = 0;
 static char rtt_ccmcmd[256] = "";
 static int rtt_ccmcmd_fetched = 0;
 static int rtt_ccmcmd_quit = 0;
 static int rtt_ccm_func_registred = 0;
 /* Local function prototypes */
 
-static int rtt_command_toupper(char* str_upper, char* str);
-static int monitor_func(menu_ctx ctx, int* flag);
-static int show_func(menu_ctx ctx, int* flag);
-static int debug_func(menu_ctx ctx, int* flag);
-static int add_func(menu_ctx ctx, int* flag);
-static int crossref_func(menu_ctx ctx, int* flag);
-static int collect_func(menu_ctx ctx, int* flag);
-static int logging_func(menu_ctx ctx, int* flag);
-static int directory_func(menu_ctx ctx, int* flag);
-static int rtt_get_func(menu_ctx ctx, int* flag);
-static int rtt_set_func(menu_ctx ctx, int* flag);
-static int plcscan_func(menu_ctx ctx, int* flag);
-static int store_func(menu_ctx ctx, int* flag);
-static int alarm_func(menu_ctx ctx, int* flag);
-static int rtt_create_func(menu_ctx ctx, int* flag);
-static int rtt_delete_func(menu_ctx ctx, int* flag);
-static int rtt_view_func(menu_ctx ctx, int* flag);
-static int wait_func(menu_ctx ctx, int* flag);
-static int search_func(menu_ctx ctx, int* flag);
-static int top_func(menu_ctx ctx, int* flag);
-static int page_func(menu_ctx ctx, int* flag);
-static int help_func(menu_ctx ctx, int* flag);
-static int exit_func(menu_ctx ctx, int* flag);
-static int classhier_func(menu_ctx ctx, int* flag);
-static int qcom_func(menu_ctx ctx, int* flag);
-static int rtt_login_func(menu_ctx ctx, int* flag);
-static int rtt_show_object_add(pwr_tObjid objid, rtt_t_menu** menulist,
-    int* index, void* dum2, void* dum3, void* dum4);
-static int rtt_show_parameter_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
-    char* parname, int* index, int* element, void* dum4);
+static int rtt_command_toupper(char *str_upper, char *str);
+static int monitor_func(menu_ctx ctx, int *flag);
+static int show_func(menu_ctx ctx, int *flag);
+static int debug_func(menu_ctx ctx, int *flag);
+static int add_func(menu_ctx ctx, int *flag);
+static int crossref_func(menu_ctx ctx, int *flag);
+static int collect_func(menu_ctx ctx, int *flag);
+static int logging_func(menu_ctx ctx, int *flag);
+static int directory_func(menu_ctx ctx, int *flag);
+static int rtt_get_func(menu_ctx ctx, int *flag);
+static int rtt_set_func(menu_ctx ctx, int *flag);
+static int plcscan_func(menu_ctx ctx, int *flag);
+static int store_func(menu_ctx ctx, int *flag);
+static int alarm_func(menu_ctx ctx, int *flag);
+static int rtt_create_func(menu_ctx ctx, int *flag);
+static int rtt_delete_func(menu_ctx ctx, int *flag);
+static int rtt_view_func(menu_ctx ctx, int *flag);
+static int wait_func(menu_ctx ctx, int *flag);
+static int search_func(menu_ctx ctx, int *flag);
+static int top_func(menu_ctx ctx, int *flag);
+static int page_func(menu_ctx ctx, int *flag);
+static int help_func(menu_ctx ctx, int *flag);
+static int exit_func(menu_ctx ctx, int *flag);
+static int classhier_func(menu_ctx ctx, int *flag);
+static int qcom_func(menu_ctx ctx, int *flag);
+static int rtt_login_func(menu_ctx ctx, int *flag);
+static int rtt_show_object_add(pwr_tObjid objid, rtt_t_menu **menulist,
+                               int *index, void *dum2, void *dum3, void *dum4);
+static int rtt_show_parameter_add(pwr_tObjid objid, rtt_t_menu_upd **menulist,
+                                  char *parname, int *index, int *element,
+                                  void *dum4);
 static int rtt_show_par_hier_class_name(menu_ctx parent_ctx,
-    char* parametername, char* hiername, char* classname, char* name, int add,
-    int global, int max_objects);
-static int rtt_debug_obj_hier_class_name(menu_ctx parent_ctx, char* hiername,
-    char* classname, char* name, int add, int global);
+                                        char *parametername, char *hiername,
+                                        char *classname, char *name, int add,
+                                        int global, int max_objects);
+static int rtt_debug_obj_hier_class_name(menu_ctx parent_ctx, char *hiername,
+                                         char *classname, char *name, int add,
+                                         int global);
 static int rtt_get_child_object_hi_cl_na(menu_ctx ctx, pwr_tClassId class,
-    char* name, pwr_tObjid objid, int* obj_counter, int max_count, int global,
-    int (*backcall)(), void* arg1, void* arg2, void* arg3, void* arg4,
-    void* arg5);
-static int rtt_find_name(menu_ctx ctx, char* name, pwr_tObjid* objid);
-static int rtt_find_hierarchy(menu_ctx ctx, pwr_tObjid* objid);
-static int rtt_menulist_search(
-    menu_ctx ctx, char* searchstr, int index, int* foundindex);
-static int rtt_store(menu_ctx ctx, char* filename, int collect);
-static int rtt_set_parameter(char* name_str, char* value_str, int bypass);
-static int rtt_get_current_object(menu_ctx ctx, pwr_tObjid* objid,
-    char* objectname, int size, pwr_tBitMask nametype);
-static int rtt_get_current_aref(menu_ctx ctx, pwr_sAttrRef* arp,
-    char* objectname, int size, pwr_tBitMask nametype);
-static int rtt_set_plcscan(
-    pwr_tObjid objid, int* on, void* dum1, void* dum2, void* dum3, void* dum4);
-static int rtt_plcscan(
-    menu_ctx ctx, int on, int all, char* hiername, int global);
-static int rtt_create_object(menu_ctx parent_ctx, char* classname, char* name);
-static int rtt_delete_object(menu_ctx parent_ctx, char* name);
-static int rtt_show_step(menu_ctx parent_ctx, char* hiername, int initstep);
-static int rtt_print_picture(menu_ctx ctx, char* filename, int append,
-    int text_size, int parameter_size);
-static int rtt_print_item_upd(char* text, char* parameter, char* value_ptr,
-    int value_type, int flags, FILE* outfile, int text_size,
-    int parameter_size);
+                                         char *name, pwr_tObjid objid,
+                                         int *obj_counter, int max_count,
+                                         int global, int (*backcall)(),
+                                         void *arg1, void *arg2, void *arg3,
+                                         void *arg4, void *arg5);
+static int rtt_find_name(menu_ctx ctx, char *name, pwr_tObjid *objid);
+static int rtt_find_hierarchy(menu_ctx ctx, pwr_tObjid *objid);
+static int rtt_menulist_search(menu_ctx ctx, char *searchstr, int index,
+                               int *foundindex);
+static int rtt_store(menu_ctx ctx, char *filename, int collect);
+static int rtt_set_parameter(char *name_str, char *value_str, int bypass);
+static int rtt_get_current_object(menu_ctx ctx, pwr_tObjid *objid,
+                                  char *objectname, int size,
+                                  pwr_tBitMask nametype);
+static int rtt_get_current_aref(menu_ctx ctx, pwr_sAttrRef *arp,
+                                char *objectname, int size,
+                                pwr_tBitMask nametype);
+static int rtt_set_plcscan(pwr_tObjid objid, int *on, void *dum1, void *dum2,
+                           void *dum3, void *dum4);
+static int rtt_plcscan(menu_ctx ctx, int on, int all, char *hiername,
+                       int global);
+static int rtt_create_object(menu_ctx parent_ctx, char *classname, char *name);
+static int rtt_delete_object(menu_ctx parent_ctx, char *name);
+static int rtt_show_step(menu_ctx parent_ctx, char *hiername, int initstep);
+static int rtt_print_picture(menu_ctx ctx, char *filename, int append,
+                             int text_size, int parameter_size);
+static int rtt_print_item_upd(char *text, char *parameter, char *value_ptr,
+                              int value_type, int flags, FILE *outfile,
+                              int text_size, int parameter_size);
 static int rtt_set_conversion(pwr_tObjid objid, int on, int show_only);
 static int rtt_set_invert(pwr_tObjid objid, int on, int show_only);
-static int rtt_get_invert(pwr_tObjid objid, int* on);
-static int rtt_get_conversion(pwr_tObjid objid, int* on);
-static int rtt_print_picture_restore(menu_ctx ctx, char* filename);
-static int rtt_print_restore_item_upd(
-    char* parameter, char* value_ptr, int value_type, int flags, FILE* outfile);
-static int rtt_print_text(char* filename, char* str, int append);
-static int rtt_confirm(char* text);
-static int rtt_qual_to_time(char* in_str, pwr_tTime* time);
+static int rtt_get_invert(pwr_tObjid objid, int *on);
+static int rtt_get_conversion(pwr_tObjid objid, int *on);
+static int rtt_print_picture_restore(menu_ctx ctx, char *filename);
+static int rtt_print_restore_item_upd(char *parameter, char *value_ptr,
+                                      int value_type, int flags, FILE *outfile);
+static int rtt_print_text(char *filename, char *str, int append);
+static int rtt_confirm(char *text);
+static int rtt_qual_to_time(char *in_str, pwr_tTime *time);
 
 /*************************************************************************
-*
-* Name:		rtt_wildcard()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*wildname	I	wildcard name.
-* char		*name		I	object name.
-*
-* Description:
-*	Checks if the object name can be described by the
-*	wildcard string.
-*	Returns 0 if ok, else 1.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_wildcard()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*wildname	I	wildcard name.
+ * char		*name		I	object name.
+ *
+ * Description:
+ *	Checks if the object name can be described by the
+ *	wildcard string.
+ *	Returns 0 if ok, else 1.
+ *
+ **************************************************************************/
 
-int rtt_wildcard(char* wildname, char* name)
-{
+int rtt_wildcard(char *wildname, char *name) {
   int len;
-  char* s;
-  char* t;
-  char* u;
+  char *s;
+  char *t;
+  char *u;
   pwr_tAName checkstr;
   pwr_tAName upper_name;
   pwr_tAName upper_wildname;
@@ -224,47 +230,45 @@ int rtt_wildcard(char* wildname, char* name)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_toupper()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*str		I	input string.
-* char		*upper_str	I	string converted to upper case.
-*
-* Description:
-*	Converts a string to upper case.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_toupper()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*str		I	input string.
+ * char		*upper_str	I	string converted to upper case.
+ *
+ * Description:
+ *	Converts a string to upper case.
+ *
+ **************************************************************************/
 
-int rtt_toupper(char* str_upper, char* str)
-{
+int rtt_toupper(char *str_upper, char *str) {
   str_ToUpper(str_upper, str);
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		rtt_toupper()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*str		I	input string.
-* char		*upper_str	I	string converted to upper case.
-*
-* Description:
-*	Converts a string to upper case.
-*	Text between two '"' will not be affekted.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_toupper()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*str		I	input string.
+ * char		*upper_str	I	string converted to upper case.
+ *
+ * Description:
+ *	Converts a string to upper case.
+ *	Text between two '"' will not be affekted.
+ *
+ **************************************************************************/
 
-static int rtt_command_toupper(char* str_upper, char* str)
-{
+static int rtt_command_toupper(char *str_upper, char *str) {
   char namechar;
-  char* u;
-  char* t;
+  char *u;
+  char *t;
   int convert;
   unsigned char prev_char;
 
@@ -296,21 +300,20 @@ static int rtt_command_toupper(char* str_upper, char* str)
 }
 
 /*************************************************************************
-*
-* Name:		monitor_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "monitor" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		monitor_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "monitor" command i recieved.
+ *
+ **************************************************************************/
 
-static int monitor_func(menu_ctx ctx, int* flag)
-{
+static int monitor_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   int arg1_sts;
@@ -326,15 +329,15 @@ static int monitor_func(menu_ctx ctx, int* flag)
     pwr_tOName name_str;
 
     /* Get the selected object */
-    sts = rtt_get_current_object(
-        ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+    sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                 cdh_mName_volumeStrict);
     found = 0;
     while (ODD(sts)) {
       sts = gdh_GetObjectClass(objid, &class);
       if (EVEN(sts))
         return sts;
       sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), classname,
-          sizeof(classname), cdh_mName_volumeStrict);
+                            sizeof(classname), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       /* Check that this is a or a plc */
@@ -358,21 +361,20 @@ static int monitor_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		show_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "show" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		show_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "show" command i recieved.
+ *
+ **************************************************************************/
 
-static int show_func(menu_ctx ctx, int* flag)
-{
+static int show_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   int arg1_sts;
@@ -389,11 +391,11 @@ static int show_func(menu_ctx ctx, int* flag)
     return RTT__NOPICTURE;
   } else if (str_NoCaseStrncmp(arg1_str, "ALARMLIST", strlen(arg1_str)) == 0) {
     /* Command is "SHOW ALARMS" */
-    sts = rtt_cli(rtt_command_table, "ALARM SHOW", (void*)ctx, 0);
+    sts = rtt_cli(rtt_command_table, "ALARM SHOW", (void *)ctx, 0);
     return sts;
   } else if (str_NoCaseStrncmp(arg1_str, "EVENTLIST", strlen(arg1_str)) == 0) {
     /* Command is "SHOW EVENTLIST" */
-    sts = rtt_cli(rtt_command_table, "ALARM LIST", (void*)ctx, 0);
+    sts = rtt_cli(rtt_command_table, "ALARM LIST", (void *)ctx, 0);
     return sts;
   } else if (str_NoCaseStrncmp(arg1_str, "FILE", strlen(arg1_str)) == 0) {
     /* Command is "SHOW FILE" */
@@ -490,14 +492,14 @@ static int show_func(menu_ctx ctx, int* flag)
         rtt_message('E', "Object not found");
         return RTT__NOPICTURE;
       }
-      sts = gdh_ObjidToName(
-          objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(objid, name_str, sizeof(name_str),
+                            cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
     } else {
       /* Get the selected object */
-      sts = rtt_get_current_object(
-          ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                   cdh_mName_volumeStrict);
       if (EVEN(sts)) {
         rtt_message('E', "Select an object or enter name");
         return RTT__NOPICTURE;
@@ -515,9 +517,9 @@ static int show_func(menu_ctx ctx, int* flag)
     char type_str[80];
     char file_str[80];
     int maxobjects;
-    char* class_ptr;
-    char* name_ptr;
-    char* hierarchy_ptr;
+    char *class_ptr;
+    char *name_ptr;
+    char *hierarchy_ptr;
     int global;
     char str[80];
     int nr;
@@ -539,8 +541,8 @@ static int show_func(menu_ctx ctx, int* flag)
         return RTT__HOLDCOMMAND;
       }
       /* Get the object name */
-      sts = gdh_ObjidToName(
-          objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(objid, name_str, sizeof(name_str),
+                            cdh_mName_volumeStrict);
 
       if (EVEN(sts))
         return sts;
@@ -561,14 +563,14 @@ static int show_func(menu_ctx ctx, int* flag)
           rtt_message('E', "Object not found");
           return RTT__NOPICTURE;
         }
-        sts = gdh_ObjidToName(
-            objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+        sts = gdh_ObjidToName(objid, name_str, sizeof(name_str),
+                              cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
       } else {
         /* Get the selected object */
-        sts = rtt_get_current_object(
-            ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+        sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                     cdh_mName_volumeStrict);
         if (EVEN(sts)) {
           rtt_message('E', "Select an object or enter name");
           return RTT__NOPICTURE;
@@ -619,8 +621,8 @@ static int show_func(menu_ctx ctx, int* flag)
     else
       global = 1;
 
-    sts = rtt_show_obj_hier_class_name(
-        ctx, hierarchy_ptr, class_ptr, name_ptr, global, maxobjects);
+    sts = rtt_show_obj_hier_class_name(ctx, hierarchy_ptr, class_ptr, name_ptr,
+                                       global, maxobjects);
     return sts;
   }
 
@@ -637,14 +639,14 @@ static int show_func(menu_ctx ctx, int* flag)
         rtt_message('E', "Object not found");
         return RTT__NOPICTURE;
       }
-      sts = gdh_ObjidToName(
-          objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(objid, name_str, sizeof(name_str),
+                            cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
     } else {
       /* Get the selected object */
-      sts = rtt_get_current_object(
-          ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                   cdh_mName_volumeStrict);
       if (EVEN(sts)) {
         rtt_message('E', "Select an object or enter name");
         return RTT__NOPICTURE;
@@ -660,8 +662,8 @@ static int show_func(menu_ctx ctx, int* flag)
     /* Command is "SHOW SIGNALS" */
     char file_str[80];
     pwr_tOName name_str;
-    char* file_ptr;
-    char* name_ptr;
+    char *file_ptr;
+    char *name_ptr;
     pwr_tObjid objid;
     pwr_tObjid parentobjid;
     pwr_tClassId class;
@@ -687,7 +689,7 @@ static int show_func(menu_ctx ctx, int* flag)
     else {
       /* Get the selected object */
       sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
-          cdh_mName_path | cdh_mName_object);
+                                   cdh_mName_path | cdh_mName_object);
       if (EVEN(sts)) {
         rtt_message('E', "Enter name or select an object");
         return RTT__HOLDCOMMAND;
@@ -698,17 +700,17 @@ static int show_func(menu_ctx ctx, int* flag)
       if (EVEN(sts))
         return sts;
       sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), classname,
-          sizeof(classname), cdh_mName_volumeStrict);
+                            sizeof(classname), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       /* Check that this is a or a plc */
       if (streq(classname, "pwrb:Class-PlcPgm")) {
         /* Get all the windows in the plc */
         strcat(name_str, "-W*");
-      } else if (!((streq(classname, "pwrb:Class-WindowPlc"))
-                     || (streq(classname, "pwrb:Class-WindowOrderact"))
-                     || (streq(classname, "pwrb:Class-WindowCond"))
-                     || (streq(classname, "pwrb:Class-WindowSubstep")))) {
+      } else if (!((streq(classname, "pwrb:Class-WindowPlc")) ||
+                   (streq(classname, "pwrb:Class-WindowOrderact")) ||
+                   (streq(classname, "pwrb:Class-WindowCond")) ||
+                   (streq(classname, "pwrb:Class-WindowSubstep")))) {
         /* Try with the parent */
         sts = gdh_GetParent(objid, &parentobjid);
         if (EVEN(sts))
@@ -717,19 +719,19 @@ static int show_func(menu_ctx ctx, int* flag)
         if (EVEN(sts))
           return sts;
         sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), classname,
-            sizeof(classname), cdh_mName_volumeStrict);
+                              sizeof(classname), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
 
-        if (!((streq(classname, "pwrb:Class-WindowPlc"))
-                || (streq(classname, "pwrb:Class-WindowOrderact"))
-                || (streq(classname, "pwrb:Class-WindowCond"))
-                || (streq(classname, "pwrb:Class-WindowSubstep")))) {
+        if (!((streq(classname, "pwrb:Class-WindowPlc")) ||
+              (streq(classname, "pwrb:Class-WindowOrderact")) ||
+              (streq(classname, "pwrb:Class-WindowCond")) ||
+              (streq(classname, "pwrb:Class-WindowSubstep")))) {
           rtt_message('E', "Selected object has to be in a plcpgm or a plcpgm");
           return RTT__HOLDCOMMAND;
         } else {
-          sts = gdh_ObjidToName(
-              parentobjid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+          sts = gdh_ObjidToName(parentobjid, name_str, sizeof(name_str),
+                                cdh_mName_volumeStrict);
           if (EVEN(sts))
             return sts;
         }
@@ -744,7 +746,7 @@ static int show_func(menu_ctx ctx, int* flag)
     char str[80];
     int initstep;
     pwr_tOName name_str;
-    char* name_ptr;
+    char *name_ptr;
     pwr_tObjid objid;
     pwr_tObjid parentobjid;
     pwr_tClassId class;
@@ -769,8 +771,8 @@ static int show_func(menu_ctx ctx, int* flag)
       name_ptr = name_str;
       if (*name_ptr == 0) {
         /* Get the selected object */
-        sts = rtt_get_current_object(
-            ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+        sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                     cdh_mName_volumeStrict);
         if (EVEN(sts)) {
           rtt_message('E', "Enter hierarchy or select an object");
           return RTT__HOLDCOMMAND;
@@ -781,18 +783,17 @@ static int show_func(menu_ctx ctx, int* flag)
         if (EVEN(sts))
           return sts;
         sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), classname,
-            sizeof(classname), cdh_mName_volumeStrict);
+                              sizeof(classname), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
         /* Check that this is a or a plc */
-        if ((streq(classname, "pwrb:Class-PlcPgm"))
-            || (streq(classname, "pwrs:Class-$PlantHier"))) {
+        if ((streq(classname, "pwrb:Class-PlcPgm")) ||
+            (streq(classname, "pwrs:Class-$PlantHier"))) {
           /* This is ok */
-        } else if (!((streq(classname, "pwrb:Class-WindowPlc"))
-                       || (streq(classname, "pwrb:Class-WindowOrderact"))
-                       || (streq(classname, "pwrb:Class-WindowCond"))
-                       || (strcmp(classname, "pwrb:Class-WindowSubstep")
-                              == 0))) {
+        } else if (!((streq(classname, "pwrb:Class-WindowPlc")) ||
+                     (streq(classname, "pwrb:Class-WindowOrderact")) ||
+                     (streq(classname, "pwrb:Class-WindowCond")) ||
+                     (strcmp(classname, "pwrb:Class-WindowSubstep") == 0))) {
           /* Try with the parent */
           sts = gdh_GetParent(objid, &parentobjid);
           if (EVEN(sts))
@@ -801,20 +802,21 @@ static int show_func(menu_ctx ctx, int* flag)
           if (EVEN(sts))
             return sts;
           sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), classname,
-              sizeof(classname), cdh_mName_volumeStrict);
+                                sizeof(classname), cdh_mName_volumeStrict);
           if (EVEN(sts))
             return sts;
 
-          if (!((streq(classname, "pwrb:Class-WindowPlc"))
-                  || (streq(classname, "pwrb:Class-WindowOrderact"))
-                  || (streq(classname, "pwrb:Class-WindowCond"))
-                  || (streq(classname, "pwrb:Class-WindowSubstep")))) {
-            rtt_message('E',
+          if (!((streq(classname, "pwrb:Class-WindowPlc")) ||
+                (streq(classname, "pwrb:Class-WindowOrderact")) ||
+                (streq(classname, "pwrb:Class-WindowCond")) ||
+                (streq(classname, "pwrb:Class-WindowSubstep")))) {
+            rtt_message(
+                'E',
                 "Selected object has to be a planthier, plcpgm or in a plcpgm");
             return RTT__NOPICTURE;
           } else {
             sts = gdh_ObjidToName(parentobjid, name_str, sizeof(name_str),
-                cdh_mName_volumeStrict);
+                                  cdh_mName_volumeStrict);
             if (EVEN(sts))
               return sts;
           }
@@ -832,7 +834,7 @@ static int show_func(menu_ctx ctx, int* flag)
     char name_str[80];
     pwr_tClassId class;
     int index = 0;
-    rtt_t_menu* menulist = 0;
+    rtt_t_menu *menulist = 0;
     char title[80] = "Show Class";
     pwr_tObjid objid;
 
@@ -864,12 +866,12 @@ static int show_func(menu_ctx ctx, int* flag)
         return RTT__HOLDCOMMAND;
       }
 
-      sts = rtt_show_object_add(
-          cdh_ClassIdToObjid(class), &menulist, &index, 0, 0, 0);
+      sts = rtt_show_object_add(cdh_ClassIdToObjid(class), &menulist, &index, 0,
+                                0, 0);
       if (EVEN(sts))
         return sts;
-      sts = rtt_menu_new(
-          ctx, pwr_cNObjid, &menulist, title, 0, RTT_MENUTYPE_DYN);
+      sts =
+          rtt_menu_new(ctx, pwr_cNObjid, &menulist, title, 0, RTT_MENUTYPE_DYN);
       return sts;
     }
   }
@@ -880,10 +882,10 @@ static int show_func(menu_ctx ctx, int* flag)
     char class_str[80];
     char name_str[80];
     char hierarchy_str[80];
-    char* class_ptr;
-    char* name_ptr;
-    char* hierarchy_ptr;
-    char* parameter_ptr;
+    char *class_ptr;
+    char *name_ptr;
+    char *hierarchy_ptr;
+    char *parameter_ptr;
     int global;
     char str[80];
     int nr;
@@ -937,7 +939,8 @@ static int show_func(menu_ctx ctx, int* flag)
       global = 1;
 
     sts = rtt_show_par_hier_class_name(ctx, parameter_ptr, hierarchy_ptr,
-        class_ptr, name_ptr, RTT_MENU_CREATE, global, maxobjects);
+                                       class_ptr, name_ptr, RTT_MENU_CREATE,
+                                       global, maxobjects);
     return sts;
   } else if (str_NoCaseStrncmp(arg1_str, "CONVERSION", strlen(arg1_str)) == 0) {
     int on = 0;
@@ -954,8 +957,8 @@ static int show_func(menu_ctx ctx, int* flag)
       }
     } else {
       /* Get the selected object */
-      sts = rtt_get_current_object(
-          ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                   cdh_mName_volumeStrict);
       if (EVEN(sts)) {
         rtt_message('E', "Enter name or select an object");
         return RTT__HOLDCOMMAND;
@@ -978,8 +981,8 @@ static int show_func(menu_ctx ctx, int* flag)
       }
     } else {
       /* Get the selected object */
-      sts = rtt_get_current_object(
-          ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                   cdh_mName_volumeStrict);
       if (EVEN(sts)) {
         rtt_message('E', "Enter name or select an object");
         return RTT__HOLDCOMMAND;
@@ -1002,8 +1005,8 @@ static int show_func(menu_ctx ctx, int* flag)
       }
     } else {
       /* Get the selected object */
-      sts = rtt_get_current_object(
-          ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                   cdh_mName_volumeStrict);
       if (EVEN(sts)) {
         rtt_message('E', "Enter name or select an object");
         return RTT__HOLDCOMMAND;
@@ -1026,8 +1029,8 @@ static int show_func(menu_ctx ctx, int* flag)
       }
     } else {
       /* Get the selected object */
-      sts = rtt_get_current_object(
-          ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                   cdh_mName_volumeStrict);
       if (EVEN(sts)) {
         rtt_message('E', "Enter name or select an object");
         return RTT__HOLDCOMMAND;
@@ -1071,21 +1074,20 @@ static int show_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		debug_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "debug" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		debug_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "debug" command i recieved.
+ *
+ **************************************************************************/
 
-static int debug_func(menu_ctx ctx, int* flag)
-{
+static int debug_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   int arg1_sts;
@@ -1098,9 +1100,9 @@ static int debug_func(menu_ctx ctx, int* flag)
     char class_str[80];
     char name_str[80];
     char hierarchy_str[80];
-    char* class_ptr;
-    char* name_ptr;
-    char* hierarchy_ptr;
+    char *class_ptr;
+    char *name_ptr;
+    char *hierarchy_ptr;
     int global;
     char str[80];
 
@@ -1132,8 +1134,8 @@ static int debug_func(menu_ctx ctx, int* flag)
     else
       global = 1;
 
-    sts = rtt_debug_obj_hier_class_name(
-        ctx, hierarchy_ptr, class_ptr, name_ptr, RTT_MENU_CREATE, global);
+    sts = rtt_debug_obj_hier_class_name(ctx, hierarchy_ptr, class_ptr, name_ptr,
+                                        RTT_MENU_CREATE, global);
     return sts;
   } else if (str_NoCaseStrncmp(arg1_str, "CHILDREN", strlen(arg1_str)) == 0) {
     /* Command is "DEBUG CHILDEN" */
@@ -1165,8 +1167,8 @@ static int debug_func(menu_ctx ctx, int* flag)
     /* Command is "DEBUG SIGNALS" */
     char file_str[80];
     pwr_tOName name_str;
-    char* file_ptr;
-    char* name_ptr;
+    char *file_ptr;
+    char *name_ptr;
     pwr_tObjid objid;
     pwr_tObjid parentobjid;
     pwr_tClassId class;
@@ -1191,7 +1193,7 @@ static int debug_func(menu_ctx ctx, int* flag)
     else {
       /* Get the selected object */
       sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
-          cdh_mName_path | cdh_mName_object);
+                                   cdh_mName_path | cdh_mName_object);
       if (EVEN(sts)) {
         rtt_message('E', "Enter name or select an object");
         return RTT__HOLDCOMMAND;
@@ -1202,17 +1204,17 @@ static int debug_func(menu_ctx ctx, int* flag)
       if (EVEN(sts))
         return sts;
       sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), classname,
-          sizeof(classname), cdh_mName_volumeStrict);
+                            sizeof(classname), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       /* Check that this is a or a plc */
       if (streq(classname, "pwrb:Class-PlcPgm")) {
         /* Get all the windows in the plc */
         strcat(name_str, "-W*");
-      } else if (!((streq(classname, "pwrb:Class-WindowPlc"))
-                     || (streq(classname, "pwrb:Class-WindowOrderact"))
-                     || (streq(classname, "pwrb:Class-WindowCond"))
-                     || (streq(classname, "pwrb:Class-WindowSubstep")))) {
+      } else if (!((streq(classname, "pwrb:Class-WindowPlc")) ||
+                   (streq(classname, "pwrb:Class-WindowOrderact")) ||
+                   (streq(classname, "pwrb:Class-WindowCond")) ||
+                   (streq(classname, "pwrb:Class-WindowSubstep")))) {
         /* Try with the parent */
         sts = gdh_GetParent(objid, &parentobjid);
         if (EVEN(sts))
@@ -1221,19 +1223,19 @@ static int debug_func(menu_ctx ctx, int* flag)
         if (EVEN(sts))
           return sts;
         sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), classname,
-            sizeof(classname), cdh_mName_volumeStrict);
+                              sizeof(classname), cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
 
-        if (!((streq(classname, "pwrb:Class-WindowPlc"))
-                || (streq(classname, "pwrb:Class-WindowOrderact"))
-                || (streq(classname, "pwrb:Class-WindowCond"))
-                || (streq(classname, "pwrb:Class-WindowSubstep")))) {
+        if (!((streq(classname, "pwrb:Class-WindowPlc")) ||
+              (streq(classname, "pwrb:Class-WindowOrderact")) ||
+              (streq(classname, "pwrb:Class-WindowCond")) ||
+              (streq(classname, "pwrb:Class-WindowSubstep")))) {
           rtt_message('E', "Selected object has to be in a plcpgm or a plcpgm");
           return RTT__HOLDCOMMAND;
         } else {
-          sts = gdh_ObjidToName(
-              parentobjid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+          sts = gdh_ObjidToName(parentobjid, name_str, sizeof(name_str),
+                                cdh_mName_volumeStrict);
           if (EVEN(sts))
             return sts;
         }
@@ -1247,21 +1249,20 @@ static int debug_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		add_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "add" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		add_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "add" command i recieved.
+ *
+ **************************************************************************/
 
-static int add_func(menu_ctx ctx, int* flag)
-{
+static int add_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   int arg1_sts;
@@ -1274,10 +1275,10 @@ static int add_func(menu_ctx ctx, int* flag)
     char class_str[80];
     char name_str[80];
     char hierarchy_str[80];
-    char* class_ptr;
-    char* name_ptr;
-    char* hierarchy_ptr;
-    char* parameter_ptr;
+    char *class_ptr;
+    char *name_ptr;
+    char *hierarchy_ptr;
+    char *parameter_ptr;
     int global;
     char str[80];
 
@@ -1323,7 +1324,8 @@ static int add_func(menu_ctx ctx, int* flag)
       global = 1;
 
     sts = rtt_show_par_hier_class_name(ctx, parameter_ptr, hierarchy_ptr,
-        class_ptr, name_ptr, RTT_MENU_ADD, global, 0);
+                                       class_ptr, name_ptr, RTT_MENU_ADD,
+                                       global, 0);
     return sts;
   }
 
@@ -1332,9 +1334,9 @@ static int add_func(menu_ctx ctx, int* flag)
     char class_str[80];
     char name_str[80];
     char hierarchy_str[80];
-    char* class_ptr;
-    char* name_ptr;
-    char* hierarchy_ptr;
+    char *class_ptr;
+    char *name_ptr;
+    char *hierarchy_ptr;
     int global;
     char str[80];
 
@@ -1374,8 +1376,8 @@ static int add_func(menu_ctx ctx, int* flag)
     else
       global = 1;
 
-    sts = rtt_debug_obj_hier_class_name(
-        ctx, hierarchy_ptr, class_ptr, name_ptr, RTT_MENU_ADD, global);
+    sts = rtt_debug_obj_hier_class_name(ctx, hierarchy_ptr, class_ptr, name_ptr,
+                                        RTT_MENU_ADD, global);
     return sts;
   } else if (str_NoCaseStrncmp(arg1_str, "MENU", strlen(arg1_str)) == 0) {
     /* Command is "ADD MENU" */
@@ -1383,7 +1385,7 @@ static int add_func(menu_ctx ctx, int* flag)
     char object_str[80];
     char text_str[80];
     char command_str[80];
-    rtt_t_menu* menu_ptr;
+    rtt_t_menu *menu_ptr;
     int i;
     int command;
     int object;
@@ -1411,8 +1413,8 @@ static int add_func(menu_ctx ctx, int* flag)
     i = 0;
     for (menu_ptr = ctx->menu; menu_ptr->text[0]; menu_ptr++)
       i++;
-    sts = rtt_menu_list_add(
-        &ctx->menu, i, 0, text_str, NULL, NULL, NULL, pwr_cNObjid, 0, 0, 0, 0);
+    sts = rtt_menu_list_add(&ctx->menu, i, 0, text_str, NULL, NULL, NULL,
+                            pwr_cNObjid, 0, 0, 0, 0);
     if (EVEN(sts))
       return sts;
 
@@ -1437,28 +1439,27 @@ static int add_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		crossref_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "crossreference" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		crossref_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "crossreference" command i recieved.
+ *
+ **************************************************************************/
 
-static int crossref_func(menu_ctx ctx, int* flag)
-{
+static int crossref_func(menu_ctx ctx, int *flag) {
   int sts;
   char file_str[80];
   pwr_tAName name_str;
   char string_str[80];
   char func_str[80];
-  char* file_ptr;
-  char* name_ptr;
+  char *file_ptr;
+  char *name_ptr;
   pwr_sAttrRef objar;
   pwr_tClassId class;
   int brief;
@@ -1498,7 +1499,8 @@ static int crossref_func(menu_ctx ctx, int* flag)
     else {
       /* Get the selected object */
       sts = rtt_get_current_aref(ctx, &objar, name_str, sizeof(name_str),
-          cdh_mName_path | cdh_mName_object | cdh_mName_attribute);
+                                 cdh_mName_path | cdh_mName_object |
+                                     cdh_mName_attribute);
       if (EVEN(sts)) {
         rtt_message('E', "Enter name or select an object");
         return RTT__HOLDCOMMAND;
@@ -1529,24 +1531,23 @@ static int crossref_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		print_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "print" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		print_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "print" command i recieved.
+ *
+ **************************************************************************/
 
-int rttcmd_print_func(menu_ctx ctx, int* flag)
-{
+int rttcmd_print_func(menu_ctx ctx, int *flag) {
   int sts;
   char file_str[80];
-  char* file_ptr = NULL;
+  char *file_ptr = NULL;
   int append;
   int text_size;
   int parameter_size;
@@ -1638,21 +1639,20 @@ int rttcmd_print_func(menu_ctx ctx, int* flag)
   }
 }
 /*************************************************************************
-*
-* Name:		say_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "say" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		say_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "say" command i recieved.
+ *
+ **************************************************************************/
 
-int rttcmd_say_func(menu_ctx ctx, int* flag)
-{
+int rttcmd_say_func(menu_ctx ctx, int *flag) {
   char str[80];
 
   if (ODD(rtt_get_qualifier("/TEXT", str))) {
@@ -1665,25 +1665,24 @@ int rttcmd_say_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		collect_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "collect" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		collect_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "collect" command i recieved.
+ *
+ **************************************************************************/
 
-static int collect_func(menu_ctx ctx, int* flag)
-{
+static int collect_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   char name_str[80];
-  char* name_ptr;
+  char *name_ptr;
 
   IF_NOGDH_RETURN;
 
@@ -1701,7 +1700,7 @@ static int collect_func(menu_ctx ctx, int* flag)
   } else if (str_NoCaseStrncmp(arg1_str, "CLEAR", strlen(arg1_str)) == 0) {
     menu_ctx dummyctx;
 
-    if (ctx->menu == (rtt_t_menu*)rtt_collectionmenulist) {
+    if (ctx->menu == (rtt_t_menu *)rtt_collectionmenulist) {
       /* The current menu is the collectionmenu */
       rtt_collectionmenulist = 0;
       return RTT__BACK;
@@ -1711,7 +1710,7 @@ static int collect_func(menu_ctx ctx, int* flag)
       else {
         /* Create a dummy ctx for the collection picture, then delete it */
         sts = rtt_menu_create_ctx(
-            &dummyctx, 0, (rtt_t_menu*)rtt_collectionmenulist, "dummy", 0);
+            &dummyctx, 0, (rtt_t_menu *)rtt_collectionmenulist, "dummy", 0);
         if (EVEN(sts))
           return sts;
 
@@ -1731,21 +1730,20 @@ static int collect_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		logging_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "logging" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		logging_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "logging" command i recieved.
+ *
+ **************************************************************************/
 
-static int logging_func(menu_ctx ctx, int* flag)
-{
+static int logging_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   int arg1_sts;
@@ -1770,10 +1768,10 @@ static int logging_func(menu_ctx ctx, int* flag)
     int priority;
     int entry;
     int line_size;
-    char* parameter_ptr;
+    char *parameter_ptr;
     int logg_time;
-    char* file_ptr;
-    char* condition_ptr;
+    char *file_ptr;
+    char *condition_ptr;
     int buffer_size;
     int nr;
     int logg_type = 0;
@@ -1891,8 +1889,8 @@ static int logging_func(menu_ctx ctx, int* flag)
       create = 0;
 
     sts = rtt_logging_set(ctx, entry, logg_time, file_ptr, parameter_ptr,
-        condition_ptr, logg_type, insert, buffer_size, stop, priority, create,
-        line_size, shortname);
+                          condition_ptr, logg_type, insert, buffer_size, stop,
+                          priority, create, line_size, shortname);
     return sts;
   }
 
@@ -1912,10 +1910,10 @@ static int logging_func(menu_ctx ctx, int* flag)
     int priority;
     int entry;
     int line_size;
-    char* parameter_ptr;
+    char *parameter_ptr;
     int logg_time;
-    char* file_ptr;
-    char* condition_ptr;
+    char *file_ptr;
+    char *condition_ptr;
     int buffer_size;
     int nr;
     int logg_type = 0;
@@ -2019,8 +2017,8 @@ static int logging_func(menu_ctx ctx, int* flag)
       shortname = -1;
 
     sts = rtt_logging_create(ctx, entry, logg_time, file_ptr, parameter_ptr,
-        condition_ptr, logg_type, insert, buffer_size, stop, priority,
-        line_size, shortname);
+                             condition_ptr, logg_type, insert, buffer_size,
+                             stop, priority, line_size, shortname);
     return sts;
   }
 
@@ -2029,7 +2027,7 @@ static int logging_func(menu_ctx ctx, int* flag)
 
     char entry_str[80];
     char parameter_str[80];
-    char* parameter_ptr;
+    char *parameter_ptr;
     int entry;
     int nr;
 
@@ -2119,7 +2117,7 @@ static int logging_func(menu_ctx ctx, int* flag)
 
     char entry_str[80];
     char file_str[80];
-    char* file_ptr;
+    char *file_ptr;
     int entry;
     int nr;
 
@@ -2165,28 +2163,27 @@ static int logging_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		set_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "set" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		set_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "set" command i recieved.
+ *
+ **************************************************************************/
 
-int rttcmd_define_func(menu_ctx ctx, int* flag)
-{
+int rttcmd_define_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   char arg2_str[80];
   char arg3_str[80];
   char arg4_str[80];
-  char* arg3_ptr;
-  char* arg4_ptr;
+  char *arg3_ptr;
+  char *arg4_ptr;
 
   if (EVEN(rtt_get_qualifier("rtt_arg1", arg1_str))) {
     rtt_message('E', "Syntax error");
@@ -2210,21 +2207,20 @@ int rttcmd_define_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		get_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "get" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		get_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "get" command i recieved.
+ *
+ **************************************************************************/
 
-static int rtt_get_func(menu_ctx ctx, int* flag)
-{
+static int rtt_get_func(menu_ctx ctx, int *flag) {
   char arg1_str[80];
   int arg1_sts;
 
@@ -2240,21 +2236,20 @@ static int rtt_get_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		directory_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "directory" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		directory_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "directory" command i recieved.
+ *
+ **************************************************************************/
 
-static int directory_func(menu_ctx ctx, int* flag)
-{
+static int directory_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   char filespec[80];
@@ -2274,21 +2269,20 @@ static int directory_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		setup_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "setup" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		setup_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "setup" command i recieved.
+ *
+ **************************************************************************/
 
-static int rtt_setup_func(menu_ctx ctx, int* flag)
-{
+static int rtt_setup_func(menu_ctx ctx, int *flag) {
   int sts;
 
   /* Command is "SETUP" */
@@ -2296,21 +2290,20 @@ static int rtt_setup_func(menu_ctx ctx, int* flag)
   return sts;
 }
 /*************************************************************************
-*
-* Name:		set_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "set" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		set_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "set" command i recieved.
+ *
+ **************************************************************************/
 
-static int rtt_set_func(menu_ctx ctx, int* flag)
-{
+static int rtt_set_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   char arg2_str[80];
@@ -2497,8 +2490,8 @@ static int rtt_set_func(menu_ctx ctx, int* flag)
       return RTT__HOLDCOMMAND;
     } else
       return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "RTDB_OFFSET", strlen(arg1_str))
-      == 0) {
+  } else if (str_NoCaseStrncmp(arg1_str, "RTDB_OFFSET", strlen(arg1_str)) ==
+             0) {
     /* Command is "SET RTDB_OFFSET" */
     /* Set rtdb_offset for the rtt job */
     char offset_str[80];
@@ -2531,15 +2524,15 @@ static int rtt_set_func(menu_ctx ctx, int* flag)
       }
       rtt_mode_address = 1;
       return RTT__NOPICTURE;
-    } else if (str_NoCaseStrncmp(arg2_str, "NOADDRESS", strlen(arg2_str))
-        == 0) {
+    } else if (str_NoCaseStrncmp(arg2_str, "NOADDRESS", strlen(arg2_str)) ==
+               0) {
       rtt_mode_address = 0;
       return RTT__NOPICTURE;
     } else if (str_NoCaseStrcmp(arg2_str, "ACCVIO") == 0) {
-      volatile char* s = 0;
+      volatile char *s = 0;
 
       /* Test of exception handler... */
-      *(char*)s = 'X';
+      *(char *)s = 'X';
     } else if (str_NoCaseStrncmp(arg2_str, "DUMP", strlen(arg2_str)) == 0) {
       /* Check authorization */
       if (!(rtt_priv & RTT_PRIV_SYS)) {
@@ -2555,13 +2548,13 @@ static int rtt_set_func(menu_ctx ctx, int* flag)
       rtt_message('E', "Unknown qualifier");
       return RTT__HOLDCOMMAND;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "ALARMMESSAGE", strlen(arg1_str))
-      == 0) {
+  } else if (str_NoCaseStrncmp(arg1_str, "ALARMMESSAGE", strlen(arg1_str)) ==
+             0) {
     rtt_AlarmMessage = 1;
     rtt_message('I', "Alarm message set on");
     return RTT__NOPICTURE;
-  } else if (str_NoCaseStrncmp(arg1_str, "NOALARMMESSAGE", strlen(arg1_str))
-      == 0) {
+  } else if (str_NoCaseStrncmp(arg1_str, "NOALARMMESSAGE", strlen(arg1_str)) ==
+             0) {
     rtt_AlarmMessage = 0;
     rtt_message('I', "Alarm message set off");
     return RTT__NOPICTURE;
@@ -2569,8 +2562,8 @@ static int rtt_set_func(menu_ctx ctx, int* flag)
     rtt_AlarmBeep = 1;
     rtt_message('I', "Alarm beep set on");
     return RTT__NOPICTURE;
-  } else if (str_NoCaseStrncmp(arg1_str, "NOALARMBEEP", strlen(arg1_str))
-      == 0) {
+  } else if (str_NoCaseStrncmp(arg1_str, "NOALARMBEEP", strlen(arg1_str)) ==
+             0) {
     rtt_AlarmBeep = 0;
     rtt_message('I', "Alarm beep set off");
     return RTT__NOPICTURE;
@@ -2603,8 +2596,8 @@ static int rtt_set_func(menu_ctx ctx, int* flag)
       }
     } else {
       /* Get the selected object */
-      sts = rtt_get_current_object(
-          ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                   cdh_mName_volumeStrict);
       if (EVEN(sts)) {
         rtt_message('E', "Enter name or select an object");
         return RTT__HOLDCOMMAND;
@@ -2641,8 +2634,8 @@ static int rtt_set_func(menu_ctx ctx, int* flag)
       }
     } else {
       /* Get the selected object */
-      sts = rtt_get_current_object(
-          ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                   cdh_mName_volumeStrict);
       if (EVEN(sts)) {
         rtt_message('E', "Enter name or select an object");
         return RTT__HOLDCOMMAND;
@@ -2679,8 +2672,8 @@ static int rtt_set_func(menu_ctx ctx, int* flag)
       }
     } else {
       /* Get the selected object */
-      sts = rtt_get_current_object(
-          ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                   cdh_mName_volumeStrict);
       if (EVEN(sts)) {
         rtt_message('E', "Enter name or select an object");
         return RTT__HOLDCOMMAND;
@@ -2717,8 +2710,8 @@ static int rtt_set_func(menu_ctx ctx, int* flag)
       }
     } else {
       /* Get the selected object */
-      sts = rtt_get_current_object(
-          ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                   cdh_mName_volumeStrict);
       if (EVEN(sts)) {
         rtt_message('E', "Enter name or select an object");
         return RTT__HOLDCOMMAND;
@@ -2726,13 +2719,13 @@ static int rtt_set_func(menu_ctx ctx, int* flag)
     }
     sts = rtt_set_do_testvalue(objid, on, 0);
     return sts;
-  } else if (str_NoCaseStrncmp(arg1_str, "DESCRIPTION", strlen(arg1_str))
-      == 0) {
+  } else if (str_NoCaseStrncmp(arg1_str, "DESCRIPTION", strlen(arg1_str)) ==
+             0) {
     rtt_description_on = 1;
     rtt_message('I', "Description set on");
     return RTT__NOPICTURE;
-  } else if (str_NoCaseStrncmp(arg1_str, "NODESCRIPTION", strlen(arg1_str))
-      == 0) {
+  } else if (str_NoCaseStrncmp(arg1_str, "NODESCRIPTION", strlen(arg1_str)) ==
+             0) {
     rtt_description_on = 0;
     rtt_message('I', "Description set off");
     return RTT__NOPICTURE;
@@ -2782,26 +2775,25 @@ static int rtt_set_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		plcscan_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "plcscan" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		plcscan_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "plcscan" command i recieved.
+ *
+ **************************************************************************/
 
-static int plcscan_func(menu_ctx ctx, int* flag)
-{
+static int plcscan_func(menu_ctx ctx, int *flag) {
   int sts;
   int on, all;
   char hierarchy_str[80];
   char str[80];
-  char* hierarchy_ptr;
+  char *hierarchy_ptr;
   int global;
 
   IF_NOGDH_RETURN;
@@ -2844,21 +2836,20 @@ static int plcscan_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		rttcmd_learn_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "learn" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		rttcmd_learn_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "learn" command i recieved.
+ *
+ **************************************************************************/
 
-int rttcmd_learn_func(menu_ctx ctx, int* flag)
-{
+int rttcmd_learn_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   int arg1_sts;
@@ -2915,24 +2906,23 @@ int rttcmd_learn_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		store_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "store" command i receieved.
-*
-**************************************************************************/
+ *
+ * Name:		store_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "store" command i receieved.
+ *
+ **************************************************************************/
 
-static int store_func(menu_ctx ctx, int* flag)
-{
+static int store_func(menu_ctx ctx, int *flag) {
   int sts;
 
-  char* file_ptr;
+  char *file_ptr;
   char file_str[80];
   char str[80];
   int collect;
@@ -2981,21 +2971,20 @@ static int store_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		alarm_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "alarm" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		alarm_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "alarm" command i recieved.
+ *
+ **************************************************************************/
 
-static int alarm_func(menu_ctx ctx, int* flag)
-{
+static int alarm_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   int arg1_sts;
@@ -3147,8 +3136,8 @@ static int alarm_func(menu_ctx ctx, int* flag)
     } else
       user_objid = pwr_cNObjid;
 
-    sts = rtt_alarm_connect(
-        user_objid, maxalarm, maxevent, acknowledge, returned, beep);
+    sts = rtt_alarm_connect(user_objid, maxalarm, maxevent, acknowledge,
+                            returned, beep);
     if (EVEN(sts)) {
       rtt_message('E', "Unable to connect to user");
       return RTT__HOLDCOMMAND;
@@ -3216,8 +3205,8 @@ static int alarm_func(menu_ctx ctx, int* flag)
     } else
       user_objid = pwr_cNObjid;
 
-    sts = rtt_alarm_connect(
-        user_objid, maxalarm, maxevent, acknowledge, returned, beep);
+    sts = rtt_alarm_connect(user_objid, maxalarm, maxevent, acknowledge,
+                            returned, beep);
     if (EVEN(sts)) {
       rtt_message('E', "Unable to connect to user");
       return RTT__HOLDCOMMAND;
@@ -3227,8 +3216,8 @@ static int alarm_func(menu_ctx ctx, int* flag)
       rtt_message('E', "Unable to show alarm");
       return RTT__NOPICTURE;
     }
-  } else if (str_NoCaseStrncmp(arg1_str, "ACKNOWLEDGE", strlen(arg1_str))
-      == 0) {
+  } else if (str_NoCaseStrncmp(arg1_str, "ACKNOWLEDGE", strlen(arg1_str)) ==
+             0) {
     rtt_alarm_ack(rtt_alarm_ctx);
     return RTT__NOPICTURE;
   } else {
@@ -3239,21 +3228,20 @@ static int alarm_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_create_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "create" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_create_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "create" command i recieved.
+ *
+ **************************************************************************/
 
-static int rtt_create_func(menu_ctx ctx, int* flag)
-{
+static int rtt_create_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   int arg1_sts;
@@ -3293,8 +3281,8 @@ static int rtt_create_func(menu_ctx ctx, int* flag)
     char text_str[80];
     char object_str[80];
     char command_str[80];
-    rtt_t_menu* menulist = 0;
-    rtt_t_menu* menu_ptr;
+    rtt_t_menu *menulist = 0;
+    rtt_t_menu *menu_ptr;
     int i;
     int command;
     int object;
@@ -3325,8 +3313,8 @@ static int rtt_create_func(menu_ctx ctx, int* flag)
 
     menulist = 0;
     i = 0;
-    sts = rtt_menu_list_add(
-        &menulist, i, 0, text_str, NULL, NULL, NULL, pwr_cNObjid, 0, 0, 0, 0);
+    sts = rtt_menu_list_add(&menulist, i, 0, text_str, NULL, NULL, NULL,
+                            pwr_cNObjid, 0, 0, 0, 0);
     if (EVEN(sts))
       return sts;
 
@@ -3342,8 +3330,8 @@ static int rtt_create_func(menu_ctx ctx, int* flag)
       menu_ptr->argoi = objid;
     }
 
-    sts = rtt_menu_new(
-        ctx, pwr_cNObjid, &menulist, title_str, 0, RTT_MENUTYPE_DYN);
+    sts = rtt_menu_new(ctx, pwr_cNObjid, &menulist, title_str, 0,
+                       RTT_MENUTYPE_DYN);
     if (sts == RTT__FASTBACK)
       return sts;
     else if (sts == RTT__BACKTOCOLLECT)
@@ -3359,21 +3347,20 @@ static int rtt_create_func(menu_ctx ctx, int* flag)
   return RTT__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		rtt_delete_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "delete" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_delete_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "delete" command i recieved.
+ *
+ **************************************************************************/
 
-static int rtt_delete_func(menu_ctx ctx, int* flag)
-{
+static int rtt_delete_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   int arg1_sts;
@@ -3406,23 +3393,22 @@ static int rtt_delete_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_view_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "delete" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_view_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "delete" command i recieved.
+ *
+ **************************************************************************/
 
-static int rtt_view_func(menu_ctx ctx, int* flag)
-{
+static int rtt_view_func(menu_ctx ctx, int *flag) {
   int sts;
-  char* file_ptr;
+  char *file_ptr;
   char file_str[80];
 
   if (ODD(rtt_get_qualifier("/FILE", file_str)))
@@ -3445,21 +3431,20 @@ static int rtt_view_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		wait_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "wait" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		wait_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "wait" command i recieved.
+ *
+ **************************************************************************/
 
-static int wait_func(menu_ctx ctx, int* flag)
-{
+static int wait_func(menu_ctx ctx, int *flag) {
   int nr;
   char time_str[80];
   char dum_str[80];
@@ -3486,21 +3471,20 @@ static int wait_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		search_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	Searches for a string in the menu text.
-*
-**************************************************************************/
+ *
+ * Name:		search_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	Searches for a string in the menu text.
+ *
+ **************************************************************************/
 
-static int search_func(menu_ctx ctx, int* flag)
-{
+static int search_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   int index;
@@ -3554,21 +3538,20 @@ static int search_func(menu_ctx ctx, int* flag)
   return RTT__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		top_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	Position at top of menu.
-*
-**************************************************************************/
+ *
+ * Name:		top_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	Position at top of menu.
+ *
+ **************************************************************************/
 
-static int top_func(menu_ctx ctx, int* flag)
-{
+static int top_func(menu_ctx ctx, int *flag) {
   if (ctx->current_page == 0) {
     /* Select the found item */
     if (ctx->menutype & RTT_MENUTYPE_EDIT) {
@@ -3591,21 +3574,20 @@ static int top_func(menu_ctx ctx, int* flag)
   return RTT__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		page_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	Set page.
-*
-**************************************************************************/
+ *
+ * Name:		page_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	Set page.
+ *
+ **************************************************************************/
 
-static int page_func(menu_ctx ctx, int* flag)
-{
+static int page_func(menu_ctx ctx, int *flag) {
   int nr;
   char arg1_str[80];
   int page;
@@ -3638,21 +3620,20 @@ static int page_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		help_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I
-*
-* Description:
-*	This function is called when a "help" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		help_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I
+ *
+ * Description:
+ *	This function is called when a "help" command i recieved.
+ *
+ **************************************************************************/
 
-static int help_func(menu_ctx ctx, int* flag)
-{
+static int help_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   char arg2_str[80];
@@ -3679,9 +3660,9 @@ static int help_func(menu_ctx ctx, int* flag)
   }
 
   if (help_str[0] == '\0')
-    sts = rtt_help(ctx, "HELP", (rtt_t_helptext*)rtt_command_helptext);
+    sts = rtt_help(ctx, "HELP", (rtt_t_helptext *)rtt_command_helptext);
   else {
-    sts = rtt_help(ctx, help_str, (rtt_t_helptext*)rtt_command_helptext);
+    sts = rtt_help(ctx, help_str, (rtt_t_helptext *)rtt_command_helptext);
     if (EVEN(sts)) {
       rtt_message('E', "No help on this subject");
       return RTT__HOLDCOMMAND;
@@ -3691,41 +3672,39 @@ static int help_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		exit_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "exit" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		exit_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "exit" command i recieved.
+ *
+ **************************************************************************/
 
-static int exit_func(menu_ctx ctx, int* flag)
-{
+static int exit_func(menu_ctx ctx, int *flag) {
   rtt_exit_now(0, RTT__SUCCESS);
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		classhier_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "classhier" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		classhier_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "classhier" command i recieved.
+ *
+ **************************************************************************/
 
-static int classhier_func(menu_ctx ctx, int* flag)
-{
+static int classhier_func(menu_ctx ctx, int *flag) {
   int sts;
 
   IF_NOGDH_RETURN;
@@ -3734,21 +3713,20 @@ static int classhier_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		qcom_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	Connect and disconnect qcom.
-*
-**************************************************************************/
+ *
+ * Name:		qcom_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	Connect and disconnect qcom.
+ *
+ **************************************************************************/
 
-static int qcom_func(menu_ctx ctx, int* flag)
-{
+static int qcom_func(menu_ctx ctx, int *flag) {
   int sts;
   char arg1_str[80];
   int arg1_sts;
@@ -3827,38 +3805,37 @@ static int qcom_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_login_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	This function is called when a "login" command i recieved.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_login_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	This function is called when a "login" command i recieved.
+ *
+ **************************************************************************/
 
-static int rtt_login_func(menu_ctx ctx, int* flag)
-{
+static int rtt_login_func(menu_ctx ctx, int *flag) {
   int sts;
   char username_str[80];
   char password_str[80];
   char systemgroup[80];
   unsigned int privilege;
 
-  if (ODD(rtt_get_qualifier("rtt_arg1", username_str))
-      && ODD(rtt_get_qualifier("rtt_arg2", password_str))) {
-    sts = gdh_GetObjectInfo(
-        "pwrNode-System.SystemGroup", &systemgroup, sizeof(systemgroup));
+  if (ODD(rtt_get_qualifier("rtt_arg1", username_str)) &&
+      ODD(rtt_get_qualifier("rtt_arg2", password_str))) {
+    sts = gdh_GetObjectInfo("pwrNode-System.SystemGroup", &systemgroup,
+                            sizeof(systemgroup));
     if (EVEN(sts))
       return sts;
 
     str_ToLower(password_str, password_str);
 
-    sts = user_CheckUser(
-        systemgroup, username_str, user_PwCrypt(password_str), &privilege);
+    sts = user_CheckUser(systemgroup, username_str, user_PwCrypt(password_str),
+                         &privilege);
     if (EVEN(sts)) {
       rtt_message('E', "User not authorized");
       return RTT__SUCCESS;
@@ -3888,115 +3865,125 @@ static int rtt_login_func(menu_ctx ctx, int* flag)
 }
 
 /*************************************************************************
-*
-* Description:
-*	Command table.
-*	The commands in pwr_rtt is defined here.
-*	First parameter is the command verb.
-*	Second is the function to be called.
-*	Third and on are the qualifiers.
-*	If the first arguments are named rtt_arg1, rtt_arg2 etc
-*	parameters are allowed and can be fetched by the user.
-*
-**************************************************************************/
+ *
+ * Description:
+ *	Command table.
+ *	The commands in pwr_rtt is defined here.
+ *	First parameter is the command verb.
+ *	Second is the function to be called.
+ *	Third and on are the qualifiers.
+ *	If the first arguments are named rtt_arg1, rtt_arg2 etc
+ *	parameters are allowed and can be fetched by the user.
+ *
+ **************************************************************************/
 
 extern rtt_t_comtbl rtt_command_table[];
 rtt_t_comtbl rtt_command_table[] = {
-  { "SHOW", &show_func,
-      { "rtt_arg1", "rtt_arg2", "/NAME", "/CLASS", "/HIERARCHY", "/PARAMETER",
-          "/OBJID", "/FILE", "/LOCAL", "/INITSTEP", "/MAXOBJECTS", "/VOLUME",
-          "/ALL", "/TYPE", "" } },
-  { "MONITOR", &monitor_func, { "rtt_arg1", "" } },
-  { "ADD", &add_func,
-      { "rtt_arg1", "rtt_arg2", "/NAME", "/CLASS", "/HIERARCHY", "/PARAMETER",
-          "/LOCAL", "/TEXT", "/OBJECT", "/COMMAND", "" } },
-  { "COLLECT", &collect_func, { "rtt_arg1", "/NAME", "" } },
-  { "DEBUG", &debug_func, { "rtt_arg1", "rtt_arg2", "/NAME", "/CLASS",
-                              "/HIERARCHY", "/FILE", "/LOCAL", "" } },
-  { "CROSSREFERENCE", &crossref_func,
-      { "rtt_arg1", "/NAME", "/FILE", "/STRING", "/BRIEF", "/FUNCTION",
-          "/CASE_SENSITIVE", "" } },
-  { "PRINT", &rttcmd_print_func,
-      { "rtt_arg1", "/FILE", "/APPEND", "/TSIZE", "/PSIZE", "/TEXT",
-          "/TERMINAL", "/RESTORE", "" } },
-  { "SAY", &rttcmd_say_func, { "rtt_arg1", "/TEXT", "" } },
-  { "SEARCH", &search_func, { "rtt_arg1", "" } },
-  { "LOGGING", &logging_func,
-      { "rtt_arg1", "rtt_arg2", "/FILE", "/TIME", "/ENTRY", "/TYPE",
-          "/PARAMETER", "/CONDITION", "/INSERT", "/BUFFER_SIZE", "/PRIORITY",
-          "/STOP", "/NOSTOP", "/CREATE", "/ALL", "/LINE_SIZE", "/SHORTNAME",
-          "/NOSHORTNAME", "" } },
-  { "ALARM", &alarm_func,
-      { "rtt_arg1", "/TEXT", "/PRIORITY", "/USER", "/MAXALARM", "/MAXEVENT",
-          "/FILE", "/NONAME", "/NOTEXT", "/ACKNOWLEDGE", "/RETURN", "/BEEP",
-          "/START", "/STOP", "" } },
-  { "LEARN", &rttcmd_learn_func, { "rtt_arg1", "/FILE", "" } },
-  { "STORE", &store_func, { "rtt_arg1", "/COLLECT", "/FILE", "/SYMBOLS", "" } },
-  { "WAIT", &wait_func, { "/TIME", "/PLCPGM", "" } },
-  { "SETUP", &rtt_setup_func, { "" } },
-  { "SET", &rtt_set_func,
-      { "rtt_arg1", "rtt_arg2", "/PRIORITY", "/NAME", "/VALUE", "/RTDB_OFFSET",
-          "/BYPASS", "/ON", "/OFF", "/MESSAGE", "/COMMAND", "/TIME", "" } },
-  { "GET", &rtt_get_func, { "rtt_arg1", "" } },
-  { "DIRECTORY", &directory_func, { "rtt_arg1", "" } },
-  { "DEFINE", &rttcmd_define_func,
-      { "rtt_arg1", "rtt_arg2", "rtt_arg4", "rtt_arg4", "" } },
-  { "PLCSCAN", &plcscan_func,
-      { "/ON", "/OFF", "/ALL", "/HIERARCHY", "/GLOBAL", "" } },
-  { "PAGE", &page_func, { "rtt_arg1", "" } }, { "TOP", &top_func, { "" } },
-  { "HELP", &help_func,
-      { "rtt_arg1", "rtt_arg2", "rtt_arg3", "rtt_arg4", "" } },
-  { "EXIT", &exit_func,
-      {
-          "",
-      } },
-  { "QUIT", &exit_func,
-      {
-          "",
-      } },
-  { "CLASSHIER", &classhier_func, { "" } },
-  { "QCOM", &qcom_func, { "rtt_arg1", "/NODE", "" } },
-  { "CREATE", &rtt_create_func, { "rtt_arg1", "/NAME", "/CLASS", "/TITLE",
-                                    "/TEXT", "/COMMAND", "/OBJECT", "" } },
-  { "DELETE", &rtt_delete_func, { "rtt_arg1", "/NAME", "" } },
-  { "VIEW", &rtt_view_func, { "rtt_arg1", "/FILE", "" } },
-  { "LOGIN", &rtt_login_func, { "rtt_arg1", "rtt_arg2", "" } },
-  {
-      "", NULL, { "" }
-  }
-};
+    {"SHOW",
+     &show_func,
+     {"rtt_arg1", "rtt_arg2", "/NAME", "/CLASS", "/HIERARCHY", "/PARAMETER",
+      "/OBJID", "/FILE", "/LOCAL", "/INITSTEP", "/MAXOBJECTS", "/VOLUME",
+      "/ALL", "/TYPE", ""}},
+    {"MONITOR", &monitor_func, {"rtt_arg1", ""}},
+    {"ADD",
+     &add_func,
+     {"rtt_arg1", "rtt_arg2", "/NAME", "/CLASS", "/HIERARCHY", "/PARAMETER",
+      "/LOCAL", "/TEXT", "/OBJECT", "/COMMAND", ""}},
+    {"COLLECT", &collect_func, {"rtt_arg1", "/NAME", ""}},
+    {"DEBUG",
+     &debug_func,
+     {"rtt_arg1", "rtt_arg2", "/NAME", "/CLASS", "/HIERARCHY", "/FILE",
+      "/LOCAL", ""}},
+    {"CROSSREFERENCE",
+     &crossref_func,
+     {"rtt_arg1", "/NAME", "/FILE", "/STRING", "/BRIEF", "/FUNCTION",
+      "/CASE_SENSITIVE", ""}},
+    {"PRINT",
+     &rttcmd_print_func,
+     {"rtt_arg1", "/FILE", "/APPEND", "/TSIZE", "/PSIZE", "/TEXT", "/TERMINAL",
+      "/RESTORE", ""}},
+    {"SAY", &rttcmd_say_func, {"rtt_arg1", "/TEXT", ""}},
+    {"SEARCH", &search_func, {"rtt_arg1", ""}},
+    {"LOGGING",
+     &logging_func,
+     {"rtt_arg1", "rtt_arg2", "/FILE", "/TIME", "/ENTRY", "/TYPE", "/PARAMETER",
+      "/CONDITION", "/INSERT", "/BUFFER_SIZE", "/PRIORITY", "/STOP", "/NOSTOP",
+      "/CREATE", "/ALL", "/LINE_SIZE", "/SHORTNAME", "/NOSHORTNAME", ""}},
+    {"ALARM",
+     &alarm_func,
+     {"rtt_arg1", "/TEXT", "/PRIORITY", "/USER", "/MAXALARM", "/MAXEVENT",
+      "/FILE", "/NONAME", "/NOTEXT", "/ACKNOWLEDGE", "/RETURN", "/BEEP",
+      "/START", "/STOP", ""}},
+    {"LEARN", &rttcmd_learn_func, {"rtt_arg1", "/FILE", ""}},
+    {"STORE", &store_func, {"rtt_arg1", "/COLLECT", "/FILE", "/SYMBOLS", ""}},
+    {"WAIT", &wait_func, {"/TIME", "/PLCPGM", ""}},
+    {"SETUP", &rtt_setup_func, {""}},
+    {"SET",
+     &rtt_set_func,
+     {"rtt_arg1", "rtt_arg2", "/PRIORITY", "/NAME", "/VALUE", "/RTDB_OFFSET",
+      "/BYPASS", "/ON", "/OFF", "/MESSAGE", "/COMMAND", "/TIME", ""}},
+    {"GET", &rtt_get_func, {"rtt_arg1", ""}},
+    {"DIRECTORY", &directory_func, {"rtt_arg1", ""}},
+    {"DEFINE",
+     &rttcmd_define_func,
+     {"rtt_arg1", "rtt_arg2", "rtt_arg4", "rtt_arg4", ""}},
+    {"PLCSCAN",
+     &plcscan_func,
+     {"/ON", "/OFF", "/ALL", "/HIERARCHY", "/GLOBAL", ""}},
+    {"PAGE", &page_func, {"rtt_arg1", ""}},
+    {"TOP", &top_func, {""}},
+    {"HELP", &help_func, {"rtt_arg1", "rtt_arg2", "rtt_arg3", "rtt_arg4", ""}},
+    {"EXIT",
+     &exit_func,
+     {
+         "",
+     }},
+    {"QUIT",
+     &exit_func,
+     {
+         "",
+     }},
+    {"CLASSHIER", &classhier_func, {""}},
+    {"QCOM", &qcom_func, {"rtt_arg1", "/NODE", ""}},
+    {"CREATE",
+     &rtt_create_func,
+     {"rtt_arg1", "/NAME", "/CLASS", "/TITLE", "/TEXT", "/COMMAND", "/OBJECT",
+      ""}},
+    {"DELETE", &rtt_delete_func, {"rtt_arg1", "/NAME", ""}},
+    {"VIEW", &rtt_view_func, {"rtt_arg1", "/FILE", ""}},
+    {"LOGIN", &rtt_login_func, {"rtt_arg1", "rtt_arg2", ""}},
+    {"", NULL, {""}}};
 
 /*************************************************************************
-*
-* Name:		rtt_get_command()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-* unsigned long	*chn		I	channel.
-* unsigned long	recall		I	recall buffer.
-* int		timeout		I	timeout time.
-* int		(* timeout_func) () I	function called at timeout.
-* unsigned long	timeout_arg	I	argument passed to timeout_func.
-* char		*prompt		I	input prompt.
-* int		x		I	x koordinate for input prompt.
-* int		y		I	y koordinate for input prompt.
-*
-* Description:
-*	This function writes a prompt and waits for a input string.
-*	If a terminator key is not recieved within the timeout time
-*	the timeoutfunction is called with the timeout argument.
-*	The function continues to read the input string and calls the
-*	timeout function with timeout inverval until a terminator key
-*	is recieved.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_command()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ * unsigned long	*chn		I	channel.
+ * unsigned long	recall		I	recall buffer.
+ * int		timeout		I	timeout time.
+ * int		(* timeout_func) () I	function called at timeout.
+ * unsigned long	timeout_arg	I	argument passed to timeout_func.
+ * char		*prompt		I	input prompt.
+ * int		x		I	x koordinate for input prompt.
+ * int		y		I	y koordinate for input prompt.
+ *
+ * Description:
+ *	This function writes a prompt and waits for a input string.
+ *	If a terminator key is not recieved within the timeout time
+ *	the timeoutfunction is called with the timeout argument.
+ *	The function continues to read the input string and calls the
+ *	timeout function with timeout inverval until a terminator key
+ *	is recieved.
+ *
+ **************************************************************************/
 
-int rtt_get_command(menu_ctx ctx, char* chn, rtt_t_recall* recall, int timeout,
-    int (*timeout_func)(), void* timeout_arg, char* prompt, int x, int y,
-    rtt_t_comtbl* command_table)
-{
+int rtt_get_command(menu_ctx ctx, char *chn, rtt_t_recall *recall, int timeout,
+                    int (*timeout_func)(), void *timeout_arg, char *prompt,
+                    int x, int y, rtt_t_comtbl *command_table) {
   unsigned long terminator;
   unsigned long option;
   char input_str[160];
@@ -4021,8 +4008,8 @@ int rtt_get_command(menu_ctx ctx, char* chn, rtt_t_recall* recall, int timeout,
       rtt_cursor_abs(x, y);
       rtt_eofline_erase();
       rtt_get_input_string(chn, input_str, &terminator, maxlen,
-          (rtt_t_recall*)recall, option, timeout, timeout_func, timeout_arg,
-          prompt);
+                           (rtt_t_recall *)recall, option, timeout,
+                           timeout_func, timeout_arg, prompt);
       rtt_message('S', "");
       rtt_command_toupper(input_str, input_str);
     }
@@ -4038,11 +4025,11 @@ int rtt_get_command(menu_ctx ctx, char* chn, rtt_t_recall* recall, int timeout,
       printf("\n%%RTT-I-CMD, %s", command);
 
     /* Print command on file if file on */
-    if (rtt_commandmode & RTT_COMMANDMODE_FILE && rtt_file_on
-        && rtt_print_command) {
+    if (rtt_commandmode & RTT_COMMANDMODE_FILE && rtt_file_on &&
+        rtt_print_command) {
       /* Don't print the print and say commands */
-      if (str_NoCaseStrncmp(command, "PRINT", 5)
-          && str_NoCaseStrncmp(command, "SAY", 3))
+      if (str_NoCaseStrncmp(command, "PRINT", 5) &&
+          str_NoCaseStrncmp(command, "SAY", 3))
         fprintf(rtt_outfile, "%%RTT-I-CMD, %s\n", command);
     }
 
@@ -4059,7 +4046,7 @@ int rtt_get_command(menu_ctx ctx, char* chn, rtt_t_recall* recall, int timeout,
       return RTT__NOPICTURE;
     }
 
-    sts = rtt_cli(command_table, command, (void*)ctx, 0);
+    sts = rtt_cli(command_table, command, (void *)ctx, 0);
     if (sts == RTT__COM_NODEF) {
       /* Try to find a matching symbol */
       sym_sts = rtt_get_symbol_cmd(command, symbol_value);
@@ -4076,7 +4063,7 @@ int rtt_get_command(menu_ctx ctx, char* chn, rtt_t_recall* recall, int timeout,
             return sts;
           return RTT__NOPICTURE;
         }
-        sts = rtt_cli(command_table, symbol_value, (void*)ctx, 0);
+        sts = rtt_cli(command_table, symbol_value, (void *)ctx, 0);
       } else if (sym_sts == RTT__SYMBOL_AMBIG)
         sts = sym_sts;
     }
@@ -4106,22 +4093,21 @@ int rtt_get_command(menu_ctx ctx, char* chn, rtt_t_recall* recall, int timeout,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_execute_file()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_execute_file()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int rtt_menu_execute_file(menu_ctx ctx, pwr_tObjid argoi, char* filename,
-    void* arg2, void* arg3, void* arg4)
-{
+int rtt_menu_execute_file(menu_ctx ctx, pwr_tObjid argoi, char *filename,
+                          void *arg2, void *arg3, void *arg4) {
   char command[256];
   int sts;
 
@@ -4141,24 +4127,23 @@ int rtt_menu_execute_file(menu_ctx ctx, pwr_tObjid argoi, char* filename,
   return RTT__NOPICTURE;
 }
 /*************************************************************************
-*
-* Name:		rtt_menu_command()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_command()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int rtt_menu_command(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
-    void* arg2, void* arg3, void* arg4)
-{
+int rtt_menu_command(menu_ctx ctx, pwr_tObjid argoi, char *incommand,
+                     void *arg2, void *arg3, void *arg4) {
   int sts, sym_sts;
-  char* file;
+  char *file;
   char command[256];
   char symbol_value[80];
 
@@ -4177,13 +4162,14 @@ int rtt_menu_command(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
       return sts;
     return RTT__NOPICTURE;
   } else {
-    sts = rtt_cli((rtt_t_comtbl*)rtt_command_table, command, (void*)ctx, &one);
+    sts =
+        rtt_cli((rtt_t_comtbl *)rtt_command_table, command, (void *)ctx, &one);
     if (sts == RTT__COM_NODEF) {
       /* Try to find a matching symbol */
       sym_sts = rtt_get_symbol_cmd(command, symbol_value);
       if (ODD(sym_sts))
-        sts = rtt_cli(
-            (rtt_t_comtbl*)rtt_command_table, symbol_value, (void*)ctx, &one);
+        sts = rtt_cli((rtt_t_comtbl *)rtt_command_table, symbol_value,
+                      (void *)ctx, &one);
       else if (sym_sts == RTT__SYMBOL_AMBIG)
         sts = sym_sts;
     }
@@ -4204,22 +4190,21 @@ int rtt_menu_command(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_commandhold()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_commandhold()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int rtt_menu_commandhold(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
-    void* arg2, void* arg3, void* arg4)
-{
+int rtt_menu_commandhold(menu_ctx ctx, pwr_tObjid argoi, char *incommand,
+                         void *arg2, void *arg3, void *arg4) {
   int sts;
 
   rtt_noredraw = 1;
@@ -4228,22 +4213,21 @@ int rtt_menu_commandhold(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_vmscommand()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_vmscommand()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int rtt_menu_vmscommand(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
-    void* arg2, void* arg3, void* arg4)
-{
+int rtt_menu_vmscommand(menu_ctx ctx, pwr_tObjid argoi, char *incommand,
+                        void *arg2, void *arg3, void *arg4) {
   int sts;
   char command[256];
 
@@ -4252,9 +4236,9 @@ int rtt_menu_vmscommand(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
   /* Place cursor in message position */
   rtt_cursor_abs(0, RTT_ROW_COMMAND);
   r_print_buffer();
-  qio_reset((int*)&rtt_chn);
+  qio_reset((int *)&rtt_chn);
   sts = system(command);
-  qio_set_attr((int*)&rtt_chn);
+  qio_set_attr((int *)&rtt_chn);
   if (EVEN(sts)) {
     rtt_message('E', "Error in executing command");
   }
@@ -4262,45 +4246,43 @@ int rtt_menu_vmscommand(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_vmscommand_nowait()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_vmscommand_nowait()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int rtt_menu_vmscommand_nowait(menu_ctx ctx, pwr_tObjid argoi, char* command,
-    void* arg2, void* arg3, void* arg4)
-{
+int rtt_menu_vmscommand_nowait(menu_ctx ctx, pwr_tObjid argoi, char *command,
+                               void *arg2, void *arg3, void *arg4) {
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_vmscommandconf()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_vmscommandconf()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int rtt_menu_vmscommandconf(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
-    void* arg2, void* arg3, void* arg4)
-{
+int rtt_menu_vmscommandconf(menu_ctx ctx, pwr_tObjid argoi, char *incommand,
+                            void *arg2, void *arg3, void *arg4) {
   int sts;
   char message[120];
-  rtt_t_menu* menu_ptr;
+  rtt_t_menu *menu_ptr;
   char command[256];
 
   /* Confirm */
@@ -4323,9 +4305,9 @@ int rtt_menu_vmscommandconf(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
   rtt_cursor_abs(0, RTT_ROW_COMMAND);
   r_print_buffer();
 
-  qio_reset((int*)&rtt_chn);
+  qio_reset((int *)&rtt_chn);
   sts = system(command);
-  qio_set_attr((int*)&rtt_chn);
+  qio_set_attr((int *)&rtt_chn);
   if (EVEN(sts)) {
     rtt_message('E', "Error in executing command");
   }
@@ -4333,22 +4315,21 @@ int rtt_menu_vmscommandconf(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_vmscommandhold()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_vmscommandhold()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-int rtt_menu_vmscommandhold(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
-    void* arg2, void* arg3, void* arg4)
-{
+int rtt_menu_vmscommandhold(menu_ctx ctx, pwr_tObjid argoi, char *incommand,
+                            void *arg2, void *arg3, void *arg4) {
   int sts;
   char command[256];
 
@@ -4357,9 +4338,9 @@ int rtt_menu_vmscommandhold(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
   /* Place cursor in message position */
   rtt_cursor_abs(0, RTT_ROW_COMMAND);
   r_print_buffer();
-  qio_reset((int*)&rtt_chn);
+  qio_reset((int *)&rtt_chn);
   sts = system(command);
-  qio_set_attr((int*)&rtt_chn);
+  qio_set_attr((int *)&rtt_chn);
   if (EVEN(sts)) {
     rtt_message('E', "Error in executing command");
   }
@@ -4367,29 +4348,28 @@ int rtt_menu_vmscommandhold(menu_ctx ctx, pwr_tObjid argoi, char* incommand,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_show_object_add()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	objid		I	objid of object to insert.
-* rtt_t_menu	**menulist	I	menulist.
-* int		*index		I	index in menulist.
-* int		dum2		I
-* int		dum3		I
-* int		dum4		I
-*
-* Description:
-*	Inserts an object in the menu list at a 'show object' command.
-*	This function is called when an object that fits the description
-*	is found by rtt_get_objects_hier_class_name.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_show_object_add()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	objid		I	objid of object to insert.
+ * rtt_t_menu	**menulist	I	menulist.
+ * int		*index		I	index in menulist.
+ * int		dum2		I
+ * int		dum3		I
+ * int		dum4		I
+ *
+ * Description:
+ *	Inserts an object in the menu list at a 'show object' command.
+ *	This function is called when an object that fits the description
+ *	is found by rtt_get_objects_hier_class_name.
+ *
+ **************************************************************************/
 
-static int rtt_show_object_add(pwr_tObjid objid, rtt_t_menu** menulist,
-    int* index, void* dum2, void* dum3, void* dum4)
-{
+static int rtt_show_object_add(pwr_tObjid objid, rtt_t_menu **menulist,
+                               int *index, void *dum2, void *dum3, void *dum4) {
   pwr_tOName objname;
   int sts;
   char title[450];
@@ -4398,8 +4378,8 @@ static int rtt_show_object_add(pwr_tObjid objid, rtt_t_menu** menulist,
   int j;
 
   /* Get the object name */
-  sts = gdh_ObjidToName(
-      objid, objname, sizeof(objname), cdh_mName_volumeStrict);
+  sts =
+      gdh_ObjidToName(objid, objname, sizeof(objname), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -4421,7 +4401,8 @@ static int rtt_show_object_add(pwr_tObjid objid, rtt_t_menu** menulist,
     strcat(title, " *");
 
   sts = rtt_menu_list_add(menulist, *index, 0, title, &rtt_hierarchy_child,
-      &rtt_object_parameters, &rtt_debug_child, objid, 0, 0, 0, 0);
+                          &rtt_object_parameters, &rtt_debug_child, objid, 0, 0,
+                          0, 0);
   if (EVEN(sts))
     return sts;
 
@@ -4430,41 +4411,41 @@ static int rtt_show_object_add(pwr_tObjid objid, rtt_t_menu** menulist,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_show_parameter_add()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	objid		I	objid of found object.
-* rtt_t_menu_upd **menulist	I	menulist.
-* char		*parname	I	parameter name.
-* int		*index		I	index in menulist.
-* int		dum3		I
-* int		dum4		I
-*
-* Description:
-*	Inserts an object and parameter in the menu list at a
-*	'show parameter' command.
-*	This function is called when an object that fits the description
-*	is found by rtt_get_objects_hier_class_name.
-*
-*
-**************************************************************************/
+ *
+ * Name:		rtt_show_parameter_add()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	objid		I	objid of found object.
+ * rtt_t_menu_upd **menulist	I	menulist.
+ * char		*parname	I	parameter name.
+ * int		*index		I	index in menulist.
+ * int		dum3		I
+ * int		dum4		I
+ *
+ * Description:
+ *	Inserts an object and parameter in the menu list at a
+ *	'show parameter' command.
+ *	This function is called when an object that fits the description
+ *	is found by rtt_get_objects_hier_class_name.
+ *
+ *
+ **************************************************************************/
 
-static int rtt_show_parameter_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
-    char* parname, int* index, int* elem, void* dum4)
-{
+static int rtt_show_parameter_add(pwr_tObjid objid, rtt_t_menu_upd **menulist,
+                                  char *parname, int *index, int *elem,
+                                  void *dum4) {
   int j;
   pwr_tAName objname;
   int sts;
   int elements;
-  char* parameter_ptr;
+  char *parameter_ptr;
   SUBID subid;
   char title[450];
   char classname[80];
   pwr_tObjid childobjid;
-  char* s;
+  char *s;
   int element;
   gdh_sAttrDef ad;
   pwr_sAttrRef aref;
@@ -4473,8 +4454,8 @@ static int rtt_show_parameter_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
   element = *elem;
 
   /* Get the object name */
-  sts = gdh_ObjidToName(
-      objid, objname, sizeof(objname), cdh_mName_volumeStrict);
+  sts =
+      gdh_ObjidToName(objid, objname, sizeof(objname), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
   strcat(objname, ".");
@@ -4489,8 +4470,8 @@ static int rtt_show_parameter_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
     return sts;
 
   /* Get rtdb pointer */
-  sts = gdh_RefObjectInfo(
-      objname, (pwr_tAddress*)&parameter_ptr, &subid, ad.attr->Param.Info.Size);
+  sts = gdh_RefObjectInfo(objname, (pwr_tAddress *)&parameter_ptr, &subid,
+                          ad.attr->Param.Info.Size);
   if (EVEN(sts))
     parameter_ptr = 0;
 
@@ -4538,10 +4519,11 @@ static int rtt_show_parameter_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
     strcat(title, " *");
 
   sts = rtt_menu_upd_list_add(menulist, *index, 0, title, &rtt_hierarchy_child,
-      &rtt_object_parameters, &rtt_debug_child, objid, 0, 0, 0, 0, objname,
-      RTT_PRIV_NOOP, parameter_ptr, ad.attr->Param.Info.Type, flags,
-      ad.attr->Param.Info.Size / elements, subid, 0, 0, 0, 0, 0.0, 0.0,
-      RTT_DATABASE_GDH, 0);
+                              &rtt_object_parameters, &rtt_debug_child, objid,
+                              0, 0, 0, 0, objname, RTT_PRIV_NOOP, parameter_ptr,
+                              ad.attr->Param.Info.Type, flags,
+                              ad.attr->Param.Info.Size / elements, subid, 0, 0,
+                              0, 0, 0.0, 0.0, RTT_DATABASE_GDH, 0);
   if (EVEN(sts))
     return sts;
   (*index)++;
@@ -4550,38 +4532,37 @@ static int rtt_show_parameter_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_debug_object_add()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid	objid		I	objid of object.
-* rtt_t_menu_upd **menulist	I	menulist.
-* int		*index		I	index in menulist.
-* void		*dum2		I
-* void		*dum3		I
-* void		*dum4		I
-*
-* Description:
-*	Inserts an object and parameter in the menu list at a
-*	'debug object' command.
-*	This function is called when an object that fits the description
-*	is found by rtt_get_objects_hier_class_name.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_debug_object_add()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid	objid		I	objid of object.
+ * rtt_t_menu_upd **menulist	I	menulist.
+ * int		*index		I	index in menulist.
+ * void		*dum2		I
+ * void		*dum3		I
+ * void		*dum4		I
+ *
+ * Description:
+ *	Inserts an object and parameter in the menu list at a
+ *	'debug object' command.
+ *	This function is called when an object that fits the description
+ *	is found by rtt_get_objects_hier_class_name.
+ *
+ **************************************************************************/
 
-int rtt_debug_object_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
-    int* index, int* crossref, void* dum3, void* dum4)
-{
+int rtt_debug_object_add(pwr_tObjid objid, rtt_t_menu_upd **menulist,
+                         int *index, int *crossref, void *dum3, void *dum4) {
   int j;
   pwr_tAName objname;
   int sts;
-  char* s;
+  char *s;
   pwr_tOName hiername;
   pwr_tClassId class;
   unsigned long elements;
-  char* parameter_ptr;
+  char *parameter_ptr;
   SUBID subid;
   pwr_sParInfo parinfo;
   char parname[80];
@@ -4615,8 +4596,8 @@ int rtt_debug_object_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
   case pwr_cClass_ChanAo:
   case pwr_cClass_ChanIi:
   case pwr_cClass_ChanIo:
-    sts = gdh_ObjidToName(
-        objid, objname, sizeof(objname), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(objid, objname, sizeof(objname),
+                          cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
     strcat(objname, ".SigChanCon");
@@ -4626,8 +4607,8 @@ int rtt_debug_object_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
     strcpy(parname, "ActualValue");
     break;
   case pwr_cClass_ChanCo:
-    sts = gdh_ObjidToName(
-        objid, objname, sizeof(objname), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(objid, objname, sizeof(objname),
+                          cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
     strcat(objname, ".SigChanCon");
@@ -4711,21 +4692,21 @@ int rtt_debug_object_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
   }
 
   /* Get the object name */
-  sts = gdh_ObjidToName(
-      objid, objname, sizeof(objname), cdh_mName_volumeStrict);
+  sts =
+      gdh_ObjidToName(objid, objname, sizeof(objname), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
   strcat(objname, ".");
   strcat(objname, parname);
 
   /* Get rtdb pointer */
-  sts = gdh_GetAttributeCharacteristics(
-      objname, &attrtype, &attrsize, &attroffs, &attrelem);
+  sts = gdh_GetAttributeCharacteristics(objname, &attrtype, &attrsize,
+                                        &attroffs, &attrelem);
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_RefObjectInfo(
-      objname, (pwr_tAddress*)&parameter_ptr, &subid, attrsize);
+  sts = gdh_RefObjectInfo(objname, (pwr_tAddress *)&parameter_ptr, &subid,
+                          attrsize);
   if ((EVEN(sts)) /****NYGDH || ( sts == (GDH__NODEDOWN -1)) ****/) {
     parameter_ptr = 0;
   }
@@ -4735,7 +4716,7 @@ int rtt_debug_object_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
     return sts;
 
   sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), hiername, sizeof(hiername),
-      cdh_mName_volumeStrict);
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -4780,19 +4761,21 @@ int rtt_debug_object_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
     strcat(title, " *");
 
   if (*crossref) {
-    sts = rtt_menu_upd_list_add(menulist, *index, 0, title,
-        &rtt_hierarchy_child, &rtt_object_parameters, &rtt_crossref_signal,
-        objid, 0, 0, 0, 0, objname, RTT_PRIV_NOOP, parameter_ptr, parinfo.Type,
-        parinfo.Flags, parinfo.Size / elements, subid, 0, 0, 0, 0, 0.0, 0.0,
-        RTT_DATABASE_GDH, 0);
+    sts = rtt_menu_upd_list_add(
+        menulist, *index, 0, title, &rtt_hierarchy_child,
+        &rtt_object_parameters, &rtt_crossref_signal, objid, 0, 0, 0, 0,
+        objname, RTT_PRIV_NOOP, parameter_ptr, parinfo.Type, parinfo.Flags,
+        parinfo.Size / elements, subid, 0, 0, 0, 0, 0.0, 0.0, RTT_DATABASE_GDH,
+        0);
     if (EVEN(sts))
       return sts;
   } else {
     sts = rtt_menu_upd_list_add(menulist, *index, 0, title,
-        &rtt_hierarchy_child, &rtt_object_parameters, &rtt_debug_child, objid,
-        0, 0, 0, 0, objname, RTT_PRIV_NOOP, parameter_ptr, parinfo.Type,
-        parinfo.Flags, parinfo.Size / elements, subid, 0, 0, 0, 0, 0.0, 0.0,
-        RTT_DATABASE_GDH, 0);
+                                &rtt_hierarchy_child, &rtt_object_parameters,
+                                &rtt_debug_child, objid, 0, 0, 0, 0, objname,
+                                RTT_PRIV_NOOP, parameter_ptr, parinfo.Type,
+                                parinfo.Flags, parinfo.Size / elements, subid,
+                                0, 0, 0, 0, 0.0, 0.0, RTT_DATABASE_GDH, 0);
     if (EVEN(sts))
       return sts;
   }
@@ -4802,35 +4785,34 @@ int rtt_debug_object_add(pwr_tObjid objid, rtt_t_menu_upd** menulist,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_debug_child_add()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid	objid		I	objid of object to add in menulist.
-* rtt_t_menu_upd **menulist	I	menulist.
-* int		*index		I	index in menulist.
-* void		*dum2		I
-* void		*dum3		I
-* void		*dum4		I
-*
-* Description:
-*	Inserts an object and parameter in the menu list at a
-*	'debug children' command (PF2).
-*
-**************************************************************************/
+ *
+ * Name:		rtt_debug_child_add()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid	objid		I	objid of object to add in menulist.
+ * rtt_t_menu_upd **menulist	I	menulist.
+ * int		*index		I	index in menulist.
+ * void		*dum2		I
+ * void		*dum3		I
+ * void		*dum4		I
+ *
+ * Description:
+ *	Inserts an object and parameter in the menu list at a
+ *	'debug children' command (PF2).
+ *
+ **************************************************************************/
 
-int rtt_debug_child_add(pwr_tObjid objid, rtt_t_menu_upd** menulist, int* index,
-    int* allocated, void* dum3, void* dum4)
-{
+int rtt_debug_child_add(pwr_tObjid objid, rtt_t_menu_upd **menulist, int *index,
+                        int *allocated, void *dum3, void *dum4) {
   int j;
   pwr_tOName objname;
   int sts;
   pwr_tOName hiername;
   pwr_tClassId class;
   unsigned long elements;
-  char* parameter_ptr;
+  char *parameter_ptr;
   SUBID subid;
   pwr_sParInfo parinfo;
   char parname[32];
@@ -4853,8 +4835,8 @@ int rtt_debug_child_add(pwr_tObjid objid, rtt_t_menu_upd** menulist, int* index,
     return sts;
 
   /* Get the object name */
-  sts = gdh_ObjidToName(
-      objid, objname, sizeof(objname), cdh_mName_volumeStrict);
+  sts =
+      gdh_ObjidToName(objid, objname, sizeof(objname), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -4889,8 +4871,8 @@ int rtt_debug_child_add(pwr_tObjid objid, rtt_t_menu_upd** menulist, int* index,
     sts = gdh_GetObjectInfo(con_parname, &con_obj, sizeof(con_obj));
     if (EVEN(sts))
       break;
-    sts = gdh_ObjidToName(
-        con_obj, hiername, sizeof(hiername), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(con_obj, hiername, sizeof(hiername),
+                          cdh_mName_volumeStrict);
     if (EVEN(sts))
       break;
     /* We want the two last parts of the name */
@@ -4978,8 +4960,8 @@ int rtt_debug_child_add(pwr_tObjid objid, rtt_t_menu_upd** menulist, int* index,
     sts = gdh_GetObjectInfo(con_parname, &con_obj, sizeof(con_obj));
     if (EVEN(sts))
       break;
-    sts = gdh_ObjidToName(
-        con_obj, hiername, sizeof(hiername), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(con_obj, hiername, sizeof(hiername),
+                          cdh_mName_volumeStrict);
     if (EVEN(sts))
       break;
     /* The rtdbpointer is actualvalue of connected object */
@@ -5096,22 +5078,22 @@ int rtt_debug_child_add(pwr_tObjid objid, rtt_t_menu_upd** menulist, int* index,
   }
 
   /* Get rtdb pointer */
-  sts = gdh_GetAttributeCharacteristics(
-      full_parname, &attrtype, &attrsize, &attroffs, &attrelem);
+  sts = gdh_GetAttributeCharacteristics(full_parname, &attrtype, &attrsize,
+                                        &attroffs, &attrelem);
   if (EVEN(sts)) {
     /* Not connected channel */
     return RTT__SUCCESS;
   }
 
-  sts = gdh_RefObjectInfo(
-      full_parname, (pwr_tAddress*)&parameter_ptr, &subid, attrsize);
+  sts = gdh_RefObjectInfo(full_parname, (pwr_tAddress *)&parameter_ptr, &subid,
+                          attrsize);
   if ((EVEN(sts)) /****NYGDH || ( sts == (GDH__NODEDOWN -1)) ****/) {
     parameter_ptr = 0;
   }
 
   /* Get class name */
   sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), hiername, sizeof(hiername),
-      cdh_mName_volumeStrict);
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -5163,10 +5145,11 @@ int rtt_debug_child_add(pwr_tObjid objid, rtt_t_menu_upd** menulist, int* index,
     strcat(title, " *");
 
   sts = rtt_menu_upd_list_add(menulist, *index, *allocated, title,
-      &rtt_hierarchy_child, &rtt_object_parameters, &rtt_debug_child, objid, 0,
-      0, 0, 0, full_parname, RTT_PRIV_NOOP, parameter_ptr, parinfo.Type,
-      parinfo.Flags, parinfo.Size / elements, subid, 0, 0, 0, 0, 0.0, 0.0,
-      RTT_DATABASE_GDH, 0);
+                              &rtt_hierarchy_child, &rtt_object_parameters,
+                              &rtt_debug_child, objid, 0, 0, 0, 0, full_parname,
+                              RTT_PRIV_NOOP, parameter_ptr, parinfo.Type,
+                              parinfo.Flags, parinfo.Size / elements, subid, 0,
+                              0, 0, 0, 0.0, 0.0, RTT_DATABASE_GDH, 0);
   if (EVEN(sts))
     return sts;
   (*index)++;
@@ -5174,21 +5157,20 @@ int rtt_debug_child_add(pwr_tObjid objid, rtt_t_menu_upd** menulist, int* index,
   return RTT__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		rtt_debug_child_add()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid	objid		I	objid of object to add in menulist.
-*
-* Description:
-*	Check is there is a debug parameter defined for an object.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_debug_child_add()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid	objid		I	objid of object to add in menulist.
+ *
+ * Description:
+ *	Check is there is a debug parameter defined for an object.
+ *
+ **************************************************************************/
 
-int rtt_debug_child_check(pwr_tObjid objid)
-{
+int rtt_debug_child_check(pwr_tObjid objid) {
   int sts;
   pwr_tClassId class;
 
@@ -5266,36 +5248,36 @@ int rtt_debug_child_check(pwr_tObjid objid)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_show_obj_hier_class_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	parent_ctx	I	rtt context.
-* char		*hiername	I	hierarchy object name.
-* char		*classname	I	class name.
-* char		*name		I	object name descripion.
-*
-* Description:
-*	This function is called when a 'show object' command is recieved.
-*	All object under the hierarchy object, with the specified class
-*	that fits in the name description is inserted in a menulist
-*	and displayed on the screen.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_show_obj_hier_class_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	parent_ctx	I	rtt context.
+ * char		*hiername	I	hierarchy object name.
+ * char		*classname	I	class name.
+ * char		*name		I	object name descripion.
+ *
+ * Description:
+ *	This function is called when a 'show object' command is recieved.
+ *	All object under the hierarchy object, with the specified class
+ *	that fits in the name description is inserted in a menulist
+ *	and displayed on the screen.
+ *
+ **************************************************************************/
 
-int rtt_show_obj_hier_class_name(menu_ctx parent_ctx, char* hiername,
-    char* classname, char* name, int global, int max_objects)
-{
+int rtt_show_obj_hier_class_name(menu_ctx parent_ctx, char *hiername,
+                                 char *classname, char *name, int global,
+                                 int max_objects) {
   int sts;
   int index = 0;
   pwr_tObjid objid;
   pwr_tClassId class;
   pwr_tObjid hierobjid;
-  rtt_t_menu* menulist = 0;
+  rtt_t_menu *menulist = 0;
   char title[80] = "SEARCH LIST";
-  char* s;
+  char *s;
 
   if (max_objects == 0)
     max_objects = 300;
@@ -5318,8 +5300,8 @@ int rtt_show_obj_hier_class_name(menu_ctx parent_ctx, char* hiername,
         sts = rtt_show_object_add(objid, &menulist, &index, 0, 0, 0);
         if (EVEN(sts))
           return sts;
-        sts = rtt_menu_new(
-            parent_ctx, pwr_cNObjid, &menulist, title, 0, RTT_MENUTYPE_DYN);
+        sts = rtt_menu_new(parent_ctx, pwr_cNObjid, &menulist, title, 0,
+                           RTT_MENUTYPE_DYN);
         return sts;
       } else
         return sts;
@@ -5360,8 +5342,9 @@ int rtt_show_obj_hier_class_name(menu_ctx parent_ctx, char* hiername,
   } else
     hierobjid = pwr_cNObjid;
 
-  sts = rtt_get_objects_hier_class_name(parent_ctx, hierobjid, class, name,
-      max_objects, global, &rtt_show_object_add, &menulist, &index, 0, 0, 0);
+  sts = rtt_get_objects_hier_class_name(
+      parent_ctx, hierobjid, class, name, max_objects, global,
+      &rtt_show_object_add, &menulist, &index, 0, 0, 0);
   if (sts == RTT__MAXCOUNT)
     rtt_message('E', "To many object, all objects could not be shown");
   else if (EVEN(sts))
@@ -5369,8 +5352,8 @@ int rtt_show_obj_hier_class_name(menu_ctx parent_ctx, char* hiername,
 
   if (menulist != 0) {
     sts = rtt_menu_bubblesort(menulist);
-    sts = rtt_menu_new(
-        parent_ctx, pwr_cNObjid, &menulist, title, 0, RTT_MENUTYPE_DYN);
+    sts = rtt_menu_new(parent_ctx, pwr_cNObjid, &menulist, title, 0,
+                       RTT_MENUTYPE_DYN);
     if (sts == RTT__FASTBACK)
       return sts;
     else if (sts == RTT__BACKTOCOLLECT)
@@ -5385,44 +5368,44 @@ int rtt_show_obj_hier_class_name(menu_ctx parent_ctx, char* hiername,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_show_par_hier_class_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	parent_ctx	I	rtt context.
-* char		*parametername	I	name of parameter.
-* char		*hiername	I	name of hierarchy object.
-* char		*classname	I	name of class.
-* char		*name		I	name description.
-* int		add		I	if added to existing menulist or
-*					createing a new menu.
-*
-* Description:
-*	This function is called when a 'show parameter' command is recieved.
-*	All object under the hierarchy object, with the specified class
-*	that fits in the name description is inserted in a menulist
-*	and displayed on the screen.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_show_par_hier_class_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	parent_ctx	I	rtt context.
+ * char		*parametername	I	name of parameter.
+ * char		*hiername	I	name of hierarchy object.
+ * char		*classname	I	name of class.
+ * char		*name		I	name description.
+ * int		add		I	if added to existing menulist or
+ *					createing a new menu.
+ *
+ * Description:
+ *	This function is called when a 'show parameter' command is recieved.
+ *	All object under the hierarchy object, with the specified class
+ *	that fits in the name description is inserted in a menulist
+ *	and displayed on the screen.
+ *
+ **************************************************************************/
 
 static int rtt_show_par_hier_class_name(menu_ctx parent_ctx,
-    char* parametername, char* hiername, char* classname, char* name, int add,
-    int global, int max_objects)
-{
+                                        char *parametername, char *hiername,
+                                        char *classname, char *name, int add,
+                                        int global, int max_objects) {
   char parametername_str[80];
   char name_str[80];
   int sts;
   int index = 0;
   pwr_tClassId class;
   pwr_tObjid hierobjid;
-  rtt_t_menu_upd* menulist = 0;
+  rtt_t_menu_upd *menulist = 0;
   char title[80] = "SEARCH LIST";
   pwr_tObjid objid = {0, 0};
-  char* s;
+  char *s;
   int single_object = 0;
-  char* t;
+  char *t;
   char elementstr[10];
   int len;
   int element;
@@ -5435,8 +5418,9 @@ static int rtt_show_par_hier_class_name(menu_ctx parent_ctx,
   if ((parametername == NULL) && (name != NULL)) {
     /* Parse the parameter name to get object name and
      parameter name */
-    names = rtt_parse(name, ".", "", (char*)name_array,
-        sizeof(name_array) / sizeof(name_array[0]), sizeof(name_array[0]), 0);
+    names = rtt_parse(name, ".", "", (char *)name_array,
+                      sizeof(name_array) / sizeof(name_array[0]),
+                      sizeof(name_array[0]), 0);
     if (names != 2) {
       rtt_message('E', "Name syntax error");
       return RTT__NOPICTURE;
@@ -5523,16 +5507,17 @@ static int rtt_show_par_hier_class_name(menu_ctx parent_ctx,
 
   if (add == RTT_MENU_ADD) {
     rtt_get_menusize(parent_ctx, &index);
-    menulist = (rtt_t_menu_upd*)parent_ctx->menu;
+    menulist = (rtt_t_menu_upd *)parent_ctx->menu;
   }
 
   if (single_object)
-    sts = rtt_show_parameter_add(
-        objid, &menulist, parametername, &index, &element, 0);
+    sts = rtt_show_parameter_add(objid, &menulist, parametername, &index,
+                                 &element, 0);
   else
-    sts = rtt_get_objects_hier_class_name(parent_ctx, hierobjid, class, name,
-        max_objects, global, &rtt_show_parameter_add, (void*)&menulist,
-        (void*)parametername, (void*)&index, (void*)&element, 0);
+    sts = rtt_get_objects_hier_class_name(
+        parent_ctx, hierobjid, class, name, max_objects, global,
+        &rtt_show_parameter_add, (void *)&menulist, (void *)parametername,
+        (void *)&index, (void *)&element, 0);
   if (sts == RTT__MAXCOUNT)
     rtt_message('E', "To many object, all objects could not be shown");
   else if (EVEN(sts))
@@ -5540,13 +5525,13 @@ static int rtt_show_par_hier_class_name(menu_ctx parent_ctx,
 
   if (add == RTT_MENU_ADD) {
     /* Reconfigure and redraw the menu */
-    parent_ctx->menu = (rtt_t_menu*)menulist;
+    parent_ctx->menu = (rtt_t_menu *)menulist;
     sts = rtt_menu_upd_bubblesort(menulist);
     rtt_menu_upd_configure(parent_ctx);
   } else if (menulist != 0) {
     sts = rtt_menu_upd_bubblesort(menulist);
-    sts = rtt_menu_upd_new(
-        parent_ctx, pwr_cNObjid, &menulist, title, 0, RTT_MENUTYPE_DYN);
+    sts = rtt_menu_upd_new(parent_ctx, pwr_cNObjid, &menulist, title, 0,
+                           RTT_MENUTYPE_DYN);
     if (sts == RTT__FASTBACK)
       return sts;
     else if (sts == RTT__BACKTOCOLLECT)
@@ -5562,39 +5547,39 @@ static int rtt_show_par_hier_class_name(menu_ctx parent_ctx,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_debug_obj_hier_class_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	parent_ctx	I	rtt context.
-* char		*hiername	I	name of hierarchy object.
-* char		*classname	I	name of class.
-* char		*name		I	name description.
-* int		add		I	if add to existing menulist or
-*					creating a new menu.
-*
-* Description:
-*	This function is called when a 'debug object' command is recieved.
-*	All object under the hierarchy object, with the specified class
-*	that fits in the name description is inserted in a menulist
-*	and displayed on the screen.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_debug_obj_hier_class_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	parent_ctx	I	rtt context.
+ * char		*hiername	I	name of hierarchy object.
+ * char		*classname	I	name of class.
+ * char		*name		I	name description.
+ * int		add		I	if add to existing menulist or
+ *					creating a new menu.
+ *
+ * Description:
+ *	This function is called when a 'debug object' command is recieved.
+ *	All object under the hierarchy object, with the specified class
+ *	that fits in the name description is inserted in a menulist
+ *	and displayed on the screen.
+ *
+ **************************************************************************/
 
-static int rtt_debug_obj_hier_class_name(menu_ctx parent_ctx, char* hiername,
-    char* classname, char* name, int add, int global)
-{
+static int rtt_debug_obj_hier_class_name(menu_ctx parent_ctx, char *hiername,
+                                         char *classname, char *name, int add,
+                                         int global) {
   int sts;
   int index = 0;
   pwr_tClassId class;
   pwr_tObjid hierobjid;
-  rtt_t_menu_upd* menulist = 0;
+  rtt_t_menu_upd *menulist = 0;
   char title[80] = "SEARCH LIST";
   int max_objects = 300;
   pwr_tObjid objid = {0, 0};
-  char* s;
+  char *s;
   int single_object = 0;
 
   if (name != NULL) {
@@ -5648,15 +5633,15 @@ static int rtt_debug_obj_hier_class_name(menu_ctx parent_ctx, char* hiername,
 
   if (add == RTT_MENU_ADD) {
     rtt_get_menusize(parent_ctx, &index);
-    menulist = (rtt_t_menu_upd*)parent_ctx->menu;
+    menulist = (rtt_t_menu_upd *)parent_ctx->menu;
   }
 
   if (single_object)
     sts = rtt_debug_object_add(objid, &menulist, &index, &zero, 0, 0);
   else
-    sts = rtt_get_objects_hier_class_name(parent_ctx, hierobjid, class, name,
-        max_objects, global, &rtt_debug_object_add, (void*)&menulist,
-        (void*)&index, &zero, 0, 0);
+    sts = rtt_get_objects_hier_class_name(
+        parent_ctx, hierobjid, class, name, max_objects, global,
+        &rtt_debug_object_add, (void *)&menulist, (void *)&index, &zero, 0, 0);
   if (sts == RTT__MAXCOUNT)
     rtt_message('E', "To many object, all objects could not be shown");
   else if (EVEN(sts))
@@ -5664,13 +5649,13 @@ static int rtt_debug_obj_hier_class_name(menu_ctx parent_ctx, char* hiername,
 
   if (add == RTT_MENU_ADD) {
     /* Reconfigure and redraw the menu */
-    parent_ctx->menu = (rtt_t_menu*)menulist;
+    parent_ctx->menu = (rtt_t_menu *)menulist;
     sts = rtt_menu_upd_bubblesort(menulist);
     rtt_menu_upd_configure(parent_ctx);
   } else if (menulist != 0) {
     sts = rtt_menu_upd_bubblesort(menulist);
-    sts = rtt_menu_upd_new(
-        parent_ctx, pwr_cNObjid, &menulist, title, 0, RTT_MENUTYPE_DYN);
+    sts = rtt_menu_upd_new(parent_ctx, pwr_cNObjid, &menulist, title, 0,
+                           RTT_MENUTYPE_DYN);
     if (sts == RTT__FASTBACK)
       return sts;
     else if (sts == RTT__BACKTOCOLLECT)
@@ -5686,30 +5671,29 @@ static int rtt_debug_obj_hier_class_name(menu_ctx parent_ctx, char* hiername,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_collect_insert()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I
-*
-* Description:
-*	This function inserts an object in the rtt_collectmenulist.
-*	If the current item is an object the debug parameter is inserted.
-*	If the current item is a parameter in a 'show object' picture
-*	this parameter is inserted.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_collect_insert()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I
+ *
+ * Description:
+ *	This function inserts an object in the rtt_collectmenulist.
+ *	If the current item is an object the debug parameter is inserted.
+ *	If the current item is a parameter in a 'show object' picture
+ *	this parameter is inserted.
+ *
+ **************************************************************************/
 
-int rtt_collect_insert(menu_ctx ctx, char* full_name)
-{
+int rtt_collect_insert(menu_ctx ctx, char *full_name) {
   int sts;
-  rtt_t_menu_upd* menu_ptr_upd;
-  rtt_t_menu* menu_ptr_stat;
+  rtt_t_menu_upd *menu_ptr_upd;
+  rtt_t_menu *menu_ptr_stat;
   int index;
   pwr_tObjid objid;
-  char* s;
+  char *s;
   pwr_tAName aname;
   pwr_sAttrRef aref;
 
@@ -5729,7 +5713,7 @@ int rtt_collect_insert(menu_ctx ctx, char* full_name)
     if (EVEN(sts))
       return sts;
   } else if (ctx->menutype & RTT_MENUTYPE_UPD) {
-    menu_ptr_upd = (rtt_t_menu_upd*)ctx->menu;
+    menu_ptr_upd = (rtt_t_menu_upd *)ctx->menu;
     menu_ptr_upd += ctx->current_item;
 
     strcpy(aname, menu_ptr_upd->parameter_name);
@@ -5750,8 +5734,8 @@ int rtt_collect_insert(menu_ctx ctx, char* full_name)
     /* Only object name, debug object */
     objid = aref.Objid;
 
-    sts = rtt_debug_object_add(
-        objid, &rtt_collectionmenulist, &index, &zero, 0, 0);
+    sts = rtt_debug_object_add(objid, &rtt_collectionmenulist, &index, &zero, 0,
+                               0);
     if ((EVEN(sts)) || (sts == RTT__ITEM_NOCREA)) {
       rtt_message('E', "No debug on this item");
       return RTT__NOPICTURE;
@@ -5768,8 +5752,8 @@ int rtt_collect_insert(menu_ctx ctx, char* full_name)
       return RTT__NOPICTURE;
     s++;
 
-    sts = rtt_show_parameter_add(
-        aref.Objid, &rtt_collectionmenulist, s, &index, &zero, 0);
+    sts = rtt_show_parameter_add(aref.Objid, &rtt_collectionmenulist, s, &index,
+                                 &zero, 0);
     if ((EVEN(sts)) || (sts == RTT__ITEM_NOCREA)) {
       rtt_message('E', "No debug on this item");
       return RTT__NOPICTURE;
@@ -5780,7 +5764,7 @@ int rtt_collect_insert(menu_ctx ctx, char* full_name)
 
   /* Update the menu in the context, if it exists */
   if (rtt_collectionmenuctx != 0) {
-    rtt_collectionmenuctx->menu = (rtt_t_menu*)rtt_collectionmenulist;
+    rtt_collectionmenuctx->menu = (rtt_t_menu *)rtt_collectionmenulist;
     sts = rtt_menu_upd_bubblesort(rtt_collectionmenulist);
     rtt_menu_upd_configure(rtt_collectionmenuctx);
   }
@@ -5788,47 +5772,48 @@ int rtt_collect_insert(menu_ctx ctx, char* full_name)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_get_child_object_hier_class_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-* pwr_tObjid	hierobjid	I	ancestor of wanted objects.
-* pwr_tClassId	class		I	class of the wanted objects.
-* char		*name		I	wildcard name of wanted objects.
-* pwr_tObjid	objid		I	objid of the object
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Routine used by rtt_get_objects_hier_class
-*	to find all objects in a system of
-*	a specified class that has a specific object as ancestor.
-*	Calls a backcallroutine with the given arguments for every object
-*	found of the specified class below the specified hierarchy object.
-*	This is  a recursiv functions that calls itself for all children
-*	found to the given objdid.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_child_object_hier_class_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ * pwr_tObjid	hierobjid	I	ancestor of wanted objects.
+ * pwr_tClassId	class		I	class of the wanted objects.
+ * char		*name		I	wildcard name of wanted objects.
+ * pwr_tObjid	objid		I	objid of the object
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Routine used by rtt_get_objects_hier_class
+ *	to find all objects in a system of
+ *	a specified class that has a specific object as ancestor.
+ *	Calls a backcallroutine with the given arguments for every object
+ *	found of the specified class below the specified hierarchy object.
+ *	This is  a recursiv functions that calls itself for all children
+ *	found to the given objdid.
+ *
+ **************************************************************************/
 
 static int rtt_get_child_object_hi_cl_na(menu_ctx ctx, pwr_tClassId class,
-    char* name, pwr_tObjid objid, int* obj_counter, int max_count, int global,
-    int (*backcall)(), void* arg1, void* arg2, void* arg3, void* arg4,
-    void* arg5)
-{
+                                         char *name, pwr_tObjid objid,
+                                         int *obj_counter, int max_count,
+                                         int global, int (*backcall)(),
+                                         void *arg1, void *arg2, void *arg3,
+                                         void *arg4, void *arg5) {
   int sts;
   pwr_tClassId obj_class;
   pwr_tObjid childobjid;
   int name_ok, class_ok;
   pwr_tOName obj_name;
   unsigned int location;
-  char* s;
+  char *s;
 
   if (!global) {
     sts = gdh_GetObjectLocation(objid, &location);
@@ -5852,8 +5837,8 @@ static int rtt_get_child_object_hi_cl_na(menu_ctx ctx, pwr_tClassId class,
   name_ok = 1;
   if (class_ok && (name != NULL)) {
     /* Get the name of the object */
-    sts = gdh_ObjidToName(
-        objid, obj_name, sizeof(obj_name), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(objid, obj_name, sizeof(obj_name),
+                          cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
@@ -5879,7 +5864,8 @@ static int rtt_get_child_object_hi_cl_na(menu_ctx ctx, pwr_tClassId class,
   sts = gdh_GetChild(objid, &childobjid);
   while (ODD(sts)) {
     sts = rtt_get_child_object_hi_cl_na(ctx, class, name, childobjid,
-        obj_counter, max_count, global, backcall, arg1, arg2, arg3, arg4, arg5);
+                                        obj_counter, max_count, global,
+                                        backcall, arg1, arg2, arg3, arg4, arg5);
     if (EVEN(sts))
       return sts;
     sts = gdh_GetNextSibling(childobjid, &childobjid);
@@ -5889,53 +5875,53 @@ static int rtt_get_child_object_hi_cl_na(menu_ctx ctx, pwr_tClassId class,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_get_objects_hier_class_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-* pwr_tObjid	hierobjid	I	ancestor of wanted objects.
-* pwr_tClassId	class		I	class of the wanded objects.
-* char		*name		I	wildcard name of wanted objects.
-* int		(*backcall)()	I 	backcallroutine called for every object.
-* void		*arg1		I	argument passed to the backcall routine.
-* void		*arg2		I	argument passed to the backcall routine.
-* void		*arg3		I	argument passed to the backcall routine.
-* void		*arg4		I	argument passed to the backcall routine.
-* void		*arg5		I	argument passed to the backcall routine.
-*
-* Description:
-*	Traverses the objects in the plant and nodehierarchy.
-*	Calls a backcallroutine with the given arguments for every found
-*	object of the specified class that is found below the hierobjid in
-*	the hierarchy and that  fits in a wildcard description.
-*	If hierobjid is eq 0 the hierarchy is not tested.
-*	If class is eq 0 the class is not tested.
-*	If name is eq NULL the name is not tested.
-*	The objid of the found object and arguments will be
-*	passed to the backcallroutine. The backcallroutine should be
-*	declared as:
-*
-*	int	'backcallroutine name'( objid, arg1, arg2, arg3, arg4, arg5)
-*	pwr_tObjid	objid;
-*	void	*arg1;
-*	void	*arg2;
-*	void	*arg3;
-*	void	*arg4;
-*	void	*arg5;
-*	...
-*	Calls a backcall routine for every object in the plathierarchy
-*	of a specified class under a specific object in the hierarchy.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_objects_hier_class_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ * pwr_tObjid	hierobjid	I	ancestor of wanted objects.
+ * pwr_tClassId	class		I	class of the wanded objects.
+ * char		*name		I	wildcard name of wanted objects.
+ * int		(*backcall)()	I 	backcallroutine called for every object.
+ * void		*arg1		I	argument passed to the backcall routine.
+ * void		*arg2		I	argument passed to the backcall routine.
+ * void		*arg3		I	argument passed to the backcall routine.
+ * void		*arg4		I	argument passed to the backcall routine.
+ * void		*arg5		I	argument passed to the backcall routine.
+ *
+ * Description:
+ *	Traverses the objects in the plant and nodehierarchy.
+ *	Calls a backcallroutine with the given arguments for every found
+ *	object of the specified class that is found below the hierobjid in
+ *	the hierarchy and that  fits in a wildcard description.
+ *	If hierobjid is eq 0 the hierarchy is not tested.
+ *	If class is eq 0 the class is not tested.
+ *	If name is eq NULL the name is not tested.
+ *	The objid of the found object and arguments will be
+ *	passed to the backcallroutine. The backcallroutine should be
+ *	declared as:
+ *
+ *	int	'backcallroutine name'( objid, arg1, arg2, arg3, arg4, arg5)
+ *	pwr_tObjid	objid;
+ *	void	*arg1;
+ *	void	*arg2;
+ *	void	*arg3;
+ *	void	*arg4;
+ *	void	*arg5;
+ *	...
+ *	Calls a backcall routine for every object in the plathierarchy
+ *	of a specified class under a specific object in the hierarchy.
+ *
+ **************************************************************************/
 
 int rtt_get_objects_hier_class_name(menu_ctx ctx, pwr_tObjid hierobjid,
-    pwr_tClassId class, char* name, int max_count, int global,
-    int (*backcall)(), void* arg1, void* arg2, void* arg3, void* arg4,
-    void* arg5)
-{
+                                    pwr_tClassId class, char *name,
+                                    int max_count, int global,
+                                    int (*backcall)(), void *arg1, void *arg2,
+                                    void *arg3, void *arg4, void *arg5) {
   int sts;
   pwr_tObjid objid;
   pwr_tClassId obj_class;
@@ -5947,8 +5933,8 @@ int rtt_get_objects_hier_class_name(menu_ctx ctx, pwr_tObjid hierobjid,
   if (cdh_ObjidIsNotNull(hierobjid)) {
     /* Check if the children */
     sts = rtt_get_child_object_hi_cl_na(ctx, class, name, hierobjid,
-        &obj_counter, max_count, global, backcall, arg1, arg2, arg3, arg4,
-        arg5);
+                                        &obj_counter, max_count, global,
+                                        backcall, arg1, arg2, arg3, arg4, arg5);
     if (EVEN(sts))
       return sts;
   } else {
@@ -5969,18 +5955,18 @@ int rtt_get_objects_hier_class_name(menu_ctx ctx, pwr_tObjid hierobjid,
       if (EVEN(sts))
         return sts;
       sts = gdh_ObjidToName(cdh_ClassIdToObjid(obj_class), hiername,
-          sizeof(hiername), cdh_mName_volumeStrict);
+                            sizeof(hiername), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
 
       /* Check that the class of the node object is correct */
-      if ((streq(hiername, "pwrs:Class-$NodeHier"))
-          || (streq(hiername, "pwrs:Class-$PlantHier"))
-          || (streq(hiername, "pwrs:Class-$System"))) {
+      if ((streq(hiername, "pwrs:Class-$NodeHier")) ||
+          (streq(hiername, "pwrs:Class-$PlantHier")) ||
+          (streq(hiername, "pwrs:Class-$System"))) {
         /* Check if the children */
-        sts = rtt_get_child_object_hi_cl_na(ctx, class, name, objid,
-            &obj_counter, max_count, global, backcall, arg1, arg2, arg3, arg4,
-            arg5);
+        sts = rtt_get_child_object_hi_cl_na(
+            ctx, class, name, objid, &obj_counter, max_count, global, backcall,
+            arg1, arg2, arg3, arg4, arg5);
         if (EVEN(sts))
           return sts;
       }
@@ -5991,29 +5977,28 @@ int rtt_get_objects_hier_class_name(menu_ctx ctx, pwr_tObjid hierobjid,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_find_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-* char		*name		I	name string.
-* pwr_tObjid	*objid		O	name objid.
-*
-* Description:
-*	Returns the objid of a namestring.
-*	If the name is not found the the routine adds the title
-*	that used to be the hierarchy to the name.
-*	If it is not found on this level, higher levels of the
-*	hierarchy is serarched.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_find_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ * char		*name		I	name string.
+ * pwr_tObjid	*objid		O	name objid.
+ *
+ * Description:
+ *	Returns the objid of a namestring.
+ *	If the name is not found the the routine adds the title
+ *	that used to be the hierarchy to the name.
+ *	If it is not found on this level, higher levels of the
+ *	hierarchy is serarched.
+ *
+ **************************************************************************/
 
-static int rtt_find_name(menu_ctx ctx, char* name, pwr_tObjid* objid)
-{
+static int rtt_find_name(menu_ctx ctx, char *name, pwr_tObjid *objid) {
   char title[100];
-  char* s;
+  char *s;
   int sts;
 
   sts = gdh_NameToObjid(name, objid);
@@ -6035,28 +6020,27 @@ static int rtt_find_name(menu_ctx ctx, char* name, pwr_tObjid* objid)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_find_hierarchy()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-* pwr_tObjid	*objid		O	objid of object.
-*
-* Description:
-*	Returns the objid of a namestring.
-*	If the name is not found the the routine adds the title
-*	that used to be the hierarchy to the name.
-*	If it is not found on this level, higher levels of the
-*	hierarchy is searched.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_find_hierarchy()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ * pwr_tObjid	*objid		O	objid of object.
+ *
+ * Description:
+ *	Returns the objid of a namestring.
+ *	If the name is not found the the routine adds the title
+ *	that used to be the hierarchy to the name.
+ *	If it is not found on this level, higher levels of the
+ *	hierarchy is searched.
+ *
+ **************************************************************************/
 
-static int rtt_find_hierarchy(menu_ctx ctx, pwr_tObjid* objid)
-{
+static int rtt_find_hierarchy(menu_ctx ctx, pwr_tObjid *objid) {
   char title[100];
-  char* s;
+  char *s;
   int sts = 0;
 
   while ((EVEN(sts)) && (ctx != 0)) {
@@ -6072,24 +6056,23 @@ static int rtt_find_hierarchy(menu_ctx ctx, pwr_tObjid* objid)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_classort()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* rtt_t_menu	*menulist	I	menulist.
-* int		redo		I	do or redo.
-*
-* Description:
-*	This function modifies the menulist so bubblesort sort in class also.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_classort()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * rtt_t_menu	*menulist	I	menulist.
+ * int		redo		I	do or redo.
+ *
+ * Description:
+ *	This function modifies the menulist so bubblesort sort in class also.
+ *
+ **************************************************************************/
 
-int rtt_menu_classort(rtt_t_menu* menulist, int redo)
-{
+int rtt_menu_classort(rtt_t_menu *menulist, int redo) {
   int sts;
-  rtt_t_menu* menu_ptr;
+  rtt_t_menu *menu_ptr;
   pwr_tClassId class;
   pwr_tOName classname;
   char dummytxt[120];
@@ -6102,7 +6085,7 @@ int rtt_menu_classort(rtt_t_menu* menulist, int redo)
     if (EVEN(sts))
       return sts;
     sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), classname,
-        sizeof(classname), cdh_mName_volumeStrict);
+                          sizeof(classname), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
@@ -6112,7 +6095,7 @@ int rtt_menu_classort(rtt_t_menu* menulist, int redo)
         strcpy(menu_ptr->text, "000");
         strcat(menu_ptr->text, dummytxt);
       } else {
-	strcpy(dummytxt, &menu_ptr->text[3]);
+        strcpy(dummytxt, &menu_ptr->text[3]);
         strcpy(menu_ptr->text, dummytxt);
       }
     } else if (streq(classname, "pwrb:Class-PlcPgm")) {
@@ -6121,7 +6104,7 @@ int rtt_menu_classort(rtt_t_menu* menulist, int redo)
         strcpy(menu_ptr->text, "001");
         strcat(menu_ptr->text, dummytxt);
       } else {
-	strcpy(dummytxt, &menu_ptr->text[3]);
+        strcpy(dummytxt, &menu_ptr->text[3]);
         strcpy(menu_ptr->text, dummytxt);
       }
     }
@@ -6132,33 +6115,31 @@ int rtt_menu_classort(rtt_t_menu* menulist, int redo)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_bubblesort()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* rtt_t_menu	*menulist	I	menulist.
-*
-* Description:
-*	This function sorts the items in a nondynamic menulist in
-*	characther order.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_bubblesort()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * rtt_t_menu	*menulist	I	menulist.
+ *
+ * Description:
+ *	This function sorts the items in a nondynamic menulist in
+ *	characther order.
+ *
+ **************************************************************************/
 
-static int rtt_menu_cmp(const void* p1, const void* p2)
-{
-  char* str1 = ((rtt_t_menu*) p1)->text;
-  char* str2 = ((rtt_t_menu*) p2)->text;
+static int rtt_menu_cmp(const void *p1, const void *p2) {
+  char *str1 = ((rtt_t_menu *)p1)->text;
+  char *str2 = ((rtt_t_menu *)p2)->text;
   if (*str2 == 0)
     return 0;
   return strcmp(str1, str2);
 }
 
-int rtt_menu_bubblesort(rtt_t_menu* menulist)
-{
+int rtt_menu_bubblesort(rtt_t_menu *menulist) {
   /* Get the size of the menu */
-  rtt_t_menu* menu_ptr = menulist;
+  rtt_t_menu *menu_ptr = menulist;
   int size = 0;
   while (menu_ptr->text[0] != 0) {
     menu_ptr++;
@@ -6169,33 +6150,31 @@ int rtt_menu_bubblesort(rtt_t_menu* menulist)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menu_upd_bubblesort()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* rtt_t_menu_upd *menulist	I	dynamic menulist.
-*
-* Description:
-*	This function sorts the items in a dynamic menulist in
-*	characther order.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menu_upd_bubblesort()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * rtt_t_menu_upd *menulist	I	dynamic menulist.
+ *
+ * Description:
+ *	This function sorts the items in a dynamic menulist in
+ *	characther order.
+ *
+ **************************************************************************/
 
-static int rtt_menu_upd_cmp(const void* p1, const void* p2)
-{
-  char* str1 = ((rtt_t_menu_upd*) p1)->text;
-  char* str2 = ((rtt_t_menu_upd*) p2)->text;
+static int rtt_menu_upd_cmp(const void *p1, const void *p2) {
+  char *str1 = ((rtt_t_menu_upd *)p1)->text;
+  char *str2 = ((rtt_t_menu_upd *)p2)->text;
   if (*str2 == 0)
     return 0;
   return strcmp(str1, str2);
 }
 
-int rtt_menu_upd_bubblesort(rtt_t_menu_upd* menulist)
-{
+int rtt_menu_upd_bubblesort(rtt_t_menu_upd *menulist) {
   /* Get the size of the menu */
-  rtt_t_menu_upd* menu_ptr = menulist;
+  rtt_t_menu_upd *menu_ptr = menulist;
   int size = 0;
   while (menu_ptr->text[0] != 0) {
     menu_ptr++;
@@ -6207,21 +6186,20 @@ int rtt_menu_upd_bubblesort(rtt_t_menu_upd* menulist)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_collect_show()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	Displays the collection picture.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_collect_show()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	Displays the collection picture.
+ *
+ **************************************************************************/
 
-int rtt_collect_show(menu_ctx ctx)
-{
+int rtt_collect_show(menu_ctx ctx) {
   char title[] = "COLLECTION PICTURE";
   int sts;
 
@@ -6233,8 +6211,8 @@ int rtt_collect_show(menu_ctx ctx)
 
   if (rtt_collectionmenulist != 0) {
     sts = rtt_menu_upd_bubblesort(rtt_collectionmenulist);
-    sts = rtt_menu_upd_new(
-        ctx, pwr_cNObjid, &rtt_collectionmenulist, title, 0, RTT_MENUTYPE_DYN);
+    sts = rtt_menu_upd_new(ctx, pwr_cNObjid, &rtt_collectionmenulist, title, 0,
+                           RTT_MENUTYPE_DYN);
     if (sts == RTT__FASTBACK)
       return sts;
     else if (EVEN(sts))
@@ -6248,23 +6226,22 @@ int rtt_collect_show(menu_ctx ctx)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_menulist_search()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-*
-* Description:
-*	Search for a string in the menu items text.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_menulist_search()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ *
+ * Description:
+ *	Search for a string in the menu items text.
+ *
+ **************************************************************************/
 
-static int rtt_menulist_search(
-    menu_ctx ctx, char* searchstr, int index, int* foundindex)
-{
-  char* menu_ptr;
+static int rtt_menulist_search(menu_ctx ctx, char *searchstr, int index,
+                               int *foundindex) {
+  char *menu_ptr;
   int size = 0;
   int i;
   char text[120];
@@ -6274,11 +6251,11 @@ static int rtt_menulist_search(
   else if (ctx->menutype & RTT_MENUTYPE_UPD)
     size = sizeof(rtt_t_menu_upd);
 
-  menu_ptr = (char*)ctx->menu;
+  menu_ptr = (char *)ctx->menu;
   menu_ptr += index * size;
-  while (((rtt_t_menu*)menu_ptr)->text[0] != 0) {
+  while (((rtt_t_menu *)menu_ptr)->text[0] != 0) {
     /* Convert menu text to upper case (no case sensitive) */
-    rtt_toupper(text, ((rtt_t_menu*)menu_ptr)->text);
+    rtt_toupper(text, ((rtt_t_menu *)menu_ptr)->text);
 
     if (strlen(text) >= strlen(searchstr)) {
       for (i = 0; i <= (int)(strlen(text) - strlen(searchstr)); i++) {
@@ -6296,31 +6273,30 @@ static int rtt_menulist_search(
 }
 
 /*************************************************************************
-*
-* Name:		rtt_commandmode_start()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Start the commandmode. Open the commanfile and put the content
-*	in a command array.
-*	Set the global variable rtt_commandmode to RTT_COMMANDMODE_FILE.
-*	Command from now on will be fetched from the command array.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_commandmode_start()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Start the commandmode. Open the commanfile and put the content
+ *	in a command array.
+ *	Set the global variable rtt_commandmode to RTT_COMMANDMODE_FILE.
+ *	Command from now on will be fetched from the command array.
+ *
+ **************************************************************************/
 
-static int rtt_deffilename_func(char* outfile, char* infile, void* client_data)
-{
+static int rtt_deffilename_func(char *outfile, char *infile,
+                                void *client_data) {
   rtt_get_defaultfilename(infile, outfile, ".rtt_com");
   return 1;
 }
 
-static int rtt_getinput_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
-{
+static int rtt_getinput_func(void *filectx, ccm_sArg *arg_list, int arg_count,
+                             int *return_decl, ccm_tFloat *return_float,
+                             ccm_tInt *return_int, char *return_string) {
   ccm_sArg *arg_p, *arg_p2 = NULL, *arg_p3 = NULL;
   int maxlen = 79;
   char input_str[80];
@@ -6328,7 +6304,7 @@ static int rtt_getinput_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   unsigned long option;
   unsigned long terminator;
   menu_ctx ctx;
-  rtt_t_menu* menu_ptr;
+  rtt_t_menu *menu_ptr;
   int (*timeout_func)();
   char format[80];
   char prompt[80];
@@ -6374,9 +6350,9 @@ static int rtt_getinput_func(void* filectx, ccm_sArg* arg_list, int arg_count,
     timeout_func = rtt_scan;
   }
 
-  sts = rtt_get_input_string((char*)&rtt_chn, input_str, &terminator, maxlen,
-      rtt_value_recallbuff, option, rtt_scantime, timeout_func, (void*)ctx,
-      prompt);
+  sts = rtt_get_input_string((char *)&rtt_chn, input_str, &terminator, maxlen,
+                             rtt_value_recallbuff, option, rtt_scantime,
+                             timeout_func, (void *)ctx, prompt);
   if (arg_p->value_decl == CCM_DECL_FLOAT)
     sts = sscanf(input_str, format, &arg_p->value_float);
   else if (arg_p->value_decl == CCM_DECL_INT)
@@ -6395,11 +6371,11 @@ static int rtt_getinput_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int rtt_placecursor_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
-  ccm_sArg* arg_p2;
+static int rtt_placecursor_func(void *filectx, ccm_sArg *arg_list,
+                                int arg_count, int *return_decl,
+                                ccm_tFloat *return_float, ccm_tInt *return_int,
+                                char *return_string) {
+  ccm_sArg *arg_p2;
 
   if (arg_count != 2)
     return CCM__ARGMISM;
@@ -6419,10 +6395,9 @@ static int rtt_placecursor_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_lineerase_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
-{
+static int rtt_lineerase_func(void *filectx, ccm_sArg *arg_list, int arg_count,
+                              int *return_decl, ccm_tFloat *return_float,
+                              ccm_tInt *return_int, char *return_string) {
   if (arg_count != 0)
     return CCM__ARGMISM;
 
@@ -6435,10 +6410,10 @@ static int rtt_lineerase_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int rtt_getcurrenttitle_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
+static int rtt_getcurrenttitle_func(void *filectx, ccm_sArg *arg_list,
+                                    int arg_count, int *return_decl,
+                                    ccm_tFloat *return_float,
+                                    ccm_tInt *return_int, char *return_string) {
   menu_ctx ctx;
 
   if (arg_count != 0)
@@ -6460,14 +6435,14 @@ static int rtt_getcurrenttitle_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_getcurrenttext_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
+static int rtt_getcurrenttext_func(void *filectx, ccm_sArg *arg_list,
+                                   int arg_count, int *return_decl,
+                                   ccm_tFloat *return_float,
+                                   ccm_tInt *return_int, char *return_string) {
   menu_ctx ctx;
-  rtt_t_menu* menu_ptr;
-  rtt_t_menu_upd* menu_upd_ptr;
-  rtt_t_menu_alarm* menu_alarm_ptr;
+  rtt_t_menu *menu_ptr;
+  rtt_t_menu_upd *menu_upd_ptr;
+  rtt_t_menu_alarm *menu_alarm_ptr;
 
   if (arg_count != 0)
     return CCM__ARGMISM;
@@ -6481,11 +6456,11 @@ static int rtt_getcurrenttext_func(void* filectx, ccm_sArg* arg_list,
     }
     menu_ptr = ctx->menu;
     if (ctx->menutype & RTT_MENUTYPE_UPD) {
-      menu_upd_ptr = (rtt_t_menu_upd*)menu_ptr;
+      menu_upd_ptr = (rtt_t_menu_upd *)menu_ptr;
       menu_upd_ptr += ctx->current_item;
       strcpy(return_string, menu_upd_ptr->text);
     } else if (ctx->menutype & RTT_MENUTYPE_ALARM) {
-      menu_alarm_ptr = (rtt_t_menu_alarm*)menu_ptr;
+      menu_alarm_ptr = (rtt_t_menu_alarm *)menu_ptr;
       menu_alarm_ptr += ctx->current_item;
       strcpy(return_string, menu_alarm_ptr->text);
     } else {
@@ -6501,10 +6476,11 @@ static int rtt_getcurrenttext_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_getcurrentobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
+static int rtt_getcurrentobject_func(void *filectx, ccm_sArg *arg_list,
+                                     int arg_count, int *return_decl,
+                                     ccm_tFloat *return_float,
+                                     ccm_tInt *return_int,
+                                     char *return_string) {
   menu_ctx ctx;
   pwr_tObjid objid;
   pwr_tOName name_str;
@@ -6516,8 +6492,8 @@ static int rtt_getcurrentobject_func(void* filectx, ccm_sArg* arg_list,
   ctx = rtt_current_ctx();
   switch (ctx->ctx_type) {
   case RTT_CTXTYPE_MENU:
-    sts = rtt_get_current_object(
-        ctx, &objid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+    sts = rtt_get_current_object(ctx, &objid, name_str, sizeof(name_str),
+                                 cdh_mName_volumeStrict);
     if (EVEN(sts))
       strcpy(return_string, "");
     else
@@ -6531,10 +6507,9 @@ static int rtt_getcurrentobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_getchild_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
-{
+static int rtt_getchild_func(void *filectx, ccm_sArg *arg_list, int arg_count,
+                             int *return_decl, ccm_tFloat *return_float,
+                             ccm_tInt *return_int, char *return_string) {
   int sts;
   char name[80];
   pwr_tObjid parent_objid;
@@ -6561,10 +6536,9 @@ static int rtt_getchild_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int rtt_getparent_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
-{
+static int rtt_getparent_func(void *filectx, ccm_sArg *arg_list, int arg_count,
+                              int *return_decl, ccm_tFloat *return_float,
+                              ccm_tInt *return_int, char *return_string) {
   int sts;
   char name[80];
   pwr_tObjid parent_objid;
@@ -6591,10 +6565,10 @@ static int rtt_getparent_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int rtt_getnextsibling_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
+static int rtt_getnextsibling_func(void *filectx, ccm_sArg *arg_list,
+                                   int arg_count, int *return_decl,
+                                   ccm_tFloat *return_float,
+                                   ccm_tInt *return_int, char *return_string) {
   int sts;
   char name[80];
   pwr_tObjid objid;
@@ -6621,10 +6595,10 @@ static int rtt_getnextsibling_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_getclasslist_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
+static int rtt_getclasslist_func(void *filectx, ccm_sArg *arg_list,
+                                 int arg_count, int *return_decl,
+                                 ccm_tFloat *return_float, ccm_tInt *return_int,
+                                 char *return_string) {
   int sts;
   pwr_tOName name;
   pwr_tClassId class;
@@ -6651,10 +6625,10 @@ static int rtt_getclasslist_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_getrootlist_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
+static int rtt_getrootlist_func(void *filectx, ccm_sArg *arg_list,
+                                int arg_count, int *return_decl,
+                                ccm_tFloat *return_float, ccm_tInt *return_int,
+                                char *return_string) {
   int sts;
   pwr_tOName name;
   pwr_tObjid objid;
@@ -6675,10 +6649,10 @@ static int rtt_getrootlist_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_getnodeobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
+static int rtt_getnodeobject_func(void *filectx, ccm_sArg *arg_list,
+                                  int arg_count, int *return_decl,
+                                  ccm_tFloat *return_float,
+                                  ccm_tInt *return_int, char *return_string) {
   int sts;
   pwr_tOName name;
   pwr_tObjid objid;
@@ -6699,10 +6673,10 @@ static int rtt_getnodeobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_getnextobject_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
+static int rtt_getnextobject_func(void *filectx, ccm_sArg *arg_list,
+                                  int arg_count, int *return_decl,
+                                  ccm_tFloat *return_float,
+                                  ccm_tInt *return_int, char *return_string) {
   int sts;
   pwr_tOName name;
   pwr_tObjid objid;
@@ -6729,10 +6703,10 @@ static int rtt_getnextobject_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_getobjectclass_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
+static int rtt_getobjectclass_func(void *filectx, ccm_sArg *arg_list,
+                                   int arg_count, int *return_decl,
+                                   ccm_tFloat *return_float,
+                                   ccm_tInt *return_int, char *return_string) {
   int sts;
   pwr_tOName name;
   pwr_tObjid objid;
@@ -6756,10 +6730,10 @@ static int rtt_getobjectclass_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_messageerror_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
+static int rtt_messageerror_func(void *filectx, ccm_sArg *arg_list,
+                                 int arg_count, int *return_decl,
+                                 ccm_tFloat *return_float, ccm_tInt *return_int,
+                                 char *return_string) {
   if (arg_count != 1)
     return CCM__ARGMISM;
 
@@ -6774,10 +6748,10 @@ static int rtt_messageerror_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_messageinfo_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
+static int rtt_messageinfo_func(void *filectx, ccm_sArg *arg_list,
+                                int arg_count, int *return_decl,
+                                ccm_tFloat *return_float, ccm_tInt *return_int,
+                                char *return_string) {
   if (arg_count != 1)
     return CCM__ARGMISM;
 
@@ -6792,11 +6766,11 @@ static int rtt_messageinfo_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_cutobjectname_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
-  ccm_sArg* arg_p2;
+static int rtt_cutobjectname_func(void *filectx, ccm_sArg *arg_list,
+                                  int arg_count, int *return_decl,
+                                  ccm_tFloat *return_float,
+                                  ccm_tInt *return_int, char *return_string) {
+  ccm_sArg *arg_p2;
 
   if (arg_count != 2)
     return CCM__ARGMISM;
@@ -6814,11 +6788,11 @@ static int rtt_cutobjectname_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_getattribute_func(void* filectx, ccm_sArg* arg_list,
-    int arg_count, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
-{
-  ccm_sArg* arg_p2;
+static int rtt_getattribute_func(void *filectx, ccm_sArg *arg_list,
+                                 int arg_count, int *return_decl,
+                                 ccm_tFloat *return_float, ccm_tInt *return_int,
+                                 char *return_string) {
+  ccm_sArg *arg_p2;
   int sts;
   int value_decl;
   ccm_tInt value_int;
@@ -6835,7 +6809,7 @@ static int rtt_getattribute_func(void* filectx, ccm_sArg* arg_list,
     return CCM__ARGMISM;
 
   sts = rtt_attribute_func(arg_list->value_string, &value_decl, &value_float,
-      &value_int, value_string);
+                           &value_int, value_string);
   if (EVEN(sts)) {
     if (arg_count == 2) {
       arg_p2->value_int = 0;
@@ -6864,8 +6838,7 @@ static int rtt_getattribute_func(void* filectx, ccm_sArg* arg_list,
   return 1;
 }
 
-static int rtt_externcmd_func(char* cmd, void* client_data)
-{
+static int rtt_externcmd_func(char *cmd, void *client_data) {
   int sts;
   menu_ctx ctx;
 
@@ -6873,12 +6846,11 @@ static int rtt_externcmd_func(char* cmd, void* client_data)
   sts = rtt_menu_create_ctx(&ctx, NULL, NULL, "Dummy", RTT_MENUTYPE_UPD);
 
   sts = rtt_menu_command(ctx, pwr_cNObjid, cmd, 0, 0, 0);
-  free((char*)ctx);
+  free((char *)ctx);
   return sts;
 }
 
-static int rtt_errormessage_func(char* msg, int severity, void* client_data)
-{
+static int rtt_errormessage_func(char *msg, int severity, void *client_data) {
   if (EVEN(severity))
     rtt_message('E', msg);
   else
@@ -6886,8 +6858,7 @@ static int rtt_errormessage_func(char* msg, int severity, void* client_data)
   return 1;
 }
 
-int rtt_commandmode_start(char* incommand, int quit)
-{
+int rtt_commandmode_start(char *incommand, int quit) {
   int appl_sts;
   int sts;
 
@@ -6904,16 +6875,16 @@ int rtt_commandmode_start(char* incommand, int quit)
     sts = ccm_register_function("Rtt", "LineErase", rtt_lineerase_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Rtt", "GetCurrentTitle", rtt_getcurrenttitle_func);
+    sts = ccm_register_function("Rtt", "GetCurrentTitle",
+                                rtt_getcurrenttitle_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Rtt", "GetCurrentText", rtt_getcurrenttext_func);
+    sts =
+        ccm_register_function("Rtt", "GetCurrentText", rtt_getcurrenttext_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Rtt", "GetCurrentObject", rtt_getcurrentobject_func);
+    sts = ccm_register_function("Rtt", "GetCurrentObject",
+                                rtt_getcurrentobject_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Rtt", "GetChild", rtt_getchild_func);
@@ -6922,8 +6893,8 @@ int rtt_commandmode_start(char* incommand, int quit)
     sts = ccm_register_function("Rtt", "GetParent", rtt_getparent_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Rtt", "GetNextSibling", rtt_getnextsibling_func);
+    sts =
+        ccm_register_function("Rtt", "GetNextSibling", rtt_getnextsibling_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Rtt", "GetClassList", rtt_getclasslist_func);
@@ -6938,8 +6909,8 @@ int rtt_commandmode_start(char* incommand, int quit)
     sts = ccm_register_function("Rtt", "GetNextObject", rtt_getnextobject_func);
     if (EVEN(sts))
       return sts;
-    sts = ccm_register_function(
-        "Rtt", "GetObjectClass", rtt_getobjectclass_func);
+    sts =
+        ccm_register_function("Rtt", "GetObjectClass", rtt_getobjectclass_func);
     if (EVEN(sts))
       return sts;
     sts = ccm_register_function("Rtt", "MessageError", rtt_messageerror_func);
@@ -6958,8 +6929,8 @@ int rtt_commandmode_start(char* incommand, int quit)
   }
 
   sts = ccm_file_exec(incommand, rtt_externcmd_func, rtt_deffilename_func,
-      rtt_errormessage_func, &appl_sts, rtt_verify, 1, &rtt_ccmctx, 1, 0,
-      rtt_ccmcmd, NULL);
+                      rtt_errormessage_func, &appl_sts, rtt_verify, 1,
+                      &rtt_ccmctx, 1, 0, rtt_ccmcmd, NULL);
   if (sts == CCM__EXTERNFUNC) {
     rtt_command_toupper(rtt_ccmcmd, rtt_ccmcmd);
     rtt_ccmcmd_fetched = 1;
@@ -6976,24 +6947,23 @@ int rtt_commandmode_start(char* incommand, int quit)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_commandmode_single()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Start the commandmode when a single command is given as an argument
-*	at start. Put the commandstring in a command array and terminates
-*	the commandarray with 'quit' to force an exit.
-*	Set the global variable rtt_commandmode to RTT_COMMANDMODE_FILE.
-*	Command from now on will be fetched from the command array.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_commandmode_single()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Start the commandmode when a single command is given as an argument
+ *	at start. Put the commandstring in a command array and terminates
+ *	the commandarray with 'quit' to force an exit.
+ *	Set the global variable rtt_commandmode to RTT_COMMANDMODE_FILE.
+ *	Command from now on will be fetched from the command array.
+ *
+ **************************************************************************/
 
-int rtt_commandmode_single(char* command)
-{
+int rtt_commandmode_single(char *command) {
   strcpy(rtt_ccmcmd, command);
   rtt_ccmcmd_fetched = 1;
   rtt_ccmcmd_quit = 1;
@@ -7005,20 +6975,19 @@ int rtt_commandmode_single(char* command)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_commandmode_getnext()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get next command.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_commandmode_getnext()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get next command.
+ *
+ **************************************************************************/
 
-int rtt_commandmode_getnext(char* command, unsigned long* terminator)
-{
+int rtt_commandmode_getnext(char *command, unsigned long *terminator) {
   int sts;
   int appl_sts;
 
@@ -7038,7 +7007,7 @@ int rtt_commandmode_getnext(char* command, unsigned long* terminator)
         rtt_exit_now(0, RTT__SUCCESS);
 
       sts = ccm_file_exec(NULL, NULL, NULL, NULL, &appl_sts, rtt_verify, 1,
-          &rtt_ccmctx, 1, 1, rtt_ccmcmd, NULL);
+                          &rtt_ccmctx, 1, 1, rtt_ccmcmd, NULL);
       rtt_command_toupper(rtt_ccmcmd, rtt_ccmcmd);
     }
     if (sts == CCM__EXTERNFUNC) {
@@ -7084,20 +7053,19 @@ int rtt_commandmode_getnext(char* command, unsigned long* terminator)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_commandmode_rewind()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Decrement the rtt_commandmode_counter.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_commandmode_rewind()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Decrement the rtt_commandmode_counter.
+ *
+ **************************************************************************/
 
-int rtt_commandmode_rewind(char* command)
-{
+int rtt_commandmode_rewind(char *command) {
   if (rtt_commandmode & RTT_COMMANDMODE_FILE) {
     strcpy(rtt_ccmcmd, command);
     rtt_ccmcmd_fetched = 1;
@@ -7105,21 +7073,20 @@ int rtt_commandmode_rewind(char* command)
   return RTT__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		rtt_read_line()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Read a line for a file.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_read_line()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Read a line for a file.
+ *
+ **************************************************************************/
 
-int rtt_read_line(char* line, int maxsize, FILE* file)
-{
-  char* s;
+int rtt_read_line(char *line, int maxsize, FILE *file) {
+  char *s;
 
   if (fgets(line, maxsize, file) == NULL)
     return 0;
@@ -7132,33 +7099,34 @@ int rtt_read_line(char* line, int maxsize, FILE* file)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_command_get_input_string()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*chn		I	channel.
-* char		*out_string	O	input string
-* unsigned long	*out_terminator	O	terminator
-* int		out_maxlen	I	max charachters.
-* unsigned long	recall		I	recall buffer.
-* unsigned long	option		I	option mask.
-* int		timeout		I	timeout time
-* int		(* timeout_func) () I	timeout function
-* void		*timeout_arg	I	timeout function argument
-* char		*prompt		I	prompt string.
-*
-* Description:
-*	Read a input string.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_command_get_input_string()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*chn		I	channel.
+ * char		*out_string	O	input string
+ * unsigned long	*out_terminator	O	terminator
+ * int		out_maxlen	I	max charachters.
+ * unsigned long	recall		I	recall buffer.
+ * unsigned long	option		I	option mask.
+ * int		timeout		I	timeout time
+ * int		(* timeout_func) () I	timeout function
+ * void		*timeout_arg	I	timeout function argument
+ * char		*prompt		I	prompt string.
+ *
+ * Description:
+ *	Read a input string.
+ *
+ **************************************************************************/
 
-int rtt_command_get_input_string(char* chn, char* out_string,
-    unsigned long* out_terminator, int out_maxlen, rtt_t_recall* recall,
-    unsigned long option, int timeout, int (*timeout_func)(), void* timeout_arg,
-    char* prompt, int function)
-{
+int rtt_command_get_input_string(char *chn, char *out_string,
+                                 unsigned long *out_terminator, int out_maxlen,
+                                 rtt_t_recall *recall, unsigned long option,
+                                 int timeout, int (*timeout_func)(),
+                                 void *timeout_arg, char *prompt,
+                                 int function) {
   int sts;
   unsigned long terminator;
   char command[160];
@@ -7220,7 +7188,8 @@ int rtt_command_get_input_string(char* chn, char* out_string,
     sts = RTT__SUCCESS;
   } else {
     sts = rtt_get_input_string(chn, out_string, out_terminator, out_maxlen,
-        recall, option, timeout, timeout_func, timeout_arg, prompt);
+                               recall, option, timeout, timeout_func,
+                               timeout_arg, prompt);
   }
 
   if (rtt_commandmode & RTT_COMMANDMODE_LEARN) {
@@ -7271,22 +7240,21 @@ int rtt_command_get_input_string(char* chn, char* out_string,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_learn_start()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*file		I	file name.
-*
-* Description:
-*	Starts a learn session.
-*	Opens a file in which all the following commands will be stored.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_learn_start()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*file		I	file name.
+ *
+ * Description:
+ *	Starts a learn session.
+ *	Opens a file in which all the following commands will be stored.
+ *
+ **************************************************************************/
 
-int rtt_learn_start(char* filename)
-{
+int rtt_learn_start(char *filename) {
   pwr_tFileName filename_str;
 
   /* Add default extention '.rtt_com' if there is no extention given */
@@ -7304,21 +7272,20 @@ int rtt_learn_start(char* filename)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_learn_stop()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Stops a learn session.
-*	Close the file in which all the commands is stored.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_learn_stop()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Stops a learn session.
+ *	Close the file in which all the commands is stored.
+ *
+ **************************************************************************/
 
-int rtt_learn_stop()
-{
+int rtt_learn_stop() {
   if (!(rtt_commandmode & RTT_COMMANDMODE_LEARN))
     return RTT__NOFILE;
 
@@ -7332,20 +7299,19 @@ int rtt_learn_stop()
 }
 
 /*************************************************************************
-*
-* Name:		rtt_learn_store()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Store a command during a learn session.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_learn_store()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Store a command during a learn session.
+ *
+ **************************************************************************/
 
-int rtt_learn_store(char* command)
-{
+int rtt_learn_store(char *command) {
   char out_str[5][80];
   int nr;
 
@@ -7353,10 +7319,11 @@ int rtt_learn_store(char* command)
     return RTT__NOFILE;
 
   /* Do not store the 'learn start' command */
-  nr = rtt_parse(command, " ", "/", (char*)out_str,
-      sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]), 0);
-  if (nr == 2 && str_NoCaseStrncmp(out_str[0], "LEARN", strlen(out_str[0])) == 0
-      && str_NoCaseStrncmp(out_str[1], "STOP", strlen(out_str[1])) == 0)
+  nr = rtt_parse(command, " ", "/", (char *)out_str,
+                 sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]), 0);
+  if (nr == 2 &&
+      str_NoCaseStrncmp(out_str[0], "LEARN", strlen(out_str[0])) == 0 &&
+      str_NoCaseStrncmp(out_str[1], "STOP", strlen(out_str[1])) == 0)
     return RTT__SUCCESS;
 
   fprintf(rtt_learn_file, "%s\n", command);
@@ -7365,24 +7332,23 @@ int rtt_learn_store(char* command)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_store()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Store a command during a learn session.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_store()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Store a command during a learn session.
+ *
+ **************************************************************************/
 
-static int rtt_store(menu_ctx ctx, char* filename, int collect)
-{
-  rtt_t_menu_upd* menu_ptr;
+static int rtt_store(menu_ctx ctx, char *filename, int collect) {
+  rtt_t_menu_upd *menu_ptr;
   char filename_str[120];
   char msg[140];
-  FILE* outfile;
+  FILE *outfile;
   int first;
 
   if (!(ctx->menutype & RTT_MENUTYPE_UPD)) {
@@ -7405,7 +7371,7 @@ static int rtt_store(menu_ctx ctx, char* filename, int collect)
   /* Loop through the menu item */
 
   first = 1;
-  menu_ptr = (rtt_t_menu_upd*)ctx->menu;
+  menu_ptr = (rtt_t_menu_upd *)ctx->menu;
   while (menu_ptr->text[0] != 0) {
     if (menu_ptr->database == RTT_DATABASE_GDH) {
       /* Store only gdh parameters */
@@ -7414,8 +7380,8 @@ static int rtt_store(menu_ctx ctx, char* filename, int collect)
           fprintf(outfile, "collect show\ncollect clear\n");
           fprintf(outfile, "collect/name=%s\n", menu_ptr->parameter_name);
         } else
-          fprintf(
-              outfile, "show parameter/name=%s\n", menu_ptr->parameter_name);
+          fprintf(outfile, "show parameter/name=%s\n",
+                  menu_ptr->parameter_name);
         first = 0;
       } else {
         if (collect)
@@ -7438,20 +7404,19 @@ static int rtt_store(menu_ctx ctx, char* filename, int collect)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_set_parameter()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Set value of a parameter in rtdb.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_set_parameter()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Set value of a parameter in rtdb.
+ *
+ **************************************************************************/
 
-static int rtt_set_parameter(char* name_str, char* value_str, int bypass)
-{
+static int rtt_set_parameter(char *name_str, char *value_str, int bypass) {
   /* Get type of the parameter from info in the class object */
 
   int sts;
@@ -7467,9 +7432,9 @@ static int rtt_set_parameter(char* name_str, char* value_str, int bypass)
   pwr_eType parameter_type;
   unsigned long parameter_size;
   char buffer[250];
-  char* buffer_ptr = buffer;
+  char *buffer_ptr = buffer;
   int value_syntax_error;
-  char* s;
+  char *s;
 
   /* Check authorization, sys is required */
   if (!bypass) {
@@ -7480,8 +7445,9 @@ static int rtt_set_parameter(char* name_str, char* value_str, int bypass)
   }
 
   /* Parse the parameter name into a object and a parameter name */
-  nr = rtt_parse(name_str, ".", "", (char*)name_array,
-      sizeof(name_array) / sizeof(name_array[0]), sizeof(name_array[0]), 0);
+  nr = rtt_parse(name_str, ".", "", (char *)name_array,
+                 sizeof(name_array) / sizeof(name_array[0]),
+                 sizeof(name_array[0]), 0);
   if (nr != 2) {
     rtt_message('E', "Syntax error in name");
     return RTT__HOLDCOMMAND;
@@ -7505,7 +7471,7 @@ static int rtt_set_parameter(char* name_str, char* value_str, int bypass)
   if (EVEN(sts))
     return sts;
   sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), hiername, sizeof(hiername),
-      cdh_mName_volumeStrict);
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
   strcat(hiername, "-RtBody-");
@@ -7515,7 +7481,7 @@ static int rtt_set_parameter(char* name_str, char* value_str, int bypass)
   if (EVEN(sts)) {
     /* Try with sysbody */
     sts = gdh_ObjidToName(cdh_ClassIdToObjid(class), hiername, sizeof(hiername),
-        cdh_mName_volumeStrict);
+                          cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
     strcat(hiername, "-SysBody-");
@@ -7540,14 +7506,14 @@ static int rtt_set_parameter(char* name_str, char* value_str, int bypass)
   value_syntax_error = 0;
   switch (parameter_type) {
   case pwr_eType_Boolean: {
-    if (sscanf(value_str, "%d", (pwr_tBoolean*)buffer_ptr) != 1)
+    if (sscanf(value_str, "%d", (pwr_tBoolean *)buffer_ptr) != 1)
       value_syntax_error = 1;
     if ((*buffer_ptr < 0) || (*buffer_ptr > 1))
       value_syntax_error = 1;
     break;
   }
   case pwr_eType_Float32: {
-    if (sscanf(value_str, "%f", (pwr_tFloat32*)buffer_ptr) != 1)
+    if (sscanf(value_str, "%f", (pwr_tFloat32 *)buffer_ptr) != 1)
 
       value_syntax_error = 1;
     break;
@@ -7561,7 +7527,7 @@ static int rtt_set_parameter(char* name_str, char* value_str, int bypass)
       value_syntax_error = 1;
     else {
       d = f;
-      memcpy(buffer_ptr, (char*)&d, sizeof(d));
+      memcpy(buffer_ptr, (char *)&d, sizeof(d));
     }
     break;
   }
@@ -7577,22 +7543,22 @@ static int rtt_set_parameter(char* name_str, char* value_str, int bypass)
       value_syntax_error = 1;
     else {
       i8 = i16;
-      memcpy(buffer_ptr, (char*)&i8, sizeof(i8));
+      memcpy(buffer_ptr, (char *)&i8, sizeof(i8));
     }
     break;
   }
   case pwr_eType_Int16: {
-    if (sscanf(value_str, "%hd", (pwr_tInt16*)buffer_ptr) != 1)
+    if (sscanf(value_str, "%hd", (pwr_tInt16 *)buffer_ptr) != 1)
       value_syntax_error = 1;
     break;
   }
   case pwr_eType_Int32: {
-    if (sscanf(value_str, "%d", (int*)buffer_ptr) != 1)
+    if (sscanf(value_str, "%d", (int *)buffer_ptr) != 1)
       value_syntax_error = 1;
     break;
   }
   case pwr_eType_Int64: {
-    if (sscanf(value_str, pwr_dFormatInt64, (pwr_tInt64*)buffer_ptr) != 1)
+    if (sscanf(value_str, pwr_dFormatInt64, (pwr_tInt64 *)buffer_ptr) != 1)
       value_syntax_error = 1;
     break;
   }
@@ -7603,22 +7569,22 @@ static int rtt_set_parameter(char* name_str, char* value_str, int bypass)
       value_syntax_error = 1;
     else {
       ui8 = ui16;
-      memcpy(buffer_ptr, (char*)&ui8, sizeof(ui8));
+      memcpy(buffer_ptr, (char *)&ui8, sizeof(ui8));
     }
     break;
   }
   case pwr_eType_UInt16: {
-    if (sscanf(value_str, "%hd", (pwr_tUInt16*)buffer_ptr) != 1)
+    if (sscanf(value_str, "%hd", (pwr_tUInt16 *)buffer_ptr) != 1)
       value_syntax_error = 1;
     break;
   }
   case pwr_eType_UInt32: {
-    if (sscanf(value_str, "%d", (pwr_tUInt32*)buffer_ptr) != 1)
+    if (sscanf(value_str, "%d", (pwr_tUInt32 *)buffer_ptr) != 1)
       value_syntax_error = 1;
     break;
   }
   case pwr_eType_UInt64: {
-    if (sscanf(value_str, pwr_dFormatUInt64, (pwr_tUInt64*)buffer_ptr) != 1)
+    if (sscanf(value_str, pwr_dFormatUInt64, (pwr_tUInt64 *)buffer_ptr) != 1)
       value_syntax_error = 1;
     break;
   }
@@ -7660,29 +7626,29 @@ static int rtt_set_parameter(char* name_str, char* value_str, int bypass)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_get_current_object()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get the selected object in the current picture.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_current_object()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get the selected object in the current picture.
+ *
+ **************************************************************************/
 
-static int rtt_get_current_object(menu_ctx ctx, pwr_tObjid* objid,
-    char* objectname, int size, pwr_tBitMask nametype)
-{
-  rtt_t_menu_upd* menu_ptr_upd;
-  rtt_t_menu* menu_ptr_stat;
+static int rtt_get_current_object(menu_ctx ctx, pwr_tObjid *objid,
+                                  char *objectname, int size,
+                                  pwr_tBitMask nametype) {
+  rtt_t_menu_upd *menu_ptr_upd;
+  rtt_t_menu *menu_ptr_stat;
   int sts;
 
   if (ctx->menutype & RTT_MENUTYPE_UPD) {
     /* Get objid for the item,
                 assume that it is in the first argument */
-    menu_ptr_upd = (rtt_t_menu_upd*)ctx->menu;
+    menu_ptr_upd = (rtt_t_menu_upd *)ctx->menu;
     menu_ptr_upd += ctx->current_item;
     *objid = menu_ptr_upd->argoi;
   } else if (ctx->menutype & RTT_MENUTYPE_MENU) {
@@ -7698,17 +7664,17 @@ static int rtt_get_current_object(menu_ctx ctx, pwr_tObjid* objid,
   return RTT__SUCCESS;
 }
 
-static int rtt_get_current_aref(menu_ctx ctx, pwr_sAttrRef* arp,
-    char* objectname, int size, pwr_tBitMask nametype)
-{
-  rtt_t_menu_upd* menu_ptr_upd;
-  rtt_t_menu* menu_ptr_stat;
+static int rtt_get_current_aref(menu_ctx ctx, pwr_sAttrRef *arp,
+                                char *objectname, int size,
+                                pwr_tBitMask nametype) {
+  rtt_t_menu_upd *menu_ptr_upd;
+  rtt_t_menu *menu_ptr_stat;
   int sts;
 
   if (ctx->menutype & RTT_MENUTYPE_UPD) {
     /* Get objid for the item,
                 assume that it is in the first argument */
-    menu_ptr_upd = (rtt_t_menu_upd*)ctx->menu;
+    menu_ptr_upd = (rtt_t_menu_upd *)ctx->menu;
     menu_ptr_upd += ctx->current_item;
     sts = gdh_NameToAttrref(pwr_cNObjid, menu_ptr_upd->parameter_name, arp);
     if (EVEN(sts))
@@ -7716,7 +7682,7 @@ static int rtt_get_current_aref(menu_ctx ctx, pwr_sAttrRef* arp,
 
     if (!(arp->Flags.b.Object || arp->Flags.b.ObjectAttr)) {
       char aname[80];
-      char* s;
+      char *s;
 
       strcpy(aname, menu_ptr_upd->parameter_name);
       s = strrchr(aname, '.');
@@ -7739,32 +7705,31 @@ static int rtt_get_current_aref(menu_ctx ctx, pwr_sAttrRef* arp,
   return RTT__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		rtt_set_plcscan()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* pwr_tObjid	objid		I	objid of object.
-* int		on		I	on or off.
-* int		dum1		I
-* int		dum2		I
-* int		dum3		I
-* int		dum4		I
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		rtt_set_plcscan()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * pwr_tObjid	objid		I	objid of object.
+ * int		on		I	on or off.
+ * int		dum1		I
+ * int		dum2		I
+ * int		dum3		I
+ * int		dum4		I
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int rtt_set_plcscan(
-    pwr_tObjid objid, int* on, void* dum1, void* dum2, void* dum3, void* dum4)
-{
+static int rtt_set_plcscan(pwr_tObjid objid, int *on, void *dum1, void *dum2,
+                           void *dum3, void *dum4) {
   char parname[120];
   unsigned char scanoff;
   int sts;
 
-  sts = gdh_ObjidToName(
-      objid, parname, sizeof(parname), cdh_mName_volumeStrict);
+  sts =
+      gdh_ObjidToName(objid, parname, sizeof(parname), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
   strcat(parname, ".ScanOff");
@@ -7782,33 +7747,32 @@ static int rtt_set_plcscan(
 }
 
 /*************************************************************************
-*
-* Name:		rtt_plcscan()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	parent_ctx	I	rtt context.
-* char		*hiername	I	hierarchy object name.
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		rtt_plcscan()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	parent_ctx	I	rtt context.
+ * char		*hiername	I	hierarchy object name.
+ *
+ * Description:
+ *
+ **************************************************************************/
 
-static int rtt_plcscan(
-    menu_ctx ctx, int on, int all, char* hiername, int global)
-{
+static int rtt_plcscan(menu_ctx ctx, int on, int all, char *hiername,
+                       int global) {
   int sts;
   pwr_tClassId class;
   pwr_tObjid class_objid;
   pwr_tObjid hierobjid;
   int max_objects = 100000;
   pwr_tOName name_str;
-  char* name = NULL;
+  char *name = NULL;
 
-  pwr_tString40 classname[]
-      = { "WindowPlc", "WindowCond", "WindowOrderact", "WindowSubstep", "" };
-  pwr_tString40* classname_p;
+  pwr_tString40 classname[] = {"WindowPlc", "WindowCond", "WindowOrderact",
+                               "WindowSubstep", ""};
+  pwr_tString40 *classname_p;
   pwr_tString256 objectname;
   pwr_tObjid objid;
   pwr_tBoolean value;
@@ -7824,8 +7788,8 @@ static int rtt_plcscan(
       }
     } else {
       /* Get the selected object */
-      sts = rtt_get_current_object(
-          ctx, &hierobjid, name_str, sizeof(name_str), cdh_mName_volumeStrict);
+      sts = rtt_get_current_object(ctx, &hierobjid, name_str, sizeof(name_str),
+                                   cdh_mName_volumeStrict);
       if (EVEN(sts)) {
         rtt_message('E', "Select an object or enter hierarchy");
         return RTT__HOLDCOMMAND;
@@ -7837,8 +7801,8 @@ static int rtt_plcscan(
   if (all && !global) {
     /* Get all window classes */
     classname_p = classname;
-    while (!streq((char*)classname_p, "")) {
-      sts = gdh_ClassNameToNumber((char*)classname_p, &class);
+    while (!streq((char *)classname_p, "")) {
+      sts = gdh_ClassNameToNumber((char *)classname_p, &class);
       if (EVEN(sts))
         return sts;
 
@@ -7846,8 +7810,8 @@ static int rtt_plcscan(
       sts = gdh_GetClassList(class, &objid);
       while (ODD(sts)) {
         /* Set attribute ScanOff to true */
-        sts = gdh_ObjidToName(
-            objid, objectname, sizeof(objectname), cdh_mName_volumeStrict);
+        sts = gdh_ObjidToName(objid, objectname, sizeof(objectname),
+                              cdh_mName_volumeStrict);
         if (EVEN(sts))
           return sts;
 
@@ -7869,7 +7833,8 @@ static int rtt_plcscan(
     class = cdh_ClassObjidToId(class_objid);
 
     sts = rtt_get_objects_hier_class_name(ctx, hierobjid, class, name,
-        max_objects, global, &rtt_set_plcscan, &on, 0, 0, 0, 0);
+                                          max_objects, global, &rtt_set_plcscan,
+                                          &on, 0, 0, 0, 0);
     if (EVEN(sts))
       return sts;
 
@@ -7879,7 +7844,8 @@ static int rtt_plcscan(
     class = cdh_ClassObjidToId(class_objid);
 
     sts = rtt_get_objects_hier_class_name(ctx, hierobjid, class, name,
-        max_objects, global, &rtt_set_plcscan, &on, 0, 0, 0, 0);
+                                          max_objects, global, &rtt_set_plcscan,
+                                          &on, 0, 0, 0, 0);
     if (EVEN(sts))
       return sts;
 
@@ -7889,7 +7855,8 @@ static int rtt_plcscan(
     class = cdh_ClassObjidToId(class_objid);
 
     sts = rtt_get_objects_hier_class_name(ctx, hierobjid, class, name,
-        max_objects, global, &rtt_set_plcscan, &on, 0, 0, 0, 0);
+                                          max_objects, global, &rtt_set_plcscan,
+                                          &on, 0, 0, 0, 0);
     if (EVEN(sts))
       return sts;
 
@@ -7899,7 +7866,8 @@ static int rtt_plcscan(
     class = cdh_ClassObjidToId(class_objid);
 
     sts = rtt_get_objects_hier_class_name(ctx, hierobjid, class, name,
-        max_objects, global, &rtt_set_plcscan, &on, 0, 0, 0, 0);
+                                          max_objects, global, &rtt_set_plcscan,
+                                          &on, 0, 0, 0, 0);
     if (EVEN(sts))
       return sts;
   }
@@ -7912,22 +7880,21 @@ static int rtt_plcscan(
 }
 
 /*************************************************************************
-*
-* Name:		rtt_create_object()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*classname	I	class name.
-* char		*name		I	object name descripion.
-*
-* Description:
-*	This function is called when a 'create object' command is recieved.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_create_object()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*classname	I	class name.
+ * char		*name		I	object name descripion.
+ *
+ * Description:
+ *	This function is called when a 'create object' command is recieved.
+ *
+ **************************************************************************/
 
-static int rtt_create_object(menu_ctx parent_ctx, char* classname, char* name)
-{
+static int rtt_create_object(menu_ctx parent_ctx, char *classname, char *name) {
   int sts;
   pwr_tObjid objid;
   pwr_tClassId class = 0;
@@ -7954,21 +7921,20 @@ static int rtt_create_object(menu_ctx parent_ctx, char* classname, char* name)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_delete_object()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*name		I	object name descripion.
-*
-* Description:
-*	This function is called when a 'delete object' command is recieved.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_delete_object()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*name		I	object name descripion.
+ *
+ * Description:
+ *	This function is called when a 'delete object' command is recieved.
+ *
+ **************************************************************************/
 
-static int rtt_delete_object(menu_ctx parent_ctx, char* name)
-{
+static int rtt_delete_object(menu_ctx parent_ctx, char *name) {
   int sts;
   pwr_tObjid objid;
 
@@ -7991,36 +7957,35 @@ static int rtt_delete_object(menu_ctx parent_ctx, char* name)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_debug_obj_hier_class_name()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	parent_ctx	I	rtt context.
-* char		*hiername	I	name of hierarchy object.
-* char		*classname	I	name of class.
-* char		*name		I	name description.
-* int		add		I	if add to existing menulist or
-*					creating a new menu.
-*
-* Description:
-*	This function is called when a 'debug object' command is recieved.
-*	All object under the hierarchy object, with the specified class
-*	that fits in the name description is inserted in a menulist
-*	and displayed on the screen.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_debug_obj_hier_class_name()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	parent_ctx	I	rtt context.
+ * char		*hiername	I	name of hierarchy object.
+ * char		*classname	I	name of class.
+ * char		*name		I	name description.
+ * int		add		I	if add to existing menulist or
+ *					creating a new menu.
+ *
+ * Description:
+ *	This function is called when a 'debug object' command is recieved.
+ *	All object under the hierarchy object, with the specified class
+ *	that fits in the name description is inserted in a menulist
+ *	and displayed on the screen.
+ *
+ **************************************************************************/
 
-static int rtt_show_step(menu_ctx parent_ctx, char* hiername, int initstep)
-{
+static int rtt_show_step(menu_ctx parent_ctx, char *hiername, int initstep) {
   int sts = 0;
   int index = 0;
-  rtt_t_menu_upd* menulist = 0;
+  rtt_t_menu_upd *menulist = 0;
   char title[80] = "ACTIVE STEP LIST";
-  char* s;
-  pwr_tString40 classname[] = { "Step", "SsBegin", "SsEnd", "InitStep", "" };
-  pwr_tString40* classname_p;
+  char *s;
+  pwr_tString40 classname[] = {"Step", "SsBegin", "SsEnd", "InitStep", ""};
+  pwr_tString40 *classname_p;
   pwr_tString256 objectname;
   pwr_tString256 hierarchyname;
   pwr_tClassId class;
@@ -8048,8 +8013,8 @@ static int rtt_show_step(menu_ctx parent_ctx, char* hiername, int initstep)
       return RTT__HOLDCOMMAND;
     }
 
-    sts = gdh_ObjidToName(
-        objid, hierarchyname, sizeof(hierarchyname), cdh_mNName);
+    sts = gdh_ObjidToName(objid, hierarchyname, sizeof(hierarchyname),
+                          cdh_mNName);
     if (EVEN(sts))
       return sts;
   }
@@ -8057,8 +8022,8 @@ static int rtt_show_step(menu_ctx parent_ctx, char* hiername, int initstep)
   /* Get all step classes */
   abort = 0;
   classname_p = classname;
-  while (!streq((char*)classname_p, "")) {
-    sts = gdh_ClassNameToNumber((char*)classname_p, &class);
+  while (!streq((char *)classname_p, "")) {
+    sts = gdh_ClassNameToNumber((char *)classname_p, &class);
     if (EVEN(sts))
       return sts;
 
@@ -8071,8 +8036,8 @@ static int rtt_show_step(menu_ctx parent_ctx, char* hiername, int initstep)
         return sts;
 
       if (hiername != 0) {
-        if (str_NoCaseStrncmp(hierarchyname, objectname, strlen(hierarchyname))
-            != 0) {
+        if (str_NoCaseStrncmp(hierarchyname, objectname,
+                              strlen(hierarchyname)) != 0) {
           /* Next object */
           sts = gdh_GetNextObject(objid, &objid);
           continue;
@@ -8107,8 +8072,8 @@ static int rtt_show_step(menu_ctx parent_ctx, char* hiername, int initstep)
 
   if (menulist != 0) {
     sts = rtt_menu_upd_bubblesort(menulist);
-    sts = rtt_menu_upd_new(
-        parent_ctx, pwr_cNObjid, &menulist, title, 0, RTT_MENUTYPE_DYN);
+    sts = rtt_menu_upd_new(parent_ctx, pwr_cNObjid, &menulist, title, 0,
+                           RTT_MENUTYPE_DYN);
     if (sts == RTT__FASTBACK)
       return sts;
     else if (sts == RTT__BACKTOCOLLECT)
@@ -8124,27 +8089,26 @@ static int rtt_show_step(menu_ctx parent_ctx, char* hiername, int initstep)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_print_picture()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-* char		*filename	I	filename.
-*
-* Description:
-*	Prints the content of a picture on a file.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_print_picture()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ * char		*filename	I	filename.
+ *
+ * Description:
+ *	Prints the content of a picture on a file.
+ *
+ **************************************************************************/
 
-static int rtt_print_picture(
-    menu_ctx ctx, char* filename, int append, int text_size, int parameter_size)
-{
-  FILE* outfile;
+static int rtt_print_picture(menu_ctx ctx, char *filename, int append,
+                             int text_size, int parameter_size) {
+  FILE *outfile;
   int sts;
-  rtt_t_menu_upd* menu_upd_ptr;
-  rtt_t_menu* menu_ptr;
+  rtt_t_menu_upd *menu_upd_ptr;
+  rtt_t_menu *menu_ptr;
   char filename_str[80] = "";
   char msg[200];
   view_ctx viewctx;
@@ -8167,14 +8131,14 @@ static int rtt_print_picture(
 
   if (ctx->ctx_type == RTT_CTXTYPE_MENU) {
     if (ctx->menutype & RTT_MENUTYPE_UPD) {
-      menu_upd_ptr = (rtt_t_menu_upd*)ctx->menu;
+      menu_upd_ptr = (rtt_t_menu_upd *)ctx->menu;
       fprintf(outfile, "    %s\n\n", ctx->title);
       while (menu_upd_ptr->text[0] != 0) {
         /* Print this item */
-        sts = rtt_print_item_upd(menu_upd_ptr->text,
-            menu_upd_ptr->parameter_name, menu_upd_ptr->value_ptr,
-            menu_upd_ptr->value_type, menu_upd_ptr->flags, outfile, text_size,
-            parameter_size);
+        sts = rtt_print_item_upd(
+            menu_upd_ptr->text, menu_upd_ptr->parameter_name,
+            menu_upd_ptr->value_ptr, menu_upd_ptr->value_type,
+            menu_upd_ptr->flags, outfile, text_size, parameter_size);
         menu_upd_ptr++;
       }
 
@@ -8219,26 +8183,25 @@ static int rtt_print_picture(
 }
 
 /*************************************************************************
-*
-* Name:		rtt_print_picture_restore()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-* char		*filename	I	filename.
-*
-* Description:
-*	Prints the content of a picture in a command file so that the values
-*	of the attributes in the picture can be restored.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_print_picture_restore()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ * char		*filename	I	filename.
+ *
+ * Description:
+ *	Prints the content of a picture in a command file so that the values
+ *	of the attributes in the picture can be restored.
+ *
+ **************************************************************************/
 
-static int rtt_print_picture_restore(menu_ctx ctx, char* filename)
-{
-  FILE* outfile;
+static int rtt_print_picture_restore(menu_ctx ctx, char *filename) {
+  FILE *outfile;
   int sts;
-  rtt_t_menu_upd* menu_upd_ptr;
+  rtt_t_menu_upd *menu_upd_ptr;
   char filename_str[80];
   char msg[200];
   char outfilename[80];
@@ -8255,12 +8218,12 @@ static int rtt_print_picture_restore(menu_ctx ctx, char* filename)
 
   if (ctx->ctx_type == RTT_CTXTYPE_MENU) {
     if (ctx->menutype & RTT_MENUTYPE_UPD) {
-      menu_upd_ptr = (rtt_t_menu_upd*)ctx->menu;
+      menu_upd_ptr = (rtt_t_menu_upd *)ctx->menu;
       while (menu_upd_ptr->text[0] != 0) {
         /* Print this item */
-        sts = rtt_print_restore_item_upd(menu_upd_ptr->parameter_name,
-            menu_upd_ptr->value_ptr, menu_upd_ptr->value_type,
-            menu_upd_ptr->flags, outfile);
+        sts = rtt_print_restore_item_upd(
+            menu_upd_ptr->parameter_name, menu_upd_ptr->value_ptr,
+            menu_upd_ptr->value_type, menu_upd_ptr->flags, outfile);
         menu_upd_ptr++;
       }
 
@@ -8277,23 +8240,22 @@ static int rtt_print_picture_restore(menu_ctx ctx, char* filename)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_print_text()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	rtt context.
-* char		*filename	I	filename.
-*
-* Description:
-*	Prints a text on a file.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_print_text()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	rtt context.
+ * char		*filename	I	filename.
+ *
+ * Description:
+ *	Prints a text on a file.
+ *
+ **************************************************************************/
 
-static int rtt_print_text(char* filename, char* str, int append)
-{
-  FILE* outfile;
+static int rtt_print_text(char *filename, char *str, int append) {
+  FILE *outfile;
   char filename_str[80] = "";
   char msg[200];
 
@@ -8326,26 +8288,26 @@ static int rtt_print_text(char* filename, char* str, int append)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_print_restore_item_upd()
-*
-* Type		int
-*
-* Description:
-*	Prints an item in a file.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_print_restore_item_upd()
+ *
+ * Type		int
+ *
+ * Description:
+ *	Prints an item in a file.
+ *
+ **************************************************************************/
 
-static int rtt_print_restore_item_upd(
-    char* parameter, char* value_ptr, int value_type, int flags, FILE* outfile)
-{
+static int rtt_print_restore_item_upd(char *parameter, char *value_ptr,
+                                      int value_type, int flags,
+                                      FILE *outfile) {
   pwr_tObjid objid;
   int sts;
 
   if (value_ptr == 0) {
     return RTT__SUCCESS;
   }
-  if (value_ptr == (char*)RTT_ERASE) {
+  if (value_ptr == (char *)RTT_ERASE) {
     return RTT__SUCCESS;
   }
   if (flags & PWR_MASK_POINTER) {
@@ -8361,11 +8323,11 @@ static int rtt_print_restore_item_upd(
     break;
   }
   case pwr_eType_Float32: {
-    fprintf(outfile, "%f\n", *(float*)value_ptr);
+    fprintf(outfile, "%f\n", *(float *)value_ptr);
     break;
   }
   case pwr_eType_Float64: {
-    fprintf(outfile, "%f\n", *(double*)value_ptr);
+    fprintf(outfile, "%f\n", *(double *)value_ptr);
     break;
   }
   case pwr_eType_Char: {
@@ -8377,31 +8339,31 @@ static int rtt_print_restore_item_upd(
     break;
   }
   case pwr_eType_Int16: {
-    fprintf(outfile, "%d\n", *(short*)value_ptr);
+    fprintf(outfile, "%d\n", *(short *)value_ptr);
     break;
   }
   case pwr_eType_Int32: {
-    fprintf(outfile, "%d\n", *(int*)value_ptr);
+    fprintf(outfile, "%d\n", *(int *)value_ptr);
     break;
   }
   case pwr_eType_Int64: {
-    fprintf(outfile, pwr_dFormatInt64 "\n", *(pwr_tInt64*)value_ptr);
+    fprintf(outfile, pwr_dFormatInt64 "\n", *(pwr_tInt64 *)value_ptr);
     break;
   }
   case pwr_eType_UInt8: {
-    fprintf(outfile, "%d\n", *(unsigned char*)value_ptr);
+    fprintf(outfile, "%d\n", *(unsigned char *)value_ptr);
     break;
   }
   case pwr_eType_UInt16: {
-    fprintf(outfile, "%d\n", *(unsigned short*)value_ptr);
+    fprintf(outfile, "%d\n", *(unsigned short *)value_ptr);
     break;
   }
   case pwr_eType_UInt32: {
-    fprintf(outfile, "%lu\n", *(unsigned long*)value_ptr);
+    fprintf(outfile, "%lu\n", *(unsigned long *)value_ptr);
     break;
   }
   case pwr_eType_UInt64: {
-    fprintf(outfile, pwr_dFormatUInt64 "\n", *(pwr_tUInt64*)value_ptr);
+    fprintf(outfile, pwr_dFormatUInt64 "\n", *(pwr_tUInt64 *)value_ptr);
     break;
   }
   case pwr_eType_String: {
@@ -8411,7 +8373,7 @@ static int rtt_print_restore_item_upd(
   case pwr_eType_Objid: {
     pwr_tOName hiername;
 
-    objid = *(pwr_tObjid*)value_ptr;
+    objid = *(pwr_tObjid *)value_ptr;
     sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
     if (EVEN(sts))
       break;
@@ -8427,26 +8389,26 @@ static int rtt_print_restore_item_upd(
 }
 
 /*************************************************************************
-*
-* Name:		rtt_print_value()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*value_ptr	I	pointer to value
-* int		value_type	I	type of value
-* int		flags		I	flags of value
-* int		size		I	size of value
-* FILE		*outfile	I	output file
-*
-* Description:
-*	Prints an item in a file.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_print_value()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*value_ptr	I	pointer to value
+ * int		value_type	I	type of value
+ * int		flags		I	flags of value
+ * int		size		I	size of value
+ * FILE		*outfile	I	output file
+ *
+ * Description:
+ *	Prints an item in a file.
+ *
+ **************************************************************************/
 
-static int rtt_print_item_upd(char* text, char* parameter, char* value_ptr,
-    int value_type, int flags, FILE* outfile, int text_size, int parameter_size)
-{
+static int rtt_print_item_upd(char *text, char *parameter, char *value_ptr,
+                              int value_type, int flags, FILE *outfile,
+                              int text_size, int parameter_size) {
   pwr_tObjid objid;
   int sts;
   int spaces;
@@ -8479,7 +8441,7 @@ static int rtt_print_item_upd(char* text, char* parameter, char* value_ptr,
     fprintf(outfile, "UNDEFINED\n");
     return RTT__SUCCESS;
   }
-  if (value_ptr == (char*)RTT_ERASE) {
+  if (value_ptr == (char *)RTT_ERASE) {
     fprintf(outfile, "\n");
     return RTT__SUCCESS;
   }
@@ -8497,11 +8459,11 @@ static int rtt_print_item_upd(char* text, char* parameter, char* value_ptr,
     break;
   }
   case pwr_eType_Float32: {
-    fprintf(outfile, "%f\n", *(float*)value_ptr);
+    fprintf(outfile, "%f\n", *(float *)value_ptr);
     break;
   }
   case pwr_eType_Float64: {
-    fprintf(outfile, "%f\n", *(double*)value_ptr);
+    fprintf(outfile, "%f\n", *(double *)value_ptr);
     break;
   }
   case pwr_eType_Char: {
@@ -8513,31 +8475,31 @@ static int rtt_print_item_upd(char* text, char* parameter, char* value_ptr,
     break;
   }
   case pwr_eType_Int16: {
-    fprintf(outfile, "%d\n", *(short*)value_ptr);
+    fprintf(outfile, "%d\n", *(short *)value_ptr);
     break;
   }
   case pwr_eType_Int32: {
-    fprintf(outfile, "%d\n", *(int*)value_ptr);
+    fprintf(outfile, "%d\n", *(int *)value_ptr);
     break;
   }
   case pwr_eType_Int64: {
-    fprintf(outfile, pwr_dFormatInt64 "\n", *(pwr_tInt64*)value_ptr);
+    fprintf(outfile, pwr_dFormatInt64 "\n", *(pwr_tInt64 *)value_ptr);
     break;
   }
   case pwr_eType_UInt8: {
-    fprintf(outfile, "%d\n", *(unsigned char*)value_ptr);
+    fprintf(outfile, "%d\n", *(unsigned char *)value_ptr);
     break;
   }
   case pwr_eType_UInt16: {
-    fprintf(outfile, "%d\n", *(unsigned short*)value_ptr);
+    fprintf(outfile, "%d\n", *(unsigned short *)value_ptr);
     break;
   }
   case pwr_eType_UInt32: {
-    fprintf(outfile, "%lu\n", *(unsigned long*)value_ptr);
+    fprintf(outfile, "%lu\n", *(unsigned long *)value_ptr);
     break;
   }
   case pwr_eType_UInt64: {
-    fprintf(outfile, pwr_dFormatUInt64 "\n", *(pwr_tUInt64*)value_ptr);
+    fprintf(outfile, pwr_dFormatUInt64 "\n", *(pwr_tUInt64 *)value_ptr);
     break;
   }
   case pwr_eType_String: {
@@ -8547,7 +8509,7 @@ static int rtt_print_item_upd(char* text, char* parameter, char* value_ptr,
   case pwr_eType_Objid: {
     pwr_tOName hiername;
 
-    objid = *(pwr_tObjid*)value_ptr;
+    objid = *(pwr_tObjid *)value_ptr;
     sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
     if (EVEN(sts))
       fprintf(outfile, "-\n");
@@ -8559,7 +8521,7 @@ static int rtt_print_item_upd(char* text, char* parameter, char* value_ptr,
     pwr_tAName hiername;
     pwr_tAttrRef aref;
 
-    aref = *(pwr_tAttrRef*)value_ptr;
+    aref = *(pwr_tAttrRef *)value_ptr;
     sts = gdh_AttrrefToName(&aref, hiername, sizeof(hiername), cdh_mNName);
     if (EVEN(sts))
       fprintf(outfile, "-\n");
@@ -8574,30 +8536,29 @@ static int rtt_print_item_upd(char* text, char* parameter, char* value_ptr,
   return RTT__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		rtt_print_value()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Starts debug signals for current item in an edit picture.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_print_value()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Starts debug signals for current item in an edit picture.
+ *
+ **************************************************************************/
 
-int rtt_edit_debug_signals(menu_ctx ctx, pwr_tObjid objid, void* dum1,
-    void* dum2, void* dum3, void* dum4)
-{
-  rtt_t_menu_upd* menu_ptr;
+int rtt_edit_debug_signals(menu_ctx ctx, pwr_tObjid objid, void *dum1,
+                           void *dum2, void *dum3, void *dum4) {
+  rtt_t_menu_upd *menu_ptr;
   pwr_tOName hiername;
   int sts;
 
-  menu_ptr = (rtt_t_menu_upd*)ctx->menu;
+  menu_ptr = (rtt_t_menu_upd *)ctx->menu;
   menu_ptr += ctx->current_item;
 
-  sts = gdh_ObjidToName(
-      objid, hiername, sizeof(hiername), cdh_mName_path | cdh_mName_object);
+  sts = gdh_ObjidToName(objid, hiername, sizeof(hiername),
+                        cdh_mName_path | cdh_mName_object);
   if (EVEN(sts)) {
     rtt_message('E', "No signal debug on this item");
     return RTT__NOPICTURE;
@@ -8609,20 +8570,19 @@ int rtt_edit_debug_signals(menu_ctx ctx, pwr_tObjid objid, void* dum1,
   return sts;
 }
 /*************************************************************************
-*
-* Name:		rtt_set_conversion()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Set conversin for a channel on or off.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_set_conversion()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Set conversin for a channel on or off.
+ *
+ **************************************************************************/
 
-static int rtt_set_conversion(pwr_tObjid objid, int on, int show_only)
-{
+static int rtt_set_conversion(pwr_tObjid objid, int on, int show_only) {
   int sts;
   pwr_tObjid chan_objid;
   pwr_tObjid card_objid;
@@ -8661,8 +8621,8 @@ static int rtt_set_conversion(pwr_tObjid objid, int on, int show_only)
     case pwr_cClass_ChanAi:
     case pwr_cClass_ChanDi:
     case pwr_cClass_ChanCo:
-      sts = gdh_ObjidToName(
-          chan_objid, name, sizeof(name), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(chan_objid, name, sizeof(name),
+                            cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       break;
@@ -8690,8 +8650,8 @@ static int rtt_set_conversion(pwr_tObjid objid, int on, int show_only)
     if (EVEN(sts))
       return sts;
 
-    sts = gdh_ObjidToName(
-        card_objid, card_name, sizeof(name), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(card_objid, card_name, sizeof(name),
+                          cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
@@ -8767,20 +8727,19 @@ static int rtt_set_conversion(pwr_tObjid objid, int on, int show_only)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_set_invert()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Set invert for a channel on or off.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_set_invert()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Set invert for a channel on or off.
+ *
+ **************************************************************************/
 
-static int rtt_set_invert(pwr_tObjid objid, int on, int show_only)
-{
+static int rtt_set_invert(pwr_tObjid objid, int on, int show_only) {
   int sts;
   pwr_tObjid chan_objid;
   pwr_tObjid card_objid;
@@ -8818,8 +8777,8 @@ static int rtt_set_invert(pwr_tObjid objid, int on, int show_only)
     switch (class) {
     case pwr_cClass_ChanDi:
     case pwr_cClass_ChanDo:
-      sts = gdh_ObjidToName(
-          chan_objid, name, sizeof(name), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(chan_objid, name, sizeof(name),
+                            cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       break;
@@ -8843,8 +8802,8 @@ static int rtt_set_invert(pwr_tObjid objid, int on, int show_only)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_ObjidToName(
-      card_objid, card_name, sizeof(card_name), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(card_objid, card_name, sizeof(card_name),
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -8890,8 +8849,8 @@ static int rtt_set_invert(pwr_tObjid objid, int on, int show_only)
     return sts;
 
   /* Set the flag in the channelobject */
-  sts = gdh_ObjidToName(
-      chan_objid, attrname, sizeof(attrname), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(chan_objid, attrname, sizeof(attrname),
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
   strcat(attrname, ".InvertOn");
@@ -8908,20 +8867,19 @@ static int rtt_set_invert(pwr_tObjid objid, int on, int show_only)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_get_invert()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get invert for a channel on or off.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_invert()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get invert for a channel on or off.
+ *
+ **************************************************************************/
 
-static int rtt_get_invert(pwr_tObjid objid, int* on)
-{
+static int rtt_get_invert(pwr_tObjid objid, int *on) {
   int sts;
   pwr_tObjid chan_objid;
   pwr_tObjid card_objid;
@@ -8956,8 +8914,8 @@ static int rtt_get_invert(pwr_tObjid objid, int* on)
     switch (class) {
     case pwr_cClass_ChanDi:
     case pwr_cClass_ChanDo:
-      sts = gdh_ObjidToName(
-          chan_objid, name, sizeof(name), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(chan_objid, name, sizeof(name),
+                            cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       break;
@@ -8979,8 +8937,8 @@ static int rtt_get_invert(pwr_tObjid objid, int* on)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_ObjidToName(
-      card_objid, card_name, sizeof(name), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(card_objid, card_name, sizeof(name),
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -9011,20 +8969,19 @@ static int rtt_get_invert(pwr_tObjid objid, int* on)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_get_conversion()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get conversin for a channel on or off.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_conversion()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get conversin for a channel on or off.
+ *
+ **************************************************************************/
 
-static int rtt_get_conversion(pwr_tObjid objid, int* on)
-{
+static int rtt_get_conversion(pwr_tObjid objid, int *on) {
   int sts;
   pwr_tObjid chan_objid;
   pwr_tObjid card_objid;
@@ -9058,8 +9015,8 @@ static int rtt_get_conversion(pwr_tObjid objid, int* on)
     switch (class) {
     case pwr_cClass_ChanDi:
     case pwr_cClass_ChanCo:
-      sts = gdh_ObjidToName(
-          chan_objid, name, sizeof(name), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(chan_objid, name, sizeof(name),
+                            cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       break;
@@ -9081,8 +9038,8 @@ static int rtt_get_conversion(pwr_tObjid objid, int* on)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_ObjidToName(
-      card_objid, card_name, sizeof(name), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(card_objid, card_name, sizeof(name),
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -9118,20 +9075,19 @@ static int rtt_get_conversion(pwr_tObjid objid, int* on)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_get_do_test()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get test for a do channel on or off.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_do_test()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get test for a do channel on or off.
+ *
+ **************************************************************************/
 
-int rtt_get_do_test(pwr_tObjid objid, int* on)
-{
+int rtt_get_do_test(pwr_tObjid objid, int *on) {
   int sts;
   pwr_tObjid chan_objid;
   pwr_tObjid card_objid;
@@ -9164,8 +9120,8 @@ int rtt_get_do_test(pwr_tObjid objid, int* on)
       return sts;
     switch (class) {
     case pwr_cClass_ChanDo:
-      sts = gdh_ObjidToName(
-          chan_objid, name, sizeof(name), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(chan_objid, name, sizeof(name),
+                            cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       break;
@@ -9186,8 +9142,8 @@ int rtt_get_do_test(pwr_tObjid objid, int* on)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_ObjidToName(
-      card_objid, card_name, sizeof(name), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(card_objid, card_name, sizeof(name),
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -9216,20 +9172,19 @@ int rtt_get_do_test(pwr_tObjid objid, int* on)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_set_do_test()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Set invert for a channel on or off.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_set_do_test()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Set invert for a channel on or off.
+ *
+ **************************************************************************/
 
-int rtt_set_do_test(pwr_tObjid objid, int on, int show_only)
-{
+int rtt_set_do_test(pwr_tObjid objid, int on, int show_only) {
   int sts;
   pwr_tObjid chan_objid;
   pwr_tObjid card_objid;
@@ -9265,8 +9220,8 @@ int rtt_set_do_test(pwr_tObjid objid, int on, int show_only)
     }
     switch (class) {
     case pwr_cClass_ChanDo:
-      sts = gdh_ObjidToName(
-          chan_objid, name, sizeof(name), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(chan_objid, name, sizeof(name),
+                            cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       break;
@@ -9289,8 +9244,8 @@ int rtt_set_do_test(pwr_tObjid objid, int on, int show_only)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_ObjidToName(
-      card_objid, card_name, sizeof(card_name), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(card_objid, card_name, sizeof(card_name),
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -9336,8 +9291,8 @@ int rtt_set_do_test(pwr_tObjid objid, int on, int show_only)
     return sts;
 
   /* Set the flag in the channelobject */
-  sts = gdh_ObjidToName(
-      chan_objid, attrname, sizeof(attrname), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(chan_objid, attrname, sizeof(attrname),
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
   strcat(attrname, ".TestOn");
@@ -9354,20 +9309,19 @@ int rtt_set_do_test(pwr_tObjid objid, int on, int show_only)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_get_do_testvalue()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get testvalue for a do channel (true or false).
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_do_testvalue()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get testvalue for a do channel (true or false).
+ *
+ **************************************************************************/
 
-int rtt_get_do_testvalue(pwr_tObjid objid, int* on)
-{
+int rtt_get_do_testvalue(pwr_tObjid objid, int *on) {
   int sts;
   pwr_tObjid chan_objid;
   pwr_tObjid card_objid;
@@ -9400,8 +9354,8 @@ int rtt_get_do_testvalue(pwr_tObjid objid, int* on)
       return sts;
     switch (class) {
     case pwr_cClass_ChanDo:
-      sts = gdh_ObjidToName(
-          chan_objid, name, sizeof(name), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(chan_objid, name, sizeof(name),
+                            cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       break;
@@ -9422,8 +9376,8 @@ int rtt_get_do_testvalue(pwr_tObjid objid, int* on)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_ObjidToName(
-      card_objid, card_name, sizeof(name), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(card_objid, card_name, sizeof(name),
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -9452,20 +9406,19 @@ int rtt_get_do_testvalue(pwr_tObjid objid, int* on)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_set_do_testvalue()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Set testvalue of do true or false
-*
-**************************************************************************/
+ *
+ * Name:		rtt_set_do_testvalue()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Set testvalue of do true or false
+ *
+ **************************************************************************/
 
-int rtt_set_do_testvalue(pwr_tObjid objid, int on, int show_only)
-{
+int rtt_set_do_testvalue(pwr_tObjid objid, int on, int show_only) {
   int sts;
   pwr_tObjid chan_objid;
   pwr_tObjid card_objid;
@@ -9501,8 +9454,8 @@ int rtt_set_do_testvalue(pwr_tObjid objid, int on, int show_only)
     }
     switch (class) {
     case pwr_cClass_ChanDo:
-      sts = gdh_ObjidToName(
-          chan_objid, name, sizeof(name), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(chan_objid, name, sizeof(name),
+                            cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
       break;
@@ -9525,8 +9478,8 @@ int rtt_set_do_testvalue(pwr_tObjid objid, int on, int show_only)
   if (EVEN(sts))
     return sts;
 
-  sts = gdh_ObjidToName(
-      card_objid, card_name, sizeof(name), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(card_objid, card_name, sizeof(name),
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -9572,8 +9525,8 @@ int rtt_set_do_testvalue(pwr_tObjid objid, int on, int show_only)
     return sts;
 
   /* Set the flag in the channelobject */
-  sts = gdh_ObjidToName(
-      chan_objid, attrname, sizeof(attrname), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(chan_objid, attrname, sizeof(attrname),
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
   strcat(attrname, ".TestValue");
@@ -9590,31 +9543,31 @@ int rtt_set_do_testvalue(pwr_tObjid objid, int on, int show_only)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_show_menu()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Show a menu specified by a string.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_show_menu()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Show a menu specified by a string.
+ *
+ **************************************************************************/
 
-int rtt_show_menu(menu_ctx ctx, char* menu_name)
-{
+int rtt_show_menu(menu_ctx ctx, char *menu_name) {
   char name_array[20][32];
   int i;
-  rtt_t_menu* menu_ptr;
+  rtt_t_menu *menu_ptr;
   char title[80];
   int nr;
   int found;
   int sts;
 
   /* Parse the menu_name */
-  nr = rtt_parse(menu_name, "-", "", (char*)name_array,
-      sizeof(name_array) / sizeof(name_array[0]), sizeof(name_array[0]), 0);
+  nr = rtt_parse(menu_name, "-", "", (char *)name_array,
+                 sizeof(name_array) / sizeof(name_array[0]),
+                 sizeof(name_array[0]), 0);
 
   menu_ptr = rtt_mainmenu;
   for (i = 0; i < nr; i++) {
@@ -9625,8 +9578,8 @@ int rtt_show_menu(menu_ctx ctx, char* menu_name)
       if (!strcmp(title, name_array[i])) {
         if (i < nr - 1) {
           /* Check that the menu type is correct */
-          if (!(menu_ptr->func == rtt_menu_new
-                  || menu_ptr->func == rtt_menu_keys_new)) {
+          if (!(menu_ptr->func == rtt_menu_new ||
+                menu_ptr->func == rtt_menu_keys_new)) {
             rtt_message('E', "Error in menu type");
             return RTT__NOPICTURE;
           }
@@ -9634,7 +9587,7 @@ int rtt_show_menu(menu_ctx ctx, char* menu_name)
             rtt_message('E', "Menu not found");
             return RTT__NOPICTURE;
           }
-          menu_ptr = *(rtt_t_menu**)(menu_ptr->arg1);
+          menu_ptr = *(rtt_t_menu **)(menu_ptr->arg1);
           found = 1;
           break;
         } else {
@@ -9652,7 +9605,7 @@ int rtt_show_menu(menu_ctx ctx, char* menu_name)
 
   if (menu_ptr->func) {
     sts = (menu_ptr->func)(ctx, menu_ptr->argoi, menu_ptr->arg1, menu_ptr->arg2,
-        menu_ptr->arg3, menu_ptr->arg4);
+                           menu_ptr->arg3, menu_ptr->arg4);
     return sts;
   } else {
     rtt_message('E', "Function in menu not defined");
@@ -9660,9 +9613,8 @@ int rtt_show_menu(menu_ctx ctx, char* menu_name)
   }
 }
 
-int rtt_remove_blank(char* out_str, char* in_str)
-{
-  char* s;
+int rtt_remove_blank(char *out_str, char *in_str) {
+  char *s;
 
   s = in_str;
   /* Find first not blank */
@@ -9686,19 +9638,18 @@ int rtt_remove_blank(char* out_str, char* in_str)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_confirm()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Print a confirm text and wait for confirm.
-*
-**************************************************************************/
-static int rtt_confirm(char* text)
-{
+ *
+ * Name:		rtt_confirm()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Print a confirm text and wait for confirm.
+ *
+ **************************************************************************/
+static int rtt_confirm(char *text) {
   unsigned long option;
   unsigned long terminator;
   char input_str[80];
@@ -9712,48 +9663,48 @@ static int rtt_confirm(char* text)
 
   rtt_cursor_abs(0, RTT_ROW_COMMAND);
   rtt_eofline_erase();
-  rtt_command_get_input_string((char*)rtt_chn, input_str, &terminator, maxlen,
-      (rtt_t_recall*)rtt_recallbuff, option, rtt_scantime, rtt_scan, 0, message,
-      RTT_COMMAND_VALUE);
+  rtt_command_get_input_string((char *)rtt_chn, input_str, &terminator, maxlen,
+                               (rtt_t_recall *)rtt_recallbuff, option,
+                               rtt_scantime, rtt_scan, 0, message,
+                               RTT_COMMAND_VALUE);
   if (terminator != RTT_K_PF1)
     return RTT__CONFABO;
   return RTT__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		tlog_qual_to_time()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Convert a commandline input time to VMS-time.
-*
-**************************************************************************/
+ *
+ * Name:		tlog_qual_to_time()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Convert a commandline input time to VMS-time.
+ *
+ **************************************************************************/
 
-static int rtt_qual_to_time(char* in_str, pwr_tTime* time)
-{
+static int rtt_qual_to_time(char *in_str, pwr_tTime *time) {
   pwr_tStatus sts;
-  char* s;
+  char *s;
   pwr_tDeltaTime one_day_time;
   pwr_tTime current_time;
   char str[64];
   char timstr[64];
 
-  if (!strcmp(in_str, "")
-      || !str_NoCaseStrncmp(in_str, "TODAY", strlen(in_str))) {
+  if (!strcmp(in_str, "") ||
+      !str_NoCaseStrncmp(in_str, "TODAY", strlen(in_str))) {
     time_GetTime(&current_time);
-    time_AtoAscii(
-        &current_time, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+    time_AtoAscii(&current_time, time_eFormat_DateAndTime, timstr,
+                  sizeof(timstr));
     timstr[12] = 0;
     strcat(timstr, " 00:00:00.00");
     sts = time_AsciiToA(timstr, time);
   } else if (!str_NoCaseStrncmp(in_str, "YESTERDAY", strlen(in_str))) {
     time_GetTime(&current_time);
-    time_AtoAscii(
-        &current_time, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+    time_AtoAscii(&current_time, time_eFormat_DateAndTime, timstr,
+                  sizeof(timstr));
     timstr[12] = 0;
     strcat(timstr, " 00:00:00.00");
     sts = time_AsciiToA(timstr, &current_time);
@@ -9771,8 +9722,8 @@ static int rtt_qual_to_time(char* in_str, pwr_tTime* time)
     } else {
       /* No date is supplied, add current date as default */
       time_GetTime(&current_time);
-      time_AtoAscii(
-          &current_time, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+      time_AtoAscii(&current_time, time_eFormat_DateAndTime, timstr,
+                    sizeof(timstr));
       timstr[12] = 0;
       strcat(timstr, " ");
       strcat(timstr, str);

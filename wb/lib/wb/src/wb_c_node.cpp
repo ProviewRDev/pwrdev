@@ -49,8 +49,8 @@
 #include "wb_pwrb_msg.h"
 #include "wb_wsx.h"
 
-static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father,
+                              pwr_tClassId Class)
 {
   pwr_tObjid oid;
   pwr_tClassId cid;
@@ -61,33 +61,34 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
   pwr_tUInt32 ival;
 
   cnf_get_value("defaultSecurity", name, sizeof(name));
-  sts = ldh_CreateObject(
-      Session, &oid, name, pwr_eClass_Security, Object, ldh_eDest_IntoLast);
+  sts = ldh_CreateObject(Session, &oid, name, pwr_eClass_Security, Object, ldh_eDest_IntoLast);
   ival = 1;
   cnf_get_value("defaultXttPriv", name, sizeof(name));
-  if (!streq(name, "")) {
+  if (!streq(name, ""))
+  {
     sts = sscanf(name, "%d", &ival);
-    if (sts == 1) {
-      sts = ldh_SetObjectPar(Session, oid, "SysBody", "DefaultXttPriv",
-          (char*)&ival, sizeof(ival));
+    if (sts == 1)
+    {
+      sts = ldh_SetObjectPar(Session, oid, "SysBody", "DefaultXttPriv", (char*)&ival, sizeof(ival));
       if (EVEN(sts))
         return sts;
     }
   }
   cnf_get_value("defaultWebPriv", name, sizeof(name));
-  if (!streq(name, "")) {
+  if (!streq(name, ""))
+  {
     sts = sscanf(name, "%d", &ival);
-    if (sts == 1) {
-      sts = ldh_SetObjectPar(Session, oid, "SysBody", "DefaultWebPriv",
-          (char*)&ival, sizeof(ival));
+    if (sts == 1)
+    {
+      sts = ldh_SetObjectPar(Session, oid, "SysBody", "DefaultWebPriv", (char*)&ival, sizeof(ival));
       if (EVEN(sts))
         return sts;
     }
   }
   cnf_get_value("defaultWebSystemGroup", name, sizeof(name));
-  if (!streq(name, "")) {
-    sts = ldh_SetObjectPar(
-        Session, oid, "SysBody", "WebSystemGroup", (char*)name, sizeof(name));
+  if (!streq(name, ""))
+  {
+    sts = ldh_SetObjectPar(Session, oid, "SysBody", "WebSystemGroup", (char*)name, sizeof(name));
     if (EVEN(sts))
       return sts;
   }
@@ -95,8 +96,7 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
   // OpPlace objects
   cnf_get_value("defaultOpPlaces", name, sizeof(name));
   sts = ldh_ClassNameToId(Session, &cid, "$NodeHier");
-  sts = ldh_CreateObject(
-      Session, &opp_oid, name, cid, Object, ldh_eDest_IntoLast);
+  sts = ldh_CreateObject(Session, &opp_oid, name, cid, Object, ldh_eDest_IntoLast);
 
   sts = ldh_ClassNameToId(Session, &cid, "OpPlace");
   cnf_get_value("defaultOpOp", name, sizeof(name));
@@ -105,13 +105,11 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
   sts = ldh_CreateObject(Session, &oid, name, cid, opp_oid, ldh_eDest_IntoLast);
   cnf_get_value("defaultOpSystemManager", name, sizeof(name));
   if (!streq(name, ""))
-    sts = ldh_CreateObject(
-        Session, &oid, name, cid, opp_oid, ldh_eDest_IntoLast);
+    sts = ldh_CreateObject(Session, &oid, name, cid, opp_oid, ldh_eDest_IntoLast);
   cnf_get_value("defaultOpDefault", name, sizeof(name));
   sts = ldh_CreateObject(Session, &oid, name, cid, opp_oid, ldh_eDest_IntoLast);
   bval = 1;
-  sts = ldh_SetObjectPar(
-      Session, oid, "RtBody", "IsDefaultOp", (char*)&bval, sizeof(bval));
+  sts = ldh_SetObjectPar(Session, oid, "RtBody", "IsDefaultOp", (char*)&bval, sizeof(bval));
   if (EVEN(sts))
     return sts;
 
@@ -122,34 +120,27 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
   sts = ldh_ClassNameToId(Session, &cid, "$NodeHier");
   cnf_get_value("defaultGraphHier", name, sizeof(name));
   if (!streq(name, ""))
-    sts = ldh_CreateObject(
-        Session, &oid, name, cid, opp_oid, ldh_eDest_IntoLast);
+    sts = ldh_CreateObject(Session, &oid, name, cid, opp_oid, ldh_eDest_IntoLast);
 
   // Server objects
   cnf_get_value("defaultServers", name, sizeof(name));
   sts = ldh_ClassNameToId(Session, &cid, "$NodeHier");
-  sts = ldh_CreateObject(
-      Session, &srv_oid, name, cid, Object, ldh_eDest_IntoLast);
+  sts = ldh_CreateObject(Session, &srv_oid, name, cid, Object, ldh_eDest_IntoLast);
 
   sts = ldh_ClassNameToId(Session, &cid, "MessageHandler");
-  sts = ldh_CreateObject(
-      Session, &oid, "MessageHandler", cid, srv_oid, ldh_eDest_IntoLast);
+  sts = ldh_CreateObject(Session, &oid, "MessageHandler", cid, srv_oid, ldh_eDest_IntoLast);
 
   sts = ldh_ClassNameToId(Session, &cid, "IOHandler");
-  sts = ldh_CreateObject(
-      Session, &oid, "IOHandler", cid, srv_oid, ldh_eDest_IntoLast);
+  sts = ldh_CreateObject(Session, &oid, "IOHandler", cid, srv_oid, ldh_eDest_IntoLast);
 
   sts = ldh_ClassNameToId(Session, &cid, "Backup_Conf");
-  sts = ldh_CreateObject(
-      Session, &oid, "Backup", cid, srv_oid, ldh_eDest_IntoLast);
+  sts = ldh_CreateObject(Session, &oid, "Backup", cid, srv_oid, ldh_eDest_IntoLast);
 
   sts = ldh_ClassNameToId(Session, &cid, "WebSocketServer");
-  sts = ldh_CreateObject(
-      Session, &oid, "WebSocketServer", cid, srv_oid, ldh_eDest_IntoLast);
+  sts = ldh_CreateObject(Session, &oid, "WebSocketServer", cid, srv_oid, ldh_eDest_IntoLast);
 
   sts = ldh_ClassNameToId(Session, &cid, "StatusServerConfig");
-  sts = ldh_CreateObject(
-      Session, &oid, "StatusServer", cid, srv_oid, ldh_eDest_IntoLast);
+  sts = ldh_CreateObject(Session, &oid, "StatusServer", cid, srv_oid, ldh_eDest_IntoLast);
   // Plc process
   sts = ldh_ClassNameToId(Session, &cid, "PlcProcess");
   sts = ldh_CreateObject(Session, &oid, "Plc", cid, Object, ldh_eDest_IntoLast);
@@ -164,8 +155,8 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
   return PWRS__SUCCESS;
 }
 
-static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
-    int* ErrorCount, int* WarningCount)
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, int* ErrorCount,
+                               int* WarningCount)
 {
   wb_session* sp = (wb_session*)Session;
   pwr_tAttrRef aref;
@@ -176,17 +167,16 @@ static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
   // Security object
   o = sp->object(pwr_eClass_Security);
   if (!o)
-    wsx_error_msg_str(Session, "No Security object found", Object, 'W',
-        ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "No Security object found", Object, 'W', ErrorCount, WarningCount);
 
   // DsTrend
   sp->aref(pwr_cClass_DsTrend, &aref);
-  if (sp->oddSts()) {
+  if (sp->oddSts())
+  {
     // Check DsTrendConf
     o = sp->object(pwr_cClass_DsTrendConf);
     if (!o)
-      wsx_error_msg_str(Session, "No DsTrendConf object found", Object, 'W',
-          ErrorCount, WarningCount);
+      wsx_error_msg_str(Session, "No DsTrendConf object found", Object, 'W', ErrorCount, WarningCount);
   }
 
   // DsFast
@@ -194,39 +184,38 @@ static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
   if (sp->evenSts())
     sp->aref(pwr_cClass_DsFastCurve, &aref);
 
-  if (sp->oddSts()) {
+  if (sp->oddSts())
+  {
     // Check DsFastConf
     o = sp->object(pwr_cClass_DsFastConf);
     if (!o)
-      wsx_error_msg_str(Session, "No DsFastConf object found", Object, 'W',
-          ErrorCount, WarningCount);
+      wsx_error_msg_str(Session, "No DsFastConf object found", Object, 'W', ErrorCount, WarningCount);
   }
 
   // SevHistMonintor
   sp->aref(pwr_cClass_SevHist, &aref);
-  if (sp->oddSts()) {
+  if (sp->oddSts())
+  {
     // Check SevHistMonitor
     o = sp->object(pwr_cClass_SevHistMonitor);
     if (!o)
-      wsx_error_msg_str(Session, "No SevHistMonitor object found", Object, 'W',
-          ErrorCount, WarningCount);
+      wsx_error_msg_str(Session, "No SevHistMonitor object found", Object, 'W', ErrorCount, WarningCount);
   }
 
   // Backup_Conf
   sp->aref(pwr_cClass_Backup, &aref);
-  if (sp->oddSts()) {
+  if (sp->oddSts())
+  {
     // Check Backup_Conf
     o = sp->object(pwr_cClass_Backup_Conf);
     if (!o)
-      wsx_error_msg_str(Session, "No Backup_Conf object found", Object, 'W',
-          ErrorCount, WarningCount);
+      wsx_error_msg_str(Session, "No Backup_Conf object found", Object, 'W', ErrorCount, WarningCount);
   }
 
   return PWRB__SUCCESS;
 }
 
-static pwr_tStatus AnteCreate(
-    ldh_tSesContext Session, pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus AnteCreate(ldh_tSesContext Session, pwr_tObjid Father, pwr_tClassId Class)
 {
   pwr_tStatus sts;
   pwr_tOid oid;
@@ -239,5 +228,5 @@ static pwr_tStatus AnteCreate(
   return PWRS__SUCCESS;
 }
 
-pwr_dExport pwr_BindMethods($Node) = { pwr_BindMethod(PostCreate),
-  pwr_BindMethod(AnteCreate), pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods($Node) = {pwr_BindMethod(PostCreate), pwr_BindMethod(AnteCreate),
+                                      pwr_BindMethod(SyntaxCheck), pwr_NullMethod};

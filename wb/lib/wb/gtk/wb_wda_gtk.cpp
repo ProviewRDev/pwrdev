@@ -57,10 +57,13 @@ void WdaGtk::message(char severity, const char* message)
 
 void WdaGtk::set_prompt(const char* prompt)
 {
-  if (streq(prompt, "")) {
+  if (streq(prompt, ""))
+  {
     g_object_set(cmd_prompt, "visible", FALSE, NULL);
     g_object_set(msg_label, "visible", TRUE, NULL);
-  } else {
+  }
+  else
+  {
     g_object_set(msg_label, "visible", FALSE, NULL);
     g_object_set(cmd_prompt, "visible", TRUE, NULL);
   }
@@ -70,8 +73,8 @@ void WdaGtk::print(const char* title)
 {
   pwr_tStatus sts;
 
-  wow->CreateBrowPrintDialog(title, wdanav->brow->ctx,
-      flow_eOrientation_Portrait, 1.0, (void*)toplevel, &sts);
+  wow->CreateBrowPrintDialog(title, wdanav->brow->ctx, flow_eOrientation_Portrait, 1.0, (void*)toplevel,
+                             &sts);
 }
 
 void WdaGtk::change_value(int set_focus)
@@ -82,7 +85,8 @@ void WdaGtk::change_value(int set_focus)
   char* value;
   int input_size;
 
-  if (input_open) {
+  if (input_open)
+  {
     g_object_set(cmd_input, "visible", FALSE, NULL);
     g_object_set(cmd_scrolledinput, "visible", FALSE, NULL);
     set_prompt("");
@@ -90,9 +94,9 @@ void WdaGtk::change_value(int set_focus)
     return;
   }
 
-  sts = wdanav->check_attr(
-      &multiline, &input_node, input_name, &value, &input_size);
-  if (EVEN(sts)) {
+  sts = wdanav->check_attr(&multiline, &input_node, input_name, &value, &input_size);
+  if (EVEN(sts))
+  {
     if (sts == WDA__NOATTRSEL)
       message('E', "No attribute is selected");
     else
@@ -100,7 +104,8 @@ void WdaGtk::change_value(int set_focus)
     return;
   }
 
-  if (multiline) {
+  if (multiline)
+  {
     text_w = cmd_scrolledinput;
     g_object_set(text_w, "visible", TRUE, NULL);
 
@@ -108,7 +113,9 @@ void WdaGtk::change_value(int set_focus)
     gtk_paned_set_position(GTK_PANED(pane), h - 170);
     gtk_widget_grab_focus(cmd_scrolledtextview);
     input_multiline = 1;
-  } else {
+  }
+  else
+  {
     text_w = cmd_input;
     g_object_set(text_w, "visible", TRUE, NULL);
     gtk_widget_grab_focus(cmd_input);
@@ -117,11 +124,12 @@ void WdaGtk::change_value(int set_focus)
 
   message(' ', "");
 
-  if (value) {
-    char* valueutf8
-        = g_convert(value, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  if (value)
+  {
+    char* valueutf8 = g_convert(value, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
 
-    if (multiline) {
+    if (multiline)
+    {
       GtkTextIter start_iter, end_iter;
       gtk_text_buffer_get_start_iter(cmd_scrolled_buffer, &start_iter);
       gtk_text_buffer_get_end_iter(cmd_scrolled_buffer, &end_iter);
@@ -135,18 +143,21 @@ void WdaGtk::change_value(int set_focus)
       // gtk_text_buffer_get_end_iter( cmd_scrolled_buffer, &end_iter);
       // gtk_text_buffer_select_range( cmd_scrolled_buffer, &start_iter,
       // &end_iter);
-    } else {
+    }
+    else
+    {
       gint pos = 0;
       gtk_editable_delete_text(GTK_EDITABLE(cmd_input), 0, -1);
-      gtk_editable_insert_text(
-          GTK_EDITABLE(text_w), valueutf8, strlen(valueutf8), &pos);
+      gtk_editable_insert_text(GTK_EDITABLE(text_w), valueutf8, strlen(valueutf8), &pos);
 
       // Select the text
       gtk_editable_set_position(GTK_EDITABLE(cmd_input), -1);
       gtk_editable_select_region(GTK_EDITABLE(cmd_input), 0, -1);
     }
     g_free(valueutf8);
-  } else {
+  }
+  else
+  {
     gtk_editable_delete_text(GTK_EDITABLE(cmd_input), 0, -1);
   }
   set_prompt("value >");
@@ -237,8 +248,7 @@ void WdaGtk::activate_prevattr(GtkWidget* w, gpointer data)
 
 void WdaGtk::activate_help(GtkWidget* w, gpointer data)
 {
-  CoXHelp::dhelp("spreadsheeteditor_refman", 0, navh_eHelpFile_Other,
-      "$pwr_lang/man_dg.dat", true);
+  CoXHelp::dhelp("spreadsheeteditor_refman", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
 }
 
 void WdaGtk::class_activate_ok(GtkWidget* w, gpointer data)
@@ -261,14 +271,15 @@ void WdaGtk::class_activate_ok(GtkWidget* w, gpointer data)
   classname = g_convert(utf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(utf8);
 
-  wda->attrobjects = (int)gtk_toggle_button_get_active(
-      GTK_TOGGLE_BUTTON(wda->wdaclass_attrobjects));
+  wda->attrobjects = (int)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(wda->wdaclass_attrobjects));
 
   if (streq(hiername, ""))
     wda->objid = pwr_cNObjid;
-  else {
+  else
+  {
     sts = ldh_NameToObjid(wda->ldhses, &wda->objid, hiername);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       CoWowGtk ww(wda->wdaclass_dia);
       ww.DisplayError("Hierarchy object error", wnav_get_message(sts));
       return;
@@ -280,7 +291,8 @@ void WdaGtk::class_activate_ok(GtkWidget* w, gpointer data)
   g_free(classname);
   g_free(hiername);
   g_free(searchname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     CoWowGtk ww(wda->wdaclass_dia);
     ww.DisplayError("Class error", wnav_get_message(sts));
     return;
@@ -288,16 +300,19 @@ void WdaGtk::class_activate_ok(GtkWidget* w, gpointer data)
 
   g_object_set(wda->wdaclass_dia, "visible", FALSE, NULL);
 
-  if (wda->classid != new_classid) {
+  if (wda->classid != new_classid)
+  {
     // Enter attribute
     wda->classid = new_classid;
     wda->open_attr_dialog();
-  } else {
+  }
+  else
+  {
     // Find new attributes
     sts = ((WdaNav*)wda->wdanav)
-              ->update(wda->objid, wda->classid, wda->attribute,
-                  wda->attrobjects, wda->search_name);
-    if (EVEN(sts)) {
+              ->update(wda->objid, wda->classid, wda->attribute, wda->attrobjects, wda->search_name);
+    if (EVEN(sts))
+    {
       CoWowGtk ww(wda->wdaclass_dia);
       ww.DisplayError("Spreadsheet error", wnav_get_message(sts));
     }
@@ -339,17 +354,19 @@ void WdaGtk::change_value_close()
   unsigned char* s;
   int sts;
 
-  if (input_open) {
-    if (input_multiline) {
+  if (input_open)
+  {
+    if (input_multiline)
+    {
       gchar* text;
       GtkTextIter start_iter, end_iter;
       gtk_text_buffer_get_start_iter(cmd_scrolled_buffer, &start_iter);
       gtk_text_buffer_get_end_iter(cmd_scrolled_buffer, &end_iter);
 
-      text = gtk_text_buffer_get_text(
-          cmd_scrolled_buffer, &start_iter, &end_iter, FALSE);
+      text = gtk_text_buffer_get_text(cmd_scrolled_buffer, &start_iter, &end_iter, FALSE);
       // Replace ctrl characters with space
-      for (s = (unsigned char*)text; *s; s++) {
+      for (s = (unsigned char*)text; *s; s++)
+      {
         if (*s < ' ' && *s != 10 && *s != 13)
           *s = ' ';
       }
@@ -365,13 +382,16 @@ void WdaGtk::change_value_close()
 
       wdanav->redraw();
       wdanav->set_inputfocus();
-    } else {
+    }
+    else
+    {
       char *text, *textutf8;
       textutf8 = gtk_editable_get_chars(GTK_EDITABLE(cmd_input), 0, -1);
       text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
       g_free(textutf8);
 
-      if (text) {
+      if (text)
+      {
         sts = wdanav->set_attr_value(input_node, input_name, text);
         g_free(text);
       }
@@ -404,7 +424,8 @@ void WdaGtk::activate_cmd_input(GtkWidget* w, gpointer data)
   text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  if (wda->input_open) {
+  if (wda->input_open)
+  {
     if (text)
       sts = wda->wdanav->set_attr_value(wda->input_node, wda->input_name, text);
     g_object_set(w, "visible", FALSE, NULL);
@@ -427,19 +448,21 @@ void WdaGtk::activate_cmd_scrolled_ok(GtkWidget* w, gpointer data)
   unsigned char* s;
   int sts;
 
-  if (wda->input_open) {
+  if (wda->input_open)
+  {
     GtkTextIter start_iter, end_iter;
     gtk_text_buffer_get_start_iter(wda->cmd_scrolled_buffer, &start_iter);
     gtk_text_buffer_get_end_iter(wda->cmd_scrolled_buffer, &end_iter);
 
-    textutf8 = gtk_text_buffer_get_text(
-        wda->cmd_scrolled_buffer, &start_iter, &end_iter, FALSE);
+    textutf8 = gtk_text_buffer_get_text(wda->cmd_scrolled_buffer, &start_iter, &end_iter, FALSE);
     text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
     g_free(textutf8);
 
-    if (text) {
+    if (text)
+    {
       // Replace ctrl characters with space
-      for (s = (unsigned char*)text; *s; s++) {
+      for (s = (unsigned char*)text; *s; s++)
+      {
         if (*s < ' ' && *s != 10 && *s != 13)
           *s = ' ';
       }
@@ -466,7 +489,8 @@ void WdaGtk::activate_cmd_scrolled_ca(GtkWidget* w, gpointer data)
 {
   WdaGtk* wda = (WdaGtk*)data;
 
-  if (wda->input_open) {
+  if (wda->input_open)
+  {
     g_object_set(wda->cmd_scrolledinput, "visible", FALSE, NULL);
 
     int h = gdk_window_get_height(gtk_widget_get_window(wda->pane));
@@ -478,34 +502,24 @@ void WdaGtk::activate_cmd_scrolled_ca(GtkWidget* w, gpointer data)
   }
 }
 
-void WdaGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void WdaGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
 void WdaGtk::open_class_dialog(char* hierstr, char* classstr, char* namestr)
 {
   gint pos = 0;
   gtk_editable_delete_text(GTK_EDITABLE(wdaclass_hiervalue), 0, -1);
-  gtk_editable_insert_text(
-      GTK_EDITABLE(wdaclass_hiervalue), hierstr, strlen(hierstr), &pos);
+  gtk_editable_insert_text(GTK_EDITABLE(wdaclass_hiervalue), hierstr, strlen(hierstr), &pos);
   pos = 0;
   gtk_editable_delete_text(GTK_EDITABLE(wdaclass_classvalue), 0, -1);
-  gtk_editable_insert_text(
-      GTK_EDITABLE(wdaclass_classvalue), classstr, strlen(classstr), &pos);
+  gtk_editable_insert_text(GTK_EDITABLE(wdaclass_classvalue), classstr, strlen(classstr), &pos);
   pos = 0;
   gtk_editable_delete_text(GTK_EDITABLE(wdaclass_namevalue), 0, -1);
-  gtk_editable_insert_text(
-      GTK_EDITABLE(wdaclass_namevalue), namestr, strlen(namestr), &pos);
-  gtk_toggle_button_set_active(
-      GTK_TOGGLE_BUTTON(wdaclass_attrobjects), attrobjects);
+  gtk_editable_insert_text(GTK_EDITABLE(wdaclass_namevalue), namestr, strlen(namestr), &pos);
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(wdaclass_attrobjects), attrobjects);
   g_object_set(wdaclass_dia, "visible", TRUE, NULL);
 }
 
-void WdaGtk::update_title()
-{
-  CoWowGtk::update_title(toplevel, editmode);
-}
+void WdaGtk::update_title() { CoWowGtk::update_title(toplevel, editmode); }
 
 WdaGtk::~WdaGtk()
 {
@@ -528,27 +542,23 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
   return FALSE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-WdaGtk::WdaGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
-    ldh_tSesContext wa_ldhses, pwr_tObjid wa_objid, pwr_tClassId wa_classid,
-    const char* wa_attribute, int wa_editmode, int wa_advanced_user,
-    int wa_display_objectname)
-    : Wda(wa_parent_ctx, wa_ldhses, wa_objid, wa_classid, wa_attribute,
-          wa_editmode, wa_advanced_user, wa_display_objectname),
+WdaGtk::WdaGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_tObjid wa_objid,
+               pwr_tClassId wa_classid, const char* wa_attribute, int wa_editmode, int wa_advanced_user,
+               int wa_display_objectname)
+    : Wda(wa_parent_ctx, wa_ldhses, wa_objid, wa_classid, wa_attribute, wa_editmode, wa_advanced_user,
+          wa_display_objectname),
       parent_wid(wa_parent_wid), wdaclass_dia(0)
 {
   int sts;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 700,
-      "default-width", 700, "title", "Spreadsheet Editor", NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 700, "default-width", 700, "title",
+                                      "Spreadsheet Editor", NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(
-      toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
@@ -556,59 +566,42 @@ WdaGtk::WdaGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
 
   // Menu
   // Accelerators
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File entry
-  GtkWidget* file_select_class
-      = gtk_menu_item_new_with_mnemonic("_Select Class");
-  g_signal_connect(
-      file_select_class, "activate", G_CALLBACK(activate_setclass), this);
-  gtk_widget_add_accelerator(file_select_class, "activate", accel_g, 'c',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* file_select_class = gtk_menu_item_new_with_mnemonic("_Select Class");
+  g_signal_connect(file_select_class, "activate", G_CALLBACK(activate_setclass), this);
+  gtk_widget_add_accelerator(file_select_class, "activate", accel_g, 'c', GDK_CONTROL_MASK,
+                             GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_select_attr
-      = gtk_menu_item_new_with_mnemonic("Select _Attribute");
-  g_signal_connect(
-      file_select_attr, "activate", G_CALLBACK(activate_setattr), this);
-  gtk_widget_add_accelerator(file_select_attr, "activate", accel_g, 'a',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* file_select_attr = gtk_menu_item_new_with_mnemonic("Select _Attribute");
+  g_signal_connect(file_select_attr, "activate", G_CALLBACK(activate_setattr), this);
+  gtk_widget_add_accelerator(file_select_attr, "activate", accel_g, 'a', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* file_next_attr = gtk_menu_item_new_with_mnemonic("Next Attribute");
-  g_signal_connect(
-      file_next_attr, "activate", G_CALLBACK(activate_nextattr), this);
-  gtk_widget_add_accelerator(file_next_attr, "activate", accel_g, 'n',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(file_next_attr, "activate", G_CALLBACK(activate_nextattr), this);
+  gtk_widget_add_accelerator(file_next_attr, "activate", accel_g, 'n', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_prev_attr
-      = gtk_menu_item_new_with_mnemonic("Previous Attribute");
-  g_signal_connect(
-      file_prev_attr, "activate", G_CALLBACK(activate_prevattr), this);
-  gtk_widget_add_accelerator(file_prev_attr, "activate", accel_g, 'p',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* file_prev_attr = gtk_menu_item_new_with_mnemonic("Previous Attribute");
+  g_signal_connect(file_prev_attr, "activate", G_CALLBACK(activate_prevattr), this);
+  gtk_widget_add_accelerator(file_prev_attr, "activate", accel_g, 'p', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_export_text
-      = gtk_menu_item_new_with_mnemonic("Export to Textfile");
-  g_signal_connect(
-      file_export_text, "activate", G_CALLBACK(activate_export_text), this);
+  GtkWidget* file_export_text = gtk_menu_item_new_with_mnemonic("Export to Textfile");
+  g_signal_connect(file_export_text, "activate", G_CALLBACK(activate_export_text), this);
 
-  GtkWidget* file_import_text
-      = gtk_menu_item_new_with_mnemonic("Import from Textfile");
-  g_signal_connect(
-      file_import_text, "activate", G_CALLBACK(activate_import_text), this);
+  GtkWidget* file_import_text = gtk_menu_item_new_with_mnemonic("Import from Textfile");
+  g_signal_connect(file_import_text, "activate", G_CALLBACK(activate_import_text), this);
 
-  GtkWidget* file_print
-      = gtk_menu_item_new_with_mnemonic("_Print");
+  GtkWidget* file_print = gtk_menu_item_new_with_mnemonic("_Print");
   g_signal_connect(file_print, "activate", G_CALLBACK(activate_print), this);
 
-  GtkWidget* file_close
-      = gtk_menu_item_new_with_mnemonic("_Close");
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_select_class);
@@ -625,19 +618,14 @@ WdaGtk::WdaGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // Functions entry
-  GtkWidget* func_changevalue
-      = gtk_menu_item_new_with_mnemonic("_Change Value");
-  g_signal_connect(
-      func_changevalue, "activate", G_CALLBACK(activate_change_value), this);
-  gtk_widget_add_accelerator(func_changevalue, "activate", accel_g, 'q',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* func_changevalue = gtk_menu_item_new_with_mnemonic("_Change Value");
+  g_signal_connect(func_changevalue, "activate", G_CALLBACK(activate_change_value), this);
+  gtk_widget_add_accelerator(func_changevalue, "activate", accel_g, 'q', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* func_close_changeval
-      = gtk_menu_item_new_with_mnemonic("C_lose Change Value");
-  g_signal_connect(func_close_changeval, "activate",
-      G_CALLBACK(activate_close_changeval), this);
-  gtk_widget_add_accelerator(func_close_changeval, "activate", accel_g, 't',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* func_close_changeval = gtk_menu_item_new_with_mnemonic("C_lose Change Value");
+  g_signal_connect(func_close_changeval, "activate", G_CALLBACK(activate_close_changeval), this);
+  gtk_widget_add_accelerator(func_close_changeval, "activate", accel_g, 't', GDK_CONTROL_MASK,
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* func_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(func_menu), func_changevalue);
@@ -648,11 +636,10 @@ WdaGtk::WdaGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(func_menu));
 
   // Help entry
-  GtkWidget* help_help
-      = gtk_menu_item_new_with_mnemonic("_Help");
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
-  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -664,9 +651,8 @@ WdaGtk::WdaGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
   pane = gtk_paned_new(GTK_ORIENTATION_VERTICAL);
 
   utility = ((WUtility*)parent_ctx)->utype;
-  wdanav = new WdaNavGtk((void*)this, pane, "Plant", ldhses, objid, classid,
-      attribute, wa_editmode, wa_advanced_user, wa_display_objectname, utility,
-      &brow_widget, &sts);
+  wdanav = new WdaNavGtk((void*)this, pane, "Plant", ldhses, objid, classid, attribute, wa_editmode,
+                         wa_advanced_user, wa_display_objectname, utility, &brow_widget, &sts);
   wdanav->message_cb = &Wda::message_cb;
   wdanav->change_value_cb = &Wda::change_value_cb;
 
@@ -702,12 +688,10 @@ WdaGtk::WdaGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
 
   cmd_scrolled_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(cmd_scrolled_ok, 70, 25);
-  g_signal_connect(
-      cmd_scrolled_ok, "clicked", G_CALLBACK(activate_cmd_scrolled_ok), this);
+  g_signal_connect(cmd_scrolled_ok, "clicked", G_CALLBACK(activate_cmd_scrolled_ok), this);
   cmd_scrolled_ca = gtk_button_new_with_label("Cancel");
   gtk_widget_set_size_request(cmd_scrolled_ca, 70, 25);
-  g_signal_connect(
-      cmd_scrolled_ca, "clicked", G_CALLBACK(activate_cmd_scrolled_ca), this);
+  g_signal_connect(cmd_scrolled_ca, "clicked", G_CALLBACK(activate_cmd_scrolled_ca), this);
 
   GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), cmd_scrolled_ok, FALSE, FALSE, 0);
@@ -733,9 +717,9 @@ WdaGtk::WdaGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
 
   update_title();
 
-  if (utility == wb_eUtility_Wtt) {
-    ((Wtt*)parent_ctx)
-        ->register_utility((void*)this, wb_eUtility_SpreadsheetEditor);
+  if (utility == wb_eUtility_Wtt)
+  {
+    ((Wtt*)parent_ctx)->register_utility((void*)this, wb_eUtility_SpreadsheetEditor);
   }
   ((Wda*)this)->open_class_dialog();
 }
@@ -748,34 +732,33 @@ static gint india_delete_event(GtkWidget* w, GdkEvent* event, gpointer wda)
 
 void WdaGtk::create_class_dialog()
 {
-  if (wdaclass_dia) {
+  if (wdaclass_dia)
+  {
     return;
   }
 
   // Create an input dialog
-  wdaclass_dia = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      150, "default-width", 550, "title", "Select Class", NULL);
-  g_signal_connect(
-      wdaclass_dia, "delete_event", G_CALLBACK(india_delete_event), this);
+  wdaclass_dia = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 150, "default-width", 550,
+                                          "title", "Select Class", NULL);
+  g_signal_connect(wdaclass_dia, "delete_event", G_CALLBACK(india_delete_event), this);
 
   wdaclass_classvalue = gtk_entry_new();
   GtkWidget* class_label = gtk_label_new("Class");
   gtk_widget_set_size_request(class_label, 95, -1);
-  //gtk_misc_set_alignment(GTK_MISC(class_label), 0, 0.5);
+  // gtk_misc_set_alignment(GTK_MISC(class_label), 0, 0.5);
   wdaclass_hiervalue = gtk_entry_new();
   GtkWidget* hier_label = gtk_label_new("Hierarchy");
   gtk_widget_set_size_request(hier_label, 95, -1);
-  //gtk_misc_set_alignment(GTK_MISC(hier_label), 0, 0.5);
+  // gtk_misc_set_alignment(GTK_MISC(hier_label), 0, 0.5);
   wdaclass_namevalue = gtk_entry_new();
   GtkWidget* name_label = gtk_label_new("Name");
   gtk_widget_set_size_request(name_label, 95, -1);
-  //gtk_misc_set_alignment(GTK_MISC(name_label), 0, 0.5);
+  // gtk_misc_set_alignment(GTK_MISC(name_label), 0, 0.5);
   wdaclass_attrobjects = gtk_check_button_new_with_label("Attribute Objects");
 
   GtkWidget* india_hboxclass = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(india_hboxclass), class_label, FALSE, FALSE, 15);
-  gtk_box_pack_end(
-      GTK_BOX(india_hboxclass), wdaclass_classvalue, TRUE, TRUE, 30);
+  gtk_box_pack_end(GTK_BOX(india_hboxclass), wdaclass_classvalue, TRUE, TRUE, 30);
 
   GtkWidget* india_hboxhier = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(india_hboxhier), hier_label, FALSE, FALSE, 15);
@@ -786,17 +769,14 @@ void WdaGtk::create_class_dialog()
   gtk_box_pack_end(GTK_BOX(india_hboxname), wdaclass_namevalue, TRUE, TRUE, 30);
 
   GtkWidget* india_hboxattrobj = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  gtk_box_pack_start(
-      GTK_BOX(india_hboxattrobj), wdaclass_attrobjects, FALSE, FALSE, 150);
+  gtk_box_pack_start(GTK_BOX(india_hboxattrobj), wdaclass_attrobjects, FALSE, FALSE, 150);
 
   GtkWidget* india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(india_ok, 70, 25);
-  g_signal_connect(
-      india_ok, "clicked", G_CALLBACK(WdaGtk::class_activate_ok), this);
+  g_signal_connect(india_ok, "clicked", G_CALLBACK(WdaGtk::class_activate_ok), this);
   GtkWidget* india_cancel = gtk_button_new_with_label("Cancel");
   gtk_widget_set_size_request(india_cancel, 70, 25);
-  g_signal_connect(
-      india_cancel, "clicked", G_CALLBACK(WdaGtk::class_activate_cancel), this);
+  g_signal_connect(india_cancel, "clicked", G_CALLBACK(WdaGtk::class_activate_cancel), this);
 
   GtkWidget* india_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(india_hboxbuttons), india_ok, FALSE, FALSE, 40);
@@ -807,8 +787,7 @@ void WdaGtk::create_class_dialog()
   gtk_box_pack_start(GTK_BOX(india_vbox), india_hboxhier, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(india_vbox), india_hboxname, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(india_vbox), india_hboxattrobj, TRUE, TRUE, 15);
-  gtk_box_pack_start(
-      GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(india_vbox), india_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(wdaclass_dia), india_vbox);
   gtk_widget_show_all(wdaclass_dia);

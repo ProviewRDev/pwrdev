@@ -46,12 +46,14 @@ typedef unsigned int pwr_tDbId;
 typedef pwr_tVolumeId pwr_tNodeId;
 typedef pwr_tNodeId pwr_tNodeIndex;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjectIx oix;
   pwr_tVolumeId vid;
 } pwr_tObjid;
 
-typedef struct {
+typedef struct
+{
 #if defined(__powerpc__)
 
   unsigned int must_be_three : 2;
@@ -67,7 +69,8 @@ typedef struct {
 #endif
 } cdh_mTypeObjid;
 
-typedef struct {
+typedef struct
+{
   unsigned int oix : 32;
 
 #if defined(__powerpc__)
@@ -78,7 +81,8 @@ typedef struct {
 #endif
 } cdh_mObjid;
 
-typedef struct {
+typedef struct
+{
 #if defined(__powerpc__)
   unsigned int must_be_two : 2;
   unsigned int cix : 12;
@@ -93,7 +97,8 @@ typedef struct {
 #endif
 } cdh_mClassObjid;
 
-typedef union {
+typedef union
+{
   pwr_tObjid pwr;
   cdh_mObjid o;
   cdh_mClassObjid c;
@@ -105,9 +110,11 @@ main()
   int b;
   cdh_uObjid oid;
 
-  union {
+  union
+  {
     int mask;
-    struct {
+    struct
+    {
       unsigned int b0 : 1;
       unsigned int b1 : 1;
       unsigned int b2 : 1;

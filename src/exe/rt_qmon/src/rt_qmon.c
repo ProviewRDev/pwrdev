@@ -36,33 +36,33 @@
 
 /* rt_qmon.c -- Qcom monitor. */
 
+#include <arpa/inet.h>
 #include <errno.h>
 #include <sched.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <arpa/inet.h>
 
 #include "co_string.h"
-#include "co_tree.h"
 #include "co_timelog.h"
+#include "co_tree.h"
 
-#include "rt_qdb.h"
-#include "rt_net.h"
-#include "rt_que.h"
-#include "rt_proc.h"
-#include "rt_thread_msg.h"
-#include "rt_pwr_msg.h"
 #include "rt_ini_event.h"
+#include "rt_net.h"
+#include "rt_proc.h"
+#include "rt_pwr_msg.h"
+#include "rt_qdb.h"
 #include "rt_qmon.h"
+#include "rt_que.h"
+#include "rt_thread_msg.h"
 
 #define RTT_RXMIN 0.0500 /* seconds */
 #define RTT_RXMAX 10.000 /* seconds */
 #define EXPORT_BUF_WARN_LEVEL 300000
 #define EXPORT_BUF_QUOTA 600000
-//#define IS_SECONDARY_NID(nid) ((nid)&0x80000000)
+// #define IS_SECONDARY_NID(nid) ((nid)&0x80000000)
 #define SECONDARY_NID(nid) ((nid) | 0x80000000)
-#define NID_LIX(nid) (((nid)&0x80000000) ? 1 : 0)
-#define NID(nid) ((nid)&0x7fffffff)
+#define NID_LIX(nid) (((nid) & 0x80000000) ? 1 : 0)
+#define NID(nid) ((nid) & 0x7fffffff)
 
 typedef enum {
   eAction__ = 0,
@@ -75,10 +75,11 @@ typedef enum {
 typedef union {
   pwr_tBitMask m;
   pwr_32Bits(pwr_Bits(version, 3), , , pwr_Bits(first, 1), pwr_Bits(middle, 1),
-      pwr_Bits(last, 1), pwr_Bits(fill_0, 2), ,
+             pwr_Bits(last, 1), pwr_Bits(fill_0, 2), ,
 
-      pwr_Bits(bcast, 1), pwr_Bits(resent, 1), pwr_Bits(fill_1, 6), , , , , ,
-      pwr_Bits(fill_2, 8), , , , , , , , pwr_Bits(event, 8), , , , , , , ) b;
+             pwr_Bits(bcast, 1), pwr_Bits(resent, 1), pwr_Bits(fill_1, 6), , , ,
+             , , pwr_Bits(fill_2, 8), , , , , , , , pwr_Bits(event, 8), , , , ,
+             , , ) b;
 
 #define mSeg_first pwr_Bit(3)
 #define mSeg_middle pwr_Bit(4)
@@ -94,7 +95,7 @@ typedef struct sIseg sIseg;
 
 struct sHead {
   pwr_tNodeId nid pwr_dPacked; /* Node identitiy. */
-  int birth pwr_dPacked; /* Time when link was born. */
+  int birth pwr_dPacked;       /* Time when link was born. */
   mSeg flags pwr_dPacked;
   qdb_sAck lack;
   qdb_sAck rack;
@@ -109,12 +110,12 @@ struct sEseg {
   sCseg c;
   sHead head;
   unsigned int size;
-  sLink* lp;
+  sLink *lp;
   lst_sEntry le_bcast;
   lst_sEntry le_seg;
   unsigned int id;
-  qdb_sBuffer* bp;
-  char* p;
+  qdb_sBuffer *bp;
+  char *p;
   int bytes;
   pwr_tTime tmo;
   int sent;
@@ -126,7 +127,7 @@ struct sIseg {
   sHead head;
   unsigned int size;
   int ts_recv;
-  sLink* lp;
+  sLink *lp;
   pwr_tStatus sts;
   char buff[1];
 };
@@ -146,10 +147,10 @@ struct sLink {
   lst_sEntry lh_send;
   lst_sEntry lh_win;
   que_sQue q_in;
-  qdb_sNode* np;
+  qdb_sNode *np;
   thread_s thread;
-  qdb_sBuffer* bp;
-  char* p;
+  qdb_sBuffer *bp;
+  char *p;
   pwr_tDeltaTime ack_delay;
   unsigned int exp_buf_quota;
   sIseg tmo;
@@ -192,7 +193,7 @@ struct {
   } iseg;
   struct {
     int count;
-    tree_sTable* table;
+    tree_sTable *table;
     thread_sMutex mutex;
   } links;
   thread_sMutex bcast;
@@ -218,61 +219,60 @@ static int tics_per_sec = 0;
 static unsigned int qcom_segment_size = 8192 - sizeof(sHead);
 
 static void cancel_links();
-static pwr_tBoolean clean_insert(lst_sEntry*, sEseg*, pwr_tBoolean);
-static sEseg* create_connect(sLink*);
+static pwr_tBoolean clean_insert(lst_sEntry *, sEseg *, pwr_tBoolean);
+static sEseg *create_connect(sLink *);
 static void create_links();
-static void decode_head(sHead*, sHead*);
-static void decode_info(qdb_sInfo*);
-static void encode_head(sHead*, sHead*);
-static void encode_info(qdb_sInfo*, qdb_sInfo*);
-static sEseg* eseg_alloc(thread_sMutex*);
-static sEseg* eseg_build(qdb_sBuffer*);
-static void eseg_free(sEseg*);
-static char* event_string(eEvent);
-static pwr_tBoolean expired(pwr_tTime*);
-static void* export_thread();
-static sLink* get_link(pwr_tNodeId, sMsg*);
-static void get_tmo(sLink*, pwr_tBoolean, pwr_tTime*);
-static void* import_thread();
-static void ini_link_info(qdb_sLinkInfo*);
-static sIseg* iseg_alloc();
-static void iseg_free(sIseg*);
-static void iseg_import(sLink*, sIseg*);
-static void lack(sLink*, sIseg*);
-static void link_active(sLink*);
-static void link_connect(sLink*, sIseg*);
-static void link_purge(sLink*);
-static void link_disconnect(sLink*);
-static void link_import(sLink*, sIseg*);
-static void link_redisconnect(sLink*);
-static void link_send(sLink*);
-static void link_stalled(sLink*);
-static void link_redcom_active(sLink*, sIseg*);
-static void link_redcom_passive(sLink*, sIseg*);
-static void* link_thread(sLink*);
-static pwr_tDeltaTime* link_tmo(sLink*);
-static sLink* new_link(pwr_tNodeId, sMsg*);
+static void decode_head(sHead *, sHead *);
+static void decode_info(qdb_sInfo *);
+static void encode_head(sHead *, sHead *);
+static void encode_info(qdb_sInfo *, qdb_sInfo *);
+static sEseg *eseg_alloc(thread_sMutex *);
+static sEseg *eseg_build(qdb_sBuffer *);
+static void eseg_free(sEseg *);
+static char *event_string(eEvent);
+static pwr_tBoolean expired(pwr_tTime *);
+static void *export_thread();
+static sLink *get_link(pwr_tNodeId, sMsg *);
+static void get_tmo(sLink *, pwr_tBoolean, pwr_tTime *);
+static void *import_thread();
+static void ini_link_info(qdb_sLinkInfo *);
+static sIseg *iseg_alloc();
+static void iseg_free(sIseg *);
+static void iseg_import(sLink *, sIseg *);
+static void lack(sLink *, sIseg *);
+static void link_active(sLink *);
+static void link_connect(sLink *, sIseg *);
+static void link_purge(sLink *);
+static void link_disconnect(sLink *);
+static void link_import(sLink *, sIseg *);
+static void link_redisconnect(sLink *);
+static void link_send(sLink *);
+static void link_stalled(sLink *);
+static void link_redcom_active(sLink *, sIseg *);
+static void link_redcom_passive(sLink *, sIseg *);
+static void *link_thread(sLink *);
+static pwr_tDeltaTime *link_tmo(sLink *);
+static sLink *new_link(pwr_tNodeId, sMsg *);
 static void open_socket();
-static sEseg* pending_send(sLink*);
-static void send_ack(sLink*);
-static void set_link_info(sLink*, qdb_sLinkInfo*);
-static void set_rack(sLink*, sIseg*);
-static void set_recvmsg(sIseg*, sMsg*);
-static void seg_send(sLink*, sEseg*);
-static void set_sendmsg(sLink*, sEseg*, sMsg*);
-static void start_rto(sLink*);
-static void update_rtt(sLink*, sEseg*);
-static void window_insert(sLink*, sEseg*);
-static void window_remove(sLink*, sEseg*);
-static sEseg* window_tmo(sLink*);
+static sEseg *pending_send(sLink *);
+static void send_ack(sLink *);
+static void set_link_info(sLink *, qdb_sLinkInfo *);
+static void set_rack(sLink *, sIseg *);
+static void set_recvmsg(sIseg *, sMsg *);
+static void seg_send(sLink *, sEseg *);
+static void set_sendmsg(sLink *, sEseg *, sMsg *);
+static void start_rto(sLink *);
+static void update_rtt(sLink *, sEseg *);
+static void window_insert(sLink *, sEseg *);
+static void window_remove(sLink *, sEseg *);
+static sEseg *window_tmo(sLink *);
 static void check_link_status();
 static void set_status(pwr_tStatus);
 static void purge(void);
-static void* action_thread();
-static sEseg* send_action(sLink*, qmon_eMsgTypeAction);
+static void *action_thread();
+static sEseg *send_action(sLink *, qmon_eMsgTypeAction);
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
   pwr_tStatus sts;
   qcom_sQid qid = qdb_cQexport;
   qcom_sQid neth_qid;
@@ -335,12 +335,9 @@ int main(int argc, char* argv[])
 
   if (!noneth) {
     for (;;) {
-      qdb_sQue* qp = NULL;
+      qdb_sQue *qp = NULL;
 
-      qdb_ScopeLock
-      {
-        qp = qdb_Que(NULL, &neth_qid, NULL);
-      }
+      qdb_ScopeLock { qp = qdb_Que(NULL, &neth_qid, NULL); }
       qdb_ScopeUnlock;
 
       if (qp != NULL)
@@ -363,8 +360,9 @@ int main(int argc, char* argv[])
     sts = thread_MutexInit(&l.import.mutex);
     sts = thread_CondInit(&l.import.cond);
 
-    l.links.table = tree_CreateTable(&sts, sizeof(pwr_tNodeId),
-        offsetof(sLink, nid), sizeof(sLink), 100, tree_Comp_nid);
+    l.links.table =
+        tree_CreateTable(&sts, sizeof(pwr_tNodeId), offsetof(sLink, nid),
+                         sizeof(sLink), 100, tree_Comp_nid);
 
     create_links();
 
@@ -377,8 +375,8 @@ int main(int argc, char* argv[])
   check_link_status();
   set_status(PWR__SRUN);
 
-  qcom_WaitAnd(
-      &sts, &my_q, &qcom_cQini, ini_mEvent_terminate, qcom_cTmoEternal);
+  qcom_WaitAnd(&sts, &my_q, &qcom_cQini, ini_mEvent_terminate,
+               qcom_cTmoEternal);
 
   //  sts = thread_Wait(NULL);	/* Wait forever */
 
@@ -393,10 +391,9 @@ int main(int argc, char* argv[])
   exit(QCOM__SUCCESS);
 }
 
-static int export_alloc_check(sLink* lp)
-{
-  if (lp->np->link[lp->lix].export_alloc_cnt > EXPORT_BUF_WARN_LEVEL
-      && qcom_sts != QCOM__BUFFHIGH)
+static int export_alloc_check(sLink *lp) {
+  if (lp->np->link[lp->lix].export_alloc_cnt > EXPORT_BUF_WARN_LEVEL &&
+      qcom_sts != QCOM__BUFFHIGH)
     set_status(QCOM__BUFFHIGH);
   if (lp->np->link[lp->lix].export_alloc_cnt > lp->exp_buf_quota) {
     link_purge(lp);
@@ -405,23 +402,21 @@ static int export_alloc_check(sLink* lp)
   return 0;
 }
 
-static void export_alloc_sub(sEseg* sp)
-{
+static void export_alloc_sub(sEseg *sp) {
   if (!sp || !sp->lp)
     return;
 
   sp->lp->np->link[sp->lp->lix].export_alloc_cnt -= sp->size;
   if (sp->lp->np->link[sp->lp->lix].export_alloc_cnt < 0)
     sp->lp->np->link[sp->lp->lix].export_alloc_cnt = 0;
-  if (qcom_sts == QCOM__BUFFHIGH
-      && sp->lp->np->link[sp->lp->lix].export_alloc_cnt < EXPORT_BUF_WARN_LEVEL)
+  if (qcom_sts == QCOM__BUFFHIGH &&
+      sp->lp->np->link[sp->lp->lix].export_alloc_cnt < EXPORT_BUF_WARN_LEVEL)
     set_status(PWR__SRUN);
 }
 
-static void cancel_links()
-{
+static void cancel_links() {
   pwr_tStatus sts;
-  sLink* lp;
+  sLink *lp;
 
   for (lp = tree_Minimum(&sts, l.links.table); lp != NULL;
        lp = tree_Successor(&sts, l.links.table, lp))
@@ -431,9 +426,8 @@ static void cancel_links()
 /* Free unsent segments from que that has not been
    sent which will be replaced by new segment  */
 
-static pwr_tBoolean clean_insert(
-    lst_sEntry* le, sEseg* esp, pwr_tBoolean pending)
-{
+static pwr_tBoolean clean_insert(lst_sEntry *le, sEseg *esp,
+                                 pwr_tBoolean pending) {
   lst_sEntry *se, *li;
   sEseg *sp, *nsp;
   pwr_tBoolean ret_pend = FALSE;
@@ -478,8 +472,8 @@ static pwr_tBoolean clean_insert(
           nsp = lst_Succ(NULL, se, &se);
 
           if (sp->bp != NULL) {
-            if ((sp->bp->b.msg_id == esp->bp->b.msg_id)
-                && (sp->bp == esp->bp)) {
+            if ((sp->bp->b.msg_id == esp->bp->b.msg_id) &&
+                (sp->bp == esp->bp)) {
               first = TRUE;
               li = se;
             } else if (first) {
@@ -506,13 +500,12 @@ static pwr_tBoolean clean_insert(
   return ret_pend;
 }
 
-static sEseg* create_connect(sLink* lp)
-{
-  sEseg* sp;
+static sEseg *create_connect(sLink *lp) {
+  sEseg *sp;
 
   sp = eseg_alloc(&l.eseg.mutex);
-  if (qdb->my_node->redundancy_state == pwr_eRedundancyState_Passive
-      || qdb->my_node->redundancy_state == pwr_eRedundancyState_Init) {
+  if (qdb->my_node->redundancy_state == pwr_eRedundancyState_Passive ||
+      qdb->my_node->redundancy_state == pwr_eRedundancyState_Init) {
     sp->head.flags.b.event = eEvent_connectPassive;
     timelog(1, "qmon sending connect Passive");
   } else {
@@ -525,15 +518,13 @@ static sEseg* create_connect(sLink* lp)
   return sp;
 }
 
-static void create_links()
-{
+static void create_links() {
   pwr_tStatus sts;
-  pool_sQlink* nl;
-  qdb_sNode* np;
-  sLink* lp;
+  pool_sQlink *nl;
+  qdb_sNode *np;
+  sLink *lp;
 
-  qdb_ScopeLock
-  {
+  qdb_ScopeLock {
     for (nl = pool_Qsucc(NULL, &qdb->pool, &qdb->g->node_lh);
          nl != &qdb->g->node_lh; nl = pool_Qsucc(NULL, &qdb->pool, nl)) {
       np = pool_Qitem(nl, qdb_sNode, node_ll);
@@ -555,8 +546,7 @@ static void create_links()
     new_link(lp->nid, NULL);
 }
 
-static void decode_head(sHead* tp, sHead* sp)
-{
+static void decode_head(sHead *tp, sHead *sp) {
   tp->nid = ntohl(sp->nid);
   tp->birth = ntohl(sp->birth);
   tp->flags.m = ntohl(sp->flags.m);
@@ -566,8 +556,7 @@ static void decode_head(sHead* tp, sHead* sp)
   tp->rack.ts = ntohl(sp->rack.ts);
 }
 
-static void decode_info(qdb_sInfo* ip)
-{
+static void decode_info(qdb_sInfo *ip) {
   ip->sender.aix = ntohl(ip->sender.aix);
   ip->sender.nid = ntohl(ip->sender.nid);
   ip->pid = ntohl(ip->pid);
@@ -584,8 +573,7 @@ static void decode_info(qdb_sInfo* ip)
   ip->status = ntohl(ip->status);
 }
 
-static void encode_head(sHead* tp, sHead* sp)
-{
+static void encode_head(sHead *tp, sHead *sp) {
   tp->nid = htonl(sp->nid);
   tp->birth = htonl(sp->birth);
   tp->flags.m = htonl(sp->flags.m);
@@ -595,8 +583,7 @@ static void encode_head(sHead* tp, sHead* sp)
   tp->rack.ts = htonl(sp->rack.ts);
 }
 
-static void encode_info(qdb_sInfo* tp, qdb_sInfo* sp)
-{
+static void encode_info(qdb_sInfo *tp, qdb_sInfo *sp) {
   tp->sender.aix = htonl(sp->sender.aix);
   tp->sender.nid = htonl(sp->sender.nid);
   tp->pid = htonl(sp->pid);
@@ -613,13 +600,12 @@ static void encode_info(qdb_sInfo* tp, qdb_sInfo* sp)
   tp->status = htonl(sp->status);
 }
 
-static sEseg* eseg_alloc(thread_sMutex* mp)
-{
-  sEseg* sp;
+static sEseg *eseg_alloc(thread_sMutex *mp) {
+  sEseg *sp;
 
   sp = lst_RemoveSucc(mp, &l.eseg.lh, NULL);
   if (sp == NULL) {
-    sp = (sEseg*)calloc(1, sizeof(*sp));
+    sp = (sEseg *)calloc(1, sizeof(*sp));
 
     lst_Init(NULL, &sp->le_bcast, sp);
     lst_Init(NULL, &sp->le_seg, sp);
@@ -633,16 +619,15 @@ static sEseg* eseg_alloc(thread_sMutex* mp)
    If buffer is to be broadcasted then allocate
    for all active links.  */
 
-static sEseg* eseg_build(qdb_sBuffer* bp)
-{
+static sEseg *eseg_build(qdb_sBuffer *bp) {
   pwr_tStatus sts;
   int size;
-  sEseg* sp = NULL;
-  sEseg* msp = NULL;
-  sEseg* csp;
-  sEseg* mcsp;
-  sLink* lp;
-  char* p;
+  sEseg *sp = NULL;
+  sEseg *msp = NULL;
+  sEseg *csp;
+  sEseg *mcsp;
+  sLink *lp;
+  char *p;
   int ii;
   pwr_tBoolean bcast = bp->c.flags.b.broadcast;
 
@@ -666,7 +651,7 @@ static sEseg* eseg_build(qdb_sBuffer* bp)
       break;
 
     for (msp = NULL, size = bp->b.info.size + sizeof(bp->b.info), ii = 0,
-        p = (char*)&bp->b.info;
+        p = (char *)&bp->b.info;
          size > 0; ii++, p += qcom_segment_size, size -= qcom_segment_size) {
       sp = eseg_alloc(NULL);
       sp->p = p;
@@ -728,8 +713,7 @@ static sEseg* eseg_build(qdb_sBuffer* bp)
   return msp;
 }
 
-static void eseg_free(sEseg* sp)
-{
+static void eseg_free(sEseg *sp) {
   pwr_tBoolean bcast = sp->head.flags.b.bcast;
 
   if (bcast)
@@ -740,10 +724,7 @@ static void eseg_free(sEseg* sp)
   lst_Remove(NULL, &sp->c.le);
   if (lst_IsEmpty(NULL, &sp->le_bcast) && lst_IsEmpty(NULL, &sp->le_seg)) {
     if (sp->bp != NULL) {
-      qdb_ScopeLock
-      {
-        qdb_Free(NULL, sp->bp);
-      }
+      qdb_ScopeLock { qdb_Free(NULL, sp->bp); }
       qdb_ScopeUnlock;
     }
   } else {
@@ -761,10 +742,9 @@ static void eseg_free(sEseg* sp)
   lst_InsertPred(&l.eseg.mutex, &l.eseg.lh, &sp->c.le, sp);
 }
 
-static char* event_string(eEvent event)
-{
-  static char* es[eEvent_ + 1]
-      = { "<<low>>", "connect", "down", "user", "ack", "<<high>>" };
+static char *event_string(eEvent event) {
+  static char *es[eEvent_ + 1] = {"<<low>>", "connect", "down",
+                                  "user",    "ack",     "<<high>>"};
 
   if (event <= eEvent__)
     return es[eEvent__];
@@ -774,33 +754,27 @@ static char* event_string(eEvent event)
     return es[event];
 }
 
-static pwr_tBoolean expired(pwr_tTime* clock)
-{
+static pwr_tBoolean expired(pwr_tTime *clock) {
   pwr_tTime now;
 
   time_GetTimeMonotonic(&now);
   return (time_Acomp(clock, &now) == -1);
 }
 
-static void* export_thread()
-{
+static void *export_thread() {
   pwr_tStatus sts;
-  sEseg* sp;
-  sEseg* ssp;
-  sEseg* esp;
-  qdb_sBuffer* bp;
-  qdb_sQue* qp = NULL;
+  sEseg *sp;
+  sEseg *ssp;
+  sEseg *esp;
+  qdb_sBuffer *bp;
+  qdb_sQue *qp = NULL;
 
-  qdb_ScopeLock
-  {
-    qp = qdb_Que(&sts, &qdb->g->qid_export, NULL);
-  }
+  qdb_ScopeLock { qp = qdb_Que(&sts, &qdb->g->qid_export, NULL); }
   qdb_ScopeUnlock;
 
   while (qdb->g->up) {
     sched_yield();
-    qdb_ScopeLock
-    {
+    qdb_ScopeLock {
       bp = qdb_Get(&sts, qp, qcom_cTmoEternal, NULL, 0);
       if (bp != NULL)
         bp = qdb_DetachBuffer(&sts, bp);
@@ -813,10 +787,7 @@ static void* export_thread()
 
     sp = eseg_build(bp);
     if (sp == NULL) {
-      qdb_ScopeLock
-      {
-        qdb_Free(NULL, bp);
-      }
+      qdb_ScopeLock { qdb_Free(NULL, bp); }
       qdb_ScopeUnlock;
       continue;
     }
@@ -843,10 +814,9 @@ static void* export_thread()
   return NULL;
 }
 
-static sLink* get_link(pwr_tNodeId nid, sMsg* mp)
-{
+static sLink *get_link(pwr_tNodeId nid, sMsg *mp) {
   pwr_tStatus sts;
-  sLink* lp;
+  sLink *lp;
 
   if (nid == qdb->my_node->nid)
     return NULL;
@@ -862,8 +832,7 @@ static sLink* get_link(pwr_tNodeId nid, sMsg* mp)
   return lp;
 }
 
-static void get_tmo(sLink* lp, pwr_tBoolean do_inc, pwr_tTime* tmo)
-{
+static void get_tmo(sLink *lp, pwr_tBoolean do_inc, pwr_tTime *tmo) {
   float rto;
   pwr_tTime now;
   pwr_tDeltaTime drto;
@@ -884,13 +853,12 @@ static void get_tmo(sLink* lp, pwr_tBoolean do_inc, pwr_tTime* tmo)
   time_Aadd(tmo, &now, time_FloatToD(&drto, rto));
 }
 
-static void* import_thread()
-{
+static void *import_thread() {
   sMsg msg;
-  sIseg* sp;
-  sLink* last_link = NULL;
+  sIseg *sp;
+  sLink *last_link = NULL;
   int bytes;
-  thread_sMutex* mp = &l.import.mutex;
+  thread_sMutex *mp = &l.import.mutex;
 
   thread_MutexLock(mp);
 
@@ -915,7 +883,8 @@ static void* import_thread()
       sp->lp = last_link = get_link(sp->head.nid, &msg);
     if (sp->lp == NULL) {
       char volstr[20];
-      errh_Warning("Request from unknown node %s (%s)",
+      errh_Warning(
+          "Request from unknown node %s (%s)",
           cdh_VolumeIdToString(volstr, sizeof(volstr), sp->head.nid, 0, 0),
           inet_ntoa(msg.sa.sin_addr));
       continue;
@@ -932,9 +901,8 @@ static void* import_thread()
   return NULL;
 }
 
-static void ini_link_info(qdb_sLinkInfo* lp)
-{
-  qdb_sNode* my_np = qdb->my_node;
+static void ini_link_info(qdb_sLinkInfo *lp) {
+  qdb_sNode *my_np = qdb->my_node;
 
   strcpy(lp->name, my_np->link[0].name);
 
@@ -948,13 +916,12 @@ static void ini_link_info(qdb_sLinkInfo* lp)
   lp->ft = ntohl(my_np->ft);
 }
 
-static sIseg* iseg_alloc()
-{
-  sIseg* sp;
+static sIseg *iseg_alloc() {
+  sIseg *sp;
 
   sp = lst_RemoveSucc(&l.iseg.mutex, &l.iseg.lh, NULL);
   if (sp == NULL) {
-    sp = (sIseg*)calloc(1, sizeof(*sp) + qcom_segment_size - 1);
+    sp = (sIseg *)calloc(1, sizeof(*sp) + qcom_segment_size - 1);
     lst_Init(NULL, &sp->c.le, sp);
     sp->size = qcom_segment_size;
   }
@@ -962,8 +929,7 @@ static sIseg* iseg_alloc()
   return sp;
 }
 
-static void iseg_free(sIseg* sp)
-{
+static void iseg_free(sIseg *sp) {
   pwr_Assert(!lst_IsLinked(NULL, &sp->c.le));
   memset(sp, 0, sizeof(*sp) + qcom_segment_size - 1);
   lst_Init(NULL, &sp->c.le, sp);
@@ -971,12 +937,11 @@ static void iseg_free(sIseg* sp)
   lst_InsertPred(&l.iseg.mutex, &l.iseg.lh, &sp->c.le, sp);
 }
 
-static void iseg_import(sLink* lp, sIseg* sp)
-{
+static void iseg_import(sLink *lp, sIseg *sp) {
   pwr_tStatus sts;
   int diff;
-  qdb_sInfo* ip;
-  qdb_sQue* qp;
+  qdb_sInfo *ip;
+  qdb_sQue *qp;
   qcom_sQid receiver;
 
   if (!lp->np->link[lp->lix].flags.b.connected) {
@@ -990,10 +955,9 @@ static void iseg_import(sLink* lp, sIseg* sp)
 
   if (sp->head.flags.b.first) {
     // pwr_Assert(lp->bp == NULL);
-    ip = (qdb_sInfo*)sp->buff;
+    ip = (qdb_sInfo *)sp->buff;
     decode_info(ip);
-    qdb_ScopeLock
-    {
+    qdb_ScopeLock {
       if (lp->bp != NULL) {
         lp->np->link[lp->lix].err_seg_seq++;
         qdb_Free(NULL, lp->bp);
@@ -1006,7 +970,7 @@ static void iseg_import(sLink* lp, sIseg* sp)
       return;
     }
     lp->bp->c.flags.m |= ip->flags.m & qdb_mBuffer_maskExport;
-    lp->p = (char*)&lp->bp->b.info;
+    lp->p = (char *)&lp->bp->b.info;
   } else if (!sp->head.flags.b.first) {
     // pwr_Assert(lp->bp != NULL);
     // pwr_Assert(lp->p != NULL);
@@ -1022,8 +986,7 @@ static void iseg_import(sLink* lp, sIseg* sp)
   if (sp->head.flags.b.last) {
     lp->bp->c.flags.b.imported = 1;
 
-    qdb_ScopeLock
-    {
+    qdb_ScopeLock {
       receiver = lp->bp->b.info.receiver;
       qp = qdb_Que(&sts, &receiver, NULL);
       if (qp == NULL) {
@@ -1031,8 +994,8 @@ static void iseg_import(sLink* lp, sIseg* sp)
         qdb_Free(NULL, lp->bp);
       } else {
         qdb_Put(&sts, lp->bp, qp);
-	if (sts == QDB__QUOTAEXCEEDED)
-	  qdb_Free(NULL, lp->bp);
+        if (sts == QDB__QUOTAEXCEEDED)
+          qdb_Free(NULL, lp->bp);
       }
     }
     qdb_ScopeUnlock;
@@ -1045,12 +1008,11 @@ static void iseg_import(sLink* lp, sIseg* sp)
    Free the segments in window that have been
    succesfully received at remote node.  */
 
-static void lack(sLink* lp, sIseg* isp)
-{
-  lst_sEntry* se;
+static void lack(sLink *lp, sIseg *isp) {
+  lst_sEntry *se;
   int diff;
   sEseg *sp, *nsp;
-  thread_sMutex* mx;
+  thread_sMutex *mx;
 
   for (sp = lst_Succ(NULL, &lp->lh_win, &se); se != &lp->lh_win; sp = nsp) {
     nsp = lst_Succ(NULL, se, &se);
@@ -1078,8 +1040,7 @@ static void lack(sLink* lp, sIseg* isp)
   }
 }
 
-static void link_active(sLink* lp)
-{
+static void link_active(sLink *lp) {
   pwr_tStatus sts;
 
   if (lp->np->link[lp->lix].flags.b.active) {
@@ -1091,9 +1052,8 @@ static void link_active(sLink* lp)
   lp->np->link[lp->lix].flags.b.active = 1;
   lp->np->link[lp->lix].flags.b.connected = 1;
   errh_Info("Active, link to %s (%s)", lp->np->link[lp->lix].name,
-      cdh_NodeIdToString(NULL, lp->np->nid, 0, 0));
-  qdb_ScopeLock
-  {
+            cdh_NodeIdToString(NULL, lp->np->nid, 0, 0));
+  qdb_ScopeLock {
     lp->np->link[lp->lix].qflags.b.active = 1;
     lp->np->link[lp->lix].qflags.b.connected = 1;
     if (lp->np->clx == lp->lix)
@@ -1103,8 +1063,7 @@ static void link_active(sLink* lp)
   check_link_status();
 }
 
-static void link_connect(sLink* lp, sIseg* sp)
-{
+static void link_connect(sLink *lp, sIseg *sp) {
   pwr_tStatus sts;
 
   if (sp->head.flags.b.event == eEvent_connect)
@@ -1124,14 +1083,13 @@ static void link_connect(sLink* lp, sIseg* sp)
 
   lp->np->link[lp->lix].flags.b.connected = 1;
   errh_Info("Connected, link to %s (%s)", lp->np->link[lp->lix].name,
-      cdh_NodeIdToString(NULL, lp->np->nid, 0, 0));
-  qdb_ScopeLock
-  {
+            cdh_NodeIdToString(NULL, lp->np->nid, 0, 0));
+  qdb_ScopeLock {
     lp->np->link[lp->lix].birth = sp->head.birth;
     time_GetTime(&lp->np->link[lp->lix].timeup);
     lp->np->link[lp->lix].qflags.b.connected = 1;
     lp->np->link[lp->lix].qflags.b.active = 1;
-    set_link_info(lp, (qdb_sLinkInfo*)sp->buff);
+    set_link_info(lp, (qdb_sLinkInfo *)sp->buff);
     if (lp->np->clx == lp->lix && sp->head.flags.b.event == eEvent_connect)
       qdb_NetEvent(&sts, lp->np, qcom_eStype_linkConnect);
   }
@@ -1140,10 +1098,9 @@ static void link_connect(sLink* lp, sIseg* sp)
   check_link_status();
 }
 
-static void link_disconnect(sLink* lp)
-{
+static void link_disconnect(sLink *lp) {
   pwr_tStatus sts;
-  sEseg* sp;
+  sEseg *sp;
 
   if (!lp->np->link[lp->lix].flags.b.connected) {
     pwr_Assert(!lp->np->link[lp->lix].flags.b.active);
@@ -1180,9 +1137,8 @@ static void link_disconnect(sLink* lp)
   lp->np->link[lp->lix].win_count = 0;
 
   errh_Info("Disconnected, link to  %s (%s)", lp->np->link[lp->lix].name,
-      cdh_NodeIdToString(NULL, lp->np->nid, 0, 0));
-  qdb_ScopeLock
-  {
+            cdh_NodeIdToString(NULL, lp->np->nid, 0, 0));
+  qdb_ScopeLock {
     if (lp->bp != NULL) {
       qdb_Free(NULL, lp->bp);
     }
@@ -1202,25 +1158,20 @@ static void link_disconnect(sLink* lp)
   check_link_status();
 }
 
-static void link_redcom_active(sLink* lp, sIseg* sp)
-{
+static void link_redcom_active(sLink *lp, sIseg *sp) {
   pwr_tStatus sts;
 
   if (lp->np->clx == lp->lix)
     return;
 
   // Disconnect previous link
-  qdb_ScopeLock
-  {
-    qdb_NetEvent(&sts, lp->np, qcom_eStype_linkDisconnect);
-  }
+  qdb_ScopeLock { qdb_NetEvent(&sts, lp->np, qcom_eStype_linkDisconnect); }
   qdb_ScopeUnlock;
 
   lp->np->clx = lp->lix;
   errh_Info("Primary link to %s (%s)", lp->np->link[lp->lix].name,
-      cdh_NodeIdToString(NULL, lp->np->nid, 0, 0));
-  qdb_ScopeLock
-  {
+            cdh_NodeIdToString(NULL, lp->np->nid, 0, 0));
+  qdb_ScopeLock {
     if (lp->np->clx == lp->lix)
       qdb_NetEvent(&sts, lp->np, qcom_eStype_linkConnect);
   }
@@ -1229,8 +1180,7 @@ static void link_redcom_active(sLink* lp, sIseg* sp)
   check_link_status();
 }
 
-static void link_redcom_passive(sLink* lp, sIseg* sp)
-{
+static void link_redcom_passive(sLink *lp, sIseg *sp) {
   pwr_tStatus sts;
 
   if (lp->np->clx != lp->lix)
@@ -1240,18 +1190,14 @@ static void link_redcom_passive(sLink* lp, sIseg* sp)
     return;
 
   // Disconnect previous link
-  qdb_ScopeLock
-  {
-    qdb_NetEvent(&sts, lp->np, qcom_eStype_linkDisconnect);
-  }
+  qdb_ScopeLock { qdb_NetEvent(&sts, lp->np, qcom_eStype_linkDisconnect); }
   qdb_ScopeUnlock;
 
   lp->np->clx = !lp->lix;
 
   errh_Info("Primary link to %s (%s)", lp->np->link[lp->np->clx].name,
-      cdh_NodeIdToString(NULL, lp->np->nid, 0, 0));
-  qdb_ScopeLock
-  {
+            cdh_NodeIdToString(NULL, lp->np->nid, 0, 0));
+  qdb_ScopeLock {
     if (lp->np->link[lp->np->clx].flags.b.active)
       qdb_NetEvent(&sts, lp->np, qcom_eStype_linkConnect);
   }
@@ -1260,8 +1206,7 @@ static void link_redcom_passive(sLink* lp, sIseg* sp)
   check_link_status();
 }
 
-static void link_purge(sLink* lp)
-{
+static void link_purge(sLink *lp) {
   sEseg *sp, *nsp;
   int purge = 0;
   int alloc_cnt = 0;
@@ -1288,22 +1233,21 @@ static void link_purge(sLink* lp)
   }
   thread_MutexUnlock(&lp->eseg_mutex);
   printf("link_purge: %d cnt %d (%d)\n", i,
-      lp->np->link[lp->lix].export_alloc_cnt, alloc_cnt);
+         lp->np->link[lp->lix].export_alloc_cnt, alloc_cnt);
   lp->np->link[lp->lix].export_alloc_cnt = alloc_cnt;
   lp->np->link[lp->lix].export_purge_cnt++;
 }
 
-static void link_import(sLink* lp, sIseg* sp)
-{
-  if (!lp->np->link[lp->lix].flags.b.active
-      && lp->np->link[lp->lix].birth == sp->head.birth)
+static void link_import(sLink *lp, sIseg *sp) {
+  if (!lp->np->link[lp->lix].flags.b.active &&
+      lp->np->link[lp->lix].birth == sp->head.birth)
     link_active(lp);
-  else if (lp->np->link[lp->lix].birth != sp->head.birth
-      && lp->np->link[lp->lix].flags.b.connected)
+  else if (lp->np->link[lp->lix].birth != sp->head.birth &&
+           lp->np->link[lp->lix].flags.b.connected)
     link_disconnect(lp);
-  else if (lp->np->link[lp->lix].birth != 0
-      && lp->np->link[lp->lix].birth != sp->head.birth
-      && !lp->np->link[lp->lix].flags.b.connected)
+  else if (lp->np->link[lp->lix].birth != 0 &&
+           lp->np->link[lp->lix].birth != sp->head.birth &&
+           !lp->np->link[lp->lix].flags.b.connected)
     link_redisconnect(lp);
 
   switch (sp->head.flags.b.event) {
@@ -1354,9 +1298,8 @@ static void link_import(sLink* lp, sIseg* sp)
   iseg_free(sp);
 }
 
-static void link_redisconnect(sLink* lp)
-{
-  sEseg* sp;
+static void link_redisconnect(sLink *lp) {
+  sEseg *sp;
 
   pwr_Assert(!lp->np->link[lp->lix].flags.b.connected);
   pwr_Assert(!lp->np->link[lp->lix].flags.b.active);
@@ -1369,29 +1312,27 @@ static void link_redisconnect(sLink* lp)
   if (sp == NULL)
     sp = lst_Succ(NULL, &lp->lh_send, NULL);
   pwr_Assert(sp != NULL);
-  pwr_Assert(sp->head.flags.b.event == eEvent_connect
-      || sp->head.flags.b.event == eEvent_connectPassive);
+  pwr_Assert(sp->head.flags.b.event == eEvent_connect ||
+             sp->head.flags.b.event == eEvent_connectPassive);
 
   sp->tmo = pwr_cNTime;
 }
 
-static void link_send(sLink* lp)
-{
-  sEseg* sp;
+static void link_send(sLink *lp) {
+  sEseg *sp;
 
   if ((sp = window_tmo(lp)) != NULL) {
     seg_send(lp, sp);
   } else if ((sp = pending_send(lp)) != NULL) {
     window_insert(lp, sp);
     seg_send(lp, sp);
-  } else if (lp->np->link[lp->lix].pending_rack
-      && expired(&lp->np->link[lp->lix].rack_tmo)) {
+  } else if (lp->np->link[lp->lix].pending_rack &&
+             expired(&lp->np->link[lp->lix].rack_tmo)) {
     send_ack(lp);
   }
 }
 
-static void link_stalled(sLink* lp)
-{
+static void link_stalled(sLink *lp) {
   pwr_tStatus sts;
 
   if (!lp->np->link[lp->lix].flags.b.active)
@@ -1399,9 +1340,8 @@ static void link_stalled(sLink* lp)
 
   lp->np->link[lp->lix].flags.b.active = 0;
   errh_Info("Stalled, link to node %s (%s)", lp->np->link[lp->lix].name,
-      cdh_NodeIdToString(NULL, lp->np->nid, 0, 0));
-  qdb_ScopeLock
-  {
+            cdh_NodeIdToString(NULL, lp->np->nid, 0, 0));
+  qdb_ScopeLock {
     lp->np->link[lp->lix].qflags.b.active = 0;
     if (lp->np->clx == lp->lix)
       qdb_NetEvent(&sts, lp->np, qcom_eStype_linkStalled);
@@ -1410,9 +1350,8 @@ static void link_stalled(sLink* lp)
   check_link_status();
 }
 
-static void* link_thread(sLink* lp)
-{
-  uSeg* sp;
+static void *link_thread(sLink *lp) {
+  uSeg *sp;
   pwr_tBoolean pending = FALSE;
 
   for (;;) {
@@ -1421,7 +1360,7 @@ static void* link_thread(sLink* lp)
     switch (sp->action) {
     case eAction_export:
       /*      lst_InsertPred(NULL, &lp->lh_send, &sp->c.le, sp); */
-      pending = clean_insert(&lp->lh_send, (sEseg*)sp, pending);
+      pending = clean_insert(&lp->lh_send, (sEseg *)sp, pending);
       if (pending)
         continue;
       else
@@ -1444,18 +1383,17 @@ static void* link_thread(sLink* lp)
   return NULL;
 }
 
-static pwr_tDeltaTime* link_tmo(sLink* lp)
-{
+static pwr_tDeltaTime *link_tmo(sLink *lp) {
   pwr_tDeltaTime diff_send = pwr_cNDeltaTime;
   pwr_tDeltaTime diff_rack = pwr_cNDeltaTime;
   pwr_tTime clock;
   pwr_tDeltaTime tmo = pwr_cNDeltaTime;
-  sEseg* sp;
+  sEseg *sp;
 
   time_GetTimeMonotonic(&clock);
 
-  if (lst_Succ(NULL, &lp->lh_send, NULL) != NULL
-      && lp->np->link[lp->lix].win_count < lp->np->link[lp->lix].win_max)
+  if (lst_Succ(NULL, &lp->lh_send, NULL) != NULL &&
+      lp->np->link[lp->lix].win_count < lp->np->link[lp->lix].win_max)
     return time_ZeroD(&lp->np->link[lp->lix].timer);
 
   if (lp->np->link[lp->lix].pending_rack) {
@@ -1489,11 +1427,10 @@ static pwr_tDeltaTime* link_tmo(sLink* lp)
   return &lp->np->link[lp->lix].timer;
 }
 
-static sLink* new_link(pwr_tNodeId nid, sMsg* mp)
-{
+static sLink *new_link(pwr_tNodeId nid, sMsg *mp) {
   pwr_tStatus sts;
-  sLink* lp;
-  sEseg* sp;
+  sLink *lp;
+  sEseg *sp;
   float rtt_rxmin, rtt_rxmax;
   float ack_delay;
 
@@ -1512,29 +1449,26 @@ static sLink* new_link(pwr_tNodeId nid, sMsg* mp)
 
   l.links.count++;
 
-  qdb_ScopeLock
-  {
-    lp->np = qdb_AddNode(&sts, NID(nid), 0);
-  }
+  qdb_ScopeLock { lp->np = qdb_AddNode(&sts, NID(nid), 0); }
   qdb_ScopeUnlock;
 
   pwr_Assert(lp->np != NULL);
 
   rtt_rxmin = (float)(MAX(lp->np->link[lp->lix].min_resend_time,
-                  qdb->my_node->link[0].min_resend_time))
-      / 1000;
+                          qdb->my_node->link[0].min_resend_time)) /
+              1000;
   if (feqf(rtt_rxmin, 0.0f))
     rtt_rxmin = RTT_RXMIN;
   rtt_rxmax = (float)(MAX(lp->np->link[lp->lix].max_resend_time,
-                  qdb->my_node->link[0].max_resend_time))
-      / 1000;
+                          qdb->my_node->link[0].max_resend_time)) /
+              1000;
   if (feqf(rtt_rxmax, 0.0f))
     rtt_rxmax = RTT_RXMAX;
-  ack_delay
-      = MAX(lp->np->link[lp->lix].ack_delay, qdb->my_node->link[0].ack_delay);
+  ack_delay =
+      MAX(lp->np->link[lp->lix].ack_delay, qdb->my_node->link[0].ack_delay);
   time_FloatToD(&lp->ack_delay, qdb->my_node->link[0].ack_delay);
   lp->exp_buf_quota = MAX(lp->np->link[lp->lix].export_buf_quota,
-      qdb->my_node->link[0].export_buf_quota);
+                          qdb->my_node->link[0].export_buf_quota);
   if (lp->exp_buf_quota == 0)
     lp->exp_buf_quota = EXPORT_BUF_QUOTA;
   lp->np->link[lp->lix].export_quota = lp->exp_buf_quota;
@@ -1560,8 +1494,7 @@ static sLink* new_link(pwr_tNodeId nid, sMsg* mp)
   return lp;
 }
 
-static void open_socket()
-{
+static void open_socket() {
   if ((l.sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     errh_Error("socket failed: %s", strerror(errno));
     exit(errno_ExitErrno(errno));
@@ -1571,16 +1504,15 @@ static void open_socket()
   l.sa.sin_addr.s_addr = htonl(INADDR_ANY);
   l.sa.sin_port = qdb->my_node->sa.sin_port;
 
-  if ((bind(l.sock, (struct sockaddr*)&l.sa, sizeof(l.sa))) < 0) {
+  if ((bind(l.sock, (struct sockaddr *)&l.sa, sizeof(l.sa))) < 0) {
     errh_Error("bind failed: %s", strerror(errno));
     close(l.sock);
     exit(errno_ExitErrno(errno));
   }
 }
 
-static sEseg* pending_send(sLink* lp)
-{
-  sEseg* sp;
+static sEseg *pending_send(sLink *lp) {
+  sEseg *sp;
 
   if (lp->np->link[lp->lix].win_count >= lp->np->link[lp->lix].win_max)
     return NULL;
@@ -1591,8 +1523,7 @@ static sEseg* pending_send(sLink* lp)
   return sp;
 }
 
-static void send_ack(sLink* lp)
-{
+static void send_ack(sLink *lp) {
   sHead head;
   sMsg msg;
   int bytes;
@@ -1624,9 +1555,8 @@ static void send_ack(sLink* lp)
   sched_yield();
 }
 
-static void set_link_info(sLink* lp, qdb_sLinkInfo* ip)
-{
-  qdb_sNode* np = lp->np;
+static void set_link_info(sLink *lp, qdb_sLinkInfo *ip) {
+  qdb_sNode *np = lp->np;
 
   strcpy(np->link[lp->lix].name, ip->name);
 
@@ -1640,8 +1570,7 @@ static void set_link_info(sLink* lp, qdb_sLinkInfo* ip)
   np->ft = ntohl(ip->ft);
 }
 
-static void set_rack(sLink* lp, sIseg* sp)
-{
+static void set_rack(sLink *lp, sIseg *sp) {
   int diff;
 
   if (!lp->np->link[lp->lix].flags.b.connected)
@@ -1656,17 +1585,17 @@ static void set_rack(sLink* lp, sIseg* sp)
   } else if (diff > 1) {
     if ((++lp->np->link[lp->lix].err_seq % 20) == 1) {
       errh_Info("%s, %d sequence error %d segments %s : (%d)[%d]\n",
-          lp->np->link[lp->lix].name, lp->np->link[lp->lix].err_seq, diff - 1,
-          event_string(sp->head.flags.b.event), sp->head.lack.seq,
-          sp->head.rack.seq);
+                lp->np->link[lp->lix].name, lp->np->link[lp->lix].err_seq,
+                diff - 1, event_string(sp->head.flags.b.event),
+                sp->head.lack.seq, sp->head.rack.seq);
     }
     return;
   } else {
     if ((++lp->np->link[lp->lix].err_red % 20) == 1) {
       errh_Info("%s, %d redundant segment %s : (%d)[%d]\n",
-          lp->np->link[lp->lix].name, lp->np->link[lp->lix].err_red,
-          event_string(sp->head.flags.b.event), sp->head.lack.seq,
-          sp->head.rack.seq);
+                lp->np->link[lp->lix].name, lp->np->link[lp->lix].err_red,
+                event_string(sp->head.flags.b.event), sp->head.lack.seq,
+                sp->head.rack.seq);
     }
     return;
   }
@@ -1683,15 +1612,14 @@ static void set_rack(sLink* lp, sIseg* sp)
     lp->np->link[lp->lix].pending_rack = YES;
     time_GetTimeMonotonic(&lp->np->link[lp->lix].rack_tmo);
     time_Aadd(&lp->np->link[lp->lix].rack_tmo, &lp->np->link[lp->lix].rack_tmo,
-        &lp->ack_delay); /* lp->rack_tmo; */
+              &lp->ack_delay); /* lp->rack_tmo; */
   }
 }
 
-static void set_recvmsg(sIseg* sp, sMsg* mp)
-{
-  mp->iov[0].iov_base = (char*)&mp->head;
+static void set_recvmsg(sIseg *sp, sMsg *mp) {
+  mp->iov[0].iov_base = (char *)&mp->head;
   mp->iov[0].iov_len = sizeof(mp->head);
-  mp->iov[1].iov_base = (char*)sp->buff;
+  mp->iov[1].iov_base = (char *)sp->buff;
   mp->iov[1].iov_len = qcom_segment_size;
 
   memset(&mp->sa, 0, sizeof(mp->sa));
@@ -1699,12 +1627,11 @@ static void set_recvmsg(sIseg* sp, sMsg* mp)
   mp->msg.msg_iov = mp->iov;
   mp->msg.msg_iovlen = 2;
 
-  mp->msg.msg_name = (void*)&mp->sa;
+  mp->msg.msg_name = (void *)&mp->sa;
   mp->msg.msg_namelen = sizeof(mp->sa);
 }
 
-static void seg_send(sLink* lp, sEseg* sp)
-{
+static void seg_send(sLink *lp, sEseg *sp) {
   sMsg msg;
 
   sp->head.lack.ts = time_Clock(NULL, NULL);
@@ -1726,8 +1653,9 @@ static void seg_send(sLink* lp, sEseg* sp)
   if (sp->bytes == -1) {
     if (errno != EHOSTDOWN && errno != EHOSTUNREACH) {
       errh_Error("sendmsg to node %s (%s) failed\n(%d) %s",
-          sp->lp->np->link[lp->lix].name,
-          cdh_NodeIdToString(NULL, sp->lp->nid, 0, 0), errno, strerror(errno));
+                 sp->lp->np->link[lp->lix].name,
+                 cdh_NodeIdToString(NULL, sp->lp->nid, 0, 0), errno,
+                 strerror(errno));
     }
   } else {
     lp->np->link[lp->lix].pending_rack = NO;
@@ -1749,32 +1677,31 @@ static void seg_send(sLink* lp, sEseg* sp)
   sched_yield();
 }
 
-static void set_sendmsg(sLink* lp, sEseg* sp, sMsg* mp)
-{
+static void set_sendmsg(sLink *lp, sEseg *sp, sMsg *mp) {
   int i = 0;
   int size = 0;
-  char* p;
+  char *p;
 
   pwr_Assert(lp != NULL);
 
   memset(&mp->msg, 0, sizeof(mp->msg));
   mp->msg.msg_iov = mp->iov;
 
-  mp->iov[i].iov_base = (char*)&mp->head;
+  mp->iov[i].iov_base = (char *)&mp->head;
   mp->iov[i++].iov_len = sizeof(mp->head);
 
   if (sp == NULL) {
     ;
-  } else if (sp->head.flags.b.event == eEvent_connect
-      || sp->head.flags.b.event == eEvent_connectPassive) {
-    mp->iov[i].iov_base = (char*)&l.link_info;
+  } else if (sp->head.flags.b.event == eEvent_connect ||
+             sp->head.flags.b.event == eEvent_connectPassive) {
+    mp->iov[i].iov_base = (char *)&l.link_info;
     mp->iov[i++].iov_len = sizeof(l.link_info);
   } else if (sp->bp != NULL) {
-    p = (char*)sp->p;
+    p = (char *)sp->p;
     size = sp->size;
     if (sp->head.flags.b.first) {
-      encode_info(&mp->info, (qdb_sInfo*)p);
-      mp->iov[i].iov_base = (char*)&mp->info;
+      encode_info(&mp->info, (qdb_sInfo *)p);
+      mp->iov[i].iov_base = (char *)&mp->info;
       mp->iov[i++].iov_len = sizeof(mp->info);
       p += sizeof(mp->info);
       size -= sizeof(mp->info);
@@ -1784,12 +1711,11 @@ static void set_sendmsg(sLink* lp, sEseg* sp, sMsg* mp)
   }
 
   mp->msg.msg_iovlen = i;
-  mp->msg.msg_name = (void*)&lp->np->link[lp->lix].sa;
+  mp->msg.msg_name = (void *)&lp->np->link[lp->lix].sa;
   mp->msg.msg_namelen = sizeof(lp->np->link[0].sa);
 }
 
-static void start_rto(sLink* lp)
-{
+static void start_rto(sLink *lp) {
   double rto;
 
   rto = lp->np->link[lp->lix].rtt_srtt + (4.0 * lp->np->link[lp->lix].rtt_var);
@@ -1802,8 +1728,7 @@ static void start_rto(sLink* lp)
   lp->np->link[lp->lix].rtt_rto = rto;
 }
 
-static void update_rtt(sLink* lp, sEseg* sp)
-{
+static void update_rtt(sLink *lp, sEseg *sp) {
   pwr_tDeltaTime dt;
   float delta;
   pwr_tTime now;
@@ -1824,24 +1749,21 @@ static void update_rtt(sLink* lp, sEseg* sp)
   lp->np->link[lp->lix].rtt_var += (delta - lp->np->link[lp->lix].rtt_var) / 4;
 }
 
-static void window_insert(sLink* lp, sEseg* sp)
-{
+static void window_insert(sLink *lp, sEseg *sp) {
   pwr_Assert(!lst_IsLinked(NULL, &sp->c.le));
   lst_InsertPred(NULL, &lp->lh_win, &sp->c.le, sp);
   lp->np->link[lp->lix].win_count++;
   sp->head.lack.seq = ++lp->np->link[lp->lix].seq;
 }
 
-static void window_remove(sLink* lp, sEseg* sp)
-{
+static void window_remove(sLink *lp, sEseg *sp) {
   pwr_Assert(lst_IsLinked(NULL, &sp->c.le));
   lst_Remove(NULL, &sp->c.le);
   lp->np->link[lp->lix].win_count--;
 }
 
-static sEseg* window_tmo(sLink* lp)
-{
-  sEseg* sp = lst_Succ(NULL, &lp->lh_win, NULL);
+static sEseg *window_tmo(sLink *lp) {
+  sEseg *sp = lst_Succ(NULL, &lp->lh_win, NULL);
 
   if (sp == NULL || !expired(&sp->tmo))
     return NULL;
@@ -1849,11 +1771,10 @@ static sEseg* window_tmo(sLink* lp)
   return sp;
 }
 
-static void check_link_status()
-{
+static void check_link_status() {
   pwr_tStatus sts;
   pwr_tStatus linksts = PWR__SRUN;
-  sLink* lp;
+  sLink *lp;
 
   for (lp = tree_Minimum(&sts, l.links.table); lp != NULL;
        lp = tree_Successor(&sts, l.links.table, lp)) {
@@ -1863,29 +1784,27 @@ static void check_link_status()
   if (linksts != l.sts) {
     if (errh_Severity(linksts) >= errh_Severity(qcom_sts))
       errh_SetStatus(linksts);
-    else if (errh_Severity(l.sts) >= errh_Severity(qcom_sts)
-        && errh_Severity(linksts) < errh_Severity(qcom_sts))
+    else if (errh_Severity(l.sts) >= errh_Severity(qcom_sts) &&
+             errh_Severity(linksts) < errh_Severity(qcom_sts))
       errh_SetStatus(qcom_sts);
     l.sts = linksts;
   }
 }
 
-static void set_status(pwr_tStatus sts)
-{
+static void set_status(pwr_tStatus sts) {
   if (sts != qcom_sts) {
     if (errh_Severity(sts) >= errh_Severity(l.sts))
       errh_SetStatus(sts);
-    else if (errh_Severity(qcom_sts) >= errh_Severity(l.sts)
-        && errh_Severity(sts) < errh_Severity(l.sts))
+    else if (errh_Severity(qcom_sts) >= errh_Severity(l.sts) &&
+             errh_Severity(sts) < errh_Severity(l.sts))
       errh_SetStatus(l.sts);
     qcom_sts = sts;
   }
 }
 
-static void purge(void)
-{
+static void purge(void) {
   pwr_tStatus sts;
-  sLink* lp;
+  sLink *lp;
 
   for (lp = tree_Minimum(&sts, l.links.table); lp != NULL;
        lp = tree_Successor(&sts, l.links.table, lp))
@@ -1893,14 +1812,13 @@ static void purge(void)
   errh_Error("Links purged, qdb pool exhausted");
 }
 
-static void*
+static void *
 
-action_thread()
-{
+action_thread() {
   pwr_tStatus sts;
   qcom_sGet get;
-  void* msg;
-  sLink* lp;
+  void *msg;
+  sLink *lp;
 
   while (qdb->g->up) {
     memset(&get, 0, sizeof(get));
@@ -1918,11 +1836,11 @@ action_thread()
 
           break;
         case qmon_eMsgTypeAction_Connect: {
-          sLink* lp;
-          sEseg* sp;
+          sLink *lp;
+          sEseg *sp;
           pwr_tNodeId nid;
 
-          nid = *(pwr_tNodeId*)msg;
+          nid = *(pwr_tNodeId *)msg;
           lp = get_link(nid, NULL);
           if (!lp)
             break;
@@ -1932,10 +1850,10 @@ action_thread()
           break;
         }
         case qmon_eMsgTypeAction_Disconnect: {
-          sLink* lp;
+          sLink *lp;
           pwr_tNodeId nid;
 
-          nid = *(pwr_tNodeId*)msg;
+          nid = *(pwr_tNodeId *)msg;
 
           lp = get_link(nid, NULL);
           if (!lp)
@@ -1955,9 +1873,8 @@ action_thread()
   return NULL;
 }
 
-static sEseg* send_action(sLink* lp, qmon_eMsgTypeAction action)
-{
-  sEseg* sp;
+static sEseg *send_action(sLink *lp, qmon_eMsgTypeAction action) {
+  sEseg *sp;
 
   sp = eseg_alloc(&l.eseg.mutex);
   switch (action) {

@@ -50,20 +50,18 @@
 #include "xtt_trend_gtk.h"
 #include "xtt_xnav.h"
 
-XttTrendGtk::XttTrendGtk(void* parent_ctx, GtkWidget* parent_wid, char* name,
-    GtkWidget** w, pwr_sAttrRef* trend_list, pwr_sAttrRef* plotgroup, int width,
-    int height, unsigned int x_options, int x_color_theme, void* basewidget,
-    int* sts)
-    : XttTrend(parent_ctx, name, trend_list, plotgroup, x_options,
-          x_color_theme, sts),
+XttTrendGtk::XttTrendGtk(void* parent_ctx, GtkWidget* parent_wid, char* name, GtkWidget** w,
+                         pwr_sAttrRef* trend_list, pwr_sAttrRef* plotgroup, int width, int height,
+                         unsigned int x_options, int x_color_theme, void* basewidget, int* sts)
+    : XttTrend(parent_ctx, name, trend_list, plotgroup, x_options, x_color_theme, sts),
       parent_widget(parent_wid)
 {
   if (EVEN(*sts))
     return;
   *sts = XNAV__SUCCESS;
 
-  curve = new GeCurveGtk(this, parent_widget, name, NULL, gcd, 1, width, height,
-      options, color_theme, basewidget);
+  curve = new GeCurveGtk(this, parent_widget, name, NULL, gcd, 1, width, height, options, color_theme,
+                         basewidget);
   curve->close_cb = trend_close_cb;
   curve->help_cb = trend_help_cb;
   curve->snapshot_cb = trend_snapshot_cb;
@@ -73,11 +71,10 @@ XttTrendGtk::XttTrendGtk(void* parent_ctx, GtkWidget* parent_wid, char* name,
     *w = (GtkWidget*)curve->get_widget();
 
   if (trend_tid == pwr_cClass_DsTrendCurve)
-    curve->enable(curve_mEnable_Snapshot | curve_mEnable_Add
-        | curve_mEnable_CurveType | curve_mEnable_FillCurve);
+    curve->enable(curve_mEnable_Snapshot | curve_mEnable_Add | curve_mEnable_CurveType |
+                  curve_mEnable_FillCurve);
   else
-    curve->enable(
-        curve_mEnable_Add | curve_mEnable_CurveType | curve_mEnable_FillCurve);
+    curve->enable(curve_mEnable_Add | curve_mEnable_CurveType | curve_mEnable_FillCurve);
 
   wow = new CoWowGtk(parent_widget);
   timerid = wow->timer_new();
@@ -89,7 +86,8 @@ XttTrendGtk::~XttTrendGtk()
   if (timerid)
     timerid->remove();
 
-  for (int i = 0; i < trend_cnt; i++) {
+  for (int i = 0; i < trend_cnt; i++)
+  {
     gdh_UnrefObjectInfo(subid[i]);
   }
   delete curve;
@@ -100,10 +98,8 @@ XttTrendGtk::~XttTrendGtk()
   delete wow;
 }
 
-XttOTree* XttTrendGtk::tree_new(const char* title, pwr_tAttrRef* itemlist,
-    int itemcnt, unsigned int layout,
-    pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
+XttOTree* XttTrendGtk::tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt, unsigned int layout,
+                                pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
 {
-  return new XttOTreeGtk(
-      parent_widget, this, title, itemlist, itemcnt, layout, action_cb);
+  return new XttOTreeGtk(parent_widget, this, title, itemlist, itemcnt, layout, action_cb);
 }

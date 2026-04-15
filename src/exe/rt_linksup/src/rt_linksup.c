@@ -56,7 +56,8 @@
 #define cTimerTimeScan 1000 /* ms */
 #define cTimerTimeDetect cTimerTimeScan
 
-typedef enum {
+typedef enum
+{
   eListState__ = 0,
   eListState_Init = 1,
   eListState_Scan = 2,
@@ -65,11 +66,15 @@ typedef enum {
   eListState_
 } eListState;
 
-typedef enum { eTimer_ScanMessage = 1 } eTimer;
+typedef enum
+{
+  eTimer_ScanMessage = 1
+} eTimer;
 
 typedef struct s_Node sNode;
 
-struct s_Node {
+struct s_Node
+{
   struct LstHead node_l;
   struct LstHead timer_l;
   pwr_tObjid oid;
@@ -104,25 +109,29 @@ int main(int argc, char** argv)
   errh_Init("pwr_linksup", errh_eAnix_linksup);
   errh_SetStatus(PWR__SRVSTARTUP);
 
-  if (!qcom_Init(&sts, NULL, "pwr_linksup")) {
+  if (!qcom_Init(&sts, NULL, "pwr_linksup"))
+  {
     errh_Error("qcom_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   sts = gdh_Init("pwr_linksup");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
-  if (!qcom_CreateQ(&sts, &my_q, NULL, "events")) {
+  if (!qcom_CreateQ(&sts, &my_q, NULL, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
-  if (!qcom_Bind(&sts, &my_q, &qcom_cQini)) {
+  if (!qcom_Bind(&sts, &my_q, &qcom_cQini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
@@ -139,9 +148,12 @@ int main(int argc, char** argv)
   LstInit(&timer_l);
 
   init_nodes();
-  if (!LstEmpty(&node_l)) {
+  if (!LstEmpty(&node_l))
+  {
     list_state = eListState_Scan;
-  } else {
+  }
+  else
+  {
     errh_Info("No nodes to supervise, exiting");
     errh_SetStatus(pwr_cNStatus);
     exit(0);
@@ -149,14 +161,19 @@ int main(int argc, char** argv)
 
   errh_SetStatus(PWR__SRUN);
 
-  for (;;) {
+  for (;;)
+  {
     scan_timers();
     scan_nodes();
     get.data = NULL;
-    if (qcom_Get(&sts, &my_q, &get, cTimerTimeScan) != NULL) {
-      if (get.type.b == qcom_eBtype_event) {
+    if (qcom_Get(&sts, &my_q, &get, cTimerTimeScan) != NULL)
+    {
+      if (get.type.b == qcom_eBtype_event)
+      {
         event(&get);
-      } else {
+      }
+      else
+      {
         errh_Info("unexpected message type, type: %d", get.type.b);
       }
       qcom_Free(&sts, get.data);
@@ -174,26 +191,35 @@ static void detect(pwr_sClass_NodeLinkSup* o, pwr_tBoolean con, sNode* np)
   /* For DSup we compare with control position, but for NodeLink
      we only detect LinkDown  */
 
-  if (o->LinkUp) {
+  if (o->LinkUp)
+  {
     if (o->Action)
       o->Action = FALSE;
-    if (o->ReturnCheck) {
+    if (o->ReturnCheck)
+    {
       time_GetTime(&o->ReturnTime);
       o->ReturnCheck = FALSE;
       o->ReturnSend = TRUE;
     }
-    if (o->AlarmCheck && !o->DetectCheck) {
+    if (o->AlarmCheck && !o->DetectCheck)
+    {
       o->TimerFlag = FALSE;
       o->DetectCheck = TRUE;
     }
-  } else if (con) {
+  }
+  else if (con)
+  {
     if (!o->Action)
       o->Action = TRUE;
-    if (o->AlarmCheck && o->DetectOn && !o->Blocked) {
-      if (o->DetectCheck) {
+    if (o->AlarmCheck && o->DetectOn && !o->Blocked)
+    {
+      if (o->DetectCheck)
+      {
         o->TimerCount = (o->TimerTime * 1000) / cTimerTimeDetect;
-        if (!o->TimerFlag && o->TimerCount > 0) {
-          if (LstIsNull(&np->timer_l)) {
+        if (!o->TimerFlag && o->TimerCount > 0)
+        {
+          if (LstIsNull(&np->timer_l))
+          {
             LstInsert(&timer_l, &np->timer_l);
           }
           o->TimerFlag = TRUE;
@@ -201,7 +227,8 @@ static void detect(pwr_sClass_NodeLinkSup* o, pwr_tBoolean con, sNode* np)
         time_GetTime(&o->DetectTime);
         o->DetectCheck = FALSE;
       }
-      if (!o->TimerFlag) {
+      if (!o->TimerFlag)
+      {
         o->DetectSend = TRUE;
         o->ReturnCheck = TRUE;
         o->Acked = FALSE;
@@ -224,21 +251,29 @@ static void event(qcom_sGet* get)
   cur_event.m = sav_event;
   new_event.m = ep->mask;
 
-  if (new_event.b.swapDone & !cur_event.b.swapDone) {
+  if (new_event.b.swapDone & !cur_event.b.swapDone)
+  {
     errh_Info("Warm restart completed.");
     reinit_nodes();
-    if (!LstEmpty(&node_l)) {
+    if (!LstEmpty(&node_l))
+    {
       list_state = eListState_Scan;
       scan_timers();
       scan_nodes();
-    } else {
+    }
+    else
+    {
       list_state = eListState_NoNodeLink;
       errh_Info("No NodeLink objects.");
     }
-  } else if (new_event.b.swapInit & !cur_event.b.swapInit) {
+  }
+  else if (new_event.b.swapInit & !cur_event.b.swapInit)
+  {
     list_state = eListState_Wait;
     errh_Info("Warm restart initiated.");
-  } else if (new_event.b.terminate & !cur_event.b.terminate) {
+  }
+  else if (new_event.b.terminate & !cur_event.b.terminate)
+  {
     exit(0);
   }
 
@@ -260,15 +295,18 @@ static sNode* init_node(pwr_tObjid oid, sNode* np, pwr_tBoolean new_sub)
     return NULL;
 
   /* Allocate and initiate NodeLink control block */
-  if (np == NULL) {
+  if (np == NULL)
+  {
     aref = cdh_ObjidToAref(oid);
     sts = gdh_DLRefObjectInfoAttrref(&aref, (pwr_tAddress*)&o, &dlid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_Error("Couldn't get direct link to NodeLink object, %m", sts);
       return NULL;
     }
     np = (sNode*)calloc(1, sizeof(sNode));
-    if (np == NULL) {
+    if (np == NULL)
+    {
       if (cdh_DlidIsNotNull(dlid))
         gdh_DLUnrefObjectInfo(dlid);
       errh_Error("Error calloc, sNode");
@@ -283,7 +321,8 @@ static sNode* init_node(pwr_tObjid oid, sNode* np, pwr_tBoolean new_sub)
 
   /* Setup subscription to supervised Node object's attribute CurVersion. */
 
-  if (new_sub) {
+  if (new_sub)
+  {
     int dt;
     int tmo;
 
@@ -294,12 +333,13 @@ static sNode* init_node(pwr_tObjid oid, sNode* np, pwr_tBoolean new_sub)
     aref.Objid = o->Node;
     sts = gdh_ClassAttrToAttrref(pwr_eClass_Node, ".SystemStatus", &aref);
     sts = gdh_SubRefObjectInfoAttrref(&aref, &o->SubId);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_Error("Couldn't get link to Node object, %m", sts);
       o->SystemStatus = PWR__NETTIMEOUT;
-    } else
-      gdh_SubAssociateBuffer(
-          o->SubId, (void**)&np->subvalue, sizeof(pwr_tStatus));
+    }
+    else
+      gdh_SubAssociateBuffer(o->SubId, (void**)&np->subvalue, sizeof(pwr_tStatus));
   }
 
   return np;
@@ -310,16 +350,17 @@ static sNode* init_node(pwr_tObjid oid, sNode* np, pwr_tBoolean new_sub)
 static pwr_tStatus init_nodes()
 {
   pwr_tStatus sts;
-  struct LstHead * nl;
+  struct LstHead* nl;
   sNode* np;
   pwr_tObjid oid;
 
   nl = &node_l;
 
-  for (sts = gdh_GetClassList(pwr_cClass_NodeLinkSup, &oid); ODD(sts);
-       sts = gdh_GetNextObject(oid, &oid)) {
+  for (sts = gdh_GetClassList(pwr_cClass_NodeLinkSup, &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+  {
     np = init_node(oid, NULL, 1);
-    if (np != NULL) {
+    if (np != NULL)
+    {
       LstInsert(nl, &np->node_l);
       nl = &np->node_l;
     }
@@ -335,9 +376,10 @@ static pwr_tStatus init_nodes()
 
 static sNode* get_nodes(pwr_tObjid oid)
 {
-  struct LstHead * nl;
+  struct LstHead* nl;
 
-  LstForEach(nl, &node_l) {
+  LstForEach(nl, &node_l)
+  {
     if (cdh_ObjidIsEqual(LstEntry(nl, sNode, node_l)->oid, oid))
       return LstEntry(nl, sNode, node_l);
   }
@@ -348,31 +390,36 @@ static sNode* get_nodes(pwr_tObjid oid)
 static void reinit_nodes()
 {
   pwr_tStatus sts;
-  struct LstHead * nl;
+  struct LstHead* nl;
   sNode* np;
   pwr_tObjid oid;
 
   /* Mark all links in the NodeLink list */
-  LstForEach(nl, &node_l)
-    LstEntry(nl, sNode, node_l)->found = FALSE;
+  LstForEach(nl, &node_l) LstEntry(nl, sNode, node_l)->found = FALSE;
 
-  for (sts = gdh_GetClassList(pwr_cClass_NodeLinkSup, &oid); ODD(sts);
-       sts = gdh_GetNextObject(oid, &oid)) {
-    if ((np = get_nodes(oid)) == NULL) {
+  for (sts = gdh_GetClassList(pwr_cClass_NodeLinkSup, &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+  {
+    if ((np = get_nodes(oid)) == NULL)
+    {
       np = init_node(oid, NULL, 1);
-      if (np != NULL) {
+      if (np != NULL)
+      {
         LstInsert(nl, &np->node_l);
         nl = &np->node_l;
         np->found = TRUE;
       }
-    } else {
+    }
+    else
+    {
       update_node(np);
     }
   }
 
-  LstForEach(nl, &node_l) {
+  LstForEach(nl, &node_l)
+  {
     np = LstEntry(nl, sNode, node_l);
-    if (!np->found) {
+    if (!np->found)
+    {
       nl = np->node_l.prev;
       LstRemove(&np->node_l);
       LstNull(&np->node_l);
@@ -385,7 +432,7 @@ static void reinit_nodes()
 
 static void scan_nodes()
 {
-  struct LstHead * nl;
+  struct LstHead* nl;
   pwr_tStatus sts;
   pwr_tBoolean Old;
   pwr_tTime LastUpdate, Timeout, CurrentTime;
@@ -394,12 +441,14 @@ static void scan_nodes()
 
   time_GetTime(&CurrentTime);
 
-  LstForEach(nl, &node_l) {
+  LstForEach(nl, &node_l)
+  {
     sNode* np = LstEntry(nl, sNode, node_l);
     pwr_sClass_NodeLinkSup* o = np->o;
     LinkUp = 0;
     sts = gdh_GetSubscriptionOldness(o->SubId, &Old, &LastUpdate, NULL);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* IF (CurrentTime < LastUpdate + TimeoutTime) THEN LinkUp */
       Delta.tv_sec = o->TimeoutTime;
       Delta.tv_nsec = 0;
@@ -409,11 +458,14 @@ static void scan_nodes()
       o->SystemStatus = *np->subvalue;
     }
 
-    if (o->LinkUp && !LinkUp) {
+    if (o->LinkUp && !LinkUp)
+    {
       o->LinkUp = 0;
       o->DownTime = CurrentTime;
       o->SystemStatus = PWR__NETTIMEOUT;
-    } else if (!o->LinkUp && LinkUp) {
+    }
+    else if (!o->LinkUp && LinkUp)
+    {
       o->LinkUp = 1;
       o->UpTime = CurrentTime;
       o->UpCount++;
@@ -425,18 +477,22 @@ static void scan_nodes()
 
 static void scan_timers()
 {
-  struct LstHead * nl, *nxtnl;
+  struct LstHead *nl, *nxtnl;
   plc_sTimer* tp;
 
-  for (nl = timer_l.next; nl != &timer_l; nl = nxtnl) {
+  for (nl = timer_l.next; nl != &timer_l; nl = nxtnl)
+  {
     tp = LstEntry(nl, sNode, timer_l)->timer;
     nxtnl = nl->next;
-    if (tp->TimerCount <= 1 || !tp->TimerFlag) {
+    if (tp->TimerCount <= 1 || !tp->TimerFlag)
+    {
       tp->TimerCount = 0;
       tp->TimerFlag = FALSE;
       LstRemove(nl);
       LstNull(nl);
-    } else {
+    }
+    else
+    {
       tp->TimerCount--;
     }
   }
@@ -447,10 +503,13 @@ static void update_node(sNode* np)
   pwr_tBoolean new_sub;
 
   /* Check that the same Node object is supervised   */
-  if (cdh_ObjidIsEqual(np->node.Node, np->o->Node)
-      && feqf(np->node.SubscriptionInterval, np->o->SubscriptionInterval)) {
+  if (cdh_ObjidIsEqual(np->node.Node, np->o->Node) &&
+      feqf(np->node.SubscriptionInterval, np->o->SubscriptionInterval))
+  {
     new_sub = FALSE;
-  } else {
+  }
+  else
+  {
     gdh_SubUnrefObjectInfo(np->o->SubId);
     np->o->SubId = pwr_cNSubid;
     new_sub = TRUE;

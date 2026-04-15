@@ -12,9 +12,11 @@ main()
   int i;
   char str[80];
 
-  while (gets(string) != NULL) {
+  while (gets(string) != NULL)
+  {
     pn = cdh_ParseName(&sts, &ParseName, poid, string, 0);
-    if (pn == NULL) {
+    if (pn == NULL)
+    {
       printf("Error, sts = %d\n", sts);
       continue;
     }
@@ -50,8 +52,10 @@ main()
     printf("nobject: %d\n", pn->nObject);
     printf("nbody  : %d\n", pn->nBody);
 
-    if (pn->flags.b.idString) {
-      switch (pn->eId) {
+    if (pn->flags.b.idString)
+    {
+      switch (pn->eId)
+      {
       case cdh_eId_objectIx:
         printf("eId  : ObjectIx\n");
         printf("Value: %s\n", cdh_ObjectIxToString(NULL, pn->uId.oix, 1));
@@ -91,22 +95,20 @@ main()
       }
     }
     if (pn->flags.b.volume)
-      printf("Volume      : %d,%d,%c,%c, %s %s\n", pn->volume.pack.c.len,
-          pn->volume.pack.c.hash, pn->volume.pack.c.first,
-          pn->volume.pack.c.last, pn->volume.orig, pn->volume.norm);
-    for (i = 0; i < pn->nObject; i++) {
-      printf("Object(%.4d): %d,%d,%c,%c, %s %s\n", i, pn->object[i].pack.c.len,
-          pn->object[i].pack.c.hash, pn->object[i].pack.c.first,
-          pn->object[i].pack.c.last, pn->object[i].orig, pn->object[i].norm);
+      printf("Volume      : %d,%d,%c,%c, %s %s\n", pn->volume.pack.c.len, pn->volume.pack.c.hash,
+             pn->volume.pack.c.first, pn->volume.pack.c.last, pn->volume.orig, pn->volume.norm);
+    for (i = 0; i < pn->nObject; i++)
+    {
+      printf("Object(%.4d): %d,%d,%c,%c, %s %s\n", i, pn->object[i].pack.c.len, pn->object[i].pack.c.hash,
+             pn->object[i].pack.c.first, pn->object[i].pack.c.last, pn->object[i].orig, pn->object[i].norm);
     }
-    for (i = 0; i < pn->nBody; i++) {
-      printf("Body(%.4d)  : %d,%d,%c,%c, %s %s\n", i, pn->body[i].pack.c.len,
-          pn->body[i].pack.c.hash, pn->body[i].pack.c.first,
-          pn->body[i].pack.c.last, pn->body[i].orig, pn->body[i].norm);
+    for (i = 0; i < pn->nBody; i++)
+    {
+      printf("Body(%.4d)  : %d,%d,%c,%c, %s %s\n", i, pn->body[i].pack.c.len, pn->body[i].pack.c.hash,
+             pn->body[i].pack.c.first, pn->body[i].pack.c.last, pn->body[i].orig, pn->body[i].norm);
     }
     if (pn->flags.b.attribute)
-      printf("Attribute   : %d,%d,%c,%c, %s %s\n", pn->attribute.pack.c.len,
-          pn->attribute.pack.c.hash, pn->attribute.pack.c.first,
-          pn->attribute.pack.c.last, pn->attribute.orig, pn->attribute.norm);
+      printf("Attribute   : %d,%d,%c,%c, %s %s\n", pn->attribute.pack.c.len, pn->attribute.pack.c.hash,
+             pn->attribute.pack.c.first, pn->attribute.pack.c.last, pn->attribute.orig, pn->attribute.norm);
   }
 }

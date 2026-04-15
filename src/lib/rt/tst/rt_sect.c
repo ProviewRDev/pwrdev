@@ -35,7 +35,7 @@
  */
 
 /* rt_sect.c -- <short description>
-*/
+ */
 
 #include <semaphore.h>
 #include <stdio.h>
@@ -59,20 +59,23 @@ void* mapit(char* poolName, int memorySize, char fill)
 
   shm_fd = shm_open(poolName, shMemFlags, shMemMode);
 
-  if (shm_fd == -1) {
+  if (shm_fd == -1)
+  {
     perror(" Error : ");
     return NULL;
   }
 
   sts = ftruncate(shm_fd, memorySize);
-  if (sts < 0) {
+  if (sts < 0)
+  {
     perror(" Error :");
     return NULL;
   }
 
   myData = mmap(0, memorySize, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);
   printf("myData = %x\n", myData);
-  if (myData == MAP_FAILED) {
+  if (myData == MAP_FAILED)
+  {
     perror(" Error : ");
     return NULL;
   }
@@ -92,7 +95,8 @@ main(int argc, char** argv)
   char a = 'a';
   char s[80];
 
-  for (i = 0; i < 10; i++) {
+  for (i = 0; i < 10; i++)
+  {
     sprintf(s, "/Lasse%x", i);
     addr = mapit(s, i * 10000, a++);
     printf("Addr: %x\n", addr);

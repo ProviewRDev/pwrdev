@@ -42,27 +42,27 @@
 
 #include "flow.h"
 
-typedef struct {
-    char object[200];
-    char attribute[200];
-    flow_eTraceType type;
-    int inverted;
+typedef struct
+{
+  char object[200];
+  char attribute[200];
+  flow_eTraceType type;
+  int inverted;
 } FlowTraceAttr;
 
-class FlowArrayElem {
+class FlowArrayElem
+{
 public:
   virtual void zoom();
   virtual void nav_zoom();
   virtual void print_zoom();
   virtual void traverse(int x, int y);
-  virtual void get_borders(
-      double* x_right, double* x_left, double* y_high, double* y_low);
-  virtual void get_borders(double pos_x, double pos_y, double* x_right,
-      double* x_left, double* y_high, double* y_low, void* node);
+  virtual void get_borders(double* x_right, double* x_left, double* y_high, double* y_low);
+  virtual void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                           double* y_low, void* node);
   virtual void get_borders();
   virtual int event_handler(flow_eEvent event, int x, int y);
-  virtual int event_handler(
-      void* pos, flow_eEvent event, int x, int y, void* node);
+  virtual int event_handler(void* pos, flow_eEvent event, int x, int y, void* node);
   virtual void print(double ll_x, double ll_y, double ur_x, double ur_y);
   virtual void save(std::ofstream& fp, flow_eSaveMode mode);
   virtual void open(std::ifstream& fp);
@@ -74,14 +74,12 @@ public:
   virtual void draw_inverse(void* pos, int hot, void* node);
   virtual void move(int delta_x, int delta_y, int grid);
   virtual void move_noerase(int delta_x, int delta_y, int grid);
-  virtual void shift(void* pos, double delta_x, double delta_y, int highlight,
-      int dimmed, int hot);
+  virtual void shift(void* pos, double delta_x, double delta_y, int highlight, int dimmed, int hot);
   virtual void nav_draw(int ll_x, int ll_y, int ur_x, int ur_y);
   virtual void nav_draw(void* pos, int highlight, void* node);
   virtual void nav_erase();
   virtual void nav_erase(void* pos, void* node);
-  virtual void conpoint_select(
-      void* pos, int x, int y, double* distance, void** cp);
+  virtual void conpoint_select(void* pos, int x, int y, double* distance, void** cp);
   virtual int get_conpoint(int num, double* x, double* y, flow_eDirection* dir);
   virtual void redraw_node_cons(void* node);
   virtual int delete_node_cons(void* node);
@@ -91,8 +89,7 @@ public:
   virtual int get_dimmed();
   virtual void set_inverse(int on);
   virtual void set_hot(int on);
-  virtual void select_region_insert(
-      double ll_x, double ll_y, double ur_x, double ur_y);
+  virtual void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y);
   virtual flow_eObjectType type();
   virtual void link_insert(FlowArrayElem** start);
   virtual int in_area(double ll_x, double ll_y, double ur_x, double ur_y);
@@ -107,17 +104,13 @@ public:
   virtual void trace_scan();
   virtual int trace_init();
   virtual void trace_close();
-  virtual void set_trace_attr(const char* object, const char* attribute,
-      flow_eTraceType type, int inverted);
+  virtual void set_trace_attr(const char* object, const char* attribute, flow_eTraceType type, int inverted);
   virtual FlowTraceAttr get_trace_attr();
   virtual void* get_ctx();
   virtual void configure(void* previous);
   virtual void move_widgets(int x, int y);
   virtual void get_object_name(char* name);
-  friend std::ostream& operator<<(std::ostream& o, const FlowArrayElem e)
-  {
-    return o;
-  }
+  friend std::ostream& operator<<(std::ostream& o, const FlowArrayElem e) { return o; }
   virtual ~FlowArrayElem();
 };
 

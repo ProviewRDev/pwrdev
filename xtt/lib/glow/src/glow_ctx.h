@@ -52,64 +52,60 @@ class DrawWind;
 class GlowDraw;
 
 //! Comment storage
-class CtxComment {
+class CtxComment
+{
 public:
   CtxComment();
   char text[100][200];
 };
 
 //! Main or navigation window
-class GlowWind {
+class GlowWind
+{
 public:
-  DrawWind* window; //!< Window context.
-  double zoom_factor_x; //!< Zoom factor in x direction.
-  double zoom_factor_y; //!< Zoom factor in y direction.
+  DrawWind* window;        //!< Window context.
+  double zoom_factor_x;    //!< Zoom factor in x direction.
+  double zoom_factor_y;    //!< Zoom factor in y direction.
   double base_zoom_factor; //!< Original zoom factor.
-  int offset_x; //!< Offset in pixel between origo and displayed window in x
+  int offset_x;            //!< Offset in pixel between origo and displayed window in x
   //! direction.
   int offset_y; //!< Offset in pixel between origo and displayde window in y
   //! direction.
-  int window_width; //!< Window width in pixel.
-  int window_height; //!< Window height in pixel.
-  int old_window_width; //!< Old window width in pixel.
-  int old_window_height; //!< Old window height in pixel.
-  int subwindow_x; //!< Subwindow x coordinate in pixel.
-  int subwindow_y; //!< Subwindow y coordinate in pixel.
+  int window_width;       //!< Window width in pixel.
+  int window_height;      //!< Window height in pixel.
+  int old_window_width;   //!< Old window width in pixel.
+  int old_window_height;  //!< Old window height in pixel.
+  int subwindow_x;        //!< Subwindow x coordinate in pixel.
+  int subwindow_y;        //!< Subwindow y coordinate in pixel.
   double subwindow_scale; //!< Subwindow scale.
-  int defered_x_low; //!< Left border of defered redrawing area.
-  int defered_x_high; //!< Right border of defered redrawing area.
-  int defered_y_low; //!< Low border of defered redrawing area.
-  int defered_y_high; //!< High border of defered redrawing area.
+  int defered_x_low;      //!< Left border of defered redrawing area.
+  int defered_x_high;     //!< Right border of defered redrawing area.
+  int defered_y_low;      //!< Low border of defered redrawing area.
+  int defered_y_high;     //!< High border of defered redrawing area.
 
-  GlowWind(double zoom_fact_x, double zoom_fact_y, double base_zoom_fact,
-      int offs_x, int offs_y)
-      : window(0), zoom_factor_x(zoom_fact_x), zoom_factor_y(zoom_fact_y),
-        base_zoom_factor(base_zoom_fact), offset_x(offs_x), offset_y(offs_y),
-        window_width(0), window_height(0), old_window_width(0), 
-        old_window_height(0), subwindow_x(0), subwindow_y(0),
-        subwindow_scale(1)
+  GlowWind(double zoom_fact_x, double zoom_fact_y, double base_zoom_fact, int offs_x, int offs_y)
+      : window(0), zoom_factor_x(zoom_fact_x), zoom_factor_y(zoom_fact_y), base_zoom_factor(base_zoom_fact),
+        offset_x(offs_x), offset_y(offs_y), window_width(0), window_height(0), old_window_width(0),
+        old_window_height(0), subwindow_x(0), subwindow_y(0), subwindow_scale(1)
   {
   }
-
 };
 
 //! Backcall data for scrollbar reconfiguration
-typedef struct {
+typedef struct
+{
   void* scroll_data; //!< Scrollbar data (growwidget_sScroll).
-  int total_width; //!< Total width of work area
-  int total_height; //!< Total height of work area
-  int window_width; //!< Window width
+  int total_width;   //!< Total width of work area
+  int total_height;  //!< Total height of work area
+  int window_width;  //!< Window width
   int window_height; //!< Window height
-  int offset_x; //!< Offset from workarea border to displayed window.
-  int offset_y; //!< Offset from workarea border to displayed window.
+  int offset_x;      //!< Offset from workarea border to displayed window.
+  int offset_y;      //!< Offset from workarea border to displayed window.
 } glow_sScroll;
 
-typedef void (*glow_tUserDataSaveCb)(
-    std::ofstream*, void*, glow_eUserdataCbType);
-typedef void (*glow_tUserDataOpenCb)(
-    std::ifstream*, void*, glow_eUserdataCbType);
-typedef void (*glow_tUserDataCopyCb)(
-    void*, void*, void**, glow_eUserdataCbType);
+typedef void (*glow_tUserDataSaveCb)(std::ofstream*, void*, glow_eUserdataCbType);
+typedef void (*glow_tUserDataOpenCb)(std::ifstream*, void*, glow_eUserdataCbType);
+typedef void (*glow_tUserDataCopyCb)(void*, void*, void**, glow_eUserdataCbType);
 typedef void (*glow_tEventLogCb)(void*, void*, unsigned int);
 typedef void (*glow_tScriptExecCb)(void*, char*);
 
@@ -122,7 +118,8 @@ typedef void (*glow_tScriptExecCb)(void*, char*);
   The event handler detects event in each object and send enabled event to the
   caller.
 */
-class GlowCtx {
+class GlowCtx
+{
 public:
   //! Constructor
   /*!
@@ -131,18 +128,17 @@ public:
     \param offs_x	Initial offset for x-coordinate.
     \param offs_y	Initial offset for y-coordinate.
   */
-  GlowCtx(const char* ctx_name, double zoom_fact = 100, int offs_x = 0,
-      int offs_y = 0);
+  GlowCtx(const char* ctx_name, double zoom_fact = 100, int offs_x = 0, int offs_y = 0);
 
-  glow_eCtxType ctx_type; //!< Type of context
-  GlowWind mw; //!< Main window data.
-  GlowWind navw; //!< Navigation window data.
+  glow_eCtxType ctx_type;   //!< Type of context
+  GlowWind mw;              //!< Main window data.
+  GlowWind navw;            //!< Navigation window data.
   double print_zoom_factor; //!< Zoom factor when printing to postscript.
-  double x_right; //!< Right border of work area.
-  double x_left; //!< Left border of work area.
-  double y_high; //!< High border of work area.
-  double y_low; //!< Low border of work area.
-  int nav_rect_ll_x; //!< x coordinate for lower left corner of navigation
+  double x_right;           //!< Right border of work area.
+  double x_left;            //!< Left border of work area.
+  double y_high;            //!< High border of work area.
+  double y_low;             //!< Low border of work area.
+  int nav_rect_ll_x;        //!< x coordinate for lower left corner of navigation
   //! rectangle in nav window.
   int nav_rect_ll_y; //!< y coordinate for lower left corner of navigation
   //! rectangle in nav window.
@@ -151,7 +147,7 @@ public:
   int nav_rect_ur_y; //!< y coordinate for upper right corner of navigation
   //! rectangle in nav window.
   int nav_rect_hot; //!< Cursor is in navigation rectangle in navigation window.
-  GlowDraw* gdraw; //!< Draw context.
+  GlowDraw* gdraw;  //!< Draw context.
 
   //! Save context to file.
   /*!
@@ -183,10 +179,7 @@ public:
 
   //! Remove an object.
   /*! \param element	Object to remove. */
-  void remove(GlowArrayElem* element)
-  {
-    a.remove(element);
-  }
+  void remove(GlowArrayElem* element) { a.remove(element); }
 
   //! Remove and delete all objects.
   void delete_all();
@@ -201,47 +194,32 @@ public:
     \return		Returns 1 if success, 0 if nodeclass already is
     inserted.
   */
-  int nodeclass_insert(GlowArrayElem* element)
-  {
-    return a_nc.insert(element);
-  }
+  int nodeclass_insert(GlowArrayElem* element) { return a_nc.insert(element); }
 
   //! Insert a connection class.
   /*!
     \param element	Connection class to insert.
     \return		Returns 1 if success, 0 if conclass already is inserted.
   */
-  int conclass_insert(GlowArrayElem* element)
-  {
-    return a_cc.insert(element);
-  }
+  int conclass_insert(GlowArrayElem* element) { return a_cc.insert(element); }
 
   //! Find an object.
   /*!
     \param element	Object to search for.
     \return		1 if object is found, else 0.
   */
-  int find(GlowArrayElem* element)
-  {
-    return a.find(element);
-  }
+  int find(GlowArrayElem* element) { return a.find(element); }
 
   //! Insert an object in select list.
   /*!
     \param element	Object to insert.
     \return		Returns 1 if success, 0 if object already is inserted.
   */
-  int select_insert(GlowArrayElem* element)
-  {
-    return a_sel.insert(element);
-  }
+  int select_insert(GlowArrayElem* element) { return a_sel.insert(element); }
 
   //! Remove an object from selection list.
   /*! \param element	Object to remove. */
-  void select_remove(GlowArrayElem* element)
-  {
-    a_sel.remove(element);
-  }
+  void select_remove(GlowArrayElem* element) { a_sel.remove(element); }
 
   //! Clear selection list.
   /*! Remove all objects from selection list. */
@@ -252,78 +230,51 @@ public:
     \param element	Object to serach for.
     \return		Returns 1 if object is found, else 0.
   */
-  int select_find(GlowArrayElem* element)
-  {
-    return a_sel.find(element);
-  }
+  int select_find(GlowArrayElem* element) { return a_sel.find(element); }
 
   //! Insert an object in list of currently moved objects.
   /*!
     \param element	Object to insert.
     \return		Returns 1 if success, 0 if object already is inserted.
   */
-  int move_insert(GlowArrayElem* element)
-  {
-    return a_move.insert(element);
-  }
+  int move_insert(GlowArrayElem* element) { return a_move.insert(element); }
 
   //! Remove an object from list or currently moved objects.
   /*! \param element	Object to remove. */
-  void move_remove(GlowArrayElem* element)
-  {
-    a_move.remove(element);
-  }
+  void move_remove(GlowArrayElem* element) { a_move.remove(element); }
 
   //! Clear list of currently moved objects.
   /*! Remove all objects from list. */
-  void move_clear()
-  {
-    a_move.clear();
-  }
+  void move_clear() { a_move.clear(); }
 
   //! Find an object in list of currently moved objects.
   /*!
     \param element	Object to serach for.
     \return		Returns 1 if object is found, else 0.
   */
-  int move_find(GlowArrayElem* element)
-  {
-    return a_move.find(element);
-  }
+  int move_find(GlowArrayElem* element) { return a_move.find(element); }
 
   //! Insert an object in paste list.
   /*!
     \param element	Object to insert.
     \return		Returns 1 if success, 0 if object already is inserted.
   */
-  int paste_insert(GlowArrayElem* element)
-  {
-    return a_paste.insert(element);
-  }
+  int paste_insert(GlowArrayElem* element) { return a_paste.insert(element); }
 
   //! Remove an object from paste list.
   /*! \param element	Object to remove. */
-  void paste_remove(GlowArrayElem* element)
-  {
-    a_paste.remove(element);
-  }
+  void paste_remove(GlowArrayElem* element) { a_paste.remove(element); }
 
   //! Clear selection list.
   /*! Remove all objects from paste list. */
-  void paste_clear()
-  {
-    a_paste.clear();
-  } // todo Delete objects also !!!
+  void paste_clear() { a_paste.clear(); } // todo Delete objects also !!!
 
   //! Find an object in paste list.
   /*!
     \param element	Object to serach for.
     \return		Returns 1 if object is found, else 0.
   */
-  int paste_find(GlowArrayElem* element)
-  {
-    return a_paste.find(element);
-  }
+  int paste_find(GlowArrayElem* element) { return a_paste.find(element); }
 
   //! Paste object in pastelist into the window.
   /*! Call paste execute now, or when the cursor enters the window. */
@@ -335,10 +286,7 @@ public:
     the move list.
   */
   void paste_execute();
-  int get_paste_active()
-  {
-    return node_movement_paste_active;
-  }
+  int get_paste_active() { return node_movement_paste_active; }
 
   //! Cut selected objects.
   /*! Clear paste list and move obejcts from select list to the pastelist.
@@ -351,31 +299,19 @@ public:
 
   //! Set highlight on or off on all objects.
   /*! \param on		1 set highlight on, 0 set off. */
-  void set_highlight(int on)
-  {
-    a.set_highlight(on);
-  }
+  void set_highlight(int on) { a.set_highlight(on); }
 
   //! Set inverse on or off on all objects.
   /*! \param on		1 set inverse on, 0 set off. */
-  void set_inverse(int on)
-  {
-    a.set_inverse(on);
-  }
+  void set_inverse(int on) { a.set_inverse(on); }
 
   //! Set highlight on or off on all selected objects.
   /*! \param on		1 set highlight on, 0 set off. */
-  void set_select_highlight(int on)
-  {
-    a_sel.set_highlight(on);
-  }
+  void set_select_highlight(int on) { a_sel.set_highlight(on); }
 
   //! Set inverse on or off on all objects.
   /*! \param on		1 set inverse on, 0 set off. */
-  void set_select_inverse(int on)
-  {
-    a_sel.set_inverse(on);
-  }
+  void set_select_inverse(int on) { a_sel.set_inverse(on); }
 
   void node_movement(GlowArrayElem* node, int x, int y);
 
@@ -396,8 +332,7 @@ public:
     \param x		x coordinate of connection point.
     \param y		y coordinate of connection point.
   */
-  void con_create_dest(
-      GlowArrayElem* node, int cp_num, glow_eEvent event, int x, int y);
+  void con_create_dest(GlowArrayElem* node, int cp_num, glow_eEvent event, int x, int y);
 
   //! Get the selection list.
   /*!
@@ -445,10 +380,7 @@ public:
 
   //! Set snap to grid on or off.
   /*! \param on		1 snap is on, 0 snap is off. */
-  void set_grid(int on)
-  {
-    grid_on = on;
-  }
+  void set_grid(int on) { grid_on = on; }
 
   //! Find the closest grid point.
   /*!
@@ -459,14 +391,14 @@ public:
   */
   void find_grid(double x, double y, double* x_grid, double* y_grid);
 
-  GlowArrayElem* node_moved; //!< Not used.
-  int node_move_last_x; //!< Last x position of the cursor in a move sequence.
-  int node_move_last_y; //!< Last y position of the cursor in a move sequence.
-  int node_movement_active; //!< Movement sequence is active.
+  GlowArrayElem* node_moved;      //!< Not used.
+  int node_move_last_x;           //!< Last x position of the cursor in a move sequence.
+  int node_move_last_y;           //!< Last y position of the cursor in a move sequence.
+  int node_movement_active;       //!< Movement sequence is active.
   int node_movement_paste_active; //!< Movement sequence of pasted node is
   //! active.
   int node_movement_paste_pending; //!< Execution of paste is pending.
-  int nav_rect_move_last_x; //!< Last x position of the cursor when moving
+  int nav_rect_move_last_x;        //!< Last x position of the cursor when moving
   //! navigation rectangle in nav window.
   int nav_rect_move_last_y; //!< Last x position of the cursor when moving
   //! navigation rectangle in nav window.
@@ -474,7 +406,7 @@ public:
   //! window active.
   int nav_rect_zoom_active; //!< Zoom with navigation rectangle in nav window
   //! active.
-  int select_rect_active; //!< Selection rectangle active.
+  int select_rect_active;        //!< Selection rectangle active.
   glow_eEvent select_rect_event; //!< Event for selection rectangle (select or
   //! add select).
   int select_rect_last_x; //!< Last x position of cursor for select rectangle in
@@ -501,9 +433,8 @@ public:
   //! selected area.
   double select_area_ur_y; //!< y coordinate for upper right corner of last
   //! selected area.
-  GlowArrayElem*
-      con_create_node; //!< Source node in a connection creation sequence.
-  int con_create_last_x; //!< Last x position in cursor for connection creation
+  GlowArrayElem* con_create_node; //!< Source node in a connection creation sequence.
+  int con_create_last_x;          //!< Last x position in cursor for connection creation
   //! sequence.
   int con_create_last_y; //!< Last y position in cursor for connection creation
   //! sequence.
@@ -513,9 +444,9 @@ public:
   //! creation sequence.
   int con_create_conpoint_y; //!< y coordinate for conpoint in connection
   //! creation sequence.
-  int con_create_active; //!< Connection creation sequence active.
+  int con_create_active;     //!< Connection creation sequence active.
   int auto_scrolling_active; //!< Auto scrolling active.
-  void* auto_scrolling_id; //!< Autoscrolling timer id.
+  void* auto_scrolling_id;   //!< Autoscrolling timer id.
 
   //! Stop autoscrolling.
   /*! Autoscrolling started with auto_scrolling() fuction is stopped with this
@@ -552,18 +483,12 @@ public:
   //! Set default connection class. This is used as default when a connection is
   //! created.
   /*! \param cc 	Connection class. */
-  void set_default_conclass(void* cc)
-  {
-    default_conclass = cc;
-  }
+  void set_default_conclass(void* cc) { default_conclass = cc; }
 
   //! Get default connection class. This is used as default when a connection is
   //! created.
   /*! \return	The default connection class. */
-  void* get_default_conclass()
-  {
-    return default_conclass;
-  }
+  void* get_default_conclass() { return default_conclass; }
 
   //! Print to postscript. Not implemented.
   void print(double ll_x, double ll_y, double ur_x, double ur_y);
@@ -665,7 +590,7 @@ public:
     \param event_cb	Callback function for the event.
   */
   void enable_event(glow_eEvent event, glow_eEventType event_type,
-      int (*event_cb)(GlowCtx* ctx, glow_tEvent event));
+                    int (*event_cb)(GlowCtx* ctx, glow_tEvent event));
 
   //! Disable an event.
   /*! \param event	Event to disable. */
@@ -693,24 +618,23 @@ public:
   void redraw_defered();
 
   int defered_redraw_active; //!< Defered redraw is active.
-  GrowLayer *layer; //!< Pointer to current layer.
-  GlowArray a_nc; //!< Array of nodeclasses.
-  GlowArray a_cc; //!< Array of connection classes.
-  GrowLayer a; //!< Object array.
-  GlowArray a_sel; //!< List of selected objects.
-  GlowArray a_paste; //!< List of objects in paste buffer.
-  GlowArray a_move; //!< List of currently moved objects.
-  char name[32]; //!< Context name.
-  void* default_conclass; //!< Default connection class.
+  GrowLayer* layer;          //!< Pointer to current layer.
+  GlowArray a_nc;            //!< Array of nodeclasses.
+  GlowArray a_cc;            //!< Array of connection classes.
+  GrowLayer a;               //!< Object array.
+  GlowArray a_sel;           //!< List of selected objects.
+  GlowArray a_paste;         //!< List of objects in paste buffer.
+  GlowArray a_move;          //!< List of currently moved objects.
+  char name[32];             //!< Context name.
+  void* default_conclass;    //!< Default connection class.
   int (*event_callback[glow_eEvent__])(GlowCtx* ctx,
-      glow_tEvent); //!< Array with registred event callback functions.
-  glow_eEvent event_region_select; //!< Event registred as region select event.
-  glow_eEvent
-      event_region_add_select; //!< Event registred as region add select event.
-  glow_eEvent event_create_con; //!< Event registred as create connection event.
-  glow_eEvent event_create_node; //!< Event registred as create node event.
-  glow_eEvent event_move_node; //!< Event registred as move node event.
-  GlowArrayElem* callback_object; //!< Current callback object. Object that is
+                                       glow_tEvent); //!< Array with registred event callback functions.
+  glow_eEvent event_region_select;                   //!< Event registred as region select event.
+  glow_eEvent event_region_add_select;               //!< Event registred as region add select event.
+  glow_eEvent event_create_con;                      //!< Event registred as create connection event.
+  glow_eEvent event_create_node;                     //!< Event registred as create node event.
+  glow_eEvent event_move_node;                       //!< Event registred as move node event.
+  GlowArrayElem* callback_object;                    //!< Current callback object. Object that is
   //! hit by the current event.
   glow_eObjectType callback_object_type; //!< Type of current callback object.
 
@@ -737,15 +661,14 @@ public:
     \param ur_y		y coordinate of upper right corner of selection region.
     \param policy	Selection policy.
   */
-  void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
-      glow_eSelectPolicy policy)
+  void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y, glow_eSelectPolicy policy)
   {
     layer->select_region_insert(ll_x, ll_y, ur_x, ur_y, policy);
   }
 
   int cursor_present; //!< Cursor in present in window.
-  int cursor_x; //!< x coordinate of cursor in pixel.
-  int cursor_y; //!< y coordinate of cursor in pixel.
+  int cursor_x;       //!< x coordinate of cursor in pixel.
+  int cursor_y;       //!< y coordinate of cursor in pixel.
   int user_highlight; //!< Highlight is set by the application. Otherwise
   //! selected objects are highlighted.
   int application_paste; //!< The application handles the paste.
@@ -753,49 +676,38 @@ public:
   //! Set user highlight.
   /*! \param mode 	1 the application controls the highlight, 0 selected
    * objects are highlighted. */
-  void set_user_highlight(int mode)
-  {
-    user_highlight = mode;
-  }
+  void set_user_highlight(int mode) { user_highlight = mode; }
 
-  double grid_size_x; //!< Grid size in x direction.
-  double grid_size_y; //!< Grid size in y direction.
-  int grid_on; //!< Snap to grid is active.
-  int show_grid; //!< Gridpoints are dislayed in the window.
+  double grid_size_x;    //!< Grid size in x direction.
+  double grid_size_y;    //!< Grid size in y direction.
+  int grid_on;           //!< Snap to grid is active.
+  int show_grid;         //!< Gridpoints are dislayed in the window.
   GlowPscript* print_ps; //!< Print postscript object.
 
   //! Print a region to postscript. Not implemented.
-  void print_region(
-      double ll_x, double ll_y, double ur_x, double ur_y, char* filename);
+  void print_region(double ll_x, double ll_y, double ur_x, double ur_y, char* filename);
 
-  double draw_delta; //!< A quantity used when routing connections.
-  double
-      grafcet_con_delta; //!< A quantity used when drawing grafcet connections.
-  int refcon_cnt; //!< Counter for reference connections numbers.
-  double refcon_width; //!< Width of a reference connection.
-  double refcon_height; //!< Height of a reference connection.
-  int refcon_textsize; //!< Text size for a reference connection.
-  int refcon_linewidth; //!< Line width for a reference connection.
+  double draw_delta;        //!< A quantity used when routing connections.
+  double grafcet_con_delta; //!< A quantity used when drawing grafcet connections.
+  int refcon_cnt;           //!< Counter for reference connections numbers.
+  double refcon_width;      //!< Width of a reference connection.
+  double refcon_height;     //!< Height of a reference connection.
+  int refcon_textsize;      //!< Text size for a reference connection.
+  int refcon_linewidth;     //!< Line width for a reference connection.
 
   //! Redraw the reference connections for a specific node and connection point.
   /*!
     \param node		Node.
     \param conpoint	Connection point number.
   */
-  void conpoint_refcon_redraw(void* node, int conpoint)
-  {
-    layer->conpoint_refcon_redraw(node, conpoint);
-  }
+  void conpoint_refcon_redraw(void* node, int conpoint) { layer->conpoint_refcon_redraw(node, conpoint); }
 
   //! Erase the reference connections for a specific node and connection point.
   /*!
     \param node		Node.
     \param conpoint	Connection point number.
   */
-  void conpoint_refcon_erase(void* node, int conpoint)
-  {
-    layer->conpoint_refcon_erase(node, conpoint);
-  }
+  void conpoint_refcon_erase(void* node, int conpoint) { layer->conpoint_refcon_erase(node, conpoint); }
 
   //! Get object from name.
   /*!
@@ -819,13 +731,11 @@ public:
   GlowArrayElem* get_conclass_from_name(char* name);
 
   int (*trace_connect_func)(void*,
-      GlowTraceData*); //!< Backcall function for trace connect of an object.
-  int (*trace_disconnect_func)(
-      void*); //!< Backcall function for trace disconnect of an object.
-  int (*trace_scan_func)(
-      void*, void*); //!< Backcall function for trace scan of an object.
-  int (*trace_ctrl_func)(int, void*); //!< Backcall function for trace control.
-  int trace_started; //!< Trace is started.
+                            GlowTraceData*); //!< Backcall function for trace connect of an object.
+  int (*trace_disconnect_func)(void*);       //!< Backcall function for trace disconnect of an object.
+  int (*trace_scan_func)(void*, void*);      //!< Backcall function for trace scan of an object.
+  int (*trace_ctrl_func)(int, void*);        //!< Backcall function for trace control.
+  int trace_started;                         //!< Trace is started.
 
   void remove_trace_objects();
 
@@ -837,9 +747,8 @@ public:
     object.
     \param scan_func		Backcall function for trace scan of an object.
   */
-  int trace_init(int (*connect_func)(void*, GlowTraceData*),
-      int (*disconnect_func)(void*), int (*scan_func)(void*, void*),
-      int (*ctrl_func)(int, void*));
+  int trace_init(int (*connect_func)(void*, GlowTraceData*), int (*disconnect_func)(void*),
+                 int (*scan_func)(void*, void*), int (*ctrl_func)(int, void*));
 
   //! Trace close.
   /*! Calls the disconnect backcall function for all connected objects. */
@@ -849,26 +758,17 @@ public:
   /*! Calls the scan backcall function for all connected objects. */
   int trace_scan();
 
-  int trace_init_object(GlowArrayElem *e) {
-    return e->trace_init();
-  }
-
+  int trace_init_object(GlowArrayElem* e) { return e->trace_init(); }
 
   void* user_data; //!< User data.
 
   //! Set user data.
   /*! \param data	User data. */
-  void set_user_data(void* data)
-  {
-    user_data = data;
-  }
+  void set_user_data(void* data) { user_data = data; }
 
   //! Get user data.
   /*! \param data	User data. */
-  void get_user_data(void** data)
-  {
-    *data = user_data;
-  }
+  void get_user_data(void** data) { *data = user_data; }
 
   //! Get list of selected nodes, i.e objects of type GlowNode.
   /*!
@@ -903,10 +803,7 @@ public:
 
   //! Unzoom.
   /*! Return to base zoom factor. */
-  void unzoom()
-  {
-    zoom(mw.base_zoom_factor / mw.zoom_factor_x);
-  }
+  void unzoom() { zoom(mw.base_zoom_factor / mw.zoom_factor_x); }
 
   //! Position the view so that the specified object is in the center of the
   //! window.
@@ -916,17 +813,14 @@ public:
   GlowArrayElem* get_document(double x, double y);
 
   int unobscured; //! Window visibility is unobscured.
-  int nodraw; //! No drawings are performed.
-  int no_nav; //! No navigation window is present.
+  int nodraw;     //! No drawings are performed.
+  int no_nav;     //! No navigation window is present.
   int widget_cnt;
   glow_eSelectPolicy select_policy; //! Select policy.
 
   //! Set nodraw.
   /*! No drawing is performed. */
-  void set_nodraw()
-  {
-    nodraw++;
-  }
+  void set_nodraw() { nodraw++; }
 
   //! Reset nodraw.
   /*! Drawing is resumed when the nodraw counter is zero. */
@@ -953,8 +847,7 @@ public:
     \param y		y coordinate for event.
   */
   void tiptext_event(GlowArrayElem* object, int x, int y);
-  void tiptext_toolbar_event(
-      GlowArrayElem* object, int x, int y, int category, int idx);
+  void tiptext_toolbar_event(GlowArrayElem* object, int x, int y, int category, int idx);
 
   void annotation_input_cb(GlowArrayElem* object, int number, char* text);
   void radiobutton_cb(GlowArrayElem* object, int number, int value);
@@ -968,10 +861,7 @@ public:
 
   //! Get the type of the context.
   /*! \return 	Context type. */
-  int type()
-  {
-    return ctx_type;
-  }
+  int type() { return ctx_type; }
 
   // Move input widgets.
   void move_widgets(int x, int y)
@@ -998,35 +888,33 @@ public:
   */
   void scroll(int delta_x, int delta_y);
 
-  double scroll_size; //!< Quantity to calculate size of scrollbars.
-  void (*scroll_callback)(
-      glow_sScroll*); //!< Backcall function to update the scrollbars.
-  void* scroll_data; //!< Data for scrollbar backcall.
-  glow_eHotMode hot_mode; //!< Hot mode.
-  glow_eHotMode default_hot_mode; //!< Default hot mode.
-  int hot_found; //!< A hot object is found.
+  double scroll_size;                          //!< Quantity to calculate size of scrollbars.
+  void (*scroll_callback)(glow_sScroll*);      //!< Backcall function to update the scrollbars.
+  void* scroll_data;                           //!< Data for scrollbar backcall.
+  glow_eHotMode hot_mode;                      //!< Hot mode.
+  glow_eHotMode default_hot_mode;              //!< Default hot mode.
+  int hot_found;                               //!< A hot object is found.
   glow_tUserDataSaveCb userdata_save_callback; //!< Callback function called
   //! when userdata is saved.
   glow_tUserDataOpenCb userdata_open_callback; //!< Callback function called
   //! when userdata is opened.
   glow_tUserDataCopyCb userdata_copy_callback; //!< Callback function called
   //! when userdata is copied.
-  int version; //!< Current glow version.
-  GlowTipText* tiptext; //!< Tip text object.
+  int version;                      //!< Current glow version.
+  GlowTipText* tiptext;             //!< Tip text object.
   GlowArrayElem* inputfocus_object; //!< Object that has input focus.
-  int is_component; //!< Ctx is a window component.
+  int is_component;                 //!< Ctx is a window component.
   CtxComment* comment;
-  glow_eHotIndication
-      hot_indication; //!< Specification of how hots object should be drawn.
-  int tiptext_size; //!< Size of tooltip text
-  glow_eAppMotion app_motion; //!< Action for app motion event.
-  glow_tEventLogCb eventlog_callback; //!< Callback function to log events.
-  static int eventlog_enabled; //!< Event logging enabled.
+  glow_eHotIndication hot_indication;     //!< Specification of how hots object should be drawn.
+  int tiptext_size;                       //!< Size of tooltip text
+  glow_eAppMotion app_motion;             //!< Action for app motion event.
+  glow_tEventLogCb eventlog_callback;     //!< Callback function to log events.
+  static int eventlog_enabled;            //!< Event logging enabled.
   glow_tScriptExecCb scriptexec_callback; //!< Callback function to execute script.
-  GlowCustomColors* customcolors; //!< Custom colors storage
-  char color_theme[40]; //!< Custom color file.
-  static char default_color_theme[40]; //!< Default custom color file.
-  int closing_down; //!< Ctx is closing down.
+  GlowCustomColors* customcolors;         //!< Custom colors storage
+  char color_theme[40];                   //!< Custom color file.
+  static char default_color_theme[40];    //!< Default custom color file.
+  int closing_down;                       //!< Ctx is closing down.
 
   //! Register scrollbar callback function
   /*!
@@ -1050,17 +938,11 @@ public:
     \param element	Pointer to the object.
     \return		Returns 1 if the object is found, else 0.
   */
-  int find_by_name(char* name, GlowArrayElem** element)
-  {
-    return a.find_by_name(name, element);
-  }
+  int find_by_name(char* name, GlowArrayElem** element) { return a.find_by_name(name, element); }
 
   //! Set hot mode.
   /*! \param mode	Hot mode. */
-  void set_hot_mode(glow_eHotMode mode)
-  {
-    hot_mode = mode;
-  }
+  void set_hot_mode(glow_eHotMode mode) { hot_mode = mode; }
 
   //! Set show grid.
   /*! \param show	1 display the grid points, 0 hide. */
@@ -1068,10 +950,7 @@ public:
 
   //! Get show grid.
   /*! \return		1 grid points are displayed, 0 hidden. */
-  int get_show_grid()
-  {
-    return show_grid;
-  }
+  int get_show_grid() { return show_grid; }
 
   //! Draw gridpoints in the specified area.
   /*!
@@ -1094,8 +973,8 @@ public:
     userdata
     is copied.
   */
-  void register_userdata_callbacks(glow_tUserDataSaveCb save_callback,
-      glow_tUserDataOpenCb open_callback, glow_tUserDataCopyCb copy_callback)
+  void register_userdata_callbacks(glow_tUserDataSaveCb save_callback, glow_tUserDataOpenCb open_callback,
+                                   glow_tUserDataCopyCb copy_callback)
   {
     userdata_save_callback = save_callback;
     userdata_open_callback = open_callback;
@@ -1106,10 +985,7 @@ public:
   /*!
     \param log_callback	Callback function that will be called to log an event.
   */
-  void register_eventlog_callback(glow_tEventLogCb log_callback)
-  {
-    eventlog_callback = log_callback;
-  }
+  void register_eventlog_callback(glow_tEventLogCb log_callback) { eventlog_callback = log_callback; }
 
   //! Register callback functions for script execution.
   /*!
@@ -1121,16 +997,10 @@ public:
   }
 
   //! Set custom colors.
-  void set_custom_colors(GlowCustomColors* cc)
-  {
-    customcolors = cc;
-  }
+  void set_custom_colors(GlowCustomColors* cc) { customcolors = cc; }
 
   //! Get custom colors.
-  GlowCustomColors* get_custom_colors()
-  {
-    return customcolors;
-  }
+  GlowCustomColors* get_custom_colors() { return customcolors; }
 
   //! Set colorthem lightness.
   void set_colortheme_lightness(int lightness);

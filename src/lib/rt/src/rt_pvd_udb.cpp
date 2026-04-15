@@ -42,7 +42,8 @@
 #include "wb_ldh.h"
 #include "wb_ldh_msg.h"
 
-extern "C" {
+extern "C"
+{
 #include "co_dcli.h"
 }
 
@@ -50,22 +51,25 @@ void rt_pvd_udb::save(pwr_tStatus* sts)
 {
   gu->clear();
 
-  for (int i = 1; i < (int)m_list.size(); i++) {
+  for (int i = 1; i < (int)m_list.size(); i++)
+  {
     if (m_list[i].flags & procom_obj_mFlags_Deleted)
       continue;
 
-    switch (m_list[i].cid) {
-    case pwr_cClass_SystemGroupReg: {
-      pwr_sClass_SystemGroupReg* body
-          = (pwr_sClass_SystemGroupReg*)m_list[i].body;
+    switch (m_list[i].cid)
+    {
+    case pwr_cClass_SystemGroupReg:
+    {
+      pwr_sClass_SystemGroupReg* body = (pwr_sClass_SystemGroupReg*)m_list[i].body;
 
-      *sts = gu->add_system(groupname(longname(m_list[i].oix)),
-          body->Attributes, body->Description, m_list[i].oix - 1);
+      *sts = gu->add_system(groupname(longname(m_list[i].oix)), body->Attributes, body->Description,
+                            m_list[i].oix - 1);
       if (EVEN(*sts))
         return;
       break;
     }
-    case pwr_cClass_UserReg: {
+    case pwr_cClass_UserReg:
+    {
       pwr_sClass_UserReg* body = (pwr_sClass_UserReg*)m_list[i].body;
       char gname[120];
       char* s;
@@ -74,9 +78,8 @@ void rt_pvd_udb::save(pwr_tStatus* sts)
       if ((s = strrchr(gname, '-')))
         *s = 0;
 
-      *sts = gu->add_user(groupname(gname), m_list[i].name, body->Password,
-          body->Privileges, body->FullName, body->Description, body->Email,
-          body->Phone, body->Sms, m_list[i].oix - 1);
+      *sts = gu->add_user(groupname(gname), m_list[i].name, body->Password, body->Privileges, body->FullName,
+                          body->Description, body->Email, body->Phone, body->Sms, m_list[i].oix - 1);
       if (EVEN(*sts))
         return;
       break;
@@ -92,7 +95,8 @@ char* rt_pvd_udb::groupname(char* name)
   static char str[200];
   char *s, *t;
 
-  for (s = name, t = str; *s; s++, t++) {
+  for (s = name, t = str; *s; s++, t++)
+  {
     if (*s == '-')
       *t = '.';
     else
@@ -117,11 +121,14 @@ void rt_pvd_udb::load(pwr_tStatus* rsts)
   // Create Root object
 
   procom_obj rootitem;
-  if (m_env == pvd_eEnv_Wb) {
+  if (m_env == pvd_eEnv_Wb)
+  {
     strcpy(rootitem.name, "UserDatabase");
     rootitem.cid = pwr_eClass_PlantHier;
     rootitem.oix = 0;
-  } else {
+  }
+  else
+  {
     strcpy(rootitem.name, "VolUserDatabase");
     rootitem.cid = pwr_eClass_ExternVolume;
     rootitem.oix = 0;
@@ -133,15 +140,18 @@ void rt_pvd_udb::load(pwr_tStatus* rsts)
   menu_cnt++;
 
   SystemList* systemgroup = gu->root_system();
-  while (systemgroup) {
+  while (systemgroup)
+  {
     load_systemgroup(systemgroup);
 
     systemgroup = systemgroup->next_system();
   }
 
-  if (m_env == pvd_eEnv_Rt) {
+  if (m_env == pvd_eEnv_Rt)
+  {
     // Convert to Rt style
-    for (int i = 1; i < (int)m_list.size(); i++) {
+    for (int i = 1; i < (int)m_list.size(); i++)
+    {
       if (m_list[i].bwsoix == 0)
         m_list[i].bwsoix = m_list[m_list[i].fthoix].lchoix;
       if (m_list[i].fwsoix == 0)
@@ -157,8 +167,7 @@ void rt_pvd_udb::load_systemgroup(SystemList* systemgroup)
   char sname[120];
   char* s;
 
-  body = (pwr_sClass_SystemGroupReg*)calloc(
-      1, sizeof(pwr_sClass_SystemGroupReg));
+  body = (pwr_sClass_SystemGroupReg*)calloc(1, sizeof(pwr_sClass_SystemGroupReg));
   item.body = body;
   gu->get_system_name(systemgroup, sname);
   if ((s = strrchr(sname, '.')))
@@ -187,13 +196,15 @@ void rt_pvd_udb::load_systemgroup(SystemList* systemgroup)
   m_list[item.oix] = item;
 
   UserList* user = systemgroup->first_user();
-  while (user) {
+  while (user)
+  {
     load_user(user, systemgroup);
 
     user = user->next_user();
   }
   SystemList* sg = systemgroup->first_system();
-  while (sg) {
+  while (sg)
+  {
     load_systemgroup(sg);
 
     sg = sg->next_system();
@@ -207,8 +218,8 @@ void rt_pvd_udb::load_user(UserList* user, SystemList* sg)
   pwr_sClass_UserReg* body;
 
   body = (pwr_sClass_UserReg*)calloc(1, sizeof(pwr_sClass_UserReg));
-  user->get_data(body->Password, &body->Privileges, &item.oix, body->FullName,
-      body->Description, body->Email, body->Phone, body->Sms);
+  user->get_data(body->Password, &body->Privileges, &item.oix, body->FullName, body->Description, body->Email,
+                 body->Phone, body->Sms);
   item.oix = next_oix++;
 
   item.cid = pwr_cClass_UserReg;
@@ -230,32 +241,32 @@ void rt_pvd_udb::load_user(UserList* user, SystemList* sg)
   // m_list.push_back( item);
 }
 
-void rt_pvd_udb::writeAttribute(co_procom* pcom, pwr_tOix oix,
-    unsigned int offset, unsigned int size, char* buffer)
+void rt_pvd_udb::writeAttribute(co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size,
+                                char* buffer)
 {
-  if (oix >= m_list.size() || oix <= 0) {
+  if (oix >= m_list.size() || oix <= 0)
+  {
     pcom->provideStatus(LDH__NOSUCHOBJ);
     return;
   }
 
-  if (offset + size > m_list[oix].body_size) {
+  if (offset + size > m_list[oix].body_size)
+  {
     pcom->provideStatus(LDH__NOSUCHATTR);
     return;
   }
 
   // Crypt password
-  if (m_list[oix].cid == pwr_cClass_UserReg
-      && (int)offset
-          == (char*)((pwr_sClass_UserReg*)m_list[oix].body)->Password
-              - (char*)m_list[oix].body) {
+  if (m_list[oix].cid == pwr_cClass_UserReg &&
+      (int)offset == (char*)((pwr_sClass_UserReg*)m_list[oix].body)->Password - (char*)m_list[oix].body)
+  {
     pwr_tString40 pw;
 
     strncpy(pw, UserList::pwcrypt(buffer), sizeof(pw));
-    memcpy((void*)((unsigned long)m_list[oix].body + (unsigned long)offset), pw,
-        size);
-  } else
-    memcpy((void*)((unsigned long)m_list[oix].body + (unsigned long)offset),
-        buffer, size);
+    memcpy((void*)((unsigned long)m_list[oix].body + (unsigned long)offset), pw, size);
+  }
+  else
+    memcpy((void*)((unsigned long)m_list[oix].body + (unsigned long)offset), buffer, size);
 
   pcom->provideStatus(1);
 }

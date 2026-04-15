@@ -51,12 +51,14 @@
 
 class MsgWindow;
 
-typedef enum {
+typedef enum
+{
   nl_mLayout_view_node_descr = 1 << 0,
   nl_mLayout_hide_rtmon = 1 << 1
 } nl_mLayout;
 
-typedef enum {
+typedef enum
+{
   nodelist_eMode_SystemStatus,
   nodelist_eMode_Status1,
   nodelist_eMode_Status2,
@@ -65,17 +67,18 @@ typedef enum {
   nodelist_eMode_Status5
 } nodelist_eMode;
 
-typedef enum {
+typedef enum
+{
   nodelistnav_eItemType_Node,
   nodelistnav_eItemType_Attr,
   nodelistnav_eItemType_AttrSts,
   nodelistnav_eItemType_AttrSysSts
 } nodelistnav_eItemType;
 
-class NodelistNavBrow {
+class NodelistNavBrow
+{
 public:
-  NodelistNavBrow(BrowCtx* brow_ctx, void* evl)
-      : ctx(brow_ctx), nodelistnav(evl){}
+  NodelistNavBrow(BrowCtx* brow_ctx, void* evl) : ctx(brow_ctx), nodelistnav(evl) {}
   ~NodelistNavBrow();
 
   BrowCtx* ctx;
@@ -96,11 +99,12 @@ public:
   void brow_setup();
 };
 
-class NodeData {
+class NodeData
+{
 public:
   NodeData()
-      : CurrentStatus(0), SystemStatus(0), SystemTime(pwr_cNTime),
-        BootTime(pwr_cNTime), RestartTime(pwr_cNTime), Restarts(0)
+      : CurrentStatus(0), SystemStatus(0), SystemTime(pwr_cNTime), BootTime(pwr_cNTime),
+        RestartTime(pwr_cNTime), Restarts(0)
   {
     strcpy(Description, "");
     strcpy(CurrentStatusStr, "");
@@ -122,10 +126,11 @@ class ItemNode;
 class CoWow;
 class statussrv_client;
 
-class NodelistNode {
+class NodelistNode
+{
 public:
-  NodelistNode(const char* name) : busid(0), item(0), connection_sts(0), init_done(0),
-    network_timeout(0), cli(0)
+  NodelistNode(const char* name)
+      : busid(0), item(0), connection_sts(0), init_done(0), network_timeout(0), cli(0)
   {
     strncpy(node_name, name, sizeof(node_name));
     strcpy(address, "");
@@ -141,15 +146,15 @@ public:
   pwr_tStatus connection_sts;
   int init_done;
   int network_timeout;
-  statussrv_client *cli;
+  statussrv_client* cli;
 };
 
-class NodelistNav {
+class NodelistNav
+{
 public:
-  NodelistNav(void* ev_parent_ctx, MsgWindow* nodelistnav_msg_window,
-      char* nodelistnav_nodename, int nodelistnav_mode,
-      nl_mLayout nodelistnav_layout, int nodelistnav_msgw_pop,
-      char *nodelist_conf_file);
+  NodelistNav(void* ev_parent_ctx, MsgWindow* nodelistnav_msg_window, char* nodelistnav_nodename,
+              int nodelistnav_mode, nl_mLayout nodelistnav_layout, int nodelistnav_msgw_pop,
+              char* nodelist_conf_file);
   virtual ~NodelistNav();
 
   void* parent_ctx;
@@ -169,19 +174,13 @@ public:
   nl_mLayout layout;
   int connect;
 
-  virtual void set_input_focus()
-  {
-  }
-  virtual void trace_start()
-  {
-  }
-  virtual void beep()
-  {
-  }
+  virtual void set_input_focus() {}
+  virtual void trace_start() {}
+  virtual void beep() {}
 
   void zoom(double zoom_factor);
   void unzoom();
-  void reconnect() {connect = 1;}
+  void reconnect() { connect = 1; }
   void set_mode(int nodelist_mode);
   void set_nodraw();
   void reset_nodraw();
@@ -190,35 +189,29 @@ public:
   int update_nodes();
   void force_trace_scan();
   void message(pwr_tStatus sts, const char* node, int idx, const char* text);
-  int select_node(char *name);
+  int select_node(char* name);
   int select_node(int idx);
   void remove_node(char* name);
   int get_selected_node(char* name);
   int get_selected_node_idx(int* idx);
   int get_selected_opplace(char* address, int* busid, char* opplace, char* descr);
   int get_node(char* name, int* idx);
-  int get_node_data(int idx, char* node_name, char* address, int* busid,
-			       char* opplace, char* descr);
-  int set_node_data(int idx, char* node_name, char *addess, int busid, char* opplace,
-      char* descr);
+  int get_node_data(int idx, char* node_name, char* address, int* busid, char* opplace, char* descr);
+  int set_node_data(int idx, char* node_name, char* addess, int busid, char* opplace, char* descr);
   void save();
-  void add_node(const char* name, const char* address, const int busid, 
-      const char* description, const char* opplace);
-  void set_msgw_pop(int pop)
-  {
-    msgw_pop = pop;
-  }
-  static void attrvalue_to_string(int type_id, void* value_ptr, char* str,
-      int size, int* len, char* format);
+  void add_node(const char* name, const char* address, const int busid, const char* description,
+                const char* opplace);
+  void set_msgw_pop(int pop) { msgw_pop = pop; }
+  static void attrvalue_to_string(int type_id, void* value_ptr, char* str, int size, int* len, char* format);
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
   static int trace_scan_bc(brow_tObject object, void* p);
-  static int trace_connect_bc(brow_tObject object, char* name, char* attr,
-      flow_eTraceType type, void** p);
+  static int trace_connect_bc(brow_tObject object, char* name, char* attr, flow_eTraceType type, void** p);
   static int trace_disconnect_bc(brow_tObject object);
 };
 
-class ItemBase {
+class ItemBase
+{
 public:
   ItemBase(NodelistNav* item_nodelistnav, const char* item_name);
   virtual ~ItemBase();
@@ -232,10 +225,11 @@ public:
   virtual int close(NodelistNav* nodelistnav, double x, double y);
 };
 
-class ItemNode : public ItemBase {
+class ItemNode : public ItemBase
+{
 public:
-  ItemNode(NodelistNav* item_nodelistnav, int item_idx,  const char* item_name,
-      const char* item_node_descr, brow_tNode dest, flow_eDest dest_code);
+  ItemNode(NodelistNav* item_nodelistnav, int item_idx, const char* item_name, const char* item_node_descr,
+           brow_tNode dest, flow_eDest dest_code);
 
   int idx;
   NodeData data;
@@ -249,11 +243,11 @@ public:
 };
 
 //! Item for a normal attribute.
-class ItemAttr : public ItemBase {
+class ItemAttr : public ItemBase
+{
 public:
-  ItemAttr(NodelistNav* item_nodelistnav, const char* item_name,
-      const char* attr, int attr_type, int attr_size, void* attr_value_p,
-      brow_tNode dest, flow_eDest dest_code);
+  ItemAttr(NodelistNav* item_nodelistnav, const char* item_name, const char* attr, int attr_type,
+           int attr_size, void* attr_value_p, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemAttr();
   void* value_p;
   char old_value[120];
@@ -263,12 +257,12 @@ public:
 };
 
 //! Item for a system status attribute.
-class ItemAttrSysSts : public ItemBase {
+class ItemAttrSysSts : public ItemBase
+{
 public:
-  ItemAttrSysSts(NodelistNav* item_nodelistnav, const char* item_name,
-      const char* attr, int attr_type, int attr_size, void* attr_value_p,
-      void* attr_status_p, ItemNode* attr_parent, brow_tNode dest,
-      flow_eDest dest_code);
+  ItemAttrSysSts(NodelistNav* item_nodelistnav, const char* item_name, const char* attr, int attr_type,
+                 int attr_size, void* attr_value_p, void* attr_status_p, ItemNode* attr_parent,
+                 brow_tNode dest, flow_eDest dest_code);
   void* value_p;
   void* status_p;
   char old_value[120];
@@ -282,12 +276,12 @@ public:
 };
 
 //! Item for a server status attribute.
-class ItemAttrSts : public ItemBase {
+class ItemAttrSts : public ItemBase
+{
 public:
-  ItemAttrSts(NodelistNav* item_nodelistnav, const char* item_name,
-      const char* attr, char* attr_value_p, pwr_tStatus* attr_status_p,
-      char* attr_name_p, ItemAttrSysSts* attr_parent, brow_tNode dest,
-      flow_eDest dest_code);
+  ItemAttrSts(NodelistNav* item_nodelistnav, const char* item_name, const char* attr, char* attr_value_p,
+              pwr_tStatus* attr_status_p, char* attr_name_p, ItemAttrSysSts* attr_parent, brow_tNode dest,
+              flow_eDest dest_code);
   virtual ~ItemAttrSts();
   char* value_p;
   pwr_tStatus* status_p;

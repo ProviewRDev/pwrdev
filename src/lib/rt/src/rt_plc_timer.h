@@ -41,7 +41,8 @@
 
 #include "rt_gdh.h"
 
-typedef struct {
+typedef struct
+{
   pwr_tBoolean TimerFlag pwr_dAlignLW;
   pwr_tBoolean* TimerNext pwr_dAlignLW;
   pwr_tUInt32 TimerCount pwr_dAlignLW;
@@ -56,8 +57,7 @@ typedef struct {
 
 #define PTRREL(r, p) gdh_StoreRtdbPointer((unsigned long*)r, (void*)p)
 
-#define RELPTR(r)                                                              \
-  ((unsigned long)r == 0) ? NULL : gdh_TranslateRtdbPointer((unsigned long)r)
+#define RELPTR(r) ((unsigned long)r == 0) ? NULL : gdh_TranslateRtdbPointer((unsigned long)r)
 
 /*	Insert timer into timer-queue	*/
 extern pthread_mutex_t timer_mutex;
@@ -65,30 +65,34 @@ extern pthread_mutex_t timer_mutex;
 #define PLC_UNLOCK_MUTEX(m) pthread_mutex_unlock(&m)
 
 /* Local timer handing in object without timer list */
-#define timer2_in(tp, o)                                                       \
-  o->TimerCount = o->TimerTime / tp->f_scan_time;                              \
-  if (o->TimerCount > 0)                                                       \
+#define timer2_in(tp, o)                                                                                     \
+  o->TimerCount = o->TimerTime / tp->f_scan_time;                                                            \
+  if (o->TimerCount > 0)                                                                                     \
     o->TimerFlag = 1;
 
-#define timer2_scan(tp, o)                                                     \
-  if (o->TimerFlag) {                                                          \
-    if (o->TimerCount <= 0) {                                                  \
-      o->TimerCount = 0;                                                       \
-      o->TimerFlag = 0;                                                        \
-    } else                                                                     \
-      o->TimerCount -= (1 + tp->skip_count);                                   \
+#define timer2_scan(tp, o)                                                                                   \
+  if (o->TimerFlag)                                                                                          \
+  {                                                                                                          \
+    if (o->TimerCount <= 0)                                                                                  \
+    {                                                                                                        \
+      o->TimerCount = 0;                                                                                     \
+      o->TimerFlag = 0;                                                                                      \
+    }                                                                                                        \
+    else                                                                                                     \
+      o->TimerCount -= (1 + tp->skip_count);                                                                 \
   }
 
-#define timer_in(tp, o)                                                        \
-  {                                                                            \
-    o->TimerCount = o->TimerTime / tp->f_scan_time;                            \
-    if (!o->TimerFlag && (o->TimerCount > 0)) {                                \
-      o->TimerFlag = TRUE;                                                     \
-      /*PLC_LOCK_MUTEX(tp->timer_mutex);*/                                     \
-      (o->TimerNext) = tp->PlcThread->TimerStart;                              \
-      PTRREL(&tp->PlcThread->TimerStart, &o->TimerFlag);                       \
-      /*PLC_UNLOCK_MUTEX(tp->timer_mutex);*/                                   \
-    }                                                                          \
+#define timer_in(tp, o)                                                                                      \
+  {                                                                                                          \
+    o->TimerCount = o->TimerTime / tp->f_scan_time;                                                          \
+    if (!o->TimerFlag && (o->TimerCount > 0))                                                                \
+    {                                                                                                        \
+      o->TimerFlag = TRUE;                                                                                   \
+      /*PLC_LOCK_MUTEX(tp->timer_mutex);*/                                                                   \
+      (o->TimerNext) = tp->PlcThread->TimerStart;                                                            \
+      PTRREL(&tp->PlcThread->TimerStart, &o->TimerFlag);                                                     \
+      /*PLC_UNLOCK_MUTEX(tp->timer_mutex);*/                                                                 \
+    }                                                                                                        \
   }
 
 #include "rt_plc.h"

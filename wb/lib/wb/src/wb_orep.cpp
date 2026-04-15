@@ -42,13 +42,12 @@ wb_orep::wb_orep() : m_nRef(0)
   // printf( "orep C: %x %d\n", this, ++ocnt);
 }
 
-wb_orep::~wb_orep()
-{
-}
+wb_orep::~wb_orep() {}
 
 void wb_orep::unref()
 {
-  if (--m_nRef == 0) {
+  if (--m_nRef == 0)
+  {
     // printf( "orep  : %x %d\n", this, --ocnt);
     delete this;
   }
@@ -60,15 +59,9 @@ wb_orep* wb_orep::ref()
   return this;
 }
 
-bool wb_orep::docBlock(char** block, int* size) const
-{
-  return false;
-}
+bool wb_orep::docBlock(char** block, int* size) const { return false; }
 
-bool wb_orep::docBlock(char* block)
-{
-  return false;
-}
+bool wb_orep::docBlock(char* block) { return false; }
 
 pwr_tTime wb_orep::modTime()
 {
@@ -90,7 +83,8 @@ pwr_tTime wb_orep::treeModTime()
   pwr_tTime tchild;
   wb_orep* after;
 
-  for (wb_orep* child = first(&sts); ODD(sts); child = after) {
+  for (wb_orep* child = first(&sts); ODD(sts); child = after)
+  {
     child->ref();
 
     tchild = child->treeModTime();

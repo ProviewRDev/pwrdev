@@ -5,7 +5,8 @@
 #ifndef _Included_jpwr_rt_Hist
 #define _Included_jpwr_rt_Hist
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 #undef jpwr_rt_Hist_mh_mEventFlags_Return
 #define jpwr_rt_Hist_mh_mEventFlags_Return 1L
@@ -65,22 +66,25 @@ extern "C" {
 #define jpwr_rt_Hist_mh_eEvent_ 65L
 #undef jpwr_rt_Hist_EventType_ClearAlarmList
 #define jpwr_rt_Hist_EventType_ClearAlarmList 66L
-/* Inaccessible static: initDone */
-/*
- * Class:     jpwr_rt_Hist
- * Method:    initIDs
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_jpwr_rt_Hist_initHistIDs
-  (JNIEnv *, jclass);
+  /* Inaccessible static: initDone */
+  /*
+   * Class:     jpwr_rt_Hist
+   * Method:    initIDs
+   * Signature: ()V
+   */
+  JNIEXPORT void JNICALL Java_jpwr_rt_Hist_initHistIDs(JNIEnv*, jclass);
 
-/*
- * Class:     jpwr_rt_Hist
- * Method:    getHistList
- * Signature: (Ljava/lang/String;Ljava/lang/String;ZZZZZZZZLjava/lang/String;Ljava/lang/String;)[Ljpwr/rt/MhrEvent;
- */
-JNIEXPORT jobjectArray JNICALL Java_jpwr_rt_Hist_getHistList
-(JNIEnv *, jclass, jstring, jstring, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jboolean, jstring, jstring);
+  /*
+   * Class:     jpwr_rt_Hist
+   * Method:    getHistList
+   * Signature:
+   * (Ljava/lang/String;Ljava/lang/String;ZZZZZZZZLjava/lang/String;Ljava/lang/String;)[Ljpwr/rt/MhrEvent;
+   */
+  JNIEXPORT jobjectArray JNICALL Java_jpwr_rt_Hist_getHistList(JNIEnv*, jclass, jstring, jstring, jboolean,
+                                                               jboolean, jboolean, jboolean, jboolean,
+                                                               jboolean, jboolean, jboolean, jboolean,
+                                                               jboolean, jboolean, jboolean, jboolean,
+                                                               jboolean, jboolean, jstring, jstring);
 
 #ifdef __cplusplus
 }

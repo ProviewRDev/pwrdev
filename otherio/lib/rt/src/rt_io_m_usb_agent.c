@@ -58,7 +58,8 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   ap->Local = local;
 
   sts = libusb_init(&local->libusb_ctx);
-  if (sts != 0) {
+  if (sts != 0)
+  {
     if (sts == io_cLibDummy)
       op->Status = IO__DUMMYBUILD;
     else
@@ -67,7 +68,9 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 
     local->libusb_ctx = 0;
     return op->Status;
-  } else {
+  }
+  else
+  {
     op->Status = IO__SUCCESS;
     errh_Info("Init of USBIO agent '%s'", ap->Name);
   }
@@ -88,17 +91,11 @@ static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap)
 }
 
 #else
-static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
-{
-  return IO__RELEASEBUILD;
-}
-static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap)
-{
-  return IO__RELEASEBUILD;
-}
+static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap) { return IO__RELEASEBUILD; }
+static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap) { return IO__RELEASEBUILD; }
 #endif
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(USB_Agent) = { pwr_BindIoMethod(IoAgentInit),
-  pwr_BindIoMethod(IoAgentClose), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(USB_Agent) = {pwr_BindIoMethod(IoAgentInit), pwr_BindIoMethod(IoAgentClose),
+                                            pwr_NullMethod};

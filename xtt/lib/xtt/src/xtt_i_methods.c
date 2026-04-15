@@ -40,5 +40,5 @@ pwr_dImport pwr_BindXttMethods($Object);
 pwr_dImport pwr_BindXttMethods(PlcPgm);
 pwr_dImport pwr_BindXttMethods(Sound);
 
-pwr_dExport pwr_BindXttClasses(Base) = { pwr_BindXttClass($Object),
-  pwr_BindXttClass(PlcPgm), pwr_BindXttClass(Sound), pwr_NullClass };
+pwr_dExport pwr_BindXttClasses(Base) = {pwr_BindXttClass($Object), pwr_BindXttClass(PlcPgm),
+                                        pwr_BindXttClass(Sound), pwr_NullClass};

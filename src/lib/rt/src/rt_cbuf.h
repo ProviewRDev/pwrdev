@@ -40,35 +40,35 @@
 #include "rt_qcom.h"
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/**
- * Circular buffer argument structure
- */
-typedef struct {
-  pwr_sAttrRef circ_aref; /**< Attribute reference to circular buffer object */
-  unsigned int resolution; /**< Resolution of return data */
-  unsigned int samples; /**< number of data values */
-  void* bufp; /**< Data buffer that receives the requested information */
-  unsigned int bufsize; /**< The size in bytes of the data buffer */
-  unsigned int size; /**< Number of returned values */
-  unsigned int
-      first_idx; /**< First index, this has to be saved to the next call */
-  unsigned int
-      last_idx; /**< Last index, this has to be saved to the next call */
-  unsigned int offset; /**< Index offset to use in the next call */
-} cbuf_sCircBuffInfo;
+  /**
+   * Circular buffer argument structure
+   */
+  typedef struct
+  {
+    pwr_sAttrRef circ_aref;  /**< Attribute reference to circular buffer object */
+    unsigned int resolution; /**< Resolution of return data */
+    unsigned int samples;    /**< number of data values */
+    void* bufp;              /**< Data buffer that receives the requested information */
+    unsigned int bufsize;    /**< The size in bytes of the data buffer */
+    unsigned int size;       /**< Number of returned values */
+    unsigned int first_idx;  /**< First index, this has to be saved to the next call */
+    unsigned int last_idx;   /**< Last index, this has to be saved to the next call */
+    unsigned int offset;     /**< Index offset to use in the next call */
+  } cbuf_sCircBuffInfo;
 
-pwr_tStatus cbuf_GetCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize);
-pwr_tStatus cbuf_UpdateCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize);
+  pwr_tStatus cbuf_GetCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize);
+  pwr_tStatus cbuf_UpdateCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize);
 
-void cbuf_GetCircBufferMsg(qcom_sGet* get);
-void cbuf_UpdateCircBufferMsg(qcom_sGet* get);
+  void cbuf_GetCircBufferMsg(qcom_sGet* get);
+  void cbuf_UpdateCircBufferMsg(qcom_sGet* get);
 
-void cbuf_InitBuffer(void* o, pwr_tUInt32 size, pwr_tUInt32 element_size);
-void cbuf_AddSample(void* o, void* value);
-void cbuf_AddTimeSample(void* o, pwr_tTime* t);
+  void cbuf_InitBuffer(void* o, pwr_tUInt32 size, pwr_tUInt32 element_size);
+  void cbuf_AddSample(void* o, void* value);
+  void cbuf_AddTimeSample(void* o, pwr_tTime* t);
 
 #if defined __cplusplus
 }

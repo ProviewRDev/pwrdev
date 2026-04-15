@@ -78,8 +78,7 @@ void WRevGtk::activate_history(GtkWidget* w, gpointer data)
   wb_log::category_to_string(wlog_eCategory_RevisionRestore, categories[1]);
   strcpy(categories[2], "");
 
-  CoLogWGtk* logw = new CoLogWGtk(
-      wrev, ((WRevGtk*)wrev)->parent_wid, "Revision History", 1, &sts);
+  CoLogWGtk* logw = new CoLogWGtk(wrev, ((WRevGtk*)wrev)->parent_wid, "Revision History", 1, &sts);
   logw->show(categories, 0);
 }
 
@@ -144,12 +143,10 @@ void WRevGtk::activate_exit(GtkWidget* w, gpointer data)
 
 void WRevGtk::activate_help(GtkWidget* w, gpointer data)
 {
-  CoXHelp::dhelp(
-      "revisions", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
+  CoXHelp::dhelp("revisions", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
 }
 
-gboolean WRevGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean WRevGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   WRevGtk* wrev = (WRevGtk*)data;
 
@@ -162,21 +159,14 @@ gboolean WRevGtk::action_inputfocus(
   return FALSE;
 }
 
-void WRevGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void WRevGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
-void WRevGtk::flush()
-{
-  gdk_display_flush(gtk_widget_get_display(toplevel));
-}
+void WRevGtk::flush() { gdk_display_flush(gtk_widget_get_display(toplevel)); }
 
 void WRevGtk::set_clock_cursor()
 {
   if (!clock_cursor)
-    clock_cursor = gdk_cursor_new_for_display(
-        gtk_widget_get_display(toplevel), GDK_WATCH);
+    clock_cursor = gdk_cursor_new_for_display(gtk_widget_get_display(toplevel), GDK_WATCH);
 
   gdk_window_set_cursor(gtk_widget_get_window(toplevel), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(toplevel));
@@ -202,46 +192,36 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer wrev)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-WRevGtk::WRevGtk(
-    GtkWidget* wa_parent_wid, void* wa_parent_ctx, ldh_tSession wa_ldhses)
-    : WRev(wa_parent_ctx, wa_ldhses), parent_wid(wa_parent_wid),
-      india_widget(0), clock_cursor(0)
+WRevGtk::WRevGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx, ldh_tSession wa_ldhses)
+    : WRev(wa_parent_ctx, wa_ldhses), parent_wid(wa_parent_wid), india_widget(0), clock_cursor(0)
 {
   const int window_width = 700;
   const int window_height = 300;
   int sts;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      window_height, "default-width", window_width, "title", "Revisions", NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height, "default-width",
+                                      window_width, "title", "Revisions", NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(
-      toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File Entry
   GtkWidget* file_history = gtk_menu_item_new_with_mnemonic("_History");
-  g_signal_connect(
-      file_history, "activate", G_CALLBACK(WRevGtk::activate_history), this);
+  g_signal_connect(file_history, "activate", G_CALLBACK(WRevGtk::activate_history), this);
 
-  GtkWidget* file_close
-      = gtk_menu_item_new_with_mnemonic("_Close");
-  g_signal_connect(
-      file_close, "activate", G_CALLBACK(WRevGtk::activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
+  g_signal_connect(file_close, "activate", G_CALLBACK(WRevGtk::activate_exit), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_history);
@@ -253,22 +233,16 @@ WRevGtk::WRevGtk(
 
   // Functions Entry
   GtkWidget* functions_store = gtk_menu_item_new_with_mnemonic("_New Revision");
-  g_signal_connect(
-      functions_store, "activate", G_CALLBACK(WRevGtk::activate_store), this);
+  g_signal_connect(functions_store, "activate", G_CALLBACK(WRevGtk::activate_store), this);
 
-  GtkWidget* functions_restore
-      = gtk_menu_item_new_with_mnemonic("_Restore Revision");
-  g_signal_connect(functions_restore, "activate",
-      G_CALLBACK(WRevGtk::activate_restore), this);
+  GtkWidget* functions_restore = gtk_menu_item_new_with_mnemonic("_Restore Revision");
+  g_signal_connect(functions_restore, "activate", G_CALLBACK(WRevGtk::activate_restore), this);
 
-  GtkWidget* functions_delete
-      = gtk_menu_item_new_with_mnemonic("_Delete Revision");
-  g_signal_connect(
-      functions_delete, "activate", G_CALLBACK(WRevGtk::activate_delete), this);
+  GtkWidget* functions_delete = gtk_menu_item_new_with_mnemonic("_Delete Revision");
+  g_signal_connect(functions_delete, "activate", G_CALLBACK(WRevGtk::activate_delete), this);
 
   GtkWidget* functions_build = gtk_menu_item_new_with_mnemonic("_Build All");
-  g_signal_connect(
-      functions_build, "activate", G_CALLBACK(WRevGtk::activate_build), this);
+  g_signal_connect(functions_build, "activate", G_CALLBACK(WRevGtk::activate_build), this);
 
   GtkMenu* functions_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_store);
@@ -278,25 +252,19 @@ WRevGtk::WRevGtk(
 
   GtkWidget* functions = gtk_menu_item_new_with_mnemonic("F_unctions");
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), functions);
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
 
   // View menu
   GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic("Zoom _In");
-  g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(WRevGtk::activate_zoom_in), this);
-  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(WRevGtk::activate_zoom_in), this);
+  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic("Zoom _Out");
-  g_signal_connect(
-      view_zoom_out, "activate", G_CALLBACK(WRevGtk::activate_zoom_out), this);
-  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(view_zoom_out, "activate", G_CALLBACK(WRevGtk::activate_zoom_out), this);
+  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic("Zoom _Reset");
-  g_signal_connect(view_zoom_reset, "activate",
-      G_CALLBACK(WRevGtk::activate_zoom_reset), this);
+  g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(WRevGtk::activate_zoom_reset), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
@@ -309,10 +277,8 @@ WRevGtk::WRevGtk(
 
   // Menu Help
   GtkWidget* help_help = gtk_menu_item_new_with_mnemonic("_Help");
-  g_signal_connect(
-      help_help, "activate", G_CALLBACK(WRevGtk::activate_help), this);
-  gtk_widget_add_accelerator(
-      help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(help_help, "activate", G_CALLBACK(WRevGtk::activate_help), this);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -324,20 +290,17 @@ WRevGtk::WRevGtk(
   // Toolbar
   GtkToolbar* tools = (GtkToolbar*)g_object_new(GTK_TYPE_TOOLBAR, NULL);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", 
-      G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 0);
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_in.png", G_CALLBACK(activate_zoom_in), "Zoom in", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", 
-      G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 0);
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_out.png", G_CALLBACK(activate_zoom_out), "Zoom out", this, 1, 0);
 
-  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", 
-      G_CALLBACK(activate_zoom_reset), "Zoom reset", this, 1, 0);
+  wutl_tools_item(tools, "$pwr_exe/xtt_zoom_reset.png", G_CALLBACK(activate_zoom_reset), "Zoom reset", this,
+                  1, 0);
 
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 
   utility = ((WUtility*)parent_ctx)->utype;
-  wrevnav = new WRevNavGtk(
-      (void*)this, vbox, ldhses, "Packages", utility, &brow_widget, &sts);
+  wrevnav = new WRevNavGtk((void*)this, vbox, ldhses, "Packages", utility, &brow_widget, &sts);
   ((WRevNav*)wrevnav)->message_cb = message_cb;
   ((WRevNav*)wrevnav)->set_clock_cursor_cb = set_clock_cursor_cb;
   ((WRevNav*)wrevnav)->reset_cursor_cb = reset_cursor_cb;
@@ -375,13 +338,11 @@ void WRevGtk::activate_india_ok(GtkWidget* w, gpointer data)
   WRevGtk* wrev = (WRevGtk*)data;
   char *text1, *text2, *textutf8;
 
-  textutf8 = gtk_editable_get_chars(
-      GTK_EDITABLE(((WRevGtk*)wrev)->india_text1), 0, -1);
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(((WRevGtk*)wrev)->india_text1), 0, -1);
   text1 = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
-  textutf8 = gtk_editable_get_chars(
-      GTK_EDITABLE(((WRevGtk*)wrev)->india_text2), 0, -1);
+  textutf8 = gtk_editable_get_chars(GTK_EDITABLE(((WRevGtk*)wrev)->india_text2), 0, -1);
   text2 = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
   g_free(textutf8);
 
@@ -404,9 +365,9 @@ void WRevGtk::activate_india_cancel(GtkWidget* w, gpointer data)
   // g_object_set( ((WRevGtk *)wrev)->india_widget, "visible", FALSE, NULL);
 }
 
-void WRevGtk::open_input_dialog(const char* text1, const char* text2,
-    const char* title, const char* init_text1, const char* init_text2,
-    void (*ok_cb)(WRev*, char*, char*))
+void WRevGtk::open_input_dialog(const char* text1, const char* text2, const char* title,
+                                const char* init_text1, const char* init_text2,
+                                void (*ok_cb)(WRev*, char*, char*))
 {
   create_input_dialog();
 
@@ -415,12 +376,10 @@ void WRevGtk::open_input_dialog(const char* text1, const char* text2,
 
   gint pos = 0;
   gtk_editable_delete_text(GTK_EDITABLE(india_text1), 0, -1);
-  gtk_editable_insert_text(
-      GTK_EDITABLE(india_text1), init_text1, strlen(init_text1), &pos);
+  gtk_editable_insert_text(GTK_EDITABLE(india_text1), init_text1, strlen(init_text1), &pos);
 
   gtk_editable_delete_text(GTK_EDITABLE(india_text2), 0, -1);
-  gtk_editable_insert_text(
-      GTK_EDITABLE(india_text2), init_text2, strlen(init_text2), &pos);
+  gtk_editable_insert_text(GTK_EDITABLE(india_text2), init_text2, strlen(init_text2), &pos);
 
   india_ok_cb = ok_cb;
   dialog_count++;
@@ -429,11 +388,10 @@ void WRevGtk::open_input_dialog(const char* text1, const char* text2,
 void WRevGtk::create_input_dialog()
 {
   // Create an input dialog
-  india_widget = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      150, "default-width", 350, "title", "New Revision", "window-position",
-      GTK_WIN_POS_CENTER, NULL);
-  g_signal_connect(
-      india_widget, "delete_event", G_CALLBACK(india_delete_event), this);
+  india_widget =
+      (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 150, "default-width", 350, "title",
+                               "New Revision", "window-position", GTK_WIN_POS_CENTER, NULL);
+  g_signal_connect(india_widget, "delete_event", G_CALLBACK(india_delete_event), this);
   india_text1 = gtk_entry_new();
   india_text2 = gtk_entry_new();
   india_label1 = gtk_label_new("");
@@ -441,12 +399,10 @@ void WRevGtk::create_input_dialog()
 
   GtkWidget* india_ok = gtk_button_new_with_label("Ok");
   gtk_widget_set_size_request(india_ok, 70, 25);
-  g_signal_connect(
-      india_ok, "clicked", G_CALLBACK(WRevGtk::activate_india_ok), this);
+  g_signal_connect(india_ok, "clicked", G_CALLBACK(WRevGtk::activate_india_ok), this);
   GtkWidget* india_cancel = gtk_button_new_with_label("Cancel");
   gtk_widget_set_size_request(india_cancel, 70, 25);
-  g_signal_connect(india_cancel, "clicked",
-      G_CALLBACK(WRevGtk::activate_india_cancel), this);
+  g_signal_connect(india_cancel, "clicked", G_CALLBACK(WRevGtk::activate_india_cancel), this);
 
   GtkWidget* india_hboxtext1 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   // gtk_box_pack_start( GTK_BOX(india_hboxtext1), india_image1, FALSE, FALSE,
@@ -467,13 +423,11 @@ void WRevGtk::create_input_dialog()
   GtkWidget* india_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(india_vbox), india_hboxtext1, TRUE, TRUE, 30);
   gtk_box_pack_start(GTK_BOX(india_vbox), india_hboxtext2, TRUE, TRUE, 30);
-  gtk_box_pack_start(
-      GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(india_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   gtk_box_pack_end(GTK_BOX(india_vbox), india_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(india_widget), india_vbox);
   gtk_widget_show_all(india_widget);
   // g_object_set( india_widget, "visible", FALSE, NULL);
-  gtk_window_set_transient_for(
-      GTK_WINDOW(gtk_widget_get_toplevel(india_widget)),
-      GTK_WINDOW(gtk_widget_get_toplevel(toplevel)));
+  gtk_window_set_transient_for(GTK_WINDOW(gtk_widget_get_toplevel(india_widget)),
+                               GTK_WINDOW(gtk_widget_get_toplevel(toplevel)));
 }

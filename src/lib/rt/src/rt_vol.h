@@ -48,21 +48,20 @@
 
 #include "rt_mvol.h"
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(init, 1), pwr_Bits(fill, 3), , , pwr_Bits(goAdopt, 1),
-      pwr_Bits(go_fill, 3), , ,
+  pwr_32Bits(pwr_Bits(init, 1), pwr_Bits(fill, 3), , , pwr_Bits(goAdopt, 1), pwr_Bits(go_fill, 3), , ,
 
-      pwr_Bits(loObjList, 1), pwr_Bits(loOidTab, 1), pwr_Bits(loFamilyTab, 1),
-      pwr_Bits(loParentRef, 1), pwr_Bits(loVolumeRef, 1),
-      pwr_Bits(loMountServer, 1), pwr_Bits(lo_fill, 2), ,
+             pwr_Bits(loObjList, 1), pwr_Bits(loOidTab, 1), pwr_Bits(loFamilyTab, 1),
+             pwr_Bits(loParentRef, 1), pwr_Bits(loVolumeRef, 1), pwr_Bits(loMountServer, 1),
+             pwr_Bits(lo_fill, 2), ,
 
-      pwr_Bits(noSibList, 1), pwr_Bits(noCidList, 1),
-      pwr_Bits(noAliasClientList, 1), pwr_Bits(noMountClientList, 1),
-      pwr_Bits(noBody, 1), pwr_Bits(noSub, 1), pwr_Bits(noSan, 1),
-      pwr_Bits(no_fill, 1),
+             pwr_Bits(noSibList, 1), pwr_Bits(noCidList, 1), pwr_Bits(noAliasClientList, 1),
+             pwr_Bits(noMountClientList, 1), pwr_Bits(noBody, 1), pwr_Bits(noSub, 1), pwr_Bits(noSan, 1),
+             pwr_Bits(no_fill, 1),
 
-      pwr_Bits(coTouch, 1), pwr_Bits(co_fill, 7), , , , , , ) b;
+             pwr_Bits(coTouch, 1), pwr_Bits(co_fill, 7), , , , , , ) b;
 
 #define vol_mLink__ 0
 #define vol_mLink_init pwr_Bit(0)
@@ -95,52 +94,43 @@ typedef union {
 #define vol_mLink_rebuild 0
 #define vol_mLink_flush 0
 
-#define vol_mLink_load                                                         \
-  (vol_mLink_init | vol_mLink_loObjList | vol_mLink_loOidTab                   \
-      | vol_mLink_loFamilyTab | vol_mLink_loParentRef | vol_mLink_loVolumeRef)
+#define vol_mLink_load                                                                                       \
+  (vol_mLink_init | vol_mLink_loObjList | vol_mLink_loOidTab | vol_mLink_loFamilyTab |                       \
+   vol_mLink_loParentRef | vol_mLink_loVolumeRef)
 
-#define vol_mLink_swapLoad                                                     \
-  (vol_mLink_init | vol_mLink_loVolumeRef | vol_mLink_loOidTab)
+#define vol_mLink_swapLoad (vol_mLink_init | vol_mLink_loVolumeRef | vol_mLink_loOidTab)
 
-#define vol_mLink_build                                                        \
-  (vol_mLink_goAdopt | vol_mLink_noSibList | vol_mLink_loMountServer           \
-      | vol_mLink_noCidList | vol_mLink_noAliasClientList                      \
-      | vol_mLink_noMountClientList | vol_mLink_noBody)
+#define vol_mLink_build                                                                                      \
+  (vol_mLink_goAdopt | vol_mLink_noSibList | vol_mLink_loMountServer | vol_mLink_noCidList |                 \
+   vol_mLink_noAliasClientList | vol_mLink_noMountClientList | vol_mLink_noBody)
 
-#define vol_mLink_swapBuild                                                    \
-  (vol_mLink_goAdopt | vol_mLink_loObjList | vol_mLink_loFamilyTab             \
-      | vol_mLink_loParentRef | vol_mLink_noSibList | vol_mLink_loMountServer  \
-      | vol_mLink_noCidList | vol_mLink_noAliasClientList                      \
-      | vol_mLink_noMountClientList | vol_mLink_noBody)
+#define vol_mLink_swapBuild                                                                                  \
+  (vol_mLink_goAdopt | vol_mLink_loObjList | vol_mLink_loFamilyTab | vol_mLink_loParentRef |                 \
+   vol_mLink_noSibList | vol_mLink_loMountServer | vol_mLink_noCidList | vol_mLink_noAliasClientList |       \
+   vol_mLink_noMountClientList | vol_mLink_noBody)
 
 #define vol_mLink_rename (vol_mLink_loFamilyTab)
 
-#define vol_mLink_create                                                       \
-  (vol_mLink_init | vol_mLink_loObjList | vol_mLink_loOidTab                   \
-      | vol_mLink_noSibList | vol_mLink_loParentRef | vol_mLink_loVolumeRef    \
-      | vol_mLink_loMountServer | vol_mLink_noCidList                          \
-      | vol_mLink_noAliasClientList | vol_mLink_noMountClientList              \
-      | vol_mLink_noBody | vol_mLink_noSub | vol_mLink_noSan)
+#define vol_mLink_create                                                                                     \
+  (vol_mLink_init | vol_mLink_loObjList | vol_mLink_loOidTab | vol_mLink_noSibList | vol_mLink_loParentRef | \
+   vol_mLink_loVolumeRef | vol_mLink_loMountServer | vol_mLink_noCidList | vol_mLink_noAliasClientList |     \
+   vol_mLink_noMountClientList | vol_mLink_noBody | vol_mLink_noSub | vol_mLink_noSan)
 
-#define vol_mLink_delete                                                       \
-  (vol_mLink_init | vol_mLink_loObjList | vol_mLink_loOidTab                   \
-      | vol_mLink_loFamilyTab | vol_mLink_noSibList | vol_mLink_loParentRef    \
-      | vol_mLink_loVolumeRef | vol_mLink_loMountServer | vol_mLink_noCidList  \
-      | vol_mLink_noAliasClientList | vol_mLink_noMountClientList              \
-      | vol_mLink_noBody | vol_mLink_noSub | vol_mLink_noSan)
+#define vol_mLink_delete                                                                                     \
+  (vol_mLink_init | vol_mLink_loObjList | vol_mLink_loOidTab | vol_mLink_loFamilyTab | vol_mLink_noSibList | \
+   vol_mLink_loParentRef | vol_mLink_loVolumeRef | vol_mLink_loMountServer | vol_mLink_noCidList |           \
+   vol_mLink_noAliasClientList | vol_mLink_noMountClientList | vol_mLink_noBody | vol_mLink_noSub |          \
+   vol_mLink_noSan)
 
-#define vol_mLink_swapDelete                                                   \
-  (vol_mLink_init | vol_mLink_goAdopt | vol_mLink_loObjList                    \
-      | vol_mLink_loOidTab | vol_mLink_loFamilyTab | vol_mLink_noSibList       \
-      | vol_mLink_loParentRef | vol_mLink_loVolumeRef                          \
-      | vol_mLink_loMountServer | vol_mLink_noCidList                          \
-      | vol_mLink_noAliasClientList | vol_mLink_noMountClientList              \
-      | vol_mLink_noBody | vol_mLink_noSub | vol_mLink_noSan)
+#define vol_mLink_swapDelete                                                                                 \
+  (vol_mLink_init | vol_mLink_goAdopt | vol_mLink_loObjList | vol_mLink_loOidTab | vol_mLink_loFamilyTab |   \
+   vol_mLink_noSibList | vol_mLink_loParentRef | vol_mLink_loVolumeRef | vol_mLink_loMountServer |           \
+   vol_mLink_noCidList | vol_mLink_noAliasClientList | vol_mLink_noMountClientList | vol_mLink_noBody |      \
+   vol_mLink_noSub | vol_mLink_noSan)
 
-#define vol_mLink_cacheDelete                                                  \
-  (vol_mLink_loObjList | vol_mLink_loOidTab | vol_mLink_loFamilyTab            \
-      | vol_mLink_loParentRef | vol_mLink_loVolumeRef                          \
-      | vol_mLink_loMountServer)
+#define vol_mLink_cacheDelete                                                                                \
+  (vol_mLink_loObjList | vol_mLink_loOidTab | vol_mLink_loFamilyTab | vol_mLink_loParentRef |                \
+   vol_mLink_loVolumeRef | vol_mLink_loMountServer)
 
 #define vol_mLink_cacheTrim vol_mLink_cacheDelete
 #define vol_mLink_cacheMove (vol_mLink_loFamilyTab)
@@ -150,17 +140,17 @@ typedef union {
 
 /** Link mask for sub classes */
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(init, 1), pwr_Bits(scList, 1), pwr_Bits(scTab, 1),
-      pwr_Bits(parentRef, 1), pwr_Bits(volumeRef, 1), pwr_Bits(classRef, 1),
-      pwr_Bits(sibList, 1), pwr_Bits(cidList, 1),
+  pwr_32Bits(pwr_Bits(init, 1), pwr_Bits(scList, 1), pwr_Bits(scTab, 1), pwr_Bits(parentRef, 1),
+             pwr_Bits(volumeRef, 1), pwr_Bits(classRef, 1), pwr_Bits(sibList, 1), pwr_Bits(cidList, 1),
 
-      pwr_Bits(body, 1), pwr_Bits(fill_1, 7), , , , , , ,
+             pwr_Bits(body, 1), pwr_Bits(fill_1, 7), , , , , , ,
 
-      pwr_Bits(fill_2, 8), , , , , , , ,
+             pwr_Bits(fill_2, 8), , , , , , , ,
 
-      pwr_Bits(fill_3, 8), , , , , , , ) b;
+             pwr_Bits(fill_3, 8), , , , , , , ) b;
 
 #define vol_mLinkSc__ 0
 #define vol_mLinkSc_init pwr_Bit(0)
@@ -176,22 +166,21 @@ typedef union {
 
 #define vol_mLinkSc_ (~vol_mLinkSc__)
 
-#define vol_mLinkSc_load                                                       \
-  (vol_mLinkSc_init | vol_mLinkSc_scList | vol_mLinkSc_scTab                   \
-      | vol_mLinkSc_parentRef | vol_mLinkSc_volumeRef)
+#define vol_mLinkSc_load                                                                                     \
+  (vol_mLinkSc_init | vol_mLinkSc_scList | vol_mLinkSc_scTab | vol_mLinkSc_parentRef | vol_mLinkSc_volumeRef)
 
-#define vol_mLinkSc_build                                                      \
-  (vol_mLinkSc_sibList | vol_mLinkSc_cidList | vol_mLinkSc_body                \
-      | vol_mLinkSc_classRef)
+#define vol_mLinkSc_build                                                                                    \
+  (vol_mLinkSc_sibList | vol_mLinkSc_cidList | vol_mLinkSc_body | vol_mLinkSc_classRef)
 } vol_mLinkSc;
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(privat, 1), pwr_Bits(native, 1), pwr_Bits(fileCached, 1),
-      pwr_Bits(netCached, 1), pwr_Bits(fill0, 4), , , ,
+  pwr_32Bits(pwr_Bits(privat, 1), pwr_Bits(native, 1), pwr_Bits(fileCached, 1), pwr_Bits(netCached, 1),
+             pwr_Bits(fill0, 4), , , ,
 
-      pwr_Bits(fill1, 8), , , , , , , , pwr_Bits(fill2, 8), , , , , , , ,
-      pwr_Bits(fill3, 8), , , , , , , ) b;
+             pwr_Bits(fill1, 8), , , , , , , , pwr_Bits(fill2, 8), , , , , , , , pwr_Bits(fill3, 8), , , , , ,
+             , ) b;
 
 #define vol_mLoad__ 0
 #define vol_mLoad_private pwr_Bit(0)
@@ -208,13 +197,13 @@ typedef union {
    If 'Alias' is set, then alias clients will be translated.
    If "Mount' is set, then mount clients will be translated.  */
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(alias, 1), pwr_Bits(mount, 1), pwr_Bits(fill0, 6), , , , ,
-      ,
+  pwr_32Bits(pwr_Bits(alias, 1), pwr_Bits(mount, 1), pwr_Bits(fill0, 6), , , , , ,
 
-      pwr_Bits(fill1, 8), , , , , , , , pwr_Bits(fill2, 8), , , , , , , ,
-      pwr_Bits(fill3, 8), , , , , , , ) b;
+             pwr_Bits(fill1, 8), , , , , , , , pwr_Bits(fill2, 8), , , , , , , , pwr_Bits(fill3, 8), , , , , ,
+             , ) b;
 
 #define vol_mTrans__ 0
 #define vol_mTrans_none 0
@@ -233,13 +222,12 @@ gdb_sMountServer* vol_AddMountClient(pwr_tStatus* sts, gdb_sObject* op);
 
 gdb_sMountServer* vol_AddMountServer(pwr_tStatus* sts, pwr_tObjid oid);
 
-mvol_sAttribute* vol_ArefToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
-    pwr_sAttrRef* arp, pwr_tBitMask local, pwr_tBitMask trans);
+mvol_sAttribute* vol_ArefToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap, pwr_sAttrRef* arp,
+                                     pwr_tBitMask local, pwr_tBitMask trans);
 
 void* vol_AttributeToAddress(pwr_tStatus* sts, mvol_sAttribute* ap);
 
-char* vol_AttributeToName(
-    pwr_tStatus* sts, mvol_sAttribute* ap, pwr_tBitMask nametype, char* s);
+char* vol_AttributeToName(pwr_tStatus* sts, mvol_sAttribute* ap, pwr_tBitMask nametype, char* s);
 
 pool_tRef vol_AttributeToReference(pwr_tStatus* sts, mvol_sAttribute* ap);
 
@@ -247,59 +235,51 @@ void vol_CancelDlink(pwr_tStatus* sts, pwr_tDlid dlid);
 
 void vol_CancelUserDlinks(qcom_sQid user);
 
-gdb_sObject* vol_InitiateObject(
-    pwr_tStatus* sts, gdb_sObject* op, gdb_sVolume* vp);
+gdb_sObject* vol_InitiateObject(pwr_tStatus* sts, gdb_sObject* op, gdb_sVolume* vp);
 
 void vol_InsertSiblist(pwr_tStatus* sts, gdb_sObject* op, gdb_sObject* p_op);
 
-gdb_sObject* vol_LinkObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask ilink);
+gdb_sObject* vol_LinkObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask ilink);
 
-gdb_sScObject* vol_LinkScObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sScObject* op, pwr_tBitMask ilink);
+gdb_sScObject* vol_LinkScObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sScObject* op, pwr_tBitMask ilink);
 
-gdb_sObject* vol_LoadObject(pwr_tStatus* sts, gdb_sVolume* vp, char* name,
-    pwr_tObjid oid, pwr_tClassId cid, pwr_tUInt32 size, pwr_tObjid poid,
-    pwr_tBitMask iflags, pwr_tObjid soid, void* bodyp);
+gdb_sObject* vol_LoadObject(pwr_tStatus* sts, gdb_sVolume* vp, char* name, pwr_tObjid oid, pwr_tClassId cid,
+                            pwr_tUInt32 size, pwr_tObjid poid, pwr_tBitMask iflags, pwr_tObjid soid,
+                            void* bodyp);
 
-gdb_sVolume* vol_LoadVolume(pwr_tStatus* sts, pwr_tVolumeId vid, char* name,
-    pwr_tClassId cid, pwr_tNodeId nid, pwr_tBitMask iload);
+gdb_sVolume* vol_LoadVolume(pwr_tStatus* sts, pwr_tVolumeId vid, char* name, pwr_tClassId cid,
+                            pwr_tNodeId nid, pwr_tBitMask iload);
 
 gdb_sVolume* vol_MountVolume(pwr_tStatus* sts, pwr_tVolumeId vid);
 
-mvol_sAttribute* vol_NameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap,
-    cdh_sParseName* pn, pwr_tBitMask local, pwr_tBitMask trans);
+mvol_sAttribute* vol_NameToAttribute(pwr_tStatus* sts, mvol_sAttribute* ap, cdh_sParseName* pn,
+                                     pwr_tBitMask local, pwr_tBitMask trans);
 
-gdb_sObject* vol_NameToParentObject(pwr_tStatus* sts, cdh_sParseName* pn,
-    pwr_tBitMask lo_flags, pwr_tBitMask trans);
+gdb_sObject* vol_NameToParentObject(pwr_tStatus* sts, cdh_sParseName* pn, pwr_tBitMask lo_flags,
+                                    pwr_tBitMask trans);
 
-gdb_sObject* vol_NameToObject(pwr_tStatus* sts, cdh_sParseName* pn,
-    pwr_tBitMask lo_flags, pwr_tBitMask trans);
+gdb_sObject* vol_NameToObject(pwr_tStatus* sts, cdh_sParseName* pn, pwr_tBitMask lo_flags,
+                              pwr_tBitMask trans);
 
 char* vol_ObjectToAddress(pwr_tStatus* sts, gdb_sObject* op);
 
-char* vol_ObjectToName(
-    pwr_tStatus* sts, gdb_sObject* op, pwr_tBitMask nametype, char* buff);
+char* vol_ObjectToName(pwr_tStatus* sts, gdb_sObject* op, pwr_tBitMask nametype, char* buff);
 
 pwr_tObjid vol_Oid(pwr_tStatus* sts, gdb_sVolume* vp, pwr_tClassId cid);
 
-gdb_sObject* vol_OidToObject(
-    pwr_tStatus* sts, pwr_tObjid oid, pwr_tBitMask in_db, pwr_tBitMask trans,
-    cvol_eHint hint /* Give a hint to the cache handler.  */
-    );
+gdb_sObject* vol_OidToObject(pwr_tStatus* sts, pwr_tObjid oid, pwr_tBitMask in_db, pwr_tBitMask trans,
+                             cvol_eHint hint /* Give a hint to the cache handler.  */
+);
 
-gdb_sObject* vol_OixToObject(
-    pwr_tStatus* sts, pwr_tVolumeId vid, pwr_tObjectIx oix, pwr_tBitMask local,
-    pwr_tBitMask trans, cvol_eHint hint /* Give a hint to the cache handler.  */
-    );
+gdb_sObject* vol_OixToObject(pwr_tStatus* sts, pwr_tVolumeId vid, pwr_tObjectIx oix, pwr_tBitMask local,
+                             pwr_tBitMask trans, cvol_eHint hint /* Give a hint to the cache handler.  */
+);
 
-void vol_PropagateAlarmLevel(pwr_tStatus* sts, gdb_sObject* op,
-    pwr_tBoolean l_maxa, pwr_tUInt32 old_maxa, pwr_tUInt32 new_maxa,
-    pwr_tBoolean propagate_alias);
+void vol_PropagateAlarmLevel(pwr_tStatus* sts, gdb_sObject* op, pwr_tBoolean l_maxa, pwr_tUInt32 old_maxa,
+                             pwr_tUInt32 new_maxa, pwr_tBoolean propagate_alias);
 
-void vol_PropagateBlockLevel(pwr_tStatus* sts, gdb_sObject* op,
-    pwr_tBoolean l_maxb, pwr_tUInt32 omblvl, pwr_tUInt32 nmblvl,
-    pwr_tBoolean propagate_alias);
+void vol_PropagateBlockLevel(pwr_tStatus* sts, gdb_sObject* op, pwr_tBoolean l_maxb, pwr_tUInt32 omblvl,
+                             pwr_tUInt32 nmblvl, pwr_tBoolean propagate_alias);
 
 void vol_RemoveMountClient(pwr_tStatus* sts, gdb_sObject* op);
 
@@ -313,11 +293,9 @@ void vol_SetBlockLevel(pwr_tStatus* sts, gdb_sObject* op, pwr_tUInt32 blvl);
 
 gdb_sObject* vol_FamilyToObject(pwr_tStatus* sts, char* name, pwr_tObjid poid);
 
-gdb_sObject* vol_TranslateObject(
-    pwr_tStatus* sts, gdb_sObject* op, pwr_tBitMask in_db, pwr_tBitMask trans);
+gdb_sObject* vol_TranslateObject(pwr_tStatus* sts, gdb_sObject* op, pwr_tBitMask in_db, pwr_tBitMask trans);
 
-void vol_UnlinkObject(
-    pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask link);
+void vol_UnlinkObject(pwr_tStatus* sts, gdb_sVolume* vp, gdb_sObject* op, pwr_tBitMask link);
 
 void vol_UpdateAlarm(pwr_tStatus* sts, gdb_sObject* op, net_sAlarm al);
 

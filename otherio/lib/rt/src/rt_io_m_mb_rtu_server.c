@@ -36,14 +36,14 @@
 
 /* rt_io_m_mb_rtu_server.c -- io methods for Modbus/RTU Server */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 #include <termios.h>
+#include <unistd.h>
 #if defined OS_LINUX
 #include <termio.h>
 #endif
@@ -53,41 +53,37 @@
 #include <sys/ioctl.h>
 
 #include "co_cdh.h"
+#include "co_time.h"
 #include "pwr_basecomponentclasses.h"
 #include "pwr_otherioclasses.h"
 #include "pwr_version.h"
 #include "rt_io_base.h"
 #include "rt_io_bus.h"
 #include "rt_io_msg.h"
-#include "co_cdh.h"
-#include "co_time.h"
 #include "rt_mb_msg.h"
 
 #include "rt_io_mb_rtu.h"
 
-static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp);
-static void mb_shift_write(
-    unsigned char* in, unsigned char* out, int sh, int quant);
-static void mb_shift_read(
-    unsigned char* in, unsigned char* out, int sh, int quant);
+static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent *ap, io_sRack *rp);
+static void mb_shift_write(unsigned char *in, unsigned char *out, int sh,
+                           int quant);
+static void mb_shift_read(unsigned char *in, unsigned char *out, int sh,
+                          int quant);
 
 typedef struct {
-  io_sRack* rp;
+  io_sRack *rp;
 } mb_sCondata;
 
-static void float_to_timeval(struct timeval* tv, float t)
-{
+static void float_to_timeval(struct timeval *tv, float t) {
   tv->tv_sec = t;
   tv->tv_usec = (t - (float)tv->tv_sec) * 1000000;
 }
-static void float_to_timespec(struct timespec* tv, float t)
-{
+static void float_to_timespec(struct timespec *tv, float t) {
   tv->tv_sec = t;
   tv->tv_nsec = (t - (float)tv->tv_sec) * 1000000000;
 }
 
-static void generate_crc(unsigned char* buf, int size, unsigned char* result)
-{
+static void generate_crc(unsigned char *buf, int size, unsigned char *result) {
   unsigned short int crc;
   unsigned short int gen_polynomial = 0xA001;
   unsigned short int flag_mask = 0x0001;
@@ -111,11 +107,11 @@ static void generate_crc(unsigned char* buf, int size, unsigned char* result)
   result[1] = (unsigned char)((crc >> 8) & 0x00FF);
 }
 
-static pwr_tStatus rtu_send(io_sServerLocal* local_master,
-    pwr_sClass_Modbus_RTU_Server* op, void* bufp, int buffer_size)
-{
+static pwr_tStatus rtu_send(io_sServerLocal *local_master,
+                            pwr_sClass_Modbus_RTU_Server *op, void *bufp,
+                            int buffer_size) {
   int sts;
-  unsigned char* buf = (unsigned char*)bufp;
+  unsigned char *buf = (unsigned char *)bufp;
   struct timespec tf;
 
   generate_crc(buf, buffer_size, &buf[buffer_size]);
@@ -144,17 +140,16 @@ static pwr_tStatus rtu_send(io_sServerLocal* local_master,
   return 1;
 }
 
-static void* mb_receive(void* data)
-{
-  io_sRack* rp = ((mb_sCondata*)data)->rp;
-  io_sServerLocal* local_master = rp->Local;
-  pwr_sClass_Modbus_RTU_Server* op = (pwr_sClass_Modbus_RTU_Server*)rp->op;
+static void *mb_receive(void *data) {
+  io_sRack *rp = ((mb_sCondata *)data)->rp;
+  io_sServerLocal *local_master = rp->Local;
+  pwr_sClass_Modbus_RTU_Server *op = (pwr_sClass_Modbus_RTU_Server *)rp->op;
   int data_size = 0;
-  rec_buf* rb;
+  rec_buf *rb;
   unsigned char fc;
   unsigned char exception_code;
   ssize_t ssts;
-  struct timeval tv = { 0, 0 };
+  struct timeval tv = {0, 0};
   int sts;
   fd_set read_fd;
   unsigned char crc[2];
@@ -219,15 +214,15 @@ static void* mb_receive(void* data)
     }
 
     generate_crc(telegram, data_size - 2, crc);
-    if (crc[0] != telegram[data_size - 2]
-        || crc[1] != telegram[data_size - 1]) {
+    if (crc[0] != telegram[data_size - 2] ||
+        crc[1] != telegram[data_size - 1]) {
       op->ErrorCount++;
       continue;
     }
 
     op->RX_packets++;
 
-    rb = (rec_buf*)telegram;
+    rb = (rec_buf *)telegram;
 
     fc = rb->fc;
 
@@ -236,10 +231,10 @@ static void* mb_receive(void* data)
 
     switch (fc) {
     case pwr_eModbus_FCEnum_ReadHoldingRegisters: {
-      io_sCard* cardp;
-      io_sServerModuleLocal* local_card = NULL;
-      pwr_sClass_Modbus_RTU_ServerModule* mp = NULL;
-      read_req* rmsg = (read_req*)rb;
+      io_sCard *cardp;
+      io_sServerModuleLocal *local_card = NULL;
+      pwr_sClass_Modbus_RTU_ServerModule *mp = NULL;
+      read_req *rmsg = (read_req *)rb;
       rsp_read msg;
       int found;
 
@@ -255,7 +250,7 @@ static void* mb_receive(void* data)
       /* Check the address */
       found = 0;
       for (cardp = rp->cardlist; cardp; cardp = cardp->next) {
-        mp = (pwr_sClass_Modbus_RTU_ServerModule*)cardp->op;
+        mp = (pwr_sClass_Modbus_RTU_ServerModule *)cardp->op;
         if (mp->UnitId == unit_id) {
           local_card = cardp->Local;
           found = 1;
@@ -279,11 +274,11 @@ static void* mb_receive(void* data)
       msg.bc = quant * 2;
       msg.unit_id = rmsg->unit_id;
       thread_MutexLock(&local_master->mutex);
-      memcpy(msg.buf, (char*)local_card->output_area + addr, quant * 2);
+      memcpy(msg.buf, (char *)local_card->output_area + addr, quant * 2);
       thread_MutexUnlock(&local_master->mutex);
 
       ssts = rtu_send(local_master, op, &msg,
-          sizeof(msg) - sizeof(msg.buf) + quant * 2 - 2);
+                      sizeof(msg) - sizeof(msg.buf) + quant * 2 - 2);
       if (ssts < 0) {
         op->Status = MB__CONNLOST;
         break;
@@ -295,10 +290,10 @@ static void* mb_receive(void* data)
     }
     case pwr_eModbus_FCEnum_ReadCoils:
     case pwr_eModbus_FCEnum_ReadDiscreteInputs: {
-      io_sCard* cardp;
-      io_sServerModuleLocal* local_card = NULL;
-      pwr_sClass_Modbus_RTU_ServerModule* mp;
-      read_req* rmsg = (read_req*)rb;
+      io_sCard *cardp;
+      io_sServerModuleLocal *local_card = NULL;
+      pwr_sClass_Modbus_RTU_ServerModule *mp;
+      read_req *rmsg = (read_req *)rb;
       rsp_read msg;
       int found;
       unsigned char mask;
@@ -318,7 +313,7 @@ static void* mb_receive(void* data)
       /* Check the address */
       found = 0;
       for (cardp = rp->cardlist; cardp; cardp = cardp->next) {
-        mp = (pwr_sClass_Modbus_RTU_ServerModule*)cardp->op;
+        mp = (pwr_sClass_Modbus_RTU_ServerModule *)cardp->op;
         if (mp->UnitId == unit_id) {
           local_card = cardp->Local;
           found = 1;
@@ -334,9 +329,9 @@ static void* mb_receive(void* data)
       offs = addr / 8;
       bytes = (addr + quant) / 8 + (((addr + quant) % 8 == 0) ? 0 : 1) - offs;
 
-      if (addr < 0
-          || offs + bytes + local_card->do_offset > local_card->output_size
-          || offs + bytes > local_card->do_size) {
+      if (addr < 0 ||
+          offs + bytes + local_card->do_offset > local_card->output_size ||
+          offs + bytes > local_card->do_size) {
         exception_code = 2;
         break;
       }
@@ -349,26 +344,27 @@ static void* mb_receive(void* data)
       thread_MutexLock(&local_master->mutex);
       if (addr % 8 == 0) {
         memcpy(msg.buf,
-            (char*)local_card->output_area + local_card->do_offset + addr / 8,
-            bytes);
+               (char *)local_card->output_area + local_card->do_offset +
+                   addr / 8,
+               bytes);
 
         mask = 0;
         for (i = 0; i < quant % 8; i++)
           mask |= 1 << i;
 
         if (quant % 8 != 0) {
-          unsigned char* b = (unsigned char*)msg.buf;
+          unsigned char *b = (unsigned char *)msg.buf;
           b[bytes - 1] &= mask;
         }
       } else {
-        mb_shift_read((unsigned char*)local_card->output_area
-                + local_card->do_offset + addr / 8,
-            (unsigned char*)msg.buf, addr % 8, quant);
+        mb_shift_read((unsigned char *)local_card->output_area +
+                          local_card->do_offset + addr / 8,
+                      (unsigned char *)msg.buf, addr % 8, quant);
       }
       thread_MutexUnlock(&local_master->mutex);
 
-      ssts = rtu_send(
-          local_master, op, &msg, sizeof(msg) - sizeof(msg.buf) + bytes - 2);
+      ssts = rtu_send(local_master, op, &msg,
+                      sizeof(msg) - sizeof(msg.buf) + bytes - 2);
       if (ssts < 0) {
         op->Status = MB__CONNLOST;
         break;
@@ -379,10 +375,10 @@ static void* mb_receive(void* data)
       break;
     }
     case pwr_eModbus_FCEnum_WriteSingleRegister: {
-      io_sCard* cardp;
-      io_sServerModuleLocal* local_card = NULL;
-      pwr_sClass_Modbus_RTU_ServerModule* mp = NULL;
-      write_single_req* rmsg = (write_single_req*)rb;
+      io_sCard *cardp;
+      io_sServerModuleLocal *local_card = NULL;
+      pwr_sClass_Modbus_RTU_ServerModule *mp = NULL;
+      write_single_req *rmsg = (write_single_req *)rb;
       rsp_single_write msg;
       int found;
 
@@ -392,7 +388,7 @@ static void* mb_receive(void* data)
       /* Check the address */
       found = 0;
       for (cardp = rp->cardlist; cardp; cardp = cardp->next) {
-        mp = (pwr_sClass_Modbus_RTU_ServerModule*)cardp->op;
+        mp = (pwr_sClass_Modbus_RTU_ServerModule *)cardp->op;
         if (mp->UnitId == unit_id) {
           local_card = cardp->Local;
           found = 1;
@@ -413,7 +409,7 @@ static void* mb_receive(void* data)
       }
 
       thread_MutexLock(&local_master->mutex);
-      memcpy((char*)local_card->input_area + addr, &rmsg->value, 2);
+      memcpy((char *)local_card->input_area + addr, &rmsg->value, 2);
       thread_MutexUnlock(&local_master->mutex);
 
       msg.fc = fc;
@@ -432,10 +428,10 @@ static void* mb_receive(void* data)
       break;
     }
     case pwr_eModbus_FCEnum_WriteMultipleRegisters: {
-      io_sCard* cardp;
-      io_sServerModuleLocal* local_card = NULL;
-      pwr_sClass_Modbus_RTU_ServerModule* mp = NULL;
-      write_reg_req* rmsg = (write_reg_req*)rb;
+      io_sCard *cardp;
+      io_sServerModuleLocal *local_card = NULL;
+      pwr_sClass_Modbus_RTU_ServerModule *mp = NULL;
+      write_reg_req *rmsg = (write_reg_req *)rb;
       rsp_write msg;
       int found;
 
@@ -451,7 +447,7 @@ static void* mb_receive(void* data)
       /* Check the address */
       found = 0;
       for (cardp = rp->cardlist; cardp; cardp = cardp->next) {
-        mp = (pwr_sClass_Modbus_RTU_ServerModule*)cardp->op;
+        mp = (pwr_sClass_Modbus_RTU_ServerModule *)cardp->op;
         if (mp->UnitId == unit_id) {
           local_card = cardp->Local;
           found = 1;
@@ -472,7 +468,7 @@ static void* mb_receive(void* data)
       }
 
       thread_MutexLock(&local_master->mutex);
-      memcpy((char*)local_card->input_area + addr, rmsg->reg, quant * 2);
+      memcpy((char *)local_card->input_area + addr, rmsg->reg, quant * 2);
       thread_MutexUnlock(&local_master->mutex);
 
       msg.fc = fc;
@@ -491,10 +487,10 @@ static void* mb_receive(void* data)
       break;
     }
     case pwr_eModbus_FCEnum_WriteSingleCoil: {
-      io_sCard* cardp;
-      io_sServerModuleLocal* local_card = NULL;
-      pwr_sClass_Modbus_RTU_ServerModule* mp;
-      write_single_req* rmsg = (write_single_req*)rb;
+      io_sCard *cardp;
+      io_sServerModuleLocal *local_card = NULL;
+      pwr_sClass_Modbus_RTU_ServerModule *mp;
+      write_single_req *rmsg = (write_single_req *)rb;
       rsp_single_write msg;
       int found;
       unsigned char mask;
@@ -507,7 +503,7 @@ static void* mb_receive(void* data)
       /* Check the address */
       found = 0;
       for (cardp = rp->cardlist; cardp; cardp = cardp->next) {
-        mp = (pwr_sClass_Modbus_RTU_ServerModule*)cardp->op;
+        mp = (pwr_sClass_Modbus_RTU_ServerModule *)cardp->op;
         if (mp->UnitId == unit_id) {
           local_card = cardp->Local;
           found = 1;
@@ -522,8 +518,8 @@ static void* mb_receive(void* data)
 
       offs = addr / 8;
 
-      if (addr < 0 || offs + local_card->di_offset >= local_card->input_size
-          || offs >= local_card->di_size) {
+      if (addr < 0 || offs + local_card->di_offset >= local_card->input_size ||
+          offs >= local_card->di_size) {
         exception_code = 2;
         break;
       }
@@ -532,11 +528,11 @@ static void* mb_receive(void* data)
       if (value == 0xFF00 || value == 0) {
         thread_MutexLock(&local_master->mutex);
         if (value == 0xFF00)
-          *((char*)local_card->input_area + local_card->di_offset + offs)
-              |= mask;
+          *((char *)local_card->input_area + local_card->di_offset + offs) |=
+              mask;
         else
-          *((char*)local_card->input_area + local_card->di_offset + offs)
-              &= ~mask;
+          *((char *)local_card->input_area + local_card->di_offset + offs) &=
+              ~mask;
         thread_MutexUnlock(&local_master->mutex);
       }
       msg.fc = fc;
@@ -555,10 +551,10 @@ static void* mb_receive(void* data)
       break;
     }
     case pwr_eModbus_FCEnum_WriteMultipleCoils: {
-      io_sCard* cardp;
-      io_sServerModuleLocal* local_card = NULL;
-      pwr_sClass_Modbus_RTU_ServerModule* mp;
-      write_reg_req* rmsg = (write_reg_req*)rb;
+      io_sCard *cardp;
+      io_sServerModuleLocal *local_card = NULL;
+      pwr_sClass_Modbus_RTU_ServerModule *mp;
+      write_reg_req *rmsg = (write_reg_req *)rb;
       rsp_write msg;
       int found;
       unsigned char mask;
@@ -578,7 +574,7 @@ static void* mb_receive(void* data)
       /* Check the address */
       found = 0;
       for (cardp = rp->cardlist; cardp; cardp = cardp->next) {
-        mp = (pwr_sClass_Modbus_RTU_ServerModule*)cardp->op;
+        mp = (pwr_sClass_Modbus_RTU_ServerModule *)cardp->op;
         if (mp->UnitId == unit_id) {
           local_card = cardp->Local;
           found = 1;
@@ -595,9 +591,9 @@ static void* mb_receive(void* data)
       offs = addr / 8;
       bytes = (addr + quant) / 8 + (((addr + quant) % 8 == 0) ? 0 : 1) - offs;
 
-      if (addr < 0
-          || offs + bytes + local_card->di_offset > local_card->input_size
-          || offs + bytes > local_card->di_size) {
+      if (addr < 0 ||
+          offs + bytes + local_card->di_offset > local_card->input_size ||
+          offs + bytes > local_card->di_size) {
         exception_code = 2;
         break;
       }
@@ -608,24 +604,22 @@ static void* mb_receive(void* data)
           for (i = 0; i < quant % 8; i++)
             mask |= 1 << i;
 
-          memcpy(
-              (char*)local_card->input_area + local_card->di_offset + addr / 8,
-              rmsg->reg, bytes - 1);
-          *((char*)local_card->input_area + local_card->di_offset + addr / 8
-              + bytes - 1)
-              &= ~mask;
-          *((char*)local_card->input_area + local_card->di_offset + addr / 8
-              + bytes - 1)
-              |= *((char*)rmsg->reg + bytes - 1) & mask;
+          memcpy((char *)local_card->input_area + local_card->di_offset +
+                     addr / 8,
+                 rmsg->reg, bytes - 1);
+          *((char *)local_card->input_area + local_card->di_offset + addr / 8 +
+            bytes - 1) &= ~mask;
+          *((char *)local_card->input_area + local_card->di_offset + addr / 8 +
+            bytes - 1) |= *((char *)rmsg->reg + bytes - 1) & mask;
         } else
-          memcpy(
-              (char*)local_card->input_area + local_card->di_offset + addr / 8,
-              rmsg->reg, bytes);
+          memcpy((char *)local_card->input_area + local_card->di_offset +
+                     addr / 8,
+                 rmsg->reg, bytes);
       } else {
-        mb_shift_write((unsigned char*)rmsg->reg,
-            (unsigned char*)local_card->input_area + local_card->di_offset
-                + addr / 8,
-            addr % 8, quant);
+        mb_shift_write((unsigned char *)rmsg->reg,
+                       (unsigned char *)local_card->input_area +
+                           local_card->di_offset + addr / 8,
+                       addr % 8, quant);
       }
       thread_MutexUnlock(&local_master->mutex);
 
@@ -646,7 +640,7 @@ static void* mb_receive(void* data)
     }
     case 43: {
       /* Encapsulated Interface Transport, Read Device Identification */
-      read_dev_id_req* rmsg = (read_dev_id_req*)rb;
+      read_dev_id_req *rmsg = (read_dev_id_req *)rb;
       rsp_dev_id msg;
       int i;
       int len;
@@ -680,27 +674,27 @@ static void* mb_receive(void* data)
       msg.list[i++] = 0;
       len = strlen("Proview");
       msg.list[i++] = len;
-      strncpy((char*)&msg.list[i], "Proview", len);
+      strncpy((char *)&msg.list[i], "Proview", len);
       i += len;
 
       /* Product code */
       msg.list[i++] = 0;
       len = strlen("-");
       msg.list[i++] = len;
-      strncpy((char*)&msg.list[i], "-", len);
+      strncpy((char *)&msg.list[i], "-", len);
       i += len;
 
       /* Major Minor Revision */
       msg.list[i++] = 0;
       len = strlen(pwrv_cPwrVersionStr);
       msg.list[i++] = len;
-      strncpy((char*)&msg.list[i], pwrv_cPwrVersionStr, len);
+      strncpy((char *)&msg.list[i], pwrv_cPwrVersionStr, len);
       i += len;
 
       msg.unit_id = rmsg->unit_id;
 
-      ssts = rtu_send(
-          local_master, op, &msg, sizeof(msg) - sizeof(msg.list) + 1 - 2);
+      ssts = rtu_send(local_master, op, &msg,
+                      sizeof(msg) - sizeof(msg.list) + 1 - 2);
       if (ssts < 0) {
         op->Status = MB__CONNLOST;
         break;
@@ -737,18 +731,17 @@ static void* mb_receive(void* data)
    Init method for the Modbus/RTU server
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
+static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent *ap, io_sRack *rp) {
   struct termios tty_attributes;
-  io_sServerLocal* local;
+  io_sServerLocal *local;
   pwr_tStatus sts;
-  pwr_sClass_Modbus_RTU_Server* op;
+  pwr_sClass_Modbus_RTU_Server *op;
   pwr_tOName name;
-  mb_sCondata* condata;
+  mb_sCondata *condata;
 
-  op = (pwr_sClass_Modbus_RTU_Server*)rp->op;
+  op = (pwr_sClass_Modbus_RTU_Server *)rp->op;
 
-  sts = gdh_ObjidToName(rp->Objid, (char*)&name, sizeof(name), cdh_mNName);
+  sts = gdh_ObjidToName(rp->Objid, (char *)&name, sizeof(name), cdh_mNName);
   errh_Info("Init of Modbus RTU Server %s", name);
 
   rp->Local = calloc(1, sizeof(io_sServerLocal));
@@ -772,7 +765,7 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   tty_attributes.c_oflag &= ~(ONLCR);
   tty_attributes.c_iflag &= ~(INLCR | ICRNL);
 
-/* Speed */
+  /* Speed */
 
 #if defined OS_LINUX
   tty_attributes.c_cflag &= ~CBAUD;
@@ -889,13 +882,13 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   }
 
   /* Create a thread for receive */
-  condata = (mb_sCondata*)malloc(sizeof(mb_sCondata));
+  condata = (mb_sCondata *)malloc(sizeof(mb_sCondata));
   condata->rp = rp;
 
-  sts = thread_Create(&local->receive_thread, 0, mb_receive, (void*)condata);
+  sts = thread_Create(&local->receive_thread, 0, mb_receive, (void *)condata);
   if (EVEN(sts)) {
-    errh_Error(
-        "Error creating receive thread IO modbus rtu server %s", rp->Name);
+    errh_Error("Error creating receive thread IO modbus rtu server %s",
+               rp->Name);
     free(condata);
     return IO__ERRINIDEVICE;
   }
@@ -905,35 +898,34 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   return IO__SUCCESS;
 }
 
-static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  io_sServerModuleLocal* local_card;
-  io_sCard* cardp;
-  io_sServerLocal* local;
+static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent *ap, io_sRack *rp) {
+  io_sServerModuleLocal *local_card;
+  io_sCard *cardp;
+  io_sServerLocal *local;
   short input_counter;
   short output_counter;
   short card_input_counter;
   short card_output_counter;
-  pwr_sClass_Modbus_RTU_Server* op;
-  pwr_sClass_Modbus_RTU_ServerModule* mp;
+  pwr_sClass_Modbus_RTU_Server *op;
+  pwr_sClass_Modbus_RTU_ServerModule *mp;
   char name[196];
   pwr_tStatus sts;
   pwr_tCid cid;
 
-  io_sChannel* chanp;
+  io_sChannel *chanp;
   int i, latent_input_counter, latent_output_counter;
   pwr_tInt32 chan_size;
-  pwr_sClass_ChanDi* chan_di;
-  pwr_sClass_ChanDo* chan_do;
-  pwr_sClass_ChanAi* chan_ai;
-  pwr_sClass_ChanAit* chan_ait;
-  pwr_sClass_ChanIi* chan_ii;
-  pwr_sClass_ChanAo* chan_ao;
-  pwr_sClass_ChanIo* chan_io;
+  pwr_sClass_ChanDi *chan_di;
+  pwr_sClass_ChanDo *chan_do;
+  pwr_sClass_ChanAi *chan_ai;
+  pwr_sClass_ChanAit *chan_ait;
+  pwr_sClass_ChanIi *chan_ii;
+  pwr_sClass_ChanAo *chan_ao;
+  pwr_sClass_ChanIo *chan_io;
 
-  sts = gdh_ObjidToName(rp->Objid, (char*)&name, sizeof(name), cdh_mNName);
+  sts = gdh_ObjidToName(rp->Objid, (char *)&name, sizeof(name), cdh_mNName);
 
-  op = (pwr_sClass_Modbus_RTU_Server*)rp->op;
+  op = (pwr_sClass_Modbus_RTU_Server *)rp->op;
 
   local = rp->Local;
 
@@ -954,10 +946,10 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     local_card = calloc(1, sizeof(*local_card));
     cardp->Local = local_card;
     input_counter = input_counter + card_input_counter + latent_input_counter;
-    output_counter
-        = output_counter + card_output_counter + latent_output_counter;
-    local_card->input_area = (void*)&(op->Inputs) + input_counter;
-    local_card->output_area = (void*)&(op->Outputs) + output_counter;
+    output_counter =
+        output_counter + card_output_counter + latent_output_counter;
+    local_card->input_area = (void *)&(op->Inputs) + input_counter;
+    local_card->output_area = (void *)&(op->Outputs) + output_counter;
     card_input_counter = 0;
     card_output_counter = 0;
     latent_input_counter = 0;
@@ -971,7 +963,7 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
     switch (cid) {
     case pwr_cClass_Modbus_RTU_ServerModule:
-      mp = (pwr_sClass_Modbus_RTU_ServerModule*)cardp->op;
+      mp = (pwr_sClass_Modbus_RTU_ServerModule *)cardp->op;
       mp->Status = pwr_eModbusModule_StatusEnum_StatusUnknown;
       for (i = 0; i < cardp->ChanListSize; i++) {
         chanp = &cardp->chanlist[i];
@@ -980,9 +972,9 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
           chanp->udata |= PB_UDATA_DIAG;
           switch (chanp->ChanClass) {
           case pwr_cClass_ChanIi:
-            chanp->offset = ((pwr_sClass_ChanIi*)chanp->cop)->Number;
-            chanp->size
-                = GetChanSize(((pwr_sClass_ChanIi*)chanp->cop)->Representation);
+            chanp->offset = ((pwr_sClass_ChanIi *)chanp->cop)->Number;
+            chanp->size =
+                GetChanSize(((pwr_sClass_ChanIi *)chanp->cop)->Representation);
             break;
           default:
             errh_Error("Diagnostic channel class, card %s", cardp->Name);
@@ -1002,7 +994,7 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
         switch (chanp->ChanClass) {
         case pwr_cClass_ChanDi:
-          chan_di = (pwr_sClass_ChanDi*)chanp->cop;
+          chan_di = (pwr_sClass_ChanDi *)chanp->cop;
           if (chan_di->Number == 0) {
             card_input_counter += latent_input_counter;
             latent_input_counter = 0;
@@ -1020,11 +1012,11 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
           if (chan_di->Number == 0 || local_card->di_size == 0)
             local_card->di_size += GetChanSize(chan_di->Representation);
           //	      printf("Di channel found in %s, Number %d, Offset %d\n",
-          //cardp->Name, chan_di->Number, chanp->offset);
+          // cardp->Name, chan_di->Number, chanp->offset);
           break;
 
         case pwr_cClass_ChanAi:
-          chan_ai = (pwr_sClass_ChanAi*)chanp->cop;
+          chan_ai = (pwr_sClass_ChanAi *)chanp->cop;
           chanp->offset = card_input_counter;
           chan_size = GetChanSize(chan_ai->Representation);
           chanp->size = chan_size;
@@ -1032,11 +1024,11 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
           card_input_counter += chan_size;
           io_AiRangeToCoef(chanp);
           //	      printf("Ai channel found in %s, Number %d, Offset %d\n",
-          //cardp->Name, chan_ai->Number, chanp->offset);
+          // cardp->Name, chan_ai->Number, chanp->offset);
           break;
 
         case pwr_cClass_ChanAit:
-          chan_ait = (pwr_sClass_ChanAit*)chanp->cop;
+          chan_ait = (pwr_sClass_ChanAit *)chanp->cop;
           chanp->offset = card_input_counter;
           chan_size = GetChanSize(chan_ait->Representation);
           chanp->size = chan_size;
@@ -1046,18 +1038,18 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
           break;
 
         case pwr_cClass_ChanIi:
-          chan_ii = (pwr_sClass_ChanIi*)chanp->cop;
+          chan_ii = (pwr_sClass_ChanIi *)chanp->cop;
           chanp->offset = card_input_counter;
           chan_size = GetChanSize(chan_ii->Representation);
           chanp->size = chan_size;
           chanp->mask = 0;
           card_input_counter += chan_size;
           //	      printf("Ii channel found in %s, Number %d, Offset %d\n",
-          //cardp->Name, chan_ii->Number, chanp->offset);
+          // cardp->Name, chan_ii->Number, chanp->offset);
           break;
 
         case pwr_cClass_ChanDo:
-          chan_do = (pwr_sClass_ChanDo*)chanp->cop;
+          chan_do = (pwr_sClass_ChanDo *)chanp->cop;
           if (chan_do->Number == 0) {
             card_output_counter += latent_output_counter;
             latent_output_counter = 0;
@@ -1076,11 +1068,11 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
           if (chan_do->Number == 0 || local_card->do_size == 0)
             local_card->do_size += GetChanSize(chan_do->Representation);
           //	      printf("Do channel found in %s, Number %d, Offset %d\n",
-          //cardp->Name, chan_do->Number, chanp->offset);
+          // cardp->Name, chan_do->Number, chanp->offset);
           break;
 
         case pwr_cClass_ChanAo:
-          chan_ao = (pwr_sClass_ChanAo*)chanp->cop;
+          chan_ao = (pwr_sClass_ChanAo *)chanp->cop;
           chanp->offset = card_output_counter;
           chan_size = GetChanSize(chan_ao->Representation);
           chanp->size = chan_size;
@@ -1088,18 +1080,18 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
           card_output_counter += chan_size;
           io_AoRangeToCoef(chanp);
           //	      printf("Ao channel found in %s, Number %d, Offset %d\n",
-          //cardp->Name, chan_ao->Number, chanp->offset);
+          // cardp->Name, chan_ao->Number, chanp->offset);
           break;
 
         case pwr_cClass_ChanIo:
-          chan_io = (pwr_sClass_ChanIo*)chanp->cop;
+          chan_io = (pwr_sClass_ChanIo *)chanp->cop;
           chanp->offset = card_output_counter;
           chan_size = GetChanSize(chan_io->Representation);
           chanp->size = chan_size;
           chanp->mask = 0;
           card_output_counter += chan_size;
           //	      printf("Io channel found in %s, Number %d, Offset %d\n",
-          //cardp->Name, chan_io->Number, chanp->offset);
+          // cardp->Name, chan_io->Number, chanp->offset);
           break;
         }
       } /* End - for ... */
@@ -1114,15 +1106,14 @@ static pwr_tStatus mb_init_channels(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   }
 
   local->input_size = input_counter + card_input_counter + latent_input_counter;
-  local->output_size
-      = output_counter + card_output_counter + latent_output_counter;
+  local->output_size =
+      output_counter + card_output_counter + latent_output_counter;
 
   return IO__SUCCESS;
 }
 
-static void mb_shift_write(
-    unsigned char* in, unsigned char* out, int sh, int quant)
-{
+static void mb_shift_write(unsigned char *in, unsigned char *out, int sh,
+                           int quant) {
   int i;
 
   if (sh + quant <= 8) {
@@ -1157,8 +1148,7 @@ static void mb_shift_write(
   }
 }
 
-void mb_shift_read(unsigned char* in, unsigned char* out, int sh, int quant)
-{
+void mb_shift_read(unsigned char *in, unsigned char *out, int sh, int quant) {
   int i;
 
   if (sh + quant <= 8) {
@@ -1188,25 +1178,22 @@ void mb_shift_read(unsigned char* in, unsigned char* out, int sh, int quant)
 /*----------------------------------------------------------------------------*\
    Read method for the Modbus RTU server
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
+static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent *ap, io_sRack *rp) {
   return IO__SUCCESS;
 }
 
 /*----------------------------------------------------------------------------*\
    Write method for the Modbus_RTU server
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
+static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent *ap, io_sRack *rp) {
   return IO__SUCCESS;
 }
 
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  io_sServerLocal* local = rp->Local;
+static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent *ap, io_sRack *rp) {
+  io_sServerLocal *local = rp->Local;
 
   close(local->fd);
 
@@ -1217,7 +1204,7 @@ static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Modbus_RTU_Server)
-    = { pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackRead),
-        pwr_BindIoMethod(IoRackWrite), pwr_BindIoMethod(IoRackClose),
-        pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Modbus_RTU_Server) = {
+    pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackRead),
+    pwr_BindIoMethod(IoRackWrite), pwr_BindIoMethod(IoRackClose),
+    pwr_NullMethod};

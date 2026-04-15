@@ -75,28 +75,30 @@ void FlowRadiobutton::print(void* pos, void* node, int highlight)
   ll_y = int(ll.print_z_y + ((FlowPoint*)pos)->print_z_y);
   ur_x = int(ll_x + ur.print_z_x - ll.print_z_x);
   ur_y = int(ll_y + ur.print_z_y - ll.print_z_y);
-  ctx->current_print->rect(
-      ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, draw_type, idx, 0);
-  if (((FlowNode*)node)->rbuttonv[number]) {
-    ctx->current_print->line(ll_x + sc * 1, ll_y + sc * 1, ur_x - sc * 1,
-        ll_y + sc * 1, flow_eDrawType_LineGray, idx, 0);
-    ctx->current_print->line(ll_x + sc * 2, ll_y + sc * 2, ur_x - sc * 2,
-        ll_y + sc * 2, flow_eDrawType_LineGray, idx, 0);
-    ctx->current_print->line(ll_x + sc * 1, ll_y + sc * 1, ll_x + sc * 1,
-        ur_y - sc * 1, flow_eDrawType_LineGray, idx, 0);
-    ctx->current_print->line(ll_x + sc * 2, ll_y + sc * 2, ll_x + sc * 2,
-        ur_y - sc * 2, flow_eDrawType_LineGray, idx, 0);
-    ctx->current_print->filled_rect(ll_x + sc * 3, ll_y + sc * 3,
-        ur_x - ll_x - sc * 5, ur_y - ll_y - sc * 5, flow_eDrawType_Line, idx);
-  } else {
-    ctx->current_print->line(ur_x - sc * 1, ur_y - sc * 1, ll_x + sc * 1,
-        ur_y - sc * 1, flow_eDrawType_LineGray, idx, 0);
-    ctx->current_print->line(ur_x - sc * 2, ur_y - sc * 2, ll_x + sc * 2,
-        ur_y - sc * 2, flow_eDrawType_LineGray, idx, 0);
-    ctx->current_print->line(ur_x - sc * 1, ur_y - sc * 1, ur_x - sc * 1,
-        ll_y + sc * 1, flow_eDrawType_LineGray, idx, 0);
-    ctx->current_print->line(ur_x - sc * 2, ur_y - sc * 2, ur_x - sc * 2,
-        ll_y + sc * 2, flow_eDrawType_LineGray, idx, 0);
+  ctx->current_print->rect(ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, draw_type, idx, 0);
+  if (((FlowNode*)node)->rbuttonv[number])
+  {
+    ctx->current_print->line(ll_x + sc * 1, ll_y + sc * 1, ur_x - sc * 1, ll_y + sc * 1,
+                             flow_eDrawType_LineGray, idx, 0);
+    ctx->current_print->line(ll_x + sc * 2, ll_y + sc * 2, ur_x - sc * 2, ll_y + sc * 2,
+                             flow_eDrawType_LineGray, idx, 0);
+    ctx->current_print->line(ll_x + sc * 1, ll_y + sc * 1, ll_x + sc * 1, ur_y - sc * 1,
+                             flow_eDrawType_LineGray, idx, 0);
+    ctx->current_print->line(ll_x + sc * 2, ll_y + sc * 2, ll_x + sc * 2, ur_y - sc * 2,
+                             flow_eDrawType_LineGray, idx, 0);
+    ctx->current_print->filled_rect(ll_x + sc * 3, ll_y + sc * 3, ur_x - ll_x - sc * 5, ur_y - ll_y - sc * 5,
+                                    flow_eDrawType_Line, idx);
+  }
+  else
+  {
+    ctx->current_print->line(ur_x - sc * 1, ur_y - sc * 1, ll_x + sc * 1, ur_y - sc * 1,
+                             flow_eDrawType_LineGray, idx, 0);
+    ctx->current_print->line(ur_x - sc * 2, ur_y - sc * 2, ll_x + sc * 2, ur_y - sc * 2,
+                             flow_eDrawType_LineGray, idx, 0);
+    ctx->current_print->line(ur_x - sc * 1, ur_y - sc * 1, ur_x - sc * 1, ll_y + sc * 1,
+                             flow_eDrawType_LineGray, idx, 0);
+    ctx->current_print->line(ur_x - sc * 2, ur_y - sc * 2, ur_x - sc * 2, ll_y + sc * 2,
+                             flow_eDrawType_LineGray, idx, 0);
   }
 }
 
@@ -110,8 +112,7 @@ void FlowRadiobutton::open(std::ifstream& fp)
   // Not yet implemented
 }
 
-void FlowRadiobutton::draw(
-    void* pos, int highlight, int dimmed, int hot, void* node)
+void FlowRadiobutton::draw(void* pos, int highlight, int dimmed, int hot, void* node)
 {
   int ll_x, ll_y, ur_x, ur_y;
   int idx = 0;
@@ -120,38 +121,31 @@ void FlowRadiobutton::draw(
   ll_y = ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y;
   ur_x = ll_x + ur.z_x - ll.z_x;
   ur_y = ll_y + ur.z_y - ll.z_y;
-  ctx->fdraw->rect(
-      ctx, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, draw_type, idx, 0, 0);
-  if (((FlowNode*)node)->rbuttonv[number]) {
-    ctx->fdraw->line(ctx, ll_x + 1, ll_y + 1, ur_x - 1, ll_y + 1,
-        flow_eDrawType_LineGray, idx, 0, 0);
-    ctx->fdraw->line(ctx, ll_x + 2, ll_y + 2, ur_x - 2, ll_y + 2,
-        flow_eDrawType_LineGray, idx, 0, 0);
-    ctx->fdraw->line(ctx, ll_x + 1, ll_y + 1, ll_x + 1, ur_y - 1,
-        flow_eDrawType_LineGray, idx, 0, 0);
-    ctx->fdraw->line(ctx, ll_x + 2, ll_y + 2, ll_x + 2, ur_y - 2,
-        flow_eDrawType_LineGray, idx, 0, 0);
+  ctx->fdraw->rect(ctx, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, draw_type, idx, 0, 0);
+  if (((FlowNode*)node)->rbuttonv[number])
+  {
+    ctx->fdraw->line(ctx, ll_x + 1, ll_y + 1, ur_x - 1, ll_y + 1, flow_eDrawType_LineGray, idx, 0, 0);
+    ctx->fdraw->line(ctx, ll_x + 2, ll_y + 2, ur_x - 2, ll_y + 2, flow_eDrawType_LineGray, idx, 0, 0);
+    ctx->fdraw->line(ctx, ll_x + 1, ll_y + 1, ll_x + 1, ur_y - 1, flow_eDrawType_LineGray, idx, 0, 0);
+    ctx->fdraw->line(ctx, ll_x + 2, ll_y + 2, ll_x + 2, ur_y - 2, flow_eDrawType_LineGray, idx, 0, 0);
     ctx->fdraw->line_erase(ctx, ur_x - 1, ur_y - 1, ll_x + 1, ur_y - 1, idx);
     ctx->fdraw->line_erase(ctx, ur_x - 2, ur_y - 2, ll_x + 2, ur_y - 2, idx);
     ctx->fdraw->line_erase(ctx, ur_x - 1, ur_y - 1, ur_x - 1, ll_y + 1, idx);
     ctx->fdraw->line_erase(ctx, ur_x - 2, ur_y - 2, ur_x - 2, ll_y + 2, idx);
-    ctx->fdraw->fill_rect(ctx, ll_x + 2, ll_y + 2, ur_x - ll_x - 5,
-        ur_y - ll_y - 5, flow_eDrawType_Line);
-  } else {
+    ctx->fdraw->fill_rect(ctx, ll_x + 2, ll_y + 2, ur_x - ll_x - 5, ur_y - ll_y - 5, flow_eDrawType_Line);
+  }
+  else
+  {
     ctx->fdraw->line_erase(ctx, ll_x + 1, ll_y + 1, ur_x - 1, ll_y + 1, idx);
     ctx->fdraw->line_erase(ctx, ll_x + 2, ll_y + 2, ur_x - 2, ll_y + 2, idx);
     ctx->fdraw->line_erase(ctx, ll_x + 1, ll_y + 1, ll_x + 1, ur_y - 1, idx);
     ctx->fdraw->line_erase(ctx, ll_x + 2, ll_y + 2, ll_x + 2, ur_y - 2, idx);
-    ctx->fdraw->line(ctx, ur_x - 1, ur_y - 1, ll_x + 1, ur_y - 1,
-        flow_eDrawType_LineGray, idx, 0, 0);
-    ctx->fdraw->line(ctx, ur_x - 2, ur_y - 2, ll_x + 2, ur_y - 2,
-        flow_eDrawType_LineGray, idx, 0, 0);
-    ctx->fdraw->line(ctx, ur_x - 1, ur_y - 1, ur_x - 1, ll_y + 1,
-        flow_eDrawType_LineGray, idx, 0, 0);
-    ctx->fdraw->line(ctx, ur_x - 2, ur_y - 2, ur_x - 2, ll_y + 2,
-        flow_eDrawType_LineGray, idx, 0, 0);
-    ctx->fdraw->fill_rect(ctx, ll_x + 2, ll_y + 2, ur_x - ll_x - 5,
-        ur_y - ll_y - 5, flow_eDrawType_LineErase);
+    ctx->fdraw->line(ctx, ur_x - 1, ur_y - 1, ll_x + 1, ur_y - 1, flow_eDrawType_LineGray, idx, 0, 0);
+    ctx->fdraw->line(ctx, ur_x - 2, ur_y - 2, ll_x + 2, ur_y - 2, flow_eDrawType_LineGray, idx, 0, 0);
+    ctx->fdraw->line(ctx, ur_x - 1, ur_y - 1, ur_x - 1, ll_y + 1, flow_eDrawType_LineGray, idx, 0, 0);
+    ctx->fdraw->line(ctx, ur_x - 2, ur_y - 2, ur_x - 2, ll_y + 2, flow_eDrawType_LineGray, idx, 0, 0);
+    ctx->fdraw->fill_rect(ctx, ll_x + 2, ll_y + 2, ur_x - ll_x - 5, ur_y - ll_y - 5,
+                          flow_eDrawType_LineErase);
   }
 }
 
@@ -163,47 +157,43 @@ void FlowRadiobutton::erase(void* pos, int hot, void* node)
   ll_y = ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y;
   ur_x = ll_x + ur.z_x - ll.z_x;
   ur_y = ll_y + ur.z_y - ll.z_y;
-  ctx->fdraw->fill_rect(
-      ctx, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, flow_eDrawType_LineErase);
+  ctx->fdraw->fill_rect(ctx, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, flow_eDrawType_LineErase);
 }
 
-void FlowRadiobutton::nav_draw(void* pos, int highlight, void* node)
-{
-}
+void FlowRadiobutton::nav_draw(void* pos, int highlight, void* node) {}
 
-void FlowRadiobutton::nav_erase(void* pos, void* node)
-{
-}
+void FlowRadiobutton::nav_erase(void* pos, void* node) {}
 
-int FlowRadiobutton::event_handler(
-    void* pos, flow_eEvent event, int x, int y, void* node)
+int FlowRadiobutton::event_handler(void* pos, flow_eEvent event, int x, int y, void* node)
 {
   FlowPoint* p;
   int sts;
 
   p = (FlowPoint*)pos;
-  if (ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x <= x
-      && x <= ur.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x
-      && ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y <= y
-      && y <= ur.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y) {
-    switch (event) {
+  if (ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x <= x &&
+      x <= ur.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x &&
+      ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y <= y &&
+      y <= ur.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y)
+  {
+    switch (event)
+    {
     case flow_eEvent_MB1Click:
       //        std::cout << "Event handler: Hit in radiobutton\n";
       // Call backcall function
-      sts = ctx->radiobutton_cb(
-          (FlowArrayElem*)node, number, ((FlowNode*)node)->rbuttonv[number]);
+      sts = ctx->radiobutton_cb((FlowArrayElem*)node, number, ((FlowNode*)node)->rbuttonv[number]);
       if (sts == FLOW__DESTROYED)
         return sts;
       return FLOW__NO_PROPAGATE;
     default:;
     }
     return 1;
-  } else
+  }
+  else
     return 0;
 }
 
-void FlowRadiobutton::get_borders(double pos_x, double pos_y, double* x_right,
-    double* x_left, double* y_high, double* y_low, void* node)
+void FlowRadiobutton::get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                                  double* y_low, void* node)
 {
   if (pos_x + ll.x < *x_left)
     *x_left = pos_x + ll.x;
@@ -215,8 +205,7 @@ void FlowRadiobutton::get_borders(double pos_x, double pos_y, double* x_right,
     *y_high = pos_y + ur.y;
 }
 
-void FlowRadiobutton::move(
-    void* pos, double x, double y, int highlight, int dimmed, int hot)
+void FlowRadiobutton::move(void* pos, double x, double y, int highlight, int dimmed, int hot)
 {
   double width, height;
 
@@ -230,8 +219,7 @@ void FlowRadiobutton::move(
   nav_zoom();
 }
 
-void FlowRadiobutton::shift(void* pos, double delta_x, double delta_y,
-    int highlight, int dimmed, int hot)
+void FlowRadiobutton::shift(void* pos, double delta_x, double delta_y, int highlight, int dimmed, int hot)
 {
   ll.x += delta_x;
   ll.y += delta_y;
@@ -243,8 +231,7 @@ void FlowRadiobutton::shift(void* pos, double delta_x, double delta_y,
 
 std::ostream& operator<<(std::ostream& o, const FlowRadiobutton r)
 {
-  o << '(' << r.ll.x << ',' << r.ll.y << ')' << '(' << r.ur.x << ',' << r.ur.y
-    << ')' << '[' << r.ll.z_x << ',' << r.ll.z_y << ']' << '[' << r.ur.z_x
-    << ',' << r.ur.z_y << ']';
+  o << '(' << r.ll.x << ',' << r.ll.y << ')' << '(' << r.ur.x << ',' << r.ur.y << ')' << '[' << r.ll.z_x
+    << ',' << r.ll.z_y << ']' << '[' << r.ur.z_x << ',' << r.ur.z_y << ']';
   return o;
 }

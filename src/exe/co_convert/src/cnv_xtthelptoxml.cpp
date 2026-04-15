@@ -41,7 +41,8 @@
 
 #include <stdlib.h>
 
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 #include "co_dcli.h"
 }
@@ -55,7 +56,8 @@ extern "C" {
 #define xml_cHead "<?xml version=\"1.0\" ?>"
 #define xml_cCss "<?xml-stylesheet type=\"text/css\" href=\"pxtthelp.css\" ?>"
 
-typedef enum {
+typedef enum
+{
   xml_eTag_paragraph = 0,
   xml_eTag_bold = 1,
   xml_eTag_link = 2,
@@ -74,21 +76,25 @@ typedef enum {
   xml_eTag_hline = 15
 } xml_eTag;
 
-typedef struct {
+typedef struct
+{
   char start[40];
   char end[40];
 } xml_sTag;
 
-static xml_sTag tags[] = { { "<p>", "</p>" }, { "<b>", "</b>" },
-  { "<a>", "</a>" }, { "<a", "</a>" }, { "<h1>", "</h1>" }, { "<h2>", "</h2>" },
-  { "<h3>", "</h3>" }, { "<topic>", "</topic>" }, { "<img ", " />" },
-  { "<table>", "</table>" }, { "<t1>", "</t1>" }, { "<t2>", "</t2>" },
-  { "<t3>", "</t3>" }, { "<xtthelp>", "</xtthelp>" }, { "<br/>", "" },
-  { "<hr/>", "" } };
+static xml_sTag tags[] = {{"<p>", "</p>"},   {"<b>", "</b>"},
+                          {"<a>", "</a>"},   {"<a", "</a>"},
+                          {"<h1>", "</h1>"}, {"<h2>", "</h2>"},
+                          {"<h3>", "</h3>"}, {"<topic>", "</topic>"},
+                          {"<img ", " />"},  {"<table>", "</table>"},
+                          {"<t1>", "</t1>"}, {"<t2>", "</t2>"},
+                          {"<t3>", "</t3>"}, {"<xtthelp>", "</xtthelp>"},
+                          {"<br/>", ""},     {"<hr/>", ""}};
 
 void CnvXtthelpToXml::cnv_text(char* to, const char* from)
 {
-  if (!from) {
+  if (!from)
+  {
     strcpy(to, "");
     return;
   }
@@ -96,8 +102,10 @@ void CnvXtthelpToXml::cnv_text(char* to, const char* from)
   char* t = to;
   char* s = (char*)from;
 
-  for (; *s; s++) {
-    switch (*s) {
+  for (; *s; s++)
+  {
+    switch (*s)
+    {
     case '<':
       *t++ = 'l';
       *t++ = 't';
@@ -135,20 +143,23 @@ void CnvXtthelpToXml::cnv_text(char* to, const char* from)
   *t = 0;
 }
 
-void CnvXtthelpToXml::subject_to_fname(
-    char* fname, const char* subject, int path)
+void CnvXtthelpToXml::subject_to_fname(char* fname, const char* subject, int path)
 {
   char *s, *t;
 
-  if (path) {
+  if (path)
+  {
     strcpy(fname, ctx->dir);
     strcat(fname, ctx->rx->name);
-  } else
+  }
+  else
     strcpy(fname, ctx->rx->name);
-  if (!ctx->common_structfile_only) {
+  if (!ctx->common_structfile_only)
+  {
     strcat(fname, "_");
     t = fname + strlen(fname);
-    for (s = (char*)subject; *s; s++, t++) {
+    for (s = (char*)subject; *s; s++, t++)
+    {
       if (*s == ' ' || *s == '(' || *s == ')')
         *t = '_';
       else
@@ -161,8 +172,10 @@ void CnvXtthelpToXml::subject_to_fname(
 
 CnvXtthelpToXml::~CnvXtthelpToXml()
 {
-  if (ctx->common_structfile_only && !first_topic) {
-    if (status & xml_mStatus_xtthelp) {
+  if (ctx->common_structfile_only && !first_topic)
+  {
+    if (status & xml_mStatus_xtthelp)
+    {
       fp << tags[xml_eTag_xtthelp].end << '\n';
       status &= ~xml_mStatus_xtthelp;
     }
@@ -170,10 +183,9 @@ CnvXtthelpToXml::~CnvXtthelpToXml()
   }
 }
 
-void* CnvXtthelpToXml::insert(navh_eItemType item_type, const char* t1,
-    const char* t2, const char* t3, const char* link, const char* link_bookmark,
-    const char* file_name, navh_eHelpFile file_type, int help_index,
-    const char* bookmark, int coding)
+void* CnvXtthelpToXml::insert(navh_eItemType item_type, const char* t1, const char* t2, const char* t3,
+                              const char* link, const char* link_bookmark, const char* file_name,
+                              navh_eHelpFile file_type, int help_index, const char* bookmark, int coding)
 {
   int i;
   static int in_table = 0;
@@ -185,33 +197,39 @@ void* CnvXtthelpToXml::insert(navh_eItemType item_type, const char* t1,
   cnv_text(text2, t2);
   cnv_text(text3, t3);
 
-  if ((t2 && !streq(text2, "")) || (t3 && !streq(text3, ""))) {
-    if (!(status & xml_mStatus_table)) {
+  if ((t2 && !streq(text2, "")) || (t3 && !streq(text3, "")))
+  {
+    if (!(status & xml_mStatus_table))
+    {
       fp << tags[xml_eTag_table].start << '\n';
       status |= xml_mStatus_table;
     }
-  } else {
-    if (status & xml_mStatus_table) {
+  }
+  else
+  {
+    if (status & xml_mStatus_table)
+    {
       // Close table (keep if empty line)
-      if (!(t1 && streq(text1, "")
-              && (item_type == navh_eItemType_Help
-                     || item_type == navh_eItemType_HelpCode
-                     || item_type == navh_eItemType_HelpBold))) {
+      if (!(t1 && streq(text1, "") &&
+            (item_type == navh_eItemType_Help || item_type == navh_eItemType_HelpCode ||
+             item_type == navh_eItemType_HelpBold)))
+      {
         fp << tags[xml_eTag_table].end << '\n';
         status &= ~xml_mStatus_table;
       }
     }
   }
-  switch (item_type) {
-  case navh_eItemType_Topic: {
+  switch (item_type)
+  {
+  case navh_eItemType_Topic:
+  {
     pwr_tFileName fname;
 
-    if (first_topic || !ctx->common_structfile_only) {
+    if (first_topic || !ctx->common_structfile_only)
+    {
       subject_to_fname(fname, text1, 1);
       fp.open(fname);
-      fp << xml_cHead << '\n'
-         << xml_cCss << '\n'
-         << tags[xml_eTag_xtthelp].start << '\n';
+      fp << xml_cHead << '\n' << xml_cCss << '\n' << tags[xml_eTag_xtthelp].start << '\n';
 
       status |= xml_mStatus_xtthelp;
       first_topic = 0;
@@ -220,21 +238,27 @@ void* CnvXtthelpToXml::insert(navh_eItemType item_type, const char* t1,
     status |= xml_mStatus_topic;
     return NULL;
   }
-  case navh_eItemType_EndTopic: {
-    if (status & xml_mStatus_table) {
+  case navh_eItemType_EndTopic:
+  {
+    if (status & xml_mStatus_table)
+    {
       fp << tags[xml_eTag_table].end << '\n';
       status &= ~xml_mStatus_table;
     }
-    if (status & xml_mStatus_paragraph) {
+    if (status & xml_mStatus_paragraph)
+    {
       fp << tags[xml_eTag_paragraph].end << '\n';
       status &= ~xml_mStatus_paragraph;
     }
-    if (status & xml_mStatus_topic) {
+    if (status & xml_mStatus_topic)
+    {
       fp << tags[xml_eTag_topic].end << '\n';
       status &= ~xml_mStatus_topic;
     }
-    if (!ctx->common_structfile_only) {
-      if (status & xml_mStatus_xtthelp) {
+    if (!ctx->common_structfile_only)
+    {
+      if (status & xml_mStatus_xtthelp)
+      {
         fp << tags[xml_eTag_xtthelp].end << '\n';
         status &= ~xml_mStatus_xtthelp;
       }
@@ -243,43 +267,58 @@ void* CnvXtthelpToXml::insert(navh_eItemType item_type, const char* t1,
     return NULL;
   }
   case navh_eItemType_Help:
-  case navh_eItemType_HelpCode: {
-    if (!streq(link, "")) {
+  case navh_eItemType_HelpCode:
+  {
+    if (!streq(link, ""))
+    {
       pwr_tFileName fname;
 
-      if (str_StartsWith(link, "$web:")) {
+      if (str_StartsWith(link, "$web:"))
+      {
         if (str_StartsWith(&link[5], "$pwrp_web/"))
           strcpy(fname, &link[15]);
         else
           strcpy(fname, &link[5]);
-      } else if ((strstr(link, ".htm") != 0) || (strstr(link, ".pdf") != 0)) {
+      }
+      else if ((strstr(link, ".htm") != 0) || (strstr(link, ".pdf") != 0))
+      {
         strcpy(fname, link);
-      } else {
+      }
+      else
+      {
         subject_to_fname(fname, link, 0);
 
-        if (!streq(link_bookmark, "")) {
+        if (!streq(link_bookmark, ""))
+        {
           strcat(fname, "#");
           strcat(fname, link_bookmark);
         }
       }
       fp << tags[xml_eTag_link].start << " href=\"" << fname << "\">";
-    } else if (bookmark) {
+    }
+    else if (bookmark)
+    {
       fp << tags[xml_eTag_link].start << " name=\"" << bookmark << "\">";
     }
 
-    if (!in_table) {
+    if (!in_table)
+    {
       fp << text1;
       if (!streq(link, "") || bookmark)
         fp << tags[xml_eTag_break].start << tags[xml_eTag_link].end << '\n';
       else
         fp << tags[xml_eTag_break].start << '\n';
-    } else {
+    }
+    else
+    {
       fp << "<TR><TD>" << text1;
-      if (!streq(text2, "") || !streq(text3, "")) {
+      if (!streq(text2, "") || !streq(text3, ""))
+      {
         for (i = 0; i < (int)(CNV_TAB - strlen(text1)); i++)
           fp << "&nbsp;";
         fp << "&nbsp;&nbsp;</TD><TD>" << text2;
-        if (!streq(text3, "")) {
+        if (!streq(text3, ""))
+        {
           for (i = 0; i < (int)(CNV_TAB - strlen(text2)); i++)
             fp << "&nbsp;";
           fp << "&nbsp;&nbsp;</TD><TD>" << text3;
@@ -293,37 +332,50 @@ void* CnvXtthelpToXml::insert(navh_eItemType item_type, const char* t1,
     }
     return NULL;
   }
-  case navh_eItemType_HelpBold: {
+  case navh_eItemType_HelpBold:
+  {
     pwr_tFileName fname;
-    if (!streq(link, "")) {
-      if (str_StartsWith(link, "$web:")) {
+    if (!streq(link, ""))
+    {
+      if (str_StartsWith(link, "$web:"))
+      {
         if (str_StartsWith(&link[5], "$pwrp_web/"))
           strcpy(fname, &link[15]);
         else
           strcpy(fname, &link[5]);
-      } else if ((strstr(link, ".htm") != 0) || (strstr(link, ".pdf") != 0)) {
+      }
+      else if ((strstr(link, ".htm") != 0) || (strstr(link, ".pdf") != 0))
+      {
         strcpy(fname, link);
-      } else {
+      }
+      else
+      {
         subject_to_fname(fname, link, 0);
-        if (!streq(link_bookmark, "")) {
+        if (!streq(link_bookmark, ""))
+        {
           strcat(fname, "#");
           strcat(fname, link_bookmark);
         }
       }
       if (!in_table)
         fp << tags[xml_eTag_link].start << " href=\"" << fname << "\">";
-    } else if (bookmark) {
+    }
+    else if (bookmark)
+    {
       if (!in_table)
         fp << tags[xml_eTag_link].start << " name=\"" << bookmark << "\">";
     }
 
-    if (!in_table) {
+    if (!in_table)
+    {
       fp << tags[xml_eTag_bold].start << text1 << tags[xml_eTag_bold].end;
       if (!streq(link, "") || bookmark)
         fp << tags[xml_eTag_break].start << tags[xml_eTag_link].end << '\n';
       else
         fp << tags[xml_eTag_break].start << '\n';
-    } else {
+    }
+    else
+    {
       fp << "<TR><TD><B>";
       if (!streq(link, ""))
         fp << "<A HREF=\"" << fname << "\">";
@@ -332,11 +384,13 @@ void* CnvXtthelpToXml::insert(navh_eItemType item_type, const char* t1,
       fp << text1;
       if (!streq(link, "") || bookmark)
         fp << "</A>";
-      if (!streq(text2, "") || !streq(text3, "")) {
+      if (!streq(text2, "") || !streq(text3, ""))
+      {
         for (i = 0; i < (int)(CNV_TAB - strlen(text1)); i++)
           fp << "&nbsp;";
         fp << "&nbsp;&nbsp;</B></TD><TD><B>" << text2;
-        if (!streq(text3, "")) {
+        if (!streq(text3, ""))
+        {
           for (i = 0; i < (int)(CNV_TAB - strlen(text2)); i++)
             fp << "&nbsp;";
           fp << "&nbsp;&nbsp;</B></TD><TD><B>" << text3;
@@ -350,28 +404,29 @@ void* CnvXtthelpToXml::insert(navh_eItemType item_type, const char* t1,
     }
     return NULL;
   }
-  case navh_eItemType_HelpHeader: {
-    fp << tags[xml_eTag_h1].start << text1 << tags[xml_eTag_h1].end
-       << tags[xml_eTag_break].start << '\n';
+  case navh_eItemType_HelpHeader:
+  {
+    fp << tags[xml_eTag_h1].start << text1 << tags[xml_eTag_h1].end << tags[xml_eTag_break].start << '\n';
     return NULL;
   }
-  case navh_eItemType_Header: {
-    fp << tags[xml_eTag_h3].start << text1 << tags[xml_eTag_h3].end
-       << tags[xml_eTag_break].start << '\n';
+  case navh_eItemType_Header:
+  {
+    fp << tags[xml_eTag_h3].start << text1 << tags[xml_eTag_h3].end << tags[xml_eTag_break].start << '\n';
     return NULL;
   }
-  case navh_eItemType_HeaderLarge: {
-    fp << tags[xml_eTag_h2].start << text1 << tags[xml_eTag_h2].end
-       << tags[xml_eTag_break].start << '\n';
+  case navh_eItemType_HeaderLarge:
+  {
+    fp << tags[xml_eTag_h2].start << text1 << tags[xml_eTag_h2].end << tags[xml_eTag_break].start << '\n';
     return NULL;
   }
-  case navh_eItemType_HorizontalLine: {
+  case navh_eItemType_HorizontalLine:
+  {
     fp << tags[xml_eTag_hline].start << '\n';
     return NULL;
   }
-  case navh_eItemType_Image: {
-    fp << tags[xml_eTag_image].start << " src=\"" << text1 << "\""
-       << tags[xml_eTag_image].end << '\n'
+  case navh_eItemType_Image:
+  {
+    fp << tags[xml_eTag_image].start << " src=\"" << text1 << "\"" << tags[xml_eTag_image].end << '\n'
        << tags[xml_eTag_break].start << '\n';
     return NULL;
   }

@@ -57,31 +57,24 @@ extern msg_sHead glowMsgHead;
 extern msg_sHead pwrpMsgHead;
 extern msg_sHead rsMsgHead;
 
-static const msg_sHead* heads[]
-    = { &rtMsgHead, &pwrpMsgHead, &qcomMsgHead, &coMsgHead, &opMsgHead,
-        &wbMsgHead, &geMsgHead, &flowMsgHead, &glowMsgHead, &rsMsgHead, NULL };
+static const msg_sHead* heads[] = {&rtMsgHead, &pwrpMsgHead, &qcomMsgHead, &coMsgHead, &opMsgHead, &wbMsgHead,
+                                   &geMsgHead, &flowMsgHead, &glowMsgHead, &rsMsgHead, NULL};
 
 static msg_sFacility* facility(int facNum, int idx);
 
 static msg_sFacility* IsRightHead(const msg_sHead* h, int facNum, int idx,
-    int* invalidIdx /* Only valid if NULL is returned */
-    );
+                                  int* invalidIdx /* Only valid if NULL is returned */
+);
 
 /* Check if a given messagenumber exists,
    return string representation if valid.  */
 
-char* msg_GetMsg(const int sts, char* buf, int bufSize)
-{
-  return msg_GetMessage(sts, 0xf, buf, bufSize);
-}
+char* msg_GetMsg(const int sts, char* buf, int bufSize) { return msg_GetMessage(sts, 0xf, buf, bufSize); }
 
 /* Checks if a given messagenumber exists,
   return string representation if valid.  */
 
-char* msg_GetText(const int sts, char* buf, int bufSize)
-{
-  return msg_GetMessage(sts, 1, buf, bufSize);
-}
+char* msg_GetText(const int sts, char* buf, int bufSize) { return msg_GetMessage(sts, 1, buf, bufSize); }
 
 /* Return the address to the Facility which contains the
    FacNum and MsgIdx.  */
@@ -91,8 +84,10 @@ static msg_sFacility* facility(int facNum, int idx)
   msg_sFacility* f = NULL;
   int i, invalidIdx;
 
-  for (i = 0; heads[i] != NULL; i++) {
-    if (heads[i]->NofFacility != 0) {
+  for (i = 0; heads[i] != NULL; i++)
+  {
+    if (heads[i]->NofFacility != 0)
+    {
       f = IsRightHead(heads[i], facNum, idx, &invalidIdx);
       if (f != NULL || invalidIdx)
         break;
@@ -107,19 +102,23 @@ static msg_sFacility* facility(int facNum, int idx)
    'invalidIdx will be set to TRUE if the facnum is found
    but the idx  isn't valid.  */
 
-static msg_sFacility* IsRightHead(
-    const msg_sHead* h, int facNum, int idx, int* invalidIdx)
+static msg_sFacility* IsRightHead(const msg_sHead* h, int facNum, int idx, int* invalidIdx)
 {
   int i;
   msg_sFacility** f = h->Facility;
   *invalidIdx = 0;
 
-  for (i = 0; i < h->NofFacility; i++) {
-    if (f[i]->FacNum == facNum) {
-      if ((idx > f[i]->NofMsg) || (idx < 1)) {
+  for (i = 0; i < h->NofFacility; i++)
+  {
+    if (f[i]->FacNum == facNum)
+    {
+      if ((idx > f[i]->NofMsg) || (idx < 1))
+      {
         *invalidIdx = 1;
         return NULL;
-      } else {
+      }
+      else
+      {
         return f[i];
       }
     }
@@ -130,7 +129,8 @@ static msg_sFacility* IsRightHead(
 
 static char get_severity(pwr_tStatus sts)
 {
-  switch (sts & 7) {
+  switch (sts & 7)
+  {
   case 0:
     return 'W';
   case 1:
@@ -146,8 +146,7 @@ static char get_severity(pwr_tStatus sts)
   }
 }
 
-char* msg_GetMessage(
-    const pwr_tStatus sts, unsigned int flags, char* buf, int bufSize)
+char* msg_GetMessage(const pwr_tStatus sts, unsigned int flags, char* buf, int bufSize)
 {
   int facNum = FACNUM(sts);
   int idx = MSGIDX(sts);
@@ -159,11 +158,14 @@ char* msg_GetMessage(
   char text[sizeof("Message number 00000000")];
   char* msgTxt = text;
 
-  if (f != NULL) {
+  if (f != NULL)
+  {
     facName = f->FacName;
     msgName = f->Msg[idx - 1].MsgName;
     msgTxt = f->Msg[idx - 1].MsgTxt;
-  } else {
+  }
+  else
+  {
     sprintf(text, "Message number %08X", sts);
   }
 
@@ -171,17 +173,20 @@ char* msg_GetMessage(
     *s++ = '%';
   if (flags & 0x8)
     s += sprintf(s, "%s", facName);
-  if (flags & 0x4) {
+  if (flags & 0x4)
+  {
     if (flags & 0x8)
       *s++ = '-';
     *s++ = get_severity(sts);
   }
-  if (flags & 0x2) {
+  if (flags & 0x2)
+  {
     if (flags & 0xc)
       *s++ = '-';
     s += sprintf(s, "%s", msgName);
   }
-  if (flags & 0x1) {
+  if (flags & 0x1)
+  {
     if (flags & ~0x1)
       s += sprintf(s, ", ");
     s += sprintf(s, "%s", msgTxt);

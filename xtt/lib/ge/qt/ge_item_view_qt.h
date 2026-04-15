@@ -43,7 +43,8 @@
 #include <QFileSystemWatcher>
 #include <QTreeWidget>
 
-class GeItemViewQt : public QWidget {
+class GeItemViewQt : public QWidget
+{
   Q_OBJECT
 
 private:

@@ -45,10 +45,11 @@
 
 #include "wb_ldh.h"
 
-class WCast {
+class WCast
+{
 public:
-  WCast(void* wc_parent_ctx, const char* wc_name, ldh_tSesContext wc_ldhses,
-      pwr_sAttrRef wc_aref, pwr_tStatus* status);
+  WCast(void* wc_parent_ctx, const char* wc_name, ldh_tSesContext wc_ldhses, pwr_sAttrRef wc_aref,
+        pwr_tStatus* status);
 
   void* parent_ctx;
   char name[80];

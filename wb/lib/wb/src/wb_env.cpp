@@ -43,10 +43,7 @@ wb_env::wb_env() : wb_status(LDH__SUCCESS)
   m_erep->ref();
 }
 
-wb_env::wb_env(wb_erep* e) : wb_status(LDH__SUCCESS), m_erep(e)
-{
-  m_erep->ref();
-}
+wb_env::wb_env(wb_erep* e) : wb_status(LDH__SUCCESS), m_erep(e) { m_erep->ref(); }
 
 wb_env::wb_env(wb_env& e) : wb_status(e.sts()), m_erep(e.m_erep)
 {
@@ -54,9 +51,7 @@ wb_env::wb_env(wb_env& e) : wb_status(e.sts()), m_erep(e.m_erep)
     m_erep->ref();
 }
 
-wb_env::~wb_env()
-{
-}
+wb_env::~wb_env() {}
 
 wb_env& wb_env::operator=(const wb_env& x)
 {
@@ -80,20 +75,11 @@ wb_env::operator bool() const
   return true;
 }
 
-wb_env::operator wb_erep*() const
-{
-  return m_erep;
-}
+wb_env::operator wb_erep*() const { return m_erep; }
 
-bool wb_env::open()
-{
-  return true;
-}
+bool wb_env::open() { return true; }
 
-bool wb_env::close()
-{
-  return true;
-}
+bool wb_env::close() { return true; }
 
 wb_volume wb_env::volume()
 {
@@ -128,8 +114,8 @@ wb_volume wb_env::volume(const char* name)
   return v;
 }
 
-wb_volume wb_env::createVolume(pwr_tVid vid, pwr_tCid cid, const char* name,
-    ldh_eVolRep type, char* server, bool add)
+wb_volume wb_env::createVolume(pwr_tVid vid, pwr_tCid cid, const char* name, ldh_eVolRep type, char* server,
+                               bool add)
 {
   wb_volume v(m_erep->createVolume(&m_sts, vid, cid, name, type, server, add));
   return v;

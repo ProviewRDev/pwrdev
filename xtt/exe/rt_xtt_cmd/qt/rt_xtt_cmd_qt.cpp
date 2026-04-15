@@ -43,7 +43,7 @@
 #include "co_string.h"
 
 #include "cow_qt_helpers.h"
-//#include "cow_style_qt.h"
+// #include "cow_style_qt.h"
 
 #include "xtt_xnav_qt.h"
 
@@ -57,8 +57,7 @@ XttCmdQt::XttCmdQt()
   pwr_tStatus sts;
   pwr_tOName opplace = "";
 
-  xnav = new XNavQt(this, "Plant", &brow_widget, (xnav_sStartMenu*)root_menu,
-      opplace, 0, &sts);
+  xnav = new XNavQt(this, "Plant", &brow_widget, (xnav_sStartMenu*)root_menu, opplace, 0, &sts);
 
   xnav->message_cb = &message_cb;
   xnav->close_cb = XttCmd::close_cb;
@@ -87,10 +86,13 @@ int main(int argc, char* argv[])
 
   log_debug("%s ", argv[0]);
   str[0] = 0;
-  for (i = 1; i < argc; i++) {
+  for (i = 1; i < argc; i++)
+  {
     fprintf(stderr, "%s ", argv[i]);
-    if (argv[i][0] == '-') {
-      switch (argv[i][1]) {
+    if (argv[i][0] == '-')
+    {
+      switch (argv[i][1])
+      {
       case 'h':
         XttCmd::usage();
         exit(0);
@@ -109,8 +111,11 @@ int main(int argc, char* argv[])
       default:
         std::cout << "Unknown argument: " << argv[i] << '\n';
       }
-    } else {
-      if (str[0] != 0) {
+    }
+    else
+    {
+      if (str[0] != 0)
+      {
         strcat(str, " ");
       }
       strcat(str, argv[i]);
@@ -119,13 +124,14 @@ int main(int argc, char* argv[])
   fprintf(stderr, "\n");
 
   sts = gdh_Init("rt_xtt_cmd");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("Unable to connect to database\n");
     exit(0);
   }
 
   QApplication app(argc, argv);
-  //QApplication::setStyle(new PwrStyle());
+  // QApplication::setStyle(new PwrStyle());
 
   setlocale(LC_TIME, "en_US");
   setlocale(LC_NUMERIC, "POSIX");
@@ -138,11 +144,13 @@ int main(int argc, char* argv[])
   cmd->brow_widget->setWindowTitle(fl(title));
   cmd->brow_widget->setAttribute(Qt::WA_DeleteOnClose);
   cmd->brow_widget->show();
-  if (hide) {
+  if (hide)
+  {
     cmd->brow_widget->setVisible(false);
   }
 
-  if (!quiet) {
+  if (!quiet)
+  {
     std::cout << "\n\
 Proview is free software; covered by the GNU General Public License.\n\
 You can redistribute it and/or modify it under the terms of this license.\n\
@@ -153,22 +161,26 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the \n\
 GNU General Public License for more details.\n\n";
   }
 
-  if (str[0] != 0) {
+  if (str[0] != 0)
+  {
     str_trim(str, str);
     sts = cmd->xnav->command(str);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       return 0;
     }
     exit(sts);
   }
   sts = dcli_input_init(&cmd->chn, &cmd->recall_buf);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     exit(sts);
   }
 
   // Init input
 
-  while (1) {
+  while (1)
+  {
     unsigned long terminator;
     unsigned long option = DCLI_OPT_TIMEOUT;
 
@@ -176,13 +188,14 @@ GNU General Public License for more details.\n\n";
 
     /* get input */
     dcli_qio_set_attr(&cmd->chn, 1);
-    sts = dcli_get_input_string(&cmd->chn, str, &terminator, sizeof(str),
-        cmd->recall_buf, option, 1, timeout_func, 0, "xttc> ");
+    sts = dcli_get_input_string(&cmd->chn, str, &terminator, sizeof(str), cmd->recall_buf, option, 1,
+                                timeout_func, 0, "xttc> ");
     dcli_qio_reset(&cmd->chn);
 
     //    sts = scanf( "%s", str);
 
-    if (streq(str, "")) {
+    if (streq(str, ""))
+    {
       continue;
     }
 

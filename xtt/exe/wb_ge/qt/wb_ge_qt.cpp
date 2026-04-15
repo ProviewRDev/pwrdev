@@ -42,7 +42,7 @@
 
 #include "cow_msgwindow_qt.h"
 #include "cow_qt_helpers.h"
-//#include "cow_style_qt.h"
+// #include "cow_style_qt.h"
 #include "cow_xhelp_qt.h"
 
 #include "ge_qt.h"
@@ -57,10 +57,7 @@
 
 static QWidget* toplevel;
 
-static void usage()
-{
-  printf("\nUsage: wb_ge [-l language] [graphname]\n");
-}
+static void usage() { printf("\nUsage: wb_ge [-l language] [graphname]\n"); }
 
 int main(int argc, char* argv[])
 {
@@ -74,7 +71,7 @@ int main(int argc, char* argv[])
   pwr_tFileName fname;
 
   QApplication app(argc, argv);
-  //QApplication::setStyle(new PwrStyle());
+  // QApplication::setStyle(new PwrStyle());
 
   setlocale(LC_NUMERIC, "POSIX");
   setlocale(LC_TIME, "en_US");
@@ -89,31 +86,41 @@ int main(int argc, char* argv[])
   CoXHelpQt::set_default(xhelp);
 
   log_debug("%s ", argv[0]);
-  if (argc > 1) {
-    for (i = 1; i < argc; i++) {
+  if (argc > 1)
+  {
+    for (i = 1; i < argc; i++)
+    {
       fprintf(stderr, "%s ", argv[i]);
-      if (streq(argv[i], "-l")) {
-        if (i + 1 >= argc) {
+      if (streq(argv[i], "-l"))
+      {
+        if (i + 1 >= argc)
+        {
           usage();
           exit(0);
         }
         Lng::set(argv[i + 1]);
         i++;
-      } else {
+      }
+      else
+      {
         strcpy(file, argv[i]);
       }
     }
 
-    if (file[0] == '@') {
+    if (file[0] == '@')
+    {
       // Execute script
       pwr_tStatus sts;
 
       gectx = new GeQt(NULL, 0, 1, 0, NULL);
       sts = gectx->command(file);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         gectx->message(sts);
       }
-    } else {
+    }
+    else
+    {
       // Open graph
       strcpy(graph_name, file);
       gectx = new GeQt(NULL, 0, 1, opt, graph_name);
@@ -121,7 +128,9 @@ int main(int argc, char* argv[])
       sprintf(fname, "@%s.pwr_com", wnav_cInitFile);
       gectx->command(fname);
     }
-  } else {
+  }
+  else
+  {
     gectx = new GeQt(NULL, 0, 1, opt, NULL);
 
     sprintf(fname, "@%s.pwr_com", wnav_cInitFile);

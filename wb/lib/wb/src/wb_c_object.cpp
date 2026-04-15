@@ -50,8 +50,7 @@
 #include "wb_vldh.h"
 #include "wb_wtt.h"
 
-static pwr_tStatus configure_parse_attr(
-    ldh_sMenuCall* ip, pwr_tAttrRef* parent, char* str);
+static pwr_tStatus configure_parse_attr(ldh_sMenuCall* ip, pwr_tAttrRef* parent, char* str);
 
 static pwr_tStatus CopyObject(ldh_sMenuCall* ip)
 {
@@ -65,11 +64,11 @@ static pwr_tStatus CopyObject(ldh_sMenuCall* ip)
   pwr_tObjid NewObject;
   pwr_tBoolean Self = 0;
 
-  sts = ldh_ReadObjectBody(ip->PointedSession,
-      ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
-      sizeof(pwr_sMenuButton));
+  sts = ldh_ReadObjectBody(ip->PointedSession, ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
+                           sizeof(pwr_sMenuButton));
 
-  if (mb.MethodArguments[0][0] != '\0') {
+  if (mb.MethodArguments[0][0] != '\0')
+  {
     if (streq(mb.MethodArguments[0], "Before"))
       Dest = ldh_eDest_Before;
     else if (streq(mb.MethodArguments[0], "After"))
@@ -82,7 +81,8 @@ static pwr_tStatus CopyObject(ldh_sMenuCall* ip)
       Dest = ldh_eDest__;
   }
 
-  for (i = 0; i < (int)ip->SelectCount; i++) {
+  for (i = 0; i < (int)ip->SelectCount; i++)
+  {
     if (cdh_ObjidIsEqual(ip->Selected[i].Objid, ip->Pointed.Objid))
       Self = 1;
     if (cdh_ObjidIsEqual(ip->Selected[i].Objid, pwr_cNObjid))
@@ -92,21 +92,24 @@ static pwr_tStatus CopyObject(ldh_sMenuCall* ip)
   if (!Self)
     DestObject = ip->Pointed.Objid;
 
-  if (Dest == ldh_eDest_After || Dest == ldh_eDest_IntoFirst) {
-    for (j = i - 1; j >= 0; j--) {
+  if (Dest == ldh_eDest_After || Dest == ldh_eDest_IntoFirst)
+  {
+    for (j = i - 1; j >= 0; j--)
+    {
       if (Self)
         DestObject = ip->Selected[j].Objid;
-      sts = ldh_CopyObject(ip->PointedSession, &NewObject, NULL,
-          ip->Selected[j].Objid, DestObject, Dest);
+      sts = ldh_CopyObject(ip->PointedSession, &NewObject, NULL, ip->Selected[j].Objid, DestObject, Dest);
       if (EVEN(sts))
         retsts = sts;
     }
-  } else {
-    for (j = 0; j < i; j++) {
+  }
+  else
+  {
+    for (j = 0; j < i; j++)
+    {
       if (Self)
         DestObject = ip->Selected[j].Objid;
-      sts = ldh_CopyObject(ip->PointedSession, &NewObject, NULL,
-          ip->Selected[j].Objid, DestObject, Dest);
+      sts = ldh_CopyObject(ip->PointedSession, &NewObject, NULL, ip->Selected[j].Objid, DestObject, Dest);
       if (EVEN(sts))
         retsts = sts;
     }
@@ -123,7 +126,8 @@ static int IsOkCopyObject(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
   pwr_tBoolean Self = 0;
   pwr_tObjid DestObject;
 
-  if (mbp->MethodArguments[0][0] != '\0') {
+  if (mbp->MethodArguments[0][0] != '\0')
+  {
     if (streq(mbp->MethodArguments[0], "Before"))
       Dest = ldh_eDest_Before;
     else if (streq(mbp->MethodArguments[0], "After"))
@@ -136,7 +140,8 @@ static int IsOkCopyObject(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
       Dest = ldh_eDest__;
   }
 
-  for (i = 0; i < (int)ip->SelectCount; i++) {
+  for (i = 0; i < (int)ip->SelectCount; i++)
+  {
     if (cdh_ObjidIsEqual(ip->Selected[i].Objid, ip->Pointed.Objid))
       Self = 1;
     if (cdh_ObjidIsNull(ip->Selected[i].Objid))
@@ -146,13 +151,13 @@ static int IsOkCopyObject(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
   if (!Self)
     DestObject = ip->Pointed.Objid;
 
-  for (i = 0; i < (int)ip->SelectCount; i++) {
+  for (i = 0; i < (int)ip->SelectCount; i++)
+  {
     if (cdh_ObjidIsNull(ip->Selected[i].Objid))
       break;
     if (Self)
       DestObject = ip->Selected[i].Objid;
-    sts = ldh_IsOkCopyObject(
-        ip->PointedSession, ip->Selected[i].Objid, DestObject, Dest);
+    sts = ldh_IsOkCopyObject(ip->PointedSession, ip->Selected[i].Objid, DestObject, Dest);
     if (EVEN(sts))
       retsts = sts;
   }
@@ -168,11 +173,11 @@ static pwr_tStatus CopyObjectTree(ldh_sMenuCall* ip)
   pwr_tBoolean Self = 0;
   int i;
 
-  sts = ldh_ReadObjectBody(ip->PointedSession,
-      ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
-      sizeof(pwr_sMenuButton));
+  sts = ldh_ReadObjectBody(ip->PointedSession, ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
+                           sizeof(pwr_sMenuButton));
 
-  if (mb.MethodArguments[0][0] != '\0') {
+  if (mb.MethodArguments[0][0] != '\0')
+  {
     if (streq(mb.MethodArguments[0], "Before"))
       Dest = ldh_eDest_Before;
     else if (streq(mb.MethodArguments[0], "After"))
@@ -185,15 +190,15 @@ static pwr_tStatus CopyObjectTree(ldh_sMenuCall* ip)
       Dest = ldh_eDest__;
   }
 
-  for (i = 0; i < (int)ip->SelectCount; i++) {
+  for (i = 0; i < (int)ip->SelectCount; i++)
+  {
     if (cdh_ObjidIsEqual(ip->Selected[i].Objid, ip->Pointed.Objid))
       Self = 1;
     if (cdh_ObjidIsNull(ip->Selected[i].Objid))
       break;
   }
 
-  sts = ldh_CopyObjectTrees(
-      ip->PointedSession, ip->Selected, ip->Pointed.Objid, Dest, Self, 0, 0, 0);
+  sts = ldh_CopyObjectTrees(ip->PointedSession, ip->Selected, ip->Pointed.Objid, Dest, Self, 0, 0, 0);
   return sts;
 }
 
@@ -206,7 +211,8 @@ static int IsOkCopyObjectTree(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
   pwr_tBoolean Self = 0;
   pwr_tObjid DestObject;
 
-  if (mbp->MethodArguments[0][0] != '\0') {
+  if (mbp->MethodArguments[0][0] != '\0')
+  {
     if (streq(mbp->MethodArguments[0], "Before"))
       Dest = ldh_eDest_Before;
     else if (streq(mbp->MethodArguments[0], "After"))
@@ -219,7 +225,8 @@ static int IsOkCopyObjectTree(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
       Dest = ldh_eDest__;
   }
 
-  for (i = 0; i < (int)ip->SelectCount; i++) {
+  for (i = 0; i < (int)ip->SelectCount; i++)
+  {
     if (cdh_ObjidIsEqual(ip->Selected[i].Objid, ip->Pointed.Objid))
       Self = 1;
     if (cdh_ObjidIsNull(ip->Selected[i].Objid))
@@ -229,13 +236,13 @@ static int IsOkCopyObjectTree(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
   if (!Self)
     DestObject = ip->Pointed.Objid;
 
-  for (i = 0; i < (int)ip->SelectCount; i++) {
+  for (i = 0; i < (int)ip->SelectCount; i++)
+  {
     if (cdh_ObjidIsNull(ip->Selected[i].Objid))
       break;
     if (Self)
       DestObject = ip->Selected[i].Objid;
-    sts = ldh_IsOkCopyObject(
-        ip->PointedSession, ip->Selected[i].Objid, DestObject, Dest);
+    sts = ldh_IsOkCopyObject(ip->PointedSession, ip->Selected[i].Objid, DestObject, Dest);
     if (EVEN(sts))
       retsts = sts;
   }
@@ -249,7 +256,8 @@ static int IsOkCreateObject(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
   pwr_tClassId Class = cdh_ClassObjidToId(ip->Selected[0].Objid);
   ldh_eDest Dest = ldh_eDest__;
 
-  if (mbp->MethodArguments[0][0] != '\0') {
+  if (mbp->MethodArguments[0][0] != '\0')
+  {
     if (streq(mbp->MethodArguments[0], "Before"))
       Dest = ldh_eDest_Before;
     else if (streq(mbp->MethodArguments[0], "After"))
@@ -262,8 +270,7 @@ static int IsOkCreateObject(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
       Dest = ldh_eDest__;
   }
 
-  sts = ldh_IsOkCreateObject(
-      ip->PointedSession, Class, ip->Pointed.Objid, Dest);
+  sts = ldh_IsOkCreateObject(ip->PointedSession, Class, ip->Pointed.Objid, Dest);
 
   return ODD(sts);
 }
@@ -276,11 +283,11 @@ static pwr_tStatus CreateObject(ldh_sMenuCall* ip)
   pwr_sMenuButton mb;
   ldh_eDest Dest = ldh_eDest__;
 
-  sts = ldh_ReadObjectBody(ip->PointedSession,
-      ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
-      sizeof(pwr_sMenuButton));
+  sts = ldh_ReadObjectBody(ip->PointedSession, ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
+                           sizeof(pwr_sMenuButton));
 
-  if (mb.MethodArguments[0][0] != '\0') {
+  if (mb.MethodArguments[0][0] != '\0')
+  {
     if (streq(mb.MethodArguments[0], "Before"))
       Dest = ldh_eDest_Before;
     else if (streq(mb.MethodArguments[0], "After"))
@@ -293,8 +300,7 @@ static pwr_tStatus CreateObject(ldh_sMenuCall* ip)
       Dest = ldh_eDest__;
   }
 
-  sts = ldh_CreateObject(
-      ip->PointedSession, &Object, NULL, Class, ip->Pointed.Objid, Dest);
+  sts = ldh_CreateObject(ip->PointedSession, &Object, NULL, Class, ip->Pointed.Objid, Dest);
   return sts;
 }
 
@@ -323,18 +329,19 @@ static pwr_tStatus DeleteObject(ldh_sMenuCall* ip)
   ldh_sMenuCall* mc;
 
   sts = ldh_DeleteObject(ip->PointedSession, ip->Pointed.Objid);
-  if (sts == LDH__HAS_CHILD) {
-    sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid,
-        ldh_eName_Object, name, sizeof(name), &size);
-    snprintf(msg, sizeof(msg), "Object '%s' has children!\nDo you want to "
-                               "delete the whole object tree ?",
-        name);
+  if (sts == LDH__HAS_CHILD)
+  {
+    sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Object, name, sizeof(name), &size);
+    snprintf(msg, sizeof(msg),
+             "Object '%s' has children!\nDo you want to "
+             "delete the whole object tree ?",
+             name);
     mc = (ldh_sMenuCall*)malloc(sizeof(*mc));
     *mc = *ip;
 
     ip->wtt->disable_focus();
-    ip->wnav->wow->DisplayQuestion(ip->wnav, "Delete Object", msg,
-        DeleteObjectYesCb, DeleteObjectNoCb, (void*)mc);
+    ip->wnav->wow->DisplayQuestion(ip->wnav, "Delete Object", msg, DeleteObjectYesCb, DeleteObjectNoCb,
+                                   (void*)mc);
     // dutl_MessageDialog (ip->WindowContext, dutl_eDialogType_Question,
     //  dutl_eDialogModality_Modeless, "Delete Object", msg, "  Yes  ", "  No
     //  ", NULL,
@@ -349,7 +356,8 @@ static void DeleteObjectsYesCb(void* Ctx, void* CallbackData)
   ldh_sMenuCall* mc = (ldh_sMenuCall*)CallbackData;
   int i;
 
-  for (i = 0; mc->SelectCount; i++) { /* count number of selected objects */
+  for (i = 0; mc->SelectCount; i++)
+  { /* count number of selected objects */
     if (cdh_ObjidIsNull(mc->Selected[i].Objid))
       break;
     ldh_DeleteObjectTree(mc->PointedSession, mc->Selected[i].Objid, 0);
@@ -375,14 +383,12 @@ static pwr_tStatus DeleteObjects(ldh_sMenuCall* ip)
   mc = (ldh_sMenuCall*)malloc(sizeof(*mc));
   *mc = *ip;
 
-  mc->Selected
-      = (pwr_sAttrRef*)malloc((ip->SelectCount + 1) * sizeof(pwr_sAttrRef));
-  memcpy(
-      mc->Selected, ip->Selected, (ip->SelectCount + 1) * sizeof(pwr_sAttrRef));
+  mc->Selected = (pwr_sAttrRef*)malloc((ip->SelectCount + 1) * sizeof(pwr_sAttrRef));
+  memcpy(mc->Selected, ip->Selected, (ip->SelectCount + 1) * sizeof(pwr_sAttrRef));
 
   ip->wtt->disable_focus();
-  ip->wnav->wow->DisplayQuestion(ip->wnav, "Delete Selected Object", msg,
-      DeleteObjectsYesCb, DeleteObjectsNoCb, (void*)mc);
+  ip->wnav->wow->DisplayQuestion(ip->wnav, "Delete Selected Object", msg, DeleteObjectsYesCb,
+                                 DeleteObjectsNoCb, (void*)mc);
   // dutl_MessageDialog (ip->WindowContext, dutl_eDialogType_Question,
   //  dutl_eDialogModality_Modeless, "Delete Selected Objects", msg, "  Yes  ",
   //  "  No  ", NULL,
@@ -400,11 +406,11 @@ static pwr_tStatus MoveObject(ldh_sMenuCall* ip)
   int j;
   ldh_eDest Dest = ldh_eDest__;
 
-  sts = ldh_ReadObjectBody(ip->PointedSession,
-      ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
-      sizeof(pwr_sMenuButton));
+  sts = ldh_ReadObjectBody(ip->PointedSession, ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
+                           sizeof(pwr_sMenuButton));
 
-  if (mb.MethodArguments[0][0] != '\0') {
+  if (mb.MethodArguments[0][0] != '\0')
+  {
     if (streq(mb.MethodArguments[0], "Before"))
       Dest = ldh_eDest_Before;
     else if (streq(mb.MethodArguments[0], "After"))
@@ -417,22 +423,26 @@ static pwr_tStatus MoveObject(ldh_sMenuCall* ip)
       Dest = ldh_eDest__;
   }
 
-  for (i = 0;; i++) { /* count number of selected objects */
+  for (i = 0;; i++)
+  { /* count number of selected objects */
     if (cdh_ObjidIsNull(ip->Selected[i].Objid))
       break;
   }
 
-  if (Dest == ldh_eDest_After || Dest == ldh_eDest_IntoFirst) {
-    for (j = i - 1; j >= 0; j--) {
-      sts = ldh_MoveObject(
-          ip->PointedSession, ip->Selected[j].Objid, ip->Pointed.Objid, Dest);
+  if (Dest == ldh_eDest_After || Dest == ldh_eDest_IntoFirst)
+  {
+    for (j = i - 1; j >= 0; j--)
+    {
+      sts = ldh_MoveObject(ip->PointedSession, ip->Selected[j].Objid, ip->Pointed.Objid, Dest);
       if (EVEN(sts))
         retsts = sts;
     }
-  } else {
-    for (j = 0; j < i; j++) {
-      sts = ldh_MoveObject(
-          ip->PointedSession, ip->Selected[j].Objid, ip->Pointed.Objid, Dest);
+  }
+  else
+  {
+    for (j = 0; j < i; j++)
+    {
+      sts = ldh_MoveObject(ip->PointedSession, ip->Selected[j].Objid, ip->Pointed.Objid, Dest);
       if (EVEN(sts))
         retsts = sts;
     }
@@ -447,7 +457,8 @@ static int IsOkMoveObject(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
   ldh_eDest Dest = ldh_eDest__;
   int i;
 
-  if (mbp->MethodArguments[0][0] != '\0') {
+  if (mbp->MethodArguments[0][0] != '\0')
+  {
     if (streq(mbp->MethodArguments[0], "Before"))
       Dest = ldh_eDest_Before;
     else if (streq(mbp->MethodArguments[0], "After"))
@@ -460,11 +471,11 @@ static int IsOkMoveObject(ldh_sMenuCall* ip, pwr_sMenuButton* mbp)
       Dest = ldh_eDest__;
   }
 
-  for (i = 0;; i++) {
+  for (i = 0;; i++)
+  {
     if (cdh_ObjidIsNull(ip->Selected[i].Objid))
       break;
-    sts = ldh_IsOkMoveObject(
-        ip->PointedSession, ip->Selected[i].Objid, ip->Pointed.Objid, Dest);
+    sts = ldh_IsOkMoveObject(ip->PointedSession, ip->Selected[i].Objid, ip->Pointed.Objid, Dest);
     if (EVEN(sts))
       retsts = sts;
   }
@@ -486,8 +497,7 @@ static pwr_tStatus OpenTemplate(ldh_sMenuCall* ip)
   pwr_sAttrRef Aref;
   int size;
 
-  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid,
-      ldh_eName_Default, Name, sizeof(Name), &size);
+  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Default, Name, sizeof(Name), &size);
   if (EVEN(sts))
     return sts;
 
@@ -509,8 +519,8 @@ static pwr_tStatus SetDefaults(ldh_sMenuCall* ip)
   pwr_tObjid Object;
   int size;
 
-  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid,
-      ldh_eName_Hierarchy, Name, sizeof(Name), &size);
+  sts =
+      ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
   if (EVEN(sts))
     return sts;
 
@@ -572,17 +582,16 @@ static pwr_tStatus HelpClass(ldh_sMenuCall* ip)
     return sts;
 
   vid = cdh_CidToVid(cid);
-  if (cdh_cManufactClassVolMin <= vid && vid <= cdh_cManufactClassVolMax) {
+  if (cdh_cManufactClassVolMin <= vid && vid <= cdh_cManufactClassVolMax)
+  {
     /* Get help file for this volume */
-    sts = ldh_VolumeIdToName(
-        ldh_SessionToWB(ip->PointedSession), vid, vname, sizeof(vname), &size);
+    sts = ldh_VolumeIdToName(ldh_SessionToWB(ip->PointedSession), vid, vname, sizeof(vname), &size);
     if (EVEN(sts))
       return sts;
 
     str_ToLower(vname, vname);
-    snprintf(cmd, sizeof(cmd),
-        "help %s /helpfile=\"$pwr_exe/%s/%s_xtthelp.dat\"/strict", cname,
-        lng_get_language_str(), vname);
+    snprintf(cmd, sizeof(cmd), "help %s /helpfile=\"$pwr_exe/%s/%s_xtthelp.dat\"/strict", cname,
+             lng_get_language_str(), vname);
 
     ip->wnav->command(cmd);
     return 1;
@@ -597,10 +606,7 @@ static pwr_tStatus HelpClass(ldh_sMenuCall* ip)
   return 1;
 }
 
-static pwr_tStatus HelpClassFilter(ldh_sMenuCall* ip)
-{
-  return 1;
-}
+static pwr_tStatus HelpClassFilter(ldh_sMenuCall* ip) { return 1; }
 
 static pwr_tStatus Help(ldh_sMenuCall* ip)
 {
@@ -614,28 +620,29 @@ static pwr_tStatus Help(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  switch (cid) {
-  case pwr_cClass_plc: {
+  switch (cid)
+  {
+  case pwr_cClass_plc:
+  {
     pwr_tOid woid;
 
     sts = ldh_GetChild(ip->PointedSession, ip->Pointed.Objid, &woid);
     if (EVEN(sts))
       return LDH__SUCCESS;
 
-    sprintf(cmd, "help plcw_%s /helpfile=\"" pwr_cNamePlcXttHelp "\"",
-        vldh_IdToStr(0, woid), vldh_VolumeIdToStr(woid.vid));
+    sprintf(cmd, "help plcw_%s /helpfile=\"" pwr_cNamePlcXttHelp "\"", vldh_IdToStr(0, woid),
+            vldh_VolumeIdToStr(woid.vid));
     break;
   }
   default:
-    sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody",
-        "HelpTopic", &topic, &size);
+    sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody", "HelpTopic", &topic, &size);
     if (EVEN(sts))
-      sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "SysBody",
-          "HelpTopic", &topic, &size);
+      sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "SysBody", "HelpTopic", &topic, &size);
     if (EVEN(sts))
       return LDH__SUCCESS;
 
-    if (streq(topic, "")) {
+    if (streq(topic, ""))
+    {
       free(topic);
       return LDH__SUCCESS;
     }
@@ -659,19 +666,19 @@ static pwr_tStatus HelpFilter(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_plc:
     return 1;
   default:
-    sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody",
-        "HelpTopic", &topic, &size);
+    sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody", "HelpTopic", &topic, &size);
     if (EVEN(sts))
-      sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "SysBody",
-          "HelpTopic", &topic, &size);
+      sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "SysBody", "HelpTopic", &topic, &size);
     if (EVEN(sts))
       return 0;
 
-    if (streq(topic, "")) {
+    if (streq(topic, ""))
+    {
       free(topic);
       return 0;
     }
@@ -694,7 +701,8 @@ static pwr_tStatus Cast(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  if (info.flags & PWR_MASK_CASTATTR) {
+  if (info.flags & PWR_MASK_CASTATTR)
+  {
     ip->wtt->wcast_new(ip->Pointed, &sts);
   }
   return 1;
@@ -723,7 +731,8 @@ static pwr_tStatus Disable(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  if (info.flags & PWR_MASK_DISABLEATTR) {
+  if (info.flags & PWR_MASK_DISABLEATTR)
+  {
     sts = ldh_DisableAttribute(ip->PointedSession, &ip->Pointed, 1);
     if (EVEN(sts))
       return sts;
@@ -745,8 +754,7 @@ static pwr_tStatus DisableFilter(ldh_sMenuCall* ip)
   return 0;
 }
 
-static pwr_tStatus configure_object(
-    ldh_sMenuCall* ip, pwr_sAttrRef* aref, unsigned int disable_mask)
+static pwr_tStatus configure_object(ldh_sMenuCall* ip, pwr_sAttrRef* aref, unsigned int disable_mask)
 {
   pwr_tStatus sts;
   pwr_tCid cid;
@@ -761,16 +769,16 @@ static pwr_tStatus configure_object(
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectBodyDef(
-      ip->PointedSession, cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ip->PointedSession, cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  for (i = 0; i < rows; i++) {
-    if (bodydef[i].Par->Param.Info.Flags & PWR_MASK_DISABLEATTR) {
+  for (i = 0; i < rows; i++)
+  {
+    if (bodydef[i].Par->Param.Info.Flags & PWR_MASK_DISABLEATTR)
+    {
       // Disable or enable dependent on mask
-      sts = ldh_ArefANameToAref(
-          ip->PointedSession, aref, bodydef[i].ParName, &aaref);
+      sts = ldh_ArefANameToAref(ip->PointedSession, aref, bodydef[i].ParName, &aaref);
       if (EVEN(sts))
         return sts;
 
@@ -781,8 +789,7 @@ static pwr_tStatus configure_object(
       else
         disable = 0;
 
-      sts = ldh_WriteAttribute(
-          ip->PointedSession, &daref, (void*)&disable, sizeof(disable));
+      sts = ldh_WriteAttribute(ip->PointedSession, &daref, (void*)&disable, sizeof(disable));
       if (EVEN(sts))
         return sts;
     }
@@ -792,8 +799,7 @@ static pwr_tStatus configure_object(
   return LDH__SUCCESS;
 }
 
-static pwr_tStatus configure_object_reset(
-    ldh_sMenuCall* ip, pwr_sAttrRef* aref, pwr_sMenuButton* mb)
+static pwr_tStatus configure_object_reset(ldh_sMenuCall* ip, pwr_sAttrRef* aref, pwr_sMenuButton* mb)
 {
   pwr_tStatus sts;
   pwr_tCid cid;
@@ -808,33 +814,38 @@ static pwr_tStatus configure_object_reset(
   char* s;
 
   // Attribute objects in argument 2 are not controlled by the configure method
-  if (mb) {
-    vect_cnt = dcli_parse(mb->MethodArguments[2], ",", "", (char*)vect,
-        sizeof(vect) / sizeof(vect[0]), sizeof(vect[0]), 0);
+  if (mb)
+  {
+    vect_cnt = dcli_parse(mb->MethodArguments[2], ",", "", (char*)vect, sizeof(vect) / sizeof(vect[0]),
+                          sizeof(vect[0]), 0);
     for (j = 0; j < vect_cnt; j++)
       str_trim(vect[j], vect[j]);
-  } else
+  }
+  else
     vect_cnt = 0;
 
   sts = ldh_GetAttrRefTid(ip->PointedSession, aref, &cid);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectBodyDef(
-      ip->PointedSession, cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ip->PointedSession, cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  for (i = 0; i < rows; i++) {
+  for (i = 0; i < rows; i++)
+  {
     // Check if attribute is controlled by this method
     skip = 0;
-    if (mb) {
+    if (mb)
+    {
       // Remove leading Super.
       s = bodydef[i].ParName;
       while (str_StartsWith(s, "Super."))
         s += 6;
-      for (j = 0; j < vect_cnt; j++) {
-        if (str_NoCaseStrcmp(vect[j], s) == 0) {
+      for (j = 0; j < vect_cnt; j++)
+      {
+        if (str_NoCaseStrcmp(vect[j], s) == 0)
+        {
           // This object should not be reset
           skip = 1;
           break;
@@ -844,25 +855,24 @@ static pwr_tStatus configure_object_reset(
         continue;
     }
 
-    if (bodydef[i].Par->Param.Info.Flags & PWR_MASK_DISABLEATTR) {
+    if (bodydef[i].Par->Param.Info.Flags & PWR_MASK_DISABLEATTR)
+    {
       // Enable all attributes
-      sts = ldh_ArefANameToAref(
-          ip->PointedSession, aref, bodydef[i].ParName, &aaref);
+      sts = ldh_ArefANameToAref(ip->PointedSession, aref, bodydef[i].ParName, &aaref);
       if (EVEN(sts))
         return sts;
 
       daref = cdh_ArefToDisableAref(&aaref);
 
-      sts = ldh_WriteAttribute(
-          ip->PointedSession, &daref, (void*)&disable, sizeof(disable));
+      sts = ldh_WriteAttribute(ip->PointedSession, &daref, (void*)&disable, sizeof(disable));
       if (EVEN(sts))
         return sts;
     }
 
-    if (bodydef[i].Par->Param.Info.Flags & PWR_MASK_CLASS) {
+    if (bodydef[i].Par->Param.Info.Flags & PWR_MASK_CLASS)
+    {
       // Reset object attribute
-      sts = ldh_ArefANameToAref(
-          ip->PointedSession, aref, bodydef[i].ParName, &aaref);
+      sts = ldh_ArefANameToAref(ip->PointedSession, aref, bodydef[i].ParName, &aaref);
       if (EVEN(sts))
         return sts;
 
@@ -876,8 +886,7 @@ static pwr_tStatus configure_object_reset(
   return LDH__SUCCESS;
 }
 
-static pwr_tStatus configure_attrmask(
-    ldh_sMenuCall* ip, pwr_tAttrRef* parent, char* str1)
+static pwr_tStatus configure_attrmask(ldh_sMenuCall* ip, pwr_tAttrRef* parent, char* str1)
 {
   char vect[10][80];
   int vect_cnt;
@@ -888,7 +897,8 @@ static pwr_tStatus configure_attrmask(
 
   vect_cnt = 0;
   s = strchr(str1, '(');
-  if (s) {
+  if (s)
+  {
     strncpy(str2, s + 1, sizeof(str2));
     if (str2[strlen(str2) - 1] != ')')
       return LDH__COMPSYNTAX;
@@ -899,12 +909,14 @@ static pwr_tStatus configure_attrmask(
     int len;
     int parlevel = 0;
     char* start = str2;
-    for (s = str2; *s; s++) {
+    for (s = str2; *s; s++)
+    {
       if (*s == '(')
         parlevel++;
       else if (*s == ')')
         parlevel--;
-      if (parlevel == 0 && *s == ',') {
+      if (parlevel == 0 && *s == ',')
+      {
         len = s - start;
         strncpy(vect[vect_cnt], start, len);
         vect[vect_cnt][len] = 0;
@@ -917,7 +929,8 @@ static pwr_tStatus configure_attrmask(
     vect[vect_cnt][len] = 0;
     vect_cnt++;
   }
-  for (i = 0; i < vect_cnt; i++) {
+  for (i = 0; i < vect_cnt; i++)
+  {
     str_trim(vect[i], vect[i]);
 
     sts = configure_parse_attr(ip, parent, vect[i]);
@@ -928,8 +941,7 @@ static pwr_tStatus configure_attrmask(
   return LDH__SUCCESS;
 }
 
-static pwr_tStatus configure_parse_attr(
-    ldh_sMenuCall* ip, pwr_tAttrRef* parent, char* str)
+static pwr_tStatus configure_parse_attr(ldh_sMenuCall* ip, pwr_tAttrRef* parent, char* str)
 {
   int nr;
   unsigned int disable_mask;
@@ -946,7 +958,8 @@ static pwr_tStatus configure_parse_attr(
   // printf( "-- Setting disable mask %d on object '%s'\n", disable_mask, attr);
 
   sts = ldh_ArefANameToAref(ip->PointedSession, parent, attr, &aaref);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = configure_object(ip, &aaref, disable_mask);
     if (EVEN(sts))
       return sts;
@@ -972,30 +985,34 @@ static pwr_tStatus ConfigureComponent(ldh_sMenuCall* ip)
   int nr;
   int vect_cnt;
 
-  sts = ldh_ReadObjectBody(ip->PointedSession,
-      ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
-      sizeof(pwr_sMenuButton));
+  sts = ldh_ReadObjectBody(ip->PointedSession, ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
+                           sizeof(pwr_sMenuButton));
 
   // Reset previoius disable configuration
   configure_object_reset(ip, &ip->Pointed, &mb);
 
   // Set disable attributes from argument 0
-  if (mb.MethodArguments[0][0] != '(') {
+  if (mb.MethodArguments[0][0] != '(')
+  {
     // Old syntax, eg '7, CircuitBreaker 4, Contactor 5'
-    vect_cnt = dcli_parse(mb.MethodArguments[0], ",", "", (char*)vect,
-        sizeof(vect) / sizeof(vect[0]), sizeof(vect[0]), 0);
+    vect_cnt = dcli_parse(mb.MethodArguments[0], ",", "", (char*)vect, sizeof(vect) / sizeof(vect[0]),
+                          sizeof(vect[0]), 0);
 
-    for (i = 0; i < vect_cnt; i++) {
-      nr = dcli_parse(vect[i], " 	", "", (char*)item,
-          sizeof(item) / sizeof(item[0]), sizeof(item[0]), 0);
-      if (nr == 1) {
+    for (i = 0; i < vect_cnt; i++)
+    {
+      nr = dcli_parse(vect[i], " 	", "", (char*)item, sizeof(item) / sizeof(item[0]), sizeof(item[0]),
+                      0);
+      if (nr == 1)
+      {
         if (sscanf(item[0], "%d", &disable_mask) != 1)
           graph_configuration = 0;
 
         sts = configure_object(ip, &ip->Pointed, disable_mask);
         if (EVEN(sts))
           return sts;
-      } else if (nr == 2) {
+      }
+      else if (nr == 2)
+      {
         pwr_tAName aname;
 
         if (sscanf(item[1], "%d", &disable_mask) != 1)
@@ -1003,16 +1020,18 @@ static pwr_tStatus ConfigureComponent(ldh_sMenuCall* ip)
 
         strncpy(aname, item[0], sizeof(aname));
 
-        sts = ldh_ArefANameToAref(
-            ip->PointedSession, &ip->Pointed, aname, &aaref);
-        if (ODD(sts)) {
+        sts = ldh_ArefANameToAref(ip->PointedSession, &ip->Pointed, aname, &aaref);
+        if (ODD(sts))
+        {
           sts = configure_object(ip, &aaref, disable_mask);
           if (EVEN(sts))
             return sts;
         }
       }
     }
-  } else {
+  }
+  else
+  {
     // New syntax, eg '(7 (CircuitBreaker 4, Contactor 5))'
     char str1[256];
     char* s;
@@ -1039,25 +1058,28 @@ static pwr_tStatus ConfigureComponent(ldh_sMenuCall* ip)
   }
 
   // Set GraphConfiguration from argument 1
-  vect_cnt = dcli_parse(mb.MethodArguments[1], ",", "", (char*)vect,
-      sizeof(vect) / sizeof(vect[0]), sizeof(vect[0]), 0);
+  vect_cnt = dcli_parse(mb.MethodArguments[1], ",", "", (char*)vect, sizeof(vect) / sizeof(vect[0]),
+                        sizeof(vect[0]), 0);
 
-  for (i = 0; i < vect_cnt; i++) {
-    nr = dcli_parse(vect[i], " 	", "", (char*)item,
-        sizeof(item) / sizeof(item[0]), sizeof(item[0]), 0);
-    if (nr == 1) {
+  for (i = 0; i < vect_cnt; i++)
+  {
+    nr = dcli_parse(vect[i], " 	", "", (char*)item, sizeof(item) / sizeof(item[0]), sizeof(item[0]), 0);
+    if (nr == 1)
+    {
       if (sscanf(item[0], "%d", &graph_configuration) != 1)
         graph_configuration = 0;
 
-      sts = ldh_ArefANameToAref(
-          ip->PointedSession, &ip->Pointed, "GraphConfiguration", &aaref);
-      if (ODD(sts)) {
-        sts = ldh_WriteAttribute(ip->PointedSession, &aaref,
-            (void*)&graph_configuration, sizeof(graph_configuration));
+      sts = ldh_ArefANameToAref(ip->PointedSession, &ip->Pointed, "GraphConfiguration", &aaref);
+      if (ODD(sts))
+      {
+        sts = ldh_WriteAttribute(ip->PointedSession, &aaref, (void*)&graph_configuration,
+                                 sizeof(graph_configuration));
         if (EVEN(sts))
           return sts;
       }
-    } else if (nr == 2) {
+    }
+    else if (nr == 2)
+    {
       pwr_tAName aname;
 
       if (sscanf(item[1], "%d", &graph_configuration) != 1)
@@ -1066,11 +1088,11 @@ static pwr_tStatus ConfigureComponent(ldh_sMenuCall* ip)
       strncpy(aname, item[0], sizeof(aname));
       strncat(aname, ".GraphConfiguration", sizeof(aname) - strlen(aname) - 1);
 
-      sts = ldh_ArefANameToAref(
-          ip->PointedSession, &ip->Pointed, aname, &aaref);
-      if (ODD(sts)) {
-        sts = ldh_WriteAttribute(ip->PointedSession, &aaref,
-            (void*)&graph_configuration, sizeof(graph_configuration));
+      sts = ldh_ArefANameToAref(ip->PointedSession, &ip->Pointed, aname, &aaref);
+      if (ODD(sts))
+      {
+        sts = ldh_WriteAttribute(ip->PointedSession, &aaref, (void*)&graph_configuration,
+                                 sizeof(graph_configuration));
         if (EVEN(sts))
           return sts;
       }
@@ -1079,10 +1101,7 @@ static pwr_tStatus ConfigureComponent(ldh_sMenuCall* ip)
   return 1;
 }
 
-static pwr_tStatus ConfigureComponentFilter(ldh_sMenuCall* ip)
-{
-  return 1;
-}
+static pwr_tStatus ConfigureComponentFilter(ldh_sMenuCall* ip) { return 1; }
 
 // Common Build filter
 static pwr_tStatus BuildFilter(ldh_sMenuCall* ip)
@@ -1108,8 +1127,8 @@ static pwr_tStatus History(ldh_sMenuCall* ip)
   pwr_tCid cid;
   char* s;
 
-  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid,
-      ldh_eName_VolPath, oname, sizeof(oname), &size);
+  sts =
+      ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_VolPath, oname, sizeof(oname), &size);
   if (EVEN(sts))
     return sts;
 
@@ -1117,17 +1136,17 @@ static pwr_tStatus History(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_ReadObjectBody(ip->PointedSession,
-      ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
-      sizeof(pwr_sMenuButton));
+  sts = ldh_ReadObjectBody(ip->PointedSession, ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
+                           sizeof(pwr_sMenuButton));
 
-  switch (cid) {
-  case pwr_cClass_XttGraph: {
+  switch (cid)
+  {
+  case pwr_cClass_XttGraph:
+  {
     char* action;
 
     // Get action attribute
-    sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody",
-        "Action", &action, &size);
+    sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody", "Action", &action, &size);
     if (EVEN(sts))
       return sts;
     strncpy(item, action, sizeof(item));
@@ -1142,12 +1161,12 @@ static pwr_tStatus History(ldh_sMenuCall* ip)
     showitem = 1;
     break;
   }
-  case pwr_cClass_NodeConfig: {
+  case pwr_cClass_NodeConfig:
+  {
     char* nodename;
 
     // Get NodeName attribute
-    sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody",
-        "NodeName", &nodename, &size);
+    sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody", "NodeName", &nodename, &size);
     if (EVEN(sts))
       return sts;
     strncpy(item, nodename, sizeof(item));
@@ -1160,12 +1179,13 @@ static pwr_tStatus History(ldh_sMenuCall* ip)
   case pwr_cClass_RootVolumeConfig:
   case pwr_cClass_ClassVolumeConfig:
   case pwr_cClass_SubVolumeConfig:
-  case pwr_cClass_SharedVolumeConfig: {
+  case pwr_cClass_SharedVolumeConfig:
+  {
     pwr_tObjName vname;
 
     // Get object name attribute
-    sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid,
-        ldh_eName_Object, vname, sizeof(vname), &size);
+    sts =
+        ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Object, vname, sizeof(vname), &size);
     if (EVEN(sts))
       return sts;
     strncpy(item, vname, sizeof(item));
@@ -1179,15 +1199,15 @@ static pwr_tStatus History(ldh_sMenuCall* ip)
     strncpy(item, oname, sizeof(item));
 
     strncpy(categories, mb.MethodArguments[0], sizeof(categories));
-    if (streq(mb.MethodArguments[1], "Descendants")) {
+    if (streq(mb.MethodArguments[1], "Descendants"))
+    {
       strncat(item, "*", sizeof(item) - strlen(item) - 1);
       showitem = 1;
     }
   }
 
   char cmd[420];
-  snprintf(cmd, sizeof(cmd), "open history/item=\"%s\"/categories=\"%s\"", item,
-      categories);
+  snprintf(cmd, sizeof(cmd), "open history/item=\"%s\"/categories=\"%s\"", item, categories);
   if (showitem)
     strncat(cmd, "/showitem", sizeof(cmd) - strlen(cmd) - 1);
 
@@ -1195,10 +1215,7 @@ static pwr_tStatus History(ldh_sMenuCall* ip)
   return 1;
 }
 
-static pwr_tStatus HistoryFilter(ldh_sMenuCall* ip)
-{
-  return 1;
-}
+static pwr_tStatus HistoryFilter(ldh_sMenuCall* ip) { return 1; }
 
 //
 //  Crossreferences
@@ -1210,8 +1227,7 @@ static pwr_tStatus Crossreferences(ldh_sMenuCall* ip)
   char* namep;
   char cmd[600];
 
-  sts = ldh_AttrRefToName(
-      ip->PointedSession, &ip->Pointed, cdh_mNName, &namep, &size);
+  sts = ldh_AttrRefToName(ip->PointedSession, &ip->Pointed, cdh_mNName, &namep, &size);
   if (EVEN(sts))
     return sts;
 
@@ -1221,10 +1237,7 @@ static pwr_tStatus Crossreferences(ldh_sMenuCall* ip)
   return 1;
 }
 
-static pwr_tStatus CrossreferencesFilter(ldh_sMenuCall* ip)
-{
-  return 1;
-}
+static pwr_tStatus CrossreferencesFilter(ldh_sMenuCall* ip) { return 1; }
 
 //
 //  PopupMenu SyntaxCheck
@@ -1236,8 +1249,8 @@ static pwr_tStatus PM_SyntaxCheck(ldh_sMenuCall* ip)
   pwr_tOName oname;
   pwr_tCmd cmd;
 
-  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid,
-      ldh_eName_VolPath, oname, sizeof(oname), &size);
+  sts =
+      ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_VolPath, oname, sizeof(oname), &size);
   if (EVEN(sts))
     return sts;
 
@@ -1247,10 +1260,7 @@ static pwr_tStatus PM_SyntaxCheck(ldh_sMenuCall* ip)
   return 1;
 }
 
-static pwr_tStatus PM_SyntaxCheckFilter(ldh_sMenuCall* ip)
-{
-  return 1;
-}
+static pwr_tStatus PM_SyntaxCheckFilter(ldh_sMenuCall* ip) { return 1; }
 
 /*----------------------------------------------------------------------------*\
   To connect an object to an attribute
@@ -1262,9 +1272,8 @@ static pwr_tStatus ConnectAttribute(ldh_sMenuCall* ip)
   pwr_sMenuButton mb;
   pwr_sAttrRef PattrRef;
 
-  sts = ldh_ReadObjectBody(ip->PointedSession,
-      ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
-      sizeof(pwr_sMenuButton));
+  sts = ldh_ReadObjectBody(ip->PointedSession, ip->ItemList[ip->ChosenItem].MenuObject, "SysBody", &mb,
+                           sizeof(pwr_sMenuButton));
   if (EVEN(sts))
     return sts;
 
@@ -1273,8 +1282,7 @@ static pwr_tStatus ConnectAttribute(ldh_sMenuCall* ip)
   pwr_tAName aname;
   int size;
 
-  sts = ldh_AttrRefToName(
-      ip->PointedSession, &ip->Pointed, ldh_eName_ArefVol, &aname_p, &size);
+  sts = ldh_AttrRefToName(ip->PointedSession, &ip->Pointed, ldh_eName_ArefVol, &aname_p, &size);
   if (EVEN(sts))
     return 0;
 
@@ -1284,25 +1292,26 @@ static pwr_tStatus ConnectAttribute(ldh_sMenuCall* ip)
 
   sts = ldh_NameToAttrRef(ip->PointedSession, aname, &PattrRef);
   if (ODD(sts))
-    sts = ldh_WriteAttribute(
-        ip->PointedSession, &PattrRef, &ip->Selected[0], sizeof(pwr_tAttrRef));
+    sts = ldh_WriteAttribute(ip->PointedSession, &PattrRef, &ip->Selected[0], sizeof(pwr_tAttrRef));
 
-  if (ip->message_cb) {
+  if (ip->message_cb)
+  {
     char msg[300];
 
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       pwr_tOName name;
 
-      sts = ldh_AttrRefToName(ip->PointedSession, &ip->Selected[0],
-          ldh_eName_Hierarchy, &aname_p, &size);
+      sts = ldh_AttrRefToName(ip->PointedSession, &ip->Selected[0], ldh_eName_Hierarchy, &aname_p, &size);
       if (ODD(sts))
         strncpy(name, aname_p, sizeof(name));
       else
         cdh_OidToString(name, sizeof(name), ip->Selected[0].Objid, 1);
-      snprintf(msg, sizeof(msg), "%s connected to:   %s", mb.MethodArguments[0],
-          name);
+      snprintf(msg, sizeof(msg), "%s connected to:   %s", mb.MethodArguments[0], name);
       ip->wtt->message('I', msg);
-    } else {
+    }
+    else
+    {
       msg_GetMsg(sts, msg, sizeof(msg));
       ip->wtt->message('E', msg);
     }
@@ -1310,25 +1319,39 @@ static pwr_tStatus ConnectAttribute(ldh_sMenuCall* ip)
   return LDH__SUCCESS;
 }
 
-static pwr_tStatus ConnectAttributeFilter(ldh_sMenuCall* ip)
-{
-  return 1;
-}
+static pwr_tStatus ConnectAttributeFilter(ldh_sMenuCall* ip) { return 1; }
 
-pwr_dExport pwr_BindMethods($Object) = { pwr_BindMethod(CreateObject),
-  pwr_BindMethod(CopyObject), pwr_BindMethod(CopyObjectTree),
-  pwr_BindMethod(DeleteObject), pwr_BindMethod(DeleteObjects),
-  pwr_BindMethod(IsOkCopyObject), pwr_BindMethod(IsOkCopyObjectTree),
-  pwr_BindMethod(IsOkCreateObject), pwr_BindMethod(IsOkMoveObject),
-  pwr_BindMethod(MoveObject), pwr_BindMethod(OpenObject),
-  pwr_BindMethod(OpenTemplate), pwr_BindMethod(SetDefaults),
-  pwr_BindMethod(ClassHelp), pwr_BindMethod(HelpClass),
-  pwr_BindMethod(HelpClassFilter), pwr_BindMethod(Help),
-  pwr_BindMethod(HelpFilter), pwr_BindMethod(Cast), pwr_BindMethod(CastFilter),
-  pwr_BindMethod(Disable), pwr_BindMethod(DisableFilter),
-  pwr_BindMethod(ConfigureComponent), pwr_BindMethod(ConfigureComponentFilter),
-  pwr_BindMethod(BuildFilter), pwr_BindMethod(History),
-  pwr_BindMethod(HistoryFilter), pwr_BindMethod(Crossreferences),
-  pwr_BindMethod(CrossreferencesFilter), pwr_BindMethod(PM_SyntaxCheck),
-  pwr_BindMethod(PM_SyntaxCheckFilter), pwr_BindMethod(ConnectAttribute),
-  pwr_BindMethod(ConnectAttributeFilter), pwr_NullMethod };
+pwr_dExport pwr_BindMethods($Object) = {pwr_BindMethod(CreateObject),
+                                        pwr_BindMethod(CopyObject),
+                                        pwr_BindMethod(CopyObjectTree),
+                                        pwr_BindMethod(DeleteObject),
+                                        pwr_BindMethod(DeleteObjects),
+                                        pwr_BindMethod(IsOkCopyObject),
+                                        pwr_BindMethod(IsOkCopyObjectTree),
+                                        pwr_BindMethod(IsOkCreateObject),
+                                        pwr_BindMethod(IsOkMoveObject),
+                                        pwr_BindMethod(MoveObject),
+                                        pwr_BindMethod(OpenObject),
+                                        pwr_BindMethod(OpenTemplate),
+                                        pwr_BindMethod(SetDefaults),
+                                        pwr_BindMethod(ClassHelp),
+                                        pwr_BindMethod(HelpClass),
+                                        pwr_BindMethod(HelpClassFilter),
+                                        pwr_BindMethod(Help),
+                                        pwr_BindMethod(HelpFilter),
+                                        pwr_BindMethod(Cast),
+                                        pwr_BindMethod(CastFilter),
+                                        pwr_BindMethod(Disable),
+                                        pwr_BindMethod(DisableFilter),
+                                        pwr_BindMethod(ConfigureComponent),
+                                        pwr_BindMethod(ConfigureComponentFilter),
+                                        pwr_BindMethod(BuildFilter),
+                                        pwr_BindMethod(History),
+                                        pwr_BindMethod(HistoryFilter),
+                                        pwr_BindMethod(Crossreferences),
+                                        pwr_BindMethod(CrossreferencesFilter),
+                                        pwr_BindMethod(PM_SyntaxCheck),
+                                        pwr_BindMethod(PM_SyntaxCheckFilter),
+                                        pwr_BindMethod(ConnectAttribute),
+                                        pwr_BindMethod(ConnectAttributeFilter),
+                                        pwr_NullMethod};

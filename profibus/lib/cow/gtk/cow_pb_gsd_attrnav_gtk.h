@@ -45,9 +45,8 @@
 class GsdAttrNavGtk : public GsdAttrNav
 {
 public:
-  GsdAttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-                const char* xn_name, pb_gsd* xn_gsd, int xn_edit_mode,
-                GtkWidget** w, pwr_tStatus* status);
+  GsdAttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name, pb_gsd* xn_gsd,
+                int xn_edit_mode, GtkWidget** w, pwr_tStatus* status);
   ~GsdAttrNavGtk();
   void set_inputfocus();
 

@@ -43,7 +43,8 @@
 
 #include <QWidget>
 
-class CoLogWNavQt : public CoLogWNav {
+class CoLogWNavQt : public CoLogWNav
+{
 public:
   CoLogWNavQt(void* ev_parent_ctx, int l_show_item, QWidget** w);
   ~CoLogWNavQt();

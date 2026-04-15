@@ -77,16 +77,13 @@ char* CnvPwgToXtthelp::fname_to_topic(char* fname)
 CnvPwgToXtthelp::CnvPwgToXtthelp(CnvCtx* cnv_ctx) : ctx(cnv_ctx)
 {
   // Get files
-  static pwr_tFileName filenames[10] = { 
-    "$pwre_croot/xtt/exp/ge/src/pwr_*.pwg",
-    "$pwre_croot/xtt/exp/ge/src/pwrct_*.pwg",
-    "$pwre_croot/xtt/mmi/sis/src/sis*.pwg",
-    "$pwre_croot/xtt/mmi/ssg/src/ssg*.pwg",
-    "$pwre_croot/bcomp/mmi/bcomp/src/bcomp*.pwg",
-    "$pwre_croot/abb/mmi/mcomp/src/mcomp*.pwg",
-    "$pwre_croot/profibus/mmi/mcomp/src/mcomp*.pwg", "" };
-  static pwr_tFileName titles[10] = { "General", "ColorTheme", "Ventilation",
-    "CircuitDiagram", "BaseComponent", "ABB", "Profibus", "" };
+  static pwr_tFileName filenames[10] = {
+      "$pwre_croot/xtt/exp/ge/src/pwr_*.pwg",          "$pwre_croot/xtt/exp/ge/src/pwrct_*.pwg",
+      "$pwre_croot/xtt/mmi/sis/src/sis*.pwg",          "$pwre_croot/xtt/mmi/ssg/src/ssg*.pwg",
+      "$pwre_croot/bcomp/mmi/bcomp/src/bcomp*.pwg",    "$pwre_croot/abb/mmi/mcomp/src/mcomp*.pwg",
+      "$pwre_croot/profibus/mmi/mcomp/src/mcomp*.pwg", ""};
+  static pwr_tFileName titles[10] = {"General",       "ColorTheme", "Ventilation", "CircuitDiagram",
+                                     "BaseComponent", "ABB",        "Profibus",    ""};
 
   pwr_tFileName found_file;
   pwr_tStatus sts;
@@ -99,7 +96,8 @@ CnvPwgToXtthelp::CnvPwgToXtthelp(CnvCtx* cnv_ctx) : ctx(cnv_ctx)
   // Open output file
   if (streq(ctx->dir, ""))
     strcpy(outfile, "$pwr_exe/man_subgraph.dat");
-  else {
+  else
+  {
     strcpy(outfile, ctx->dir);
     strcat(outfile, "man_subgraph.dat");
   }
@@ -115,7 +113,8 @@ CnvPwgToXtthelp::CnvPwgToXtthelp(CnvCtx* cnv_ctx) : ctx(cnv_ctx)
   m_fp << "<topic> index\n"
        << "Subgraph documentation\n";
 
-  for (int i = 0; i < int(sizeof(filenames) / sizeof(filenames[0])); i++) {
+  for (int i = 0; i < int(sizeof(filenames) / sizeof(filenames[0])); i++)
+  {
     if (streq(filenames[i], ""))
       break;
     m_fp << "<b>" << titles[i] << " <link>" << titles[i] << '\n';
@@ -123,15 +122,16 @@ CnvPwgToXtthelp::CnvPwgToXtthelp(CnvCtx* cnv_ctx) : ctx(cnv_ctx)
   m_fp << "</topic>\n";
   print_enable();
 
-  for (int i = 0; i < int(sizeof(filenames) / sizeof(filenames[0])); i++) {
+  for (int i = 0; i < int(sizeof(filenames) / sizeof(filenames[0])); i++)
+  {
     if (streq(filenames[i], ""))
       break;
     m_filelist.clear();
     strcpy(m_current_title, titles[i]);
 
-    for (sts = dcli_search_file(filenames[i], found_file, DCLI_DIR_SEARCH_INIT);
-         ODD(sts); sts
-         = dcli_search_file(filenames[i], found_file, DCLI_DIR_SEARCH_NEXT)) {
+    for (sts = dcli_search_file(filenames[i], found_file, DCLI_DIR_SEARCH_INIT); ODD(sts);
+         sts = dcli_search_file(filenames[i], found_file, DCLI_DIR_SEARCH_NEXT))
+    {
       if ((s = strstr(found_file, "__p")) && sscanf(s + 3, "%d", &idx))
         // Skip page
         continue;
@@ -153,14 +153,15 @@ CnvPwgToXtthelp::CnvPwgToXtthelp(CnvCtx* cnv_ctx) : ctx(cnv_ctx)
 
     exec_filelist(titles[i]);
     headerlevel();
-    for (int j = 0; j < (int)m_filelist.size(); j++) {
-      if (j == 0
-          || !streq(m_filelist[j].m_group, m_filelist[j - 1].m_group)) {
-        if (j != 0) {
+    for (int j = 0; j < (int)m_filelist.size(); j++)
+    {
+      if (j == 0 || !streq(m_filelist[j].m_group, m_filelist[j - 1].m_group))
+      {
+        if (j != 0)
+        {
           headerlevel_end();
         }
-        m_fp << "<topic>" << topic_name(m_filelist[j].m_group)
-             << "__dummy <style> function\n"
+        m_fp << "<topic>" << topic_name(m_filelist[j].m_group) << "__dummy <style> function\n"
              << "Group " << m_filelist[j].m_group << '\n'
              << "</topic>\n";
         headerlevel();
@@ -182,13 +183,14 @@ int CnvPwgToXtthelp::exec_filelist(char* title)
   m_fp << "<topic> " << title << '\n' << title << '\n';
 
   print_disable();
-  for (int j = 0; j < (int)m_filelist.size(); j++) {
-    if (j == 0 || !streq(m_filelist[j].m_group, m_filelist[idx].m_group)) {
+  for (int j = 0; j < (int)m_filelist.size(); j++)
+  {
+    if (j == 0 || !streq(m_filelist[j].m_group, m_filelist[idx].m_group))
+    {
       idx = j;
 
-      m_fp << "<b>Group " << m_filelist[j].m_group << " <link>"
-           << m_current_title << "_" << topic_name(m_filelist[j].m_group)
-           << '\n';
+      m_fp << "<b>Group " << m_filelist[j].m_group << " <link>" << m_current_title << "_"
+           << topic_name(m_filelist[j].m_group) << '\n';
     }
   }
   m_fp << "</topic>\n\n";
@@ -196,7 +198,8 @@ int CnvPwgToXtthelp::exec_filelist(char* title)
   // Print topic for groups
 
   idx = 0;
-  for (;;) {
+  for (;;)
+  {
     exec_group(idx, &next_idx);
     idx = next_idx;
     if (idx >= (int)m_filelist.size())
@@ -211,16 +214,16 @@ int CnvPwgToXtthelp::exec_filelist(char* title)
 int CnvPwgToXtthelp::exec_group(int idx, int* next_idx)
 {
   // Print index
-  m_fp << "<topic> " << m_current_title << "_"
-       << topic_name(m_filelist[idx].m_group) << '\n'
+  m_fp << "<topic> " << m_current_title << "_" << topic_name(m_filelist[idx].m_group) << '\n'
        << "Group " << m_filelist[idx].m_group << '\n';
 
-  for (int j = idx; j < (int)m_filelist.size(); j++) {
-    if (!streq(m_filelist[j].m_group, m_filelist[idx].m_group)) {
+  for (int j = idx; j < (int)m_filelist.size(); j++)
+  {
+    if (!streq(m_filelist[j].m_group, m_filelist[idx].m_group))
+    {
       break;
     }
-    m_fp << m_filelist[j].m_title << " <link>"
-         << fname_to_topic(m_filelist[j].m_fname) << '\n';
+    m_fp << m_filelist[j].m_title << " <link>" << fname_to_topic(m_filelist[j].m_fname) << '\n';
     *next_idx = j + 1;
   }
   m_fp << "</topic>\n\n";
@@ -246,14 +249,16 @@ int CnvPwgToXtthelp::exec_file(char* fname)
 
   m_fp << "<topic> " << fname_to_topic(fname) << " <style> function\n";
 
-  for (;;) {
+  for (;;)
+  {
     ifp.getline(line, sizeof(line));
     if (strstr(line, "!*/") != 0)
       break;
     else if (line[0] != '!')
       break;
 
-    if (incomment) {
+    if (incomment)
+    {
       m_fp << (char*)&line[1] << '\n';
     }
     if (strstr(line, "!/**") != 0)
@@ -265,8 +270,7 @@ int CnvPwgToXtthelp::exec_file(char* fname)
   return 1;
 }
 
-int CnvPwgToXtthelp::get_title(
-    char* fname, char* title, int tsize, char* group, int gsize)
+int CnvPwgToXtthelp::get_title(char* fname, char* title, int tsize, char* group, int gsize)
 {
   char line[200];
   int incomment = 0;
@@ -284,22 +288,26 @@ int CnvPwgToXtthelp::get_title(
   if (!str_StartsWith(line, "199"))
     return 0;
 
-  for (;;) {
+  for (;;)
+  {
     ifp.getline(line, sizeof(line));
     if (strstr(line, "!*/") != 0)
       break;
     else if (line[0] != '!')
       break;
 
-    if (incomment) {
+    if (incomment)
+    {
       strncpy(title, (char*)&line[1], tsize);
       str_trim(title, title);
 
       ifp.getline(line, sizeof(line));
-      if ((s = strstr(line, "Group"))) {
+      if ((s = strstr(line, "Group")))
+      {
         strncpy(group, s + 6, gsize);
         str_trim(group, group);
-      } else
+      }
+      else
         strcpy(group, "");
 
       found = 1;
@@ -314,18 +322,25 @@ int CnvPwgToXtthelp::get_title(
 
 void CnvPwgToXtthelp::sort()
 {
-  for (int i = m_filelist.size() - 1; i > 0; i--) {
-    for (int j = 0; j < i; j++) {
-      if (streq(m_filelist[i].m_group, m_filelist[j].m_group)) {
+  for (int i = m_filelist.size() - 1; i > 0; i--)
+  {
+    for (int j = 0; j < i; j++)
+    {
+      if (streq(m_filelist[i].m_group, m_filelist[j].m_group))
+      {
         //  Same group, sort by title
-        if (strcmp(m_filelist[i].m_title, m_filelist[j].m_title) < 0) {
+        if (strcmp(m_filelist[i].m_title, m_filelist[j].m_title) < 0)
+        {
           PwgFile tmp = m_filelist[i];
           m_filelist[i] = m_filelist[j];
           m_filelist[j] = tmp;
         }
-      } else {
+      }
+      else
+      {
         // Different groups, sort by group
-        if (strcmp(m_filelist[i].m_group, m_filelist[j].m_group) < 0) {
+        if (strcmp(m_filelist[i].m_group, m_filelist[j].m_group) < 0)
+        {
           PwgFile tmp = m_filelist[i];
           m_filelist[i] = m_filelist[j];
           m_filelist[j] = tmp;
@@ -348,56 +363,37 @@ void CnvPwgToXtthelp::header()
   if ((s = strchr(year, '-')))
     *s = 0;
 
-  m_fp
-      << "<topic> __DocumentTitlePage\n\n"
-      << "<image> pwr_logga.gif\n\n\n\n\n\n\n"
-      << "<h1> Graphic Symbol "
-         "Library\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-      << "<hr>\n"
-      << timestr << '\n'
-      << "Version " << pwrv_cPwrVersionStr << '\n'
-      << "<hr>\n"
-      << "</topic>\n\n"
-      << "<topic> __DocumentInfoPage\n\n\n"
-      << pwrv_cPwrCopyright << "\n\n"
-      << "Permission is granted to copy, distribute and/or modify this "
-         "document\n"
-      << "under the terms of the GNU Free Documentation License, Version 1.2\n"
-      << "or any later version published by the Free Software Foundation;\n"
-      << "with no Invariant Sections, no Front-Cover Texts, and no Back-Cover\n"
-      << "Texts.\n"
-      << "</topic>\n";
+  m_fp << "<topic> __DocumentTitlePage\n\n"
+       << "<image> pwr_logga.gif\n\n\n\n\n\n\n"
+       << "<h1> Graphic Symbol "
+          "Library\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+       << "<hr>\n"
+       << timestr << '\n'
+       << "Version " << pwrv_cPwrVersionStr << '\n'
+       << "<hr>\n"
+       << "</topic>\n\n"
+       << "<topic> __DocumentInfoPage\n\n\n"
+       << pwrv_cPwrCopyright << "\n\n"
+       << "Permission is granted to copy, distribute and/or modify this "
+          "document\n"
+       << "under the terms of the GNU Free Documentation License, Version 1.2\n"
+       << "or any later version published by the Free Software Foundation;\n"
+       << "with no Invariant Sections, no Front-Cover Texts, and no Back-Cover\n"
+       << "Texts.\n"
+       << "</topic>\n";
 }
 
-void CnvPwgToXtthelp::chapter()
-{
-  m_fp << "<chapter>\n";
-}
+void CnvPwgToXtthelp::chapter() { m_fp << "<chapter>\n"; }
 
-void CnvPwgToXtthelp::chapter_end()
-{
-  m_fp << "</chapter>\n";
-}
+void CnvPwgToXtthelp::chapter_end() { m_fp << "</chapter>\n"; }
 
-void CnvPwgToXtthelp::headerlevel()
-{
-  m_fp << "<headerlevel>\n";
-}
+void CnvPwgToXtthelp::headerlevel() { m_fp << "<headerlevel>\n"; }
 
-void CnvPwgToXtthelp::headerlevel_end()
-{
-  m_fp << "</headerlevel>\n";
-}
+void CnvPwgToXtthelp::headerlevel_end() { m_fp << "</headerlevel>\n"; }
 
-void CnvPwgToXtthelp::print_disable()
-{
-  m_fp << "<option> printdisable\n";
-}
+void CnvPwgToXtthelp::print_disable() { m_fp << "<option> printdisable\n"; }
 
-void CnvPwgToXtthelp::print_enable()
-{
-  m_fp << "<option> printenable\n";
-}
+void CnvPwgToXtthelp::print_enable() { m_fp << "<option> printenable\n"; }
 
 char* CnvPwgToXtthelp::topic_name(char* str)
 {
@@ -405,7 +401,8 @@ char* CnvPwgToXtthelp::topic_name(char* str)
   char *s, *t;
 
   // Replace '/' to '_'
-  for (s = str, t = res; *s; s++, t++) {
+  for (s = str, t = res; *s; s++, t++)
+  {
     if (*s == '/')
       *t = '_';
     else

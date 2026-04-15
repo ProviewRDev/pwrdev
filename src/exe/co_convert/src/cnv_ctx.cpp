@@ -38,7 +38,8 @@
 
 #include <fstream>
 
-extern "C" {
+extern "C"
+{
 #include "co_dcli.h"
 #include "co_cdh.h"
 }
@@ -46,7 +47,10 @@ extern "C" {
 #include "cnv_ctx.h"
 #include "co_string.h"
 
-CnvCtx::CnvCtx() : generate_html(0), generate_xtthelp(0), generate_src(0), generate_struct(0), generate_ps(0), generate_pdf(0), generate_cdp(0), common_structfile_only(0), hpp(0), verbose(0), first_class(1), setup(0), wblto(0), rw(0), rx(0)
+CnvCtx::CnvCtx()
+    : generate_html(0), generate_xtthelp(0), generate_src(0), generate_struct(0), generate_ps(0),
+      generate_pdf(0), generate_cdp(0), common_structfile_only(0), hpp(0), verbose(0), first_class(1),
+      setup(0), wblto(0), rw(0), rx(0)
 {
   strcpy(dir, "");
   strcpy(setup_filename, "");
@@ -87,10 +91,7 @@ void CnvCtx::add_depend(char* fname)
   depend.push_back(fnamestr);
 }
 
-void CnvCtx::set_dependfile(char* dname)
-{
-  strncpy(dependfile, dname, sizeof(dependfile));
-}
+void CnvCtx::set_dependfile(char* dname) { strncpy(dependfile, dname, sizeof(dependfile)); }
 
 void CnvCtx::print_depend()
 {

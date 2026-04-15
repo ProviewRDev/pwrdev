@@ -43,7 +43,7 @@
 
 #include "cow_qt_helpers.h"
 #include "cow_rtmon_qt.h"
-//#include "cow_style_qt.h"
+// #include "cow_style_qt.h"
 #include "cow_xhelp_qt.h"
 
 #include <QApplication>
@@ -51,15 +51,11 @@
 CoXHelp* xhelp;
 RtMon* rtmon;
 
-static void usage()
-{
-  printf("\nUsage: pwr_rtmonitor\n");
-}
+static void usage() { printf("\nUsage: pwr_rtmonitor\n"); }
 
 static void rtmon_help_cb(void* ctx, const char* topic)
 {
-  CoXHelp::dhelp(
-      "index", "", navh_eHelpFile_Other, "$pwr_lang/rtmon_help.dat", 0);
+  CoXHelp::dhelp("index", "", navh_eHelpFile_Other, "$pwr_lang/rtmon_help.dat", 0);
 }
 
 static void rtmon_close_cb(void* ctx)
@@ -76,19 +72,23 @@ int main(int argc, char* argv[])
   char display[80] = "";
 
   log_debug("%s ", argv[0]);
-  for (int i = 1; i < argc; i++) {
+  for (int i = 1; i < argc; i++)
+  {
     fprintf(stderr, "%s ", argv[i]);
-    if (streq(argv[i], "-h")) {
+    if (streq(argv[i], "-h"))
+    {
       usage();
       exit(0);
-    } else if (streq(argv[i], "--display") && i + 1 < argc) {
+    }
+    else if (streq(argv[i], "--display") && i + 1 < argc)
+    {
       strncpy(display, argv[i + 1], sizeof(display));
     }
   }
   fprintf(stderr, "\n");
 
   QApplication app(argc, argv);
-  //QApplication::setStyle(new PwrStyle());
+  // QApplication::setStyle(new PwrStyle());
 
   setlocale(LC_NUMERIC, "POSIX");
   setlocale(LC_TIME, "en_US");

@@ -81,16 +81,11 @@ void CoLogWNavBrow::create_nodeclasses()
 
   brow_CreateNodeClass(ctx, "LogDefault", flow_eNodeGroup_Common, &nc_log);
   brow_AddAnnotPixmap(nc_log, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_log, 1.4, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_log, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_log, 13, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_log, 18, 0.6, 3, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_log, 35, 0.6, 4, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_log, 1.4, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_log, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_log, 13, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_log, 18, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_log, 35, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_log, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 
@@ -107,32 +102,19 @@ void CoLogWNavBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, logwnav);
 
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, CoLogWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-      CoLogWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, CoLogWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, CoLogWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack,
-      CoLogWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack,
-      CoLogWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, CoLogWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, CoLogWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, CoLogWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack,
-      CoLogWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack,
-      CoLogWNav::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, CoLogWNav::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack,
-      CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, CoLogWNav::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, CoLogWNav::brow_cb);
 }
 
 //
@@ -152,38 +134,26 @@ int CoLogWNav::init_brow_cb(FlowCtx* fctx, void* client_data)
   return 1;
 }
 
-CoLogWNav::CoLogWNav(void* l_parent_ctx, int l_show_item)
-    : parent_ctx(l_parent_ctx), show_item(l_show_item)
+CoLogWNav::CoLogWNav(void* l_parent_ctx, int l_show_item) : parent_ctx(l_parent_ctx), show_item(l_show_item)
 {
 }
 
 //
 //  Delete
 //
-CoLogWNav::~CoLogWNav()
-{
-}
+CoLogWNav::~CoLogWNav() {}
 
-CoLogWNavBrow::~CoLogWNavBrow()
-{
-  free_pixmaps();
-}
+CoLogWNavBrow::~CoLogWNavBrow() { free_pixmaps(); }
 
 //
 //  Zoom
 //
-void CoLogWNav::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void CoLogWNav::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void CoLogWNav::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void CoLogWNav::unzoom() { brow_UnZoom(brow->ctx); }
 
 //
 // Callbacks from brow
@@ -193,34 +163,43 @@ int CoLogWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   CoLogWNav* logwnav;
   ItemLog* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
   }
 
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&logwnav);
-  switch (event->event) {
-  case flow_eEvent_Key_Up: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(logwnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLastVisible(logwnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              logwnav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(logwnav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetLastVisible(logwnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(logwnav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -236,26 +215,33 @@ int CoLogWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(logwnav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirstVisible(logwnav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              logwnav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(logwnav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetFirstVisible(logwnav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(logwnav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -279,10 +265,12 @@ int CoLogWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -294,9 +282,12 @@ int CoLogWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(logwnav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(logwnav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(logwnav->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(logwnav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(logwnav->brow->ctx, event->object.object);
@@ -306,19 +297,23 @@ int CoLogWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       brow_SelectClear(logwnav->brow->ctx);
     }
     break;
-  case flow_eEvent_Key_PageDown: {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(logwnav->brow->ctx, 0.95);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(logwnav->brow->ctx, -0.95);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(logwnav->brow->ctx, 0.10);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(logwnav->brow->ctx, -0.10);
     break;
   }
@@ -329,9 +324,8 @@ int CoLogWNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   return 1;
 }
 
-ItemLog::ItemLog(CoLogWNav* item_logwnav, const char* item_name,
-    pwr_tTime item_time, char* item_category, char* item_user,
-    char* item_comment, brow_tNode dest, flow_eDest dest_code)
+ItemLog::ItemLog(CoLogWNav* item_logwnav, const char* item_name, pwr_tTime item_time, char* item_category,
+                 char* item_user, char* item_comment, brow_tNode dest, flow_eDest dest_code)
     : logwnav(item_logwnav), time(item_time)
 {
   char time_str[40];
@@ -346,11 +340,10 @@ ItemLog::ItemLog(CoLogWNav* item_logwnav, const char* item_name,
   else
     strcpy(comment, "");
 
-  brow_CreateNode(logwnav->brow->ctx, (char*)"Log", logwnav->brow->nc_log, dest,
-      dest_code, (void*)this, 1, &node);
+  brow_CreateNode(logwnav->brow->ctx, (char*)"Log", logwnav->brow->nc_log, dest, dest_code, (void*)this, 1,
+                  &node);
 
-  time_AtoAscii(
-      &time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
+  time_AtoAscii(&time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
   time_str[17] = 0;
 
   int annot = 0;
@@ -376,17 +369,13 @@ ItemLog::ItemLog(CoLogWNav* item_logwnav, const char* item_name,
     brow_SetAnnotPixmap(node, 0, logwnav->brow->pixmap_clone);
 }
 
-ItemLog::~ItemLog()
-{
-}
+ItemLog::~ItemLog() {}
 
-void CoLogWNav::item_cb(void* ctx, pwr_tTime time, char* category, char* user,
-    char* item, char* comment)
+void CoLogWNav::item_cb(void* ctx, pwr_tTime time, char* category, char* user, char* item, char* comment)
 {
   CoLogWNav* logwnav = (CoLogWNav*)ctx;
 
-  new ItemLog(
-      logwnav, item, time, category, user, comment, 0, flow_eDest_IntoLast);
+  new ItemLog(logwnav, item, time, category, user, comment, 0, flow_eDest_IntoLast);
 }
 
 void CoLogWNav::show(char categories[][20], char* item)

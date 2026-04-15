@@ -37,7 +37,8 @@
 #ifndef xtt_applist_h
 #define xtt_applist_h
 
-typedef enum {
+typedef enum
+{
   applist_eType_Trace,
   applist_eType_Graph,
   applist_eType_Attr,
@@ -52,14 +53,12 @@ typedef enum {
   applist_eType_Dashboard
 } applist_eType;
 
-class ApplListElem {
+class ApplListElem
+{
 public:
-  ApplListElem(applist_eType al_type, void* al_ctx, pwr_sAttrRef* al_arp,
-      const char* al_name, const char* al_instance);
-  ~ApplListElem()
-  {
-    log_delete();
-  }
+  ApplListElem(applist_eType al_type, void* al_ctx, pwr_sAttrRef* al_arp, const char* al_name,
+               const char* al_instance);
+  ~ApplListElem() { log_delete(); }
   applist_eType type;
   void* ctx;
   pwr_sAttrRef aref;
@@ -71,27 +70,26 @@ public:
   void log_delete();
 };
 
-class ApplList {
+class ApplList
+{
 public:
-  ApplList() : root(NULL){}
+  ApplList() : root(NULL) {}
 
   ~ApplList()
   {
     ApplListElem *elem, *next;
-    for (elem = root; elem; elem = next) {
+    for (elem = root; elem; elem = next)
+    {
       next = elem->next;
       delete elem;
     }
   }
 
   ApplListElem* root;
-  void insert(applist_eType type, void* ctx, pwr_sAttrRef* arp,
-      const char* name, const char* instance);
-  void insert(applist_eType type, void* ctx, pwr_tObjid objid, const char* name,
-      const char* instance);
+  void insert(applist_eType type, void* ctx, pwr_sAttrRef* arp, const char* name, const char* instance);
+  void insert(applist_eType type, void* ctx, pwr_tObjid objid, const char* name, const char* instance);
   void remove(void* ctx);
-  int find(
-      applist_eType type, const char* name, const char* instance, void** ctx);
+  int find(applist_eType type, const char* name, const char* instance, void** ctx);
   int find(applist_eType type, pwr_sAttrRef* arp, void** ctx);
   int find(applist_eType type, pwr_tObjid objid, void** ctx);
   int find(applist_eType type, void* ctx, char* name, char* instance);
@@ -99,7 +97,7 @@ public:
   int find_graph_first(const char* name, void** ctx);
   int find_graph_next(const char* name, char* instance, void** ctx);
   int find_dashboard_first(void** ctx);
-  int find_dashboard_next(void *from_ctx, void** ctx);
+  int find_dashboard_next(void* from_ctx, void** ctx);
   void swap(int mode);
 };
 

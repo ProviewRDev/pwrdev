@@ -49,19 +49,19 @@
    This module handles circular buffer objects.  */
 
 #if defined OS_LINUX || defined OS_MACOS
-#define gdh_Lock                                                               \
-  pthread_mutex_lock(&gdbroot->thread_lock);                                   \
+#define gdh_Lock                                                                                             \
+  pthread_mutex_lock(&gdbroot->thread_lock);                                                                 \
   gdb_Lock
-#define gdh_Unlock                                                             \
-  gdb_Unlock;                                                                  \
+#define gdh_Unlock                                                                                           \
+  gdb_Unlock;                                                                                                \
   pthread_mutex_unlock(&gdbroot->thread_lock)
 #else
 #define gdh_Lock gdb_Lock
 #define gdh_Unlock gdb_Unlock
 #endif
 
-#define touchObject(op)                                                        \
-  if (op != NULL && op->l.flags.b.isCached)                                    \
+#define touchObject(op)                                                                                      \
+  if (op != NULL && op->l.flags.b.isCached)                                                                  \
   cvolc_TouchObject(op)
 
 void cbuf_InitBuffer(void* o, pwr_tUInt32 size, pwr_tUInt32 element_size)
@@ -78,23 +78,23 @@ void cbuf_AddSample(void* o, void* value)
   int last_idx, first_idx;
   ;
 
-  if (hp->LastIndex == 0 && hp->FirstIndex == 0) {
-    memcpy((char*)hp + pwr_AlignLW(sizeof(pwr_sClass_CircBuffHeader)), value,
-        hp->ElementSize);
+  if (hp->LastIndex == 0 && hp->FirstIndex == 0)
+  {
+    memcpy((char*)hp + pwr_AlignLW(sizeof(pwr_sClass_CircBuffHeader)), value, hp->ElementSize);
   }
   last_idx = hp->LastIndex + 1;
   first_idx = hp->FirstIndex;
   if (last_idx >= hp->Size)
     last_idx = 0;
-  if (first_idx == last_idx) {
+  if (first_idx == last_idx)
+  {
     first_idx++;
     if (first_idx >= hp->Size)
       first_idx = 0;
   }
   hp->FirstIndex = first_idx;
-  memcpy((char*)hp + pwr_AlignLW(sizeof(pwr_sClass_CircBuffHeader))
-          + last_idx * hp->ElementSize,
-      value, hp->ElementSize);
+  memcpy((char*)hp + pwr_AlignLW(sizeof(pwr_sClass_CircBuffHeader)) + last_idx * hp->ElementSize, value,
+         hp->ElementSize);
   hp->LastIndex = last_idx;
 }
 
@@ -105,14 +105,18 @@ void cbuf_AddTimeSample(void* o, pwr_tTime* t)
   ;
   char* buffp;
 
-  if (hp->LastIndex == 0 && hp->FirstIndex == 0) {
+  if (hp->LastIndex == 0 && hp->FirstIndex == 0)
+  {
     buffp = (char*)hp + pwr_AlignLW(sizeof(pwr_sClass_CircBuffHeader));
-    if (hp->ElementSize == 8) {
+    if (hp->ElementSize == 8)
+    {
       unsigned int tv_sec = (unsigned int)t->tv_sec;
       unsigned int tv_nsec = (unsigned int)t->tv_nsec;
       memcpy(buffp, &tv_sec, 4);
       memcpy(buffp + 4, &tv_nsec, 4);
-    } else {
+    }
+    else
+    {
       unsigned int tv_sec = (unsigned int)t->tv_sec;
       memcpy(buffp, &tv_sec, 4);
     }
@@ -121,20 +125,23 @@ void cbuf_AddTimeSample(void* o, pwr_tTime* t)
   first_idx = hp->FirstIndex;
   if (last_idx >= hp->Size)
     last_idx = 0;
-  if (first_idx == last_idx) {
+  if (first_idx == last_idx)
+  {
     first_idx++;
     if (first_idx >= hp->Size)
       first_idx = 0;
   }
   hp->FirstIndex = first_idx;
-  buffp = (char*)hp + pwr_AlignLW(sizeof(pwr_sClass_CircBuffHeader))
-      + last_idx * hp->ElementSize;
-  if (hp->ElementSize == 8) {
+  buffp = (char*)hp + pwr_AlignLW(sizeof(pwr_sClass_CircBuffHeader)) + last_idx * hp->ElementSize;
+  if (hp->ElementSize == 8)
+  {
     unsigned int tv_sec = (unsigned int)t->tv_sec;
     unsigned int tv_nsec = (unsigned int)t->tv_nsec;
     memcpy(buffp, &tv_sec, 4);
     memcpy(buffp + 4, &tv_nsec, 4);
-  } else {
+  }
+  else
+  {
     unsigned int tv_sec = (unsigned int)t->tv_sec;
     memcpy(buffp, &tv_sec, 4);
   }
@@ -158,14 +165,16 @@ pwr_tStatus cbuf_GetCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
 
   gdh_Lock;
 
-  for (j = 0; j < infosize; j++) {
-    while (1) {
-      ap = vol_ArefToAttribute(
-          &sts, &attribute, &info[j].circ_aref, gdb_mLo_global, vol_mTrans_all);
+  for (j = 0; j < infosize; j++)
+  {
+    while (1)
+    {
+      ap = vol_ArefToAttribute(&sts, &attribute, &info[j].circ_aref, gdb_mLo_global, vol_mTrans_all);
       if (ap == NULL || ap->op == NULL)
         break;
 
-      if (ap->op->l.flags.b.isCached) {
+      if (ap->op->l.flags.b.isCached)
+      {
         net_sGetCircBuffer* mp;
         qcom_sPut put;
         gdb_sVolume* vp;
@@ -175,7 +184,8 @@ pwr_tStatus cbuf_GetCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
         gdb_sNode* np;
 
         vp = pool_Address(NULL, gdbroot->pool, ap->op->l.vr);
-        if (vp == NULL) {
+        if (vp == NULL)
+        {
           sts = GDH__NOSUCHOBJ;
           break;
         }
@@ -197,21 +207,22 @@ pwr_tStatus cbuf_GetCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
 
         gdb_Unlock;
 
-        rsp = net_Request(
-            &sts, &tgt, &put, &get, net_eMsg_getCircBufferR, 0, 0);
+        rsp = net_Request(&sts, &tgt, &put, &get, net_eMsg_getCircBufferR, 0, 0);
 
         gdb_Lock;
 
         if (EVEN(sts))
           break;
 
-        if (EVEN(rsp->sts)) {
+        if (EVEN(rsp->sts))
+        {
           sts = rsp->sts;
           net_Free(NULL, rsp);
           break;
         }
 
-        if (cdh_ObjidIsNotEqual(rsp->circ_aref.Objid, info->circ_aref.Objid)) {
+        if (cdh_ObjidIsNotEqual(rsp->circ_aref.Objid, info->circ_aref.Objid))
+        {
           sts = 0;
           break;
         }
@@ -233,12 +244,15 @@ pwr_tStatus cbuf_GetCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
       samples = info[j].samples;
 
       hp = vol_AttributeToAddress(&sts, ap);
-      if (hp != NULL) {
-        if (hp->FirstIndex == hp->LastIndex) {
+      if (hp != NULL)
+      {
+        if (hp->FirstIndex == hp->LastIndex)
+        {
           sts = 0;
           break;
         }
-        if (info[j].resolution <= 1) {
+        if (info[j].resolution <= 1)
+        {
           if (samples > hp->Size)
             samples = hp->Size;
 
@@ -246,32 +260,41 @@ pwr_tStatus cbuf_GetCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
           first_index = hp->FirstIndex;
           last_index = hp->LastIndex;
           start_idx = last_index - samples;
-          if (first_index < last_index) {
+          if (first_index < last_index)
+          {
             if (first_index > start_idx)
               start_idx = first_index;
-          } else {
-            if (start_idx < 0) {
+          }
+          else
+          {
+            if (start_idx < 0)
+            {
               split = 1;
               start_idx = hp->Size + start_idx;
               if (start_idx < first_index)
                 start_idx = first_index;
             }
           }
-          if (split) {
+          if (split)
+          {
             memcpy(info[j].bufp, datap + start_idx * hp->ElementSize,
-                (hp->Size - start_idx) * hp->ElementSize);
-            memcpy(info[j].bufp + (hp->Size - start_idx) * hp->ElementSize,
-                datap, last_index * hp->ElementSize);
+                   (hp->Size - start_idx) * hp->ElementSize);
+            memcpy(info[j].bufp + (hp->Size - start_idx) * hp->ElementSize, datap,
+                   last_index * hp->ElementSize);
             info[j].size = hp->Size - start_idx + last_index;
-          } else {
+          }
+          else
+          {
             memcpy(info[j].bufp, datap + start_idx * hp->ElementSize,
-                (last_index - start_idx) * hp->ElementSize);
+                   (last_index - start_idx) * hp->ElementSize);
             info[j].size = last_index - start_idx;
           }
           info[j].last_idx = last_index;
           info[j].first_idx = first_index;
           info[j].offset = 0;
-        } else {
+        }
+        else
+        {
           /* Resolution > 0 */
           int elements;
           char *dp, *bp;
@@ -291,8 +314,7 @@ pwr_tStatus cbuf_GetCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
             tst_first_idx -= hp->Size;
 
           if (start_idx < tst_first_idx)
-            start_idx += (tst_first_idx - start_idx) / info[j].resolution
-                * info[j].resolution;
+            start_idx += (tst_first_idx - start_idx) / info[j].resolution * info[j].resolution;
 
           elements = (last_index - start_idx) / info[j].resolution + 1;
           info[j].size = elements;
@@ -302,7 +324,8 @@ pwr_tStatus cbuf_GetCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
 
           bp = info[j].bufp;
           idx = start_idx;
-          for (i = 0; i < elements; i++) {
+          for (i = 0; i < elements; i++)
+          {
             dp = datap + idx * hp->ElementSize;
             memcpy(bp, dp, hp->ElementSize);
             // printf( "sp1: %d\n", idx);
@@ -315,7 +338,8 @@ pwr_tStatus cbuf_GetCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
           info[j].first_idx = first_index;
         }
         sts = GDH__SUCCESS;
-      } else
+      }
+      else
         sts = 0;
       break;
     }
@@ -339,17 +363,19 @@ pwr_tStatus cbuf_UpdateCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
 
   memset(&attribute, 0, sizeof(attribute));
 
-  for (j = 0; j < infosize; j++) {
+  for (j = 0; j < infosize; j++)
+  {
     split = 0;
     gdh_Lock;
 
-    while (1) {
-      ap = vol_ArefToAttribute(
-          &sts, &attribute, &info[j].circ_aref, gdb_mLo_global, vol_mTrans_all);
+    while (1)
+    {
+      ap = vol_ArefToAttribute(&sts, &attribute, &info[j].circ_aref, gdb_mLo_global, vol_mTrans_all);
       if (ap == NULL || ap->op == NULL)
         break;
 
-      if (ap->op->l.flags.b.isCached) {
+      if (ap->op->l.flags.b.isCached)
+      {
         net_sUpdateCircBuffer* mp;
         qcom_sPut put;
         gdb_sVolume* vp;
@@ -361,7 +387,8 @@ pwr_tStatus cbuf_UpdateCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
         int offs;
 
         vp = pool_Address(NULL, gdbroot->pool, ap->op->l.vr);
-        if (vp == NULL) {
+        if (vp == NULL)
+        {
           sts = GDH__NOSUCHOBJ;
           break;
         }
@@ -374,7 +401,8 @@ pwr_tStatus cbuf_UpdateCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
         if (mp->info_size > 10)
           mp->info_size = 10;
 
-        for (i = 0; i < infosize; i++) {
+        for (i = 0; i < infosize; i++)
+        {
           mp->circ_aref[i] = info[i].circ_aref;
           mp->resolution[i] = info[i].resolution;
           mp->samples[i] = info[i].samples;
@@ -391,24 +419,25 @@ pwr_tStatus cbuf_UpdateCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
 
         gdb_Unlock;
 
-        rsp = net_Request(
-            &sts, &tgt, &put, &get, net_eMsg_updateCircBufferR, 0, 0);
+        rsp = net_Request(&sts, &tgt, &put, &get, net_eMsg_updateCircBufferR, 0, 0);
 
         gdb_Lock;
 
         if (EVEN(sts))
           break;
 
-        if (EVEN(rsp->sts)) {
+        if (EVEN(rsp->sts))
+        {
           sts = rsp->sts;
           net_Free(NULL, rsp);
           break;
         }
 
         offs = 0;
-        for (i = 0; i < rsp->info_size; i++) {
-          if (cdh_ObjidIsNotEqual(
-                  rsp->circ_aref[i].Objid, info[i].circ_aref.Objid)) {
+        for (i = 0; i < rsp->info_size; i++)
+        {
+          if (cdh_ObjidIsNotEqual(rsp->circ_aref[i].Objid, info[i].circ_aref.Objid))
+          {
             sts = 0;
             break;
           }
@@ -430,49 +459,62 @@ pwr_tStatus cbuf_UpdateCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
       touchObject(ap->op);
 
       hp = vol_AttributeToAddress(&sts, ap);
-      if (hp != NULL) {
-        if (hp->FirstIndex == hp->LastIndex) {
+      if (hp != NULL)
+      {
+        if (hp->FirstIndex == hp->LastIndex)
+        {
           info[j].size = 0;
           break;
         }
-        if (info[j].resolution <= 1) {
+        if (info[j].resolution <= 1)
+        {
           datap = (char*)hp + pwr_AlignLW(sizeof(pwr_sClass_CircBuffHeader));
           first_index = info[j].last_idx;
           last_index = hp->LastIndex;
           start_idx = last_index - info[j].samples;
-	  if (first_index == last_index) {
-	    info[j].last_idx = last_index;
-	    info[j].first_idx = first_index;
-	    info[j].offset = 0;
-	    info[j].size = 0;
-	    break;
-	  }
-          else if (first_index < last_index) {
+          if (first_index == last_index)
+          {
+            info[j].last_idx = last_index;
+            info[j].first_idx = first_index;
+            info[j].offset = 0;
+            info[j].size = 0;
+            break;
+          }
+          else if (first_index < last_index)
+          {
             if (first_index > start_idx)
               start_idx = first_index;
-          } else {
-            if (start_idx < 0) {
+          }
+          else
+          {
+            if (start_idx < 0)
+            {
               split = 1;
               start_idx = hp->Size + start_idx;
               if (start_idx < first_index)
                 start_idx = first_index;
             }
           }
-          if (split) {
+          if (split)
+          {
             memcpy(info[j].bufp, datap + start_idx * hp->ElementSize,
-                (hp->Size - start_idx) * hp->ElementSize);
-            memcpy(info[j].bufp + (hp->Size - start_idx) * hp->ElementSize,
-                datap, last_index * hp->ElementSize);
+                   (hp->Size - start_idx) * hp->ElementSize);
+            memcpy(info[j].bufp + (hp->Size - start_idx) * hp->ElementSize, datap,
+                   last_index * hp->ElementSize);
             info[j].size = hp->Size - start_idx + last_index;
-          } else {
+          }
+          else
+          {
             memcpy(info[j].bufp, datap + start_idx * hp->ElementSize,
-                (last_index - start_idx) * hp->ElementSize);
+                   (last_index - start_idx) * hp->ElementSize);
             info[j].size = last_index - start_idx;
           }
           info[j].last_idx = last_index;
           info[j].first_idx = first_index;
           info[j].offset = 0;
-        } else {
+        }
+        else
+        {
           /* Resolution > 1 */
           int elements;
           char* dp;
@@ -489,13 +531,13 @@ pwr_tStatus cbuf_UpdateCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
             tst_idx += hp->Size;
 
           start_idx = info[j].last_idx + info[j].offset;
-          if (start_idx > tst_idx) {
+          if (start_idx > tst_idx)
+          {
             info[j].size = 0;
             break;
           }
           elements = (tst_idx - start_idx) / info[j].resolution + 1;
-          info[j].offset = info[j].resolution
-              - (tst_idx - start_idx - (elements - 1) * info[j].resolution);
+          info[j].offset = info[j].resolution - (tst_idx - start_idx - (elements - 1) * info[j].resolution);
           if (start_idx >= hp->Size)
             start_idx -= hp->Size;
 
@@ -503,7 +545,8 @@ pwr_tStatus cbuf_UpdateCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
             elements = info[j].samples;
 
           info[j].size = elements;
-          for (i = 0; i < elements; i++) {
+          for (i = 0; i < elements; i++)
+          {
             dp = datap + start_idx * hp->ElementSize;
             memcpy(info[j].bufp + i * hp->ElementSize, dp, hp->ElementSize);
             // printf( "%d idx: %d   %5.2f   el:%d  off:%d  lidx: prev %d curr
@@ -518,7 +561,8 @@ pwr_tStatus cbuf_UpdateCircBuffInfo(cbuf_sCircBuffInfo* info, int infosize)
           info[j].first_idx = first_index;
         }
         sts = GDH__SUCCESS;
-      } else
+      }
+      else
         sts = 0;
       break;
     }
@@ -540,15 +584,12 @@ void cbuf_GetCircBufferMsg(qcom_sGet* get)
   qcom_sPut put;
   cbuf_sCircBuffInfo info;
 
-  gdb_ScopeLock
-  {
-    np = hash_Search(&sts, gdbroot->nid_ht, &mp->hdr.nid);
-  }
+  gdb_ScopeLock { np = hash_Search(&sts, gdbroot->nid_ht, &mp->hdr.nid); }
   gdb_ScopeUnlock;
 
-  if (gdbroot->db->log.b.id) {
-    errh_Info("Sending 'getCircBuffer' to %s (%s)", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0));
+  if (gdbroot->db->log.b.id)
+  {
+    errh_Info("Sending 'getCircBuffer' to %s (%s)", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0));
   }
 
   info.circ_aref = mp->circ_aref;
@@ -565,17 +606,21 @@ void cbuf_GetCircBufferMsg(qcom_sGet* get)
   size = (size + 3) & ~3; /* Size up to nearest multiple of 4.  */
 
   rmp = net_Alloc(&sts, &put, size, net_eMsg_getCircBufferR);
-  if (rmp == NULL) {
+  if (rmp == NULL)
+  {
     errh_Error("Failed to allocate 'getCircBufferR' to %s (%s)", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0));
+               cdh_NodeIdToString(NULL, np->nid, 0, 0));
     return;
   }
 
   rmp->sts = sts;
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rmp->sts = sts;
     rmp->size = 0;
-  } else {
+  }
+  else
+  {
     rmp->sts = sts;
     rmp->circ_aref = info.circ_aref;
     rmp->size = info.size;
@@ -602,23 +647,22 @@ void cbuf_UpdateCircBufferMsg(qcom_sGet* get)
   cbuf_sCircBuffInfo info[10];
   int i, offs;
 
-  gdb_ScopeLock
-  {
-    np = hash_Search(&sts, gdbroot->nid_ht, &mp->hdr.nid);
-  }
+  gdb_ScopeLock { np = hash_Search(&sts, gdbroot->nid_ht, &mp->hdr.nid); }
   gdb_ScopeUnlock;
 
-  if (gdbroot->db->log.b.id) {
-    errh_Info("Sending 'updateCircBuffer' to %s (%s)", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0));
+  if (gdbroot->db->log.b.id)
+  {
+    errh_Info("Sending 'updateCircBuffer' to %s (%s)", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0));
   }
 
-  if (mp->info_size >= 10) {
+  if (mp->info_size >= 10)
+  {
     errh_Error("Parameter size error 'updateCircBufferR' to %s (%s)", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0));
+               cdh_NodeIdToString(NULL, np->nid, 0, 0));
     return;
   }
-  for (i = 0; i < mp->info_size; i++) {
+  for (i = 0; i < mp->info_size; i++)
+  {
     info[i].circ_aref = mp->circ_aref[i];
     info[i].resolution = mp->resolution[i];
     info[i].samples = mp->samples[i];
@@ -630,7 +674,8 @@ void cbuf_UpdateCircBufferMsg(qcom_sGet* get)
   sts = cbuf_UpdateCircBuffInfo(info, mp->info_size);
   if (EVEN(sts))
     size = sizeof(*rmp);
-  else {
+  else
+  {
     total_size = 0;
     for (i = 0; i < mp->info_size; i++)
       total_size += info[i].bufsize;
@@ -639,22 +684,27 @@ void cbuf_UpdateCircBufferMsg(qcom_sGet* get)
   size = (size + 3) & ~3; /* Size up to nearest multiple of 4.  */
 
   rmp = net_Alloc(&sts, &put, size, net_eMsg_updateCircBufferR);
-  if (rmp == NULL) {
+  if (rmp == NULL)
+  {
     errh_Error("Failed to allocate 'updateCircBufferR' to %s (%s)", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0));
+               cdh_NodeIdToString(NULL, np->nid, 0, 0));
     return;
   }
 
   rmp->sts = sts;
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rmp->sts = sts;
     rmp->bsize = 0;
-  } else {
+  }
+  else
+  {
     rmp->sts = sts;
     rmp->info_size = mp->info_size;
     rmp->bsize = total_size;
     offs = 0;
-    for (i = 0; i < mp->info_size; i++) {
+    for (i = 0; i < mp->info_size; i++)
+    {
       rmp->circ_aref[i] = info[i].circ_aref;
       rmp->size[i] = info[i].size;
       rmp->bufsize[i] = info[i].bufsize;

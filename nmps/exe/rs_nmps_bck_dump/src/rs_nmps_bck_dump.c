@@ -35,21 +35,21 @@
  */
 
 /*************************************************************************
-*
-* 	PROGRAM		rs_nmps_bck
-*	SYSTEM		SSAB
-*
-*       Modifierad
-*		960205	Claes Sjöfors	Skapad
-*
-*
-*
-*	Funktion:	Backup av NMpsCell objekt och data objekt.
-*
-*
-*
-**************************************************************************
-**************************************************************************/
+ *
+ * 	PROGRAM		rs_nmps_bck
+ *	SYSTEM		SSAB
+ *
+ *       Modifierad
+ *		960205	Claes Sjöfors	Skapad
+ *
+ *
+ *
+ *	Funktion:	Backup av NMpsCell objekt och data objekt.
+ *
+ *
+ *
+ **************************************************************************
+ **************************************************************************/
 
 #include "pwr_nmpsclasses.h"
 
@@ -57,9 +57,9 @@
 #include "co_string.h"
 #include "co_time.h"
 
+#include "rs_nmps_msg.h"
 #include "rt_gdh_msg.h"
 #include "rt_hash_msg.h"
-#include "rs_nmps_msg.h"
 
 #include "nmps.h"
 
@@ -106,19 +106,19 @@ typedef struct nmpsbck_data_tag {
   pwr_tClassId class;
   int size;
   char data_name[80];
-  char* data_ptr;
+  char *data_ptr;
   gdh_tDlid data_subid;
   unsigned char found;
   unsigned char new;
   unsigned char created;
-  struct nmpsbck_data_tag* next_ptr;
-  struct nmpsbck_data_tag* prev_ptr;
+  struct nmpsbck_data_tag *next_ptr;
+  struct nmpsbck_data_tag *prev_ptr;
 } nmpsbck_t_data_list;
 
 typedef struct {
   pwr_tObjid objid;
   pwr_tClassId class;
-  pwr_sClass_NMpsMirrorCell* cell;
+  pwr_sClass_NMpsMirrorCell *cell;
   gdh_tDlid subid;
   int size;
   int backup_now;
@@ -128,29 +128,27 @@ typedef struct {
   int CellObjectCount;
   int DataObjectCount;
   pwr_tUInt32 LoopCount;
-  pwr_sClass_NMpsBackupConfig* bckconfig;
+  pwr_sClass_NMpsBackupConfig *bckconfig;
   gdh_tDlid bckconfig_dlid;
-  nmpsbck_t_cell_list* cellist;
+  nmpsbck_t_cell_list *cellist;
   int cell_count;
-  nmpsbck_t_data_list* data_list;
+  nmpsbck_t_data_list *data_list;
   int init_done;
-  char* buffer;
+  char *buffer;
   int buffer_size;
   int cellist_size;
-  FILE* bckfile1;
-  FILE* bckfile2;
+  FILE *bckfile1;
+  FILE *bckfile2;
   int file_num;
   int increment;
-} * bck_ctx;
+} *bck_ctx;
 
-static pwr_tUInt32 nmpsbck_fulltimestring(pwr_tTime* time, char* timestr)
-{
+static pwr_tUInt32 nmpsbck_fulltimestring(pwr_tTime *time, char *timestr) {
   return time_AtoAscii(time, time_eFormat_DateAndTime, timestr, 80);
 }
 
-static pwr_tUInt32 nmpsbck_print_recordheader(
-    nmpsbck_t_recordheader* recordheader)
-{
+static pwr_tUInt32
+nmpsbck_print_recordheader(nmpsbck_t_recordheader *recordheader) {
   char timestr[80];
 
   printf("Record header\n");
@@ -160,8 +158,7 @@ static pwr_tUInt32 nmpsbck_print_recordheader(
   return NMPS__SUCCESS;
 }
 
-static pwr_tUInt32 nmpsbck_print_fileheader(nmpsbck_t_fileheader* fileheader)
-{
+static pwr_tUInt32 nmpsbck_print_fileheader(nmpsbck_t_fileheader *fileheader) {
   char timestr[80];
 
   printf("File header\n");
@@ -171,8 +168,7 @@ static pwr_tUInt32 nmpsbck_print_fileheader(nmpsbck_t_fileheader* fileheader)
   return NMPS__SUCCESS;
 }
 
-static pwr_tUInt32 nmpsbck_print_cellheader(nmpsbck_t_cellheader* cellheader)
-{
+static pwr_tUInt32 nmpsbck_print_cellheader(nmpsbck_t_cellheader *cellheader) {
   printf("Cell header\n");
   printf("	type:  %s\n", cellheader->type);
   printf("	objid: %s\n", cdh_ObjidToString(cellheader->objid, 0));
@@ -183,8 +179,7 @@ static pwr_tUInt32 nmpsbck_print_cellheader(nmpsbck_t_cellheader* cellheader)
   return NMPS__SUCCESS;
 }
 
-static pwr_tUInt32 nmpsbck_print_dataheader(nmpsbck_t_dataheader* dataheader)
-{
+static pwr_tUInt32 nmpsbck_print_dataheader(nmpsbck_t_dataheader *dataheader) {
   printf("Data header\n");
   printf("	type:  %s\n", dataheader->type);
   printf("	objid: %s\n", cdh_ObjidToString(dataheader->objid, 0));
@@ -195,8 +190,7 @@ static pwr_tUInt32 nmpsbck_print_dataheader(nmpsbck_t_dataheader* dataheader)
   }
   return NMPS__SUCCESS;
 }
-static int nmpsbck_timecmp(pwr_tTime* time_old, pwr_tTime* time_new)
-{
+static int nmpsbck_timecmp(pwr_tTime *time_old, pwr_tTime *time_new) {
   int sts;
 
   sts = time_Acomp(time_new, time_old);
@@ -205,10 +199,9 @@ static int nmpsbck_timecmp(pwr_tTime* time_old, pwr_tTime* time_new)
   return 1;
 }
 
-int nmpsbck_get_filename(char* inname, char* outname, char* ext)
-{
-  char* s;
-  char* s2;
+int nmpsbck_get_filename(char *inname, char *outname, char *ext) {
+  char *s;
+  char *s2;
 
   strcpy(outname, inname);
 
@@ -234,23 +227,23 @@ int nmpsbck_get_filename(char* inname, char* outname, char* ext)
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_check_file
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Check the consistency of a backup file.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_check_file
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Check the consistency of a backup file.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_check_file(bck_ctx bckctx, FILE* bckfile,
-    int* record_count, unsigned int* record_start, unsigned int* cellarea_start,
-    unsigned int* dataarea_start, pwr_tTime* first_record_time,
-    pwr_tTime* last_record_time, int time_only)
-{
+static pwr_tStatus
+nmpsbck_check_file(bck_ctx bckctx, FILE *bckfile, int *record_count,
+                   unsigned int *record_start, unsigned int *cellarea_start,
+                   unsigned int *dataarea_start, pwr_tTime *first_record_time,
+                   pwr_tTime *last_record_time, int time_only) {
   nmpsbck_t_fileheader fileheader;
   nmpsbck_t_recordheader recordheader;
   nmpsbck_t_recordheader recordheaderend;
@@ -343,37 +336,37 @@ static pwr_tStatus nmpsbck_check_file(bck_ctx bckctx, FILE* bckfile,
       switch (cellheader.class) {
       case pwr_cClass_NMpsCell:
       case pwr_cClass_NMpsStoreCell: {
-        pwr_sClass_NMpsCell* cell_ptr;
-        plc_t_DataInfo* data_block_ptr;
+        pwr_sClass_NMpsCell *cell_ptr;
+        plc_t_DataInfo *data_block_ptr;
 
-        cell_ptr = (pwr_sClass_NMpsCell*)buffer;
-        data_block_ptr = (plc_t_DataInfo*)&cell_ptr->Data1P.Ptr;
+        cell_ptr = (pwr_sClass_NMpsCell *)buffer;
+        data_block_ptr = (plc_t_DataInfo *)&cell_ptr->Data1P.Ptr;
         for (k = 0; k < cell_ptr->LastIndex; k++) {
           /* Check if the objid already is in the data_db */
           printf("         Data%d: %s  %c %c %c\n", k,
-              cdh_ObjidToString(data_block_ptr->DataP.Aref.Objid, 0),
-              data_block_ptr->Data_Front ? 'F' : ' ',
-              data_block_ptr->Data_Back ? 'B' : ' ',
-              data_block_ptr->Data_Select ? 'S' : ' ');
+                 cdh_ObjidToString(data_block_ptr->DataP.Aref.Objid, 0),
+                 data_block_ptr->Data_Front ? 'F' : ' ',
+                 data_block_ptr->Data_Back ? 'B' : ' ',
+                 data_block_ptr->Data_Select ? 'S' : ' ');
           data_block_ptr++;
         }
-        data_block_ptr = (plc_t_DataInfo*)&cell_ptr->DataLP.Ptr;
+        data_block_ptr = (plc_t_DataInfo *)&cell_ptr->DataLP.Ptr;
         printf("         DataL:  %s  %c %c %c\n",
-            cdh_ObjidToString(data_block_ptr->DataP.Aref.Objid, 0),
-            data_block_ptr->Data_Front ? 'F' : ' ',
-            data_block_ptr->Data_Back ? 'B' : ' ',
-            data_block_ptr->Data_Select ? 'S' : ' ');
+               cdh_ObjidToString(data_block_ptr->DataP.Aref.Objid, 0),
+               data_block_ptr->Data_Front ? 'F' : ' ',
+               data_block_ptr->Data_Back ? 'B' : ' ',
+               data_block_ptr->Data_Select ? 'S' : ' ');
         break;
       }
       case pwr_cClass_NMpsMirrorCell: {
-        pwr_sClass_NMpsMirrorCell* cell_ptr;
-        plc_t_DataInfoMirCell* data_block_ptr;
+        pwr_sClass_NMpsMirrorCell *cell_ptr;
+        plc_t_DataInfoMirCell *data_block_ptr;
 
-        cell_ptr = (pwr_sClass_NMpsMirrorCell*)buffer;
-        data_block_ptr = (plc_t_DataInfoMirCell*)&cell_ptr->Data1P.Ptr;
+        cell_ptr = (pwr_sClass_NMpsMirrorCell *)buffer;
+        data_block_ptr = (plc_t_DataInfoMirCell *)&cell_ptr->Data1P.Ptr;
         for (k = 0; k < cell_ptr->LastIndex; k++) {
           printf("         Data%d: %s\n", k,
-              cdh_ObjidToString(data_block_ptr->DataP.Aref.Objid, 0));
+                 cdh_ObjidToString(data_block_ptr->DataP.Aref.Objid, 0));
           data_block_ptr++;
         }
         break;
@@ -440,21 +433,20 @@ static pwr_tStatus nmpsbck_check_file(bck_ctx bckctx, FILE* bckfile,
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_read
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Read the cell objects from backup file.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_read
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Read the cell objects from backup file.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_read(bck_ctx bckctx)
-{
-  FILE* bckfile1;
+static pwr_tStatus nmpsbck_read(bck_ctx bckctx) {
+  FILE *bckfile1;
   pwr_tUInt32 cellarea_start[NMPSBCK_MAX_RECORDS];
   pwr_tUInt32 dataarea_start[NMPSBCK_MAX_RECORDS];
   pwr_tUInt32 record_start[NMPSBCK_MAX_RECORDS];
@@ -467,15 +459,14 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx)
   bckfile1 = fopen(bckctx->bckconfig->BackupFile, "r+");
   if (bckfile1 == NULL)
     bckfile1_sts = NMPS__FILEREAD;
-  bckfile1_sts
-      = nmpsbck_check_file(bckctx, bckfile1, &record_count, record_start,
-          cellarea_start, dataarea_start, &bckfile1_time, &last_record_time, 0);
+  bckfile1_sts = nmpsbck_check_file(
+      bckctx, bckfile1, &record_count, record_start, cellarea_start,
+      dataarea_start, &bckfile1_time, &last_record_time, 0);
   fclose(bckfile1);
   return bckfile1_sts;
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
   bck_ctx bckctx;
   int sts;
   pwr_sClass_NMpsBackupConfig bckconfig;

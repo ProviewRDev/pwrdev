@@ -46,17 +46,20 @@
 
 class WPkg;
 
-typedef enum {
+typedef enum
+{
   wtt_eNoEdit_Save,
   wtt_eNoEdit_Revert,
 } wtt_eNoEditMode;
 
-typedef enum {
+typedef enum
+{
   wtt_eNoEdit_DetachVolume,
   wtt_eNoEdit_KeepVolume,
 } wtt_eNoEditVolMode;
 
-typedef enum {
+typedef enum
+{
   wtt_eInputMode_Attribute,
   wtt_eInputMode_ObjectName
 } wtt_eInputMode;
@@ -64,10 +67,10 @@ typedef enum {
 class wb_build;
 class wb_session;
 
-class WttApplListElem {
+class WttApplListElem
+{
 public:
-  WttApplListElem(wb_eUtility al_type, void* al_ctx, pwr_tObjid al_objid,
-      const char* al_name);
+  WttApplListElem(wb_eUtility al_type, void* al_ctx, pwr_tObjid al_objid, const char* al_name);
   wb_eUtility type;
   void* ctx;
   pwr_tObjid objid;
@@ -75,11 +78,10 @@ public:
   WttApplListElem* next;
 };
 
-class WttApplList {
+class WttApplList
+{
 public:
-  WttApplList() : root(NULL)
-  {
-  }
+  WttApplList() : root(NULL) {}
   ~WttApplList();
 
   WttApplListElem* root;
@@ -91,14 +93,12 @@ public:
   void set_editmode(int editmode, ldh_tSesContext ldhses);
 };
 
-class Wtt : public WUtility {
+class Wtt : public WUtility
+{
 public:
-  Wtt(void* wt_parent_ctx, const char* wt_name, const char* iconname,
-      ldh_tWBContext wt_wbctx, pwr_tVolumeId wt_volid, ldh_tVolume wt_volctx,
-      wnav_sStartMenu* root_menu, pwr_tStatus* status);
-  Wtt() : WUtility(wb_eUtility_Wtt)
-  {
-  }
+  Wtt(void* wt_parent_ctx, const char* wt_name, const char* iconname, ldh_tWBContext wt_wbctx,
+      pwr_tVolumeId wt_volid, ldh_tVolume wt_volctx, wnav_sStartMenu* root_menu, pwr_tStatus* status);
+  Wtt() : WUtility(wb_eUtility_Wtt) {}
 
   void* parent_ctx;
   char name[80];
@@ -232,139 +232,64 @@ public:
   void activate_help_project();
   void activate_help_proview();
 
-  virtual void set_clock_cursor()
+  virtual void set_clock_cursor() {}
+  virtual void reset_cursor() {}
+  virtual void free_cursor() {}
+  virtual void set_window_char(int width, int height) {}
+  virtual void get_window_char(int* width, int* height) {}
+  virtual void menu_setup() {}
+  virtual void set_selection_owner() {}
+  virtual void set_palette_selection_owner() {}
+  virtual int create_popup_menu(pwr_tAttrRef attrref, int x, int y) { return 0; }
+  virtual int create_pal_popup_menu(pwr_tCid cid, int x, int y) { return 0; }
+  virtual void set_noedit_show() {}
+  virtual void set_edit_show() {}
+  virtual void set_twowindows(int two, int display_wnav, int display_wnavnode) {}
+  virtual void message(char severity, const char* message) {}
+  virtual void set_prompt(const char* prompt) {}
+  virtual void open_change_value() {}
+  virtual void close_change_value() {}
+  virtual void open_change_name() {}
+  virtual void watt_new(pwr_tAttrRef aref) {}
+  virtual void wda_new(pwr_tOid oid) {}
+  virtual Ge* ge_new(char* graphname) { return 0; }
+  virtual void wcast_new(pwr_tAttrRef aref, pwr_tStatus* sts) {}
+  virtual wb_build* build_new() { return NULL; }
+  virtual void wpkg_new() {}
+  virtual int ute_new(char* title) { return 0; }
+  virtual void open_input_dialog(const char* text, const char* title, const char* init_text,
+                                 void (*ok_cb)(Wtt*, char*))
   {
   }
-  virtual void reset_cursor()
-  {
-  }
-  virtual void free_cursor()
-  {
-  }
-  virtual void set_window_char(int width, int height)
-  {
-  }
-  virtual void get_window_char(int* width, int* height)
-  {
-  }
-  virtual void menu_setup()
-  {
-  }
-  virtual void set_selection_owner()
-  {
-  }
-  virtual void set_palette_selection_owner()
-  {
-  }
-  virtual int create_popup_menu(pwr_tAttrRef attrref, int x, int y)
-  {
-    return 0;
-  }
-  virtual int create_pal_popup_menu(pwr_tCid cid, int x, int y)
-  {
-    return 0;
-  }
-  virtual void set_noedit_show()
-  {
-  }
-  virtual void set_edit_show()
-  {
-  }
-  virtual void set_twowindows(int two, int display_wnav, int display_wnavnode)
-  {
-  }
-  virtual void message(char severity, const char* message)
-  {
-  }
-  virtual void set_prompt(const char* prompt)
-  {
-  }
-  virtual void open_change_value()
-  {
-  }
-  virtual void close_change_value()
-  {
-  }
-  virtual void open_change_name()
-  {
-  }
-  virtual void watt_new(pwr_tAttrRef aref)
-  {
-  }
-  virtual void wda_new(pwr_tOid oid)
-  {
-  }
-  virtual Ge* ge_new(char* graphname)
-  {
-    return 0;
-  }
-  virtual void wcast_new(pwr_tAttrRef aref, pwr_tStatus* sts)
-  {
-  }
-  virtual wb_build* build_new()
-  {
-    return NULL;
-  }
-  virtual void wpkg_new()
-  {
-  }
-  virtual int ute_new(char* title)
-  {
-    return 0;
-  }
-  virtual void open_input_dialog(const char* text, const char* title,
-      const char* init_text, void (*ok_cb)(Wtt*, char*))
-  {
-  }
-  virtual void open_confirm(const char* text, const char* title,
-      void (*ok_cb)(Wtt*), void (*no_cb)(Wtt*))
-  {
-  }
-  virtual void open_boot_window()
-  {
-  }
-  virtual void update_options_form()
-  {
-  }
-  virtual void set_options()
-  {
-  }
-  virtual void pop()
-  {
-  }
-  virtual void disable_focus()
-  {
-  }
-  virtual void update_title()
-  {
-  }
+  virtual void open_confirm(const char* text, const char* title, void (*ok_cb)(Wtt*), void (*no_cb)(Wtt*)) {}
+  virtual void open_boot_window() {}
+  virtual void update_options_form() {}
+  virtual void set_options() {}
+  virtual void pop() {}
+  virtual void disable_focus() {}
+  virtual void update_title() {}
 
-  static int format_selection(void* ctx, pwr_sAttrRef attrref,
-      char** value_return, int is_class, int is_attr,
-      wnav_eSelectionFormat format);
+  static int format_selection(void* ctx, pwr_sAttrRef attrref, char** value_return, int is_class, int is_attr,
+                              wnav_eSelectionFormat format);
   static int start_wizard(Wtt* wtt, pwr_tCid vcid);
-  static void set_twowindows_cb(
-      void* wtt, int two, int display_w1, int display_w2);
+  static void set_twowindows_cb(void* wtt, int two, int display_w1, int display_w2);
   static pwr_tStatus ldh_this_session_cb(void* ctx, ldh_sEvent* event);
   static pwr_tStatus ldh_other_session_cb(void* ctx, ldh_sEvent* event);
-  static void open_vsel_cb(
-      void* ctx, wb_eType type, char* filename, wow_eFileSelType file_type);
+  static void open_vsel_cb(void* ctx, wb_eType type, char* filename, wow_eFileSelType file_type);
   static void set_window_char_cb(void* ctx, int width, int height);
   static char* script_filename_cb(void* ctx);
   static int traverse_focus(void* ctx, void* component);
-  static int get_global_select_cb(
-      void* ctx, pwr_sAttrRef** sel_list, int** sel_is_attr, int* sel_cnt);
+  static int get_global_select_cb(void* ctx, pwr_sAttrRef** sel_list, int** sel_is_attr, int* sel_cnt);
   static int global_unselect_objid_cb(void* ctx, pwr_tObjid objid);
   static int set_focus_cb(void* ctx, void* comp);
   static void create_popup_menu_cb(void* wtt, pwr_tAttrRef aref, int x, int y);
   static void create_pal_popup_menu_cb(void* wtt, pwr_tCid cid, int x, int y);
   static void gbl_command_cb(void* ctx, const char* cmd);
   static void configure_cb(void* ctx, int edit);
-  static void update_color_theme_cb(void *ctx, int ct);
+  static void update_color_theme_cb(void* ctx, int ct);
   static void findregex_ok(Wtt* wtt, char* search_str);
   static void find_ok(Wtt* wtt, char* search_str);
-  static void file_selected_cb(
-      void* ctx, char* filename, wow_eFileSelType file_type);
+  static void file_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type);
   static void save_cb(void* ctx, int quiet);
   static void revert_ok(Wtt* wtt);
   static void revert_cb(void* ctx, int confirm);

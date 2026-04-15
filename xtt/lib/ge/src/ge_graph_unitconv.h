@@ -39,7 +39,8 @@
 
 /* ge_graph_unitconv.h -- Unit conversions */
 
-typedef enum {
+typedef enum
+{
   graph_eUcEntity_Acceleration,
   graph_eUcEntity_Angle,
   graph_eUcEntity_Area,
@@ -59,13 +60,15 @@ typedef enum {
   graph_eUcEntity_VolumeFlow,
 } graph_eUcEntity;
 
-typedef enum {
+typedef enum
+{
   graph_eUcAcceleration_m_s2,
   graph_eUcAcceleration_ft_s2,
   graph_eUcAcceleration_in_s2,
 } graph_eUcAcceleration;
 
-typedef enum {
+typedef enum
+{
   graph_eUcAngle_rad,
   graph_eUcAngle_degree,
   graph_eUcAngle_min,
@@ -74,7 +77,8 @@ typedef enum {
   graph_eUcAngle_sec
 } graph_eUcAngle;
 
-typedef enum {
+typedef enum
+{
   graph_eUcArea_m2,
   graph_eUcArea_a,
   graph_eUcArea_ac,
@@ -88,13 +92,15 @@ typedef enum {
   graph_eUcArea_sq_yd
 } graph_eUcArea;
 
-typedef enum {
+typedef enum
+{
   graph_eUcEnergy_J,
   graph_eUcEnergy_cal,
   graph_eUcEnergy_kJ,
 } graph_eUcEnergy;
 
-typedef enum {
+typedef enum
+{
   graph_eUcForce_N,
   graph_eUcForce_kN,
   graph_eUcForce_kp,
@@ -102,7 +108,8 @@ typedef enum {
   graph_eUcForce_p,
 } graph_eUcForce;
 
-typedef enum {
+typedef enum
+{
   graph_eUcFrequency_Hz,
   graph_eUcFrequency_kHz,
   graph_eUcFrequency_MHz,
@@ -111,7 +118,8 @@ typedef enum {
   graph_eUcFrequency_RPM,
 } graph_eUcFrecuency;
 
-typedef enum {
+typedef enum
+{
   graph_eUcGeneral_1_1 = 0,
   graph_eUcGeneral_Tera,
   graph_eUcGeneral_Giga,
@@ -127,7 +135,8 @@ typedef enum {
   graph_eUcGeneral_Pico
 } graph_eUcGeneral;
 
-typedef enum {
+typedef enum
+{
   graph_eUcLength_m,
   graph_eUcLength_cm,
   graph_eUcLength_dm,
@@ -142,7 +151,8 @@ typedef enum {
   graph_eUcLength_yd,
 } graph_eUcLength;
 
-typedef enum {
+typedef enum
+{
   graph_eUcMass_kg,
   graph_eUcMass_g,
   graph_eUcMass_hg,
@@ -155,7 +165,8 @@ typedef enum {
   graph_eUcMass_ug,
 } graph_eUcMass;
 
-typedef enum {
+typedef enum
+{
   graph_eUcMassFlow_kg_s,
   graph_eUcMassFlow_g_min,
   graph_eUcMassFlow_g_s,
@@ -168,7 +179,8 @@ typedef enum {
   graph_eUcMassFlow_oz_s,
 } graph_eUcMassFlow;
 
-typedef enum {
+typedef enum
+{
   graph_eUcPower_W,
   graph_eUcPower_GW,
   graph_eUcPower_hp,
@@ -179,7 +191,8 @@ typedef enum {
   graph_eUcPower_TW,
 } graph_eUcPower;
 
-typedef enum {
+typedef enum
+{
   graph_eUcPressure_Pa,
   graph_eUcPressure_atm,
   graph_eUcPressure_b,
@@ -192,7 +205,8 @@ typedef enum {
   graph_eUcPressure_MPa,
 } graph_eUcPressure;
 
-typedef enum {
+typedef enum
+{
   graph_eUcSpeed_m_s = 0,
   graph_eUcSpeed_ft_min,
   graph_eUcSpeed_ft_s,
@@ -207,14 +221,16 @@ typedef enum {
   graph_eUcSpeed_yd_s,
 } graph_eUcSpeed;
 
-typedef enum {
+typedef enum
+{
   graph_eUcTemperature_K,
   graph_eUcTemperature_C,
   graph_eUcTemperature_F,
   graph_eUcTemperature_R
 } graph_eUcTemperature;
 
-typedef enum {
+typedef enum
+{
   graph_eUcTime_s,
   graph_eUcTime_d,
   graph_eUcTime_h,
@@ -226,7 +242,8 @@ typedef enum {
   graph_eUcTime_y,
 } graph_eUcTime;
 
-typedef enum {
+typedef enum
+{
   graph_eUcVolume_m3,
   graph_eUcVolume_cm3,
   graph_eUcVolume_dm3,
@@ -235,7 +252,8 @@ typedef enum {
   graph_eUcVolume_mm3,
 } graph_eUcVolume;
 
-typedef enum {
+typedef enum
+{
   graph_eUcVolumeFlow_m3_s,
   graph_eUcVolumeFlow_cl_s,
   graph_eUcVolumeFlow_in3_min,

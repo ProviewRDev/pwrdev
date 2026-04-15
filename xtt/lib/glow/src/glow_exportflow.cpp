@@ -67,10 +67,8 @@ int GlowExportFlow::export_flow(char* filename)
   fp << int(flow_eSave_NodeClass_nc_name) << FSPACE << nc_name << '\n';
   fp << int(flow_eSave_NodeClass_a) << '\n';
   ctx->a.export_flow(this);
-  fp << int(flow_eSave_NodeClass_group) << FSPACE << int(glow_eNodeGroup_Common)
-     << '\n';
-  fp << int(flow_eSave_NodeClass_no_con_obstacle) << FSPACE
-     << ctx->no_con_obstacle << '\n';
+  fp << int(flow_eSave_NodeClass_group) << FSPACE << int(glow_eNodeGroup_Common) << '\n';
+  fp << int(flow_eSave_NodeClass_no_con_obstacle) << FSPACE << ctx->no_con_obstacle << '\n';
   fp << int(flow_eSave_End) << '\n';
 
   fp.close();
@@ -82,7 +80,8 @@ void GlowExportFlow::array(GlowArray* o)
   int i;
 
   fp << int(flow_eSave_Array) << '\n';
-  for (i = 0; i < o->a_size; i++) {
+  for (i = 0; i < o->a_size; i++)
+  {
     if (o->a[i]->type() != glow_eObjectType_Con)
       o->a[i]->export_flow(this);
   }
@@ -99,8 +98,7 @@ void GlowExportFlow::rect(GrowRect* o)
   fp << int(flow_eSave_Rect) << '\n';
   fp << int(flow_eSave_Rect_draw_type) << FSPACE << int(draw_type) << '\n';
   fp << int(flow_eSave_Rect_line_width) << FSPACE << o->line_width << '\n';
-  fp << int(flow_eSave_Rect_display_level) << FSPACE << int(o->display_level)
-     << '\n';
+  fp << int(flow_eSave_Rect_display_level) << FSPACE << int(o->display_level) << '\n';
   fp << int(flow_eSave_Rect_ll) << '\n';
   point(&o->ll, &o->trf);
   fp << int(flow_eSave_Rect_ur) << '\n';
@@ -129,14 +127,11 @@ void GlowExportFlow::conpoint(GrowConPoint* o)
 {
   fp << int(flow_eSave_ConPoint) << '\n';
   fp << int(flow_eSave_ConPoint_number) << FSPACE << o->number << '\n';
-  fp << int(flow_eSave_ConPoint_direction) << FSPACE << int(o->direction)
-     << '\n';
+  fp << int(flow_eSave_ConPoint_direction) << FSPACE << int(o->direction) << '\n';
   fp << int(flow_eSave_ConPoint_p) << '\n';
   point(&o->p, &o->trf);
-  fp << int(flow_eSave_ConPoint_trace_attribute) << FSPACE << o->trace_attribute
-     << '\n';
-  fp << int(flow_eSave_ConPoint_trace_attr_type) << FSPACE
-     << int(o->trace_attr_type) << '\n';
+  fp << int(flow_eSave_ConPoint_trace_attribute) << FSPACE << o->trace_attribute << '\n';
+  fp << int(flow_eSave_ConPoint_trace_attr_type) << FSPACE << int(o->trace_attr_type) << '\n';
   fp << int(flow_eSave_End) << '\n';
 }
 
@@ -144,7 +139,8 @@ void GlowExportFlow::text(GrowText* o)
 {
   flow_eDrawType draw_type;
 
-  switch (o->draw_type) {
+  switch (o->draw_type)
+  {
   case glow_eDrawType_TextHelveticaBold:
     draw_type = flow_eDrawType_TextRobotoBold;
     break;
@@ -165,7 +161,8 @@ void GlowExportFlow::annot(GrowSubAnnot* o)
 {
   flow_eDrawType draw_type;
 
-  switch (o->draw_type) {
+  switch (o->draw_type)
+  {
   case glow_eDrawType_TextHelveticaBold:
     draw_type = flow_eDrawType_TextRobotoBold;
     break;
@@ -177,12 +174,10 @@ void GlowExportFlow::annot(GrowSubAnnot* o)
   fp << int(flow_eSave_Annot_number) << FSPACE << o->number << '\n';
   fp << int(flow_eSave_Annot_draw_type) << FSPACE << int(draw_type) << '\n';
   fp << int(flow_eSave_Annot_text_size) << FSPACE << o->text_size << '\n';
-  fp << int(flow_eSave_Annot_display_level) << FSPACE << int(o->display_level)
-     << '\n';
+  fp << int(flow_eSave_Annot_display_level) << FSPACE << int(o->display_level) << '\n';
   fp << int(flow_eSave_Annot_p) << '\n';
   point(&o->p, &o->trf);
-  fp << int(flow_eSave_Annot_annot_type) << FSPACE << int(o->annot_type)
-     << '\n';
+  fp << int(flow_eSave_Annot_annot_type) << FSPACE << int(o->annot_type) << '\n';
   fp << int(flow_eSave_End) << '\n';
 }
 

@@ -44,11 +44,11 @@
 #include "cnv_ctx.h"
 #include "cnv_readwbl.h"
 
-class CnvReadSrc {
-  public:
+class CnvReadSrc
+{
+public:
   CnvReadSrc(CnvCtx* cnv_ctx)
-      : ctx(cnv_ctx), state(0), linetype(cread_eLine_No), doc_fresh(0),
-        html_class_open(0)
+      : ctx(cnv_ctx), state(0), linetype(cread_eLine_No), doc_fresh(0), html_class_open(0)
   {
   }
 

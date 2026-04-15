@@ -47,7 +47,8 @@
 #include <QScrollBar>
 #include <QScrollArea>
 
-typedef struct {
+typedef struct
+{
   QWidget* parent;
   QWidget* form;
   QScrollBar* scroll_h;
@@ -56,19 +57,18 @@ typedef struct {
   int scroll_v_managed;
 } widget_sScroll;
 
-class QtScrollWidgetGlow : public QWidget {
+class QtScrollWidgetGlow : public QWidget
+{
   Q_OBJECT
 
 public:
-  void init(unsigned int eCtxType,
-      int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
-      int (*init_proc2)(QWidget* w, GlowCtx* ctx, void* client_data));
-  QWidget* initScroll(unsigned int eCtxType,
-      int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
-      int (*init_proc2)(QWidget* w, GlowCtx* ctx, void* client_data));
+  void init(unsigned int eCtxType, int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
+            int (*init_proc2)(QWidget* w, GlowCtx* ctx, void* client_data));
+  QWidget* initScroll(unsigned int eCtxType, int (*init_proc)(GlowCtx* ctx, void* client_data),
+                      void* client_data, int (*init_proc2)(QWidget* w, GlowCtx* ctx, void* client_data));
   void init(unsigned int eCtxType, QWidget* main);
 
-  bool eventFilter(QObject *object, QEvent *event);
+  bool eventFilter(QObject* object, QEvent* event);
 
   void* parent_ctx;
   GlowDrawQt* draw_ctx;

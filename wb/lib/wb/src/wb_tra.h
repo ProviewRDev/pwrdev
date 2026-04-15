@@ -43,19 +43,17 @@
 
 class WFoe;
 
-int trace_get_attributes(WGre* grectx, vldh_t_node node, char* object_str,
-    char* attr_str, flow_eTraceType* trace_type, int* inverted);
-pwr_tStatus trace_get_attr_con(WGre* grectx, vldh_t_con con,
-    const char* debug_par, char* object_str, char* attr_str,
-    flow_eTraceType* trace_type);
+int trace_get_attributes(WGre* grectx, vldh_t_node node, char* object_str, char* attr_str,
+                         flow_eTraceType* trace_type, int* inverted);
+pwr_tStatus trace_get_attr_con(WGre* grectx, vldh_t_con con, const char* debug_par, char* object_str,
+                               char* attr_str, flow_eTraceType* trace_type);
 
 pwr_tStatus trace_simsetup(WFoe* foectx);
 pwr_tStatus trace_trasetup(WFoe* foectx);
 pwr_tStatus trace_start(WFoe* foectx);
 pwr_tStatus trace_stop(WFoe* foectx);
 
-int trace_create_analyse(
-    WGre* grectx, double x, double y, vldh_t_node source, int source_conpoint);
+int trace_create_analyse(WGre* grectx, double x, double y, vldh_t_node source, int source_conpoint);
 int trace_save(WGre* grectx);
 int trace_restore(WGre* grectx);
 #endif

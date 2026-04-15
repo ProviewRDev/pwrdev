@@ -43,40 +43,29 @@
 
 class CnvToPdf;
 
-class FlowPdf : public FlowPrint {
+class FlowPdf : public FlowPrint
+{
 public:
   FlowPdf(char* filename, void* flow_ctx, int page_border, int* sts);
   ~FlowPdf();
-  int type()
-  {
-    return print_eType_Pdf;
-  }
+  int type() { return print_eType_Pdf; }
   int print_page(double ll_x, double ll_y, double ur_x, double ur_y);
-  int rect(double x, double y, double width, double height, flow_eDrawType type,
-      double idx, int highlight);
-  int filled_rect(double x, double y, double width, double height,
-      flow_eDrawType type, double idx);
-  int triangle(double x, double y, double width, double height,
-      flow_eDrawType type, double idx, int highlight);
-  int filled_triangle(double x, double y, double width, double height,
-      flow_eDrawType type, double idx);
-  int arc(double x, double y, double width, double height, int angel1,
-      int angel2, flow_eDrawType type, double idx, int highlight);
-  int line(double x1, double y1, double x2, double y2, flow_eDrawType type,
-      double idx, int highlight);
-  int text(double x, double y, char* text, int len, flow_eDrawType type,
-      double size, int line);
-  int pixmap(
-      double x, double y, flow_sPixmapDataElem* data, flow_eDrawType type);
-  int arrow(double x1, double y1, double x2, double y2, double x3, double y3,
-      flow_eDrawType type, double idx);
+  int rect(double x, double y, double width, double height, flow_eDrawType type, double idx, int highlight);
+  int filled_rect(double x, double y, double width, double height, flow_eDrawType type, double idx);
+  int triangle(double x, double y, double width, double height, flow_eDrawType type, double idx,
+               int highlight);
+  int filled_triangle(double x, double y, double width, double height, flow_eDrawType type, double idx);
+  int arc(double x, double y, double width, double height, int angel1, int angel2, flow_eDrawType type,
+          double idx, int highlight);
+  int line(double x1, double y1, double x2, double y2, flow_eDrawType type, double idx, int highlight);
+  int text(double x, double y, char* text, int len, flow_eDrawType type, double size, int line);
+  int pixmap(double x, double y, flow_sPixmapDataElem* data, flow_eDrawType type);
+  int arrow(double x1, double y1, double x2, double y2, double x3, double y3, flow_eDrawType type,
+            double idx);
   void move(double x, double y);
   void setlinewidth(double idx);
   void rowbreak();
-  void set_showred(int show)
-  {
-    show_red = show;
-  }
+  void set_showred(int show) { show_red = show; }
   double offset_x;
   double offset_y;
   FILE* file;

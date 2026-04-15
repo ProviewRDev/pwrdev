@@ -39,23 +39,22 @@
 
 #include "glow_growctx.h"
 
-class GlowAnnot : public GlowArrayElem {
+class GlowAnnot : public GlowArrayElem
+{
 public:
   GlowAnnot(GrowCtx* glow_ctx, double x = 0, double y = 0, int annot_num = 0,
-      glow_eDrawType d_type = glow_eDrawType_TextHelveticaBold,
-      glow_eDrawType color_d_type = glow_eDrawType_Line, int t_size = 2,
-      glow_eAnnotType a_type = glow_eAnnotType_OneLine, int rel_pos = 0,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1)
-      : GlowArrayElem(glow_ctx), number(annot_num), p(glow_ctx, x, y), draw_type(d_type),
-        text_size(t_size), annot_type(a_type), relative_pos(rel_pos),
-        display_level(display_lev), color_drawtype(color_d_type),
-        font(glow_eFont_Helvetica), protect(0){}
+            glow_eDrawType d_type = glow_eDrawType_TextHelveticaBold,
+            glow_eDrawType color_d_type = glow_eDrawType_Line, int t_size = 2,
+            glow_eAnnotType a_type = glow_eAnnotType_OneLine, int rel_pos = 0,
+            glow_mDisplayLevel display_lev = glow_mDisplayLevel_1)
+      : GlowArrayElem(glow_ctx), number(annot_num), p(glow_ctx, x, y), draw_type(d_type), text_size(t_size),
+        annot_type(a_type), relative_pos(rel_pos), display_level(display_lev), color_drawtype(color_d_type),
+        font(glow_eFont_Helvetica), protect(0)
+  {
+  }
   void save(std::ofstream& fp, glow_eSaveMode mode);
   void open(std::ifstream& fp);
-  void traverse(int x, int y)
-  {
-    p.traverse(x, y);
-  }
+  void traverse(int x, int y) { p.traverse(x, y); }
 
   int number;
   GlowPoint p;
@@ -69,8 +68,8 @@ public:
   int protect;
 };
 
-void glow_measure_annot_text(GrowCtx* ctx, char* text, glow_eDrawType draw_type,
-    int text_size, glow_eAnnotType annot_type, glow_eFont font, double* width,
-    double* height, int* rows);
+void glow_measure_annot_text(GrowCtx* ctx, char* text, glow_eDrawType draw_type, int text_size,
+                             glow_eAnnotType annot_type, glow_eFont font, double* width, double* height,
+                             int* rows);
 
 #endif

@@ -36,27 +36,15 @@
 
 #include "glow_curveapi.h"
 
-void curve_Zoom(CurveCtx* ctx, double factor)
-{
-  ctx->zoom(factor);
-}
+void curve_Zoom(CurveCtx* ctx, double factor) { ctx->zoom(factor); }
 
-void curve_Unzoom(CurveCtx* ctx)
-{
-  ctx->unzoom();
-}
+void curve_Unzoom(CurveCtx* ctx) { ctx->unzoom(); }
 
-void curve_GetZoom(CurveCtx* ctx, double* factor_x, double* factor_y)
-{
-  ctx->get_zoom(factor_x, factor_y);
-}
+void curve_GetZoom(CurveCtx* ctx, double* factor_x, double* factor_y) { ctx->get_zoom(factor_x, factor_y); }
 
 void curve_GetPreferedZoomY(CurveCtx* ctx, int height, double* factor_y)
 {
   ctx->get_prefered_zoom_y(height, factor_y);
 }
 
-void curve_Scroll(CurveCtx* ctx, double value)
-{
-  ctx->scroll(value);
-}
+void curve_Scroll(CurveCtx* ctx, double value) { ctx->scroll(value); }

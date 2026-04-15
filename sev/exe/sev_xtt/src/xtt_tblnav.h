@@ -49,7 +49,8 @@
 
 class ItemBase;
 
-typedef enum {
+typedef enum
+{
   tblnav_eItemType_Local,
   tblnav_eItemType_LocalAttr,
   tblnav_eItemType_TreeLocal,
@@ -57,13 +58,15 @@ typedef enum {
   tblnav_eItemType_TreeCommand
 } tblnav_eItemType;
 
-typedef enum {
+typedef enum
+{
   tblnav_mOpen_All = ~0,
   tblnav_mOpen_Children = 1 << 0,
   tblnav_mOpen_Attributes = 1 << 1
 } tblnav_mOpen;
 
-class TblNav_sevhistobjectattr {
+class TblNav_sevhistobjectattr
+{
 public:
   pwr_tAName aname;
   pwr_eType type;
@@ -72,7 +75,8 @@ public:
   pwr_tString16 unit;
 };
 
-class TblNav_sevhistobject {
+class TblNav_sevhistobject
+{
 public:
   pwr_tOid oid;
   pwr_tAName oname;
@@ -87,23 +91,24 @@ public:
   std::vector<TblNav_sevhistobjectattr> objectattrlist;
 };
 
-class TblNav_command {
+class TblNav_command
+{
 public:
   pwr_tAName oname;
   pwr_tCmd command;
 };
 
-typedef enum {
+typedef enum
+{
   tblnav_eTreeItemType_No,
   tblnav_eTreeItemType_SevHist,
   tblnav_eTreeItemType_Command
 } tblnav_eTreeItemType;
 
-class TblTreeNode {
+class TblTreeNode
+{
 public:
-  TblTreeNode()
-      : fth(0), fch(0), fws(0), bws(0), type(tblnav_eTreeItemType_No), idx(0),
-        deleted(0)
+  TblTreeNode() : fth(0), fch(0), fws(0), bws(0), type(tblnav_eTreeItemType_No), idx(0), deleted(0)
   {
     strcpy(sname, "");
   }
@@ -118,11 +123,10 @@ public:
 };
 
 //! Class for handling of brow.
-class TblNavBrow {
+class TblNavBrow
+{
 public:
-  TblNavBrow(BrowCtx* brow_ctx, void* xn) : ctx(brow_ctx), tblnav(xn)
-  {
-  }
+  TblNavBrow(BrowCtx* brow_ctx, void* xn) : ctx(brow_ctx), tblnav(xn) {}
   ~TblNavBrow();
 
   BrowCtx* ctx;
@@ -142,10 +146,10 @@ public:
 };
 
 //! The navigation area of the attribute editor.
-class TblNav {
+class TblNav
+{
 public:
-  TblNav(void* xn_parent_ctx, sevcli_sHistItem* xn_itemlist, int xn_item_cnt,
-      pwr_tStatus* status);
+  TblNav(void* xn_parent_ctx, sevcli_sHistItem* xn_itemlist, int xn_item_cnt, pwr_tStatus* status);
   virtual ~TblNav();
 
   void* parent_ctx;
@@ -173,18 +177,16 @@ public:
   void show_tree();
   void show_list();
   void delete_item(TblNav_sevhistobject* hi);
-  void create_objectlist(
-      sevcli_sHistItem* xn_itemlist, int xn_item_cnt, pwr_tStatus* status);
+  void create_objectlist(sevcli_sHistItem* xn_itemlist, int xn_item_cnt, pwr_tStatus* status);
   void add_item_command(char* name, char* command);
 
   virtual void message(char sev, const char* text);
-  virtual void set_inputfocus()
-  {
-  }
+  virtual void set_inputfocus() {}
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
 };
 
-class ItemBase {
+class ItemBase
+{
 public:
   ItemBase(tblnav_eItemType t);
   virtual ~ItemBase();
@@ -193,16 +195,14 @@ public:
 };
 
 //! Item for a normal attribute.
-class ItemLocal : public ItemBase {
+class ItemLocal : public ItemBase
+{
 public:
   //  ItemLocal( TblNav *tblnav, sevcli_sHistItem *item, brow_tNode dest,
   //  flow_eDest dest_code);
-  ItemLocal(TblNav* tblnav, TblNav_sevhistobject* item, brow_tNode dest,
-      flow_eDest dest_code);
+  ItemLocal(TblNav* tblnav, TblNav_sevhistobject* item, brow_tNode dest, flow_eDest dest_code);
 
-  virtual ~ItemLocal()
-  {
-  }
+  virtual ~ItemLocal() {}
 
   //  sevcli_sHistItem 	item;
   TblNav_sevhistobject item;
@@ -212,10 +212,10 @@ public:
   int close(TblNav* tblnav, double x, double y);
 };
 
-class ItemLocalAttr : public ItemBase {
+class ItemLocalAttr : public ItemBase
+{
 public:
-  ItemLocalAttr(TblNav* tblnav, const char* iname, char* ivalue,
-      brow_tNode dest, flow_eDest dest_code);
+  ItemLocalAttr(TblNav* tblnav, const char* iname, char* ivalue, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemLocalAttr();
 
   TblNav_sevhistobject item;
@@ -224,20 +224,20 @@ public:
 };
 
 //! Item for a normal attribute.
-class ItemTreeLocal : public ItemLocal {
+class ItemTreeLocal : public ItemLocal
+{
 public:
-  ItemTreeLocal(TblNav* tblnav, TblNav_sevhistobject* item, int index,
-      brow_tNode dest, flow_eDest dest_code);
+  ItemTreeLocal(TblNav* tblnav, TblNav_sevhistobject* item, int index, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemTreeLocal();
 
   int idx;
 };
 
 //! Item for a normal attribute.
-class ItemTreeNode : public ItemBase {
+class ItemTreeNode : public ItemBase
+{
 public:
-  ItemTreeNode(TblNav* tblnav, char* name, int index, brow_tNode dest,
-      flow_eDest dest_code);
+  ItemTreeNode(TblNav* tblnav, char* name, int index, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemTreeNode();
 
   brow_tNode node;
@@ -248,10 +248,10 @@ public:
 };
 
 //! Item for a command object.
-class ItemTreeCommand : public ItemBase {
+class ItemTreeCommand : public ItemBase
+{
 public:
-  ItemTreeCommand(TblNav* tblnav, TblNav_command* xitem, int index,
-      brow_tNode dest, flow_eDest dest_code);
+  ItemTreeCommand(TblNav* tblnav, TblNav_command* xitem, int index, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemTreeCommand();
 
   TblNav_command item;

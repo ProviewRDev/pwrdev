@@ -44,7 +44,8 @@
 class wb_adrep;
 class wb_bdrep;
 
-class wb_mvrepdbs {
+class wb_mvrepdbs
+{
   pwr_tVid m_vid;
 
 public:

@@ -66,96 +66,61 @@
 Xtt* Xtt::hot_xtt = 0;
 volatile sig_atomic_t g_xtt_exit_process = 0;
 
-xnav_sStartMenu Xtt::alarm_menu[]
-    = { { "Alarm List", xnav_eItemType_Command, menu_ePixmap_List,
-            (void*)"show alarm" },
-        { "Event List", xnav_eItemType_Command, menu_ePixmap_List,
-            (void*)"show event" },
-        { "Blocked Alarms", xnav_eItemType_Command, menu_ePixmap_List,
-            (void*)"show block" },
-        { "Historical List", xnav_eItemType_Command, menu_ePixmap_List,
-            (void*)"show hist" },
-        { "", 0, 0, NULL } };
+xnav_sStartMenu Xtt::alarm_menu[] = {
+    {"Alarm List", xnav_eItemType_Command, menu_ePixmap_List, (void*)"show alarm"},
+    {"Event List", xnav_eItemType_Command, menu_ePixmap_List, (void*)"show event"},
+    {"Blocked Alarms", xnav_eItemType_Command, menu_ePixmap_List, (void*)"show block"},
+    {"Historical List", xnav_eItemType_Command, menu_ePixmap_List, (void*)"show hist"},
+    {"", 0, 0, NULL}};
 
 xnav_sStartMenu Xtt::nethandler_menu[] = {
-  { "Link", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show link" },
-  { "Subscription Client", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show subcli" },
-  { "Subscription Server", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show subsrv" },
-  { "", 0, 0, NULL }
-};
-xnav_sStartMenu Xtt::communication_menu[]
-    = { { "RemNode", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show remnode" },
-        { "RemTrans", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show remtrans" },
-        { "", 0, 0, NULL } };
-xnav_sStartMenu Xtt::logging_menu[]
-    = { { "Logging entry 1", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=1" },
-        { "Logging entry 2", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=2" },
-        { "Logging entry 3", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=3" },
-        { "Logging entry 4", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=4" },
-        { "Logging entry 5", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=5" },
-        { "Logging entry 6", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=6" },
-        { "Logging entry 7", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=7" },
-        { "Logging entry 8", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=8" },
-        { "Logging entry 9", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=9" },
-        { "Logging entry 10", xnav_eItemType_Command, menu_ePixmap_Map,
-            (void*)"show logging/entry=10" },
-        { "", 0, 0, NULL } };
+    {"Link", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show link"},
+    {"Subscription Client", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show subcli"},
+    {"Subscription Server", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show subsrv"},
+    {"", 0, 0, NULL}};
+xnav_sStartMenu Xtt::communication_menu[] = {
+    {"RemNode", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show remnode"},
+    {"RemTrans", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show remtrans"},
+    {"", 0, 0, NULL}};
+xnav_sStartMenu Xtt::logging_menu[] = {
+    {"Logging entry 1", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=1"},
+    {"Logging entry 2", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=2"},
+    {"Logging entry 3", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=3"},
+    {"Logging entry 4", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=4"},
+    {"Logging entry 5", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=5"},
+    {"Logging entry 6", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=6"},
+    {"Logging entry 7", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=7"},
+    {"Logging entry 8", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=8"},
+    {"Logging entry 9", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=9"},
+    {"Logging entry 10", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show logging/entry=10"},
+    {"", 0, 0, NULL}};
 xnav_sStartMenu Xtt::history_menu[] = {
-  { "Items", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show history items" },
-  { "Analyser", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show history analyser" },
-  { "Events", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show history events" },
-  { "", 0, 0, NULL }
-};
-xnav_sStartMenu Xtt::system_menu[] = { { "Nethandler", xnav_eItemType_Menu,
-                                           menu_ePixmap_Map,
-                                           (void*)&Xtt::nethandler_menu },
-  { "Communication", xnav_eItemType_Menu, menu_ePixmap_Map,
-      (void*)&Xtt::communication_menu },
-  { "Device", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show device" },
-  { "PlcThread", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show plcthread" },
-  { "PlcPgm", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show plcpgm" },
-  { "Logging", xnav_eItemType_Menu, menu_ePixmap_Map,
-      (void*)&Xtt::logging_menu },
-  { "System Messages", xnav_eItemType_Command, menu_ePixmap_List,
-      (void*)"open consolelog" },
-  { "System Status", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show nodeinfo" },
-  { "Nodes", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show nodeobjects" },
-  { "Volumes", xnav_eItemType_Command, menu_ePixmap_Map,
-      (void*)"show volumes" },
-  { "History", xnav_eItemType_Menu, menu_ePixmap_Map,
-      (void*)&Xtt::history_menu },
-  { "", 0, 0, NULL } };
-xnav_sStartMenu Xtt::root_menu[] = { { "Database", xnav_eItemType_Command,
-                                         menu_ePixmap_Map,
-                                         (void*)"show database" },
-  { "Alarm", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&Xtt::alarm_menu },
-  { "Store", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show file" },
-  { "System", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&Xtt::system_menu },
-  { "Close", xnav_eItemType_Command, menu_ePixmap_Leaf, (void*)"exit" },
-  { "", 0, 0, NULL } };
+    {"Items", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show history items"},
+    {"Analyser", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show history analyser"},
+    {"Events", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show history events"},
+    {"", 0, 0, NULL}};
+xnav_sStartMenu Xtt::system_menu[] = {
+    {"Nethandler", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&Xtt::nethandler_menu},
+    {"Communication", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&Xtt::communication_menu},
+    {"Device", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show device"},
+    {"PlcThread", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show plcthread"},
+    {"PlcPgm", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show plcpgm"},
+    {"Logging", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&Xtt::logging_menu},
+    {"System Messages", xnav_eItemType_Command, menu_ePixmap_List, (void*)"open consolelog"},
+    {"System Status", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show nodeinfo"},
+    {"Nodes", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show nodeobjects"},
+    {"Volumes", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show volumes"},
+    {"History", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&Xtt::history_menu},
+    {"", 0, 0, NULL}};
+xnav_sStartMenu Xtt::root_menu[] = {
+    {"Database", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show database"},
+    {"Alarm", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&Xtt::alarm_menu},
+    {"Store", xnav_eItemType_Command, menu_ePixmap_Map, (void*)"show file"},
+    {"System", xnav_eItemType_Menu, menu_ePixmap_Map, (void*)&Xtt::system_menu},
+    {"Close", xnav_eItemType_Command, menu_ePixmap_Leaf, (void*)"exit"},
+    {"", 0, 0, NULL}};
 
-void signal_handler(int signal)
-{
-  g_xtt_exit_process = 1;
-}
+void signal_handler(int signal) { g_xtt_exit_process = 1; }
 
 static void usage()
 {
@@ -190,7 +155,8 @@ void Xtt::hotkey_activate_toggledig(char* namep)
     strcat(name, ".ActualValue");
 
   sts = gdh_GetObjectInfo(name, &value, sizeof(value));
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("rt_xtt hotkey: ToggleDig. Can't get %s\n", name);
     return;
   }
@@ -231,7 +197,7 @@ void Xtt::hotkey_activate_resetdig(char* namep)
     printf("rt_xtt hotkey: SetDig. Can't get %s\n", name);
 }
 
-void Xtt::hotkey_activate_setvalue(char* namep, char *valuep)
+void Xtt::hotkey_activate_setvalue(char* namep, char* valuep)
 {
   pwr_tAName name;
   pwr_tStatus sts;
@@ -244,13 +210,15 @@ void Xtt::hotkey_activate_setvalue(char* namep, char *valuep)
     strcat(name, ".ActualValue");
 
   sts = gdh_GetAttributeCharacteristics(name, &tid, &size, 0, 0);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("rt_xtt hotkey: SetValue. Can't get %s\n", name);
     return;
   }
 
-  sts = gdh_AttrStringToValue(tid, valuep, value, sizeof(value), size); 
-  if (EVEN(sts)) {
+  sts = gdh_AttrStringToValue(tid, valuep, value, sizeof(value), size);
+  if (EVEN(sts))
+  {
     printf("rt_xtt hotkey: SetValue. Can't convert value %s\n", name);
     return;
   }
@@ -260,10 +228,7 @@ void Xtt::hotkey_activate_setvalue(char* namep, char *valuep)
     printf("rt_xtt hotkey: SetValue. Can't get %s\n", name);
 }
 
-void Xtt::open_URL_cb(void* ctx, char* url)
-{
-  xnav_open_URL(url);
-}
+void Xtt::open_URL_cb(void* ctx, char* url) { xnav_open_URL(url); }
 
 void Xtt::qcom_events(void* data)
 {
@@ -273,22 +238,29 @@ void Xtt::qcom_events(void* data)
   static int swap = 0;
   pwr_tStatus sts = 1;
 
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &xtt->queid, &get, 0);
-    if (!(sts == QCOM__TMO || sts == QCOM__QEMPTY)) {
+    if (!(sts == QCOM__TMO || sts == QCOM__QEMPTY))
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop && !swap) {
+      if (new_event.b.oldPlcStop && !swap)
+      {
         swap = 1;
         xtt->xnav->swap(0);
-      } else if (new_event.b.swapDone && swap) {
+      }
+      else if (new_event.b.swapDone && swap)
+      {
         swap = 0;
         xtt->xnav->swap(1);
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         delete xtt->xnav;
         exit(0);
       }
@@ -315,10 +287,7 @@ void Xtt::find_ok(Xtt* xtt, char* search_str)
     xtt->message('E', xtt->xnav->get_message(sts));
 }
 
-void Xtt::xtt_message_cb(void* ctx, char severity, const char* msg)
-{
-  ((Xtt*)ctx)->message(severity, msg);
-}
+void Xtt::xtt_message_cb(void* ctx, char severity, const char* msg) { ((Xtt*)ctx)->message(severity, msg); }
 
 void Xtt::close_ok(void* ctx, void* data)
 {
@@ -345,20 +314,13 @@ void Xtt::selection_changed(void* ctx)
 //
 //  Callbackfunctions from menu entries
 //
-void Xtt::activate_print()
-{
-  print();
-}
+void Xtt::activate_print() { print(); }
 
-void Xtt::activate_find()
-{
-  open_input_dialog("Search string", "Find object", "", &find_ok);
-}
+void Xtt::activate_find() { open_input_dialog("Search string", "Find object", "", &find_ok); }
 
 void Xtt::activate_findregex()
 {
-  open_input_dialog(
-      "Search string", "Find regular expression", "", &findregex_ok);
+  open_input_dialog("Search string", "Find regular expression", "", &findregex_ok);
 }
 
 void Xtt::activate_findnext()
@@ -370,10 +332,7 @@ void Xtt::activate_findnext()
     message('E', xnav->get_message(sts));
 }
 
-void Xtt::activate_collapse()
-{
-  xnav->brow_push_all();
-}
+void Xtt::activate_collapse() { xnav->brow_push_all(); }
 
 void Xtt::activate_openobject()
 {
@@ -386,10 +345,7 @@ void Xtt::activate_openobject()
     xnav->open_object(&attrref);
 }
 
-void Xtt::activate_openplc()
-{
-  xnav->start_trace_selected();
-}
+void Xtt::activate_openplc() { xnav->start_trace_selected(); }
 
 void Xtt::activate_opengraph()
 {
@@ -403,9 +359,11 @@ void Xtt::activate_opengraph()
   char cmd[1080];
 
   sts = xnav->get_select(&attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     // If collect brow open collect graph
-    if (xnav->brow->ctx == xnav->collect_brow->ctx) {
+    if (xnav->brow->ctx == xnav->collect_brow->ctx)
+    {
       sprintf(cmd, "open graph /collect");
       xnav->command(cmd);
     }
@@ -416,8 +374,7 @@ void Xtt::activate_opengraph()
   if (EVEN(sts))
     return;
 
-  sts = gdh_AttrrefToName(
-      &attrref, vname, sizeof(vname), cdh_mName_volumeStrict);
+  sts = gdh_AttrrefToName(&attrref, vname, sizeof(vname), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return;
 
@@ -425,8 +382,10 @@ void Xtt::activate_opengraph()
   if (EVEN(sts))
     return;
 
-  if (cdh_tidIsCid(classid)) {
-    switch (classid) {
+  if (cdh_tidIsCid(classid))
+  {
+    switch (classid)
+    {
     case pwr_cClass_PlantHier:
       // Open default graph
       sprintf(cmd, "call meth /meth=Graph /object=%s", vname);
@@ -464,7 +423,8 @@ void Xtt::activate_opengraph()
       sprintf(cmd, "open history /name=%s /title=\"%s\"", vname, name);
       xnav->command(cmd);
       return;
-    case pwr_cClass_PlotGroup: {
+    case pwr_cClass_PlotGroup:
+    {
 #if 0
       pwr_tAName aname;
       pwr_tAttrRef yo;
@@ -510,8 +470,11 @@ void Xtt::activate_opengraph()
       xnav->command(cmd);
       return;
     }
-  } else {
-    switch (classid) {
+  }
+  else
+  {
+    switch (classid)
+    {
     case pwr_eType_Float32:
       sprintf(filename, "pwr_exe:pwr_t_float32.pwg");
       break;
@@ -602,36 +565,26 @@ void Xtt::activate_method(char* method, char* filter)
     menu_type = xmenu_eItemType_Attribute;
 
   if (ODD(sts))
-    xnav->call_method(
-        method, filter, aref, menu_type, xmenu_mUtility_XNav, xnav->priv, 0);
+    xnav->call_method(method, filter, aref, menu_type, xmenu_mUtility_XNav, xnav->priv, 0);
 }
 
-void Xtt::activate_help()
-{
-  CoXHelp::dhelp("overview", "", navh_eHelpFile_Base, NULL, 0);
-}
+void Xtt::activate_help() { CoXHelp::dhelp("overview", "", navh_eHelpFile_Base, NULL, 0); }
 
-void Xtt::activate_help_project()
-{
-  CoXHelp::dhelp("index", "", navh_eHelpFile_Project, NULL, 0);
-}
+void Xtt::activate_help_project() { CoXHelp::dhelp("index", "", navh_eHelpFile_Project, NULL, 0); }
 
 void Xtt::activate_help_navigator()
 {
-  CoXHelp::dhelp(
-      "opg_navigator", "", navh_eHelpFile_Other, "$pwr_lang/man_opg.dat", 0);
+  CoXHelp::dhelp("opg_navigator", "", navh_eHelpFile_Other, "$pwr_lang/man_opg.dat", 0);
 }
 
 void Xtt::activate_help_proview()
 {
-  CoXHelp::dhelp(
-      "version", "", navh_eHelpFile_Other, "$pwr_load/xtt_version_help.dat", 0);
+  CoXHelp::dhelp("version", "", navh_eHelpFile_Other, "$pwr_load/xtt_version_help.dat", 0);
 }
 
 Xtt::Xtt(int* argc, char** argv[], int* return_sts)
-    : root_item(0), input_open(0), command_open(0), india_ok_cb(0),
-      queid(qcom_cNQid), quiet(0), attach_audio(0), select_opplace(0),
-      op_close_button(0), no_advanceduser(0), network_optimized(0)
+    : root_item(0), input_open(0), command_open(0), india_ok_cb(0), queid(qcom_cNQid), quiet(0),
+      attach_audio(0), select_opplace(0), op_close_button(0), no_advanceduser(0), network_optimized(0)
 {
   pwr_tStatus sts;
   int i;
@@ -644,8 +597,9 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
   pwr_sClass_OpPlace* opp = NULL;
   static char display[80];
   static char display_opt[20] = "--display";
-  
-  if (*argc > 1 && streq((*argv)[1], "-m")) {
+
+  if (*argc > 1 && streq((*argv)[1], "-m"))
+  {
     XNav::print_methods();
     exit(0);
   }
@@ -659,40 +613,46 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
   errh_Init("rt_xtt", errh_eNAnix);
 
   sts = gdh_Init("rt_xtt");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("rt_xtt was unable to initialize a full (gdh) connection to ProviewR. Is it running?\n");
     *return_sts = sts;
     return;
   }
 
-  if (!qcom_Init(&sts, 0, "rt_xtt")) {
-    printf("rt_xtt was unable to initialize a qcom connection to ProviewR. Is it running?\n");    
+  if (!qcom_Init(&sts, 0, "rt_xtt"))
+  {
+    printf("rt_xtt was unable to initialize a qcom connection to ProviewR. Is it running?\n");
     *return_sts = sts;
     return;
   }
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, &queid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, &queid, &qAttr, "events"))
+  {
     *return_sts = sts;
     return;
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, &queid, &qini)) {
+  if (!qcom_Bind(&sts, &queid, &qini))
+  {
     *return_sts = sts;
     return;
   }
 
   // Set language
   pwr_tClassId op_class;
-  for (i = 1; i < *argc; i++) {
-    if ((*argv)[i][0] == '-') {
+  for (i = 1; i < *argc; i++)
+  {
+    if ((*argv)[i][0] == '-')
+    {
       int i_incr = 0;
-      for (int j = 1; (*argv)[i][j] != 0 && (*argv)[i][j] != ' '
-           && (*argv)[i][j] != '	';
-           j++) {
-        switch ((*argv)[i][j]) {
+      for (int j = 1; (*argv)[i][j] != 0 && (*argv)[i][j] != ' ' && (*argv)[i][j] != '	'; j++)
+      {
+        switch ((*argv)[i][j])
+        {
         case 'q':
           quiet = 1;
           break;
@@ -703,8 +663,8 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
           select_opplace = 1;
           break;
         case 'g':
-          if (i + 1 >= *argc
-              || !((*argv)[i][j + 1] == ' ' || (*argv)[i][j + 1] != '	')) {
+          if (i + 1 >= *argc || !((*argv)[i][j + 1] == ' ' || (*argv)[i][j + 1] != '	'))
+          {
             usage();
             exit(0);
           }
@@ -725,8 +685,8 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
           network_optimized = 1;
           break;
         case 'l':
-          if (i + 1 >= *argc
-              || !((*argv)[i][j + 1] == ' ' || (*argv)[i][j + 1] != '	')) {
+          if (i + 1 >= *argc || !((*argv)[i][j + 1] == ' ' || (*argv)[i][j + 1] != '	'))
+          {
             usage();
             exit(0);
           }
@@ -734,9 +694,10 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
           i++;
           i_incr = 1;
           break;
-        case 'u': {
-          if (i + 1 >= *argc
-              || !((*argv)[i][j + 1] == ' ' || (*argv)[i][j + 1] != '	')) {
+        case 'u':
+        {
+          if (i + 1 >= *argc || !((*argv)[i][j + 1] == ' ' || (*argv)[i][j + 1] != '	'))
+          {
             usage();
             exit(0);
           }
@@ -745,18 +706,19 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
           strcpy(opplace_str, (*argv)[i + 1]);
 
           sts = gdh_GetClassList(pwr_cClass_OpPlace, &op_objid);
-          while (ODD(sts)) {
-            sts = gdh_ObjidToName(
-                op_objid, oname, sizeof(oname), cdh_mName_object);
-            if (ODD(sts) && str_NoCaseStrcmp(oname, opplace_str) == 0) {
-              sts = gdh_ObjidToName(op_objid, opplace_str, sizeof(opplace_str),
-                  cdh_mName_volumeStrict);
+          while (ODD(sts))
+          {
+            sts = gdh_ObjidToName(op_objid, oname, sizeof(oname), cdh_mName_object);
+            if (ODD(sts) && str_NoCaseStrcmp(oname, opplace_str) == 0)
+            {
+              sts = gdh_ObjidToName(op_objid, opplace_str, sizeof(opplace_str), cdh_mName_volumeStrict);
               opplace_found = 1;
               break;
             }
             sts = gdh_GetNextObject(op_objid, &op_objid);
           }
-          if (!opplace_found) {
+          if (!opplace_found)
+          {
             printf("** Unable to find opplace\n");
             exit(sts);
           }
@@ -766,11 +728,14 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
         }
         case '-':
           // Possible arg to gtk
-          if (streq((*argv)[i], "--display")) {
+          if (streq((*argv)[i], "--display"))
+          {
             // Gtk arg with parameter
             i++;
             i_incr = 1;
-          } else if (streq((*argv)[i], "--sync")) {
+          }
+          else if (streq((*argv)[i], "--sync"))
+          {
             // Gtk arg without parameter
             i_incr = 1;
           }
@@ -782,32 +747,39 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
         if (i_incr)
           break;
       }
-    } else {
+    }
+    else
+    {
       // Opplace argument
       strcpy(opplace_str, (*argv)[i]);
 
-      if (strchr(opplace_str, '-') == 0) {
+      if (strchr(opplace_str, '-') == 0)
+      {
         char oname[80];
 
         sts = gdh_GetClassList(pwr_cClass_OpPlace, &op_objid);
-        while (ODD(sts)) {
-          sts = gdh_ObjidToName(
-              op_objid, oname, sizeof(oname), cdh_mName_object);
-          if (ODD(sts) && str_NoCaseStrcmp(oname, opplace_str) == 0) {
-            sts = gdh_ObjidToName(op_objid, opplace_str, sizeof(opplace_str),
-                cdh_mName_volumeStrict);
+        while (ODD(sts))
+        {
+          sts = gdh_ObjidToName(op_objid, oname, sizeof(oname), cdh_mName_object);
+          if (ODD(sts) && str_NoCaseStrcmp(oname, opplace_str) == 0)
+          {
+            sts = gdh_ObjidToName(op_objid, opplace_str, sizeof(opplace_str), cdh_mName_volumeStrict);
             opplace_found = 1;
             break;
           }
           sts = gdh_GetNextObject(op_objid, &op_objid);
         }
-        if (!opplace_found) {
+        if (!opplace_found)
+        {
           printf("** Unable to find opplace\n");
           exit(sts);
         }
-      } else {
+      }
+      else
+      {
         sts = gdh_NameToObjid(opplace_str, &op_objid);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           printf("** Unable to find opplace\n");
           exit(sts);
         }
@@ -816,7 +788,8 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
         if (EVEN(sts))
           exit(sts);
 
-        if (op_class != pwr_cClass_OpPlace) {
+        if (op_class != pwr_cClass_OpPlace)
+        {
           printf("** Error in opplace object class\n");
           exit(sts);
         }
@@ -828,38 +801,41 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
   if (network_optimized)
     XttMethodToolbar::disable();
 
-  if (select_opplace) {
+  if (select_opplace)
+  {
     // Check if there is only one single opplace
     pwr_tOName fullname;
     pwr_tStatus sts;
     pwr_tOid oid;
 
     int i = 0;
-    for (sts = gdh_GetClassList(pwr_cClass_OpPlace, &oid); ODD(sts);
-         sts = gdh_GetNextObject(oid, &oid)) {
-      sts = gdh_ObjidToName(
-          oid, fullname, sizeof(fullname), cdh_mName_volumeStrict);
+    for (sts = gdh_GetClassList(pwr_cClass_OpPlace, &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+    {
+      sts = gdh_ObjidToName(oid, fullname, sizeof(fullname), cdh_mName_volumeStrict);
       if (EVEN(sts))
         continue;
 
       i++;
     }
-    if (i == 1) {
+    if (i == 1)
+    {
       strcpy(opplace_str, fullname);
       opplace_found = 1;
     }
   }
-  if (!opplace_found) {
+  if (!opplace_found)
+  {
     // Look for default opplace
     pwr_tOid oid;
     pwr_tOName name;
 
-    for (sts = gdh_GetClassList(pwr_cClass_OpPlace, &oid); ODD(sts);
-         sts = gdh_GetNextObject(oid, &oid)) {
+    for (sts = gdh_GetClassList(pwr_cClass_OpPlace, &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+    {
       pwr_sClass_OpPlace* opp;
 
       sts = gdh_ObjidToPointer(oid, (void**)&opp);
-      if (ODD(sts) && opp->IsDefaultOp) {
+      if (ODD(sts) && opp->IsDefaultOp)
+      {
         sts = gdh_ObjidToName(oid, name, sizeof(name), cdh_mName_volumeStrict);
         if (EVEN(sts))
           exit(sts);
@@ -870,12 +846,14 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
         break;
       }
     }
-    if (default_opplace) {
+    if (default_opplace)
+    {
       sts = gdh_NameToPointer(opplace_str, (void**)&opp);
       if (EVEN(sts))
         exit(sts);
 
-      if (streq(opp->UserName, "")) {
+      if (streq(opp->UserName, ""))
+      {
         // Ignore
         printf("** No UserName supplied in default opplace, ignored\n");
         strcpy(opplace_str, "");
@@ -885,14 +863,16 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
     }
   }
 
-  if (opplace_found) {
+  if (opplace_found)
+  {
     char opsys_user[40];
 
     sts = gdh_NameToPointer(opplace_str, (void**)&opp);
     if (EVEN(sts))
       exit(sts);
 
-    if (!streq(opp->DedicatedOpsysUser, "")) {
+    if (!streq(opp->DedicatedOpsysUser, ""))
+    {
       int duser_cnt;
       char duser_array[10][40];
       int found = 0;
@@ -901,31 +881,39 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
       if (EVEN(sts))
         exit(sts);
 
-      duser_cnt = dcli_parse(opp->DedicatedOpsysUser, ",", "",
-          (char*)duser_array, sizeof(duser_array) / sizeof(duser_array[0]),
-          sizeof(duser_array[0]), 0);
+      duser_cnt = dcli_parse(opp->DedicatedOpsysUser, ",", "", (char*)duser_array,
+                             sizeof(duser_array) / sizeof(duser_array[0]), sizeof(duser_array[0]), 0);
 
-      for (int i = 0; i < duser_cnt; i++) {
+      for (int i = 0; i < duser_cnt; i++)
+      {
         str_trim(duser_array[i], duser_array[i]);
-        if (streq(duser_array[i], opsys_user)) {
+        if (streq(duser_array[i], opsys_user))
+        {
           found = 1;
           break;
         }
       }
-      if (!found) {
-        if (!default_opplace) {
+      if (!found)
+      {
+        if (!default_opplace)
+        {
           printf("Operator place is dedicated for another user\n");
           exit(0);
-        } else {
+        }
+        else
+        {
           strcpy(opplace_str, "");
           opplace_found = 0;
         }
       }
     }
   }
-  if (opplace_found) {
-    if (streq(language, "")) {
-      switch (opp->Language) {
+  if (opplace_found)
+  {
+    if (streq(language, ""))
+    {
+      switch (opp->Language)
+      {
       case pwr_eLanguageEnum_Swedish:
         strcpy(language, "sv_se");
         break;
@@ -939,7 +927,8 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
         strcpy(language, "");
       }
     }
-    if (!streq(opp->Display, "")) {
+    if (!streq(opp->Display, ""))
+    {
       strncpy(display, opp->Display, sizeof(display));
       char** argv1 = (char**)calloc(*argc + 3, sizeof(*argv1));
       for (int i = 0; i < *argc; i++)
@@ -971,30 +960,20 @@ Xtt::Xtt(int* argc, char** argv[], int* return_sts)
     Lng::set(language);
 }
 
-Xtt::~Xtt()
+Xtt::~Xtt() {}
+
+void Xtt::message(char severity, const char* msg) {}
+
+void Xtt::open_input_dialog(const char* text, const char* title, const char* init_text,
+                            void (*ok_cb)(Xtt*, char*))
 {
 }
 
-void Xtt::message(char severity, const char* msg)
-{
-}
+void Xtt::set_prompt(const char* prompt) {}
 
-void Xtt::open_input_dialog(const char* text, const char* title,
-    const char* init_text, void (*ok_cb)(Xtt*, char*))
-{
-}
+void Xtt::open_change_value() {}
 
-void Xtt::set_prompt(const char* prompt)
-{
-}
-
-void Xtt::open_change_value()
-{
-}
-
-void Xtt::print()
-{
-}
+void Xtt::print() {}
 
 void Xtt::opplace_selected_cb(void* ctx, char* text, int ok_pressed)
 {
@@ -1020,13 +999,12 @@ void Xtt::list_opplace()
   gdh_GetRootVolume(&root_vid);
 
   int i = 0;
-  for (sts = gdh_GetClassList(pwr_cClass_OpPlace, &oid); ODD(sts);
-       sts = gdh_GetNextObject(oid, &oid)) {
+  for (sts = gdh_GetClassList(pwr_cClass_OpPlace, &oid); ODD(sts); sts = gdh_GetNextObject(oid, &oid))
+  {
     if (oid.vid == root_vid)
       sts = gdh_ObjidToName(oid, texts[i], sizeof(texts[0]), cdh_mNName);
     else
-      sts = gdh_ObjidToName(
-          oid, texts[i], sizeof(texts[0]), cdh_mName_volumeStrict);
+      sts = gdh_ObjidToName(oid, texts[i], sizeof(texts[0]), cdh_mName_volumeStrict);
     if (EVEN(sts))
       continue;
 
@@ -1036,12 +1014,14 @@ void Xtt::list_opplace()
   }
   strcpy(texts[i], "");
 
-  if (i == 0) {
+  if (i == 0)
+  {
     printf("No opplace objects found\n");
     exit(0);
   }
 
-  if (i == 1) {
+  if (i == 1)
+  {
     // Only one opplace found, open it
     pwr_tCmd cmd;
 
@@ -1049,10 +1029,10 @@ void Xtt::list_opplace()
     if (op_close_button)
       strcat(cmd, " /closebutton");
     xnav->command(cmd);
-  } else
+  }
+  else
     // Select oplace from list
-    wow->CreateList("Select Operator Place", (char*)texts, sizeof(pwr_tOName),
-        opplace_selected_cb, 0, this);
+    wow->CreateList("Select Operator Place", (char*)texts, sizeof(pwr_tOName), opplace_selected_cb, 0, this);
 }
 
 int Xtt::xnav_get_select(void* ctx, pwr_tAttrRef* attrref, int* is_attr)

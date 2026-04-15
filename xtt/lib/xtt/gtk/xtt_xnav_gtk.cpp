@@ -83,15 +83,13 @@ typedef void* Widget;
 //
 // Create the navigator widget
 //
-XNavGtk::XNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-    const char* xn_name, GtkWidget** w, xnav_sStartMenu* root_menu,
-    char* xn_opplace_name, int xn_op_close_button, pwr_tStatus* status)
-    : XNav(xn_parent_ctx, xn_name, root_menu, xn_opplace_name,
-          xn_op_close_button, status),
+XNavGtk::XNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name, GtkWidget** w,
+                 xnav_sStartMenu* root_menu, char* xn_opplace_name, int xn_op_close_button,
+                 pwr_tStatus* status)
+    : XNav(xn_parent_ctx, xn_name, root_menu, xn_opplace_name, xn_op_close_button, status),
       parent_wid(xn_parent_wid), clock_cursor(0)
 {
-  form_widget
-      = scrolledbrowwidgetgtk_new(init_brow_base_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetgtk_new(init_brow_base_cb, this, &brow_widget);
 
   gtk_widget_set_name(brow_widget, "rtnavigator");
   gtk_widget_show_all(brow_widget);
@@ -123,14 +121,16 @@ XNavGtk::~XNavGtk()
   delete autoack_timerid;
   delete trace_timerid;
 
-  if (mcp) {
+  if (mcp)
+  {
     free(mcp);
     mcp = 0;
   }
   menu_tree_free();
   delete (ItemMenu*)root_item;
 
-  for (int i = 0; i < brow_cnt; i++) {
+  for (int i = 0; i < brow_cnt; i++)
+  {
     brow_stack[i]->free_pixmaps();
     if (i != 0)
       brow_DeleteSecondaryCtx(brow_stack[i]->ctx);
@@ -147,13 +147,14 @@ XNavGtk::~XNavGtk()
 
 void XNavGtk::set_inputfocus()
 {
-  if (displayed) {
+  if (displayed)
+  {
     gtk_widget_grab_focus(brow_widget);
   }
 }
 
-void XNavGtk::create_popup_menu(pwr_sAttrRef attrref, xmenu_eItemType item_type,
-    xmenu_mUtility caller, unsigned int priv, char* arg, int x, int y)
+void XNavGtk::create_popup_menu(pwr_sAttrRef attrref, xmenu_eItemType item_type, xmenu_mUtility caller,
+                                unsigned int priv, char* arg, int x, int y)
 {
   int x1, y1;
 
@@ -169,7 +170,8 @@ void XNavGtk::pop()
   GtkWidget *parent, *top = NULL;
 
   parent = gtk_widget_get_parent(form_widget);
-  while (parent) {
+  while (parent)
+  {
     top = parent;
     parent = gtk_widget_get_parent(parent);
   }
@@ -180,24 +182,21 @@ void XNavGtk::pop()
 void XNavGtk::set_clock_cursor()
 {
   if (!clock_cursor)
-    clock_cursor = gdk_cursor_new_for_display(
-        gtk_widget_get_display(form_widget), GDK_WATCH);
+    clock_cursor = gdk_cursor_new_for_display(gtk_widget_get_display(form_widget), GDK_WATCH);
 
   gdk_window_set_cursor(gtk_widget_get_window(form_widget), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(form_widget));
 }
 
-void XNavGtk::reset_cursor()
-{
-  gdk_window_set_cursor(gtk_widget_get_window(form_widget), NULL);
-}
+void XNavGtk::reset_cursor() { gdk_window_set_cursor(gtk_widget_get_window(form_widget), NULL); }
 
 void XNavGtk::set_transient(void* basewidget)
 {
   GtkWidget *parent, *top = NULL;
 
   parent = gtk_widget_get_parent(form_widget);
-  while (parent) {
+  while (parent)
+  {
     top = parent;
     parent = gtk_widget_get_parent(parent);
   }
@@ -219,21 +218,18 @@ XCrr* XNavGtk::xcrr_new(pwr_tAttrRef* arp, int advanced_user, pwr_tStatus* sts)
   return new XCrrGtk(form_widget, this, arp, advanced_user, sts);
 }
 
-XColWind* XNavGtk::xcolwind_new(pwr_tAttrRef* ar_list, char* title,
-    int advanced_user, int type, pwr_tStatus* sts)
+XColWind* XNavGtk::xcolwind_new(pwr_tAttrRef* ar_list, char* title, int advanced_user, int type,
+                                pwr_tStatus* sts)
 {
-  return new XColWindGtk(form_widget, this, ar_list, title, advanced_user,
-      (xcolwind_eType)type, sts);
+  return new XColWindGtk(form_widget, this, ar_list, title, advanced_user, (xcolwind_eType)type, sts);
 }
 
-Ev* XNavGtk::ev_new(char* eve_name, char* ala_name, char* blk_name,
-    pwr_tObjid ev_user, int display_ala, int display_eve, int display_blk,
-    int display_return, int display_ack, int ev_beep, pwr_tMask ev_pop_mask,
-    int ev_eventname_seg, pwr_tStatus* status)
+Ev* XNavGtk::ev_new(char* eve_name, char* ala_name, char* blk_name, pwr_tObjid ev_user, int display_ala,
+                    int display_eve, int display_blk, int display_return, int display_ack, int ev_beep,
+                    pwr_tMask ev_pop_mask, int ev_eventname_seg, pwr_tStatus* status)
 {
-  return new EvGtk(this, parent_wid, eve_name, ala_name, blk_name, ev_user,
-      display_ala, display_eve, display_blk, display_return, display_ack,
-      ev_beep, ev_pop_mask, ev_eventname_seg, status);
+  return new EvGtk(this, parent_wid, eve_name, ala_name, blk_name, ev_user, display_ala, display_eve,
+                   display_blk, display_return, display_ack, ev_beep, ev_pop_mask, ev_eventname_seg, status);
 }
 
 Hist* XNavGtk::hist_new(char* title, pwr_tAttrRef* arp, pwr_tStatus* sts)
@@ -241,70 +237,59 @@ Hist* XNavGtk::hist_new(char* title, pwr_tAttrRef* arp, pwr_tStatus* sts)
   return new HistGtk(this, parent_wid, title, arp, sts);
 }
 
-Block* XNavGtk::block_new(
-    pwr_tAttrRef* arp, char* name, unsigned int priv, pwr_tStatus* sts)
+Block* XNavGtk::block_new(pwr_tAttrRef* arp, char* name, unsigned int priv, pwr_tStatus* sts)
 {
   return new BlockGtk(this, parent_wid, arp, name, priv, sts);
 }
 
-Op* XNavGtk::op_new(char* opplace, pwr_tStatus* sts)
-{
-  return new OpGtk(this, parent_wid, opplace, sts);
-}
+Op* XNavGtk::op_new(char* opplace, pwr_tStatus* sts) { return new OpGtk(this, parent_wid, opplace, sts); }
 
-XttTrend* XNavGtk::xtttrend_new(char* name, pwr_tAttrRef* objar,
-    pwr_tAttrRef* plotgroup, int width, int height, unsigned int options,
-    int color_theme, void* basewidget, pwr_tStatus* sts)
+XttTrend* XNavGtk::xtttrend_new(char* name, pwr_tAttrRef* objar, pwr_tAttrRef* plotgroup, int width,
+                                int height, unsigned int options, int color_theme, void* basewidget,
+                                pwr_tStatus* sts)
 {
   GtkWidget* w;
 
-  return new XttTrendGtk(this, parent_wid, name, &w, objar, plotgroup, width,
-      height, options, color_theme, basewidget, sts);
+  return new XttTrendGtk(this, parent_wid, name, &w, objar, plotgroup, width, height, options, color_theme,
+                         basewidget, sts);
 }
 
-XttSevHist* XNavGtk::xttsevhist_new(char* name, pwr_tOid* oidv,
-    pwr_tOName* anamev, pwr_tOName* onamev, bool* sevhistobjectv,
-    sevcli_tCtx scctx, char* filename, int width, int height,
-    unsigned int options, int color_theme, time_ePeriod time_range,
-    void* basewidget, pwr_tStatus* sts)
+XttSevHist* XNavGtk::xttsevhist_new(char* name, pwr_tOid* oidv, pwr_tOName* anamev, pwr_tOName* onamev,
+                                    bool* sevhistobjectv, sevcli_tCtx scctx, char* filename, int width,
+                                    int height, unsigned int options, int color_theme,
+                                    time_ePeriod time_range, void* basewidget, pwr_tStatus* sts)
 {
   GtkWidget* w;
 
   if (!filename)
-    return new XttSevHistGtk(this, parent_wid, name, &w, oidv, anamev, onamev,
-        sevhistobjectv, scctx, width, height, options, color_theme, time_range,
-        basewidget, sts);
+    return new XttSevHistGtk(this, parent_wid, name, &w, oidv, anamev, onamev, sevhistobjectv, scctx, width,
+                             height, options, color_theme, time_range, basewidget, sts);
   else
-    return new XttSevHistGtk(
-        this, parent_wid, name, &w, filename, color_theme, basewidget, sts);
+    return new XttSevHistGtk(this, parent_wid, name, &w, filename, color_theme, basewidget, sts);
 }
 
-XttTCurve* XNavGtk::xtttcurve_new(char* name, pwr_tAttrRef* arefv, int width,
-    int height, unsigned int options, int color_theme, void* basewidget,
-    pwr_tStatus* sts)
+XttTCurve* XNavGtk::xtttcurve_new(char* name, pwr_tAttrRef* arefv, int width, int height,
+                                  unsigned int options, int color_theme, void* basewidget, pwr_tStatus* sts)
 {
   GtkWidget* w;
 
-  return new XttTCurveGtk(this, parent_wid, name, &w, arefv, width, height,
-      options, color_theme, basewidget, sts);
+  return new XttTCurveGtk(this, parent_wid, name, &w, arefv, width, height, options, color_theme, basewidget,
+                          sts);
 }
 
-XttFast* XNavGtk::xttfast_new(char* name, pwr_tAttrRef* objar, int width,
-    int height, unsigned int options, char* filename, int color_theme,
-    void* basewidget, pwr_tStatus* sts)
+XttFast* XNavGtk::xttfast_new(char* name, pwr_tAttrRef* objar, int width, int height, unsigned int options,
+                              char* filename, int color_theme, void* basewidget, pwr_tStatus* sts)
 {
   GtkWidget* w;
 
   if (!filename)
-    return new XttFastGtk(this, parent_wid, name, &w, objar, width, height,
-        options, color_theme, basewidget, sts);
+    return new XttFastGtk(this, parent_wid, name, &w, objar, width, height, options, color_theme, basewidget,
+                          sts);
   else
-    return new XttFastGtk(
-        this, parent_wid, name, &w, filename, color_theme, basewidget, sts);
+    return new XttFastGtk(this, parent_wid, name, &w, filename, color_theme, basewidget, sts);
 }
 
-XAttOne* XNavGtk::xattone_new(
-    pwr_tAttrRef* objar, char* title, unsigned int priv, pwr_tStatus* sts)
+XAttOne* XNavGtk::xattone_new(pwr_tAttrRef* objar, char* title, unsigned int priv, pwr_tStatus* sts)
 {
   return new XAttOneGtk(parent_wid, this, objar, title, priv, sts);
 }
@@ -314,89 +299,78 @@ CLog* XNavGtk::clog_new(const char* name, pwr_tStatus* sts)
   return new CLogGtk(this, parent_wid, name, sts);
 }
 
-XttOTree* XNavGtk::tree_new(const char* title, pwr_tAttrRef* itemlist,
-    int itemcnt, unsigned int options,
-    pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
+XttOTree* XNavGtk::tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt, unsigned int options,
+                            pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
 {
-  return new XttOTreeGtk(
-      parent_wid, this, title, itemlist, itemcnt, options, action_cb);
+  return new XttOTreeGtk(parent_wid, this, title, itemlist, itemcnt, options, action_cb);
 }
 
-XttGe* XNavGtk::xnav_ge_new(const char* name, const char* filename,
-    int scrollbar, int menu, int navigator, int width, int height, int x, int y,
-    double scan_time, const char* object_name, int use_default_access,
-    unsigned int access, unsigned int options, void* basewidget,
-    double* borders, int color_theme, int dashboard,
-    int (*command_cb)(void*, char*, char*, char *, void*),
-    int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-    int (*is_authorized_cb)(void*, unsigned int),
-    void (*keyboard_cb)(void*, void*, int, int))
+XttGe* XNavGtk::xnav_ge_new(const char* name, const char* filename, int scrollbar, int menu, int navigator,
+                            int width, int height, int x, int y, double scan_time, const char* object_name,
+                            int use_default_access, unsigned int access, unsigned int options,
+                            void* basewidget, double* borders, int color_theme, int dashboard,
+                            int (*command_cb)(void*, char*, char*, char*, void*),
+                            int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+                            int (*is_authorized_cb)(void*, unsigned int),
+                            void (*keyboard_cb)(void*, void*, int, int))
 {
-  return new XttGeGtk(parent_wid, this, name, filename, scrollbar, menu,
-      navigator, width, height, x, y, scan_time, object_name,
-      use_default_access, access, options, basewidget, borders, color_theme,
-      dashboard, command_cb, get_current_objects_cb, is_authorized_cb, keyboard_cb);
+  return new XttGeGtk(parent_wid, this, name, filename, scrollbar, menu, navigator, width, height, x, y,
+                      scan_time, object_name, use_default_access, access, options, basewidget, borders,
+                      color_theme, dashboard, command_cb, get_current_objects_cb, is_authorized_cb,
+                      keyboard_cb);
 }
 
-XttMultiView* XNavGtk::multiview_new(const char* name, pwr_tAttrRef* aref,
-    int width, int height, int x, int y, unsigned int options, void* basewidget,
-    int color_theme, pwr_tStatus* sts,
-    int (*command_cb)(void*, char*, char*, char *, void*),
-    int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-    int (*is_authorized_cb)(void*, unsigned int),
-    void (*keyboard_cb)(void*, void*, int, int))
+XttMultiView* XNavGtk::multiview_new(const char* name, pwr_tAttrRef* aref, int width, int height, int x,
+                                     int y, unsigned int options, void* basewidget, int color_theme,
+                                     pwr_tStatus* sts, int (*command_cb)(void*, char*, char*, char*, void*),
+                                     int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+                                     int (*is_authorized_cb)(void*, unsigned int),
+                                     void (*keyboard_cb)(void*, void*, int, int))
 {
-  return new XttMultiViewGtk(parent_wid, this, name, aref, width, height, x, y,
-      options, basewidget, color_theme, sts, command_cb, get_current_objects_cb,
-      is_authorized_cb, keyboard_cb);
+  return new XttMultiViewGtk(parent_wid, this, name, aref, width, height, x, y, options, basewidget,
+                             color_theme, sts, command_cb, get_current_objects_cb, is_authorized_cb,
+                             keyboard_cb);
 }
 
-XttStream* XNavGtk::stream_new(const char* name, const char* uri, int width,
-    int height, int x, int y, double scan_time, unsigned int options,
-    int embedded, pwr_tAttrRef* arp, pwr_tStatus* sts)
+XttStream* XNavGtk::stream_new(const char* name, const char* uri, int width, int height, int x, int y,
+                               double scan_time, unsigned int options, int embedded, pwr_tAttrRef* arp,
+                               pwr_tStatus* sts)
 {
-  return new XttStreamGtk(parent_wid, this, name, uri, width, height, x, y,
-      scan_time, options, embedded, arp, sts);
+  return new XttStreamGtk(parent_wid, this, name, uri, width, height, x, y, scan_time, options, embedded, arp,
+                          sts);
 }
 
-GeCurve* XNavGtk::gecurve_new(char* name, char* filename, GeCurveData* data,
-    int pos_right, unsigned int options, int color_theme, void* basewidget)
+GeCurve* XNavGtk::gecurve_new(char* name, char* filename, GeCurveData* data, int pos_right,
+                              unsigned int options, int color_theme, void* basewidget)
 {
-  return new GeCurveGtk(this, parent_wid, name, filename, data, pos_right, 0, 0,
-      options, color_theme, basewidget);
+  return new GeCurveGtk(this, parent_wid, name, filename, data, pos_right, 0, 0, options, color_theme,
+                        basewidget);
 }
 
-XttFileview* XNavGtk::fileview_new(pwr_tOid oid, char* title, char* dir,
-    char* pattern, int type, char* target_attr, char* trigger_attr,
-    char* filetype)
+XttFileview* XNavGtk::fileview_new(pwr_tOid oid, char* title, char* dir, char* pattern, int type,
+                                   char* target_attr, char* trigger_attr, char* filetype)
 {
-  return new XttFileviewGtk(this, parent_wid, oid, title, dir, pattern, type,
-      target_attr, trigger_attr, filetype);
+  return new XttFileviewGtk(this, parent_wid, oid, title, dir, pattern, type, target_attr, trigger_attr,
+                            filetype);
 }
 
-CoLogin* XNavGtk::login_new(const char* name, const char* groupname,
-    void (*bc_success)(void*), void (*bc_cancel)(void*), void* basewidget,
-    pwr_tStatus* status)
+CoLogin* XNavGtk::login_new(const char* name, const char* groupname, void (*bc_success)(void*),
+                            void (*bc_cancel)(void*), void* basewidget, pwr_tStatus* status)
 {
-  return new CoLoginGtk(this, parent_wid, name, groupname, bc_success,
-      bc_cancel, basewidget, status);
+  return new CoLoginGtk(this, parent_wid, name, groupname, bc_success, bc_cancel, basewidget, status);
 }
 
-XttKeyboard* XNavGtk::keyboard_new(const char* name, keyboard_eKeymap keymap,
-    keyboard_eType type, int color_theme, pwr_tStatus* sts)
+XttKeyboard* XNavGtk::keyboard_new(const char* name, keyboard_eKeymap keymap, keyboard_eType type,
+                                   int color_theme, pwr_tStatus* sts)
 {
   GtkWidget* w;
-  return new XttKeyboardGtk(
-      this, parent_wid, name, &w, keymap, type, color_theme, sts);
+  return new XttKeyboardGtk(this, parent_wid, name, &w, keymap, type, color_theme, sts);
 }
 
-void XNavGtk::bell(int time)
-{
-  gdk_display_beep(gtk_widget_get_display(brow_widget));
-}
+void XNavGtk::bell(int time) { gdk_display_beep(gtk_widget_get_display(brow_widget)); }
 
-void XNavGtk::get_popup_menu(pwr_sAttrRef attrref, xmenu_eItemType item_type,
-    xmenu_mUtility caller, unsigned int priv, char* arg, int x, int y)
+void XNavGtk::get_popup_menu(pwr_sAttrRef attrref, xmenu_eItemType item_type, xmenu_mUtility caller,
+                             unsigned int priv, char* arg, int x, int y)
 {
   int i;
   GtkWidget* popup;
@@ -404,8 +378,8 @@ void XNavGtk::get_popup_menu(pwr_sAttrRef attrref, xmenu_eItemType item_type,
   get_popup_menu_items(attrref, item_type, caller, priv, arg);
 
   i = 0;
-  popup = build_menu(parent_wid, MENU_POPUP, "", mcp, popup_button_cb,
-      (void*)this, (xmenu_sMenuItem*)mcp->ItemList, &i);
+  popup = build_menu(parent_wid, MENU_POPUP, "", mcp, popup_button_cb, (void*)this,
+                     (xmenu_sMenuItem*)mcp->ItemList, &i);
   if (!popup)
     return;
 
@@ -421,8 +395,7 @@ void XNavGtk::get_popup_menu(pwr_sAttrRef attrref, xmenu_eItemType item_type,
   gtk_menu_popup_at_pointer(GTK_MENU(popup), &ev);
 }
 
-void XNavGtk::menu_position_func(
-    GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data)
+void XNavGtk::menu_position_func(GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data)
 {
   XNavGtk* xnav = (XNavGtk*)data;
 
@@ -431,10 +404,9 @@ void XNavGtk::menu_position_func(
   *push_in = FALSE;
 }
 
-GtkWidget* XNavGtk::build_menu(GtkWidget* Parent, int MenuType,
-    const char* MenuTitle, void* MenuUserData,
-    void (*Callback)(GtkWidget*, gpointer), void* CallbackData,
-    xmenu_sMenuItem* Items, int* idx)
+GtkWidget* XNavGtk::build_menu(GtkWidget* Parent, int MenuType, const char* MenuTitle, void* MenuUserData,
+                               void (*Callback)(GtkWidget*, gpointer), void* CallbackData,
+                               xmenu_sMenuItem* Items, int* idx)
 {
   GtkWidget *Menu, *W;
   int i;
@@ -445,28 +417,33 @@ GtkWidget* XNavGtk::build_menu(GtkWidget* Parent, int MenuType,
 
   Level = Items[*idx].Level;
 
-  for (; Items[*idx].Level != 0 && Items[*idx].Level >= Level; (*idx)++) {
-    switch (Items[*idx].Item) {
-    case xmenu_eMenuItem_Ref: {
-      if (MenuType == MENU_OPTION) {
+  for (; Items[*idx].Level != 0 && Items[*idx].Level >= Level; (*idx)++)
+  {
+    switch (Items[*idx].Item)
+    {
+    case xmenu_eMenuItem_Ref:
+    {
+      if (MenuType == MENU_OPTION)
+      {
         printf("You can't have submenus from option menu items.");
         return NULL;
       }
 
       i = *idx;
-      GtkWidget* sub = gtk_menu_item_new_with_label(
-          CoWowGtk::translate_utf8(Items[*idx].Name));
+      GtkWidget* sub = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8(Items[*idx].Name));
       (*idx)++;
-      W = build_menu(Menu, MENU_PULLDOWN, Lng::translate(Items[i].Name),
-          MenuUserData, Callback, CallbackData, Items, idx);
+      W = build_menu(Menu, MENU_PULLDOWN, Lng::translate(Items[i].Name), MenuUserData, Callback, CallbackData,
+                     Items, idx);
       (*idx)--;
       gtk_menu_item_set_submenu(GTK_MENU_ITEM(sub), GTK_WIDGET(W));
       gtk_menu_shell_append(GTK_MENU_SHELL(Menu), sub);
       gtk_widget_show(sub);
       break;
     }
-    case xmenu_eMenuItem_Cascade: {
-      if (MenuType == MENU_OPTION) {
+    case xmenu_eMenuItem_Cascade:
+    {
+      if (MenuType == MENU_OPTION)
+      {
         printf("You can't have submenus from option menu items.");
         return NULL;
       }
@@ -475,27 +452,28 @@ GtkWidget* XNavGtk::build_menu(GtkWidget* Parent, int MenuType,
       int found = 0;
       unsigned int cascade_level = Items[*idx].Level;
       int cidx;
-      for (cidx = *idx + 1;
-           Items[cidx].Level != 0 && Items[cidx].Level > cascade_level;
-           cidx++) {
-        if (Items[cidx].Item == xmenu_eMenuItem_Ref
-            || Items[cidx].Item == xmenu_eMenuItem_Button) {
+      for (cidx = *idx + 1; Items[cidx].Level != 0 && Items[cidx].Level > cascade_level; cidx++)
+      {
+        if (Items[cidx].Item == xmenu_eMenuItem_Ref || Items[cidx].Item == xmenu_eMenuItem_Button)
+        {
           found = 1;
           break;
         }
       }
-      if (found) {
+      if (found)
+      {
         i = *idx;
-        GtkWidget* sub = gtk_menu_item_new_with_label(
-            CoWowGtk::translate_utf8(Items[*idx].Name));
+        GtkWidget* sub = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8(Items[*idx].Name));
         (*idx)++;
-        W = build_menu(Menu, MENU_PULLDOWN, Lng::translate(Items[i].Name),
-            MenuUserData, Callback, CallbackData, Items, idx);
+        W = build_menu(Menu, MENU_PULLDOWN, Lng::translate(Items[i].Name), MenuUserData, Callback,
+                       CallbackData, Items, idx);
         (*idx)--;
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(sub), GTK_WIDGET(W));
         gtk_menu_shell_append(GTK_MENU_SHELL(Menu), sub);
         gtk_widget_show(sub);
-      } else {
+      }
+      else
+      {
         *idx = cidx - 1;
       }
       break;
@@ -508,8 +486,7 @@ GtkWidget* XNavGtk::build_menu(GtkWidget* Parent, int MenuType,
       break;
     case xmenu_eMenuItem_Button:
       // Pushbutton
-      W = gtk_menu_item_new_with_label(
-          CoWowGtk::translate_utf8(Items[*idx].Name));
+      W = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8(Items[*idx].Name));
       gtk_widget_set_sensitive(W, Items[*idx].Flags.f.Sensitive);
       g_object_set_data((GObject*)W, "userdata", (gpointer)((long int)*idx));
       if (Callback)
@@ -556,15 +533,16 @@ int XNavGtk::confirm_dialog(char* title, char* text)
 {
   dialog_ok = 0;
   dialog_cancel = 0;
-  wow->DisplayQuestion(
-      this, title, text, xnav_confirm_dialog_ok, xnav_confirm_dialog_cancel, 0);
+  wow->DisplayQuestion(this, title, text, xnav_confirm_dialog_ok, xnav_confirm_dialog_cancel, 0);
 
   gtk_main();
 
-  if (dialog_ok) {
+  if (dialog_ok)
+  {
     return 1;
   }
-  if (dialog_cancel) {
+  if (dialog_cancel)
+  {
     return 0;
   }
   return 0;

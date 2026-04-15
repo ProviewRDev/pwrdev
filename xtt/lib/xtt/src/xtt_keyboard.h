@@ -42,11 +42,11 @@
 #include "glow_keyboardapi.h"
 #include "glow_keyboardctx.h"
 
-class XttKeyboard {
+class XttKeyboard
+{
 public:
-  XttKeyboard(void* xn_parent_ctx, const char* xn_name,
-      keyboard_eKeymap xn_keymap, keyboard_eType type, int xn_color_theme,
-      pwr_tStatus* status);
+  XttKeyboard(void* xn_parent_ctx, const char* xn_name, keyboard_eKeymap xn_keymap, keyboard_eType type,
+              int xn_color_theme, pwr_tStatus* status);
   virtual ~XttKeyboard();
 
   void* parent_ctx;
@@ -58,15 +58,9 @@ public:
   void (*key_pressed_cb)(void*, int ascii);
   void (*close_cb)(void*);
 
-  virtual void set_inputfocus()
-  {
-  }
-  virtual void pop()
-  {
-  }
-  virtual void set_transient(void* basewidget)
-  {
-  }
+  virtual void set_inputfocus() {}
+  virtual void pop() {}
+  virtual void set_transient(void* basewidget) {}
 
   void update_color_theme(int ct);
   void set_shift(int shift);

@@ -41,7 +41,8 @@
 
 class pkg_node;
 
-class pkg_file {
+class pkg_file
+{
   friend class pkg_node;
 
 private:
@@ -52,21 +53,13 @@ private:
 
 public:
   pkg_file(char* source, char* target);
-  char* source()
-  {
-    return m_source;
-  }
-  char* target()
-  {
-    return m_target;
-  }
-  pwr_tTime date()
-  {
-    return m_date;
-  }
+  char* source() { return m_source; }
+  char* target() { return m_target; }
+  pwr_tTime date() { return m_date; }
 };
 
-class pkg_pattern {
+class pkg_pattern
+{
   friend class pkg_node;
 
 private:
@@ -80,26 +73,15 @@ public:
   pkg_pattern(const char* source, const char* target, char severity = 'W');
   pkg_pattern(const char* source);
   pkg_pattern(const pkg_pattern& x);
-  char* source()
-  {
-    return m_source;
-  }
-  char* target()
-  {
-    return m_target;
-  }
-  bool hasTarget()
-  {
-    return m_target[0] != 0;
-  }
+  char* source() { return m_source; }
+  char* target() { return m_target; }
+  bool hasTarget() { return m_target[0] != 0; }
   void fetchFiles();
-  void node(pkg_node* node)
-  {
-    m_node = node;
-  }
+  void node(pkg_node* node) { m_node = node; }
 };
 
-class pkg_volume {
+class pkg_volume
+{
   friend class pkg_node;
 
 private:
@@ -113,7 +95,8 @@ public:
   pkg_volume(char* name, char* filename, pwr_tVid vid, pwr_tTime time);
 };
 
-class pkg_depnode {
+class pkg_depnode
+{
   friend class pkg_node;
 
 private:
@@ -124,7 +107,8 @@ public:
   pkg_depnode(char* nodename, char* project);
 };
 
-class pkg_node {
+class pkg_node
+{
 private:
   std::vector<pkg_pattern> m_pattern;
   std::vector<pkg_file> m_filelist;
@@ -145,79 +129,37 @@ private:
 
 public:
   pkg_node(char* name);
-  pkg_node(char* name, pwr_mOpSys opsys, int bus, pwr_tMask dstatus,
-      char* bootnode, char* custom_platform);
-  char* name()
-  {
-    return m_name;
-  }
-  pwr_mOpSys opsys()
-  {
-    return m_opsys;
-  }
-  int bus()
-  {
-    return m_bus;
-  }
-  pwr_tMask dstatus()
-  {
-    return m_dstatus;
-  }
-  char* bootnode()
-  {
-    return m_bootnode;
-  }
-  char* customPlatform()
-  {
-    return m_custom_platform;
-  }
-  bool valid()
-  {
-    return m_valid;
-  }
-  void setOpsys(pwr_mOpSys opsys)
-  {
-    m_opsys = opsys;
-  }
-  void setBus(int bus)
-  {
-    m_bus = bus;
-  }
-  void setDStatus(pwr_tMask dstatus)
-  {
-    m_dstatus = dstatus;
-  }
+  pkg_node(char* name, pwr_mOpSys opsys, int bus, pwr_tMask dstatus, char* bootnode, char* custom_platform);
+  char* name() { return m_name; }
+  pwr_mOpSys opsys() { return m_opsys; }
+  int bus() { return m_bus; }
+  pwr_tMask dstatus() { return m_dstatus; }
+  char* bootnode() { return m_bootnode; }
+  char* customPlatform() { return m_custom_platform; }
+  bool valid() { return m_valid; }
+  void setOpsys(pwr_mOpSys opsys) { m_opsys = opsys; }
+  void setBus(int bus) { m_bus = bus; }
+  void setDStatus(pwr_tMask dstatus) { m_dstatus = dstatus; }
   void setBootnode(char* bootnode);
   void setCustomPlatform(char* custom_platform);
-  void setValid()
-  {
-    m_valid = true;
-  }
+  void setValid() { m_valid = true; }
   void push_back(pkg_pattern& pattern)
   {
     pattern.node(this);
     m_pattern.push_back(pattern);
   }
-  void depnodeAdd(pkg_depnode& depnode)
-  {
-    m_depnodelist.push_back(depnode);
-  }
+  void depnodeAdd(pkg_depnode& depnode) { m_depnodelist.push_back(depnode); }
   void checkVolume(char* filename);
   void checkNode();
   void fetchFiles(bool distribute);
   int compareFiles();
   void copyPackage(char* pkg_name);
-  void incrWarnings()
-  {
-    m_warnings++;
-  }
-  void incrErrors()
-  {
-    m_errors++;
-  }
+  void incrWarnings() { m_warnings++; }
+  void incrErrors() { m_errors++; }
 };
 
-class wb_pkg {
+class wb_pkg
+{
 private:
   std::vector<pkg_node> m_nodelist;
   bool m_allnodes;
@@ -225,8 +167,8 @@ private:
   void readConfig();
 
 public:
-  wb_pkg(char* nodelist, bool distribute = true, bool config_only = false,
-      bool check = false, int* new_files = 0);
+  wb_pkg(char* nodelist, bool distribute = true, bool config_only = false, bool check = false,
+         int* new_files = 0);
   pkg_node& getNode(char* name);
   void fetchFiles(bool distribute)
   {

@@ -18,26 +18,29 @@
 #include "pwr_basecomponentclasses.h"
 #include "pwr_cvolpwrtest01classes.h"
 
-static float aproctest_wait=0.01;
+static float aproctest_wait = 0.01;
 
 void ra_aproctest::RegisterObject(void)
 {
   pwr_tOid oid;
 
   m_sts = gdh_NameToObjid("Nodes-PwrTest01c-Applications-ra_aproctest", &oid);
-  if (EVEN(m_sts)) {
+  if (EVEN(m_sts))
+  {
     m_log->log('E', "RegisterObject gdh_NameToObjid", m_sts);
     return;
   }
 
   m_sts = aproc_RegisterObject(oid);
-  if (EVEN(m_sts)) {
+  if (EVEN(m_sts))
+  {
     m_log->log('E', "RegisterObject", m_sts);
     return;
   }
 
   time_Sleep(aproctest_wait);
-  if (cdh_ObjidIsNotEqual(m_nodep->ProcObject[m_anix-1], oid)) {
+  if (cdh_ObjidIsNotEqual(m_nodep->ProcObject[m_anix - 1], oid))
+  {
     m_log->log('E', "RegisterObject, objid doesn't match");
     return;
   }
@@ -49,17 +52,20 @@ void ra_aproctest::TimeStamp(void)
 {
   errh_SetStatus(PWR__ARUN);
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 10; i++)
+  {
     aproc_TimeStamp(0.005, 0.010);
 
     time_Sleep(.005);
-    if (m_nodep->ProcStatus[m_anix-1] != PWR__ARUN) {
+    if (m_nodep->ProcStatus[m_anix - 1] != PWR__ARUN)
+    {
       m_log->log('E', "RegisterObject, process status doesn't match");
       return;
     }
   }
   time_Sleep(1.0);
-  if (m_nodep->ProcStatus[m_anix-1] != PWR__PTIMEOUT) {
+  if (m_nodep->ProcStatus[m_anix - 1] != PWR__PTIMEOUT)
+  {
     m_log->log('E', "RegisterObject, no timeout occurred");
     return;
   }
@@ -68,7 +74,6 @@ void ra_aproctest::TimeStamp(void)
 
   m_log->log('S', "RegisterObject", PWR__SUCCESS);
 }
-
 
 // Constructor
 ra_aproctest::ra_aproctest()
@@ -80,23 +85,27 @@ ra_aproctest::ra_aproctest()
   if (EVEN(m_sts))
     printf("** Unable to open log file");
   m_sts = gdh_Init("ra_aproctest");
-  if (EVEN(m_sts)) {
-    m_log->log('F', "aproc gdh_Init", m_sts);  
+  if (EVEN(m_sts))
+  {
+    m_log->log('F', "aproc gdh_Init", m_sts);
     exit(0);
   }
   m_sts = gdh_GetNodeObject(pwr_cNNid, &oid);
-  if (EVEN(m_sts)) {
-    m_log->log('F', "aproc gdh_GetNodeObject", m_sts);  
+  if (EVEN(m_sts))
+  {
+    m_log->log('F', "aproc gdh_GetNodeObject", m_sts);
     exit(0);
   }
-  m_sts = gdh_ObjidToPointer(oid, (void **)&m_nodep);
-  if (EVEN(m_sts)) {
-    m_log->log('F', "aproc gdh_ObjidToPointer", m_sts);  
+  m_sts = gdh_ObjidToPointer(oid, (void**)&m_nodep);
+  if (EVEN(m_sts))
+  {
+    m_log->log('F', "aproc gdh_ObjidToPointer", m_sts);
     exit(0);
   }
 
   m_sts = errh_Init("ra_aproctest", m_anix);
-  if (m_sts != 1) {
+  if (m_sts != 1)
+  {
     m_log->log('E', "aproc errh_Init", m_sts);
     return;
   }
@@ -104,10 +113,7 @@ ra_aproctest::ra_aproctest()
 }
 
 // Destructor
-ra_aproctest::~ra_aproctest()
-{
-  delete m_log;
-}
+ra_aproctest::~ra_aproctest() { delete m_log; }
 
 int main()
 {
@@ -116,5 +122,3 @@ int main()
   aproc.RegisterObject();
   aproc.TimeStamp();
 }
-
-

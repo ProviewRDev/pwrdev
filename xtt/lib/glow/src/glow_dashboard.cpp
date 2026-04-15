@@ -47,28 +47,32 @@ void GrowDashboard::position(double x, double y)
   ctx->a_move.move(x - ctx->node_move_last_x, y - ctx->node_move_last_y, 2);
 }
 
-int GrowDashboard::get_next_free(int start_row, int start_col, 
-				 int rows, int cols, double *x, double *y)
+int GrowDashboard::get_next_free(int start_row, int start_col, int rows, int cols, double* x, double* y)
 {
-  int *table;
-  GrowDashCell *dc;
+  int* table;
+  GrowDashCell* dc;
   double ll_x, ll_y, ur_x, ur_y;
   int row, col;
 
-  table = (int *)calloc(dash_rows * dash_columns, sizeof(int));
+  table = (int*)calloc(dash_rows * dash_columns, sizeof(int));
 
-  for (int i = 0; i < ctx->a.size(); i++) {
-    if (ctx->a[i]->type() == glow_eObjectType_GrowDashCell) {
-      dc = (GrowDashCell *)ctx->a[i];
+  for (int i = 0; i < ctx->a.size(); i++)
+  {
+    if (ctx->a[i]->type() == glow_eObjectType_GrowDashCell)
+    {
+      dc = (GrowDashCell*)ctx->a[i];
       dc->measure(&ll_x, &ll_y, &ur_x, &ur_y);
       row = round(ll_y / ctx->dash_cell_height);
       col = round(ll_x / ctx->dash_cell_width);
-      for (int j = 0; j < dc->cell_rows; j++) {
-	for (int k = 0; k < dc->cell_columns; k++) {
-	  if ((k + col) < dash_columns && (j + row) < dash_rows) {
-	    table[(j + row) * dash_columns + (k + col)] = 1; 
-	  }
-	}
+      for (int j = 0; j < dc->cell_rows; j++)
+      {
+        for (int k = 0; k < dc->cell_columns; k++)
+        {
+          if ((k + col) < dash_columns && (j + row) < dash_rows)
+          {
+            table[(j + row) * dash_columns + (k + col)] = 1;
+          }
+        }
       }
     }
   }
@@ -84,27 +88,31 @@ int GrowDashboard::get_next_free(int start_row, int start_col,
 
   int found = 0;
   // Loop over the next space
-  for (int j = start_row; j < dash_rows; j++) {
-    for (int k = start_col; k < dash_columns; k++) {
+  for (int j = start_row; j < dash_rows; j++)
+  {
+    for (int k = start_col; k < dash_columns; k++)
+    {
       // Loop over cell area
       int no = 0;
-      for (int l = 0; l < rows; l++) {
-	for (int m = 0; m < cols; m++) {
-	  if ((j + l) >= dash_rows || 
-	      (k + m) >= dash_columns || 
-	      table[(j + l) * dash_columns + (k + m)] == 1) {
-	    no = 1;
-	    break;
-	  }
-	}
-	if (no)
-	  break;
+      for (int l = 0; l < rows; l++)
+      {
+        for (int m = 0; m < cols; m++)
+        {
+          if ((j + l) >= dash_rows || (k + m) >= dash_columns || table[(j + l) * dash_columns + (k + m)] == 1)
+          {
+            no = 1;
+            break;
+          }
+        }
+        if (no)
+          break;
       }
-      if (!no) {
-	*x = ctx->dash_cell_width * k;
-	*y = ctx->dash_cell_height * j;
-	found = 1;
-	break;
+      if (!no)
+      {
+        *x = ctx->dash_cell_width * k;
+        *y = ctx->dash_cell_height * j;
+        found = 1;
+        break;
       }
     }
     if (found)
@@ -112,7 +120,8 @@ int GrowDashboard::get_next_free(int start_row, int start_col,
   }
   free(table);
 
-  if (!found) {
+  if (!found)
+  {
     *x = 0;
     *y = 0;
     return GLOW__DASH_FULL;
@@ -153,15 +162,18 @@ void GrowDashboard::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowDashboard: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowDashboard:
       break;
     case glow_eSave_GrowDashboard_dash_columns:

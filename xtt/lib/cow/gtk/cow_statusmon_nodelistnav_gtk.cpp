@@ -49,13 +49,13 @@
 
 #include "flow_browwidget_gtk.h"
 
-NodelistNavGtk::NodelistNavGtk(void* nodelist_parent_ctx,
-    GtkWidget* nodelist_parent_wid, MsgWindow* nodelist_msg_window,
-    char* nodelist_nodename, int nodelist_mode, nl_mLayout nodelist_layout,
-    int nodelist_msgw_pop, char *nodelist_conf_file, GtkWidget** w)
-    : NodelistNav(nodelist_parent_ctx, nodelist_msg_window, nodelist_nodename,
-      nodelist_mode, nodelist_layout, nodelist_msgw_pop, 
-      nodelist_conf_file), parent_wid(nodelist_parent_wid), clock_cursor(0)
+NodelistNavGtk::NodelistNavGtk(void* nodelist_parent_ctx, GtkWidget* nodelist_parent_wid,
+                               MsgWindow* nodelist_msg_window, char* nodelist_nodename, int nodelist_mode,
+                               nl_mLayout nodelist_layout, int nodelist_msgw_pop, char* nodelist_conf_file,
+                               GtkWidget** w)
+    : NodelistNav(nodelist_parent_ctx, nodelist_msg_window, nodelist_nodename, nodelist_mode, nodelist_layout,
+                  nodelist_msgw_pop, nodelist_conf_file),
+      parent_wid(nodelist_parent_wid), clock_cursor(0)
 {
   form_widget = scrolledbrowwidgetgtk_new(init_brow_cb, this, &brow_widget);
 
@@ -78,20 +78,11 @@ NodelistNavGtk::~NodelistNavGtk()
   gtk_widget_destroy(form_widget);
 }
 
-void NodelistNavGtk::beep()
-{
-  gdk_display_beep(gtk_widget_get_display(form_widget));
-}
+void NodelistNavGtk::beep() { gdk_display_beep(gtk_widget_get_display(form_widget)); }
 
-void NodelistNavGtk::set_input_focus()
-{
-  gtk_widget_grab_focus(brow_widget);
-}
+void NodelistNavGtk::set_input_focus() { gtk_widget_grab_focus(brow_widget); }
 
-void NodelistNavGtk::trace_start()
-{
-  NodelistNavGtk::trace_scan(this);
-}
+void NodelistNavGtk::trace_start() { NodelistNavGtk::trace_scan(this); }
 
 static gboolean nodelistnavgtk_trace_scan(void* data)
 {
@@ -103,33 +94,31 @@ void NodelistNavGtk::trace_scan(NodelistNav* nodelistnav)
 {
   int clock_cursor_set = 0;
 
-  if (nodelistnav->trace_started) {
-    if (nodelistnav->connect) {
-      ((NodelistNavGtk *)nodelistnav)->set_clock_cursor();
+  if (nodelistnav->trace_started)
+  {
+    if (nodelistnav->connect)
+    {
+      ((NodelistNavGtk*)nodelistnav)->set_clock_cursor();
       clock_cursor_set = 1;
     }
     nodelistnav->update_nodes();
     if (clock_cursor_set)
-      ((NodelistNavGtk *)nodelistnav)->reset_cursor();
+      ((NodelistNavGtk*)nodelistnav)->reset_cursor();
 
     brow_TraceScan(nodelistnav->brow->ctx);
 
-    ((NodelistNavGtk*)nodelistnav)->trace_timerid = g_timeout_add(
-        nodelistnav->scantime, nodelistnavgtk_trace_scan, nodelistnav);
+    ((NodelistNavGtk*)nodelistnav)->trace_timerid =
+        g_timeout_add(nodelistnav->scantime, nodelistnavgtk_trace_scan, nodelistnav);
   }
 }
 
 void NodelistNavGtk::set_clock_cursor()
 {
   if (!clock_cursor)
-    clock_cursor = gdk_cursor_new_for_display(
-        gtk_widget_get_display(parent_wid), GDK_WATCH);
+    clock_cursor = gdk_cursor_new_for_display(gtk_widget_get_display(parent_wid), GDK_WATCH);
 
   gdk_window_set_cursor(gtk_widget_get_window(parent_wid), clock_cursor);
   gdk_display_flush(gtk_widget_get_display(parent_wid));
 }
 
-void NodelistNavGtk::reset_cursor()
-{
-  gdk_window_set_cursor(gtk_widget_get_window(parent_wid), NULL);
-}
+void NodelistNavGtk::reset_cursor() { gdk_window_set_cursor(gtk_widget_get_window(parent_wid), NULL); }

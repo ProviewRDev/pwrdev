@@ -97,10 +97,13 @@ int Cmd::get_wbctx(void* ctx, ldh_tWBContext* wbctx)
   Cmd* cmd = (Cmd*)ctx;
   int sts;
 
-  if (cmd->wbctx) {
+  if (cmd->wbctx)
+  {
     *wbctx = cmd->wbctx;
     sts = 1;
-  } else {
+  }
+  else
+  {
     sts = ldh_OpenWB(&cmd->wbctx, cmd_volume_p, cmd_options);
     if (ODD(sts))
       *wbctx = cmd->wbctx;
@@ -115,26 +118,32 @@ int Cmd::attach_volume_cb(void* ctx, pwr_tVolumeId volid, int pop)
   pwr_tVolumeId vid;
   pwr_tClassId classid;
 
-  if (cmd->ldhses) {
+  if (cmd->ldhses)
+  {
     //    cmd->wnav->message( 'E', "Other volume is already attached");
     return WNAV__VOLATTACHED;
   }
 
-  if (!cmd->wbctx) {
+  if (!cmd->wbctx)
+  {
     sts = get_wbctx((void*)cmd, &cmd->wbctx);
     if (EVEN(sts))
       return sts;
   }
 
-  if (volid == 0) {
-    if (cmd_volume_p != 0) {
+  if (volid == 0)
+  {
+    if (cmd_volume_p != 0)
+    {
       // Attach argument volume
       sts = ldh_VolumeNameToId(cmd->wbctx, cmd_volume_p, &volid);
     }
-    if (cmd_volume_p == 0 || EVEN(sts)) {
+    if (cmd_volume_p == 0 || EVEN(sts))
+    {
       // Attach first rootvolume, or if no rootvolume exist some other volume
       sts = ldh_GetVolumeList(cmd->wbctx, &vid);
-      while (ODD(sts)) {
+      while (ODD(sts))
+      {
         volid = vid;
         sts = ldh_GetVolumeClass(cmd->wbctx, vid, &classid);
         if (EVEN(sts))
@@ -149,7 +158,8 @@ int Cmd::attach_volume_cb(void* ctx, pwr_tVolumeId volid, int pop)
     }
   }
 
-  if (!streq(Cmd::cmd_classvolume, "")) {
+  if (!streq(Cmd::cmd_classvolume, ""))
+  {
     // Load volume as extern
     pwr_tFileName filename;
     wb_erep* erep = (wb_erep*)(*(wb_env*)cmd->wbctx);
@@ -159,14 +169,17 @@ int Cmd::attach_volume_cb(void* ctx, pwr_tVolumeId volid, int pop)
 
     wb_vrepmem* vrep = new wb_vrepmem(erep, 0);
     vrep->loadWbl(filename, &sts);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       delete vrep;
       return sts;
     }
     erep->addExtern(&sts, vrep);
     cmd->volid = vrep->vid();
     cmd->volctx = (ldh_tVolume*)new wb_volume(vrep);
-  } else {
+  }
+  else
+  {
     cmd->volid = volid;
 
     // Open ldh session
@@ -175,12 +188,11 @@ int Cmd::attach_volume_cb(void* ctx, pwr_tVolumeId volid, int pop)
       return sts;
   }
 
-  sts = ldh_OpenSession(
-      &cmd->ldhses, cmd->volctx, ldh_eAccess_ReadWrite, ldh_eUtility_Pwr);
-  if (EVEN(sts)) {
+  sts = ldh_OpenSession(&cmd->ldhses, cmd->volctx, ldh_eAccess_ReadWrite, ldh_eUtility_Pwr);
+  if (EVEN(sts))
+  {
     // Try read access
-    sts = ldh_OpenSession(
-        &cmd->ldhses, cmd->volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Pwr);
+    sts = ldh_OpenSession(&cmd->ldhses, cmd->volctx, ldh_eAccess_ReadOnly, ldh_eUtility_Pwr);
     if (EVEN(sts))
       return sts;
   }
@@ -198,13 +210,15 @@ int Cmd::detach_volume()
     return WNAV__NOVOLATTACHED;
 
   sts = ldh_CloseSession(ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     wnav->message('E', wnav_get_message(sts));
     return 0;
   }
 
   sts = ldh_DetachVolume(wbctx, volctx);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     wnav->message('E', wnav_get_message(sts));
     return 0;
   }
@@ -228,12 +242,14 @@ void Cmd::save_cb(void* ctx, int quiet)
   Cmd* cmd = (Cmd*)ctx;
   int sts;
 
-  if (!cmd->ldhses) {
+  if (!cmd->ldhses)
+  {
     cmd->wnav->message('E', "Cmd is not attached to a volume");
     return;
   }
   sts = ldh_SaveSession(cmd->ldhses);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     cmd->wnav->message('E', wnav_get_message(sts));
     return;
   }
@@ -244,9 +260,11 @@ void Cmd::save_cb(void* ctx, int quiet)
   ldh_GetVolumeInfo(ldh_SessionToVol(cmd->ldhses), &info);
   ldh_GetVolumeClass(cmd->wbctx, info.Volume, &volcid);
 
-  if (volcid == pwr_eClass_DirectoryVolume) {
+  if (volcid == pwr_eClass_DirectoryVolume)
+  {
     sts = lfu_SaveDirectoryVolume(cmd->ldhses, 0, quiet);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       cmd->wnav->message('E', "Syntax error");
       return;
     }
@@ -269,7 +287,8 @@ void Cmd::revert_cb(void* ctx, int confirm)
 {
   Cmd* cmd = (Cmd*)ctx;
 
-  if (!cmd->ldhses) {
+  if (!cmd->ldhses)
+  {
     cmd->wnav->message('E', "Cmd is not attached to a volume");
     return;
   }
@@ -288,56 +307,59 @@ int Cmd::utilities(char* str)
 {
   pwr_tCmd cmd;
 
-  if (str_NoCaseStrcmp(str, "ge") == 0
-      || str_NoCaseStrncmp(str, "ge ", 3) == 0) {
+  if (str_NoCaseStrcmp(str, "ge") == 0 || str_NoCaseStrncmp(str, "ge ", 3) == 0)
+  {
     strcpy(cmd, "wb_ge");
     strcat(cmd, &str[2]);
     system(cmd);
     return 1;
-  } else if (str_NoCaseStrcmp(str, "s") == 0
-      || str_NoCaseStrncmp(str, "s ", 2) == 0) {
+  }
+  else if (str_NoCaseStrcmp(str, "s") == 0 || str_NoCaseStrncmp(str, "s ", 2) == 0)
+  {
     strcpy(cmd, "pwrs");
     strcat(cmd, &str[1]);
     system(cmd);
     return 1;
-  } else if (str_NoCaseStrcmp(str, "a") == 0) {
+  }
+  else if (str_NoCaseStrcmp(str, "a") == 0)
+  {
     strcpy(cmd, "pwra");
     system(cmd);
     return 1;
-  } else if (str_NoCaseStrcmp(str, "xhelp") == 0
-      || str_NoCaseStrncmp(str, "xhelp ", 6) == 0) {
+  }
+  else if (str_NoCaseStrcmp(str, "xhelp") == 0 || str_NoCaseStrncmp(str, "xhelp ", 6) == 0)
+  {
     char cmd_array[3][40];
     int nr;
 
-    nr = dcli_parse(str, " ", "", (char*)cmd_array,
-        sizeof(cmd_array) / sizeof(cmd_array[0]), sizeof(cmd_array[0]), 1);
+    nr = dcli_parse(str, " ", "", (char*)cmd_array, sizeof(cmd_array) / sizeof(cmd_array[0]),
+                    sizeof(cmd_array[0]), 1);
 
     if (nr == 1)
       strcpy(cmd, "co_help");
-    else if (nr > 1) {
-      if (str_NoCaseStrncmp(cmd_array[1], "configurator", strlen(cmd_array[1]))
-          == 0)
+    else if (nr > 1)
+    {
+      if (str_NoCaseStrncmp(cmd_array[1], "configurator", strlen(cmd_array[1])) == 0)
         strcpy(cmd, "co_help -c");
-      else if (str_NoCaseStrncmp(
-                   cmd_array[1], "designer's", strlen(cmd_array[1]))
-          == 0)
+      else if (str_NoCaseStrncmp(cmd_array[1], "designer's", strlen(cmd_array[1])) == 0)
         strcpy(cmd, "co_help -d");
       else if (str_NoCaseStrncmp(cmd_array[1], "ge", strlen(cmd_array[1])) == 0)
         strcpy(cmd, "co_help -g");
-      else if (str_NoCaseStrncmp(cmd_array[1], "operator", strlen(cmd_array[1]))
-          == 0)
+      else if (str_NoCaseStrncmp(cmd_array[1], "operator", strlen(cmd_array[1])) == 0)
         strcpy(cmd, "co_help -o");
-      else if (str_NoCaseStrncmp(cmd_array[1], "project", strlen(cmd_array[1]))
-          == 0)
+      else if (str_NoCaseStrncmp(cmd_array[1], "project", strlen(cmd_array[1])) == 0)
         strcpy(cmd, "co_help");
-      else {
+      else
+      {
         printf("Syntax error\n");
         exit(0);
       }
     }
     system(cmd);
     return 1;
-  } else if (str_NoCaseStrcmp(str, "rtmon") == 0) {
+  }
+  else if (str_NoCaseStrcmp(str, "rtmon") == 0)
+  {
     strcpy(cmd, "pwr_rtmon");
     system(cmd);
     return 1;
@@ -346,8 +368,7 @@ int Cmd::utilities(char* str)
 }
 
 Cmd::Cmd()
-    : ctx_type(wb_eUtility_Cmd), ldhses(0), wbctx(0), volctx(0), volid(0),
-      wnav(0), wb_type(0), recall_buf(0)
+    : ctx_type(wb_eUtility_Cmd), ldhses(0), wbctx(0), volctx(0), volid(0), wnav(0), wb_type(0), recall_buf(0)
 {
 }
 
@@ -364,9 +385,12 @@ void Cmd::parse(int argc, char* argv[])
   Cmd::cmd_volume_p = Cmd::cmd_volume;
 
   str[0] = 0;
-  for (i = 1; i < argc; i++) {
-    if (argv[i][0] == '-') {
-      switch (argv[i][1]) {
+  for (i = 1; i < argc; i++)
+  {
+    if (argv[i][0] == '-')
+    {
+      switch (argv[i][1])
+      {
       case 'h':
         Cmd::usage();
         exit(0);
@@ -376,21 +400,25 @@ void Cmd::parse(int argc, char* argv[])
         break;
       case 'v':
         // Load specified volume
-        if (argc >= i) {
+        if (argc >= i)
+        {
           strcpy(Cmd::cmd_volume, argv[i + 1]);
           Cmd::cmd_volume_p = Cmd::cmd_volume;
           i++;
           continue;
-        } else
+        }
+        else
           std::cout << "Syntax error, volume is missing\n";
         break;
       case 'c':
         // Load specified class volume
-        if (argc >= i) {
+        if (argc >= i)
+        {
           strcpy(Cmd::cmd_classvolume, argv[i + 1]);
           i++;
           continue;
-        } else
+        }
+        else
           std::cout << "Syntax error, volume is missing\n";
         break;
       case 'q':
@@ -405,10 +433,13 @@ void Cmd::parse(int argc, char* argv[])
       default:
         std::cout << "Unknown argument: " << argv[i] << '\n';
       }
-    } else {
+    }
+    else
+    {
       if (str[0] != 0)
         strcat(str, " ");
-      if (strlen(str) + strlen(argv[i]) >= sizeof(str)) {
+      if (strlen(str) + strlen(argv[i]) >= sizeof(str))
+      {
         std::cout << "Command string too long\n";
         exit(0);
       }
@@ -426,30 +457,35 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of \n\
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the \n\
 GNU General Public License for more details.\n\n";
 
-  if (str[0] != 0) {
+  if (str[0] != 0)
+  {
     int nr;
     char cmd_array[10][400];
 
     str_trim(str, str);
-    nr = dcli_parse(str, ";", "", (char*)cmd_array,
-        sizeof(cmd_array) / sizeof(cmd_array[0]), sizeof(cmd_array[0]), 1);
+    nr = dcli_parse(str, ";", "", (char*)cmd_array, sizeof(cmd_array) / sizeof(cmd_array[0]),
+                    sizeof(cmd_array[0]), 1);
 
-    if (nr == 1) {
+    if (nr == 1)
+    {
       sts = utilities(cmd_array[0]);
       if (ODD(sts))
         exit(0);
     }
 
-    for (int i = 0; i < nr; i++) {
+    for (int i = 0; i < nr; i++)
+    {
       str_trim(cmd_array[i], cmd_array[i]);
       // printf( "-- Executing \"%s\"\n", cmd_array[i]);
 
       sts = wnav->command(cmd_array[i]);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         sts = wnav->get_command_sts();
         if (EVEN(sts))
           exit(sts);
-      } else
+      }
+      else
         exit(sts);
     }
     exit(0);
@@ -460,7 +496,8 @@ GNU General Public License for more details.\n\n";
 
   // Init input
 
-  while (1) {
+  while (1)
+  {
     /* get and parse the command */
 
     /* get input */

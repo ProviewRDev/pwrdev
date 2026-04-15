@@ -40,29 +40,26 @@
 #include "flow_browctx.h"
 #include "flow_msg.h"
 
-int FlowAnnotPixmapButton::event_handler(
-    void* pos, flow_eEvent event, int x, int y, void* node)
+int FlowAnnotPixmapButton::event_handler(void* pos, flow_eEvent event, int x, int y, void* node)
 {
   if (!((FlowNode*)node)->annotpixmapv[number])
     return 0;
 
   int sts;
-  int idx
-      = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
+  int idx = int(ctx->zoom_factor / ctx->base_zoom_factor * (pixmap_size + 4) - 4);
   if (idx < 0)
     return 0;
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
 
-  if (p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x < x
-      && x < p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x
-              + ((FlowNode*)node)->annotpixmapv[number]->pixmap_data[idx].width
-      && p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y < y
-      && y < p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y
-              + ((FlowNode*)node)
-                    ->annotpixmapv[number]
-                    ->pixmap_data[idx]
-                    .height) {
-    switch (event) {
+  if (p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x < x &&
+      x < p.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x +
+              ((FlowNode*)node)->annotpixmapv[number]->pixmap_data[idx].width &&
+      p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y < y &&
+      y < p.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y +
+              ((FlowNode*)node)->annotpixmapv[number]->pixmap_data[idx].height)
+  {
+    switch (event)
+    {
     case flow_eEvent_MB1Click:
       //        std::cout << "Event handler: Hit in pixmapbutton\n";
       // Call backcall function
@@ -73,6 +70,7 @@ int FlowAnnotPixmapButton::event_handler(
     default:;
     }
     return 1;
-  } else
+  }
+  else
     return 0;
 }

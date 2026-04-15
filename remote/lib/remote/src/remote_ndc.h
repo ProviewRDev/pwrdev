@@ -40,10 +40,10 @@
 
 #include "rt_ndc.h"
 
-pwr_tBoolean rndc_ConvertData(pwr_tStatus* sts, const gdb_sNode* np,
-    gdb_sClass* cp, void* tp, /* Address of target.  */
-    const void* sp, /* Address of source.  */
-    pwr_tUInt32* size, /* Size of source.  */
-    ndc_eOp op, pwr_tUInt32 offset, pwr_tUInt32 offs);
+pwr_tBoolean rndc_ConvertData(pwr_tStatus* sts, const gdb_sNode* np, gdb_sClass* cp,
+                              void* tp,          /* Address of target.  */
+                              const void* sp,    /* Address of source.  */
+                              pwr_tUInt32* size, /* Size of source.  */
+                              ndc_eOp op, pwr_tUInt32 offset, pwr_tUInt32 offs);
 
 #endif

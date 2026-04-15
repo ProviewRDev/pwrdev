@@ -35,25 +35,25 @@
  */
 
 /*************************************************************************
-*		===============
-*                P r o v i e w
-*               ===============
-**************************************************************************
-*
-* Filename:             rs_remote_mq.c
-*
-* Description:		Remote transport process for BEA Message Queue as a
-*client
-*			For further information, please refer to BEA Message
-*Queue
-*			documentation.
-*
-* Change log:		2005-11-24, Claes Jurstrand
-*			First version introduced in 4.0.1-1
-*
-*
-**************************************************************************
-**************************************************************************/
+ *		===============
+ *                P r o v i e w
+ *               ===============
+ **************************************************************************
+ *
+ * Filename:             rs_remote_mq.c
+ *
+ * Description:		Remote transport process for BEA Message Queue as a
+ *client
+ *			For further information, please refer to BEA Message
+ *Queue
+ *			documentation.
+ *
+ * Change log:		2005-11-24, Claes Jurstrand
+ *			First version introduced in 4.0.1-1
+ *
+ *
+ **************************************************************************
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 
@@ -80,9 +80,9 @@
 
 // Message Q include files
 
-#include "p_entry.h" /* PAMS function declarations     */
+#include "p_entry.h"  /* PAMS function declarations     */
 #include "p_proces.h" /* Known Queue number definitions */
-#include "p_group.h" /* Known Group ID definitions     */
+#include "p_group.h"  /* Known Group ID definitions     */
 #include "p_typecl.h" /* Generic Type/Class definitions */
 #include "p_return.h" /* PAMS return status definitions */
 #include "p_symbol.h" /* Generic PSEL/PSYM definitions  */
@@ -142,43 +142,45 @@ unsigned int bmq_receive()
 
   len = sizeof(buf);
 
-  sts = pams_get_msg((char*)&buf, &prio, &source, &class, &type, &len,
-      &len_data, NULL, &psb, NULL, NULL, NULL, NULL, NULL);
-  if (sts == PAMS__SUCCESS) {
+  sts = pams_get_msg((char*)&buf, &prio, &source, &class, &type, &len, &len_data, NULL, &psb, NULL, NULL,
+                     NULL, NULL, NULL);
+  if (sts == PAMS__SUCCESS)
+  {
     if (debug)
       printf("Received message %d\n", len_data);
 
     search_remtrans = true;
 
     remtrans = rn.remtrans;
-    while (remtrans && search_remtrans) {
-      if (remtrans->objp->Address[0] == class
-          && remtrans->objp->Address[1] == type
-          && remtrans->objp->Direction == REMTRANS_IN) {
+    while (remtrans && search_remtrans)
+    {
+      if (remtrans->objp->Address[0] == class && remtrans->objp->Address[1] == type &&
+          remtrans->objp->Direction == REMTRANS_IN)
+      {
         search_remtrans = false;
         sts = RemTrans_Receive(remtrans, (char*)&buf, len_data);
         if (sts != STATUS_OK && sts != STATUS_BUFF)
-          errh_Error("Error from RemTrans_Receive, queue %d, status %d",
-              rn_mq->MyQueue, sts, 0);
+          errh_Error("Error from RemTrans_Receive, queue %d, status %d", rn_mq->MyQueue, sts, 0);
         break;
       }
       remtrans = (remtrans_item*)remtrans->next;
     }
-    if (search_remtrans) {
+    if (search_remtrans)
+    {
       rn_mq->ErrCount++;
-      errh_Info("No remtrans for received message, queue %d, class %d, type %d",
-          rn_mq->MyQueue, class, type, 0);
+      errh_Info("No remtrans for received message, queue %d, class %d, type %d", rn_mq->MyQueue, class, type,
+                0);
     }
 
-    if (psb.del_psb_status == PAMS__CONFIRMREQ
-        || psb.del_psb_status == PAMS__POSSDUPL)
+    if (psb.del_psb_status == PAMS__CONFIRMREQ || psb.del_psb_status == PAMS__POSSDUPL)
       pams_confirm_msg(psb.seq_number, &mq_sts, &receive_force_j);
-
-  } else {
-    if (sts != PAMS__NOMOREMSG) {
+  }
+  else
+  {
+    if (sts != PAMS__NOMOREMSG)
+    {
       rn_mq->ErrCount++;
-      errh_Error(
-          "Receive failed, queue %d, MQ status %d", rn_mq->MyQueue, sts, 0);
+      errh_Error("Receive failed, queue %d, MQ status %d", rn_mq->MyQueue, sts, 0);
     }
   }
 
@@ -199,8 +201,7 @@ unsigned int bmq_receive()
 **************************************************************************
 **************************************************************************/
 
-unsigned int bmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
-    char* buf, int buf_size)
+unsigned int bmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans, char* buf, int buf_size)
 
 {
   int32 mq_sts;
@@ -229,28 +230,33 @@ unsigned int bmq_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
 
   msg_size = buf_size;
 
-  mq_sts = pams_put_msg(buf, &put_prio, &dest, &class, &type, &delivery,
-      &msg_size, &timeout, &put_psb, &put_uma, NULL, NULL, NULL, NULL);
-  if (mq_sts == PAMS__SUCCESS) {
-    if (put_psb.del_psb_status < 0) {
-      if (put_psb.uma_psb_status < 0) {
+  mq_sts = pams_put_msg(buf, &put_prio, &dest, &class, &type, &delivery, &msg_size, &timeout, &put_psb,
+                        &put_uma, NULL, NULL, NULL, NULL);
+  if (mq_sts == PAMS__SUCCESS)
+  {
+    if (put_psb.del_psb_status < 0)
+    {
+      if (put_psb.uma_psb_status < 0)
+      {
         remtrans->ErrCount++;
-        errh_Error(
-            "Send failed, message not recoverable. Queue %d, UMA status %d",
-            rn_mq->MyQueue, put_psb.uma_psb_status, 0);
-      } else {
+        errh_Error("Send failed, message not recoverable. Queue %d, UMA status %d", rn_mq->MyQueue,
+                   put_psb.uma_psb_status, 0);
+      }
+      else
+      {
         errh_Error("Message not deliverable, UMA action taken. Queue %d, PSB "
                    "status %d",
-            rn_mq->MyQueue, put_psb.del_psb_status, 0);
+                   rn_mq->MyQueue, put_psb.del_psb_status, 0);
       }
     }
     if (debug)
-      printf("Sent message sts:%d psb:%d uma:%d\n", (int)mq_sts,
-          (int)put_psb.del_psb_status, (int)put_psb.uma_psb_status);
-  } else {
+      printf("Sent message sts:%d psb:%d uma:%d\n", (int)mq_sts, (int)put_psb.del_psb_status,
+             (int)put_psb.uma_psb_status);
+  }
+  else
+  {
     remtrans->ErrCount++;
-    errh_Error(
-        "Send failed, queue %d, MQ status %d", rn_mq->MyQueue, mq_sts, 0);
+    errh_Error("Send failed, queue %d, MQ status %d", rn_mq->MyQueue, mq_sts, 0);
     if (debug)
       printf("Send failed sts:%d\n", (int)mq_sts);
   }
@@ -303,7 +309,8 @@ int main(int argc, char* argv[])
   if (debug)
     printf("Before gdh_init\n");
   sts = gdh_Init(pname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -315,7 +322,8 @@ int main(int argc, char* argv[])
   sts = 0;
   if (argc >= 3)
     sts = cdh_StringToObjid(argv[2], &rn.objid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("cdh_StringToObjid, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -324,7 +332,8 @@ int main(int argc, char* argv[])
   /* Get pointer to RemnodeMQ object and store locally */
 
   sts = gdh_ObjidToPointer(rn.objid, (pwr_tAddress*)&rn_mq);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("cdh_ObjidToPointer, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -340,7 +349,8 @@ int main(int argc, char* argv[])
 
   sts = RemTrans_Init(&rn);
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("RemTrans_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -349,10 +359,10 @@ int main(int argc, char* argv[])
   /* Store remtrans objects objid in remnode_mq object */
   remtrans = rn.remtrans;
   i = 0;
-  while (remtrans) {
+  while (remtrans)
+  {
     rn_mq->RemTransObjects[i++] = remtrans->objid;
-    if (i >= (int)(sizeof(rn_mq->RemTransObjects)
-                 / sizeof(rn_mq->RemTransObjects[0])))
+    if (i >= (int)(sizeof(rn_mq->RemTransObjects) / sizeof(rn_mq->RemTransObjects[0])))
       break;
     remtrans = (remtrans_item*)remtrans->next;
   }
@@ -363,17 +373,18 @@ int main(int argc, char* argv[])
   queue_name[0] = 0;
   queue_name_len = 0;
 
-  if (rn_mq->MyQueue > 0) {
+  if (rn_mq->MyQueue > 0)
+  {
     mq_attach_mode = PSYM_ATTACH_BY_NUMBER;
     sprintf(queue_name, "%d", rn_mq->MyQueue);
     queue_name_len = strlen(queue_name);
   }
 
-  sts = pams_attach_q(&mq_attach_mode, &mq_queue_no, &mq_queue_type,
-      (char*)&queue_name, &queue_name_len, (int32*)0, (int32*)0, NULL, NULL,
-      NULL);
+  sts = pams_attach_q(&mq_attach_mode, &mq_queue_no, &mq_queue_type, (char*)&queue_name, &queue_name_len,
+                      (int32*)0, (int32*)0, NULL, NULL, NULL);
 
-  if (sts != PAMS__SUCCESS && sts != PAMS__JOURNAL_ON) {
+  if (sts != PAMS__SUCCESS && sts != PAMS__JOURNAL_ON)
+  {
     errh_Fatal("pams_attach_q, %d", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -391,8 +402,10 @@ int main(int argc, char* argv[])
 
   /* Loop forever */
 
-  while (!doomsday) {
-    if (rn_mq->Disable == 1) {
+  while (!doomsday)
+  {
+    if (rn_mq->Disable == 1)
+    {
       errh_Fatal("Disabled, exiting");
       errh_SetStatus(PWR__SRVTERM);
       exit(0);
@@ -404,7 +417,8 @@ int main(int argc, char* argv[])
 
     sts = bmq_receive();
 
-    if (time_since_scan >= rn_mq->ScanTime) {
+    if (time_since_scan >= rn_mq->ScanTime)
+    {
       sts = RemTrans_Cyclic(&rn, &bmq_send);
       time_since_scan = 0.0;
     }

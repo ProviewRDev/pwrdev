@@ -59,24 +59,23 @@ static pwr_tStatus OpenDb(ldh_sMenuCall* ip)
   char filename[80];
   char cmd[256];
 
-  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody", "Id",
-      (char**)&db_id_p, &size);
+  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody", "Id", (char**)&db_id_p, &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Object,
-      name, sizeof(name), &size);
+  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Object, name, sizeof(name), &size);
   if (EVEN(sts))
     return sts;
 
   dcli_translate_filename(filename, "$pwr_exe/wb_open_db.sh");
   str_ToLower(db_id, db_id_p);
-  sprintf(cmd, "%s \"%s\" \"%s\" \"%s\" \"\" \"%s\" &", filename, db_id,
-      CoLogin::username(), CoLogin::ucpassword(), name);
+  sprintf(cmd, "%s \"%s\" \"%s\" \"%s\" \"\" \"%s\" &", filename, db_id, CoLogin::username(),
+          CoLogin::ucpassword(), name);
   free(db_id_p);
 
   sts = system(cmd);
-  if (sts == -1 || sts == 127) {
+  if (sts == -1 || sts == 127)
+  {
     printf("-- Error when creating process.\n");
     return sts;
   }
@@ -87,5 +86,4 @@ static pwr_tStatus OpenDb(ldh_sMenuCall* ip)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(DbConfig)
-    = { pwr_BindMethod(OpenDb), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(DbConfig) = {pwr_BindMethod(OpenDb), pwr_NullMethod};

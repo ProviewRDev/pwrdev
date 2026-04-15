@@ -46,13 +46,13 @@
 
 class CowTreeQtWidget;
 
-class CowTreeQt : public CowTree {
+class CowTreeQt : public CowTree
+{
 public:
-  CowTreeQt(void* a_parent_ctx, const char* title, pwr_tAttrRef* itemlist,
-      int item_cnt, unsigned int options, pwr_tStatus (*get_object_info)(void*,
-      pwr_tAttrRef*, char*, int, char*, char*, int),
-      pwr_tStatus (*get_node_info)(void*, char*, char*, int),
-      pwr_tStatus (*action)(void*, pwr_tAttrRef*));
+  CowTreeQt(void* a_parent_ctx, const char* title, pwr_tAttrRef* itemlist, int item_cnt, unsigned int options,
+            pwr_tStatus (*get_object_info)(void*, pwr_tAttrRef*, char*, int, char*, char*, int),
+            pwr_tStatus (*get_node_info)(void*, char*, char*, int),
+            pwr_tStatus (*action)(void*, pwr_tAttrRef*));
   QWidget* brow_widget;
   QWidget* form_widget;
   QLabel* msg_label;
@@ -65,7 +65,8 @@ private:
   CowTreeQtWidget* toplevel;
 };
 
-class CowTreeQtWidget : public QWidget {
+class CowTreeQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

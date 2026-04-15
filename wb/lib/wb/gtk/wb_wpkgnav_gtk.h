@@ -39,10 +39,11 @@
 
 #include "wb_wpkgnav.h"
 
-class WPkgNavGtk : public WPkgNav {
+class WPkgNavGtk : public WPkgNav
+{
 public:
-  WPkgNavGtk(void* wa_parent_ctx, GtkWidget* wa_parent_wid, const char* wa_name,
-      wb_eUtility wa_utility, GtkWidget** w, pwr_tStatus* status);
+  WPkgNavGtk(void* wa_parent_ctx, GtkWidget* wa_parent_wid, const char* wa_name, wb_eUtility wa_utility,
+             GtkWidget** w, pwr_tStatus* status);
   ~WPkgNavGtk();
 
   GtkWidget* parent_wid;

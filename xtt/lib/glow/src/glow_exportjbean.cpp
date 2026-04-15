@@ -51,10 +51,12 @@ void GlowExportJBean::growctx(glow_eExportPass pass, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Declare:
     break;
-  case glow_eExportPass_Init: {
+  case glow_eExportPass_Init:
+  {
     ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
     fp <<
@@ -120,10 +122,8 @@ void GlowExportJBean::growctx(glow_eExportPass pass, std::ofstream& fp)
        << "  public int getBorderColor() {\n"
        << "    return borderColor;\n"
        << "  }\n"
-       << "  public int original_width = "
-       << int(dim_x1 - dim_x0) + 2 * glow_cJBean_Offset << ";\n"
-       << "  public int original_height = "
-       << int(dim_y1 - dim_y0) + 2 * glow_cJBean_Offset << ";\n"
+       << "  public int original_width = " << int(dim_x1 - dim_x0) + 2 * glow_cJBean_Offset << ";\n"
+       << "  public int original_height = " << int(dim_y1 - dim_y0) + 2 * glow_cJBean_Offset << ";\n"
        << "  double rotate;\n"
        << "  public void setRotate( double rotate) {\n"
        << "    if ( rotate < 0)\n"
@@ -135,17 +135,20 @@ void GlowExportJBean::growctx(glow_eExportPass pass, std::ofstream& fp)
        << "  Shape[] shapes = new Shape[] { \n";
     break;
   }
-  case glow_eExportPass_Shape: {
+  case glow_eExportPass_Shape:
+  {
     fp <<
 
         "  };\n";
 
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     break;
   }
-  case glow_eExportPass_Draw: {
+  case glow_eExportPass_Draw:
+  {
     func_cnt = 0;
     fp <<
 
@@ -213,7 +216,8 @@ void GlowExportJBean::growctx(glow_eExportPass pass, std::ofstream& fp)
             "scaleHeight)); // scaletest"
          << '\n'
          << "    AffineTransform save_tmp;\n";
-    if (!streq(((GrowCtx*)ctx)->background_image, "")) {
+    if (!streq(((GrowCtx*)ctx)->background_image, ""))
+    {
       fp << "    if ( backgroundImage.mImage == null)\n"
          << "      backgroundImage.paintComponent( g);\n"
          << "    TexturePaint imagePaint = new TexturePaint( "
@@ -228,7 +232,8 @@ void GlowExportJBean::growctx(glow_eExportPass pass, std::ofstream& fp)
     }
     break;
   }
-  case glow_eExportPass_End: {
+  case glow_eExportPass_End:
+  {
     fp << "    g.setTransform(save);\n"
        << "  }\n";
 
@@ -238,50 +243,55 @@ void GlowExportJBean::growctx(glow_eExportPass pass, std::ofstream& fp)
   }
 }
 
-void GlowExportJBean::nodeclass(GlowNodeClass* nc, glow_eExportPass pass,
-    std::ofstream& fp, int page, int pages)
+void GlowExportJBean::nodeclass(GlowNodeClass* nc, glow_eExportPass pass, std::ofstream& fp, int page,
+                                int pages)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   int i;
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Declare:
     break;
-  case glow_eExportPass_Init: {
+  case glow_eExportPass_Init:
+  {
     frc_created = 0;
     nc->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
-    if (page <= 1) {
+    if (page <= 1)
+    {
       fp <<
 
-          "  public int original_width = "
-         << int(dim_x1 - dim_x0) + 2 * glow_cJBean_Offset << ";\n"
-         << "  public int original_height = "
-         << int(dim_y1 - dim_y0) + 2 * glow_cJBean_Offset << ";\n"
+          "  public int original_width = " << int(dim_x1 - dim_x0) + 2 * glow_cJBean_Offset << ";\n"
+         << "  public int original_height = " << int(dim_y1 - dim_y0) + 2 * glow_cJBean_Offset << ";\n"
          << "  Shape[] shapes = new Shape[] { \n";
-    } else {
+    }
+    else
+    {
       fp <<
 
-          "  int original_width_p" << page << " = "
-         << int(dim_x1 - dim_x0) + 2 * glow_cJBean_Offset << ";\n"
-         << "  int original_height_p" << page << " = "
-         << int(dim_y1 - dim_y0) + 2 * glow_cJBean_Offset << ";\n"
+          "  int original_width_p" << page << " = " << int(dim_x1 - dim_x0) + 2 * glow_cJBean_Offset << ";\n"
+         << "  int original_height_p" << page << " = " << int(dim_y1 - dim_y0) + 2 * glow_cJBean_Offset
+         << ";\n"
          << "  Shape[] shapes_p" << page << " = new Shape[] { \n";
     }
 
     break;
   }
-  case glow_eExportPass_Shape: {
+  case glow_eExportPass_Shape:
+  {
     fp <<
 
         "  };\n";
 
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     break;
   }
-  case glow_eExportPass_Draw: {
+  case glow_eExportPass_Draw:
+  {
     char original_width[20];
     char original_height[20];
     //    if ( page <= 1)
@@ -294,13 +304,16 @@ void GlowExportJBean::nodeclass(GlowNodeClass* nc, glow_eExportPass pass,
     //      sprintf( original_width, "original_width_p%d", page);
     //      sprintf( original_height, "original_height_p%d", page);
     //    }
-    if (page <= 1) {
+    if (page <= 1)
+    {
       fp <<
 
           "  public void paintComponent(Graphics g1) {\n";
-      if (pages > page) {
+      if (pages > page)
+      {
         fp << "    switch ( page) {\n";
-        for (i = 2; i <= pages; i++) {
+        for (i = 2; i <= pages; i++)
+        {
           fp << "      case " << i << " :\n"
              << "        paintComponent_p" << i << "(g1);\n"
              << "        return;\n";
@@ -309,9 +322,10 @@ void GlowExportJBean::nodeclass(GlowNodeClass* nc, glow_eExportPass pass,
            << "        ;\n"
            << "    }\n";
       }
-    } else {
-      fp << "  public void paintComponent_p" << page << "(Graphics g1) {"
-         << '\n';
+    }
+    else
+    {
+      fp << "  public void paintComponent_p" << page << "(Graphics g1) {" << '\n';
     }
     fp << "    animationCount = " << nc->animation_count << ";\n"
        << "    if ( !visible)\n"
@@ -326,28 +340,24 @@ void GlowExportJBean::nodeclass(GlowNodeClass* nc, glow_eExportPass pass,
        << "    if ( 45.0 <= rotate && rotate < 135.0) {\n"
        << "      g.translate( width, 0.0); \n"
        << "      g.rotate( Math.PI * rotate/180, 0.0, 0.0);\n"
-       << "      g.transform( AffineTransform.getScaleInstance( height/"
-       << original_width << ",\n"
+       << "      g.transform( AffineTransform.getScaleInstance( height/" << original_width << ",\n"
        << "      		width/" << original_height << "));\n"
        << "    }\n"
        << "    else if ( 135.0 <= rotate && rotate < 225.0)\n"
        << "    {\n"
        << "      g.rotate( Math.PI * rotate/180, width/2, height/2);\n"
-       << "      g.transform( AffineTransform.getScaleInstance( width/"
-       << original_width << ",\n"
+       << "      g.transform( AffineTransform.getScaleInstance( width/" << original_width << ",\n"
        << "      		height/" << original_height << "));\n"
        << "    }\n"
        << "    else if ( 225.0 <= rotate && rotate < 315.0)\n"
        << "    {\n"
        << "      g.translate( -height, 0.0);\n"
        << "      g.rotate( Math.PI * rotate/180, height, 0.0);\n"
-       << "      g.transform( AffineTransform.getScaleInstance( height/"
-       << original_width << ",\n"
+       << "      g.transform( AffineTransform.getScaleInstance( height/" << original_width << ",\n"
        << "      		width/" << original_height << "));\n"
        << "    }\n"
        << "    else\n"
-       << "      g.transform( AffineTransform.getScaleInstance( width/"
-       << original_width << ",\n"
+       << "      g.transform( AffineTransform.getScaleInstance( width/" << original_width << ",\n"
        << "      		height/" << original_height << "));\n"
        << "    if ( (dd.dynType & GeDyn.mDynType_Rotate) != 0 && dd.rotate != "
           "0) {"
@@ -436,7 +446,8 @@ void GlowExportJBean::nodeclass(GlowNodeClass* nc, glow_eExportPass pass,
 
     break;
   }
-  case glow_eExportPass_End: {
+  case glow_eExportPass_End:
+  {
     fp << "    }\n"
        << "    if ( rounds == 2)\n"
        << "      g.setClip(null);\n"
@@ -449,12 +460,12 @@ void GlowExportJBean::nodeclass(GlowNodeClass* nc, glow_eExportPass pass,
   }
 }
 
-void GlowExportJBean::polyline(glow_sPoint* points, int point_cnt, int fill,
-    int border, glow_eDrawType fill_drawtype, glow_eDrawType border_drawtype,
-    int fill_eq_border, int fill_eq_light, int fill_eq_shadow, int line_width,
-    int print_shadow, int shadow, int drawtype_incr, glow_sShadowInfo* sp,
-    int sp_num, int fixcolor, glow_eGradient gradient, int gc1, int gc2,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
+void GlowExportJBean::polyline(glow_sPoint* points, int point_cnt, int fill, int border,
+                               glow_eDrawType fill_drawtype, glow_eDrawType border_drawtype,
+                               int fill_eq_border, int fill_eq_light, int fill_eq_shadow, int line_width,
+                               int print_shadow, int shadow, int drawtype_incr, glow_sShadowInfo* sp,
+                               int sp_num, int fixcolor, glow_eGradient gradient, int gc1, int gc2,
+                               glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
 {
   int i;
   double dim_x0, dim_x1, dim_y0, dim_y1;
@@ -464,52 +475,61 @@ void GlowExportJBean::polyline(glow_sPoint* points, int point_cnt, int fill,
   if (!is_nodeclass)
     print_shadow = print_shadow && shadow;
 
-  switch (pass) {
-  case glow_eExportPass_Shape: {
+  switch (pass)
+  {
+  case glow_eExportPass_Shape:
+  {
     if (is_nodeclass)
       nc->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
     else
       ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
-    if (fill
-        || (feq(points[0].x, points[point_cnt - 1].x)
-               && feq(points[0].y, points[point_cnt - 1].y))) {
+    if (fill || (feq(points[0].x, points[point_cnt - 1].x) && feq(points[0].y, points[point_cnt - 1].y)))
+    {
       fp << "    new Polygon( new int[] { ";
-      for (i = 0; i < point_cnt; i++) {
+      for (i = 0; i < point_cnt; i++)
+      {
         x = points[i].x - dim_x0 + glow_cJBean_Offset;
         fp << int(x + 0.5);
         if (i != point_cnt - 1)
           fp << ", ";
       }
       fp << "}, new int[] {";
-      for (i = 0; i < point_cnt; i++) {
+      for (i = 0; i < point_cnt; i++)
+      {
         y = points[i].y - dim_y0 + glow_cJBean_Offset;
         fp << int(y + 0.5);
         if (i != point_cnt - 1)
           fp << ", ";
       }
       fp << "}, " << point_cnt << "),\n";
-    } else {
+    }
+    else
+    {
       // Java polygon i always closed, go back int your own footprints
       fp << "    new Polygon( new int[] { ";
-      for (i = 0; i < point_cnt; i++) {
+      for (i = 0; i < point_cnt; i++)
+      {
         x = points[i].x - dim_x0 + glow_cJBean_Offset;
         fp << int(x + 0.5);
         fp << ", ";
       }
-      for (i = point_cnt - 2; i >= 1; i--) {
+      for (i = point_cnt - 2; i >= 1; i--)
+      {
         x = points[i].x - dim_x0 + glow_cJBean_Offset;
         fp << int(x + 0.5);
         if (i != 1)
           fp << ", ";
       }
       fp << "}, new int[] {";
-      for (i = 0; i < point_cnt; i++) {
+      for (i = 0; i < point_cnt; i++)
+      {
         y = points[i].y - dim_y0 + glow_cJBean_Offset;
         fp << int(y + 0.5);
         fp << ", ";
       }
-      for (i = point_cnt - 2; i >= 1; i--) {
+      for (i = point_cnt - 2; i >= 1; i--)
+      {
         y = points[i].y - dim_y0 + glow_cJBean_Offset;
         fp << int(y + 0.5);
         if (i != 1)
@@ -517,27 +537,29 @@ void GlowExportJBean::polyline(glow_sPoint* points, int point_cnt, int fill,
       }
       fp << "}, " << 2 * point_cnt - 2 << "),\n";
     }
-    if (print_shadow) {
-      for (i = 0; i < sp_num; i++) {
+    if (print_shadow)
+    {
+      for (i = 0; i < sp_num; i++)
+      {
         fp << "    new Polygon( new int[] { ";
         fp << int(points[i].x - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
            << int(sp[i].x - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
            << int(sp[i + 1].x - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
            << int(points[i + 1].x - dim_x0 + glow_cJBean_Offset + 0.5) << "}, "
-           << "new int[] { "
-           << int(points[i].y - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
+           << "new int[] { " << int(points[i].y - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
            << int(sp[i].y - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
            << int(sp[i + 1].y - dim_y0 + glow_cJBean_Offset + 0.5) << ","
-           << int(points[i + 1].y - dim_y0 + glow_cJBean_Offset + 0.5)
-           << "}, 4),\n";
+           << int(points[i + 1].y - dim_y0 + glow_cJBean_Offset + 0.5) << "}, 4),\n";
       }
     }
     break;
   }
-  case glow_eExportPass_Init: {
+  case glow_eExportPass_Init:
+  {
     break;
   }
-  case glow_eExportPass_Draw: {
+  case glow_eExportPass_Draw:
+  {
     int base_shape = *shape_cnt;
     char fixcolor_str[8];
 
@@ -549,7 +571,8 @@ void GlowExportJBean::polyline(glow_sPoint* points, int point_cnt, int fill,
     // Get position, width and height
     x0 = y0 = 1e37;
     x1 = y1 = -1e37;
-    for (i = 0; i < point_cnt; i++) {
+    for (i = 0; i < point_cnt; i++)
+    {
       if (points[i].y < y0)
         y0 = points[i].y;
       if (points[i].x < x0)
@@ -567,393 +590,365 @@ void GlowExportJBean::polyline(glow_sPoint* points, int point_cnt, int fill,
     else
       strcpy(fixcolor_str, "false");
 
-    if (is_nodeclass) {
-      if (!print_shadow) {
-        if (gradient == glow_eGradient_No) {
+    if (is_nodeclass)
+    {
+      if (!print_shadow)
+      {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, No shadow, Nodeclass
           fp << "    {\n"; // Avoid multiple declarations of fcolor
-          if (fixcolor) {
+          if (fixcolor)
+          {
             if (fill_eq_light)
               fp << "    int fcolor;\n"
                  << "    if ( shadow != 0)\n"
-                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-                 << ", GeColor.NO_TONE,\n"
+                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", GeColor.NO_TONE,\n"
                  << "                 0, 0," << drawtype_incr
                  << ", colorInverse,  GeColor.NO_COLOR, dimmed);\n"
                  << "    else\n"
-                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-                 << ", GeColor.NO_TONE,\n"
+                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", GeColor.NO_TONE,\n"
                  << "                 0, 0, 0, colorInverse,  "
                     "GeColor.NO_COLOR, dimmed);"
                  << '\n';
             else if (fill_eq_shadow)
               fp << "    int fcolor;\n"
                  << "    if ( shadow != 0)\n"
-                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-                 << ", GeColor.NO_TONE,\n"
+                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", GeColor.NO_TONE,\n"
                  << "                 0, 0," << -drawtype_incr
                  << ", colorInverse,  GeColor.NO_COLOR, dimmed);\n"
                  << "    else\n"
-                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-                 << ", GeColor.NO_TONE,\n"
+                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", GeColor.NO_TONE,\n"
                  << "                 0, 0, 0, colorInverse,  "
                     "GeColor.NO_COLOR, dimmed);"
                  << '\n';
             else
               fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
-          } else if (fill_eq_border)
-            fp << "    int fcolor = GeColor.getDrawtype("
-               << (int)border_drawtype << ", colorTone,\n"
+          }
+          else if (fill_eq_border)
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed);"
                << '\n';
           else if (fill_eq_light)
             fp << "    int fcolor;\n"
                << "    if ( shadow != 0)\n"
-               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
-               << "                 colorShift, colorIntensity,"
-               << drawtype_incr << ", colorInverse, fillColor, dimmed);\n"
+               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
+               << "                 colorShift, colorIntensity," << drawtype_incr
+               << ", colorInverse, fillColor, dimmed);\n"
                << "    else\n"
-               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	          colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
           else if (fill_eq_shadow)
             fp << "    int fcolor;\n"
                << "    if ( shadow != 0)\n"
-               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
-               << "                 colorShift, colorIntensity,"
-               << -drawtype_incr << ", colorInverse, fillColor, dimmed);"
-               << '\n'
+               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
+               << "                 colorShift, colorIntensity," << -drawtype_incr
+               << ", colorInverse, fillColor, dimmed);" << '\n'
                << "    else\n"
-               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	          colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
           else
-            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
-          if (fill) {
+          if (fill)
+          {
             fp << "    g.setColor(GeColor.getColor( fcolor));\n";
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
           fp << "    }\n";
-        } else {
+        }
+        else
+        {
           // Gradient, No shadow, Nodeclass
-          if (fill) {
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+          if (fill)
+          {
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
         }
         (*shape_cnt)++;
-      } else {
+      }
+      else
+      {
         // Shadow, Nodeclass
 
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, Shadow, Nodeclass
           fp << "    {\n"; // Avoid multiple declarations of fcolor
-          if (fixcolor) {
+          if (fixcolor)
+          {
             if (fill_eq_light)
               fp << "    int fcolor;\n"
                  << "    if ( shadow != 0)\n"
-                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-                 << ", GeColor.NO_TONE,\n"
+                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", GeColor.NO_TONE,\n"
                  << "                 0, 0," << drawtype_incr
                  << ", colorInverse,  GeColor.NO_COLOR, dimmed);\n"
                  << "    else\n"
-                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-                 << ", GeColor.NO_TONE,\n"
+                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", GeColor.NO_TONE,\n"
                  << "                 0, 0, 0, colorInverse,  "
                     "GeColor.NO_COLOR, dimmed);"
                  << '\n';
             else if (fill_eq_shadow)
               fp << "    int fcolor;\n"
                  << "    if ( shadow != 0)\n"
-                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-                 << ", GeColor.NO_TONE,\n"
+                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", GeColor.NO_TONE,\n"
                  << "                 0, 0," << -drawtype_incr
                  << ", colorInverse,  GeColor.NO_COLOR, dimmed);\n"
                  << "    else\n"
-                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-                 << ", GeColor.NO_TONE,\n"
+                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", GeColor.NO_TONE,\n"
                  << "                 0, 0, 0, colorInverse,  "
                     "GeColor.NO_COLOR, dimmed);"
                  << '\n';
             else
               fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
-          } else if (fill_eq_border)
-            fp << "    int fcolor = GeColor.getDrawtype("
-               << (int)border_drawtype << ", colorTone,\n"
+          }
+          else if (fill_eq_border)
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
           else if (fill_eq_light)
             fp << "    int fcolor;\n"
                << "    if ( shadow != 0)\n"
-               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
-               << "                 colorShift, colorIntensity,"
-               << drawtype_incr << ", colorInverse, fillColor, dimmed);\n"
+               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
+               << "                 colorShift, colorIntensity," << drawtype_incr
+               << ", colorInverse, fillColor, dimmed);\n"
                << "    else\n"
-               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	          colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
           else if (fill_eq_shadow)
             fp << "    int fcolor;\n"
                << "    if ( shadow != 0)\n"
-               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
-               << "                 colorShift, colorIntensity,"
-               << -drawtype_incr << ", colorInverse, fillColor, dimmed);"
-               << '\n'
+               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
+               << "                 colorShift, colorIntensity," << -drawtype_incr
+               << ", colorInverse, fillColor, dimmed);" << '\n'
                << "    else\n"
-               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	          colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
           else
-            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
-          if (fill) {
+          if (fill)
+          {
             fp << "    if ( gradient == GeGradient.eGradient_No) {\n";
 
             fp << "    g.setColor(GeColor.getColor( fcolor));\n";
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
             fp << "    } else {\n";
-            fp << "    GeGradient.paint( g, gradient," << gc1 << "," << gc2
-               << "," << x0 - dim_x0 + glow_cJBean_Offset << "F,"
-               << y0 - dim_y0 + glow_cJBean_Offset << "F," << width << "F,"
-               << height << "F, " << fixcolor_str << "," << fill_drawtype
+            fp << "    GeGradient.paint( g, gradient," << gc1 << "," << gc2 << ","
+               << x0 - dim_x0 + glow_cJBean_Offset << "F," << y0 - dim_y0 + glow_cJBean_Offset << "F,"
+               << width << "F," << height << "F, " << fixcolor_str << "," << fill_drawtype
                << ", colorTone, colorShift, colorIntensity, colorInverse, "
                   "fillColor, dimmed);"
                << '\n';
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
             fp << "    }\n";
           }
           if (!shadow)
             fp << "    if ( shadow != 0) {\n";
-          for (i = 0; i < sp_num - 1; i++) {
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, "
-               << (int)sp[i].drawtype << ", colorInverse));\n";
+          for (i = 0; i < sp_num - 1; i++)
+          {
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << (int)sp[i].drawtype
+               << ", colorInverse));\n";
             if (page <= 1)
-              fp << "    g.fill( shapes[" << *shape_cnt + 1 + i << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes[" << *shape_cnt + 1 + i << "]);" << '\n';
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 1 + i
-                 << "]);\n";
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 1 + i << "]);\n";
           }
           if (!shadow)
             fp << "    }\n";
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
           fp << "    }\n";
-        } else {
+        }
+        else
+        {
           // Gradient, Shadow, Nodeclass
-          if (fill) {
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+          if (fill)
+          {
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
           }
           fp << "    {\n"; // Avoid multiple declarations of fcolor
-          if (fixcolor) {
+          if (fixcolor)
+          {
             if (fill_eq_light)
               fp << "    int fcolor;\n"
                  << "    if ( shadow != 0)\n"
-                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-                 << ", GeColor.NO_TONE,\n"
+                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", GeColor.NO_TONE,\n"
                  << "                 0, 0," << drawtype_incr
                  << ", colorInverse,  GeColor.NO_COLOR, dimmed);\n"
                  << "    else\n"
-                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-                 << ", GeColor.NO_TONE,\n"
+                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", GeColor.NO_TONE,\n"
                  << "                 0, 0, 0, colorInverse,  "
                     "GeColor.NO_COLOR, dimmed);"
                  << '\n';
             else if (fill_eq_shadow)
               fp << "    int fcolor;\n"
                  << "    if ( shadow != 0)\n"
-                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-                 << ", GeColor.NO_TONE,\n"
+                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", GeColor.NO_TONE,\n"
                  << "                 0, 0," << -drawtype_incr
                  << ", colorInverse,  GeColor.NO_COLOR, dimmed);\n"
                  << "    else\n"
-                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-                 << ", GeColor.NO_TONE,\n"
+                 << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", GeColor.NO_TONE,\n"
                  << "                 0, 0, 0, colorInverse,  "
                     "GeColor.NO_COLOR, dimmed);"
                  << '\n';
             else
               fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
-          } else if (fill_eq_border)
-            fp << "    int fcolor = GeColor.getDrawtype("
-               << (int)border_drawtype << ", colorTone,\n"
+          }
+          else if (fill_eq_border)
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
           else if (fill_eq_light)
             fp << "    int fcolor;\n"
                << "    if ( shadow != 0)\n"
-               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
-               << "                 colorShift, colorIntensity,"
-               << drawtype_incr << ", colorInverse, fillColor, dimmed);\n"
+               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
+               << "                 colorShift, colorIntensity," << drawtype_incr
+               << ", colorInverse, fillColor, dimmed);\n"
                << "    else\n"
-               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	          colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
           else if (fill_eq_shadow)
             fp << "    int fcolor;\n"
                << "    if ( shadow != 0)\n"
-               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
-               << "                 colorShift, colorIntensity,"
-               << -drawtype_incr << ", colorInverse, fillColor, dimmed);"
-               << '\n'
+               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
+               << "                 colorShift, colorIntensity," << -drawtype_incr
+               << ", colorInverse, fillColor, dimmed);" << '\n'
                << "    else\n"
-               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+               << "      fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	          colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
           else
-            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
           if (!shadow)
             fp << "    if ( shadow != 0) {\n";
-          for (i = 0; i < sp_num - 1; i++) {
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, "
-               << (int)sp[i].drawtype << ", colorInverse));\n";
+          for (i = 0; i < sp_num - 1; i++)
+          {
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << (int)sp[i].drawtype
+               << ", colorInverse));\n";
             if (page <= 1)
-              fp << "    g.fill( shapes[" << *shape_cnt + 1 + i << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes[" << *shape_cnt + 1 + i << "]);" << '\n';
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 1 + i
-                 << "]);\n";
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 1 + i << "]);\n";
           }
           if (!shadow)
             fp << "    }\n";
 
           fp << "    }\n";
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
         }
         (*shape_cnt) += 1 + sp_num;
       }
-    } else {
+    }
+    else
+    {
       // No nodeclass
-      if (!print_shadow) {
+      if (!print_shadow)
+      {
         // No nodeclass, No shadow
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, No shadow, No nodeclass
           fp << "    {\n"; // Avoid multiple declarations of fcolor
           if (fixcolor)
             fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
           else
-            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
-          if (fill) {
+          if (fill)
+          {
             fp << "    g.setColor(GeColor.getColor( fcolor));\n";
             fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
@@ -961,90 +956,94 @@ void GlowExportJBean::polyline(glow_sPoint* points, int point_cnt, int fill,
           }
           fp << "    }\n";
           (*shape_cnt)++;
-        } else {
+        }
+        else
+        {
           // Gradient, No Shadow, No nodeclass
-          if (fill) {
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+          if (fill)
+          {
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
 
             fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
           (*shape_cnt)++;
         }
-      } else {
+      }
+      else
+      {
         // Shadow, No nodeclass
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, Shadow, No nodeclass
           fp << "    {\n"; // Avoid multiple declarations of fcolor
           if (fixcolor)
             fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
           else
-            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
-          if (fill) {
+          if (fill)
+          {
             fp << "    g.setColor(GeColor.getColor( fcolor));\n"
                << "    g.fill( shapes[" << *shape_cnt << "]);\n";
           }
-          for (i = 0; i < sp_num - 1; i++) {
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, "
-               << (int)sp[i].drawtype << ", colorInverse));\n"
+          for (i = 0; i < sp_num - 1; i++)
+          {
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << (int)sp[i].drawtype
+               << ", colorInverse));\n"
                << "    g.fill( shapes[" << *shape_cnt + 1 + i << "]);\n";
           }
           fp << "    }\n";
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             fp << "    g.draw( shapes[" << base_shape << "]);\n";
           }
-        } else {
+        }
+        else
+        {
           // Gradient, Shadow, No nodeclass
-          if (fill) {
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+          if (fill)
+          {
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
             fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
           }
           fp << "    {\n"; // Avoid multiple declarations of fcolor
           if (fixcolor)
             fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
           else
-            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
-          for (i = 0; i < sp_num - 1; i++) {
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, "
-               << (int)sp[i].drawtype << ", colorInverse));\n"
+          for (i = 0; i < sp_num - 1; i++)
+          {
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << (int)sp[i].drawtype
+               << ", colorInverse));\n"
                << "    g.fill( shapes[" << *shape_cnt + 1 + i << "]);\n";
           }
           fp << "    }\n";
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n'
@@ -1059,48 +1058,49 @@ void GlowExportJBean::polyline(glow_sPoint* points, int point_cnt, int fill,
   }
 }
 
-void GlowExportJBean::line(double x1, double y1, double x2, double y2,
-    glow_eDrawType border_drawtype, int line_width, glow_eExportPass pass,
-    int* shape_cnt, int node_cnt, std::ofstream& fp)
+void GlowExportJBean::line(double x1, double y1, double x2, double y2, glow_eDrawType border_drawtype,
+                           int line_width, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                           std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
 
-  switch (pass) {
-  case glow_eExportPass_Shape: {
+  switch (pass)
+  {
+  case glow_eExportPass_Shape:
+  {
     if (is_nodeclass)
       nc->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
     else
       ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
     fp << "    new Line2D.Float( " << x1 - dim_x0 + glow_cJBean_Offset << "F, "
-       << y1 - dim_y0 + glow_cJBean_Offset << "F, "
-       << x2 - dim_x0 + glow_cJBean_Offset << "F, "
+       << y1 - dim_y0 + glow_cJBean_Offset << "F, " << x2 - dim_x0 + glow_cJBean_Offset << "F, "
        << y2 - dim_y0 + glow_cJBean_Offset << "F),\n";
     break;
   }
-  case glow_eExportPass_Init: {
+  case glow_eExportPass_Init:
+  {
     break;
   }
-  case glow_eExportPass_Draw: {
+  case glow_eExportPass_Draw:
+  {
     fp << "    g.setStroke( new BasicStroke(" << line_width + 1
        << "F, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));\n"
-       << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-       << ", colorTone,\n"
+       << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
        << "	 colorShift, colorIntensity, colorBrightness, colorInverse, "
           "borderColor, dimmed));"
        << '\n';
     if (page <= 1)
       fp << "    g.draw( shapes[" << *shape_cnt << "]);\n";
     else
-      fp << "    g.draw( shapes_p" << page << "[" << *shape_cnt << "]);"
-         << '\n';
+      fp << "    g.draw( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
 
-    if (*shape_cnt / 500 > func_cnt) {
+    if (*shape_cnt / 500 > func_cnt)
+    {
       // Max number of bytes in a java function is ~65000
       fp << "    paintComponent" << func_cnt << "( g, save);\n"
          << "  }\n"
-         << "  void paintComponent" << func_cnt
-         << "( Graphics2D g, AffineTransform save) {\n";
+         << "  void paintComponent" << func_cnt << "( Graphics2D g, AffineTransform save) {\n";
       func_cnt++;
     }
     break;
@@ -1109,65 +1109,60 @@ void GlowExportJBean::line(double x1, double y1, double x2, double y2,
   }
 }
 
-void GlowExportJBean::rect(double x0, double y0, double width, double height,
-    int fill, int border, glow_eDrawType fill_drawtype,
-    glow_eDrawType border_drawtype, int line_width, double shadow_width,
-    int shadow, int drawtype_incr, int fixcolor, glow_eGradient gradient,
-    int gc1, int gc2, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-    std::ofstream& fp)
+void GlowExportJBean::rect(double x0, double y0, double width, double height, int fill, int border,
+                           glow_eDrawType fill_drawtype, glow_eDrawType border_drawtype, int line_width,
+                           double shadow_width, int shadow, int drawtype_incr, int fixcolor,
+                           glow_eGradient gradient, int gc1, int gc2, glow_eExportPass pass, int* shape_cnt,
+                           int node_cnt, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
 
-  switch (pass) {
-  case glow_eExportPass_Shape: {
+  switch (pass)
+  {
+  case glow_eExportPass_Shape:
+  {
     if (is_nodeclass)
       nc->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
     else
       ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
-    fp << "    new Rectangle2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-       << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, "
-       << height << "F),\n";
-    if ((is_nodeclass && !feq(shadow_width, 0.0))
-        || (!is_nodeclass && shadow)) {
-      fp << "    new Polygon( new int[] { "
-         << int(x0 - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
+    fp << "    new Rectangle2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+       << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F),\n";
+    if ((is_nodeclass && !feq(shadow_width, 0.0)) || (!is_nodeclass && shadow))
+    {
+      fp << "    new Polygon( new int[] { " << int(x0 - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
          << int(x0 + width - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
-         << int(x0 + width - shadow_width - dim_x0 + glow_cJBean_Offset + 0.5)
-         << ", " << int(x0 + shadow_width - dim_x0 + glow_cJBean_Offset + 0.5)
-         << ", " << int(x0 + shadow_width - dim_x0 + glow_cJBean_Offset + 0.5)
-         << ", " << int(x0 - dim_x0 + glow_cJBean_Offset + 0.5) << "}, "
-         << "new int[] { " << int(y0 - dim_y0 + glow_cJBean_Offset + 0.5)
-         << ", " << int(y0 - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
-         << int(y0 + shadow_width - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
-         << int(y0 + shadow_width - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
-         << int(y0 + height - shadow_width - dim_y0 + glow_cJBean_Offset + 0.5)
-         << ", " << int(y0 + height - dim_y0 + glow_cJBean_Offset + 0.5)
-         << "}, 6), \n"
-         << "    new Polygon( new int[] { "
-         << int(x0 + width - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
-         << int(x0 + width - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
-         << int(x0 + width - shadow_width - dim_x0 + glow_cJBean_Offset + 0.5)
-         << ", "
-         << int(x0 + width - shadow_width - dim_x0 + glow_cJBean_Offset + 0.5)
-         << ", " << int(x0 + shadow_width - dim_x0 + glow_cJBean_Offset + 0.5)
-         << ", " << int(x0 - dim_x0 + glow_cJBean_Offset + 0.5) << "}, "
-         << "new int[] { "
-         << int(y0 + height - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(x0 + width - shadow_width - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(x0 + shadow_width - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(x0 + shadow_width - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(x0 - dim_x0 + glow_cJBean_Offset + 0.5) << "}, "
+         << "new int[] { " << int(y0 - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
          << int(y0 - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
          << int(y0 + shadow_width - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
-         << int(y0 + height - shadow_width - dim_y0 + glow_cJBean_Offset + 0.5)
-         << ", "
-         << int(y0 + height - shadow_width - dim_y0 + glow_cJBean_Offset + 0.5)
-         << ", " << int(y0 + height - dim_y0 + glow_cJBean_Offset + 0.5)
-         << "}, 6), \n";
+         << int(y0 + shadow_width - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(y0 + height - shadow_width - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(y0 + height - dim_y0 + glow_cJBean_Offset + 0.5) << "}, 6), \n"
+         << "    new Polygon( new int[] { " << int(x0 + width - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(x0 + width - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(x0 + width - shadow_width - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(x0 + width - shadow_width - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(x0 + shadow_width - dim_x0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(x0 - dim_x0 + glow_cJBean_Offset + 0.5) << "}, "
+         << "new int[] { " << int(y0 + height - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(y0 - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(y0 + shadow_width - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(y0 + height - shadow_width - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(y0 + height - shadow_width - dim_y0 + glow_cJBean_Offset + 0.5) << ", "
+         << int(y0 + height - dim_y0 + glow_cJBean_Offset + 0.5) << "}, 6), \n";
     }
     break;
   }
-  case glow_eExportPass_Init: {
+  case glow_eExportPass_Init:
+  {
     break;
   }
-  case glow_eExportPass_Draw: {
+  case glow_eExportPass_Draw:
+  {
     int base_shape = *shape_cnt;
     char fixcolor_str[8];
 
@@ -1181,221 +1176,211 @@ void GlowExportJBean::rect(double x0, double y0, double width, double height,
     else
       strcpy(fixcolor_str, "false");
 
-    if (is_nodeclass) {
-      if (feq(shadow_width, 0.0)) {
-        if (gradient == glow_eGradient_No) {
+    if (is_nodeclass)
+    {
+      if (feq(shadow_width, 0.0))
+      {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, No shadow, Nodeclass
           fp << "    {\n"; // Avoid multiple declarations of fcolor
           if (fixcolor)
             fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
           else
-            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
-          if (fill) {
+          if (fill)
+          {
             fp << "    g.setColor(GeColor.getColor( fcolor));\n";
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
           fp << "    }\n";
-        } else {
+        }
+        else
+        {
           // Gradient, No shadow, Nodeclass
-          if (fill) {
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+          if (fill)
+          {
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
         }
         (*shape_cnt)++;
-      } else {
+      }
+      else
+      {
         // Shadow, Nodeclass
 
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, Shadow, Nodeclass
           fp << "    {\n"; // Avoid multiple declarations of fcolor
           if (fixcolor)
             fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
           else
-            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
-          if (fill) {
+          if (fill)
+          {
             fp << "    if ( gradient == GeGradient.eGradient_No) {\n";
 
             fp << "    g.setColor(GeColor.getColor( fcolor));\n";
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
             fp << "    } else {\n";
-            fp << "    GeGradient.paint( g, gradient," << gc1 << "," << gc2
-               << "," << x0 - dim_x0 + glow_cJBean_Offset << "F,"
-               << y0 - dim_y0 + glow_cJBean_Offset << "F," << width << "F,"
-               << height << "F, " << fixcolor_str << "," << fill_drawtype
+            fp << "    GeGradient.paint( g, gradient," << gc1 << "," << gc2 << ","
+               << x0 - dim_x0 + glow_cJBean_Offset << "F," << y0 - dim_y0 + glow_cJBean_Offset << "F,"
+               << width << "F," << height << "F, " << fixcolor_str << "," << fill_drawtype
                << ", colorTone, colorShift, colorIntensity, colorInverse, "
                   "fillColor, dimmed);"
                << '\n';
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
             fp << "    }\n";
           }
           if (!shadow)
             fp << "    if ( shadow != 0) {\n";
-          fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr
-             << ", colorInverse));\n";
+          fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr << ", colorInverse));\n";
           if (page <= 1)
             fp << "    g.fill( shapes[" << (*shape_cnt) + 1 << "]);\n";
           else
-            fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 1
-               << "]);\n";
-          fp << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr
-             << ", colorInverse));\n";
+            fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 1 << "]);\n";
+          fp << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr << ", colorInverse));\n";
           if (page <= 1)
             fp << "    g.fill( shapes[" << (*shape_cnt) + 2 << "]);\n";
           else
-            fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 2
-               << "]);\n";
+            fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 2 << "]);\n";
           if (!shadow)
             fp << "    }\n";
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
           fp << "    }\n";
-        } else {
+        }
+        else
+        {
           // Gradient, Shadow, Nodeclass
-          if (fill) {
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+          if (fill)
+          {
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
           }
           fp << "    {\n"; // Avoid multiple declarations of fcolor
           if (fixcolor)
             fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
           else
-            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
           if (!shadow)
             fp << "    if ( shadow != 0) {\n";
-          fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr
-             << ", colorInverse));\n";
+          fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr << ", colorInverse));\n";
           if (page <= 1)
             fp << "    g.fill( shapes[" << (*shape_cnt) + 1 << "]);\n";
           else
-            fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 1
-               << "]);\n";
-          fp << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr
-             << ", colorInverse));\n";
+            fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 1 << "]);\n";
+          fp << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr << ", colorInverse));\n";
           if (page <= 1)
             fp << "    g.fill( shapes[" << (*shape_cnt) + 2 << "]);\n";
           else
-            fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 2
-               << "]);\n";
+            fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 2 << "]);\n";
           if (!shadow)
             fp << "    }\n";
 
           fp << "    }\n";
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
         }
         (*shape_cnt) += 3;
       }
-    } else {
+    }
+    else
+    {
       // No nodeclass
-      if (!shadow) {
+      if (!shadow)
+      {
         // No nodeclass, No shadow
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, No shadow, No nodeclass
           fp << "    {\n"; // Avoid multiple declarations of fcolor
           if (fixcolor)
             fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
           else
-            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
-          if (fill) {
+          if (fill)
+          {
             fp << "    g.setColor(GeColor.getColor( fcolor));\n";
             fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
@@ -1403,92 +1388,90 @@ void GlowExportJBean::rect(double x0, double y0, double width, double height,
           }
           fp << "    }\n";
           (*shape_cnt)++;
-        } else {
+        }
+        else
+        {
           // Gradient, No Shadow, No nodeclass
-          if (fill) {
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+          if (fill)
+          {
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
 
             fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
           (*shape_cnt)++;
         }
-      } else {
+      }
+      else
+      {
         // Shadow, No nodeclass
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, Shadow, No nodeclass
           fp << "    {\n"; // Avoid multiple declarations of fcolor
           if (fixcolor)
             fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
           else
-            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
-          if (fill) {
+          if (fill)
+          {
             fp << "    g.setColor(GeColor.getColor( fcolor));\n"
                << "    g.fill( shapes[" << *shape_cnt << "]);\n";
           }
-          fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr
-             << ", colorInverse));\n"
+          fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr << ", colorInverse));\n"
              << "    g.fill( shapes[" << (*shape_cnt) + 1 << "]);\n"
-             << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr
-             << ", colorInverse));\n"
+             << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr << ", colorInverse));\n"
              << "    g.fill( shapes[" << (*shape_cnt) + 2 << "]);\n"
              << "    }\n";
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             fp << "    g.draw( shapes[" << base_shape << "]);\n";
           }
-        } else {
+        }
+        else
+        {
           // Gradient, Shadow, No nodeclass
-          if (fill) {
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+          if (fill)
+          {
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
             fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
           }
           fp << "    {\n"; // Avoid multiple declarations of fcolor
           if (fixcolor)
             fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
           else
-            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype
-               << ", colorTone,\n"
+            fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, fillColor, dimmed);"
                << '\n';
-          fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr
-             << ", colorInverse));\n"
+          fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr << ", colorInverse));\n"
              << "    g.fill( shapes[" << (*shape_cnt) + 1 << "]);\n"
-             << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr
-             << ", colorInverse));\n"
+             << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr << ", colorInverse));\n"
              << "    g.fill( shapes[" << (*shape_cnt) + 2 << "]);\n"
              << "    }\n";
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n'
@@ -1504,94 +1487,83 @@ void GlowExportJBean::rect(double x0, double y0, double width, double height,
   }
 }
 
-void GlowExportJBean::rectrounded(double x0, double y0, double width,
-    double height, int fill, int border, glow_eDrawType fill_drawtype,
-    glow_eDrawType border_drawtype, int line_width, double roundamount,
-    double shadow_width, int shadow, int drawtype_incr, glow_eGradient gradient,
-    int gc1, int gc2, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-    std::ofstream& fp)
+void GlowExportJBean::rectrounded(double x0, double y0, double width, double height, int fill, int border,
+                                  glow_eDrawType fill_drawtype, glow_eDrawType border_drawtype,
+                                  int line_width, double roundamount, double shadow_width, int shadow,
+                                  int drawtype_incr, glow_eGradient gradient, int gc1, int gc2,
+                                  glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   int fixcolor = 0;
 
-  switch (pass) {
-  case glow_eExportPass_Shape: {
+  switch (pass)
+  {
+  case glow_eExportPass_Shape:
+  {
     if (is_nodeclass)
       nc->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
     else
       ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
-    fp << "    new RoundRectangle2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-       << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, "
-       << height << "F, " << 2 * roundamount << "F, " << 2 * roundamount
-       << "F),\n";
-    if (fill && ((is_nodeclass && !feq(shadow_width, 0.0))
-                    || (!is_nodeclass && shadow))) {
+    fp << "    new RoundRectangle2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+       << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << 2 * roundamount
+       << "F, " << 2 * roundamount << "F),\n";
+    if (fill && ((is_nodeclass && !feq(shadow_width, 0.0)) || (!is_nodeclass && shadow)))
+    {
       // Light shadow
-      fp << "    new Rectangle2D.Float("
-         << x0 - dim_x0 + glow_cJBean_Offset + roundamount << "F, "
-         << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width - 2 * roundamount
-         << "F, " << shadow_width << "F),\n"
-         << "    new Rectangle2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-         << "F, " << y0 - dim_y0 + glow_cJBean_Offset + roundamount << "F, "
-         << shadow_width << "F, " << height - 2 * roundamount << "F),\n"
+      fp << "    new Rectangle2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset + roundamount << "F, "
+         << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width - 2 * roundamount << "F, " << shadow_width
+         << "F),\n"
+         << "    new Rectangle2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+         << y0 - dim_y0 + glow_cJBean_Offset + roundamount << "F, " << shadow_width << "F, "
+         << height - 2 * roundamount << "F),\n"
          << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
-         << y0 - dim_y0 + glow_cJBean_Offset << "F, " << 2 * roundamount
-         << "F, " << 2 * roundamount << "F, " << 90 << "F, " << 90
-         << "F, Arc2D.PIE),\n"
-         << "    new Arc2D.Float("
-         << x0 - dim_x0 + glow_cJBean_Offset + width - 2 * roundamount << "F, "
-         << y0 - dim_y0 + glow_cJBean_Offset << "F, " << 2 * roundamount
-         << "F, " << 2 * roundamount << "F, " << 45 << "F, " << 45
-         << "F, Arc2D.PIE),\n"
+         << y0 - dim_y0 + glow_cJBean_Offset << "F, " << 2 * roundamount << "F, " << 2 * roundamount << "F, "
+         << 90 << "F, " << 90 << "F, Arc2D.PIE),\n"
+         << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset + width - 2 * roundamount << "F, "
+         << y0 - dim_y0 + glow_cJBean_Offset << "F, " << 2 * roundamount << "F, " << 2 * roundamount << "F, "
+         << 45 << "F, " << 45 << "F, Arc2D.PIE),\n"
          << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
-         << y0 - dim_y0 + glow_cJBean_Offset + height - 2 * roundamount << "F, "
-         << 2 * roundamount << "F, " << 2 * roundamount << "F, " << 180 << "F, "
-         << 45 << "F, Arc2D.PIE),\n";
+         << y0 - dim_y0 + glow_cJBean_Offset + height - 2 * roundamount << "F, " << 2 * roundamount << "F, "
+         << 2 * roundamount << "F, " << 180 << "F, " << 45 << "F, Arc2D.PIE),\n";
       // Dark shadow
-      fp << "    new Rectangle2D.Float("
-         << x0 - dim_x0 + glow_cJBean_Offset + roundamount << "F, "
-         << y0 - dim_y0 + glow_cJBean_Offset + height - shadow_width << "F, "
-         << width - 2 * roundamount << "F, " << shadow_width << "F),\n"
-         << "    new Rectangle2D.Float("
-         << x0 - dim_x0 + glow_cJBean_Offset + width - shadow_width << "F, "
-         << y0 - dim_y0 + glow_cJBean_Offset + roundamount << "F, "
-         << shadow_width << "F, " << height - 2 * roundamount << "F),\n"
-         << "    new Arc2D.Float("
-         << x0 - dim_x0 + glow_cJBean_Offset + width - 2 * roundamount << "F, "
-         << y0 - dim_y0 + glow_cJBean_Offset + height - 2 * roundamount << "F, "
-         << 2 * roundamount << "F, " << 2 * roundamount << "F, " << 270 << "F, "
-         << 90 << "F, Arc2D.PIE),\n"
-         << "    new Arc2D.Float("
-         << x0 - dim_x0 + glow_cJBean_Offset + width - 2 * roundamount << "F, "
-         << y0 - dim_y0 + glow_cJBean_Offset << "F, " << 2 * roundamount
-         << "F, " << 2 * roundamount << "F, " << 0 << "F, " << 45
-         << "F, Arc2D.PIE),\n"
+      fp << "    new Rectangle2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset + roundamount << "F, "
+         << y0 - dim_y0 + glow_cJBean_Offset + height - shadow_width << "F, " << width - 2 * roundamount
+         << "F, " << shadow_width << "F),\n"
+         << "    new Rectangle2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset + width - shadow_width << "F, "
+         << y0 - dim_y0 + glow_cJBean_Offset + roundamount << "F, " << shadow_width << "F, "
+         << height - 2 * roundamount << "F),\n"
+         << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset + width - 2 * roundamount << "F, "
+         << y0 - dim_y0 + glow_cJBean_Offset + height - 2 * roundamount << "F, " << 2 * roundamount << "F, "
+         << 2 * roundamount << "F, " << 270 << "F, " << 90 << "F, Arc2D.PIE),\n"
+         << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset + width - 2 * roundamount << "F, "
+         << y0 - dim_y0 + glow_cJBean_Offset << "F, " << 2 * roundamount << "F, " << 2 * roundamount << "F, "
+         << 0 << "F, " << 45 << "F, Arc2D.PIE),\n"
          << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
-         << y0 - dim_y0 + glow_cJBean_Offset + height - 2 * roundamount << "F, "
-         << 2 * roundamount << "F, " << 2 * roundamount << "F, " << 225 << "F, "
-         << 45 << "F, Arc2D.PIE),\n";
-      if (roundamount > shadow_width) {
-        fp << "    new RoundRectangle2D.Float("
-           << x0 - dim_x0 + glow_cJBean_Offset + shadow_width << "F, "
-           << y0 - dim_y0 + glow_cJBean_Offset + shadow_width << "F, "
-           << width - 2 * shadow_width << "F, " << height - 2 * shadow_width
-           << "F, " << 2 * roundamount - 2 * shadow_width << "F, "
+         << y0 - dim_y0 + glow_cJBean_Offset + height - 2 * roundamount << "F, " << 2 * roundamount << "F, "
+         << 2 * roundamount << "F, " << 225 << "F, " << 45 << "F, Arc2D.PIE),\n";
+      if (roundamount > shadow_width)
+      {
+        fp << "    new RoundRectangle2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset + shadow_width << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset + shadow_width << "F, " << width - 2 * shadow_width << "F, "
+           << height - 2 * shadow_width << "F, " << 2 * roundamount - 2 * shadow_width << "F, "
            << 2 * roundamount - 2 * shadow_width << "F),\n";
-      } else {
-        fp << "    new Rectangle2D.Float("
-           << x0 - dim_x0 + glow_cJBean_Offset + shadow_width << "F, "
-           << y0 - dim_y0 + glow_cJBean_Offset + shadow_width << "F, "
-           << width - 2 * shadow_width << "F, " << height - 2 * shadow_width
-           << "F),\n";
+      }
+      else
+      {
+        fp << "    new Rectangle2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset + shadow_width << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset + shadow_width << "F, " << width - 2 * shadow_width << "F, "
+           << height - 2 * shadow_width << "F),\n";
       }
     }
     break;
   }
-  case glow_eExportPass_Init: {
+  case glow_eExportPass_Init:
+  {
     break;
   }
-  case glow_eExportPass_Draw: {
+  case glow_eExportPass_Draw:
+  {
     int base_shape = *shape_cnt;
     char fixcolor_str[8];
 
@@ -1605,17 +1577,20 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
     else
       ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
-    if (is_nodeclass) {
-      if (feq(shadow_width, 0.0)) {
-        if (gradient == glow_eGradient_No) {
+    if (is_nodeclass)
+    {
+      if (feq(shadow_width, 0.0))
+      {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, No shadow, Nodeclass
-          if (fill) {
+          if (fill)
+          {
             fp << "    {\n"; // Avoid multiple declarations of fcolor
             if (fixcolor)
               fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
             else
-              fp << "    int fcolor = GeColor.getDrawtype("
-                 << (int)fill_drawtype << ", colorTone,\n"
+              fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                  << "	 colorShift, colorIntensity, colorBrightness, "
                     "colorInverse, fillColor, dimmed);"
                  << '\n';
@@ -1623,58 +1598,58 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
           fp << "    }\n";
-        } else {
+        }
+        else
+        {
           // Gradient, No shadow, Nodeclass
-          if (fill) {
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+          if (fill)
+          {
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
           fp << "    }\n";
         }
         (*shape_cnt)++;
-      } else {
+      }
+      else
+      {
         // Shadow, Nodeclass
 
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, Shadow, Nodeclass
-          if (fill) {
+          if (fill)
+          {
             fp << "    {\n"; // Avoid multiple declarations of fcolor
             if (!shadow)
               fp << "    int fillshape = " << *shape_cnt << ";\n";
@@ -1684,15 +1659,13 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
             if (fixcolor)
               fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
             else
-              fp << "    int fcolor = GeColor.getDrawtype("
-                 << (int)fill_drawtype << ", colorTone,\n"
+              fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                  << "	 colorShift, colorIntensity, colorBrightness, "
                     "colorInverse, fillColor, dimmed);"
                  << '\n';
             if (!shadow)
               fp << "    if ( shadow != 0) {\n";
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, "
-               << -drawtype_incr << ", colorInverse));\n";
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr << ", colorInverse));\n";
             if (page <= 1)
               fp << "    g.fill( shapes[" << (*shape_cnt) + 1 << "]);\n"
                  << "    g.fill( shapes[" << (*shape_cnt) + 2 << "]);\n"
@@ -1700,18 +1673,12 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
                  << "    g.fill( shapes[" << (*shape_cnt) + 4 << "]);\n"
                  << "    g.fill( shapes[" << (*shape_cnt) + 5 << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 1
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 2
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 3
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 4
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 5
-                 << "]);\n";
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr
-               << ", colorInverse));\n";
+              fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 1 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 2 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 3 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 4 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 5 << "]);\n";
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr << ", colorInverse));\n";
             if (page <= 1)
               fp << "    g.fill( shapes[" << (*shape_cnt) + 6 << "]);\n"
                  << "    g.fill( shapes[" << (*shape_cnt) + 7 << "]);\n"
@@ -1719,16 +1686,11 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
                  << "    g.fill( shapes[" << (*shape_cnt) + 9 << "]);\n"
                  << "    g.fill( shapes[" << (*shape_cnt) + 10 << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 6
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 7
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 8
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 9
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 10
-                 << "]);\n";
+              fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 6 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 7 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 8 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 9 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 10 << "]);\n";
             if (!shadow)
               fp << "    fillshape = " << (*shape_cnt) + 11 << ";\n"
                  << "    }\n";
@@ -1740,10 +1702,9 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
             else
               fp << "    g.fill( shapes_p" << page << "[fillshape]);\n";
             fp << "    } else {\n";
-            fp << "    GeGradient.paint( g, gradient," << gc1 << "," << gc2
-               << "," << x0 - dim_x0 + glow_cJBean_Offset << "F,"
-               << y0 - dim_y0 + glow_cJBean_Offset << "F," << width << "F,"
-               << height << "F, " << fixcolor_str << "," << fill_drawtype
+            fp << "    GeGradient.paint( g, gradient," << gc1 << "," << gc2 << ","
+               << x0 - dim_x0 + glow_cJBean_Offset << "F," << y0 - dim_y0 + glow_cJBean_Offset << "F,"
+               << width << "F," << height << "F, " << fixcolor_str << "," << fill_drawtype
                << ", colorTone, colorShift, colorIntensity, colorInverse, "
                   "fillColor, dimmed);"
                << '\n';
@@ -1754,38 +1715,37 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
             fp << "    }\n"
                << "    }\n";
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
-        } else {
+        }
+        else
+        {
           // Gradient, Shadow, Nodeclass
-          if (fill) {
+          if (fill)
+          {
             fp << "    {\n"; // Avoid multiple declarations of fcolor
             if (!shadow)
               fp << "    int fillshape = " << *(shape_cnt) + 11 << ";\n";
             if (fixcolor)
               fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
             else
-              fp << "    int fcolor = GeColor.getDrawtype("
-                 << (int)fill_drawtype << ", colorTone,\n"
+              fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                  << "	 colorShift, colorIntensity, colorBrightness, "
                     "colorInverse, fillColor, dimmed);"
                  << '\n';
             if (!shadow)
               fp << "    if ( shadow != 0) {\n";
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, "
-               << -drawtype_incr << ", colorInverse));\n";
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr << ", colorInverse));\n";
             if (page <= 1)
               fp << "    g.fill( shapes[" << (*shape_cnt) + 1 << "]);\n"
                  << "    g.fill( shapes[" << (*shape_cnt) + 2 << "]);\n"
@@ -1793,18 +1753,12 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
                  << "    g.fill( shapes[" << (*shape_cnt) + 4 << "]);\n"
                  << "    g.fill( shapes[" << (*shape_cnt) + 5 << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 1
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 2
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 3
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 4
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 5
-                 << "]);\n";
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr
-               << ", colorInverse));\n";
+              fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 1 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 2 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 3 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 4 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 5 << "]);\n";
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr << ", colorInverse));\n";
             if (page <= 1)
               fp << "    g.fill( shapes[" << (*shape_cnt) + 6 << "]);\n"
                  << "    g.fill( shapes[" << (*shape_cnt) + 7 << "]);\n"
@@ -1812,51 +1766,45 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
                  << "    g.fill( shapes[" << (*shape_cnt) + 9 << "]);\n"
                  << "    g.fill( shapes[" << (*shape_cnt) + 10 << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 6
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 7
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 8
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 9
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 10
-                 << "]);\n";
-            if (!shadow) {
+              fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 6 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 7 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 8 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 9 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 10 << "]);\n";
+            if (!shadow)
+            {
               fp << "    } else\n"
                  << "    fillshape = " << *shape_cnt << ";\n";
             }
 
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
-            if (!shadow) {
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
+            if (!shadow)
+            {
               if (page <= 1)
                 fp << "    g.fill( shapes[fillshape]);\n";
               else
                 fp << "    g.fill( shapes_p" << page << "[fillshape]);\n";
-            } else {
+            }
+            else
+            {
               if (page <= 1)
-                fp << "    g.fill( shapes[" << (*shape_cnt) + 11 << "]);"
-                   << '\n';
+                fp << "    g.fill( shapes[" << (*shape_cnt) + 11 << "]);" << '\n';
               else
-                fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 11
-                   << "]);\n";
+                fp << "    g.fill( shapes_p" << page << "[" << (*shape_cnt) + 11 << "]);\n";
             }
             fp << "    }\n";
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
         }
         if (fill)
@@ -1864,19 +1812,23 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
         else
           (*shape_cnt)++;
       }
-    } else {
+    }
+    else
+    {
       // No nodeclass
-      if (!shadow) {
+      if (!shadow)
+      {
         // No nodeclass, No shadow
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, No shadow, No nodeclass
-          if (fill) {
+          if (fill)
+          {
             fp << "    {\n"; // Avoid multiple declarations of fcolor
             if (fixcolor)
               fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
             else
-              fp << "    int fcolor = GeColor.getDrawtype("
-                 << (int)fill_drawtype << ", colorTone,\n"
+              fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                  << "	 colorShift, colorIntensity, colorBrightness, "
                     "colorInverse, fillColor, dimmed);"
                  << '\n'
@@ -1884,64 +1836,64 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
                  << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             fp << "    }\n";
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             fp << "    g.draw( shapes[" << base_shape << "]);\n";
           }
           (*shape_cnt)++;
-        } else {
+        }
+        else
+        {
           // Gradient, No Shadow, No nodeclass
-          if (fill) {
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+          if (fill)
+          {
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
 
             fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << base_shape << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << base_shape << "]);" << '\n';
           }
           (*shape_cnt)++;
         }
-      } else {
+      }
+      else
+      {
         // Shadow, No nodeclass
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, Shadow, No nodeclass
-          if (fill) {
+          if (fill)
+          {
             fp << "    {\n"; // Avoid multiple declarations of fcolor
             if (fixcolor)
               fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
             else
-              fp << "    int fcolor = GeColor.getDrawtype("
-                 << (int)fill_drawtype << ", colorTone,\n"
+              fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                  << "	 colorShift, colorIntensity, colorBrightness, "
                     "colorInverse, fillColor, dimmed);"
                  << '\n';
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, "
-               << -drawtype_incr << ", colorInverse));\n"
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr << ", colorInverse));\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 1 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 2 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 3 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 4 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 5 << "]);\n"
-               << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr
-               << ", colorInverse));\n"
+               << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr << ", colorInverse));\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 6 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 7 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 8 << "]);\n"
@@ -1951,52 +1903,49 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
                << "    g.fill( shapes[" << (*shape_cnt) + 11 << "]);\n"
                << "    }\n";
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             fp << "    g.draw( shapes[" << base_shape << "]);\n";
           }
-        } else {
+        }
+        else
+        {
           // Gradient, Shadow, No nodeclass
-          if (fill) {
+          if (fill)
+          {
             fp << "    {\n"; // Avoid multiple declarations of fcolor
             if (fixcolor)
               fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
             else
-              fp << "    int fcolor = GeColor.getDrawtype("
-                 << (int)fill_drawtype << ", colorTone,\n"
+              fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                  << "	 colorShift, colorIntensity, colorBrightness, "
                     "colorInverse, fillColor, dimmed);"
                  << '\n';
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, "
-               << -drawtype_incr << ", colorInverse));\n"
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr << ", colorInverse));\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 1 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 2 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 3 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 4 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 5 << "]);\n"
-               << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr
-               << ", colorInverse));\n"
+               << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr << ", colorInverse));\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 6 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 7 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 8 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 9 << "]);\n"
                << "    g.fill( shapes[" << (*shape_cnt) + 10 << "]);\n"
                << "    }\n";
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
             fp << "    g.fill( shapes[" << (*shape_cnt) + 11 << "]);\n";
           }
-          if (border) {
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+          if (border)
+          {
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n'
@@ -2015,18 +1964,19 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width,
   }
 }
 
-void GlowExportJBean::arc(double x0, double y0, double width, double height,
-    double angle1, double angle2, int fill, int border,
-    glow_eDrawType fill_drawtype, glow_eDrawType border_drawtype,
-    int line_width, double shadow_width, int shadow, int drawtype_incr,
-    int fixcolor, glow_eGradient gradient, int gc1, int gc2,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
+void GlowExportJBean::arc(double x0, double y0, double width, double height, double angle1, double angle2,
+                          int fill, int border, glow_eDrawType fill_drawtype, glow_eDrawType border_drawtype,
+                          int line_width, double shadow_width, int shadow, int drawtype_incr, int fixcolor,
+                          glow_eGradient gradient, int gc1, int gc2, glow_eExportPass pass, int* shape_cnt,
+                          int node_cnt, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char arc_type_str[20];
 
-  switch (pass) {
-  case glow_eExportPass_Shape: {
+  switch (pass)
+  {
+  case glow_eExportPass_Shape:
+  {
     if (is_nodeclass)
       nc->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
     else
@@ -2036,108 +1986,99 @@ void GlowExportJBean::arc(double x0, double y0, double width, double height,
     else
       strcpy(arc_type_str, "PIE");
 
-    if (is_nodeclass) {
-      if (feq(shadow_width, 0.0)
-          || !feq(angle2, 360.0)) {
+    if (is_nodeclass)
+    {
+      if (feq(shadow_width, 0.0) || !feq(angle2, 360.0))
+      {
         // No shadow
-        fp << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << angle1 << "F, " << angle2
-           << "F, Arc2D." << arc_type_str << "),\n";
-      } else if (!feq(shadow_width, 0.0)
-          && gradient != glow_eGradient_No) {
-        fp << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << angle1 << "F, " << angle2
-           << "F, Arc2D." << arc_type_str << "),\n"
-           << "    new Arc2D.Float("
-           << x0 - dim_x0 + glow_cJBean_Offset + shadow_width << "F, "
-           << y0 - dim_y0 + glow_cJBean_Offset + shadow_width << "F, "
-           << width - 2 * shadow_width << "F, " << height - 2 * shadow_width
-           << "F, " << angle1 << "F, " << angle2 << "F, Arc2D." << arc_type_str
-           << "),\n";
-      } else {
-        fp << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << 35 << "F, " << 140 << "F, Arc2D."
-           << arc_type_str << "),\n"
-           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << 215 << "F, " << 140 << "F, Arc2D."
-           << arc_type_str << "),\n"
-           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << -5 << "F, " << 40 << "F, Arc2D."
-           << arc_type_str << "),\n"
-           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << 175 << "F, " << 40 << "F, Arc2D."
-           << arc_type_str << "),\n"
-           << "    new Arc2D.Float("
-           << x0 - dim_x0 + glow_cJBean_Offset + shadow_width << "F, "
-           << y0 - dim_y0 + glow_cJBean_Offset + shadow_width << "F, "
-           << width - 2 * shadow_width << "F, " << height - 2 * shadow_width
-           << "F, " << angle1 << "F, " << angle2 << "F, Arc2D." << arc_type_str
-           << "),\n"
-           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << angle1 << "F, " << angle2
-           << "F, Arc2D." << arc_type_str << "),\n";
+        fp << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << angle1
+           << "F, " << angle2 << "F, Arc2D." << arc_type_str << "),\n";
       }
-    } else { // Not nodeclass
-      if (!shadow || !feq(angle2, 360.0)) {
-        // No shadow
-        fp << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << angle1 << "F, " << angle2
-           << "F, Arc2D." << arc_type_str << "),\n";
-      } else if (gradient == glow_eGradient_No) {
-        fp << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << 35 << "F, " << 140 << "F, Arc2D."
-           << arc_type_str << "),\n"
-           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << 215 << "F, " << 140 << "F, Arc2D."
-           << arc_type_str << "),\n"
-           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << -5 << "F, " << 40 << "F, Arc2D."
-           << arc_type_str << "),\n"
-           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << 175 << "F, " << 40 << "F, Arc2D."
-           << arc_type_str << "),\n"
-           << "    new Arc2D.Float("
-           << x0 - dim_x0 + glow_cJBean_Offset + shadow_width << "F, "
-           << y0 - dim_y0 + glow_cJBean_Offset + shadow_width << "F, "
-           << width - 2 * shadow_width << "F, " << height - 2 * shadow_width
-           << "F, " << angle1 << "F, " << angle2 << "F, Arc2D." << arc_type_str
+      else if (!feq(shadow_width, 0.0) && gradient != glow_eGradient_No)
+      {
+        fp << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << angle1
+           << "F, " << angle2 << "F, Arc2D." << arc_type_str << "),\n"
+           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset + shadow_width << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset + shadow_width << "F, " << width - 2 * shadow_width << "F, "
+           << height - 2 * shadow_width << "F, " << angle1 << "F, " << angle2 << "F, Arc2D." << arc_type_str
+           << "),\n";
+      }
+      else
+      {
+        fp << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << 35 << "F, "
+           << 140 << "F, Arc2D." << arc_type_str << "),\n"
+           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << 215 << "F, "
+           << 140 << "F, Arc2D." << arc_type_str << "),\n"
+           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << -5 << "F, "
+           << 40 << "F, Arc2D." << arc_type_str << "),\n"
+           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << 175 << "F, "
+           << 40 << "F, Arc2D." << arc_type_str << "),\n"
+           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset + shadow_width << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset + shadow_width << "F, " << width - 2 * shadow_width << "F, "
+           << height - 2 * shadow_width << "F, " << angle1 << "F, " << angle2 << "F, Arc2D." << arc_type_str
            << "),\n"
-           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << angle1 << "F, " << angle2
-           << "F, Arc2D." << arc_type_str << "),\n";
-      } else {
+           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << angle1
+           << "F, " << angle2 << "F, Arc2D." << arc_type_str << "),\n";
+      }
+    }
+    else
+    { // Not nodeclass
+      if (!shadow || !feq(angle2, 360.0))
+      {
+        // No shadow
+        fp << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << angle1
+           << "F, " << angle2 << "F, Arc2D." << arc_type_str << "),\n";
+      }
+      else if (gradient == glow_eGradient_No)
+      {
+        fp << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << 35 << "F, "
+           << 140 << "F, Arc2D." << arc_type_str << "),\n"
+           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << 215 << "F, "
+           << 140 << "F, Arc2D." << arc_type_str << "),\n"
+           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << -5 << "F, "
+           << 40 << "F, Arc2D." << arc_type_str << "),\n"
+           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << 175 << "F, "
+           << 40 << "F, Arc2D." << arc_type_str << "),\n"
+           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset + shadow_width << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset + shadow_width << "F, " << width - 2 * shadow_width << "F, "
+           << height - 2 * shadow_width << "F, " << angle1 << "F, " << angle2 << "F, Arc2D." << arc_type_str
+           << "),\n"
+           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << angle1
+           << "F, " << angle2 << "F, Arc2D." << arc_type_str << "),\n";
+      }
+      else
+      {
         // Gradient with shadow
-        fp << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset
-           << "F, " << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width
-           << "F, " << height << "F, " << angle1 << "F, " << angle2
-           << "F, Arc2D." << arc_type_str << "),\n"
-           << "    new Arc2D.Float("
-           << x0 - dim_x0 + glow_cJBean_Offset + shadow_width << "F, "
-           << y0 - dim_y0 + glow_cJBean_Offset + shadow_width << "F, "
-           << width - 2 * shadow_width << "F, " << height - 2 * shadow_width
-           << "F, " << angle1 << "F, " << angle2 << "F, Arc2D." << arc_type_str
+        fp << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset << "F, " << width << "F, " << height << "F, " << angle1
+           << "F, " << angle2 << "F, Arc2D." << arc_type_str << "),\n"
+           << "    new Arc2D.Float(" << x0 - dim_x0 + glow_cJBean_Offset + shadow_width << "F, "
+           << y0 - dim_y0 + glow_cJBean_Offset + shadow_width << "F, " << width - 2 * shadow_width << "F, "
+           << height - 2 * shadow_width << "F, " << angle1 << "F, " << angle2 << "F, Arc2D." << arc_type_str
            << "),\n";
       }
     }
     break;
   }
-  case glow_eExportPass_Init: {
+  case glow_eExportPass_Init:
+  {
     break;
   }
-  case glow_eExportPass_Draw: {
+  case glow_eExportPass_Draw:
+  {
     char fixcolor_str[8];
     if (fixcolor)
       strcpy(fixcolor_str, "true");
@@ -2149,129 +2090,118 @@ void GlowExportJBean::arc(double x0, double y0, double width, double height,
     else
       ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
-    if (is_nodeclass) {
-      if (feq(shadow_width, 0.0)
-          || !feq(angle2, 360.0)) {
+    if (is_nodeclass)
+    {
+      if (feq(shadow_width, 0.0) || !feq(angle2, 360.0))
+      {
         // Nodeclass, No shadow
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, No shadow, Nodeclass
-          if (fill) {
-            if (border) {
+          if (fill)
+          {
+            if (border)
+            {
               if (page <= 1)
-                fp << "    ((Arc2D)shapes[" << *shape_cnt
-                   << "]).setArcType(Arc2D.PIE);\n";
+                fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.PIE);\n";
               else
-                fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt
-                   << "]).setArcType(Arc2D.PIE);\n";
+                fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt << "]).setArcType(Arc2D.PIE);\n";
             }
             if (fixcolor)
-              fp << "    g.setColor(GeColor.getColor(" << (int)fill_drawtype
-                 << "));\n";
+              fp << "    g.setColor(GeColor.getColor(" << (int)fill_drawtype << "));\n";
             else
-              fp << "    g.setColor(GeColor.getColor(" << (int)fill_drawtype
-                 << ", colorTone,\n"
+              fp << "    g.setColor(GeColor.getColor(" << (int)fill_drawtype << ", colorTone,\n"
                  << "	 colorShift, colorIntensity, colorBrightness, "
                     "colorInverse, fillColor, dimmed));"
                  << '\n';
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
           }
-          if (border) {
-            if (fill) {
+          if (border)
+          {
+            if (fill)
+            {
               if (page <= 1)
-                fp << "    ((Arc2D)shapes[" << *shape_cnt
-                   << "]).setArcType(Arc2D.OPEN);\n";
+                fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.OPEN);\n";
               else
-                fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt
-                   << "]).setArcType(Arc2D.OPEN);\n";
+                fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt << "]).setArcType(Arc2D.OPEN);\n";
             }
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.draw( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
           }
-        } else {
+        }
+        else
+        {
           // Gradient, No Shadow, Nodeclass
-          if (fill) {
-            if (border) {
+          if (fill)
+          {
+            if (border)
+            {
               if (page <= 1)
-                fp << "    ((Arc2D)shapes[" << *shape_cnt
-                   << "]).setArcType(Arc2D.PIE);\n";
+                fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.PIE);\n";
               else
-                fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt
-                   << "]).setArcType(Arc2D.PIE);\n";
+                fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt << "]).setArcType(Arc2D.PIE);\n";
             }
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
 
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
           }
         }
-        if (border) {
-          if (fill) {
+        if (border)
+        {
+          if (fill)
+          {
             if (page <= 1)
-              fp << "    ((Arc2D)shapes[" << *shape_cnt
-                 << "]).setArcType(Arc2D.OPEN);\n";
+              fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.OPEN);\n";
             else
-              fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt
-                 << "]).setArcType(Arc2D.OPEN);\n";
+              fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt << "]).setArcType(Arc2D.OPEN);\n";
           }
-          fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));"
-             << '\n'
-             << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-             << ", colorTone,\n"
+          fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));" << '\n'
+             << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
              << "	 colorShift, colorIntensity, colorBrightness, "
                 "colorInverse, borderColor, dimmed));"
              << '\n';
           if (page <= 1)
             fp << "    g.draw( shapes[" << *shape_cnt << "]);\n";
           else
-            fp << "    g.draw( shapes_p" << page << "[" << *shape_cnt << "]);"
-               << '\n';
+            fp << "    g.draw( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
         }
         (*shape_cnt)++;
-      } else {
+      }
+      else
+      {
         // Shadow, Nodeclass
 
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, Shadow, Nodeclass
-          if (fill) {
-            if (border) {
+          if (fill)
+          {
+            if (border)
+            {
               if (page <= 1)
-                fp << "    ((Arc2D)shapes[" << *shape_cnt
-                   << "]).setArcType(Arc2D.PIE);\n"
-                   << "    ((Arc2D)shapes[" << *shape_cnt + 1
-                   << "]).setArcType(Arc2D.PIE);\n"
-                   << "    ((Arc2D)shapes[" << *shape_cnt + 2
-                   << "]).setArcType(Arc2D.PIE);\n"
-                   << "    ((Arc2D)shapes[" << *shape_cnt + 3
-                   << "]).setArcType(Arc2D.PIE);\n"
-                   << "    ((Arc2D)shapes[" << *shape_cnt + 4
-                   << "]).setArcType(Arc2D.PIE);\n";
+                fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.PIE);\n"
+                   << "    ((Arc2D)shapes[" << *shape_cnt + 1 << "]).setArcType(Arc2D.PIE);\n"
+                   << "    ((Arc2D)shapes[" << *shape_cnt + 2 << "]).setArcType(Arc2D.PIE);\n"
+                   << "    ((Arc2D)shapes[" << *shape_cnt + 3 << "]).setArcType(Arc2D.PIE);\n"
+                   << "    ((Arc2D)shapes[" << *shape_cnt + 4 << "]).setArcType(Arc2D.PIE);\n";
               else
-                fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt
-                   << "]).setArcType(Arc2D.PIE);\n"
-                   << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt + 1
-                   << "]).setArcType(Arc2D.PIE);\n"
-                   << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt + 2
-                   << "]).setArcType(Arc2D.PIE);\n"
-                   << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt + 3
-                   << "]).setArcType(Arc2D.PIE);\n"
+                fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt << "]).setArcType(Arc2D.PIE);\n"
+                   << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt + 1 << "]).setArcType(Arc2D.PIE);\n"
+                   << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt + 2 << "]).setArcType(Arc2D.PIE);\n"
+                   << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt + 3 << "]).setArcType(Arc2D.PIE);\n"
                    << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt + 4
                    << "]).setArcType(Arc2D.PIE);\n";
             }
@@ -2279,34 +2209,30 @@ void GlowExportJBean::arc(double x0, double y0, double width, double height,
             if (fixcolor)
               fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
             else
-              fp << "    int fcolor = GeColor.getDrawtype("
-                 << (int)fill_drawtype << ", colorTone,\n"
+              fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                  << "	 colorShift, colorIntensity, colorBrightness, "
                     "colorInverse, fillColor, dimmed);"
                  << '\n';
 
-            if (!shadow) {
+            if (!shadow)
+            {
               // Shadow is configurable for different instances
               fp << "    if ( shadow != 0) {\n";
             }
             fp << "    if ( gradient == GeGradient.eGradient_No) {\n";
             // Light shadow
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, "
-               << -drawtype_incr << ", colorInverse));\n";
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr << ", colorInverse));\n";
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
 
             // Dark shadow
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr
-               << ", colorInverse));\n";
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr << ", colorInverse));\n";
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt + 1 << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 1
-                 << "]);\n";
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 1 << "]);\n";
 
             // Medium shadow and base
             fp << "    g.setColor(GeColor.getColor( fcolor));\n";
@@ -2315,235 +2241,218 @@ void GlowExportJBean::arc(double x0, double y0, double width, double height,
                  << "    g.fill( shapes[" << *shape_cnt + 3 << "]);\n"
                  << "    g.fill( shapes[" << *shape_cnt + 4 << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 2
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 3
-                 << "]);\n"
-                 << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 4
-                 << "]);\n";
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 2 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 3 << "]);\n"
+                 << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 4 << "]);\n";
             fp << "    } else {\n"
-               << "    GeGradient.paint( g, "
-               << (int)glow_eGradient_DiagonalUpperLeft << "," << gc1 << ","
-               << gc2 << "," << x0 - dim_x0 + glow_cJBean_Offset << "F,"
-               << y0 - dim_y0 + glow_cJBean_Offset << "F," << width << "F,"
-               << height << "F, " << fixcolor_str << "," << fill_drawtype
+               << "    GeGradient.paint( g, " << (int)glow_eGradient_DiagonalUpperLeft << "," << gc1 << ","
+               << gc2 << "," << x0 - dim_x0 + glow_cJBean_Offset << "F," << y0 - dim_y0 + glow_cJBean_Offset
+               << "F," << width << "F," << height << "F, " << fixcolor_str << "," << fill_drawtype
                << ", colorTone, colorShift, colorIntensity, colorInverse, "
                   "fillColor, dimmed);"
                << '\n';
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt + 5 << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 5
-                 << "]);\n";
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 5 << "]);\n";
 
-            fp << "    GeGradient.paint( g, gradient," << gc1 << "," << gc2
-               << "," << x0 - dim_x0 + glow_cJBean_Offset << "F,"
-               << y0 - dim_y0 + glow_cJBean_Offset << "F," << width << "F,"
-               << height << "F, " << fixcolor_str << "," << fill_drawtype
+            fp << "    GeGradient.paint( g, gradient," << gc1 << "," << gc2 << ","
+               << x0 - dim_x0 + glow_cJBean_Offset << "F," << y0 - dim_y0 + glow_cJBean_Offset << "F,"
+               << width << "F," << height << "F, " << fixcolor_str << "," << fill_drawtype
                << ", colorTone, colorShift, colorIntensity, colorInverse, "
                   "fillColor, dimmed);"
                << '\n';
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt + 4 << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 4
-                 << "]);\n";
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 4 << "]);\n";
             fp << "    }\n";
-            if (!shadow) {
+            if (!shadow)
+            {
               fp << "    } else {\n"
                  << "    if ( gradient == GeGradient.eGradient_No) {\n"
                  << "    g.setColor(GeColor.getColor( fcolor));\n";
               if (page <= 1)
                 fp << "    g.fill( shapes[" << *shape_cnt + 5 << "]);\n";
               else
-                fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 5
-                   << "]);\n";
+                fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 5 << "]);\n";
               fp << "    } else {\n"
-                 << "    GeGradient.paint( g, gradient," << gc1 << "," << gc2
-                 << "," << x0 - dim_x0 + glow_cJBean_Offset << "F,"
-                 << y0 - dim_y0 + glow_cJBean_Offset << "F," << width << "F,"
-                 << height << "F, " << fixcolor_str << "," << fill_drawtype
+                 << "    GeGradient.paint( g, gradient," << gc1 << "," << gc2 << ","
+                 << x0 - dim_x0 + glow_cJBean_Offset << "F," << y0 - dim_y0 + glow_cJBean_Offset << "F,"
+                 << width << "F," << height << "F, " << fixcolor_str << "," << fill_drawtype
                  << ", colorTone, colorShift, colorIntensity, colorInverse, "
                     "fillColor, dimmed);"
                  << '\n';
               if (page <= 1)
                 fp << "    g.fill( shapes[" << *shape_cnt + 5 << "]);\n";
               else
-                fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 5
-                   << "]);\n";
+                fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 5 << "]);\n";
               fp << "    }\n";
               fp << "    }\n";
             }
             fp << "    }\n";
           }
-          if (border) {
-            if (fill) {
+          if (border)
+          {
+            if (fill)
+            {
               if (page <= 1)
-                fp << "    ((Arc2D)shapes[" << *shape_cnt + 5
-                   << "]).setArcType(Arc2D.OPEN);\n";
+                fp << "    ((Arc2D)shapes[" << *shape_cnt + 5 << "]).setArcType(Arc2D.OPEN);\n";
               else
                 fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt + 5
                    << "]).setArcType(Arc2D.OPEN);\n";
             }
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             if (page <= 1)
               fp << "    g.draw( shapes[" << *shape_cnt + 5 << "]);\n";
             else
-              fp << "    g.draw( shapes_p" << page << "[" << *shape_cnt + 5
-                 << "]);\n";
+              fp << "    g.draw( shapes_p" << page << "[" << *shape_cnt + 5 << "]);\n";
           }
           (*shape_cnt) += 6;
-        } else {
+        }
+        else
+        {
           // Gradient, Shadow, Nodeclass
-          if (fill) {
-            if (border) {
+          if (fill)
+          {
+            if (border)
+            {
               if (page <= 1)
-                fp << "    ((Arc2D)shapes[" << *shape_cnt
-                   << "]).setArcType(Arc2D.PIE);\n"
-                   << "    ((Arc2D)shapes[" << *shape_cnt + 1
-                   << "]).setArcType(Arc2D.PIE);\n";
+                fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.PIE);\n"
+                   << "    ((Arc2D)shapes[" << *shape_cnt + 1 << "]).setArcType(Arc2D.PIE);\n";
               else
-                fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt
-                   << "]).setArcType(Arc2D.PIE);\n"
+                fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt << "]).setArcType(Arc2D.PIE);\n"
                    << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt + 1
                    << "]).setArcType(Arc2D.PIE);\n";
             }
 
-            if (!shadow) {
+            if (!shadow)
+            {
               // Shadow is configurable for different instances
               fp << "    if ( shadow != 0) {\n";
             }
 
             // Draw shadow
-            fp << "    GeGradient.paint( g, "
-               << (int)glow_eGradient_DiagonalUpperLeft << "," << gc1 << ","
-               << gc2 << "," << x0 - dim_x0 + glow_cJBean_Offset << "F,"
-               << y0 - dim_y0 + glow_cJBean_Offset << "F," << width << "F,"
-               << height << "F, " << fixcolor_str << "," << fill_drawtype
+            fp << "    GeGradient.paint( g, " << (int)glow_eGradient_DiagonalUpperLeft << "," << gc1 << ","
+               << gc2 << "," << x0 - dim_x0 + glow_cJBean_Offset << "F," << y0 - dim_y0 + glow_cJBean_Offset
+               << "F," << width << "F," << height << "F, " << fixcolor_str << "," << fill_drawtype
                << ", colorTone, colorShift, colorIntensity, colorInverse, "
                   "fillColor, dimmed);"
                << '\n';
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);"
-                 << '\n';
-            fp << "    GeGradient.paint( g, " << (int)gradient << "," << gc1
-               << "," << gc2 << "," << x0 - dim_x0 + glow_cJBean_Offset << "F,"
-               << y0 - dim_y0 + glow_cJBean_Offset << "F," << width << "F,"
-               << height << "F, " << fixcolor_str << "," << fill_drawtype
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);" << '\n';
+            fp << "    GeGradient.paint( g, " << (int)gradient << "," << gc1 << "," << gc2 << ","
+               << x0 - dim_x0 + glow_cJBean_Offset << "F," << y0 - dim_y0 + glow_cJBean_Offset << "F,"
+               << width << "F," << height << "F, " << fixcolor_str << "," << fill_drawtype
                << ", colorTone, colorShift, colorIntensity, colorInverse, "
                   "fillColor, dimmed);"
                << '\n';
             if (page <= 1)
               fp << "    g.fill( shapes[" << *shape_cnt + 1 << "]);\n";
             else
-              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 1
-                 << "]);\n";
-            if (!shadow) {
+              fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt + 1 << "]);\n";
+            if (!shadow)
+            {
               fp << "    } else {\n"
-                 << "    GeGradient.paint( g, " << (int)gradient << "," << gc1
-                 << "," << gc2 << "," << x0 - dim_x0 + glow_cJBean_Offset
-                 << "F," << y0 - dim_y0 + glow_cJBean_Offset << "F," << width
-                 << "F," << height << "F, " << fixcolor_str << ","
-                 << fill_drawtype << ", colorTone, colorShift, colorIntensity, "
-                                     "colorInverse, fillColor, dimmed);"
+                 << "    GeGradient.paint( g, " << (int)gradient << "," << gc1 << "," << gc2 << ","
+                 << x0 - dim_x0 + glow_cJBean_Offset << "F," << y0 - dim_y0 + glow_cJBean_Offset << "F,"
+                 << width << "F," << height << "F, " << fixcolor_str << "," << fill_drawtype
+                 << ", colorTone, colorShift, colorIntensity, "
+                    "colorInverse, fillColor, dimmed);"
                  << '\n';
               if (page <= 1)
                 fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
               else
-                fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt
-                   << "]);\n";
+                fp << "    g.fill( shapes_p" << page << "[" << *shape_cnt << "]);\n";
               fp << "    }\n";
             }
-            if (border) {
-              if (fill) {
+            if (border)
+            {
+              if (fill)
+              {
                 if (page <= 1)
-                  fp << "    ((Arc2D)shapes[" << *shape_cnt
-                     << "]).setArcType(Arc2D.OPEN);\n";
+                  fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.OPEN);\n";
                 else
-                  fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt
-                     << "]).setArcType(Arc2D.OPEN);\n";
+                  fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt << "]).setArcType(Arc2D.OPEN);\n";
               }
-              fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-                 << "F));\n"
-                 << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-                 << ", colorTone,\n"
+              fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+                 << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                  << "	 colorShift, colorIntensity, colorBrightness, "
                     "colorInverse, borderColor, dimmed));"
                  << '\n';
               if (page <= 1)
                 fp << "    g.draw( shapes[" << *shape_cnt << "]);\n";
               else
-                fp << "    g.draw( shapes_p" << page << "[" << *shape_cnt
-                   << "]);\n";
+                fp << "    g.draw( shapes_p" << page << "[" << *shape_cnt << "]);\n";
             }
           }
           (*shape_cnt) += 2;
         }
       }
-    } else {
+    }
+    else
+    {
       // No nodeclass
-      if (!shadow || !feq(angle2, 360.0)) {
+      if (!shadow || !feq(angle2, 360.0))
+      {
         // No nodeclass, No shadow
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, No shadow, No nodeclass
-          if (fill) {
+          if (fill)
+          {
             if (border)
-              fp << "    ((Arc2D)shapes[" << *shape_cnt
-                 << "]).setArcType(Arc2D.PIE);\n";
+              fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.PIE);\n";
             if (fixcolor)
-              fp << "    g.setColor(GeColor.getColor(" << (int)fill_drawtype
-                 << "));\n";
+              fp << "    g.setColor(GeColor.getColor(" << (int)fill_drawtype << "));\n";
             else
-              fp << "    g.setColor(GeColor.getColor(" << (int)fill_drawtype
-                 << ", colorTone,\n"
+              fp << "    g.setColor(GeColor.getColor(" << (int)fill_drawtype << ", colorTone,\n"
                  << "	 colorShift, colorIntensity, colorBrightness, "
                     "colorInverse, fillColor, dimmed));"
                  << '\n';
             fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
           }
-          if (border) {
-            if (fill) {
-              fp << "    ((Arc2D)shapes[" << *shape_cnt
-                 << "]).setArcType(Arc2D.OPEN);\n";
+          if (border)
+          {
+            if (fill)
+            {
+              fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.OPEN);\n";
             }
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
             fp << "    g.draw( shapes[" << *shape_cnt << "]);\n";
           }
-        } else {
+        }
+        else
+        {
           // Gradient, No Shadow, No nodeclass
-          if (fill) {
-            if (border) {
-              fp << "    ((Arc2D)shapes[" << *shape_cnt
-                 << "]).setArcType(Arc2D.PIE);\n";
+          if (fill)
+          {
+            if (border)
+            {
+              fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.PIE);\n";
             }
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
 
             fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
           }
-          if (border) {
-            if (fill) {
-              fp << "    ((Arc2D)shapes[" << *shape_cnt
-                 << "]).setArcType(Arc2D.OPEN);\n";
+          if (border)
+          {
+            if (fill)
+            {
+              fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.OPEN);\n";
             }
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
@@ -2551,42 +2460,39 @@ void GlowExportJBean::arc(double x0, double y0, double width, double height,
           }
         }
         (*shape_cnt)++;
-      } else {
+      }
+      else
+      {
         // Shadow, No nodeclass
 
-        if (gradient == glow_eGradient_No) {
+        if (gradient == glow_eGradient_No)
+        {
           // No gradient, Shadow, No nodeclass
-          if (fill) {
-            if (border) {
-              fp << "    ((Arc2D)shapes[" << *shape_cnt
-                 << "]).setArcType(Arc2D.PIE);\n"
-                 << "    ((Arc2D)shapes[" << *shape_cnt + 1
-                 << "]).setArcType(Arc2D.PIE);\n"
-                 << "    ((Arc2D)shapes[" << *shape_cnt + 2
-                 << "]).setArcType(Arc2D.PIE);\n"
-                 << "    ((Arc2D)shapes[" << *shape_cnt + 3
-                 << "]).setArcType(Arc2D.PIE);\n"
-                 << "    ((Arc2D)shapes[" << *shape_cnt + 4
-                 << "]).setArcType(Arc2D.PIE);\n";
+          if (fill)
+          {
+            if (border)
+            {
+              fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.PIE);\n"
+                 << "    ((Arc2D)shapes[" << *shape_cnt + 1 << "]).setArcType(Arc2D.PIE);\n"
+                 << "    ((Arc2D)shapes[" << *shape_cnt + 2 << "]).setArcType(Arc2D.PIE);\n"
+                 << "    ((Arc2D)shapes[" << *shape_cnt + 3 << "]).setArcType(Arc2D.PIE);\n"
+                 << "    ((Arc2D)shapes[" << *shape_cnt + 4 << "]).setArcType(Arc2D.PIE);\n";
             }
             fp << "    {\n"; // Avoid multiple declarations of fcolor
             if (fixcolor)
               fp << "    int fcolor = " << (int)fill_drawtype << ";\n";
             else
-              fp << "    int fcolor = GeColor.getDrawtype("
-                 << (int)fill_drawtype << ", colorTone,\n"
+              fp << "    int fcolor = GeColor.getDrawtype(" << (int)fill_drawtype << ", colorTone,\n"
                  << "	 colorShift, colorIntensity, colorBrightness, "
                     "colorInverse, fillColor, dimmed);"
                  << '\n';
 
             // Light shadow
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, "
-               << -drawtype_incr << ", colorInverse));\n";
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << -drawtype_incr << ", colorInverse));\n";
             fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
 
             // Dark shadow
-            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr
-               << ", colorInverse));\n";
+            fp << "    g.setColor(GeColor.shiftColor( fcolor, " << drawtype_incr << ", colorInverse));\n";
             fp << "    g.fill( shapes[" << *shape_cnt + 1 << "]);\n";
 
             // Medium shadow and base
@@ -2594,26 +2500,26 @@ void GlowExportJBean::arc(double x0, double y0, double width, double height,
             fp << "    g.fill( shapes[" << *shape_cnt + 2 << "]);\n"
                << "    g.fill( shapes[" << *shape_cnt + 3 << "]);\n"
                << "    g.fill( shapes[" << *shape_cnt + 4 << "]);\n";
-            if (!shadow) {
+            if (!shadow)
+            {
               fp << "    else {\n"
                  << "    g.setColor(GeColor.getColor( fcolor));\n";
               fp << "    g.fill( shapes[" << *shape_cnt + 4 << "]);\n"
                  << "    }\n";
             }
             fp << "    }\n";
-            if (border) {
-              if (fill) {
+            if (border)
+            {
+              if (fill)
+              {
                 if (page <= 1)
-                  fp << "    ((Arc2D)shapes[" << *shape_cnt + 5
-                     << "]).setArcType(Arc2D.OPEN);\n";
+                  fp << "    ((Arc2D)shapes[" << *shape_cnt + 5 << "]).setArcType(Arc2D.OPEN);\n";
                 else
                   fp << "    ((Arc2D)shapes_p" << page << "[" << *shape_cnt + 5
                      << "]).setArcType(Arc2D.OPEN);\n";
               }
-              fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-                 << "F));\n"
-                 << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-                 << ", colorTone,\n"
+              fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+                 << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                  << "	 colorShift, colorIntensity, colorBrightness, "
                     "colorInverse, borderColor, dimmed));"
                  << '\n';
@@ -2621,34 +2527,34 @@ void GlowExportJBean::arc(double x0, double y0, double width, double height,
             }
           }
           (*shape_cnt) += 6;
-        } else {
+        }
+        else
+        {
           // Gradient, Shadow, No nodeclass
-          if (fill) {
-            if (border) {
-              fp << "    ((Arc2D)shapes[" << *shape_cnt
-                 << "]).setArcType(Arc2D.PIE);\n"
-                 << "    ((Arc2D)shapes[" << *shape_cnt + 1
-                 << "]).setArcType(Arc2D.PIE);\n";
+          if (fill)
+          {
+            if (border)
+            {
+              fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.PIE);\n"
+                 << "    ((Arc2D)shapes[" << *shape_cnt + 1 << "]).setArcType(Arc2D.PIE);\n";
             }
 
             // Draw shadow
 
-            gradient_paint(glow_eGradient_DiagonalUpperLeft, gc1, gc2, x0, y0,
-                width, height, fixcolor, fill_drawtype, fp);
+            gradient_paint(glow_eGradient_DiagonalUpperLeft, gc1, gc2, x0, y0, width, height, fixcolor,
+                           fill_drawtype, fp);
             fp << "    g.fill( shapes[" << *shape_cnt << "]);\n";
-            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor,
-                fill_drawtype, fp);
+            gradient_paint(gradient, gc1, gc2, x0, y0, width, height, fixcolor, fill_drawtype, fp);
             fp << "    g.fill( shapes[" << *shape_cnt + 1 << "]);\n";
           }
-          if (border) {
-            if (fill) {
-              fp << "    ((Arc2D)shapes[" << *shape_cnt
-                 << "]).setArcType(Arc2D.OPEN);\n";
+          if (border)
+          {
+            if (fill)
+            {
+              fp << "    ((Arc2D)shapes[" << *shape_cnt << "]).setArcType(Arc2D.OPEN);\n";
             }
-            fp << "    g.setStroke( new BasicStroke(" << line_width + 1
-               << "F));\n"
-               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype
-               << ", colorTone,\n"
+            fp << "    g.setStroke( new BasicStroke(" << line_width + 1 << "F));\n"
+               << "    g.setColor(GeColor.getColor(" << (int)border_drawtype << ", colorTone,\n"
                << "	 colorShift, colorIntensity, colorBrightness, "
                   "colorInverse, borderColor, dimmed));"
                << '\n';
@@ -2664,20 +2570,24 @@ void GlowExportJBean::arc(double x0, double y0, double width, double height,
   }
 }
 
-void GlowExportJBean::text(int x0, int y0, char* text, glow_eDrawType drawtype,
-    glow_eDrawType color_drawtype, int bold, int idx, int rotate,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
+void GlowExportJBean::text(int x0, int y0, char* text, glow_eDrawType drawtype, glow_eDrawType color_drawtype,
+                           int bold, int idx, int rotate, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                           std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
 
-  switch (pass) {
-  case glow_eExportPass_Shape: {
+  switch (pass)
+  {
+  case glow_eExportPass_Shape:
+  {
     break;
   }
-  case glow_eExportPass_Init: {
+  case glow_eExportPass_Init:
+  {
     break;
   }
-  case glow_eExportPass_Draw: {
+  case glow_eExportPass_Draw:
+  {
     int text_size;
     char bold_str[20];
 
@@ -2685,7 +2595,8 @@ void GlowExportJBean::text(int x0, int y0, char* text, glow_eDrawType drawtype,
       nc->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
     else
       ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
-    switch (idx) {
+    switch (idx)
+    {
     case 0:
       text_size = 8;
       break;
@@ -2717,42 +2628,42 @@ void GlowExportJBean::text(int x0, int y0, char* text, glow_eDrawType drawtype,
       strcpy(bold_str, "BOLD");
     else
       strcpy(bold_str, "PLAIN");
-    fp << "    g.setColor(GeColor.getColor(" << (int)color_drawtype
-       << ", colorTone,\n"
+    fp << "    g.setColor(GeColor.getColor(" << (int)color_drawtype << ", colorTone,\n"
        << "	 colorShift, colorIntensity, colorBrightness, colorInverse, "
           "textColor, dimmed));"
        << '\n'
        <<
         // "    g.setColor(Color.black);\n" <<
-        "    g.setFont(new Font(\"Helvetica\", Font." << bold_str << ", "
-       << text_size << "));\n";
+        "    g.setFont(new Font(\"Helvetica\", Font." << bold_str << ", " << text_size << "));\n";
 
-    if (45.0 <= rotate && rotate < 135.0) {
+    if (45.0 <= rotate && rotate < 135.0)
+    {
       fp << "    save_tmp = g.getTransform();\n"
-         << "    g.rotate( - Math.PI * 3/ 2,"
-         << x0 - int(dim_x0) + glow_cJBean_Offset << ", "
+         << "    g.rotate( - Math.PI * 3/ 2," << x0 - int(dim_x0) + glow_cJBean_Offset << ", "
          << y0 - int(dim_y0) + glow_cJBean_Offset << ");\n";
-    } else if (135.0 <= rotate && rotate < 225.0) {
+    }
+    else if (135.0 <= rotate && rotate < 225.0)
+    {
       fp << "    save_tmp = g.getTransform();\n"
-         << "    g.rotate( - Math.PI," << x0 - int(dim_x0) + glow_cJBean_Offset
-         << ", " << y0 - int(dim_y0) + glow_cJBean_Offset << ");\n";
-    } else if (225.0 <= rotate && rotate < 315.0) {
+         << "    g.rotate( - Math.PI," << x0 - int(dim_x0) + glow_cJBean_Offset << ", "
+         << y0 - int(dim_y0) + glow_cJBean_Offset << ");\n";
+    }
+    else if (225.0 <= rotate && rotate < 315.0)
+    {
       fp << "    save_tmp = g.getTransform();\n"
-         << "    g.rotate( - Math.PI / 2,"
-         << x0 - int(dim_x0) + glow_cJBean_Offset << ", "
+         << "    g.rotate( - Math.PI / 2," << x0 - int(dim_x0) + glow_cJBean_Offset << ", "
          << y0 - int(dim_y0) + glow_cJBean_Offset << ");\n";
     }
 
     if (((GrowCtx*)ctx)->translate_on)
       fp << "    g.drawString( JopLang.transl(\"" << str_cnv(text) << "\"),"
-         << x0 - int(dim_x0) + glow_cJBean_Offset << ", "
-         << y0 - int(dim_y0) + glow_cJBean_Offset << ");\n";
+         << x0 - int(dim_x0) + glow_cJBean_Offset << ", " << y0 - int(dim_y0) + glow_cJBean_Offset << ");\n";
     else
-      fp << "    g.drawString( \"" << str_cnv(text) << "\","
-         << x0 - int(dim_x0) + glow_cJBean_Offset << ", "
+      fp << "    g.drawString( \"" << str_cnv(text) << "\"," << x0 - int(dim_x0) + glow_cJBean_Offset << ", "
          << y0 - int(dim_y0) + glow_cJBean_Offset << ");\n";
 
-    if (45.0 <= rotate && rotate < 315.0) {
+    if (45.0 <= rotate && rotate < 315.0)
+    {
       fp << "    g.setTransform( save_tmp);\n";
     }
 
@@ -2762,29 +2673,33 @@ void GlowExportJBean::text(int x0, int y0, char* text, glow_eDrawType drawtype,
   }
 }
 
-void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
-    glow_eDrawType text_drawtype, int bold, glow_eAdjustment adjustment,
-    int idx, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-    std::ofstream& fp)
+void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype, glow_eDrawType text_drawtype,
+                            int bold, glow_eAdjustment adjustment, int idx, glow_eExportPass pass,
+                            int* shape_cnt, int node_cnt, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   int antialiasing_on = 0;
 
-  switch (pass) {
-  case glow_eExportPass_Shape: {
+  switch (pass)
+  {
+  case glow_eExportPass_Shape:
+  {
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     char bold_str[20];
     int text_size;
 
-    if (number == 1) {
+    if (number == 1)
+    {
       // annot1Font is declared in GeComponent
       if (bold)
         strcpy(bold_str, "BOLD");
       else
         strcpy(bold_str, "PLAIN");
-      switch (idx) {
+      switch (idx)
+      {
       case 0:
         text_size = 8;
         break;
@@ -2813,12 +2728,12 @@ void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
         text_size = 24;
       }
 
-      fp << "    annot1Font = new Font(\"Helvetica\", Font." << bold_str << ", "
-         << text_size << ");\n";
+      fp << "    annot1Font = new Font(\"Helvetica\", Font." << bold_str << ", " << text_size << ");\n";
     }
     break;
   }
-  case glow_eExportPass_Init: {
+  case glow_eExportPass_Init:
+  {
     char bold_str[20];
     int text_size;
 
@@ -2826,7 +2741,8 @@ void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
       strcpy(bold_str, "BOLD");
     else
       strcpy(bold_str, "PLAIN");
-    switch (idx) {
+    switch (idx)
+    {
     case 0:
       text_size = 8;
       break;
@@ -2855,55 +2771,48 @@ void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
       text_size = 24;
     }
 
-    if (number != 1) {
+    if (number != 1)
+    {
       fp << "  String annot" << number << " = new String();\n"
-         << "  Font annot" << number << "Font = new Font(\"Helvetica\", Font."
-         << bold_str << ", " << text_size << ");\n";
+         << "  Font annot" << number << "Font = new Font(\"Helvetica\", Font." << bold_str << ", "
+         << text_size << ");\n";
     }
-    fp << "  int annot" << number << "Color = " << int(text_drawtype) << ";"
-       << '\n'
-       << "  public String getAnnot" << number << "() { return annot" << number
-       << ";}\n";
+    fp << "  int annot" << number << "Color = " << int(text_drawtype) << ";" << '\n'
+       << "  public String getAnnot" << number << "() { return annot" << number << ";}\n";
     if (((GrowCtx*)ctx)->translate_on)
-      fp << "  public void setAnnot" << number << "( String s) { annot"
-         << number << " = JopLang.transl(s);}\n";
+      fp << "  public void setAnnot" << number << "( String s) { annot" << number
+         << " = JopLang.transl(s);}\n";
     else
-      fp << "  public void setAnnot" << number << "( String s) { annot"
-         << number << " = s;}\n";
-    fp << "  public void setAnnot" << number << "Font( Font font) { annot"
-       << number << "Font = font;}\n"
-       << "  public Font getAnnot" << number << "Font() { return annot"
-       << number << "Font;}\n"
-       << "  public void setAnnot" << number << "Color( int color) { annot"
-       << number << "Color = color;}\n";
+      fp << "  public void setAnnot" << number << "( String s) { annot" << number << " = s;}\n";
+    fp << "  public void setAnnot" << number << "Font( Font font) { annot" << number << "Font = font;}\n"
+       << "  public Font getAnnot" << number << "Font() { return annot" << number << "Font;}\n"
+       << "  public void setAnnot" << number << "Color( int color) { annot" << number << "Color = color;}\n";
 
     break;
   }
-  case glow_eExportPass_Draw: {
+  case glow_eExportPass_Draw:
+  {
     char adjustmentstr[200];
     char adjustmentstr_vert[200];
     char adjustmentstr_horiz[200];
-    switch (adjustment) {
+    switch (adjustment)
+    {
     case glow_eAdjustment_Right:
-      if (!frc_created) {
+      if (!frc_created)
+      {
         frc_created = 1;
         fp << "    FontRenderContext frc = g.getFontRenderContext();\n";
       }
-      sprintf(adjustmentstr,
-          "- (float)g.getFont().getStringBounds(annot%d, frc).getWidth()",
-          number);
+      sprintf(adjustmentstr, "- (float)g.getFont().getStringBounds(annot%d, frc).getWidth()", number);
       break;
     case glow_eAdjustment_Center:
-      if (!frc_created) {
+      if (!frc_created)
+      {
         frc_created = 1;
         fp << "    FontRenderContext frc = g.getFontRenderContext();\n";
       }
-      sprintf(adjustmentstr_vert,
-          "- (float)g.getFont().getStringBounds(annot%d, frc).getWidth()/2",
-          number);
-      sprintf(adjustmentstr_horiz,
-          "- (float)g.getFont().getStringBounds(annot%d, frc).getWidth()/2",
-          number);
+      sprintf(adjustmentstr_vert, "- (float)g.getFont().getStringBounds(annot%d, frc).getWidth()/2", number);
+      sprintf(adjustmentstr_horiz, "- (float)g.getFont().getStringBounds(annot%d, frc).getWidth()/2", number);
       break;
     default:
       strcpy(adjustmentstr, "");
@@ -2912,8 +2821,7 @@ void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
       nc->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
     else
       ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
-    fp << "    g.setColor(GeColor.getColor( annot" << number
-       << "Color , colorTone,\n"
+    fp << "    g.setColor(GeColor.getColor( annot" << number << "Color , colorTone,\n"
        << "	 colorShift, colorIntensity, colorBrightness, colorInverse, "
           "textColor, dimmed));"
        << '\n'
@@ -2921,8 +2829,10 @@ void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
         //"    g.setColor(Color.black);\n" <<
         "    g.setFont( annot" << number << "Font);\n"
        << "    save_tmp = g.getTransform();\n";
-    if (antialiasing_on) {
-      if (adjustment == glow_eAdjustment_Center) {
+    if (antialiasing_on)
+    {
+      if (adjustment == glow_eAdjustment_Center)
+      {
         fp << "    if ( (45.0 <= rotate && rotate < 135.0) || (225.0 <= rotate "
               "&& rotate < 315.0)) {"
            << '\n'
@@ -2931,10 +2841,8 @@ void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
            << '\n'
            << "      		height/original_width * 0.75, 1));\n"
            << "      if ( annot" << number << " != null)\n"
-           << "        g.drawString( annot" << number << ", "
-           << x0 - int(dim_x0) + glow_cJBean_Offset
-           << " * original_height / width * height / original_width"
-           << adjustmentstr_vert << ", "
+           << "        g.drawString( annot" << number << ", " << x0 - int(dim_x0) + glow_cJBean_Offset
+           << " * original_height / width * height / original_width" << adjustmentstr_vert << ", "
            << y0 - int(dim_y0) + glow_cJBean_Offset << "F);\n"
            << "    }\n"
            << "    else {\n"
@@ -2943,26 +2851,27 @@ void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
            << '\n'
            << "      		height/original_height * 0.75, 1));\n"
            << "      if ( annot" << number << " != null)\n"
-           << "        g.drawString( annot" << number << ", "
-           << x0 - int(dim_x0) + glow_cJBean_Offset
-           << " * original_height / height * width / original_width"
-           << adjustmentstr_horiz << ", "
+           << "        g.drawString( annot" << number << ", " << x0 - int(dim_x0) + glow_cJBean_Offset
+           << " * original_height / height * width / original_width" << adjustmentstr_horiz << ", "
            << y0 - int(dim_y0) + glow_cJBean_Offset << "F);\n"
            << "    }\n";
-      } else {
+      }
+      else
+      {
         fp << "    g.transform( AffineTransform.getScaleInstance( "
               "original_width/width *"
            << '\n'
            << "      		height/original_height * 0.75, 1));\n"
            << "    if ( annot" << number << " != null)\n"
-           << "      g.drawString( annot" << number << ", "
-           << x0 - int(dim_x0) + glow_cJBean_Offset
-           << " * original_height / height * width / original_width"
-           << adjustmentstr << ", " << y0 - int(dim_y0) + glow_cJBean_Offset
-           << "F);\n";
+           << "      g.drawString( annot" << number << ", " << x0 - int(dim_x0) + glow_cJBean_Offset
+           << " * original_height / height * width / original_width" << adjustmentstr << ", "
+           << y0 - int(dim_y0) + glow_cJBean_Offset << "F);\n";
       }
-    } else {
-      if (adjustment == glow_eAdjustment_Center) {
+    }
+    else
+    {
+      if (adjustment == glow_eAdjustment_Center)
+      {
         fp << "    if ( (45.0 <= rotate && rotate < 135.0) || (225.0 <= rotate "
               "&& rotate < 315.0)) {"
            << '\n'
@@ -2975,10 +2884,8 @@ void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
            << '\n'
            << "      		width/original_height, 1));\n"
            << "      if ( annot" << number << " != null)\n"
-           << "        g.drawString( annot" << number << ", "
-           << x0 - int(dim_x0) + glow_cJBean_Offset
-           << " * original_height / width * height / original_width"
-           << adjustmentstr_vert << ", "
+           << "        g.drawString( annot" << number << ", " << x0 - int(dim_x0) + glow_cJBean_Offset
+           << " * original_height / width * height / original_width" << adjustmentstr_vert << ", "
            << y0 - int(dim_y0) + glow_cJBean_Offset << "F);\n"
            << "    } else {\n"
            << "      "
@@ -2990,13 +2897,13 @@ void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
            << '\n'
            << "      		height/original_height, 1));\n"
            << "      if ( annot" << number << " != null)\n"
-           << "        g.drawString( annot" << number << ", "
-           << x0 - int(dim_x0) + glow_cJBean_Offset
-           << " * original_height / height * width / original_width"
-           << adjustmentstr_horiz << ", "
+           << "        g.drawString( annot" << number << ", " << x0 - int(dim_x0) + glow_cJBean_Offset
+           << " * original_height / height * width / original_width" << adjustmentstr_horiz << ", "
            << y0 - int(dim_y0) + glow_cJBean_Offset << "F);\n"
            << "    }\n";
-      } else {
+      }
+      else
+      {
         fp << "    "
               "g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,"
               "RenderingHints.VALUE_ANTIALIAS_OFF);"
@@ -3006,11 +2913,9 @@ void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
            << '\n'
            << "      		height/original_height, 1));\n"
            << "    if ( annot" << number << " != null)\n"
-           << "      g.drawString( annot" << number << ", "
-           << x0 - int(dim_x0) + glow_cJBean_Offset
-           << " * original_height / height * width / original_width"
-           << adjustmentstr << ", " << y0 - int(dim_y0) + glow_cJBean_Offset
-           << "F);\n";
+           << "      g.drawString( annot" << number << ", " << x0 - int(dim_x0) + glow_cJBean_Offset
+           << " * original_height / height * width / original_width" << adjustmentstr << ", "
+           << y0 - int(dim_y0) + glow_cJBean_Offset << "F);\n";
       }
     }
     fp << "    g.setTransform( save_tmp);\n";
@@ -3020,15 +2925,17 @@ void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
   }
 }
 
-void GlowExportJBean::annot_font(int number, glow_eDrawType drawtype,
-    glow_eDrawType background, int bold, int idx, glow_eExportPass pass,
-    std::ofstream& fp)
+void GlowExportJBean::annot_font(int number, glow_eDrawType drawtype, glow_eDrawType background, int bold,
+                                 int idx, glow_eExportPass pass, std::ofstream& fp)
 {
-  switch (pass) {
-  case glow_eExportPass_Shape: {
+  switch (pass)
+  {
+  case glow_eExportPass_Shape:
+  {
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     char bold_str[20];
     int text_size;
 
@@ -3036,7 +2943,8 @@ void GlowExportJBean::annot_font(int number, glow_eDrawType drawtype,
       strcpy(bold_str, "BOLD");
     else
       strcpy(bold_str, "PLAIN");
-    switch (idx) {
+    switch (idx)
+    {
     case 0:
       text_size = 8;
       break;
@@ -3065,8 +2973,7 @@ void GlowExportJBean::annot_font(int number, glow_eDrawType drawtype,
       text_size = 24;
     }
 
-    fp << "    annotFont = new Font(\"Helvetica\", Font." << bold_str << ", "
-       << text_size << ");\n"
+    fp << "    annotFont = new Font(\"Helvetica\", Font." << bold_str << ", " << text_size << ");\n"
        << "    annotBackground = " << (int)background << ";\n";
     break;
   }
@@ -3074,13 +2981,12 @@ void GlowExportJBean::annot_font(int number, glow_eDrawType drawtype,
   }
 }
 
-void GlowExportJBean::node(double x1, double y1, double x2, double y2,
-    char* class_name, glow_eDrawType border_drawtype,
-    glow_eDrawType fill_drawtype, glow_eDrawType text_drawtype,
-    glow_eDrawTone color_tone, int color_lightness, int color_intensity,
-    int color_shift, int line_width, double rotate, int shadow,
-    glow_eGradient gradient, glow_eExportPass pass, int* shape_cnt,
-    int node_cnt, int in_nc, std::ofstream& fp)
+void GlowExportJBean::node(double x1, double y1, double x2, double y2, char* class_name,
+                           glow_eDrawType border_drawtype, glow_eDrawType fill_drawtype,
+                           glow_eDrawType text_drawtype, glow_eDrawTone color_tone, int color_lightness,
+                           int color_intensity, int color_shift, int line_width, double rotate, int shadow,
+                           glow_eGradient gradient, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                           int in_nc, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3089,14 +2995,17 @@ void GlowExportJBean::node(double x1, double y1, double x2, double y2,
   var_name[0] = _tolower(var_name[0]);
   sprintf(&var_name[strlen(var_name)], "%d", node_cnt);
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Shape:
     break;
-  case glow_eExportPass_Declare: {
+  case glow_eExportPass_Declare:
+  {
     fp << "  " << class_name << "	" << var_name << ";\n";
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     if (is_nodeclass)
       nc->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
     else
@@ -3104,39 +3013,29 @@ void GlowExportJBean::node(double x1, double y1, double x2, double y2,
 
     fp << "    " << var_name << " = new " << class_name << "(session);\n"
        << "    " << var_name << ".setBounds(new Rectangle("
-       << (int)(x1 - dim_x0 + glow_cJBean_Offset - glow_cJBean_SizeCorr / 2)
-       << ","
-       << (int)(y1 - dim_y0 + glow_cJBean_Offset - glow_cJBean_SizeCorr / 2)
-       << "," << (int)(x2 - x1 + glow_cJBean_SizeCorr) << ","
-       << (int)(y2 - y1 + glow_cJBean_SizeCorr) << "));\n";
+       << (int)(x1 - dim_x0 + glow_cJBean_Offset - glow_cJBean_SizeCorr / 2) << ","
+       << (int)(y1 - dim_y0 + glow_cJBean_Offset - glow_cJBean_SizeCorr / 2) << ","
+       << (int)(x2 - x1 + glow_cJBean_SizeCorr) << "," << (int)(y2 - y1 + glow_cJBean_SizeCorr) << "));\n";
     if (fill_drawtype != glow_eDrawType_No && color_tone == glow_eDrawTone_No)
-      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");"
-         << '\n';
+      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");" << '\n';
     if (border_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype
-         << ");\n";
+      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype << ");\n";
     if (text_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setTextColor(" << (int)text_drawtype << ");"
-         << '\n';
+      fp << "    " << var_name << ".setTextColor(" << (int)text_drawtype << ");" << '\n';
     if (color_tone != glow_eDrawTone_No)
-      fp << "    " << var_name << ".setColorTone(" << (int)color_tone << ");"
-         << '\n';
+      fp << "    " << var_name << ".setColorTone(" << (int)color_tone << ");" << '\n';
     if (color_lightness)
-      fp << "    " << var_name << ".setColorBrightness(" << color_lightness
-         << ");\n";
+      fp << "    " << var_name << ".setColorBrightness(" << color_lightness << ");\n";
     if (color_shift)
-      fp << "    " << var_name << ".setColorShift(" << color_shift << ");"
-         << '\n';
+      fp << "    " << var_name << ".setColorShift(" << color_shift << ");" << '\n';
     if (color_intensity)
-      fp << "    " << var_name << ".setColorIntensity(" << color_intensity
-         << ");\n";
+      fp << "    " << var_name << ".setColorIntensity(" << color_intensity << ");\n";
     if (rotate)
       fp << "    " << var_name << ".setRotate(" << rotate << ");\n";
     if (shadow)
       fp << "    " << var_name << ".setShadow(" << shadow << ");\n";
     if (gradient != glow_eGradient_No)
-      fp << "    " << var_name << ".setGradient(" << (int)gradient << ");"
-         << '\n';
+      fp << "    " << var_name << ".setGradient(" << (int)gradient << ");" << '\n';
     if (is_nodeclass)
       fp << "    add(" << var_name << ");\n";
     else
@@ -3146,14 +3045,13 @@ void GlowExportJBean::node(double x1, double y1, double x2, double y2,
     break;
   }
   case glow_eExportPass_Draw:
-    if (is_nodeclass) {
+    if (is_nodeclass)
+    {
       fp << "    save_tmp = g.getTransform();\n"
-         << "    g.translate( " << var_name << ".getX(), " << var_name
-         << ".getY());\n"
+         << "    g.translate( " << var_name << ".getX(), " << var_name << ".getY());\n"
          << "    if ( " << var_name << ".dd.dynType == 0) {\n"
          << "      " << var_name << ".colorTone = colorTone;\n"
-         << "      " << var_name << ".colorBrightness = colorBrightness;"
-         << '\n'
+         << "      " << var_name << ".colorBrightness = colorBrightness;" << '\n'
          << "      " << var_name << ".colorIntensity = colorIntensity;\n"
          << "      " << var_name << ".colorShift = colorShift;\n"
          << "      " << var_name << ".colorInverse = colorInverse;\n"
@@ -3166,18 +3064,17 @@ void GlowExportJBean::node(double x1, double y1, double x2, double y2,
   }
 }
 
-void GlowExportJBean::image(double x1, double y1, double x2, double y2,
-    char* filename, int transparent, glow_eDrawTone color_tone,
-    int color_lightness, int color_intensity, int color_shift, double rotate,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, int in_nc,
-    std::ofstream& fp)
+void GlowExportJBean::image(double x1, double y1, double x2, double y2, char* filename, int transparent,
+                            glow_eDrawTone color_tone, int color_lightness, int color_intensity,
+                            int color_shift, double rotate, glow_eExportPass pass, int* shape_cnt,
+                            int node_cnt, int in_nc, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
   char* s;
 
-  if ((s = strrchr(filename, '/')) || (s = strchr(filename, '>'))
-      || (s = strchr(filename, ']')) || (s = strchr(filename, ':')))
+  if ((s = strrchr(filename, '/')) || (s = strchr(filename, '>')) || (s = strchr(filename, ']')) ||
+      (s = strchr(filename, ':')))
     strcpy(var_name, s + 1);
   else
     strcpy(var_name, filename);
@@ -3185,37 +3082,34 @@ void GlowExportJBean::image(double x1, double y1, double x2, double y2,
     *s = 0;
   sprintf(&var_name[strlen(var_name)], "%d", node_cnt);
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Shape:
     break;
-  case glow_eExportPass_Declare: {
+  case glow_eExportPass_Declare:
+  {
     fp << "  GeImage 	" << var_name << ";\n";
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     if (is_nodeclass)
       nc->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
     else
       ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
     fp << "    " << var_name << " = new GeImage(session);\n"
-       << "    " << var_name << ".setBounds(new Rectangle("
-       << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
-       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1)
-       << "," << (int)(y2 - y1) << "));\n"
+       << "    " << var_name << ".setBounds(new Rectangle(" << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
+       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1) << "," << (int)(y2 - y1) << "));\n"
        << "    " << var_name << ".setImage( \"" << filename << "\");\n";
     if (color_tone != glow_eDrawTone_No)
-      fp << "    " << var_name << ".setColorTone(" << (int)color_tone << ");"
-         << '\n';
+      fp << "    " << var_name << ".setColorTone(" << (int)color_tone << ");" << '\n';
     if (color_lightness)
-      fp << "    " << var_name << ".setColorBrightness(" << color_lightness
-         << ");\n";
+      fp << "    " << var_name << ".setColorBrightness(" << color_lightness << ");\n";
     if (color_shift)
-      fp << "    " << var_name << ".setColorShift(" << color_shift << ");"
-         << '\n';
+      fp << "    " << var_name << ".setColorShift(" << color_shift << ");" << '\n';
     if (color_intensity)
-      fp << "    " << var_name << ".setColorIntensity(" << color_intensity
-         << ");\n";
+      fp << "    " << var_name << ".setColorIntensity(" << color_intensity << ");\n";
     if (rotate)
       fp << "    " << var_name << ".setRotate(" << rotate << ");\n";
     if (transparent)
@@ -3229,10 +3123,10 @@ void GlowExportJBean::image(double x1, double y1, double x2, double y2,
     break;
   }
   case glow_eExportPass_Draw:
-    if (is_nodeclass) {
+    if (is_nodeclass)
+    {
       fp << "    save_tmp = g.getTransform();\n"
-         << "    g.translate( " << var_name << ".getX(), " << var_name
-         << ".getY());\n"
+         << "    g.translate( " << var_name << ".getX(), " << var_name << ".getY());\n"
          << "    " << var_name << ".colorTone = colorTone;\n"
          << "    " << var_name << ".colorBrightness = colorBrightness;\n"
          << "    " << var_name << ".colorIntensity = colorIntensity;\n"
@@ -3246,12 +3140,11 @@ void GlowExportJBean::image(double x1, double y1, double x2, double y2,
   }
 }
 
-void GlowExportJBean::bar(double x1, double y1, double x2, double y2,
-    glow_eDrawType border_drawtype, glow_eDrawType fill_drawtype,
-    glow_eDrawType bar_drawtype, glow_eDrawType bar_bordercolor, int fill,
-    int border, double min_value, double max_value, int bar_border_width,
-    int line_width, double rotate, glow_eExportPass pass, int* shape_cnt,
-    int node_cnt, std::ofstream& fp)
+void GlowExportJBean::bar(double x1, double y1, double x2, double y2, glow_eDrawType border_drawtype,
+                          glow_eDrawType fill_drawtype, glow_eDrawType bar_drawtype,
+                          glow_eDrawType bar_bordercolor, int fill, int border, double min_value,
+                          double max_value, int bar_border_width, int line_width, double rotate,
+                          glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3261,41 +3154,38 @@ void GlowExportJBean::bar(double x1, double y1, double x2, double y2,
   var_name[0] = _tolower(var_name[0]);
   sprintf(&var_name[strlen(var_name)], "%d", node_cnt);
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Shape:
     break;
-  case glow_eExportPass_Declare: {
+  case glow_eExportPass_Declare:
+  {
     fp << "  " << class_name << "	" << var_name << ";\n";
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
     fp << "    " << var_name << " = new " << class_name << "(session);\n"
-       << "    " << var_name << ".setBounds(new Rectangle("
-       << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
-       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1)
-       << "," << (int)(y2 - y1) << "));\n";
+       << "    " << var_name << ".setBounds(new Rectangle(" << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
+       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1) << "," << (int)(y2 - y1)
+       << "));\n";
     if (fill_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");"
-         << '\n';
+      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");" << '\n';
     if (border_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype
-         << ");\n";
+      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype << ");\n";
     else
       fp << "    " << var_name << ".setBorderColor( 0);\n";
     if (bar_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setFillColorBar(" << (int)bar_drawtype
-         << ");\n";
+      fp << "    " << var_name << ".setFillColorBar(" << (int)bar_drawtype << ");\n";
     if (bar_bordercolor != glow_eDrawType_No)
-      fp << "    " << var_name << ".setBorderColorBar(" << (int)bar_bordercolor
-         << ");\n";
+      fp << "    " << var_name << ".setBorderColorBar(" << (int)bar_bordercolor << ");\n";
     if (fill)
       fp << "    " << var_name << ".setDrawFill(1);\n";
     if (border)
       fp << "    " << var_name << ".setDrawBorder(1);\n";
-    fp << "    " << var_name << ".setBarBorderWidth(" << bar_border_width
-       << ");\n"
+    fp << "    " << var_name << ".setBarBorderWidth(" << bar_border_width << ");\n"
        << "    " << var_name << ".setLineWidth(" << line_width << ");\n"
        << "    " << var_name << ".setMinValue(" << min_value << "F);\n"
        << "    " << var_name << ".setMaxValue(" << max_value << "F);\n"
@@ -3313,15 +3203,14 @@ void GlowExportJBean::bar(double x1, double y1, double x2, double y2,
   }
 }
 
-void GlowExportJBean::trend(double x1, double y1, double x2, double y2,
-    glow_eDrawType border_drawtype, glow_eDrawType fill_drawtype,
-    glow_eDrawType curve_drawtype1, glow_eDrawType curve_drawtype2,
-    glow_eDrawType curve_fill_drawtype1, glow_eDrawType curve_fill_drawtype2,
-    int fill, int border, double min_value1, double max_value1,
-    double min_value2, double max_value2, int curve_width, int no_of_points,
-    double scan_time, int horizontal_lines, int vertical_lines, int line_width,
-    double rotate, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-    std::ofstream& fp)
+void GlowExportJBean::trend(double x1, double y1, double x2, double y2, glow_eDrawType border_drawtype,
+                            glow_eDrawType fill_drawtype, glow_eDrawType curve_drawtype1,
+                            glow_eDrawType curve_drawtype2, glow_eDrawType curve_fill_drawtype1,
+                            glow_eDrawType curve_fill_drawtype2, int fill, int border, double min_value1,
+                            double max_value1, double min_value2, double max_value2, int curve_width,
+                            int no_of_points, double scan_time, int horizontal_lines, int vertical_lines,
+                            int line_width, double rotate, glow_eExportPass pass, int* shape_cnt,
+                            int node_cnt, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3331,58 +3220,50 @@ void GlowExportJBean::trend(double x1, double y1, double x2, double y2,
   var_name[0] = _tolower(var_name[0]);
   sprintf(&var_name[strlen(var_name)], "%d", node_cnt);
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Shape:
     break;
-  case glow_eExportPass_Declare: {
+  case glow_eExportPass_Declare:
+  {
     fp << "  " << class_name << "	" << var_name << ";\n";
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
     fp << "    " << var_name << " = new " << class_name << "( session);\n"
-       << "    " << var_name << ".setBounds(new Rectangle("
-       << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
-       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1)
-       << "," << (int)(y2 - y1) << "));\n";
+       << "    " << var_name << ".setBounds(new Rectangle(" << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
+       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1) << "," << (int)(y2 - y1)
+       << "));\n";
     if (fill_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");"
-         << '\n';
+      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");" << '\n';
     if (border_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype
-         << ");\n";
+      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype << ");\n";
     else
       fp << "    " << var_name << ".setBorderColor( 0);\n";
     if (curve_drawtype1 != glow_eDrawType_No)
-      fp << "    " << var_name << ".setBorderColorTrend1("
-         << (int)curve_drawtype1 << ");\n";
+      fp << "    " << var_name << ".setBorderColorTrend1(" << (int)curve_drawtype1 << ");\n";
     if (curve_drawtype2 != glow_eDrawType_No)
-      fp << "    " << var_name << ".setBorderColorTrend2("
-         << (int)curve_drawtype2 << ");\n";
+      fp << "    " << var_name << ".setBorderColorTrend2(" << (int)curve_drawtype2 << ");\n";
     if (curve_fill_drawtype1 != glow_eDrawType_No)
-      fp << "    " << var_name << ".setFillColorTrend1("
-         << (int)curve_fill_drawtype1 << ");\n";
+      fp << "    " << var_name << ".setFillColorTrend1(" << (int)curve_fill_drawtype1 << ");\n";
     if (curve_fill_drawtype2 != glow_eDrawType_No)
-      fp << "    " << var_name << ".setFillColorTrend2("
-         << (int)curve_fill_drawtype2 << ");\n";
+      fp << "    " << var_name << ".setFillColorTrend2(" << (int)curve_fill_drawtype2 << ");\n";
     if (fill)
       fp << "    " << var_name << ".setDrawFill(1);\n";
     if (border)
       fp << "    " << var_name << ".setDrawBorder(1);\n";
-    fp << "    " << var_name << ".setTrendBorderWidth(" << curve_width << ");"
-       << '\n'
+    fp << "    " << var_name << ".setTrendBorderWidth(" << curve_width << ");" << '\n'
        << "    " << var_name << ".setLineWidth(" << line_width << ");\n"
        << "    " << var_name << ".setMinValue1(" << min_value1 << "F);\n"
        << "    " << var_name << ".setMaxValue1(" << max_value1 << "F);\n"
        << "    " << var_name << ".setMinValue2(" << min_value2 << "F);\n"
        << "    " << var_name << ".setMaxValue2(" << max_value2 << "F);\n"
-       << "    " << var_name << ".setNoOfPoints(" << no_of_points << ");"
-       << '\n'
-       << "    " << var_name << ".setHorizontalLines(" << horizontal_lines
-       << ");\n"
-       << "    " << var_name << ".setVerticalLines(" << vertical_lines << ");"
-       << '\n'
+       << "    " << var_name << ".setNoOfPoints(" << no_of_points << ");" << '\n'
+       << "    " << var_name << ".setHorizontalLines(" << horizontal_lines << ");\n"
+       << "    " << var_name << ".setVerticalLines(" << vertical_lines << ");" << '\n'
        << "    " << var_name << ".setRotate(" << rotate << ");\n";
     if (is_nodeclass)
       fp << "    add(" << var_name << ");\n";
@@ -3397,11 +3278,11 @@ void GlowExportJBean::trend(double x1, double y1, double x2, double y2,
   }
 }
 
-void GlowExportJBean::xycurve(double x1, double y1, double x2, double y2,
-    glow_eDrawType border_drawtype, glow_eDrawType fill_drawtype, int fill,
-    int border, int curve_width, int no_of_points, int horizontal_lines,
-    int vertical_lines, int line_width, double rotate, glow_eExportPass pass,
-    int* shape_cnt, int node_cnt, std::ofstream& fp)
+void GlowExportJBean::xycurve(double x1, double y1, double x2, double y2, glow_eDrawType border_drawtype,
+                              glow_eDrawType fill_drawtype, int fill, int border, int curve_width,
+                              int no_of_points, int horizontal_lines, int vertical_lines, int line_width,
+                              double rotate, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                              std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3411,42 +3292,38 @@ void GlowExportJBean::xycurve(double x1, double y1, double x2, double y2,
   var_name[0] = _tolower(var_name[0]);
   sprintf(&var_name[strlen(var_name)], "%d", node_cnt);
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Shape:
     break;
-  case glow_eExportPass_Declare: {
+  case glow_eExportPass_Declare:
+  {
     fp << "  " << class_name << "	" << var_name << ";\n";
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
     fp << "    " << var_name << " = new " << class_name << "( session);\n"
-       << "    " << var_name << ".setBounds(new Rectangle("
-       << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
-       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1)
-       << "," << (int)(y2 - y1) << "));\n";
+       << "    " << var_name << ".setBounds(new Rectangle(" << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
+       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1) << "," << (int)(y2 - y1)
+       << "));\n";
     if (fill_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");"
-         << '\n';
+      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");" << '\n';
     if (border_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype
-         << ");\n";
+      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype << ");\n";
     else
       fp << "    " << var_name << ".setBorderColor( 0);\n";
     if (fill)
       fp << "    " << var_name << ".setDrawFill(1);\n";
     if (border)
       fp << "    " << var_name << ".setDrawBorder(1);\n";
-    fp << "    " << var_name << ".setTrendBorderWidth(" << curve_width << ");"
-       << '\n'
+    fp << "    " << var_name << ".setTrendBorderWidth(" << curve_width << ");" << '\n'
        << "    " << var_name << ".setLineWidth(" << line_width << ");\n"
-       << "    " << var_name << ".setNoOfPoints(" << no_of_points << ");"
-       << '\n'
-       << "    " << var_name << ".setHorizontalLines(" << horizontal_lines
-       << ");\n"
-       << "    " << var_name << ".setVerticalLines(" << vertical_lines << ");"
-       << '\n'
+       << "    " << var_name << ".setNoOfPoints(" << no_of_points << ");" << '\n'
+       << "    " << var_name << ".setHorizontalLines(" << horizontal_lines << ");\n"
+       << "    " << var_name << ".setVerticalLines(" << vertical_lines << ");" << '\n'
        << "    " << var_name << ".setRotate(" << rotate << ");\n";
     if (is_nodeclass)
       fp << "    add(" << var_name << ");\n";
@@ -3461,12 +3338,11 @@ void GlowExportJBean::xycurve(double x1, double y1, double x2, double y2,
   }
 }
 
-void GlowExportJBean::axis(double x1, double y1, double x2, double y2,
-    glow_eDrawType border_drawtype, glow_eDrawType text_drawtype,
-    double min_value, double max_value, int lines, int longquotient,
-    int valuequotient, int line_length, int line_width, double rotate, int bold,
-    int text_idx, char* format, glow_eExportPass pass, int* shape_cnt,
-    int node_cnt, std::ofstream& fp)
+void GlowExportJBean::axis(double x1, double y1, double x2, double y2, glow_eDrawType border_drawtype,
+                           glow_eDrawType text_drawtype, double min_value, double max_value, int lines,
+                           int longquotient, int valuequotient, int line_length, int line_width,
+                           double rotate, int bold, int text_idx, char* format, glow_eExportPass pass,
+                           int* shape_cnt, int node_cnt, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3476,20 +3352,24 @@ void GlowExportJBean::axis(double x1, double y1, double x2, double y2,
   var_name[0] = _tolower(var_name[0]);
   sprintf(&var_name[strlen(var_name)], "%d", node_cnt);
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Shape:
     break;
-  case glow_eExportPass_Declare: {
+  case glow_eExportPass_Declare:
+  {
     fp << "  " << class_name << "	" << var_name << ";\n";
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     char bold_str[20];
     int text_size;
 
     ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
-    switch (text_idx) {
+    switch (text_idx)
+    {
     case 0:
       text_size = 8;
       break;
@@ -3525,34 +3405,29 @@ void GlowExportJBean::axis(double x1, double y1, double x2, double y2,
       strcpy(bold_str, "PLAIN");
 
     fp << "    " << var_name << " = new " << class_name << "();\n"
-       << "    " << var_name << ".setBounds(new Rectangle("
-       << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
-       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1)
-       << "," << (int)(y2 - y1) << "));\n";
+       << "    " << var_name << ".setBounds(new Rectangle(" << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
+       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1) << "," << (int)(y2 - y1)
+       << "));\n";
 
     if (border_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype
-         << ");\n";
+      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype << ");\n";
     else
       fp << "    " << var_name << ".setBorderColor( 0);\n";
     if (text_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setTextColor(" << (int)text_drawtype << ");"
-         << '\n';
+      fp << "    " << var_name << ".setTextColor(" << (int)text_drawtype << ");" << '\n';
     else
       fp << "    " << var_name << ".setTextColor( 0);\n";
     fp << "    " << var_name << ".setLineWidth(" << line_width << ");\n"
        << "    " << var_name << ".setMinValue(" << min_value << "F);\n"
        << "    " << var_name << ".setMaxValue(" << max_value << "F);\n"
        << "    " << var_name << ".setLines(" << lines << ");\n"
-       << "    " << var_name << ".setLongQuotient(" << longquotient << ");"
-       << '\n'
-       << "    " << var_name << ".setValueQuotient(" << valuequotient << ");"
-       << '\n'
+       << "    " << var_name << ".setLongQuotient(" << longquotient << ");" << '\n'
+       << "    " << var_name << ".setValueQuotient(" << valuequotient << ");" << '\n'
        << "    " << var_name << ".setLineLength(" << line_length << ");\n"
        << "    " << var_name << ".setLineWidth(" << line_width << ");\n"
        << "    " << var_name << ".setRotate(" << rotate << ");\n"
-       << "    " << var_name << ".setFont(new Font(\"Helvetica\", Font."
-       << bold_str << ", " << text_size << "));\n"
+       << "    " << var_name << ".setFont(new Font(\"Helvetica\", Font." << bold_str << ", " << text_size
+       << "));\n"
        << "    " << var_name << ".setFormat(\"" << format << "\");\n";
 
     if (is_nodeclass)
@@ -3568,12 +3443,12 @@ void GlowExportJBean::axis(double x1, double y1, double x2, double y2,
   }
 }
 
-void GlowExportJBean::axisarc(double x1, double y1, double x2, double y2,
-    double angle1, double angle2, glow_eDrawType border_drawtype,
-    glow_eDrawType text_drawtype, double min_value, double max_value, int lines,
-    int longquotient, int valuequotient, double line_length, int line_width,
-    double rotate, int bold, int text_idx, char* format, glow_eExportPass pass,
-    int* shape_cnt, int node_cnt, std::ofstream& fp)
+void GlowExportJBean::axisarc(double x1, double y1, double x2, double y2, double angle1, double angle2,
+                              glow_eDrawType border_drawtype, glow_eDrawType text_drawtype, double min_value,
+                              double max_value, int lines, int longquotient, int valuequotient,
+                              double line_length, int line_width, double rotate, int bold, int text_idx,
+                              char* format, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                              std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3583,20 +3458,24 @@ void GlowExportJBean::axisarc(double x1, double y1, double x2, double y2,
   var_name[0] = _tolower(var_name[0]);
   sprintf(&var_name[strlen(var_name)], "%d", node_cnt);
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Shape:
     break;
-  case glow_eExportPass_Declare: {
+  case glow_eExportPass_Declare:
+  {
     fp << "  " << class_name << "	" << var_name << ";\n";
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     char bold_str[20];
     int text_size;
 
     ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
-    switch (text_idx) {
+    switch (text_idx)
+    {
     case 0:
       text_size = 8;
       break;
@@ -3632,19 +3511,16 @@ void GlowExportJBean::axisarc(double x1, double y1, double x2, double y2,
       strcpy(bold_str, "PLAIN");
 
     fp << "    " << var_name << " = new " << class_name << "();\n"
-       << "    " << var_name << ".setBounds(new Rectangle("
-       << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
-       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1)
-       << "," << (int)(y2 - y1) << "));\n";
+       << "    " << var_name << ".setBounds(new Rectangle(" << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
+       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1) << "," << (int)(y2 - y1)
+       << "));\n";
 
     if (border_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype
-         << ");\n";
+      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype << ");\n";
     else
       fp << "    " << var_name << ".setBorderColor( 0);\n";
     if (text_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setTextColor(" << (int)text_drawtype << ");"
-         << '\n';
+      fp << "    " << var_name << ".setTextColor(" << (int)text_drawtype << ");" << '\n';
     else
       fp << "    " << var_name << ".setTextColor( 0);\n";
     fp << "    " << var_name << ".setAngle1(" << angle1 << "F);\n"
@@ -3653,16 +3529,13 @@ void GlowExportJBean::axisarc(double x1, double y1, double x2, double y2,
        << "    " << var_name << ".setMinValue(" << min_value << "F);\n"
        << "    " << var_name << ".setMaxValue(" << max_value << "F);\n"
        << "    " << var_name << ".setLines(" << lines << ");\n"
-       << "    " << var_name << ".setLongQuotient(" << longquotient << ");"
-       << '\n'
-       << "    " << var_name << ".setValueQuotient(" << valuequotient << ");"
-       << '\n'
-       << "    " << var_name << ".setLineLength(" << line_length << "F);"
-       << '\n'
+       << "    " << var_name << ".setLongQuotient(" << longquotient << ");" << '\n'
+       << "    " << var_name << ".setValueQuotient(" << valuequotient << ");" << '\n'
+       << "    " << var_name << ".setLineLength(" << line_length << "F);" << '\n'
        << "    " << var_name << ".setLineWidth(" << line_width << ");\n"
        << "    " << var_name << ".setRotate(" << rotate << ");\n"
-       << "    " << var_name << ".setFont(new Font(\"Helvetica\", Font."
-       << bold_str << ", " << text_size << "));\n"
+       << "    " << var_name << ".setFont(new Font(\"Helvetica\", Font." << bold_str << ", " << text_size
+       << "));\n"
        << "    " << var_name << ".setFormat(\"" << format << "\");\n";
 
     if (is_nodeclass)
@@ -3678,13 +3551,12 @@ void GlowExportJBean::axisarc(double x1, double y1, double x2, double y2,
   }
 }
 
-void GlowExportJBean::pie(double x1, double y1, double x2, double y2,
-    int angle1, int angle2, glow_eDrawType border_drawtype,
-    glow_eDrawType fill_drawtype, int fill, int border, int sectors,
-    glow_eDrawType* sector_colors, double min_value, double max_value,
-    int line_width, double rotate, double shadow_width, int shadow,
-    glow_eGradient gradient, int gc1, int gc2, glow_eExportPass pass,
-    int* shape_cnt, int node_cnt, std::ofstream& fp)
+void GlowExportJBean::pie(double x1, double y1, double x2, double y2, int angle1, int angle2,
+                          glow_eDrawType border_drawtype, glow_eDrawType fill_drawtype, int fill, int border,
+                          int sectors, glow_eDrawType* sector_colors, double min_value, double max_value,
+                          int line_width, double rotate, double shadow_width, int shadow,
+                          glow_eGradient gradient, int gc1, int gc2, glow_eExportPass pass, int* shape_cnt,
+                          int node_cnt, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3694,29 +3566,28 @@ void GlowExportJBean::pie(double x1, double y1, double x2, double y2,
   var_name[0] = _tolower(var_name[0]);
   sprintf(&var_name[strlen(var_name)], "%d", node_cnt);
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Shape:
     break;
-  case glow_eExportPass_Declare: {
+  case glow_eExportPass_Declare:
+  {
     fp << "  " << class_name << "	" << var_name << ";\n";
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
     fp << "    " << var_name << " = new " << class_name << "(session);\n"
-       << "    " << var_name << ".setBounds(new Rectangle("
-       << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
-       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1)
-       << "," << (int)(y2 - y1) << "));"
+       << "    " << var_name << ".setBounds(new Rectangle(" << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
+       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1) << "," << (int)(y2 - y1) << "));"
        << "    " << var_name << ".setAngle1(" << angle1 << "F);\n"
        << "    " << var_name << ".setAngle2(" << angle2 << "F);\n";
     if (fill_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");"
-         << '\n';
+      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");" << '\n';
     if (border_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype
-         << ");\n";
+      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype << ");\n";
     else
       fp << "    " << var_name << ".setBorderColor( 0);\n";
     if (fill)
@@ -3725,7 +3596,8 @@ void GlowExportJBean::pie(double x1, double y1, double x2, double y2,
       fp << "    " << var_name << ".setDrawBorder(1);\n";
     fp << "    " << var_name << ".setSectors(" << sectors << ");\n"
        << "    " << var_name << ".setSectorColors(new int[] {";
-    for (int i = 0; i < PIE_MAX_SECTORS; i++) {
+    for (int i = 0; i < PIE_MAX_SECTORS; i++)
+    {
       fp << sector_colors[i];
       if (i != PIE_MAX_SECTORS - 1)
         fp << ",";
@@ -3736,8 +3608,7 @@ void GlowExportJBean::pie(double x1, double y1, double x2, double y2,
        << "    " << var_name << ".setMaxValue(" << max_value << "F);\n"
        << "    " << var_name << ".setRotate(" << rotate << ");\n"
        << "    " << var_name << ".setShadow(" << shadow << ");\n"
-       << "    " << var_name << ".setShadowWidth(" << shadow_width << ");"
-       << '\n'
+       << "    " << var_name << ".setShadowWidth(" << shadow_width << ");" << '\n'
        << "    " << var_name << ".setGradient(" << (int)gradient << ");\n"
        << "    " << var_name << ".setGc1(" << gc1 << ");\n"
        << "    " << var_name << ".setGc2(" << gc2 << ");\n";
@@ -3753,13 +3624,13 @@ void GlowExportJBean::pie(double x1, double y1, double x2, double y2,
   default:;
   }
 }
-void GlowExportJBean::barchart(double x1, double y1, double x2, double y2,
-    glow_eDrawType border_drawtype, glow_eDrawType fill_drawtype, int fill,
-    int border, int bars, int barsegments, glow_eDrawType* bar_colors,
-    double min_value, double max_value, int line_width, double rotate,
-    double shadow_width, int shadow, glow_eGradient gradient, int gc1, int gc2,
-    int vertical_lines, int horizontal_lines, glow_eDrawType line_color,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
+void GlowExportJBean::barchart(double x1, double y1, double x2, double y2, glow_eDrawType border_drawtype,
+                               glow_eDrawType fill_drawtype, int fill, int border, int bars, int barsegments,
+                               glow_eDrawType* bar_colors, double min_value, double max_value, int line_width,
+                               double rotate, double shadow_width, int shadow, glow_eGradient gradient,
+                               int gc1, int gc2, int vertical_lines, int horizontal_lines,
+                               glow_eDrawType line_color, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                               std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3769,27 +3640,27 @@ void GlowExportJBean::barchart(double x1, double y1, double x2, double y2,
   var_name[0] = _tolower(var_name[0]);
   sprintf(&var_name[strlen(var_name)], "%d", node_cnt);
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Shape:
     break;
-  case glow_eExportPass_Declare: {
+  case glow_eExportPass_Declare:
+  {
     fp << "  " << class_name << "	" << var_name << ";\n";
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
     fp << "    " << var_name << " = new " << class_name << "(session);\n"
-       << "    " << var_name << ".setBounds(new Rectangle("
-       << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
-       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1)
-       << "," << (int)(y2 - y1) << "));\n";
+       << "    " << var_name << ".setBounds(new Rectangle(" << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
+       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1) << "," << (int)(y2 - y1)
+       << "));\n";
     if (fill_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");"
-         << '\n';
+      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");" << '\n';
     if (border_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype
-         << ");\n";
+      fp << "    " << var_name << ".setBorderColor(" << (int)border_drawtype << ");\n";
     else
       fp << "    " << var_name << ".setBorderColor( 0);\n";
     if (fill)
@@ -3797,10 +3668,10 @@ void GlowExportJBean::barchart(double x1, double y1, double x2, double y2,
     if (border)
       fp << "    " << var_name << ".setDrawBorder(1);\n";
     fp << "    " << var_name << ".setBars(" << bars << ");\n"
-       << "    " << var_name << ".setBarSegments(" << barsegments << ");"
-       << '\n'
+       << "    " << var_name << ".setBarSegments(" << barsegments << ");" << '\n'
        << "    " << var_name << ".setBarColors(new int[] {";
-    for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++) {
+    for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++)
+    {
       fp << bar_colors[i];
       if (i != BARCHART_MAX_BARSEGMENTS - 1)
         fp << ",";
@@ -3811,17 +3682,13 @@ void GlowExportJBean::barchart(double x1, double y1, double x2, double y2,
        << "    " << var_name << ".setMaxValue(" << max_value << "F);\n"
        << "    " << var_name << ".setRotate(" << rotate << ");\n"
        << "    " << var_name << ".setShadow(" << shadow << ");\n"
-       << "    " << var_name << ".setShadowWidth(" << shadow_width << ");"
-       << '\n'
+       << "    " << var_name << ".setShadowWidth(" << shadow_width << ");" << '\n'
        << "    " << var_name << ".setGradient(" << (int)gradient << ");\n"
        << "    " << var_name << ".setGc1(" << gc1 << ");\n"
        << "    " << var_name << ".setGc2(" << gc2 << ");\n"
-       << "    " << var_name << ".setVerticalLines(" << vertical_lines << ");"
-       << '\n'
-       << "    " << var_name << ".setHorizontalLines(" << horizontal_lines
-       << ");\n"
-       << "    " << var_name << ".setLineColor(" << (int)line_color << ");"
-       << '\n';
+       << "    " << var_name << ".setVerticalLines(" << vertical_lines << ");" << '\n'
+       << "    " << var_name << ".setHorizontalLines(" << horizontal_lines << ");\n"
+       << "    " << var_name << ".setLineColor(" << (int)line_color << ");" << '\n';
     if (is_nodeclass)
       fp << "    add(" << var_name << ");\n";
     else
@@ -3835,10 +3702,9 @@ void GlowExportJBean::barchart(double x1, double y1, double x2, double y2,
   }
 }
 
-void GlowExportJBean::window(double x1, double y1, double x2, double y2,
-    char* filename, int vertical_scrollbar, int horizontal_scrollbar,
-    char* owner, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-    std::ofstream& fp)
+void GlowExportJBean::window(double x1, double y1, double x2, double y2, char* filename,
+                             int vertical_scrollbar, int horizontal_scrollbar, char* owner,
+                             glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3855,7 +3721,8 @@ void GlowExportJBean::window(double x1, double y1, double x2, double y2,
     strcpy(class_fname, s + 1);
   else
     strcpy(class_fname, filename);
-  if (str_StartsWith(class_fname, "pwr_c_")) {
+  if (str_StartsWith(class_fname, "pwr_c_"))
+  {
     char str[80];
     strcpy(str, "Jopc");
     strcat(str, &class_fname[6]);
@@ -3868,31 +3735,30 @@ void GlowExportJBean::window(double x1, double y1, double x2, double y2,
   sprintf(var_fname, "%s%d", class_fname, node_cnt);
   class_fname[0] = _toupper(class_fname[0]);
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Shape:
     break;
-  case glow_eExportPass_Declare: {
+  case glow_eExportPass_Declare:
+  {
     fp << "  " << class_name << "	" << var_name << ";\n";
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
     if (streq(owner, ""))
-      fp << "    " << class_fname << " " << var_fname << " = new "
-         << class_fname << "(session, null, false);\n";
+      fp << "    " << class_fname << " " << var_fname << " = new " << class_fname
+         << "(session, null, false);\n";
     else
-      fp << "    " << class_fname << " " << var_fname << " = new "
-         << class_fname << "(session, \"" << owner << "\", false);\n";
+      fp << "    " << class_fname << " " << var_fname << " = new " << class_fname << "(session, \"" << owner
+         << "\", false);\n";
 
-    fp << "    " << var_name << " = new " << class_name << "(" << var_fname
-       << ".localPanel);\n"
-       << "    " << var_name << ".setBounds(new Rectangle("
-       << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
-       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1)
-       << "," << (int)(y2 - y1) << "));\n"
-       << "    localPanel.add(" << var_name << ", new Proportion(" << var_name
-       << ".getBounds(), dsize));\n";
+    fp << "    " << var_name << " = new " << class_name << "(" << var_fname << ".localPanel);\n"
+       << "    " << var_name << ".setBounds(new Rectangle(" << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
+       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1) << "," << (int)(y2 - y1) << "));\n"
+       << "    localPanel.add(" << var_name << ", new Proportion(" << var_name << ".getBounds(), dsize));\n";
     break;
   }
   case glow_eExportPass_Draw:
@@ -3901,10 +3767,9 @@ void GlowExportJBean::window(double x1, double y1, double x2, double y2,
   }
 }
 
-void GlowExportJBean::folder(double x1, double y1, double x2, double y2,
-    int folders, char* folder_file_names, char* folder_text,
-    int* folder_v_scrollbar, int* folder_h_scrollbar, char* owner,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
+void GlowExportJBean::folder(double x1, double y1, double x2, double y2, int folders, char* folder_file_names,
+                             char* folder_text, int* folder_v_scrollbar, int* folder_h_scrollbar, char* owner,
+                             glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3917,27 +3782,32 @@ void GlowExportJBean::folder(double x1, double y1, double x2, double y2,
   var_name[0] = _tolower(var_name[0]);
   sprintf(&var_name[strlen(var_name)], "%d", node_cnt);
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Shape:
     break;
-  case glow_eExportPass_Declare: {
+  case glow_eExportPass_Declare:
+  {
     fp << "  " << class_name << "	" << var_name << ";\n";
     break;
   }
-  case glow_eExportPass_Attributes: {
+  case glow_eExportPass_Attributes:
+  {
     ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
     fp << "    " << var_name << " = new " << class_name << "();\n";
 
     char* fname_p = folder_file_names;
     char* text_p = folder_text;
-    for (int i = 0; i < folders; i++) {
+    for (int i = 0; i < folders; i++)
+    {
       // Convert filename to java class
       if ((s = strrchr(fname_p, '/')) != 0)
         strcpy(class_fname, s + 1);
       else
         strcpy(class_fname, fname_p);
-      if (str_StartsWith(class_fname, "pwr_c_")) {
+      if (str_StartsWith(class_fname, "pwr_c_"))
+      {
         char str[80];
         strcpy(str, "Jopc");
         strcat(str, &class_fname[6]);
@@ -3952,27 +3822,23 @@ void GlowExportJBean::folder(double x1, double y1, double x2, double y2,
 
       own = owner + i * 256;
       if (streq(own, ""))
-        fp << "    " << class_fname << " " << var_fname << " = new "
-           << class_fname << "(session, null, false);\n";
+        fp << "    " << class_fname << " " << var_fname << " = new " << class_fname
+           << "(session, null, false);\n";
       else
-        fp << "    " << class_fname << " " << var_fname << " = new "
-           << class_fname << "(session, \"" << owner << "\" , false);\n";
+        fp << "    " << class_fname << " " << var_fname << " = new " << class_fname << "(session, \"" << owner
+           << "\" , false);\n";
       if (folder_v_scrollbar[i] || folder_h_scrollbar[i])
-        fp << "    " << var_name << ".addTab(\"" << text_p
-           << "\", new JScrollPane(" << var_fname << ".localPanel));\n";
+        fp << "    " << var_name << ".addTab(\"" << text_p << "\", new JScrollPane(" << var_fname
+           << ".localPanel));\n";
       else
-        fp << "    " << var_name << ".addTab(\"" << text_p << "\", "
-           << var_fname << ".localPanel);\n";
+        fp << "    " << var_name << ".addTab(\"" << text_p << "\", " << var_fname << ".localPanel);\n";
       fname_p += 80;
       text_p += 80;
     }
 
-    fp << "    " << var_name << ".setBounds(new Rectangle("
-       << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
-       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1)
-       << "," << (int)(y2 - y1) << "));\n"
-       << "    localPanel.add(" << var_name << ", new Proportion(" << var_name
-       << ".getBounds(), dsize));\n";
+    fp << "    " << var_name << ".setBounds(new Rectangle(" << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
+       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1) << "," << (int)(y2 - y1) << "));\n"
+       << "    localPanel.add(" << var_name << ", new Proportion(" << var_name << ".getBounds(), dsize));\n";
     break;
   }
   case glow_eExportPass_Draw:
@@ -3981,12 +3847,11 @@ void GlowExportJBean::folder(double x1, double y1, double x2, double y2,
   }
 }
 
-void GlowExportJBean::table(double x1, double y1, double x2, double y2,
-    glow_eDrawType fill_drawtype, int fill, int rows, int columns,
-    int header_row, int header_column, int text_idx,
-    glow_eDrawType text_drawtype, double header_row_height, double row_height,
-    double* column_width, char* header_text, glow_eExportPass pass,
-    int* shape_cnt, int node_cnt, std::ofstream& fp)
+void GlowExportJBean::table(double x1, double y1, double x2, double y2, glow_eDrawType fill_drawtype,
+                            int fill, int rows, int columns, int header_row, int header_column, int text_idx,
+                            glow_eDrawType text_drawtype, double header_row_height, double row_height,
+                            double* column_width, char* header_text, glow_eExportPass pass, int* shape_cnt,
+                            int node_cnt, std::ofstream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3998,15 +3863,19 @@ void GlowExportJBean::table(double x1, double y1, double x2, double y2,
   var_name[0] = _tolower(var_name[0]);
   sprintf(&var_name[strlen(var_name)], "%d", node_cnt);
 
-  switch (pass) {
+  switch (pass)
+  {
   case glow_eExportPass_Shape:
     break;
-  case glow_eExportPass_Declare: {
+  case glow_eExportPass_Declare:
+  {
     fp << "  " << class_name << "	" << var_name << ";\n";
     break;
   }
-  case glow_eExportPass_Attributes: {
-    switch (text_idx) {
+  case glow_eExportPass_Attributes:
+  {
+    switch (text_idx)
+    {
     case 0:
       text_size = 8;
       break;
@@ -4041,33 +3910,26 @@ void GlowExportJBean::table(double x1, double y1, double x2, double y2,
 
     ((GrowCtx*)ctx)->measure_javabean(&dim_x1, &dim_x0, &dim_y1, &dim_y0);
 
-    fp << "    " << var_name << " = new " << class_name << "(session, " << rows
-       << "," << columns << "," << header_row << "," << header_column << ");"
-       << '\n'
-       << "    " << var_name << ".setHeaderRowHeight(" << int(header_row_height)
-       << ");\n"
-       << "    " << var_name << ".setRowHeight(" << int(row_height) << ");"
-       << '\n';
+    fp << "    " << var_name << " = new " << class_name << "(session, " << rows << "," << columns << ","
+       << header_row << "," << header_column << ");" << '\n'
+       << "    " << var_name << ".setHeaderRowHeight(" << int(header_row_height) << ");\n"
+       << "    " << var_name << ".setRowHeight(" << int(row_height) << ");" << '\n';
     char* text_p = header_text;
-    for (int i = 0; i < columns; i++) {
-      fp << "    " << var_name << ".setHeaderText(" << i << ",\"" << text_p
-         << "\");\n"
-         << "    " << var_name << ".setColumnWidth(" << i << ","
-         << int(column_width[i]) << ");\n";
+    for (int i = 0; i < columns; i++)
+    {
+      fp << "    " << var_name << ".setHeaderText(" << i << ",\"" << text_p << "\");\n"
+         << "    " << var_name << ".setColumnWidth(" << i << "," << int(column_width[i]) << ");\n";
       text_p += 40;
     }
     if (fill_drawtype != glow_eDrawType_No)
-      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");"
-         << '\n';
-    fp << "    " << var_name << ".setFont(new Font(\"Helvetica\", Font."
-       << bold_str << ", " << text_size << "));\n";
+      fp << "    " << var_name << ".setFillColor(" << (int)fill_drawtype << ");" << '\n';
+    fp << "    " << var_name << ".setFont(new Font(\"Helvetica\", Font." << bold_str << ", " << text_size
+       << "));\n";
 
-    fp << "    " << var_name << ".setBounds(new Rectangle("
-       << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
-       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1)
-       << "," << (int)(y2 - y1) << "));\n";
-    fp << "    localPanel.add(" << var_name << ", new Proportion(" << var_name
-       << ".getBounds(), dsize));\n";
+    fp << "    " << var_name << ".setBounds(new Rectangle(" << (int)(x1 - dim_x0 + glow_cJBean_Offset) << ","
+       << (int)(y1 - dim_y0 + glow_cJBean_Offset) << "," << (int)(x2 - x1) << "," << (int)(y2 - y1)
+       << "));\n";
+    fp << "    localPanel.add(" << var_name << ", new Proportion(" << var_name << ".getBounds(), dsize));\n";
     break;
   }
   case glow_eExportPass_Draw:
@@ -4076,23 +3938,21 @@ void GlowExportJBean::table(double x1, double y1, double x2, double y2,
   }
 }
 
-void GlowExportJBean::slider(double x1, double y1, double x2, double y2,
-    char* class_name, glow_eDrawType border_drawtype,
-    glow_eDrawType fill_drawtype, glow_eDrawType text_drawtype,
-    glow_eDrawTone color_tone, int color_lightness, int color_intensity,
-    int color_shift, int line_width, double rotate, int shadow,
-    glow_eGradient gradient, glow_eExportPass pass, int* shape_cnt,
-    int node_cnt, int in_nc, std::ofstream& fp)
+void GlowExportJBean::slider(double x1, double y1, double x2, double y2, char* class_name,
+                             glow_eDrawType border_drawtype, glow_eDrawType fill_drawtype,
+                             glow_eDrawType text_drawtype, glow_eDrawTone color_tone, int color_lightness,
+                             int color_intensity, int color_shift, int line_width, double rotate, int shadow,
+                             glow_eGradient gradient, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                             int in_nc, std::ofstream& fp)
 {
-  node(x1, y1, x2, y2, class_name, border_drawtype, fill_drawtype,
-      text_drawtype, color_tone, color_lightness, color_intensity, color_shift,
-      line_width, rotate, shadow, gradient, pass, shape_cnt, node_cnt, in_nc,
-      fp);
+  node(x1, y1, x2, y2, class_name, border_drawtype, fill_drawtype, text_drawtype, color_tone, color_lightness,
+       color_intensity, color_shift, line_width, rotate, shadow, gradient, pass, shape_cnt, node_cnt, in_nc,
+       fp);
 }
 
-void GlowExportJBean::gradient_paint(glow_eGradient gradient, int gc1, int gc2,
-    double x0, double y0, double w, double h, int fixcolor,
-    glow_eDrawType fill_drawtype, std::ofstream& fp)
+void GlowExportJBean::gradient_paint(glow_eGradient gradient, int gc1, int gc2, double x0, double y0,
+                                     double w, double h, int fixcolor, glow_eDrawType fill_drawtype,
+                                     std::ofstream& fp)
 {
   float gx0 = 0.0, gy0 = 0.0, gx1 = 0.0, gy1 = 0.0, gr = 0.0;
   double dim_x1, dim_x0, dim_y1, dim_y0;
@@ -4106,7 +3966,8 @@ void GlowExportJBean::gradient_paint(glow_eGradient gradient, int gc1, int gc2,
   x = x0 - dim_x0 + glow_cJBean_Offset;
   y = y0 - dim_y0 + glow_cJBean_Offset;
 
-  switch (gradient) {
+  switch (gradient)
+  {
   case glow_eGradient_HorizontalUp:
     gx0 = x;
     gy0 = y;
@@ -4236,7 +4097,8 @@ void GlowExportJBean::gradient_paint(glow_eGradient gradient, int gc1, int gc2,
   default:;
   }
 
-  switch (gradient) {
+  switch (gradient)
+  {
   case glow_eGradient_HorizontalUp:
   case glow_eGradient_HorizontalDown:
   case glow_eGradient_HorizontalTube1:
@@ -4253,24 +4115,18 @@ void GlowExportJBean::gradient_paint(glow_eGradient gradient, int gc1, int gc2,
   case glow_eGradient_DiagonalDownTube:
     if (fixcolor)
       fp << "    {\n"
-         << "      GradientPaint gp = new GradientPaint( " << gx0 << "F," << gy0
-         << "F,"
-         << "        GeColor.getColor(" << (int)fill_drawtype
-         << ",GeColor.NO_TONE,0,0," << gc1
+         << "      GradientPaint gp = new GradientPaint( " << gx0 << "F," << gy0 << "F,"
+         << "        GeColor.getColor(" << (int)fill_drawtype << ",GeColor.NO_TONE,0,0," << gc1
          << ", colorInverse, GeColor.NO_COLOR, dimmed),\n"
-         << "        " << gx1 << "F," << gy1 << "F,GeColor.getColor("
-         << (int)fill_drawtype << ",GeColor.NO_TONE,0,0," << gc2
-         << ", colorInverse, GeColor.NO_COLOR, dimmed),true);\n";
+         << "        " << gx1 << "F," << gy1 << "F,GeColor.getColor(" << (int)fill_drawtype
+         << ",GeColor.NO_TONE,0,0," << gc2 << ", colorInverse, GeColor.NO_COLOR, dimmed),true);\n";
     else
       fp << "    {\n"
-         << "      GradientPaint gp = new GradientPaint( " << gx0 << "F," << gy0
-         << "F,"
-         << "        GeColor.getColor(" << (int)fill_drawtype
-         << ",colorTone,colorShift,colorIntensity," << gc1
-         << ", colorInverse, fillColor, dimmed),\n"
-         << "        " << gx1 << "F," << gy1 << "F,GeColor.getColor("
-         << (int)fill_drawtype << ",colorTone,colorShift,colorIntensity," << gc2
-         << ", colorInverse, fillColor, dimmed),true);\n";
+         << "      GradientPaint gp = new GradientPaint( " << gx0 << "F," << gy0 << "F,"
+         << "        GeColor.getColor(" << (int)fill_drawtype << ",colorTone,colorShift,colorIntensity,"
+         << gc1 << ", colorInverse, fillColor, dimmed),\n"
+         << "        " << gx1 << "F," << gy1 << "F,GeColor.getColor(" << (int)fill_drawtype
+         << ",colorTone,colorShift,colorIntensity," << gc2 << ", colorInverse, fillColor, dimmed),true);\n";
 
     fp << "      g.setPaint(gp);\n"
        << "    }\n";
@@ -4286,23 +4142,19 @@ void GlowExportJBean::gradient_paint(glow_eGradient gradient, int gc1, int gc2,
       fp << "    {\n"
          << "      RadialGradientPaint gp = new RadialGradientPaint( new "
             "Point2D.Float("
-         << gx0 << "F," << gy0 << "F)," << gr
-         << "F, new float[] {0F,1F}, new Color[] { GeColor.getColor("
+         << gx0 << "F," << gy0 << "F)," << gr << "F, new float[] {0F,1F}, new Color[] { GeColor.getColor("
          << (int)fill_drawtype << ",GeColor.NO_TONE,0,0," << gc1
-         << ", colorInverse, GeColor.NO_COLOR, dimmed),GeColor.getColor("
-         << (int)fill_drawtype << ",GeColor.NO_TONE,0,0," << gc2
-         << ", colorInverse, GeColor.NO_COLOR, dimmed)});\n";
+         << ", colorInverse, GeColor.NO_COLOR, dimmed),GeColor.getColor(" << (int)fill_drawtype
+         << ",GeColor.NO_TONE,0,0," << gc2 << ", colorInverse, GeColor.NO_COLOR, dimmed)});\n";
     else
       fp << "    {\n"
          << "      RadialGradientPaint gp = new RadialGradientPaint( new "
             "Point2D.Float("
-         << gx0 << "F," << gy0 << "F)," << gr
-         << "F, new float[] {0F,1F}, new Color[] { GeColor.getColor("
+         << gx0 << "F," << gy0 << "F)," << gr << "F, new float[] {0F,1F}, new Color[] { GeColor.getColor("
          << (int)fill_drawtype << ",colorTone,colorShift,colorIntensity," << gc1
          << ", colorInverse, fillColor, dimmed),\n"
-         << "        GeColor.getColor(" << (int)fill_drawtype
-         << ",colorTone,colorShift,colorIntensity," << gc2
-         << ", colorInverse, fillColor, dimmed)});\n";
+         << "        GeColor.getColor(" << (int)fill_drawtype << ",colorTone,colorShift,colorIntensity,"
+         << gc2 << ", colorInverse, fillColor, dimmed)});\n";
 
     fp << "      g.setPaint(gp);\n"
        << "    }\n";
@@ -4318,7 +4170,8 @@ static char* str_cnv(char* instr)
   char* in;
   char* out = outstr;
 
-  for (in = instr; *in != 0; in++) {
+  for (in = instr; *in != 0; in++)
+  {
     if (*in == '"')
       *out++ = '\\';
     *out++ = *in;

@@ -57,7 +57,8 @@
 #include "wb_vrepref.h"
 #include "wb_vrepext.h"
 
-extern "C" {
+extern "C"
+{
 #include "co_dcli.h"
 #include "pwr_names.h"
 }
@@ -65,34 +66,32 @@ extern "C" {
 pwr_dImport pwr_BindClasses(System);
 pwr_dImport pwr_BindClasses(Base);
 
-typedef enum { eDbType_db, eDbType_dbms, eDbType_wbl, eDbType_none } eDbType;
+typedef enum
+{
+  eDbType_db,
+  eDbType_dbms,
+  eDbType_wbl,
+  eDbType_none
+} eDbType;
 
-wb_volcheck::wb_volcheck(
-    char* vname, char* filename, pwr_tVid vid, pwr_tTime time)
-    : m_vid(vid), m_time(time)
+wb_volcheck::wb_volcheck(char* vname, char* filename, pwr_tVid vid, pwr_tTime time) : m_vid(vid), m_time(time)
 {
   strncpy(m_vname, vname, sizeof(m_vname));
   strncpy(m_filename, filename, sizeof(m_filename));
 }
 
 wb_erep::wb_erep(unsigned int options)
-    : m_nRef(0), m_dir_cnt(0), m_volatile_idx(0), m_buffer_max(10),
-      m_ref_merep_occupied(false), m_options(options)
+    : m_nRef(0), m_dir_cnt(0), m_volatile_idx(0), m_buffer_max(10), m_ref_merep_occupied(false),
+      m_options(options)
 {
   m_merep = new wb_merep(0);
 
   atexit(at_exit);
 }
 
-wb_erep::~wb_erep()
-{
-  delete m_merep;
-}
+wb_erep::~wb_erep() { delete m_merep; }
 
-void wb_erep::at_exit()
-{
-  wb_dblock::dbunlock_all();
-}
+void wb_erep::at_exit() { wb_dblock::dbunlock_all(); }
 
 void wb_erep::unref()
 {
@@ -110,9 +109,11 @@ wb_erep* wb_erep::ref()
 wb_vrep* wb_erep::volume(pwr_tStatus* sts)
 {
   vrep_iterator it = m_vrepdb.begin();
-  if (it == m_vrepdb.end()) {
+  if (it == m_vrepdb.end())
+  {
     it = m_vrepdbs.begin();
-    if (it == m_vrepdbs.end()) {
+    if (it == m_vrepdbs.end())
+    {
       *sts = LDH__NOSUCHVOL;
       return 0;
     }
@@ -124,26 +125,30 @@ wb_vrep* wb_erep::volume(pwr_tStatus* sts)
 wb_vrep* wb_erep::volume(pwr_tStatus* sts, pwr_tVid vid)
 {
   vrep_iterator it = m_vrepdb.find(vid);
-  if (it != m_vrepdb.end()) {
+  if (it != m_vrepdb.end())
+  {
     *sts = LDH__SUCCESS;
     return it->second;
   }
 
   it = m_vrepdbs.find(vid);
-  if (it != m_vrepdbs.end()) {
+  if (it != m_vrepdbs.end())
+  {
     *sts = LDH__SUCCESS;
     return it->second;
   }
 
   it = m_vrepextern.find(vid);
-  if (it != m_vrepextern.end()) {
+  if (it != m_vrepextern.end())
+  {
     *sts = LDH__SUCCESS;
     return it->second;
   }
 
-  for (buffer_iterator itb = m_vrepbuffer.begin(); itb != m_vrepbuffer.end();
-       itb++) {
-    if ((*itb)->vid() == vid) {
+  for (buffer_iterator itb = m_vrepbuffer.begin(); itb != m_vrepbuffer.end(); itb++)
+  {
+    if ((*itb)->vid() == vid)
+    {
       *sts = LDH__SUCCESS;
       return *itb;
     }
@@ -156,28 +161,35 @@ wb_vrep* wb_erep::volume(pwr_tStatus* sts, pwr_tVid vid)
 wb_vrep* wb_erep::volume(pwr_tStatus* sts, const char* name)
 {
   vrep_iterator it;
-  for (it = m_vrepdb.begin(); it != m_vrepdb.end(); it++) {
-    if (str_NoCaseStrcmp(it->second->name(), name) == 0) {
+  for (it = m_vrepdb.begin(); it != m_vrepdb.end(); it++)
+  {
+    if (str_NoCaseStrcmp(it->second->name(), name) == 0)
+    {
       *sts = LDH__SUCCESS;
       return it->second;
     }
   }
-  for (it = m_vrepdbs.begin(); it != m_vrepdbs.end(); it++) {
-    if (str_NoCaseStrcmp(it->second->name(), name) == 0) {
+  for (it = m_vrepdbs.begin(); it != m_vrepdbs.end(); it++)
+  {
+    if (str_NoCaseStrcmp(it->second->name(), name) == 0)
+    {
       *sts = LDH__SUCCESS;
       return it->second;
     }
   }
-  for (it = m_vrepextern.begin(); it != m_vrepextern.end(); it++) {
-    if (str_NoCaseStrcmp(it->second->name(), name) == 0) {
+  for (it = m_vrepextern.begin(); it != m_vrepextern.end(); it++)
+  {
+    if (str_NoCaseStrcmp(it->second->name(), name) == 0)
+    {
       *sts = LDH__SUCCESS;
       return it->second;
     }
   }
 
-  for (buffer_iterator itb = m_vrepbuffer.begin(); itb != m_vrepbuffer.end();
-       itb++) {
-    if (str_NoCaseStrcmp((*itb)->name(), name) == 0) {
+  for (buffer_iterator itb = m_vrepbuffer.begin(); itb != m_vrepbuffer.end(); itb++)
+  {
+    if (str_NoCaseStrcmp((*itb)->name(), name) == 0)
+    {
       *sts = LDH__SUCCESS;
       return *itb;
     }
@@ -189,7 +201,8 @@ wb_vrep* wb_erep::volume(pwr_tStatus* sts, const char* name)
 wb_vrep* wb_erep::externVolume(pwr_tStatus* sts, pwr_tVid vid)
 {
   vrep_iterator it = m_vrepextern.find(vid);
-  if (it == m_vrepextern.end()) {
+  if (it == m_vrepextern.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return 0;
   }
@@ -200,7 +213,8 @@ wb_vrep* wb_erep::externVolume(pwr_tStatus* sts, pwr_tVid vid)
 wb_vrep* wb_erep::bufferVolume(pwr_tStatus* sts)
 {
   buffer_iterator it = m_vrepbuffer.begin();
-  if (it == m_vrepbuffer.end()) {
+  if (it == m_vrepbuffer.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return 0;
   }
@@ -210,9 +224,10 @@ wb_vrep* wb_erep::bufferVolume(pwr_tStatus* sts)
 
 wb_vrep* wb_erep::bufferVolume(pwr_tStatus* sts, char* name)
 {
-  for (buffer_iterator it = m_vrepbuffer.begin(); it != m_vrepbuffer.end();
-       it++) {
-    if (str_NoCaseStrcmp(name, (*it)->name()) == 0) {
+  for (buffer_iterator it = m_vrepbuffer.begin(); it != m_vrepbuffer.end(); it++)
+  {
+    if (str_NoCaseStrcmp(name, (*it)->name()) == 0)
+    {
       *sts = LDH__SUCCESS;
       return *it;
     }
@@ -225,18 +240,25 @@ wb_vrep* wb_erep::nextVolume(pwr_tStatus* sts, pwr_tVid vid)
 {
   // Search in db
   vrep_iterator it = m_vrepdb.find(vid);
-  if (it != m_vrepdb.end()) {
+  if (it != m_vrepdb.end())
+  {
     it++;
-    if (it != m_vrepdb.end()) {
+    if (it != m_vrepdb.end())
+    {
       *sts = LDH__SUCCESS;
       return it->second;
-    } else {
+    }
+    else
+    {
       // Next volume in dbs
       it = m_vrepdbs.begin();
-      if (it != m_vrepdbs.end()) {
+      if (it != m_vrepdbs.end())
+      {
         *sts = LDH__SUCCESS;
         return it->second;
-      } else {
+      }
+      else
+      {
         *sts = LDH__NOSUCHVOL;
         return 0;
       }
@@ -245,17 +267,23 @@ wb_vrep* wb_erep::nextVolume(pwr_tStatus* sts, pwr_tVid vid)
 
   // Search in dbs
   it = m_vrepdbs.find(vid);
-  if (it != m_vrepdbs.end()) {
+  if (it != m_vrepdbs.end())
+  {
     it++;
     if (it != m_vrepdbs.end() && it->second->duplicateDb())
       it++;
-    if (it != m_vrepdbs.end()) {
+    if (it != m_vrepdbs.end())
+    {
       *sts = LDH__SUCCESS;
       return it->second;
-    } else {
+    }
+    else
+    {
       // Next volume in extern
-      for (it = m_vrepextern.begin(); it != m_vrepextern.end(); it++) {
-        if (it->second->cid() == pwr_eClass_ExternVolume) {
+      for (it = m_vrepextern.begin(); it != m_vrepextern.end(); it++)
+      {
+        if (it->second->cid() == pwr_eClass_ExternVolume)
+        {
           *sts = LDH__SUCCESS;
           return it->second;
         }
@@ -266,14 +294,18 @@ wb_vrep* wb_erep::nextVolume(pwr_tStatus* sts, pwr_tVid vid)
   }
 
   // Search in buffer
-  for (buffer_iterator itb = m_vrepbuffer.begin(); itb != m_vrepbuffer.end();
-       itb++) {
-    if ((*itb)->vid() == vid) {
+  for (buffer_iterator itb = m_vrepbuffer.begin(); itb != m_vrepbuffer.end(); itb++)
+  {
+    if ((*itb)->vid() == vid)
+    {
       itb++;
-      if (itb != m_vrepbuffer.end()) {
+      if (itb != m_vrepbuffer.end())
+      {
         *sts = LDH__SUCCESS;
         return *itb;
-      } else {
+      }
+      else
+      {
         *sts = LDH__NOSUCHVOL;
         return 0;
       }
@@ -287,27 +319,33 @@ wb_vrep* wb_erep::nextVolume(pwr_tStatus* sts, pwr_tVid vid)
 void wb_erep::addDb(pwr_tStatus* sts, wb_vrep* vrep)
 {
   vrep_iterator it = m_vrepdb.find(vrep->vid());
-  if (it == m_vrepdb.end()) {
+  if (it == m_vrepdb.end())
+  {
     m_vrepdb[vrep->vid()] = vrep;
     vrep->ref();
     *sts = LDH__SUCCESS;
-  } else
+  }
+  else
     *sts = LDH__VOLIDALREXI;
 }
 
 void wb_erep::addDbs(pwr_tStatus* sts, wb_vrep* vrep)
 {
   vrep_iterator it = m_vrepdbs.find(vrep->vid());
-  if (it == m_vrepdbs.end()) {
+  if (it == m_vrepdbs.end())
+  {
     m_vrepdbs[vrep->vid()] = vrep;
     vrep->ref();
     *sts = LDH__SUCCESS;
-  } else {
+  }
+  else
+  {
     *sts = LDH__VOLIDALREXI;
     return;
   }
 
-  if (cdh_isClassVolumeClass(vrep->cid())) {
+  if (cdh_isClassVolumeClass(vrep->cid()))
+  {
     m_merep->addDbs(sts, (wb_mvrep*)vrep);
   }
 }
@@ -315,11 +353,14 @@ void wb_erep::addDbs(pwr_tStatus* sts, wb_vrep* vrep)
 void wb_erep::addExtern(pwr_tStatus* sts, wb_vrep* vrep)
 {
   vrep_iterator it = m_vrepextern.find(vrep->vid());
-  if (it == m_vrepextern.end()) {
+  if (it == m_vrepextern.end())
+  {
     m_vrepextern[vrep->vid()] = vrep;
     vrep->ref();
     *sts = LDH__SUCCESS;
-  } else {
+  }
+  else
+  {
     *sts = LDH__VOLIDALREXI;
     return;
   }
@@ -327,8 +368,8 @@ void wb_erep::addExtern(pwr_tStatus* sts, wb_vrep* vrep)
 
 wb_vrep* wb_erep::findBuffer(pwr_tVid vid)
 {
-  for (buffer_iterator itb = m_vrepbuffer.begin(); itb != m_vrepbuffer.end();
-       itb++) {
+  for (buffer_iterator itb = m_vrepbuffer.begin(); itb != m_vrepbuffer.end(); itb++)
+  {
     if ((*itb)->vid() == vid)
       return *itb;
   }
@@ -338,16 +379,20 @@ wb_vrep* wb_erep::findBuffer(pwr_tVid vid)
 void wb_erep::addBuffer(pwr_tStatus* sts, wb_vrep* vrep)
 {
   wb_vrep* v = findBuffer(vrep->vid());
-  if (!v) {
+  if (!v)
+  {
     // Remove oldest buffer
-    if ((int)m_vrepbuffer.size() >= m_buffer_max) {
+    if ((int)m_vrepbuffer.size() >= m_buffer_max)
+    {
       m_vrepbuffer.erase(m_vrepbuffer.begin());
     }
 
     m_vrepbuffer.push_back(vrep);
     vrep->ref();
     *sts = LDH__SUCCESS;
-  } else {
+  }
+  else
+  {
     *sts = LDH__VOLIDALREXI;
     return;
   }
@@ -356,7 +401,8 @@ void wb_erep::addBuffer(pwr_tStatus* sts, wb_vrep* vrep)
 void wb_erep::removeDb(pwr_tStatus* sts, wb_vrep* vrep)
 {
   vrep_iterator it = m_vrepdb.find(vrep->vid());
-  if (it == m_vrepdb.end()) {
+  if (it == m_vrepdb.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return;
   }
@@ -368,7 +414,8 @@ void wb_erep::removeDb(pwr_tStatus* sts, wb_vrep* vrep)
 void wb_erep::removeDbs(pwr_tStatus* sts, wb_vrep* vrep)
 {
   vrep_iterator it = m_vrepdbs.find(vrep->vid());
-  if (it == m_vrepdbs.end()) {
+  if (it == m_vrepdbs.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return;
   }
@@ -380,7 +427,8 @@ void wb_erep::removeDbs(pwr_tStatus* sts, wb_vrep* vrep)
 void wb_erep::removeExtern(pwr_tStatus* sts, wb_vrep* vrep)
 {
   vrep_iterator it = m_vrepextern.find(vrep->vid());
-  if (it == m_vrepextern.end()) {
+  if (it == m_vrepextern.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return;
   }
@@ -391,9 +439,10 @@ void wb_erep::removeExtern(pwr_tStatus* sts, wb_vrep* vrep)
 
 void wb_erep::removeBuffer(pwr_tStatus* sts, wb_vrep* vrep)
 {
-  for (buffer_iterator it = m_vrepbuffer.begin(); it != m_vrepbuffer.end();
-       it++) {
-    if (*it == vrep) {
+  for (buffer_iterator it = m_vrepbuffer.begin(); it != m_vrepbuffer.end(); it++)
+  {
+    if (*it == vrep)
+    {
       vrep->unref();
       m_vrepbuffer.erase(it);
       *sts = LDH__SUCCESS;
@@ -409,10 +458,12 @@ void wb_erep::load(pwr_tStatus* sts, char* db)
   loadDirList(sts);
   if (EVEN(*sts))
     return;
-  else if (*sts == LDH__PROJCONFIG) {
+  else if (*sts == LDH__PROJCONFIG)
+  {
     pwr_tStatus status;
     loadCommonMeta(&status);
-    if (EVEN(status)) {
+    if (EVEN(status))
+    {
       *sts = status;
       return;
     }
@@ -463,12 +514,14 @@ void wb_erep::loadDirList(pwr_tStatus* status)
 
   dcli_translate_filename(fname, pwr_cNameFilePath);
   std::ifstream fp(fname, std::ios::in);
-  if (!fp) {
+  if (!fp)
+  {
     *status = LDH__PROJCONFIG;
     return;
   }
 
-  while (fp.getline(line, sizeof(line))) {
+  while (fp.getline(line, sizeof(line)))
+  {
     if (m_dir_cnt > (int)(sizeof(m_dir_list) / sizeof(m_dir_list[0]) - 1))
       break;
     dcli_translate_filename(m_dir_list[m_dir_cnt], line);
@@ -489,29 +542,34 @@ void wb_erep::loadCommonMeta(pwr_tStatus* status)
   pwr_tVid vid;
   pwr_tStatus sts;
 
-  for (i = 0; i < m_dir_cnt; i++) {
+  for (i = 0; i < m_dir_cnt; i++)
+  {
     // Load metavolumes
     strcpy(fdir, m_dir_list[i]);
     strcpy(fname, fdir);
     strcat(fname, pwr_cNameCmnVolumeList);
 
     std::ifstream fpm(fname, std::ios::in);
-    if (!fpm) {
-      if (i == 0) {
+    if (!fpm)
+    {
+      if (i == 0)
+      {
         *status = LDH__NOBASE;
         return;
-      } else
+      }
+      else
         continue;
     }
-    while (fpm.getline(line, sizeof(line))) {
+    while (fpm.getline(line, sizeof(line)))
+    {
       char vol_array[2][80];
       int nr;
 
       if (line[0] == '#')
         continue;
 
-      nr = dcli_parse(line, " ", "", (char*)vol_array,
-          sizeof(vol_array) / sizeof(vol_array[0]), sizeof(vol_array[0]), 0);
+      nr = dcli_parse(line, " ", "", (char*)vol_array, sizeof(vol_array) / sizeof(vol_array[0]),
+                      sizeof(vol_array[0]), 0);
       if (nr != 2)
         MsgWindow::message('E', "Syntax error in file:", fname);
 
@@ -523,23 +581,23 @@ void wb_erep::loadCommonMeta(pwr_tStatus* status)
       cdh_StringToVolumeId(vol_array[1], &vid);
 
       wb_vrepdbs* vrep = new wb_vrepdbs(this, vname);
-      try {
+      try
+      {
         vrep->load();
         addDbs(&sts, vrep);
         char buff[270];
         if (cdh_isClassVolumeClass(vrep->cid()))
-          sprintf(buff, "Global class volume \"%s\" loaded from \"%s\"",
-              vrep->dbsenv()->vp->name, vname);
+          sprintf(buff, "Global class volume \"%s\" loaded from \"%s\"", vrep->dbsenv()->vp->name, vname);
         else
-          sprintf(buff, "Volume \"%s\" loaded from \"%s\"",
-              vrep->dbsenv()->vp->name, vname);
+          sprintf(buff, "Volume \"%s\" loaded from \"%s\"", vrep->dbsenv()->vp->name, vname);
         MsgWindow::message('O', buff);
-      } catch (wb_error& e) {
+      }
+      catch (wb_error& e)
+      {
         if (m_options & ldh_mWbOption_IgnoreDLoadError)
           MsgWindow::message('I', "Unable to open class volume", vname);
         else
-          MsgWindow::message(
-              'E', "Unable to open class volume", vname, e.what().c_str());
+          MsgWindow::message('E', "Unable to open class volume", vname, e.what().c_str());
       }
     }
     fpm.close();
@@ -569,9 +627,11 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
   dcli_translate_filename(fname, fname);
 
   // Load classvolumes first (j == 0) and then other volumes (j == 1)
-  for (j = 0; j < 2; j++) {
+  for (j = 0; j < 2; j++)
+  {
     std::ifstream fpm(fname, std::ios::in);
-    if (!fpm) {
+    if (!fpm)
+    {
       *status = LDH__PROJCONFIG;
 
       // Load directory volume
@@ -580,7 +640,8 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
 
       sts = dcli_search_file(vname, found_file, DCLI_DIR_SEARCH_INIT);
       dcli_search_file(vname, found_file, DCLI_DIR_SEARCH_END);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         wb_vrepmem* vrepmem = new wb_vrepmem(this);
         vrepmem->loadWbl(vname, &sts);
         vrepmem->name("directory");
@@ -591,15 +652,16 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
       return;
     }
 
-    while (fpm.getline(line, sizeof(line))) {
+    while (fpm.getline(line, sizeof(line)))
+    {
       char vol_array[7][80];
       int nr;
 
       if (line[0] == '#')
         continue;
 
-      nr = dcli_parse(line, " ", "", (char*)vol_array,
-          sizeof(vol_array) / sizeof(vol_array[0]), sizeof(vol_array[0]), 0);
+      nr = dcli_parse(line, " ", "", (char*)vol_array, sizeof(vol_array) / sizeof(vol_array[0]),
+                      sizeof(vol_array[0]), 0);
       if (nr > 6)
         std::cout << "Syntax error in file: " << fname << '\n';
 
@@ -611,48 +673,53 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
       load_db = 0;
       if (str_NoCaseStrcmp(vol_array[2], "ExternVolume") == 0 && j == 1)
         load_externvolume = 1;
-      else if (str_NoCaseStrcmp(vol_array[2], "ClassVolume") == 0
-          || str_NoCaseStrcmp(vol_array[2], "DetachedClassVolume") == 0
-          || streq(vol_array[3], "load")) {
+      else if (str_NoCaseStrcmp(vol_array[2], "ClassVolume") == 0 ||
+               str_NoCaseStrcmp(vol_array[2], "DetachedClassVolume") == 0 || streq(vol_array[3], "load"))
+      {
         if (j == 0)
           load_dbs = 1;
-        if (((str_NoCaseStrcmp(vol_array[2], "ClassVolume") == 0
-                 || str_NoCaseStrcmp(vol_array[2], "DetachedClassVolume") == 0)
-                && (streq(vol_array[3], "cnf") && db
-                       && str_NoCaseStrcmp(db, vol_array[0]) == 0))) {
+        if (((str_NoCaseStrcmp(vol_array[2], "ClassVolume") == 0 ||
+              str_NoCaseStrcmp(vol_array[2], "DetachedClassVolume") == 0) &&
+             (streq(vol_array[3], "cnf") && db && str_NoCaseStrcmp(db, vol_array[0]) == 0)))
+        {
           if (j == 1)
             load_db = 1;
         }
-      } else if (j == 1)
+      }
+      else if (j == 1)
         load_db = 1;
 
-      if (load_externvolume) {
+      if (load_externvolume)
+      {
         if (nr != 6)
           std::cout << "Syntax error in file: " << fname << '\n';
 
         // Load extern volume for this volume
         str_ToLower(vol_array[0], vol_array[0]);
 
-        try {
-          wb_vrepext* vrepext
-              = new wb_vrepext(this, vid, vol_array[0], vol_array[4]);
+        try
+        {
+          wb_vrepext* vrepext = new wb_vrepext(this, vid, vol_array[0], vol_array[4]);
           addExtern(&sts, vrepext);
           MsgWindow::message('O', "Volume loaded", vname);
           vol_cnt++;
-        } catch (wb_error& e) {
-          MsgWindow::message(
-              'E', "Unable to open volume", vname, e.what().c_str());
+        }
+        catch (wb_error& e)
+        {
+          MsgWindow::message('E', "Unable to open volume", vname, e.what().c_str());
         }
       }
 
-      if (load_dbs) {
+      if (load_dbs)
+      {
         if (nr < 4)
           std::cout << "Syntax error in file: " << fname << '\n';
 
         // Load dbs for this volume
         str_ToLower(vol_array[0], vol_array[0]);
 
-        if (streq(vol_array[3], "cnf")) {
+        if (streq(vol_array[3], "cnf"))
+        {
           // Configured in this project, load from pwrp_load
           strcpy(vname, "$pwrp_load/");
           strcat(vname, vol_array[0]);
@@ -660,46 +727,51 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
           dcli_translate_filename(vname, vname);
 
           // Load...
-          try {
+          try
+          {
             vrep = new wb_vrepdbs(this, vname);
             vrep->load();
             addDbs(&sts, vrep);
             MsgWindow::message('O', "Volume loaded from snapshot file", vname);
             vol_cnt++;
-          } catch (wb_error& e) {
-            if (m_options & ldh_mWbOption_IgnoreDLoadError)
-              MsgWindow::message(
-                  'I', "Unable to open volume snapshot file", vname);
-            else
-              MsgWindow::message('W', "Unable to open volume snapshot file",
-                  vname, e.what().c_str());
           }
-        } else {
+          catch (wb_error& e)
+          {
+            if (m_options & ldh_mWbOption_IgnoreDLoadError)
+              MsgWindow::message('I', "Unable to open volume snapshot file", vname);
+            else
+              MsgWindow::message('W', "Unable to open volume snapshot file", vname, e.what().c_str());
+          }
+        }
+        else
+        {
           // Imported loadfile
           bool found = false;
-          for (i = 0; i < m_dir_cnt; i++) {
+          for (i = 0; i < m_dir_cnt; i++)
+          {
             strcpy(vname, m_dir_list[i]);
             strcat(vname, vol_array[0]);
             strcat(vname, ".dbs");
             sts = dcli_search_file(vname, found_file, DCLI_DIR_SEARCH_INIT);
             dcli_search_file(vname, found_file, DCLI_DIR_SEARCH_END);
-            if (ODD(sts)) {
+            if (ODD(sts))
+            {
               // Load...
               found = true;
-              try {
+              try
+              {
                 vrep = new wb_vrepdbs(this, vname);
                 vrep->load();
                 // vrep->name( vol_array[0]);
                 addDbs(&sts, vrep);
-                MsgWindow::message(
-                    'O', "Volume loaded from snapshot file", vname);
-              } catch (wb_error& e) {
+                MsgWindow::message('O', "Volume loaded from snapshot file", vname);
+              }
+              catch (wb_error& e)
+              {
                 if (m_options & ldh_mWbOption_IgnoreDLoadError)
-                  MsgWindow::message(
-                      'I', "Unable to open volume snapshot file", vname);
+                  MsgWindow::message('I', "Unable to open volume snapshot file", vname);
                 else
-                  MsgWindow::message('E', "Unable to open volume snapshot file",
-                      vname, e.what().c_str());
+                  MsgWindow::message('E', "Unable to open volume snapshot file", vname, e.what().c_str());
               }
               break;
             }
@@ -708,38 +780,42 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
             MsgWindow::message('E', "Volume snapshotfile not found", vname);
         }
       }
-      if (load_db) {
+      if (load_db)
+      {
         // Load db for this volume
         char uname[80];
 
         if (nr < 4)
           std::cout << "Syntax error in file: " << fname << '\n';
 
-        if (db) {
+        if (db)
+        {
           // If db is specified, load only specified db, load as dbs instead
-          if (str_NoCaseStrcmp(vol_array[0], db) != 0) {
+          if (str_NoCaseStrcmp(vol_array[0], db) != 0)
+          {
             str_ToLower(vol_array[0], vol_array[0]);
             strcpy(vname, "$pwrp_load/");
             strcat(vname, vol_array[0]);
             strcat(vname, ".dbs");
             sts = dcli_search_file(vname, found_file, DCLI_DIR_SEARCH_INIT);
             dcli_search_file(vname, found_file, DCLI_DIR_SEARCH_END);
-            if (ODD(sts)) {
+            if (ODD(sts))
+            {
               // Load...
-              try {
+              try
+              {
                 vrep = new wb_vrepdbs(this, found_file);
                 vrep->load();
                 // vrep->name( vol_array[0]);
                 addDbs(&sts, vrep);
-                MsgWindow::message(
-                    'O', "Volume loaded from snapshot file", vname);
-              } catch (wb_error& e) {
+                MsgWindow::message('O', "Volume loaded from snapshot file", vname);
+              }
+              catch (wb_error& e)
+              {
                 if (m_options & ldh_mWbOption_IgnoreDLoadError)
-                  MsgWindow::message(
-                      'I', "Unable to open volume snapshot file", vname);
+                  MsgWindow::message('I', "Unable to open volume snapshot file", vname);
                 else
-                  MsgWindow::message('E', "Unable to open volume snapshot file",
-                      vname, e.what().c_str());
+                  MsgWindow::message('E', "Unable to open volume snapshot file", vname, e.what().c_str());
               }
             }
             continue;
@@ -748,8 +824,9 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
         strcpy(vname, "$pwrp_db/");
         strcat(vname, vol_array[0]);
         str_ToLower(vname, vname);
-        if (str_NoCaseStrcmp(vol_array[2], "ClassVolume") == 0
-            || str_NoCaseStrcmp(vol_array[2], "DetchedClassVolume") == 0) {
+        if (str_NoCaseStrcmp(vol_array[2], "ClassVolume") == 0 ||
+            str_NoCaseStrcmp(vol_array[2], "DetchedClassVolume") == 0)
+        {
           is_classvolume = 1;
           if (nr >= 5 && vol_array[4][0] == '2')
             db_type = eDbType_dbms;
@@ -757,15 +834,18 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
             db_type = eDbType_db;
           else
             db_type = eDbType_wbl;
-        } else if (streq(vol_array[3], "clone"))
+        }
+        else if (streq(vol_array[3], "clone"))
           db_type = eDbType_none;
-        else {
+        else
+        {
           if (nr >= 5 && vol_array[4][0] == '1')
             db_type = eDbType_dbms;
           else
             db_type = eDbType_db;
         }
-        switch (db_type) {
+        switch (db_type)
+        {
         case eDbType_dbms:
           strcat(vname, ".dbms");
           break;
@@ -777,34 +857,42 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
         }
         dcli_translate_filename(vname, vname);
 
-        if (db_type == eDbType_none) {
+        if (db_type == eDbType_none)
+        {
           m_options |= ldh_mWbOption_OpenDbs;
           sts = 1;
-        } else {
+        }
+        else
+        {
           sts = dcli_search_file(vname, found_file, DCLI_DIR_SEARCH_INIT);
           dcli_search_file(vname, found_file, DCLI_DIR_SEARCH_END);
         }
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           MsgWindow::message('E', "Database not found", vname);
-        } else {
+        }
+        else
+        {
           int open_loadfile = m_options & ldh_mWbOption_OpenDbs ? 1 : 0;
 
-          if (wb_dblock::is_locked(vname, uname) && !open_loadfile) {
+          if (wb_dblock::is_locked(vname, uname) && !open_loadfile)
+          {
             char msg[190];
 
-            sprintf(
-                msg, "Database %s is locked by user %s", vol_array[0], uname);
+            sprintf(msg, "Database %s is locked by user %s", vol_array[0], uname);
             MsgWindow::message('E', msg, msgw_ePop_No);
 
-            if (!MsgWindow::has_window()) {
+            if (!MsgWindow::has_window())
+            {
               *status = LDH__DBLOCKED;
               return;
             }
 
             CoWow* wow = MsgWindow::get_wow();
-            int res = wow->CreateModalDialog("Database Locked", msg, "Exit",
-                "Enter loadfile", "Remove lock", "$pwr_exe/wtt_padlock.png");
-            switch (res) {
+            int res = wow->CreateModalDialog("Database Locked", msg, "Exit", "Enter loadfile", "Remove lock",
+                                             "$pwr_exe/wtt_padlock.png");
+            switch (res)
+            {
             case wow_eModalDialogReturn_Button1:
             case wow_eModalDialogReturn_Deleted:
               *status = LDH__DBLOCKED;
@@ -821,7 +909,8 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
             }
           }
 
-          if (open_loadfile) {
+          if (open_loadfile)
+          {
             // Open dbs
             str_ToLower(vol_array[0], vol_array[0]);
             strcpy(vname, "$pwrp_load/");
@@ -829,27 +918,31 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
             strcat(vname, ".dbs");
             dcli_translate_filename(vname, vname);
 
-            try {
+            try
+            {
               vrep = new wb_vrepdbs(this, vname);
               vrep->load();
               addDbs(&sts, vrep);
-              MsgWindow::message(
-                  'I', "Volume loaded from snapshot file", vname);
+              MsgWindow::message('I', "Volume loaded from snapshot file", vname);
               vol_cnt++;
-            } catch (wb_error& e) {
-              if (m_options & ldh_mWbOption_IgnoreDLoadError)
-                MsgWindow::message(
-                    'I', "Unable to open volume snapshot file", vname);
-              else
-                MsgWindow::message('E', "Unable to open volume snapshot file",
-                    vname, e.what().c_str());
             }
-          } else {
+            catch (wb_error& e)
+            {
+              if (m_options & ldh_mWbOption_IgnoreDLoadError)
+                MsgWindow::message('I', "Unable to open volume snapshot file", vname);
+              else
+                MsgWindow::message('E', "Unable to open volume snapshot file", vname, e.what().c_str());
+            }
+          }
+          else
+          {
             // Open db
 
-            if (nr >= 5 && db_type == eDbType_dbms) {
+            if (nr >= 5 && db_type == eDbType_dbms)
+            {
 #if defined PWRE_CONF_MYSQL
-              if (is_classvolume) {
+              if (is_classvolume)
+              {
                 wb_vrepdbms* vrepdbms = new wb_vrepdbms(this, vname);
 
                 wb_vrepced* vrepced = new wb_vrepced(this, vrepdbms);
@@ -857,8 +950,9 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
                 addDb(&sts, vrepced);
                 MsgWindow::message('I', "Classvolume Database opened", vname);
                 vol_cnt++;
-
-              } else {
+              }
+              else
+              {
                 wb_vrepdbms* vrepdbms = new wb_vrepdbms(this, vname);
                 vrepdbms->name(vol_array[0]);
                 addDb(&sts, vrepdbms);
@@ -866,8 +960,11 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
                 vol_cnt++;
               }
 #endif
-            } else {
-              if (is_classvolume) {
+            }
+            else
+            {
+              if (is_classvolume)
+              {
                 wb_vrepdb* vrepdb = new wb_vrepdb(this, vname);
 
                 wb_vrepced* vrepced = new wb_vrepced(this, vrepdb);
@@ -875,7 +972,9 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
                 addDb(&sts, vrepced);
                 MsgWindow::message('I', "Classvolume Database opened", vname);
                 vol_cnt++;
-              } else {
+              }
+              else
+              {
                 wb_vrepdb* vrepdb = new wb_vrepdb(this, vname);
                 vrepdb->name(vol_array[0]);
                 addDb(&sts, vrepdb);
@@ -893,8 +992,10 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
   // Identify dbs that also is loaded as db
   vrep_iterator itdbs, itdb;
 
-  for (itdbs = m_vrepdbs.begin(); itdbs != m_vrepdbs.end(); itdbs++) {
-    for (itdb = m_vrepdb.begin(); itdb != m_vrepdb.end(); itdb++) {
+  for (itdbs = m_vrepdbs.begin(); itdbs != m_vrepdbs.end(); itdbs++)
+  {
+    for (itdb = m_vrepdb.begin(); itdb != m_vrepdb.end(); itdb++)
+    {
       if (itdbs->first == itdb->first)
         itdbs->second->setDuplicateDb(true);
     }
@@ -902,7 +1003,8 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
 
   // Load directory volume
 
-  if (!db || (db && str_NoCaseStrcmp("directory", db) == 0)) {
+  if (!db || (db && str_NoCaseStrcmp("directory", db) == 0))
+  {
     char uname[80];
 
     strcpy(vname, "$pwrp_db/directory.wb_load");
@@ -910,21 +1012,25 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
 
     sts = dcli_search_file(vname, found_file, DCLI_DIR_SEARCH_INIT);
     dcli_search_file(vname, found_file, DCLI_DIR_SEARCH_END);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       *status = LDH__PROJCONFIG;
       return;
     }
-    if (wb_dblock::is_locked(vname, uname)) {
+    if (wb_dblock::is_locked(vname, uname))
+    {
       char msg[120];
 
       sprintf(msg, "Database directory is locked by user %s", uname);
       MsgWindow::message('E', msg, msgw_ePop_No);
 
       CoWow* wow = MsgWindow::get_wow();
-      if (wow) {
-        int res = wow->CreateModalDialog("Database Locked", msg, "Exit", 0,
-            "Remove lock", "$pwr_exe/wtt_padlock.png");
-        switch (res) {
+      if (wow)
+      {
+        int res = wow->CreateModalDialog("Database Locked", msg, "Exit", 0, "Remove lock",
+                                         "$pwr_exe/wtt_padlock.png");
+        switch (res)
+        {
         case wow_eModalDialogReturn_NYI:
         case wow_eModalDialogReturn_Button2:
         case wow_eModalDialogReturn_Button1:
@@ -936,7 +1042,9 @@ void wb_erep::loadMeta(pwr_tStatus* status, char* db)
           wb_dblock::dbunlock(vname);
           break;
         }
-      } else {
+      }
+      else
+      {
         *status = LDH__DBLOCKED;
         return;
       }
@@ -962,18 +1070,23 @@ void wb_erep::loadLocalWb(pwr_tStatus* rsts)
 
   sts = dcli_search_file(pwr_cNameLocalWb, found_file, DCLI_DIR_SEARCH_INIT);
   dcli_search_file(pwr_cNameLocalWb, found_file, DCLI_DIR_SEARCH_END);
-  if (ODD(sts)) {
-    try {
+  if (ODD(sts))
+  {
+    try
+    {
       wb_vrepwbl* vrep = new wb_vrepwbl(this);
       sts = vrep->load(found_file);
       if (ODD(sts))
         addExtern(&sts, vrep);
-      else {
+      else
+      {
         *rsts = sts;
         MsgWindow::message('E', "Failiure loading local workbench volume");
         return;
       }
-    } catch (wb_error& e) {
+    }
+    catch (wb_error& e)
+    {
       *rsts = e.sts();
       MsgWindow::message('E', "Failiure loading local workbench volume");
       return;
@@ -1014,7 +1127,8 @@ wb_orep* wb_erep::object(pwr_tStatus* sts, const char* name)
 {
   wb_name n(name);
 
-  if (n.evenSts()) {
+  if (n.evenSts())
+  {
     *sts = n.sts();
     return 0;
   }
@@ -1028,7 +1142,8 @@ wb_orep* wb_erep::object(pwr_tStatus* sts, const char* name)
 
 wb_orep* wb_erep::object(pwr_tStatus* sts, wb_name& name)
 {
-  if (name.evenSts()) {
+  if (name.evenSts())
+  {
     *sts = name.sts();
     return 0;
   }
@@ -1044,7 +1159,8 @@ void wb_erep::method(pwr_tStatus* sts, char* methodName, wb_tMethod* method)
 {
   std::string key = std::string(methodName);
   methods_iterator it = m_methods.find(key);
-  if (it == m_methods.end()) {
+  if (it == m_methods.end())
+  {
     *sts = LDH__NOMETHOD;
     return;
   }
@@ -1058,10 +1174,12 @@ void wb_erep::bindMethods()
   pwr_tStatus sts;
   char str[200];
 
-  for (i = 0;; i++) {
+  for (i = 0;; i++)
+  {
     if (pwr_gSystem_ClassMethods[i].ClassName[0] == '\0')
       break;
-    for (j = 0;; j++) {
+    for (j = 0;; j++)
+    {
       if ((*pwr_gSystem_ClassMethods[i].Methods)[j].MethodName[0] == '\0')
         break;
       strcpy(str, pwr_gSystem_ClassMethods[i].ClassName);
@@ -1072,7 +1190,8 @@ void wb_erep::bindMethods()
     }
   }
 
-  for (i = 0;; i++) {
+  for (i = 0;; i++)
+  {
     if (pwr_gBase_ClassMethods[i].ClassName[0] == '\0')
       break;
     wb_name cname = wb_name(pwr_gBase_ClassMethods[i].ClassName);
@@ -1080,7 +1199,8 @@ void wb_erep::bindMethods()
     if (EVEN(sts))
       continue;
 
-    for (j = 0;; j++) {
+    for (j = 0;; j++)
+    {
       if ((*pwr_gBase_ClassMethods[i].Methods)[j].MethodName[0] == '\0')
         break;
       strcpy(str, pwr_gBase_ClassMethods[i].ClassName);
@@ -1098,25 +1218,28 @@ void wb_erep::printMethods()
   int i, j;
 
   printf("System Methods\n");
-  for (i = 0;; i++) {
+  for (i = 0;; i++)
+  {
     if (pwr_gSystem_ClassMethods[i].ClassName[0] == '\0')
       break;
     printf("%3d %-20s\n", i, pwr_gSystem_ClassMethods[i].ClassName);
-    for (j = 0;; j++) {
+    for (j = 0;; j++)
+    {
       if ((*pwr_gSystem_ClassMethods[i].Methods)[j].MethodName[0] == '\0')
         break;
-      printf(
-          "       %s\n", (*pwr_gSystem_ClassMethods[i].Methods)[j].MethodName);
+      printf("       %s\n", (*pwr_gSystem_ClassMethods[i].Methods)[j].MethodName);
     }
   }
 
   printf("Base Methods\n");
-  for (i = 0;; i++) {
+  for (i = 0;; i++)
+  {
     if (pwr_gBase_ClassMethods[i].ClassName[0] == '\0')
       break;
 
     printf("%3d %-20s\n", i, pwr_gBase_ClassMethods[i].ClassName);
-    for (j = 0;; j++) {
+    for (j = 0;; j++)
+    {
       if ((*pwr_gBase_ClassMethods[i].Methods)[j].MethodName[0] == '\0')
         break;
       printf("       %s\n", (*pwr_gBase_ClassMethods[i].Methods)[j].MethodName);
@@ -1127,7 +1250,8 @@ void wb_erep::printMethods()
 int wb_erep::nextVolatileVid(pwr_tStatus* sts, char* name)
 {
   pwr_tVid vid = ldh_cVolatileVolMin + m_volatile_idx++;
-  if (vid > ldh_cVolatileVolMax) {
+  if (vid > ldh_cVolatileVolMax)
+  {
     // Recycle identities, and hope that the old volumes are history
     m_volatile_idx = 0;
     vid = ldh_cVolatileVolMin + m_volatile_idx++;
@@ -1139,14 +1263,16 @@ int wb_erep::nextVolatileVid(pwr_tStatus* sts, char* name)
   return vid;
 }
 
-wb_vrep* wb_erep::createVolume(pwr_tStatus* sts, pwr_tVid vid, pwr_tCid cid,
-    const char* name, ldh_eVolRep type, char* server, bool add)
+wb_vrep* wb_erep::createVolume(pwr_tStatus* sts, pwr_tVid vid, pwr_tCid cid, const char* name,
+                               ldh_eVolRep type, char* server, bool add)
 {
   pwr_tFileName vname;
 
-  if (cid == pwr_eClass_DirectoryVolume) {
+  if (cid == pwr_eClass_DirectoryVolume)
+  {
     vrep_iterator it = m_vrepdb.find(vid);
-    if (it != m_vrepdb.end()) {
+    if (it != m_vrepdb.end())
+    {
       *sts = LDH__VOLIDALREXI;
       return 0;
     }
@@ -1167,7 +1293,9 @@ wb_vrep* wb_erep::createVolume(pwr_tStatus* sts, pwr_tVid vid, pwr_tCid cid,
     if (add)
       addDb(sts, vrepmem);
     return vrepmem;
-  } else if (type == ldh_eVolRep_Wbl) {
+  }
+  else if (type == ldh_eVolRep_Wbl)
+  {
     char vidstr[40];
     pwr_tTime t;
     char classstr[40];
@@ -1176,36 +1304,39 @@ wb_vrep* wb_erep::createVolume(pwr_tStatus* sts, pwr_tVid vid, pwr_tCid cid,
     sprintf(vname, "$pwrp_db/%s.wb_load", cdh_Low(name));
     dcli_translate_filename(vname, vname);
 
-    switch (cid) {
+    switch (cid)
+    {
     case pwr_eClass_ClassVolume:
-      strcpy(classstr, "$ClassVolume"); 
+      strcpy(classstr, "$ClassVolume");
       break;
     case pwr_eClass_RootVolume:
-      strcpy(classstr, "$RootVolume"); 
+      strcpy(classstr, "$RootVolume");
       break;
     default:
       *sts = LDH__NYI;
       return 0;
     }
-    if (ODD(dcli_file_time(vname, &t))) {
+    if (ODD(dcli_file_time(vname, &t)))
+    {
       *sts = LDH__VOLIDALREXI;
       return 0;
     }
-    
+
     std::ofstream ofd(vname);
     ofd << "Volume " << name << " " << classstr << " " << vidstr << "\n"
         << "EndVolume\n";
     ofd.close();
 
     MsgWindow::message('I', "Database created", vname);
-
-
-  } else if (type == ldh_eVolRep_Db) {
+  }
+  else if (type == ldh_eVolRep_Db)
+  {
     sprintf(vname, "$pwrp_db/%s.db", cdh_Low(name));
     dcli_translate_filename(vname, vname);
 
     vrep_iterator it = m_vrepdb.find(vid);
-    if (it != m_vrepdb.end()) {
+    if (it != m_vrepdb.end())
+    {
       *sts = LDH__VOLIDALREXI;
       return 0;
     }
@@ -1216,7 +1347,9 @@ wb_vrep* wb_erep::createVolume(pwr_tStatus* sts, pwr_tVid vid, pwr_tCid cid,
     MsgWindow::message('I', "Database created", vname);
 
     return vrepdb;
-  } else if (type == ldh_eVolRep_Dbms) {
+  }
+  else if (type == ldh_eVolRep_Dbms)
+  {
     char host[40] = "pwr42";
     char user[40] = "pwrp";
     char password[40] = "";
@@ -1229,14 +1362,14 @@ wb_vrep* wb_erep::createVolume(pwr_tStatus* sts, pwr_tVid vid, pwr_tCid cid,
     if (EVEN(*sts))
       return 0;
 
-    printf("Host: \"%s\"\nUser: \"%s\"\nPass: \"%s\"\nPort: %d\n", host, user,
-        password, port);
+    printf("Host: \"%s\"\nUser: \"%s\"\nPass: \"%s\"\nPort: %d\n", host, user, password, port);
 
     sprintf(vname, "$pwrp_db/%s.dbms", cdh_Low(name));
     dcli_translate_filename(vname, vname);
 
     vrep_iterator it = m_vrepdb.find(vid);
-    if (it != m_vrepdb.end()) {
+    if (it != m_vrepdb.end())
+    {
       *sts = LDH__VOLIDALREXI;
       return 0;
     }
@@ -1276,12 +1409,14 @@ void wb_erep::volumeNameToFilename(pwr_tStatus* sts, char* name, char* filename)
 
   dcli_translate_filename(fname, pwr_cNameFilePath);
   std::ifstream fp(fname, std::ios::in);
-  if (!fp) {
+  if (!fp)
+  {
     *sts = LDH__PROJCONFIG;
     return;
   }
 
-  while (fp.getline(line, sizeof(line))) {
+  while (fp.getline(line, sizeof(line)))
+  {
     if (dir_cnt > (int)(sizeof(dir_list) / sizeof(dir_list[0]) - 1))
       break;
     strcpy(dir_list[dir_cnt], line);
@@ -1291,13 +1426,15 @@ void wb_erep::volumeNameToFilename(pwr_tStatus* sts, char* name, char* filename)
   }
   fp.close();
 
-  for (int i = 0; i < dir_cnt; i++) {
+  for (int i = 0; i < dir_cnt; i++)
+  {
     strcpy(vname, dir_list[i]);
     str_ToLower(&vname[strlen(vname)], name);
     strcat(vname, ".dbs");
     fsts = dcli_search_file(vname, found_file, DCLI_DIR_SEARCH_INIT);
     dcli_search_file(vname, found_file, DCLI_DIR_SEARCH_END);
-    if (ODD(fsts)) {
+    if (ODD(fsts))
+    {
       strcpy(filename, vname);
       *sts = LDH__SUCCESS;
       return;
@@ -1349,7 +1486,8 @@ bool wb_erep::check_lock(char* name, ldh_eVolDb type)
   char vname[200];
 
   sprintf(vname, "$pwrp_db/%s", cdh_Low(name));
-  switch (type) {
+  switch (type)
+  {
   case ldh_eVolDb_Db:
     strcat(vname, ".db");
     break;
@@ -1363,25 +1501,26 @@ bool wb_erep::check_lock(char* name, ldh_eVolDb type)
   return wb_dblock::check(vname);
 }
 
-void wb_erep::checkVolume(pwr_tStatus* sts, pwr_tVid vid,
-    std::vector<wb_volcheck>& carray, int* err_cnt)
+void wb_erep::checkVolume(pwr_tStatus* sts, pwr_tVid vid, std::vector<wb_volcheck>& carray, int* err_cnt)
 {
   lfu_t_volref* volref;
   int volref_cnt;
   pwr_tFileName fname;
 
   wb_vrep* vol = volume(sts, vid);
-  if (EVEN(*sts)) {
-    MsgWindow::message(
-        'E', "Volume not loaded: ", cdh_VolumeIdToString(0, 0, vid, 0, 0));
+  if (EVEN(*sts))
+  {
+    MsgWindow::message('E', "Volume not loaded: ", cdh_VolumeIdToString(0, 0, vid, 0, 0));
     (*err_cnt)++;
     return;
   }
 
   wb_volcheck vcheck;
 
-  switch (vol->type()) {
-  case ldh_eVolRep_Dbs: {
+  switch (vol->type())
+  {
+  case ldh_eVolRep_Dbs:
+  {
     vcheck.m_vid = vid;
     vcheck.m_time = ((wb_vrepdbs*)vol)->m_dbsvep->vp->time;
     strcpy(vcheck.m_vname, vol->name());
@@ -1390,7 +1529,8 @@ void wb_erep::checkVolume(pwr_tStatus* sts, pwr_tVid vid,
   }
   case ldh_eVolRep_Wbl:
   case ldh_eVolRep_Db:
-  case ldh_eVolRep_Dbms: {
+  case ldh_eVolRep_Dbms:
+  {
     // Find dbs-file on $pwrp_load
     pwr_tFileName filestr;
     pwr_tVid vol_vid;
@@ -1401,11 +1541,10 @@ void wb_erep::checkVolume(pwr_tStatus* sts, pwr_tVid vid,
 
     volumeNameToFilename(sts, (char*)vol->name(), filestr);
 
-    *sts = lfu_GetVolume(
-        filestr, vol_name, &vol_vid, &vol_cid, &vol_time, &vol_dvversion);
-    if (EVEN(*sts)) {
-      MsgWindow::message('E', "Dbs file not found for volume ",
-          cdh_VolumeIdToString(0, 0, vid, 0, 0));
+    *sts = lfu_GetVolume(filestr, vol_name, &vol_vid, &vol_cid, &vol_time, &vol_dvversion);
+    if (EVEN(*sts))
+    {
+      MsgWindow::message('E', "Dbs file not found for volume ", cdh_VolumeIdToString(0, 0, vid, 0, 0));
       (*err_cnt)++;
       return;
     }
@@ -1420,20 +1559,22 @@ void wb_erep::checkVolume(pwr_tStatus* sts, pwr_tVid vid,
     break;
   }
   default:
-    MsgWindow::message(
-        'E', "Strange volume type: ", cdh_VolumeIdToString(0, 0, vid, 0, 0));
+    MsgWindow::message('E', "Strange volume type: ", cdh_VolumeIdToString(0, 0, vid, 0, 0));
     (*err_cnt)++;
   }
 
   // Check if volume is stored
   bool found = false;
-  for (int i = 0; i < (int)carray.size(); i++) {
-    if (carray[i].m_vid == vcheck.m_vid) {
+  for (int i = 0; i < (int)carray.size(); i++)
+  {
+    if (carray[i].m_vid == vcheck.m_vid)
+    {
       found = true;
-      if (carray[i].m_time.tv_sec != vcheck.m_time.tv_sec) {
+      if (carray[i].m_time.tv_sec != vcheck.m_time.tv_sec)
+      {
         char msg[280];
-        sprintf(msg, "Version mismatch volume %s in %s and %s", vcheck.m_vname,
-            vcheck.m_filename, carray[i].m_filename);
+        sprintf(msg, "Version mismatch volume %s in %s and %s", vcheck.m_vname, vcheck.m_filename,
+                carray[i].m_filename);
         MsgWindow::message('E', msg, msgw_ePop_No);
         (*err_cnt)++;
         *sts = LDH__VOLVERSION;
@@ -1452,9 +1593,11 @@ void wb_erep::checkVolume(pwr_tStatus* sts, pwr_tVid vid,
   if (EVEN(*sts))
     return;
 
-  for (int i = 0; i < volref_cnt; i++) {
+  for (int i = 0; i < volref_cnt; i++)
+  {
     volumeNameToFilename(sts, volref[i].name, fname);
-    if (EVEN(*sts)) {
+    if (EVEN(*sts))
+    {
       char msg[200];
       sprintf(msg, "Loadfile not found: %s", volref[i].name);
       MsgWindow::message('E', msg, msgw_ePop_No);
@@ -1464,12 +1607,15 @@ void wb_erep::checkVolume(pwr_tStatus* sts, pwr_tVid vid,
 
     checkVolume(sts, volref[i].vid, carray, err_cnt);
 
-    for (int j = 0; j < (int)carray.size(); j++) {
-      if (carray[j].m_vid == volref[i].vid) {
-        if (carray[j].m_time.tv_sec != volref[i].version.tv_sec) {
+    for (int j = 0; j < (int)carray.size(); j++)
+    {
+      if (carray[j].m_vid == volref[i].vid)
+      {
+        if (carray[j].m_time.tv_sec != volref[i].version.tv_sec)
+        {
           char msg[280];
-          sprintf(msg, "Version mismatch volume %s in %s and %s",
-              volref[i].name, vcheck.m_filename, carray[j].m_filename);
+          sprintf(msg, "Version mismatch volume %s in %s and %s", volref[i].name, vcheck.m_filename,
+                  carray[j].m_filename);
           MsgWindow::message('E', msg, msgw_ePop_No);
           (*err_cnt)++;
           *sts = LDH__VOLVERSION;
@@ -1494,20 +1640,24 @@ void wb_erep::checkVolumes(pwr_tStatus* sts, char* nodeconfigname)
     return;
 
   bool found = false;
-  for (int i = 0; i < volcnt; i++) {
-    if (str_NoCaseStrcmp(vollist[i].p1, nodeconfigname) == 0) {
+  for (int i = 0; i < volcnt; i++)
+  {
+    if (str_NoCaseStrcmp(vollist[i].p1, nodeconfigname) == 0)
+    {
       found = true;
       checkVolume(sts, vollist[i].volume_id, carray, &err_cnt);
     }
   }
 
-  if (!found) {
+  if (!found)
+  {
     char msg[200];
     sprintf(msg, "No root volume found for node %s", nodeconfigname);
     MsgWindow::message('E', msg, msgw_ePop_Yes);
     *sts = LDH__NOSUCHVOL;
   }
-  if (err_cnt) {
+  if (err_cnt)
+  {
     MsgWindow::map_default();
     *sts = LDH__VOLERR;
   }

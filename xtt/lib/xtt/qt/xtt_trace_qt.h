@@ -47,7 +47,8 @@
 
 class RtTraceQtWidget;
 
-class RtTraceQt : public RtTrace {
+class RtTraceQt : public RtTrace
+{
 public:
   QWidget* flow_widget;
   QWidget* form;
@@ -66,7 +67,8 @@ private:
   RtTraceQtWidget* toplevel;
 };
 
-class RtTraceQtWidget : public QWidget {
+class RtTraceQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

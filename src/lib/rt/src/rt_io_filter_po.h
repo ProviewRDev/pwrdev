@@ -48,7 +48,8 @@ typedef struct ios_FilterCard_Po io_sFilterCard_Po;
 
 /* The structure of card data   */
 
-struct ios_FilterCard_Po {
+struct ios_FilterCard_Po
+{
   pwr_tBoolean Filter;
   pwr_sClass_Po* SignalObj[32];
   void* FilterData[32];
@@ -56,13 +57,12 @@ struct ios_FilterCard_Po {
 
 /* Filtration of Po.  */
 
-pwr_tStatus io_PoFilter(
-    pwr_sClass_Po* SignalObj[], pwr_tUInt16* Data, void* FilterData[]);
+pwr_tStatus io_PoFilter(pwr_sClass_Po* SignalObj[], pwr_tUInt16* Data, void* FilterData[]);
 
 /* Initialize filter for max 16 Po ( one Do-card ).  */
 
-pwr_tStatus io_InitPoFilter(pwr_sClass_Po* SignalObj[], pwr_tBoolean* Filter,
-    void* FilterData[], pwr_tFloat32 ScanTime);
+pwr_tStatus io_InitPoFilter(pwr_sClass_Po* SignalObj[], pwr_tBoolean* Filter, void* FilterData[],
+                            pwr_tFloat32 ScanTime);
 
 void io_ClosePoFilter(void* FilterData[]);
 

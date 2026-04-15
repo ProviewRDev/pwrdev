@@ -52,24 +52,16 @@
 #include "wb_convert_volume.h"
 #include "wb_utl_api.h"
 
-wb_dbms::wb_dbms() : m_vid(0), m_cid(0), m_env(0), m_con(0), m_txn(0)
-{
-  initTables();
-}
+wb_dbms::wb_dbms() : m_vid(0), m_cid(0), m_env(0), m_con(0), m_txn(0) { initTables(); }
 
-wb_dbms::wb_dbms(pwr_tVid vid)
-    : m_vid(0), m_cid(0), m_env(0), m_con(0), m_txn(0)
-{
-  initTables();
-}
+wb_dbms::wb_dbms(pwr_tVid vid) : m_vid(0), m_cid(0), m_env(0), m_con(0), m_txn(0) { initTables(); }
 
-wb_dbms::~wb_dbms()
-{
-}
+wb_dbms::~wb_dbms() {}
 
 int wb_dbms::close()
 {
-  if (m_txn) {
+  if (m_txn)
+  {
     m_txn->abort();
   }
 
@@ -91,7 +83,8 @@ void wb_dbms::copy(wb_export& e, const char* fileName)
   char l_fileName[512];
   dcli_translate_filename(l_fileName, fileName);
 
-  if (!m_env) {
+  if (!m_env)
+  {
     m_env = new wb_dbms_env(l_fileName);
     m_env->open();
   }
@@ -101,7 +94,8 @@ void wb_dbms::copy(wb_export& e, const char* fileName)
   close();
   open();
 
-  try {
+  try
+  {
     m_env->txn_begin(0, (wb_dbms_txn**)&m_txn);
 
     wb_dbms_info i(this);
@@ -110,7 +104,9 @@ void wb_dbms::copy(wb_export& e, const char* fileName)
     m_cid = i.cid();
     strcpy(m_volumeName, i.name());
     commit(&sts);
-  } catch (wb_dbms_error& e) {
+  }
+  catch (wb_dbms_error& e)
+  {
     m_txn->abort();
     printf("exeption: %s\n", e.what().c_str());
   }
@@ -128,7 +124,8 @@ void wb_dbms::copy(wb_export& e, wb_dbms_env* env)
   close();
   open();
 
-  try {
+  try
+  {
     m_env->txn_begin(0, (wb_dbms_txn**)&m_txn);
 
     wb_dbms_info i(this);
@@ -137,14 +134,15 @@ void wb_dbms::copy(wb_export& e, wb_dbms_env* env)
     m_cid = i.cid();
     strcpy(m_volumeName, i.name());
     commit(&sts);
-  } catch (wb_dbms_error& e) {
+  }
+  catch (wb_dbms_error& e)
+  {
     m_txn->abort();
     printf("exeption: %s\n", e.what().c_str());
   }
 }
 
-void wb_dbms::create(
-    pwr_tVid vid, pwr_tCid cid, const char* volumeName, const char* fileName)
+void wb_dbms::create(pwr_tVid vid, pwr_tCid cid, const char* volumeName, const char* fileName)
 {
   m_vid = vid;
   m_cid = cid;
@@ -159,7 +157,8 @@ void wb_dbms::create(
 
   flags.m = pwr_mClassDef_System | pwr_mClassDef_TopObject;
 
-  if (!m_env) {
+  if (!m_env)
+  {
     m_env = new wb_dbms_env(l_fileName);
     m_env->open();
   }
@@ -169,7 +168,8 @@ void wb_dbms::create(
   else
     return;
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_eClass_RootVolume:
     rbSize = sizeof(pwr_sRootVolume);
     break;
@@ -197,13 +197,11 @@ void wb_dbms::create(
     flags.m = pwr_mClassDef_System | pwr_mClassDef_NoAdopt;
     break;
   case pwr_eClass_MountObject:
-    flags.m = pwr_mClassDef_System | pwr_mClassDef_TopObject
-        | pwr_mClassDef_NoAdopt;
+    flags.m = pwr_mClassDef_System | pwr_mClassDef_TopObject | pwr_mClassDef_NoAdopt;
     break;
   case pwr_eClass_VolatileVolume:
   case pwr_eClass_ExternVolume:
-    flags.m = pwr_mClassDef_System | pwr_mClassDef_TopObject
-        | pwr_mClassDef_DevOnly;
+    flags.m = pwr_mClassDef_System | pwr_mClassDef_TopObject | pwr_mClassDef_DevOnly;
     break;
   case pwr_eClass_DynamicVolume:
     break;
@@ -214,13 +212,15 @@ void wb_dbms::create(
   oid.oix = pwr_cNOix;
   wb_name n(volumeName);
 
-  try {
+  try
+  {
     m_env->txn_begin(0, (wb_dbms_txn**)&m_txn);
 
-    importHead(oid, cid, pwr_cNOid, pwr_cNOid, pwr_cNOid, pwr_cNOid, pwr_cNOid,
-        n.name(), n.normName(), flags, time, time, time, rbSize, 0);
+    importHead(oid, cid, pwr_cNOid, pwr_cNOid, pwr_cNOid, pwr_cNOid, pwr_cNOid, n.name(), n.normName(), flags,
+               time, time, time, rbSize, 0);
 
-    if (rbSize) {
+    if (rbSize)
+    {
       void* body = calloc(1, rbSize);
 
       importRbody(oid, rbSize, body);
@@ -233,7 +233,9 @@ void wb_dbms::create(
     m_cid = i.cid();
     strcpy(m_volumeName, i.name());
     commit(&sts);
-  } catch (wb_dbms_error& e) {
+  }
+  catch (wb_dbms_error& e)
+  {
     m_txn->abort();
     printf("exeption: %s\n", e.what().c_str());
   }
@@ -244,7 +246,8 @@ void wb_dbms::open(const char* fileName)
   char l_fileName[512];
   dcli_translate_filename(l_fileName, fileName);
 
-  if (!m_env) {
+  if (!m_env)
+  {
     m_env = new wb_dbms_env(l_fileName);
     m_env->open();
   }
@@ -262,7 +265,8 @@ int wb_dbms::open()
 {
   m_con = m_env->openDb();
 
-  try {
+  try
+  {
     m_env->txn_begin(0, (wb_dbms_txn**)&m_txn);
 
     wb_dbms_info i(this);
@@ -271,7 +275,9 @@ int wb_dbms::open()
     m_cid = i.cid();
     strcpy(m_volumeName, i.name());
     return 0;
-  } catch (wb_dbms_error& e) {
+  }
+  catch (wb_dbms_error& e)
+  {
     m_txn->abort();
     printf("exeption: %s\n", e.what().c_str());
     return 1;
@@ -330,13 +336,11 @@ pwr_tOid wb_dbms::new_oid(wb_dbms_txn* txn)
   oid.vid = m_vid;
   wb_dbms_rbody b(this, oid);
 
-  rc = b.get(
-      txn, offsetof(pwr_sRootVolume, NextOix), sizeof(pwr_tOix), &oid.oix);
+  rc = b.get(txn, offsetof(pwr_sRootVolume, NextOix), sizeof(pwr_tOix), &oid.oix);
   if (rc)
     printf("wb_db::new_oid, b.get, rc %d\n", rc);
   oid.oix++;
-  rc = b.upd(
-      txn, offsetof(pwr_sRootVolume, NextOix), sizeof(pwr_tOix), &oid.oix);
+  rc = b.upd(txn, offsetof(pwr_sRootVolume, NextOix), sizeof(pwr_tOix), &oid.oix);
   if (rc)
     printf("wb_dbms::new_oid, b.upd, rc %d\n", rc);
 
@@ -349,24 +353,26 @@ pwr_tOid wb_dbms::new_oid(wb_dbms_txn* txn, pwr_tOid oid)
   woid.vid = m_vid;
   woid.oix = oid.oix;
 
-  try {
+  try
+  {
     wb_dbms_ohead o(this, txn, woid);
     return pwr_cNOid;
-  } catch (wb_dbms_error&) {
+  }
+  catch (wb_dbms_error&)
+  {
     pwr_tOix nextoix;
     int rc = 0;
     pwr_tOid oid = pwr_cNOid;
     oid.vid = m_vid;
     wb_dbms_rbody b(this, oid);
 
-    rc = b.get(
-        txn, offsetof(pwr_sRootVolume, NextOix), sizeof(pwr_tOix), &nextoix);
+    rc = b.get(txn, offsetof(pwr_sRootVolume, NextOix), sizeof(pwr_tOix), &nextoix);
     if (rc)
       printf("wb_db::new_oid, b.get, rc %d\n", rc);
-    if (!rc && nextoix < woid.oix + 1) {
+    if (!rc && nextoix < woid.oix + 1)
+    {
       nextoix = woid.oix + 1;
-      rc = b.upd(
-          txn, offsetof(pwr_sRootVolume, NextOix), sizeof(pwr_tOix), &nextoix);
+      rc = b.upd(txn, offsetof(pwr_sRootVolume, NextOix), sizeof(pwr_tOix), &nextoix);
       if (rc)
         printf("wb_dbms::new_oid, b.upd, rc %d\n", rc);
     }
@@ -374,10 +380,7 @@ pwr_tOid wb_dbms::new_oid(wb_dbms_txn* txn, pwr_tOid oid)
   }
 }
 
-int wb_dbms::del_family(wb_dbms_txn* txn, wb_dbms_cursor* cp, pwr_tOid poid)
-{
-  return 0;
-}
+int wb_dbms::del_family(wb_dbms_txn* txn, wb_dbms_cursor* cp, pwr_tOid poid) { return 0; }
 
 /* Save all changes done in the current transaction.  */
 
@@ -433,7 +436,8 @@ bool wb_dbms::deleteFamily(pwr_tStatus* sts, wb_dbms_ohead* o)
 
   m_env->txn_begin(m_txn, &txn);
 
-  try {
+  try
+  {
     // unadopt(txn, wb_Position(o));
     // del_ohead(txn, o);
     // del_clist(txn, o);
@@ -441,8 +445,9 @@ bool wb_dbms::deleteFamily(pwr_tStatus* sts, wb_dbms_ohead* o)
 
     // txn->commit(0);
     // o->mark(is_deleted);
-
-  } catch (wb_dbms_error&) {
+  }
+  catch (wb_dbms_error&)
+  {
     txn->abort();
   }
 
@@ -451,32 +456,37 @@ bool wb_dbms::deleteFamily(pwr_tStatus* sts, wb_dbms_ohead* o)
 
 bool wb_dbms::importVolume(wb_export& e)
 {
-  try {
+  try
+  {
     e.exportHead(*this);
     e.exportRbody(*this);
     e.exportDbody(*this);
     e.exportMeta(*this);
     return true;
-  } catch (wb_dbms_error& e) {
+  }
+  catch (wb_dbms_error& e)
+  {
     printf("exeption: %s\n", e.what().c_str());
     return false;
   }
 }
 
-bool wb_dbms::importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid,
-    pwr_tOid boid, pwr_tOid aoid, pwr_tOid foid, pwr_tOid loid,
-    const char* name, const char* normname, pwr_mClassDef flags,
-    pwr_tTime ohTime, pwr_tTime rbTime, pwr_tTime dbTime, size_t rbSize,
-    size_t dbSize)
+bool wb_dbms::importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid, pwr_tOid aoid,
+                         pwr_tOid foid, pwr_tOid loid, const char* name, const char* normname,
+                         pwr_mClassDef flags, pwr_tTime ohTime, pwr_tTime rbTime, pwr_tTime dbTime,
+                         size_t rbSize, size_t dbSize)
 {
-  wb_dbms_ohead o(this, oid, cid, poid, boid, aoid, foid, loid, name, normname,
-      flags, ohTime, rbTime, dbTime, rbSize, dbSize);
+  wb_dbms_ohead o(this, oid, cid, poid, boid, aoid, foid, loid, name, normname, flags, ohTime, rbTime, dbTime,
+                  rbSize, dbSize);
   o.ins(m_txn);
   wb_dbms_name n(this, oid, poid, normname);
 
-  try {
+  try
+  {
     n.ins(m_txn);
-  } catch (wb_dbms_error&) {
+  }
+  catch (wb_dbms_error&)
+  {
     char newName[50];
     sprintf(newName, "O%u_%s", oid.oix, name);
     newName[31] = '\0';
@@ -489,7 +499,8 @@ bool wb_dbms::importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid,
 
   wb_dbms_class c(this, cid, oid);
   c.ins(m_txn);
-  if (oid.oix == pwr_cNOix) { // This is the volume object
+  if (oid.oix == pwr_cNOix)
+  { // This is the volume object
     wb_dbms_info i(this);
     i.cid(cid);
     i.vid(oid.vid);
@@ -526,10 +537,7 @@ bool wb_dbms::importDbody(pwr_tOid oid, size_t size, void* body)
   return true;
 }
 
-bool wb_dbms::importDocBlock(pwr_tOid oid, size_t size, char* block)
-{
-  return true;
-}
+bool wb_dbms::importDocBlock(pwr_tOid oid, size_t size, char* block) { return true; }
 
 bool wb_dbms::importMeta(dbs_sMenv* mep)
 {
@@ -602,68 +610,37 @@ int wb_dbms::initTables()
   return 0;
 }
 
-MYSQL* wb_dbms::con()
-{
-  return m_con;
-}
+MYSQL* wb_dbms::con() { return m_con; }
 
-wb_dbms_table* wb_dbms::tOhead()
-{
-  return m_t_ohead;
-}
+wb_dbms_table* wb_dbms::tOhead() { return m_t_ohead; }
 
-wb_dbms_table* wb_dbms::tRbody()
-{
-  return m_t_rbody;
-}
+wb_dbms_table* wb_dbms::tRbody() { return m_t_rbody; }
 
-wb_dbms_table* wb_dbms::tDbody()
-{
-  return m_t_dbody;
-}
+wb_dbms_table* wb_dbms::tDbody() { return m_t_dbody; }
 
-wb_dbms_table* wb_dbms::tClass()
-{
-  return m_t_class;
-}
+wb_dbms_table* wb_dbms::tClass() { return m_t_class; }
 
-wb_dbms_table* wb_dbms::tName()
-{
-  return m_t_name;
-}
+wb_dbms_table* wb_dbms::tName() { return m_t_name; }
 
-wb_dbms_table* wb_dbms::tInfo()
-{
-  return m_t_info;
-}
+wb_dbms_table* wb_dbms::tInfo() { return m_t_info; }
 
-pwr_tCid wb_dbms::cid()
-{
-  return m_cid;
-}
+pwr_tCid wb_dbms::cid() { return m_cid; }
 
-pwr_tVid wb_dbms::vid()
-{
-  return m_vid;
-}
+pwr_tVid wb_dbms::vid() { return m_vid; }
 
-const char* wb_dbms::volumeName()
-{
-  return m_volumeName;
-}
+const char* wb_dbms::volumeName() { return m_volumeName; }
 
 wb_dbms_env::wb_dbms_env(const char* v_fileName)
-    : m_con(0), m_fileName(0), m_host(0), m_user(0), m_passwd(0), m_dbName(0),
-      m_port(0), m_socket(0), m_exists(false)
+    : m_con(0), m_fileName(0), m_host(0), m_user(0), m_passwd(0), m_dbName(0), m_port(0), m_socket(0),
+      m_exists(false)
 {
   fileName(v_fileName);
 }
 
-wb_dbms_env::wb_dbms_env(const char* v_host, const char* v_user,
-    const char* v_passwd, const char* v_dbName, unsigned int v_port,
-    const char* v_socket)
-    : m_con(0), m_fileName(0), m_host(0), m_user(0), m_passwd(0), m_dbName(0),
-      m_port(0), m_socket(0), m_exists(false)
+wb_dbms_env::wb_dbms_env(const char* v_host, const char* v_user, const char* v_passwd, const char* v_dbName,
+                         unsigned int v_port, const char* v_socket)
+    : m_con(0), m_fileName(0), m_host(0), m_user(0), m_passwd(0), m_dbName(0), m_port(0), m_socket(0),
+      m_exists(false)
 {
   host(v_host);
   user(v_user);
@@ -673,10 +650,7 @@ wb_dbms_env::wb_dbms_env(const char* v_host, const char* v_user,
   socket(v_socket);
 }
 
-wb_dbms_env::~wb_dbms_env()
-{
-  close();
-}
+wb_dbms_env::~wb_dbms_env() { close(); }
 
 void wb_dbms_env::host(const char* host)
 {
@@ -730,7 +704,8 @@ char* wb_dbms_env::dbName(void)
   static char dbname[80];
 
   sts = utl_get_projectname(pname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("** Project is not configured\n");
     return m_dbName;
   }
@@ -759,10 +734,7 @@ char* wb_dbms_env::host(void)
   return host;
 }
 
-void wb_dbms_env::port(const unsigned int port)
-{
-  m_port = port;
-}
+void wb_dbms_env::port(const unsigned int port) { m_port = port; }
 
 void wb_dbms_env::socket(const char* socket)
 {
@@ -774,19 +746,15 @@ void wb_dbms_env::socket(const char* socket)
 }
 
 wb_dbms_env::wb_dbms_env()
-    : m_con(0), m_fileName(0), m_host(0), m_user(0), m_passwd(0), m_dbName(0),
-      m_port(0), m_socket(0), m_exists(false)
+    : m_con(0), m_fileName(0), m_host(0), m_user(0), m_passwd(0), m_dbName(0), m_port(0), m_socket(0),
+      m_exists(false)
 {
 }
 
-int wb_dbms_env::close()
-{
-  return 0;
-}
+int wb_dbms_env::close() { return 0; }
 
-int wb_dbms_env::open(const char* v_host, const char* v_user,
-    const char* v_passwd, const char* v_dbName, unsigned int v_port,
-    const char* v_socket)
+int wb_dbms_env::open(const char* v_host, const char* v_user, const char* v_passwd, const char* v_dbName,
+                      unsigned int v_port, const char* v_socket)
 {
   host(v_host);
   user(v_user);
@@ -797,9 +765,9 @@ int wb_dbms_env::open(const char* v_host, const char* v_user,
 
   m_con = mysql_init(NULL);
 
-  MYSQL* con = mysql_real_connect(
-      m_con, host(), user(), passwd(), dbName(), port(), socket(), 0);
-  if (con == 0) {
+  MYSQL* con = mysql_real_connect(m_con, host(), user(), passwd(), dbName(), port(), socket(), 0);
+  if (con == 0)
+  {
     printf("Failed to connect to database: Error: %s\n", mysql_error(m_con));
     return 1;
   }
@@ -808,20 +776,22 @@ int wb_dbms_env::open(const char* v_host, const char* v_user,
 
   sprintf(sql, "use %s", dbName());
   int rc = mysql_query(m_con, sql);
-  if (rc) {
+  if (rc)
+  {
     printf("%s\n", mysql_error(m_con));
     printf("%s\n", sql);
     return rc;
-  } else {
+  }
+  else
+  {
     printf("database open %s\n", sql);
   }
 
   return 0;
 }
 
-int wb_dbms_env::create(const char* v_fileName, const char* v_host,
-    const char* v_user, const char* v_passwd, const char* v_dbName,
-    unsigned int v_port, const char* v_socket)
+int wb_dbms_env::create(const char* v_fileName, const char* v_host, const char* v_user, const char* v_passwd,
+                        const char* v_dbName, unsigned int v_port, const char* v_socket)
 {
   fileName(v_fileName);
   host(v_host);
@@ -840,11 +810,11 @@ MYSQL* wb_dbms_env::createDb(void)
 {
   m_con = mysql_init(NULL);
 
-  MYSQL* con = mysql_real_connect(
-      m_con, host(), user(), passwd(), 0, port(), socket(), 0);
+  MYSQL* con = mysql_real_connect(m_con, host(), user(), passwd(), 0, port(), socket(), 0);
   // printf("Tried to connect to database, con %x: Status: %s\n", (int)con,
   // mysql_error(m_con));
-  if (con == 0) {
+  if (con == 0)
+  {
     printf("Failed to connect to database: Error: %s\n", mysql_error(m_con));
     return 0;
   }
@@ -853,7 +823,8 @@ MYSQL* wb_dbms_env::createDb(void)
 
   sprintf(sql, "create database %s", dbName());
   int rc = mysql_query(m_con, sql);
-  if (rc) {
+  if (rc)
+  {
     printf("%s\n", mysql_error(m_con));
     printf("%s\n", sql);
     return 0;
@@ -861,7 +832,8 @@ MYSQL* wb_dbms_env::createDb(void)
 
   sprintf(sql, "use %s", dbName());
   rc = mysql_query(m_con, sql);
-  if (rc) {
+  if (rc)
+  {
     printf("%s\n", mysql_error(m_con));
     printf("%s\n", sql);
     return 0;
@@ -874,11 +846,11 @@ MYSQL* wb_dbms_env::openDb()
 {
   m_con = mysql_init(NULL);
 
-  MYSQL* con = mysql_real_connect(
-      m_con, host(), user(), passwd(), dbName(), port(), socket(), 0);
+  MYSQL* con = mysql_real_connect(m_con, host(), user(), passwd(), dbName(), port(), socket(), 0);
   // printf("Tried to connect to database, con %x: Status: %s\n", (int)con,
   // mysql_error(m_con));
-  if (con == 0) {
+  if (con == 0)
+  {
     printf("Failed to connect to database: Error: %s\n", mysql_error(m_con));
     return 0;
   }
@@ -886,10 +858,7 @@ MYSQL* wb_dbms_env::openDb()
   return con;
 }
 
-bool wb_dbms_env::exists()
-{
-  return m_exists;
-}
+bool wb_dbms_env::exists() { return m_exists; }
 
 int wb_dbms_env::create()
 {
@@ -900,21 +869,24 @@ int wb_dbms_env::create()
 
   printf("wb_dbms_env::create: %s\n", m_fileName);
   /* Create the directory, read/write/access owner and group. */
-  if (stat(m_fileName, &sb) != 0) {
-    if (mkdir(m_fileName, S_IRWXU | S_IRWXG) != 0) {
-      fprintf(stderr, "wb_dbms_env::create: mkdir: %s, %s\n", m_fileName,
-          strerror(errno));
+  if (stat(m_fileName, &sb) != 0)
+  {
+    if (mkdir(m_fileName, S_IRWXU | S_IRWXG) != 0)
+    {
+      fprintf(stderr, "wb_dbms_env::create: mkdir: %s, %s\n", m_fileName, strerror(errno));
       return errno;
     }
   }
 
   sprintf(name, "%s/%s", m_fileName, "connection.dmsql");
 
-  if (stat(name, &sb) != 0) {
+  if (stat(name, &sb) != 0)
+  {
     FILE* fp;
 
     fp = fopen(name, "w+b");
-    if (fp == NULL) {
+    if (fp == NULL)
+    {
       printf("** Cannot open file: %s, %s\n", name, strerror(errno));
       return errno;
     }
@@ -956,12 +928,14 @@ int wb_dbms_env::open(void)
   sprintf(buf, "%s/%s", m_fileName, "connection.dmsql");
 
   FILE* fp = fopen(buf, "r");
-  if (fp == NULL) {
+  if (fp == NULL)
+  {
     printf("** Cannot open file: %s, %s\n", buf, strerror(errno));
     return errno;
   }
 
-  while ((s = fgets(buf, sizeof(buf) - 1, fp))) {
+  while ((s = fgets(buf, sizeof(buf) - 1, fp)))
+  {
     if (*s == '#')
       continue;
 
@@ -976,22 +950,35 @@ int wb_dbms_env::open(void)
     if (streq(valp, "(null)"))
       valp = 0;
 
-    if (streq(var, "HOST")) {
+    if (streq(var, "HOST"))
+    {
       host(valp);
-    } else if (streq(var, "USER")) {
+    }
+    else if (streq(var, "USER"))
+    {
       user(valp);
-    } else if (streq(var, "PASSWD")) {
+    }
+    else if (streq(var, "PASSWD"))
+    {
       passwd(valp);
-    } else if (streq(var, "DB_NAME")) {
+    }
+    else if (streq(var, "DB_NAME"))
+    {
       dbName(valp);
-    } else if (streq(var, "PORT")) {
+    }
+    else if (streq(var, "PORT"))
+    {
       if (valp == 0)
         port(0);
       else
         port(atoi(valp));
-    } else if (streq(var, "SOCKET")) {
+    }
+    else if (streq(var, "SOCKET"))
+    {
       socket(valp);
-    } else {
+    }
+    else
+    {
       printf("Unknown connection parameter! : %s\n", var);
     }
   }
@@ -1003,35 +990,17 @@ int wb_dbms_env::open(void)
   return 0;
 }
 
-char* wb_dbms_env::fileName(void)
-{
-  return m_fileName;
-}
+char* wb_dbms_env::fileName(void) { return m_fileName; }
 
-char* wb_dbms_env::user(void)
-{
-  return m_user;
-}
+char* wb_dbms_env::user(void) { return m_user; }
 
-char* wb_dbms_env::passwd(void)
-{
-  return m_passwd;
-}
+char* wb_dbms_env::passwd(void) { return m_passwd; }
 
-unsigned int wb_dbms_env::port(void)
-{
-  return m_port;
-}
+unsigned int wb_dbms_env::port(void) { return m_port; }
 
-char* wb_dbms_env::socket(void)
-{
-  return m_socket;
-}
+char* wb_dbms_env::socket(void) { return m_socket; }
 
-MYSQL* wb_dbms_env::con(void)
-{
-  return m_con;
-}
+MYSQL* wb_dbms_env::con(void) { return m_con; }
 
 int wb_dbms_env::txn_begin(wb_dbms_txn* pid, wb_dbms_txn** tid)
 {
@@ -1043,85 +1012,46 @@ int wb_dbms_env::txn_begin(wb_dbms_txn* pid, wb_dbms_txn** tid)
   if (rc)
     printf("mysql_autocommit(m_con, 0) : %d\n", rc);
 
-  if (tid && !*tid) {
+  if (tid && !*tid)
+  {
     *tid = new wb_dbms_txn(this);
   }
 
   return rc;
 }
 
-wb_dbms_qe::wb_dbms_qe()
-    : m_data(0), m_off(0), m_size(0), m_bSize(0), m_isNull(0)
-{
-}
+wb_dbms_qe::wb_dbms_qe() : m_data(0), m_off(0), m_size(0), m_bSize(0), m_isNull(0) {}
 
 wb_dbms_qe::wb_dbms_qe(void* data, size_t size)
     : m_data((char*)data), m_off(0), m_size(size), m_bSize(size), m_isNull(0)
 {
 }
 
-wb_dbms_qe::~wb_dbms_qe()
-{
-}
+wb_dbms_qe::~wb_dbms_qe() {}
 
-void wb_dbms_qe::data(void* data)
-{
-  m_data = (char*)data;
-}
+void wb_dbms_qe::data(void* data) { m_data = (char*)data; }
 
-char* wb_dbms_qe::data() const
-{
-  return m_data;
-}
+char* wb_dbms_qe::data() const { return m_data; }
 
-void wb_dbms_qe::size(size_t size)
-{
-  m_size = size;
-}
+void wb_dbms_qe::size(size_t size) { m_size = size; }
 
-size_t wb_dbms_qe::size() const
-{
-  return m_size;
-}
+size_t wb_dbms_qe::size() const { return m_size; }
 
-void wb_dbms_qe::offset(size_t off)
-{
-  m_off = off;
-}
+void wb_dbms_qe::offset(size_t off) { m_off = off; }
 
-size_t wb_dbms_qe::offset() const
-{
-  return m_off;
-}
+size_t wb_dbms_qe::offset() const { return m_off; }
 
-void wb_dbms_qe::bSize(size_t bSize)
-{
-  m_bSize = bSize;
-}
+void wb_dbms_qe::bSize(size_t bSize) { m_bSize = bSize; }
 
-size_t wb_dbms_qe::bSize() const
-{
-  return m_bSize;
-}
+size_t wb_dbms_qe::bSize() const { return m_bSize; }
 
-size_t* wb_dbms_qe::a_size()
-{
-  return &m_size;
-}
+size_t* wb_dbms_qe::a_size() { return &m_size; }
 
-my_bool* wb_dbms_qe::a_isNull()
-{
-  return &m_isNull;
-}
+my_bool* wb_dbms_qe::a_isNull() { return &m_isNull; }
 
-wb_dbms_info::wb_dbms_info(wb_dbms* db)
-    : m_db(db), m_data(&m_volume, sizeof(m_volume))
-{
-}
+wb_dbms_info::wb_dbms_info(wb_dbms* db) : m_db(db), m_data(&m_volume, sizeof(m_volume)) {}
 
-wb_dbms_info::~wb_dbms_info()
-{
-}
+wb_dbms_info::~wb_dbms_info() {}
 
 void wb_dbms_info::get(wb_dbms_txn* txn)
 {
@@ -1130,10 +1060,13 @@ void wb_dbms_info::get(wb_dbms_txn* txn)
   wb_dbms_qe key(&index, sizeof(index));
   wb_dbms_qe data(&m_volume, sizeof(m_volume));
 
-  try {
+  try
+  {
     ret = m_db->m_t_info->get(txn, &key, &data);
     // printf("info get: %d\n", ret);
-  } catch (wb_dbms_error& e) {
+  }
+  catch (wb_dbms_error& e)
+  {
     printf("info get Error, %d\n", ret);
     std::cout << e.what().c_str();
   }
@@ -1165,50 +1098,23 @@ void wb_dbms_info::upd(wb_dbms_txn* txn)
   printf("info ins: %d\n", ret);
 }
 
-pwr_tCid wb_dbms_info::cid()
-{
-  return m_volume.cid;
-}
+pwr_tCid wb_dbms_info::cid() { return m_volume.cid; }
 
-pwr_tVid wb_dbms_info::vid()
-{
-  return m_volume.vid;
-}
+pwr_tVid wb_dbms_info::vid() { return m_volume.vid; }
 
-pwr_tTime wb_dbms_info::time()
-{
-  return m_volume.time;
-}
+pwr_tTime wb_dbms_info::time() { return m_volume.time; }
 
-char* wb_dbms_info::name()
-{
-  return m_volume.name;
-}
+char* wb_dbms_info::name() { return m_volume.name; }
 
-void wb_dbms_info::cid(pwr_tCid cid)
-{
-  m_volume.cid = cid;
-}
+void wb_dbms_info::cid(pwr_tCid cid) { m_volume.cid = cid; }
 
-void wb_dbms_info::vid(pwr_tVid vid)
-{
-  m_volume.vid = vid;
-}
+void wb_dbms_info::vid(pwr_tVid vid) { m_volume.vid = vid; }
 
-void wb_dbms_info::time(pwr_tTime time)
-{
-  m_volume.time = time;
-}
+void wb_dbms_info::time(pwr_tTime time) { m_volume.time = time; }
 
-void wb_dbms_info::name(char const* name)
-{
-  strcpy(m_volume.name, name);
-}
+void wb_dbms_info::name(char const* name) { strcpy(m_volume.name, name); }
 
-wb_dbms_class::wb_dbms_class(wb_dbms* db)
-    : m_db(db), m_key(&m_k, sizeof(m_k)), m_dbc(0)
-{
-}
+wb_dbms_class::wb_dbms_class(wb_dbms* db) : m_db(db), m_key(&m_k, sizeof(m_k)), m_dbc(0) {}
 
 wb_dbms_class::wb_dbms_class(wb_dbms* db, wb_dbms_txn* txn, pwr_tCid cid)
     : m_db(db), m_key(&m_k, sizeof(m_k)), m_dbc(0)
@@ -1224,8 +1130,7 @@ wb_dbms_class::wb_dbms_class(wb_dbms* db, pwr_tCid cid, pwr_tOid oid)
   m_k.cid = cid;
 }
 
-wb_dbms_class::wb_dbms_class(wb_dbms* db, wb_dbms_ohead& o)
-    : m_db(db), m_key(&m_k, sizeof(m_k)), m_dbc(0)
+wb_dbms_class::wb_dbms_class(wb_dbms* db, wb_dbms_ohead& o) : m_db(db), m_key(&m_k, sizeof(m_k)), m_dbc(0)
 {
   m_k.oix = o.oid().oix;
   m_k.cid = o.cid();
@@ -1259,20 +1164,11 @@ bool wb_dbms_class::pred(pwr_tOid oid)
   return rc == 0;
 }
 
-int wb_dbms_class::ins(wb_dbms_txn* txn)
-{
-  return m_db->m_t_class->ins(txn, &m_key, 0);
-}
+int wb_dbms_class::ins(wb_dbms_txn* txn) { return m_db->m_t_class->ins(txn, &m_key, 0); }
 
-int wb_dbms_class::upd(wb_dbms_txn* txn)
-{
-  return m_db->m_t_class->upd(txn, &m_key, 0);
-}
+int wb_dbms_class::upd(wb_dbms_txn* txn) { return m_db->m_t_class->upd(txn, &m_key, 0); }
 
-int wb_dbms_class::del(wb_dbms_txn* txn)
-{
-  return m_db->m_t_class->del(txn, &m_key, 0);
-}
+int wb_dbms_class::del(wb_dbms_txn* txn) { return m_db->m_t_class->del(txn, &m_key, 0); }
 
 void wb_dbms_class::iter(void (*func)(pwr_tOid oid, pwr_tCid cid))
 {
@@ -1287,7 +1183,8 @@ void wb_dbms_class::iter(void (*func)(pwr_tOid oid, pwr_tCid cid))
 
   /* Walk through the database. */
 
-  while (m_dbc->get() == 0) {
+  while (m_dbc->get() == 0)
+  {
     pwr_tOid oid;
     oid.oix = m_k.oix;
     oid.vid = m_db->vid();
@@ -1300,10 +1197,7 @@ void wb_dbms_class::iter(void (*func)(pwr_tOid oid, pwr_tCid cid))
   m_dbc = 0;
 }
 
-pwr_tCid wb_dbms_class::cid()
-{
-  return m_k.cid;
-}
+pwr_tCid wb_dbms_class::cid() { return m_k.cid; }
 
 pwr_tOid wb_dbms_class::oid()
 {
@@ -1335,8 +1229,7 @@ wb_dbms_class_iterator::wb_dbms_class_iterator(wb_dbms* db, pwr_tCid cid)
   m_k.cid = cid;
 }
 
-wb_dbms_class_iterator::wb_dbms_class_iterator(
-    wb_dbms* db, pwr_tCid cid, pwr_tOid oid)
+wb_dbms_class_iterator::wb_dbms_class_iterator(wb_dbms* db, pwr_tCid cid, pwr_tOid oid)
     : m_db(db), m_key(&m_k, sizeof(m_k)), m_atEnd(false), m_rc(0)
 {
   memset(&m_k, 0, sizeof(m_k));
@@ -1345,10 +1238,7 @@ wb_dbms_class_iterator::wb_dbms_class_iterator(
   m_k.cid = cid;
 }
 
-bool wb_dbms_class_iterator::atEnd()
-{
-  return m_atEnd;
-}
+bool wb_dbms_class_iterator::atEnd() { return m_atEnd; }
 
 bool wb_dbms_class_iterator::first()
 {
@@ -1363,7 +1253,8 @@ bool wb_dbms_class_iterator::first()
 
 bool wb_dbms_class_iterator::succObject()
 {
-  if (!m_atEnd) {
+  if (!m_atEnd)
+  {
     m_rc = m_db->m_t_class->succ(m_db->m_txn, &m_key, 0);
     m_atEnd = (m_rc != 0);
   }
@@ -1401,24 +1292,13 @@ pwr_tOid wb_dbms_class_iterator::oid()
   return oid;
 }
 
-pwr_tCid wb_dbms_class_iterator::cid()
-{
-  return m_k.cid;
-}
+pwr_tCid wb_dbms_class_iterator::cid() { return m_k.cid; }
 
-void wb_dbms_class_iterator::oid(pwr_tOid oid)
-{
-  m_k.oix = oid.oix;
-}
+void wb_dbms_class_iterator::oid(pwr_tOid oid) { m_k.oix = oid.oix; }
 
-void wb_dbms_class_iterator::cid(pwr_tCid cid)
-{
-  m_k.cid = cid;
-}
+void wb_dbms_class_iterator::cid(pwr_tCid cid) { m_k.cid = cid; }
 
-wb_dbms_class_iterator::~wb_dbms_class_iterator()
-{
-}
+wb_dbms_class_iterator::~wb_dbms_class_iterator() {}
 
 wb_dbms_name::wb_dbms_name(wb_dbms* db, wb_dbms_txn* txn)
     : m_db(db), m_key(&m_k, sizeof(m_k)), m_data(&m_d, sizeof(m_d))
@@ -1436,8 +1316,7 @@ wb_dbms_name::wb_dbms_name(wb_dbms* db, wb_dbms_ohead& o)
   m_d.oid = o.oid();
 }
 
-wb_dbms_name::wb_dbms_name(
-    wb_dbms* db, pwr_tOid oid, pwr_tOid poid, const char* name)
+wb_dbms_name::wb_dbms_name(wb_dbms* db, pwr_tOid oid, pwr_tOid poid, const char* name)
     : m_db(db), m_key(&m_k, sizeof(m_k)), m_data(&m_d, sizeof(m_d))
 {
   wb_name n(name);
@@ -1449,8 +1328,7 @@ wb_dbms_name::wb_dbms_name(
   m_d.oid = oid;
 }
 
-wb_dbms_name::wb_dbms_name(
-    wb_dbms* db, wb_dbms_txn* txn, pwr_tOid poid, wb_name& name)
+wb_dbms_name::wb_dbms_name(wb_dbms* db, wb_dbms_txn* txn, pwr_tOid poid, wb_name& name)
     : m_db(db), m_key(&m_k, sizeof(m_k)), m_data(&m_d, sizeof(m_d))
 {
   memset(&m_k, 0, sizeof(m_k));
@@ -1476,20 +1354,11 @@ int wb_dbms_name::get(wb_dbms_txn* txn)
   return rc;
 }
 
-int wb_dbms_name::ins(wb_dbms_txn* txn)
-{
-  return m_db->m_t_name->ins(txn, &m_key, &m_data);
-}
+int wb_dbms_name::ins(wb_dbms_txn* txn) { return m_db->m_t_name->ins(txn, &m_key, &m_data); }
 
-int wb_dbms_name::upd(wb_dbms_txn* txn)
-{
-  return m_db->m_t_name->upd(txn, &m_key, &m_data);
-}
+int wb_dbms_name::upd(wb_dbms_txn* txn) { return m_db->m_t_name->upd(txn, &m_key, &m_data); }
 
-int wb_dbms_name::del(wb_dbms_txn* txn)
-{
-  return m_db->m_t_name->del(txn, &m_key, 0);
-}
+int wb_dbms_name::del(wb_dbms_txn* txn) { return m_db->m_t_name->del(txn, &m_key, 0); }
 
 void wb_dbms_name::name(wb_name& name)
 {
@@ -1497,8 +1366,7 @@ void wb_dbms_name::name(wb_name& name)
   strcpy(m_k.normname, name.normName(cdh_mName_object));
 }
 
-void wb_dbms_name::iter(
-    void (*func)(pwr_tOid poid, pwr_tObjName name, pwr_tOid oid))
+void wb_dbms_name::iter(void (*func)(pwr_tOid poid, pwr_tObjName name, pwr_tOid oid))
 {
   int rc = 0;
 
@@ -1509,7 +1377,8 @@ void wb_dbms_name::iter(
 
   /* Walk through the database and print out the key/data pairs. */
 
-  while ((rc = m_dbc->get()) == 0) {
+  while ((rc = m_dbc->get()) == 0)
+  {
     func(m_k.poid, m_k.normname, m_d.oid);
   }
 
@@ -1518,19 +1387,14 @@ void wb_dbms_name::iter(
   m_dbc = 0;
 }
 
-pwr_tOid wb_dbms_name::oid()
-{
-  return m_d.oid;
-}
+pwr_tOid wb_dbms_name::oid() { return m_d.oid; }
 
-wb_dbms_ohead::wb_dbms_ohead()
-    : m_db(0), m_key(&m_oid, sizeof(m_oid)), m_data(&m_o, sizeof(m_o))
+wb_dbms_ohead::wb_dbms_ohead() : m_db(0), m_key(&m_oid, sizeof(m_oid)), m_data(&m_o, sizeof(m_o))
 {
   memset(&m_o, 0, sizeof(m_o));
 }
 
-wb_dbms_ohead::wb_dbms_ohead(wb_dbms* db)
-    : m_db(db), m_key(&m_oid, sizeof(m_oid)), m_data(&m_o, sizeof(m_o))
+wb_dbms_ohead::wb_dbms_ohead(wb_dbms* db) : m_db(db), m_key(&m_oid, sizeof(m_oid)), m_data(&m_o, sizeof(m_o))
 {
   memset(&m_o, 0, sizeof(m_o));
 }
@@ -1550,11 +1414,10 @@ wb_dbms_ohead::wb_dbms_ohead(wb_dbms* db, wb_dbms_txn* txn, pwr_tOid oid)
   get(txn);
 }
 
-wb_dbms_ohead::wb_dbms_ohead(wb_dbms* db, pwr_tOid oid, pwr_tCid cid,
-    pwr_tOid poid, pwr_tOid boid, pwr_tOid aoid, pwr_tOid foid, pwr_tOid loid,
-    const char* name, const char* normname, pwr_mClassDef flags,
-    pwr_tTime ohTime, pwr_tTime rbTime, pwr_tTime dbTime, size_t rbSize,
-    size_t dbSize)
+wb_dbms_ohead::wb_dbms_ohead(wb_dbms* db, pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid,
+                             pwr_tOid aoid, pwr_tOid foid, pwr_tOid loid, const char* name,
+                             const char* normname, pwr_mClassDef flags, pwr_tTime ohTime, pwr_tTime rbTime,
+                             pwr_tTime dbTime, size_t rbSize, size_t dbSize)
     : m_db(db), m_key(&m_oid, sizeof(m_oid)), m_data(&m_o, sizeof(m_o))
 {
   memset(&m_o, 0, sizeof(m_o));
@@ -1577,10 +1440,7 @@ wb_dbms_ohead::wb_dbms_ohead(wb_dbms* db, pwr_tOid oid, pwr_tCid cid,
   m_o.body[1].size = dbSize;
 }
 
-void wb_dbms_ohead::setDb(wb_dbms* db)
-{
-  m_db = db;
-}
+void wb_dbms_ohead::setDb(wb_dbms* db) { m_db = db; }
 
 wb_dbms_ohead& wb_dbms_ohead::get(wb_dbms_txn* txn)
 {
@@ -1594,15 +1454,9 @@ wb_dbms_ohead& wb_dbms_ohead::get(wb_dbms_txn* txn)
   return *this;
 }
 
-int wb_dbms_ohead::ins(wb_dbms_txn* txn)
-{
-  return m_db->m_t_ohead->ins(txn, &m_key, &m_data);
-}
+int wb_dbms_ohead::ins(wb_dbms_txn* txn) { return m_db->m_t_ohead->ins(txn, &m_key, &m_data); }
 
-int wb_dbms_ohead::upd(wb_dbms_txn* txn)
-{
-  return m_db->m_t_ohead->upd(txn, &m_key, &m_data);
-}
+int wb_dbms_ohead::upd(wb_dbms_txn* txn) { return m_db->m_t_ohead->upd(txn, &m_key, &m_data); }
 
 wb_dbms_ohead& wb_dbms_ohead::get(wb_dbms_txn* txn, pwr_tOid oid)
 {
@@ -1611,107 +1465,51 @@ wb_dbms_ohead& wb_dbms_ohead::get(wb_dbms_txn* txn, pwr_tOid oid)
 
   rc = m_db->m_t_ohead->get(txn, &m_key, &m_data);
   if (rc /*////== DB_NOTFOUND*/)
-    throw wb_dbms_error(
-        m_db, "wb_dbms_ohead::get(wb_dbms_txn *txn, pwr_tOid oid)");
+    throw wb_dbms_error(m_db, "wb_dbms_ohead::get(wb_dbms_txn *txn, pwr_tOid oid)");
   if (rc)
-    printf("wb_db_ohead::get(txn, oid = %d.%d), get, rc %d\n", oid.vid, oid.oix,
-        rc);
+    printf("wb_db_ohead::get(txn, oid = %d.%d), get, rc %d\n", oid.vid, oid.oix, rc);
 
   if (oid.oix != m_o.oid.oix)
-    printf("oid.oix (%d.%d) != m_o.oid.oix (%d.%d), %s\n", oid.vid, oid.oix,
-        m_o.oid.vid, m_o.oid.oix, m_o.name);
+    printf("oid.oix (%d.%d) != m_o.oid.oix (%d.%d), %s\n", oid.vid, oid.oix, m_o.oid.vid, m_o.oid.oix,
+           m_o.name);
   return *this;
 }
 
-int wb_dbms_ohead::del(wb_dbms_txn* txn)
-{
-  return m_db->m_t_ohead->del(txn, &m_key, 0);
-}
+int wb_dbms_ohead::del(wb_dbms_txn* txn) { return m_db->m_t_ohead->del(txn, &m_key, 0); }
 
-pwr_tOid wb_dbms_ohead::oid()
-{
-  return m_o.oid;
-}
+pwr_tOid wb_dbms_ohead::oid() { return m_o.oid; }
 
-pwr_tVid wb_dbms_ohead::vid()
-{
-  return m_o.oid.vid;
-}
+pwr_tVid wb_dbms_ohead::vid() { return m_o.oid.vid; }
 
-pwr_tOix wb_dbms_ohead::oix()
-{
-  return m_o.oid.oix;
-}
+pwr_tOix wb_dbms_ohead::oix() { return m_o.oid.oix; }
 
-pwr_tCid wb_dbms_ohead::cid()
-{
-  return m_o.cid;
-}
+pwr_tCid wb_dbms_ohead::cid() { return m_o.cid; }
 
-pwr_tOid wb_dbms_ohead::poid()
-{
-  return m_o.poid;
-}
+pwr_tOid wb_dbms_ohead::poid() { return m_o.poid; }
 
-pwr_tOid wb_dbms_ohead::foid()
-{
-  return m_o.foid;
-}
+pwr_tOid wb_dbms_ohead::foid() { return m_o.foid; }
 
-pwr_tOid wb_dbms_ohead::loid()
-{
-  return m_o.loid;
-}
+pwr_tOid wb_dbms_ohead::loid() { return m_o.loid; }
 
-pwr_tOid wb_dbms_ohead::boid()
-{
-  return m_o.boid;
-}
+pwr_tOid wb_dbms_ohead::boid() { return m_o.boid; }
 
-pwr_tOid wb_dbms_ohead::aoid()
-{
-  return m_o.aoid;
-}
+pwr_tOid wb_dbms_ohead::aoid() { return m_o.aoid; }
 
-pwr_tTime wb_dbms_ohead::ohTime()
-{
-  return m_o.time;
-}
+pwr_tTime wb_dbms_ohead::ohTime() { return m_o.time; }
 
-const char* wb_dbms_ohead::name()
-{
-  return m_o.name;
-}
+const char* wb_dbms_ohead::name() { return m_o.name; }
 
-const char* wb_dbms_ohead::normname()
-{
-  return m_o.normname;
-}
+const char* wb_dbms_ohead::normname() { return m_o.normname; }
 
-pwr_mClassDef wb_dbms_ohead::flags()
-{
-  return m_o.flags;
-}
+pwr_mClassDef wb_dbms_ohead::flags() { return m_o.flags; }
 
-size_t wb_dbms_ohead::rbSize()
-{
-  return m_o.body[0].size;
-}
+size_t wb_dbms_ohead::rbSize() { return m_o.body[0].size; }
 
-size_t wb_dbms_ohead::dbSize()
-{
-  return m_o.body[1].size;
-}
+size_t wb_dbms_ohead::dbSize() { return m_o.body[1].size; }
 
-pwr_tTime wb_dbms_ohead::rbTime()
-{
-  return m_o.body[0].time;
-}
+pwr_tTime wb_dbms_ohead::rbTime() { return m_o.body[0].time; }
 
-pwr_tTime wb_dbms_ohead::dbTime()
-{
-  return m_o.body[1].time;
-}
+pwr_tTime wb_dbms_ohead::dbTime() { return m_o.body[1].time; }
 
 void wb_dbms_ohead::name(wb_name& name)
 {
@@ -1729,75 +1527,33 @@ void wb_dbms_ohead::name(pwr_tOid& oid)
   strcpy(m_o.normname, m_o.name);
 }
 
-void wb_dbms_ohead::oid(pwr_tOid oid)
-{
-  m_o.oid = m_oid = oid;
-}
+void wb_dbms_ohead::oid(pwr_tOid oid) { m_o.oid = m_oid = oid; }
 
-void wb_dbms_ohead::cid(pwr_tCid cid)
-{
-  m_o.cid = cid;
-}
+void wb_dbms_ohead::cid(pwr_tCid cid) { m_o.cid = cid; }
 
-void wb_dbms_ohead::poid(pwr_tOid oid)
-{
-  m_o.poid = oid;
-}
+void wb_dbms_ohead::poid(pwr_tOid oid) { m_o.poid = oid; }
 
-void wb_dbms_ohead::foid(pwr_tOid oid)
-{
-  m_o.foid = oid;
-}
+void wb_dbms_ohead::foid(pwr_tOid oid) { m_o.foid = oid; }
 
-void wb_dbms_ohead::loid(pwr_tOid oid)
-{
-  m_o.loid = oid;
-}
+void wb_dbms_ohead::loid(pwr_tOid oid) { m_o.loid = oid; }
 
-void wb_dbms_ohead::boid(pwr_tOid oid)
-{
-  m_o.boid = oid;
-}
+void wb_dbms_ohead::boid(pwr_tOid oid) { m_o.boid = oid; }
 
-void wb_dbms_ohead::aoid(pwr_tOid oid)
-{
-  m_o.aoid = oid;
-}
+void wb_dbms_ohead::aoid(pwr_tOid oid) { m_o.aoid = oid; }
 
-void wb_dbms_ohead::flags(pwr_mClassDef flags)
-{
-  m_o.flags = flags;
-}
+void wb_dbms_ohead::flags(pwr_mClassDef flags) { m_o.flags = flags; }
 
-void wb_dbms_ohead::rbSize(size_t size)
-{
-  m_o.body[0].size = size;
-}
+void wb_dbms_ohead::rbSize(size_t size) { m_o.body[0].size = size; }
 
-void wb_dbms_ohead::dbSize(size_t size)
-{
-  m_o.body[1].size = size;
-}
+void wb_dbms_ohead::dbSize(size_t size) { m_o.body[1].size = size; }
 
-void wb_dbms_ohead::ohTime(pwr_tTime& time)
-{
-  m_o.time = time;
-}
+void wb_dbms_ohead::ohTime(pwr_tTime& time) { m_o.time = time; }
 
-void wb_dbms_ohead::rbTime(pwr_tTime& time)
-{
-  m_o.body[0].time = time;
-}
+void wb_dbms_ohead::rbTime(pwr_tTime& time) { m_o.body[0].time = time; }
 
-void wb_dbms_ohead::dbTime(pwr_tTime& time)
-{
-  m_o.body[1].time = time;
-}
+void wb_dbms_ohead::dbTime(pwr_tTime& time) { m_o.body[1].time = time; }
 
-void wb_dbms_ohead::clear()
-{
-  memset(&m_o, 0, sizeof(m_o));
-}
+void wb_dbms_ohead::clear() { memset(&m_o, 0, sizeof(m_o)); }
 
 void wb_dbms_ohead::iter(void (*func)(pwr_tOid oid, dbms_sObject* op))
 {
@@ -1811,7 +1567,8 @@ void wb_dbms_ohead::iter(void (*func)(pwr_tOid oid, dbms_sObject* op))
 
   /* Walk through the database and print out the key/data pairs. */
 
-  while ((rc = m_dbc->get()) == 0) {
+  while ((rc = m_dbc->get()) == 0)
+  {
     func(m_oid, &m_o);
   }
 
@@ -1829,10 +1586,10 @@ void wb_dbms_ohead::iter(wb_import& i)
   memset(&m_oid, 0, sizeof(m_oid));
   memset(&m_o, 0, sizeof(m_o));
 
-  while ((rc = m_dbc->get()) == 0) {
-    i.importHead(m_o.oid, m_o.cid, m_o.poid, m_o.boid, m_o.aoid, m_o.foid,
-        m_o.loid, m_o.name, m_o.normname, m_o.flags, m_o.time, m_o.body[0].time,
-        m_o.body[1].time, m_o.body[0].size, m_o.body[1].size);
+  while ((rc = m_dbc->get()) == 0)
+  {
+    i.importHead(m_o.oid, m_o.cid, m_o.poid, m_o.boid, m_o.aoid, m_o.foid, m_o.loid, m_o.name, m_o.normname,
+                 m_o.flags, m_o.time, m_o.body[0].time, m_o.body[1].time, m_o.body[0].size, m_o.body[1].size);
   }
 
   m_dbc->close();
@@ -1841,32 +1598,23 @@ void wb_dbms_ohead::iter(wb_import& i)
 }
 
 wb_dbms_rbody::wb_dbms_rbody(wb_dbms* db, pwr_tOid oid, size_t size, void* p)
-    : m_db(db), m_oid(oid), m_size(size), m_p(p), m_key(&m_oid, sizeof(m_oid)),
-      m_data(p, size)
+    : m_db(db), m_oid(oid), m_size(size), m_p(p), m_key(&m_oid, sizeof(m_oid)), m_data(p, size)
 {
 }
 
 wb_dbms_rbody::wb_dbms_rbody(wb_dbms* db)
-    : m_db(db), m_oid(pwr_cNOid), m_size(0), m_p(0),
-      m_key(&m_oid, sizeof(m_oid)), m_data(0, 0)
+    : m_db(db), m_oid(pwr_cNOid), m_size(0), m_p(0), m_key(&m_oid, sizeof(m_oid)), m_data(0, 0)
 {
 }
 
 wb_dbms_rbody::wb_dbms_rbody(wb_dbms* db, pwr_tOid oid)
-    : m_db(db), m_oid(oid), m_size(0), m_p(0), m_key(&m_oid, sizeof(m_oid)),
-      m_data(0, 0)
+    : m_db(db), m_oid(oid), m_size(0), m_p(0), m_key(&m_oid, sizeof(m_oid)), m_data(0, 0)
 {
 }
 
-void wb_dbms_rbody::oid(pwr_tOid oid)
-{
-  m_oid = oid;
-}
+void wb_dbms_rbody::oid(pwr_tOid oid) { m_oid = oid; }
 
-int wb_dbms_rbody::ins(wb_dbms_txn* txn)
-{
-  return m_db->m_t_rbody->ins(txn, &m_key, &m_data);
-}
+int wb_dbms_rbody::ins(wb_dbms_txn* txn) { return m_db->m_t_rbody->ins(txn, &m_key, &m_data); }
 
 int wb_dbms_rbody::ins(wb_dbms_txn* txn, size_t offset, size_t size, void* p)
 {
@@ -1888,8 +1636,8 @@ int wb_dbms_rbody::upd(wb_dbms_txn* txn, size_t offset, size_t size, void* p)
     return rc;
 
   if (m_data.size() < size + offset)
-    printf("*** rbody::upd(offset %zd, size %zd, oix %d), size: %zd\n", offset,
-        size, m_oid.oix, m_data.size());
+    printf("*** rbody::upd(offset %zd, size %zd, oix %d), size: %zd\n", offset, size, m_oid.oix,
+           m_data.size());
 
   memcpy(m_db->m_buf + offset, p, size);
 
@@ -1908,8 +1656,8 @@ int wb_dbms_rbody::get(wb_dbms_txn* txn, size_t offset, size_t size, void* p)
 
   assert(sizeof(m_db->m_buf) >= size + offset);
   if (m_data.size() < size + offset)
-    printf("*** rbody::get(offset %zd, size %zd, oix %d), size: %zd\n", offset,
-        size, m_oid.oix, m_data.size());
+    printf("*** rbody::get(offset %zd, size %zd, oix %d), size: %zd\n", offset, size, m_oid.oix,
+           m_data.size());
 
   memcpy(p, m_db->m_buf + offset, size);
   m_size = m_data.size();
@@ -1917,10 +1665,7 @@ int wb_dbms_rbody::get(wb_dbms_txn* txn, size_t offset, size_t size, void* p)
   return 0;
 }
 
-int wb_dbms_rbody::del(wb_dbms_txn* txn)
-{
-  return m_db->m_t_rbody->del(txn, &m_key, 0);
-}
+int wb_dbms_rbody::del(wb_dbms_txn* txn) { return m_db->m_t_rbody->del(txn, &m_key, 0); }
 
 void wb_dbms_rbody::iter(void (*print)(pwr_tOid oid, size_t size))
 {
@@ -1936,10 +1681,14 @@ void wb_dbms_rbody::iter(void (*print)(pwr_tOid oid, size_t size))
 
   /* Walk through the database and print out the key/data pairs. */
 
-  while (1) {
-    try {
+  while (1)
+  {
+    try
+    {
       rc = m_dbc->get();
-    } catch (wb_dbms_error& e) {
+    }
+    catch (wb_dbms_error& e)
+    {
       printf("Exc: %s\n", e.what().c_str());
     }
 
@@ -1966,10 +1715,14 @@ void wb_dbms_rbody::iter(wb_import& i)
 
   m_db->m_t_rbody->cursor(m_db->m_txn, &m_key, &m_data, &m_dbc);
 
-  while (1) {
-    try {
+  while (1)
+  {
+    try
+    {
       rc = m_dbc->get();
-    } catch (wb_dbms_error& e) {
+    }
+    catch (wb_dbms_error& e)
+    {
       printf("Exc: %s\n", e.what().c_str());
     }
 
@@ -1985,32 +1738,23 @@ void wb_dbms_rbody::iter(wb_import& i)
 }
 
 wb_dbms_dbody::wb_dbms_dbody(wb_dbms* db, pwr_tOid oid, size_t size, void* p)
-    : m_db(db), m_oid(oid), m_size(size), m_p(p), m_key(&m_oid, sizeof(m_oid)),
-      m_data(p, size)
+    : m_db(db), m_oid(oid), m_size(size), m_p(p), m_key(&m_oid, sizeof(m_oid)), m_data(p, size)
 {
 }
 
 wb_dbms_dbody::wb_dbms_dbody(wb_dbms* db)
-    : m_db(db), m_oid(pwr_cNOid), m_size(0), m_p(0),
-      m_key(&m_oid, sizeof(m_oid)), m_data(0, 0)
+    : m_db(db), m_oid(pwr_cNOid), m_size(0), m_p(0), m_key(&m_oid, sizeof(m_oid)), m_data(0, 0)
 {
 }
 
 wb_dbms_dbody::wb_dbms_dbody(wb_dbms* db, pwr_tOid oid)
-    : m_db(db), m_oid(oid), m_size(0), m_p(0), m_key(&m_oid, sizeof(m_oid)),
-      m_data(0, 0)
+    : m_db(db), m_oid(oid), m_size(0), m_p(0), m_key(&m_oid, sizeof(m_oid)), m_data(0, 0)
 {
 }
 
-void wb_dbms_dbody::oid(pwr_tOid oid)
-{
-  m_oid = oid;
-}
+void wb_dbms_dbody::oid(pwr_tOid oid) { m_oid = oid; }
 
-int wb_dbms_dbody::ins(wb_dbms_txn* txn)
-{
-  return m_db->m_t_dbody->ins(txn, &m_key, &m_data);
-}
+int wb_dbms_dbody::ins(wb_dbms_txn* txn) { return m_db->m_t_dbody->ins(txn, &m_key, &m_data); }
 
 int wb_dbms_dbody::ins(wb_dbms_txn* txn, size_t offset, size_t size, void* p)
 {
@@ -2031,8 +1775,8 @@ int wb_dbms_dbody::upd(wb_dbms_txn* txn, size_t offset, size_t size, void* p)
   if (rc)
     return rc;
   if (m_data.size() < size + offset)
-    printf("*** dbody::upd(offset %zd, size %zd, oix %d), size: %zd\n", offset,
-        size, m_oid.oix, m_data.size());
+    printf("*** dbody::upd(offset %zd, size %zd, oix %d), size: %zd\n", offset, size, m_oid.oix,
+           m_data.size());
 
   memcpy(m_db->m_buf + offset, p, size);
 
@@ -2053,8 +1797,8 @@ int wb_dbms_dbody::get(wb_dbms_txn* txn, size_t offset, size_t size, void* p)
 
   assert(sizeof(m_db->m_buf) >= size + offset);
   if (m_data.size() < size + offset)
-    printf("*** dbody::get(offset %zd, size %zd, oix %d), size: %zd\n", offset,
-        size, m_oid.oix, m_data.size());
+    printf("*** dbody::get(offset %zd, size %zd, oix %d), size: %zd\n", offset, size, m_oid.oix,
+           m_data.size());
 
   memcpy(p, m_db->m_buf + offset, size);
   m_size = m_data.size();
@@ -2062,10 +1806,7 @@ int wb_dbms_dbody::get(wb_dbms_txn* txn, size_t offset, size_t size, void* p)
   return 0;
 }
 
-int wb_dbms_dbody::del(wb_dbms_txn* txn)
-{
-  return m_db->m_t_dbody->del(txn, &m_key, 0);
-}
+int wb_dbms_dbody::del(wb_dbms_txn* txn) { return m_db->m_t_dbody->del(txn, &m_key, 0); }
 
 void wb_dbms_dbody::iter(void (*print)(pwr_tOid oid, size_t size))
 {
@@ -2081,10 +1822,14 @@ void wb_dbms_dbody::iter(void (*print)(pwr_tOid oid, size_t size))
 
   /* Walk through the database and print out the key/data pairs. */
 
-  while (1) {
-    try {
+  while (1)
+  {
+    try
+    {
       rc = m_dbc->get();
-    } catch (wb_dbms_error& e) {
+    }
+    catch (wb_dbms_error& e)
+    {
       printf("Exc: %s\n", e.what().c_str());
     }
 
@@ -2113,10 +1858,14 @@ void wb_dbms_dbody::iter(wb_import& i)
 
   /* Walk through the database and print out the key/data pairs. */
 
-  while (1) {
-    try {
+  while (1)
+  {
+    try
+    {
       rc = m_dbc->get();
-    } catch (wb_dbms_error& e) {
+    }
+    catch (wb_dbms_error& e)
+    {
       printf("Exc: %s\n", e.what().c_str());
     }
 
@@ -2131,17 +1880,11 @@ void wb_dbms_dbody::iter(wb_import& i)
   m_dbc = 0;
 }
 
-wb_dbms_txn::wb_dbms_txn()
-{
-}
+wb_dbms_txn::wb_dbms_txn() {}
 
-wb_dbms_txn::wb_dbms_txn(wb_dbms_env* env) : m_env(env)
-{
-}
+wb_dbms_txn::wb_dbms_txn(wb_dbms_env* env) : m_env(env) {}
 
-wb_dbms_txn::~wb_dbms_txn()
-{
-}
+wb_dbms_txn::~wb_dbms_txn() {}
 
 int wb_dbms_txn::commit()
 {
@@ -2173,8 +1916,7 @@ int wb_dbms_txn::subBegin()
   return rc;
 
 error:
-  printf(
-      "%s rc %d, %s\n", "wb_dbms::subBegin()", rc, mysql_error(m_env->con()));
+  printf("%s rc %d, %s\n", "wb_dbms::subBegin()", rc, mysql_error(m_env->con()));
   // throw wb_error(DB__TXNERROR);
   return 1;
 }
@@ -2187,36 +1929,26 @@ int wb_dbms_txn::subAbort()
   return rc;
 
 error:
-  printf(
-      "%s rc %d, %s\n", "wb_dbms::subAbort()", rc, mysql_error(m_env->con()));
+  printf("%s rc %d, %s\n", "wb_dbms::subAbort()", rc, mysql_error(m_env->con()));
   // throw wb_error(DB__TXNERROR);
   return 1;
 }
 
-int wb_dbms_txn::subCommit()
-{
-  return 0;
-}
+int wb_dbms_txn::subCommit() { return 0; }
 
-void wb_dbms_txn::set_env(wb_dbms_env* env)
-{
-  m_env = env;
-}
+void wb_dbms_txn::set_env(wb_dbms_env* env) { m_env = env; }
 
-wb_dbms_query::wb_dbms_query() : m_db(0), m_prepared(false), m_stmt(0)
-{
-}
+wb_dbms_query::wb_dbms_query() : m_db(0), m_prepared(false), m_stmt(0) {}
 
-wb_dbms_query::~wb_dbms_query()
-{
-}
+wb_dbms_query::~wb_dbms_query() {}
 
 int wb_dbms_query::prepare(const char* query, int nResult, int nParam)
 {
   int rc = 0;
   static const char* method = "prepare";
 
-  if (!m_prepared) {
+  if (!m_prepared)
+  {
     m_query = query;
 
     m_stmt = mysql_stmt_init(m_db->con());
@@ -2232,23 +1964,27 @@ int wb_dbms_query::prepare(const char* query, int nResult, int nParam)
 
     assert((m_nParam == nParam) && (m_nResult == nResult));
 
-    if (m_nParam > 0) {
+    if (m_nParam > 0)
+    {
       m_param.bind = (MYSQL_BIND*)calloc(m_nParam, sizeof(MYSQL_BIND));
       m_param.length = (size_t*)calloc(m_nParam, sizeof(size_t));
       m_param.is_null = (my_bool*)calloc(m_nParam, sizeof(my_bool));
 
-      for (int i = m_nParam - 1; i >= 0; i--) {
+      for (int i = m_nParam - 1; i >= 0; i--)
+      {
         m_param.bind[i].is_null = &m_param.is_null[i];
         m_param.bind[i].length = (long unsigned int*)&m_param.length[i];
       }
     }
 
-    if (m_nResult > 0) {
+    if (m_nResult > 0)
+    {
       m_result.bind = (MYSQL_BIND*)calloc(m_nResult, sizeof(MYSQL_BIND));
       m_result.length = (size_t*)calloc(m_nParam, sizeof(size_t));
       m_result.is_null = (my_bool*)calloc(m_nResult, sizeof(my_bool));
 
-      for (int i = m_nResult - 1; i >= 0; i--) {
+      for (int i = m_nResult - 1; i >= 0; i--)
+      {
         m_result.bind[i].is_null = &m_result.is_null[i];
         m_result.bind[i].length = (long unsigned int*)&m_result.length[i];
       }
@@ -2265,13 +2001,15 @@ int wb_dbms_query::bindQuery(void)
   int rc = 0;
   static const char* method = "bindQuery";
 
-  if (m_nParam > 0) {
+  if (m_nParam > 0)
+  {
     rc = mysql_stmt_bind_param(m_stmt, m_param.bind);
     if (rc)
       error(rc, method, "mysql_stmt_bind_param");
   }
 
-  if (m_nResult > 0) {
+  if (m_nResult > 0)
+  {
     rc = mysql_stmt_bind_result(m_stmt, m_result.bind);
     if (rc)
       error(rc, method, "mysql_stmt_bind_result");
@@ -2286,8 +2024,7 @@ void wb_dbms_query::bindParam(int index, enum enum_field_types type, char* var)
   m_param.bind[index].buffer = var;
 }
 
-void wb_dbms_query::bindParam(
-    int index, enum enum_field_types type, char* var, size_t size)
+void wb_dbms_query::bindParam(int index, enum enum_field_types type, char* var, size_t size)
 {
   m_param.bind[index].buffer_type = type;
   m_param.bind[index].buffer = var;
@@ -2295,8 +2032,7 @@ void wb_dbms_query::bindParam(
   m_param.length[index] = size;
 }
 
-void wb_dbms_query::bindParam(
-    int index, enum enum_field_types type, char* var, size_t size, size_t bsize)
+void wb_dbms_query::bindParam(int index, enum enum_field_types type, char* var, size_t size, size_t bsize)
 {
   m_param.bind[index].buffer_type = type;
   m_param.bind[index].buffer = var;
@@ -2304,8 +2040,7 @@ void wb_dbms_query::bindParam(
   m_param.length[index] = bsize;
 }
 
-void wb_dbms_query::bindParam(
-    int index, enum enum_field_types type, wb_dbms_qe* par)
+void wb_dbms_query::bindParam(int index, enum enum_field_types type, wb_dbms_qe* par)
 {
   m_param.bind[index].buffer_type = type;
   m_param.bind[index].buffer = par->data();
@@ -2320,8 +2055,7 @@ void wb_dbms_query::bindResult(int index, enum enum_field_types type, char* var)
   m_result.bind[index].buffer = var;
 }
 
-void wb_dbms_query::bindResult(
-    int index, enum enum_field_types type, char* var, size_t size)
+void wb_dbms_query::bindResult(int index, enum enum_field_types type, char* var, size_t size)
 {
   m_result.bind[index].buffer_type = type;
   m_result.bind[index].buffer = var;
@@ -2329,8 +2063,7 @@ void wb_dbms_query::bindResult(
   m_result.length[index] = size;
 }
 
-void wb_dbms_query::bindResult(
-    int index, enum enum_field_types type, char* var, size_t size, size_t bsize)
+void wb_dbms_query::bindResult(int index, enum enum_field_types type, char* var, size_t size, size_t bsize)
 {
   m_result.bind[index].buffer_type = type;
   m_result.bind[index].buffer = var;
@@ -2338,8 +2071,7 @@ void wb_dbms_query::bindResult(
   m_result.length[index] = bsize;
 }
 
-void wb_dbms_query::bindResult(
-    int index, enum enum_field_types type, wb_dbms_qe* par)
+void wb_dbms_query::bindResult(int index, enum enum_field_types type, wb_dbms_qe* par)
 {
   m_result.bind[index].buffer_type = type;
   m_result.bind[index].buffer = par->data();
@@ -2357,8 +2089,7 @@ void wb_dbms_query::error(int rc, const char* method, const char* func)
   m_stmt = 0;
   m_prepared = false;
 
-  sprintf(s, "*** query \"%s\" %s %s %d %s\n", m_query, method, func, rc,
-      mysql_error(m_db->con()));
+  sprintf(s, "*** query \"%s\" %s %s %d %s\n", m_query, method, func, rc, mysql_error(m_db->con()));
   throw wb_dbms_error(m_db, s);
 }
 
@@ -2371,61 +2102,40 @@ void wb_dbms_query::error(const char* method, const char* func)
   m_stmt = 0;
   m_prepared = false;
 
-  sprintf(s, "*** query \"%s\" %s %s %s\n", m_query, method, func,
-      mysql_error(m_db->con()));
+  sprintf(s, "*** query \"%s\" %s %s %s\n", m_query, method, func, mysql_error(m_db->con()));
   throw wb_dbms_error(m_db, s);
 }
 
-wb_dbms_cursor::wb_dbms_cursor(wb_dbms_query* query) : m_query(query)
-{
-}
+wb_dbms_cursor::wb_dbms_cursor(wb_dbms_query* query) : m_query(query) {}
 
-wb_dbms_cursor::~wb_dbms_cursor()
-{
-}
+wb_dbms_cursor::~wb_dbms_cursor() {}
 
-int wb_dbms_cursor::get()
-{
-  return mysql_stmt_fetch(m_query->m_stmt);
-}
+int wb_dbms_cursor::get() { return mysql_stmt_fetch(m_query->m_stmt); }
 
-int wb_dbms_cursor::count()
-{
-  return 0;
-}
+int wb_dbms_cursor::count() { return 0; }
 
-int wb_dbms_cursor::close()
-{
-  return mysql_stmt_free_result(m_query->m_stmt);
-}
+int wb_dbms_cursor::close() { return mysql_stmt_free_result(m_query->m_stmt); }
 
-wb_dbms_table::wb_dbms_table(wb_dbms* db) : m_db(db)
-{
-}
+wb_dbms_table::wb_dbms_table(wb_dbms* db) : m_db(db) {}
 
-wb_dbms_table::~wb_dbms_table()
-{
-}
+wb_dbms_table::~wb_dbms_table() {}
 
 int wb_dbms_table::create(const char* query)
 {
   int rc = 0;
 
   rc = mysql_query(m_db->con(), query);
-  if (rc) {
+  if (rc)
+  {
     printf("%s\n", mysql_error(m_db->con()));
     printf("%s\n", query);
   }
   return rc;
 }
 
-int wb_dbms_table::close()
-{
-  return 0;
-}
+int wb_dbms_table::close() { return 0; }
 
-int wb_dbms_table::cursor(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data, wb_dbms_cursor** cp)
+int wb_dbms_table::cursor(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data, wb_dbms_cursor** cp)
 {
   int rc = m_q_cursor->execute(txn, key, data);
 
@@ -2437,40 +2147,19 @@ int wb_dbms_table::cursor(
   return 0;
 }
 
-void wb_dbms_table::queryGet(wb_dbms_query* query)
-{
-  m_q_get = query;
-}
+void wb_dbms_table::queryGet(wb_dbms_query* query) { m_q_get = query; }
 
-void wb_dbms_table::querySucc(wb_dbms_query* query)
-{
-  m_q_succ = query;
-}
+void wb_dbms_table::querySucc(wb_dbms_query* query) { m_q_succ = query; }
 
-void wb_dbms_table::queryPred(wb_dbms_query* query)
-{
-  m_q_pred = query;
-}
+void wb_dbms_table::queryPred(wb_dbms_query* query) { m_q_pred = query; }
 
-void wb_dbms_table::queryIns(wb_dbms_query* query)
-{
-  m_q_ins = query;
-}
+void wb_dbms_table::queryIns(wb_dbms_query* query) { m_q_ins = query; }
 
-void wb_dbms_table::queryUpd(wb_dbms_query* query)
-{
-  m_q_upd = query;
-}
+void wb_dbms_table::queryUpd(wb_dbms_query* query) { m_q_upd = query; }
 
-void wb_dbms_table::queryDel(wb_dbms_query* query)
-{
-  m_q_del = query;
-}
+void wb_dbms_table::queryDel(wb_dbms_query* query) { m_q_del = query; }
 
-void wb_dbms_table::queryCursor(wb_dbms_query* query)
-{
-  m_q_cursor = query;
-}
+void wb_dbms_table::queryCursor(wb_dbms_query* query) { m_q_cursor = query; }
 
 int wb_dbms_table::get(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2502,16 +2191,11 @@ int wb_dbms_table::del(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return m_q_del->execute(txn, key, data);
 }
 
-wb_dbms_get_query::wb_dbms_get_query()
-{
-}
+wb_dbms_get_query::wb_dbms_get_query() {}
 
-wb_dbms_get_query::~wb_dbms_get_query()
-{
-}
+wb_dbms_get_query::~wb_dbms_get_query() {}
 
-int wb_dbms_get_query::execute(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_get_query::execute(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   int rc = 0;
   static const char* method = "execute";
@@ -2538,16 +2222,11 @@ int wb_dbms_get_query::execute(
   return 0;
 }
 
-wb_dbms_iter_query::wb_dbms_iter_query()
-{
-}
+wb_dbms_iter_query::wb_dbms_iter_query() {}
 
-wb_dbms_iter_query::~wb_dbms_iter_query()
-{
-}
+wb_dbms_iter_query::~wb_dbms_iter_query() {}
 
-int wb_dbms_iter_query::execute(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_iter_query::execute(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   int rc = 0;
   static const char* method = "execute";
@@ -2577,16 +2256,11 @@ int wb_dbms_iter_query::execute(
   return 0;
 }
 
-wb_dbms_ins_query::wb_dbms_ins_query()
-{
-}
+wb_dbms_ins_query::wb_dbms_ins_query() {}
 
-wb_dbms_ins_query::~wb_dbms_ins_query()
-{
-}
+wb_dbms_ins_query::~wb_dbms_ins_query() {}
 
-int wb_dbms_ins_query::execute(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_ins_query::execute(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   int rc = 0;
   static const char* method = "execute";
@@ -2603,16 +2277,11 @@ int wb_dbms_ins_query::execute(
   return 1;
 }
 
-wb_dbms_upd_query::wb_dbms_upd_query()
-{
-}
+wb_dbms_upd_query::wb_dbms_upd_query() {}
 
-wb_dbms_upd_query::~wb_dbms_upd_query()
-{
-}
+wb_dbms_upd_query::~wb_dbms_upd_query() {}
 
-int wb_dbms_upd_query::execute(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_upd_query::execute(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   int rc = 0;
   static const char* method = "execute";
@@ -2629,16 +2298,11 @@ int wb_dbms_upd_query::execute(
   return 1;
 }
 
-wb_dbms_del_query::wb_dbms_del_query()
-{
-}
+wb_dbms_del_query::wb_dbms_del_query() {}
 
-wb_dbms_del_query::~wb_dbms_del_query()
-{
-}
+wb_dbms_del_query::~wb_dbms_del_query() {}
 
-int wb_dbms_del_query::execute(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_del_query::execute(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   int rc = 0;
   static const char* method = "execute";
@@ -2655,16 +2319,11 @@ int wb_dbms_del_query::execute(
   return 1;
 }
 
-wb_dbms_cursor_query::wb_dbms_cursor_query()
-{
-}
+wb_dbms_cursor_query::wb_dbms_cursor_query() {}
 
-wb_dbms_cursor_query::~wb_dbms_cursor_query()
-{
-}
+wb_dbms_cursor_query::~wb_dbms_cursor_query() {}
 
-int wb_dbms_cursor_query::execute(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_cursor_query::execute(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   int rc = 0;
   static const char* method = "execute";
@@ -2678,14 +2337,9 @@ int wb_dbms_cursor_query::execute(
   return 0;
 }
 
-wb_dbms_get_info::wb_dbms_get_info(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_get_info::wb_dbms_get_info(wb_dbms* db) { m_db = db; }
 
-wb_dbms_get_info::~wb_dbms_get_info()
-{
-}
+wb_dbms_get_info::~wb_dbms_get_info() {}
 
 int wb_dbms_get_info::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2698,14 +2352,9 @@ int wb_dbms_get_info::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_ins_info::wb_dbms_ins_info(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_ins_info::wb_dbms_ins_info(wb_dbms* db) { m_db = db; }
 
-wb_dbms_ins_info::~wb_dbms_ins_info()
-{
-}
+wb_dbms_ins_info::~wb_dbms_ins_info() {}
 
 int wb_dbms_ins_info::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2718,14 +2367,9 @@ int wb_dbms_ins_info::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_upd_info::wb_dbms_upd_info(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_upd_info::wb_dbms_upd_info(wb_dbms* db) { m_db = db; }
 
-wb_dbms_upd_info::~wb_dbms_upd_info()
-{
-}
+wb_dbms_upd_info::~wb_dbms_upd_info() {}
 
 int wb_dbms_upd_info::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2738,14 +2382,9 @@ int wb_dbms_upd_info::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_del_info::wb_dbms_del_info(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_del_info::wb_dbms_del_info(wb_dbms* db) { m_db = db; }
 
-wb_dbms_del_info::~wb_dbms_del_info()
-{
-}
+wb_dbms_del_info::~wb_dbms_del_info() {}
 
 int wb_dbms_del_info::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2757,14 +2396,9 @@ int wb_dbms_del_info::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_get_ohead::wb_dbms_get_ohead(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_get_ohead::wb_dbms_get_ohead(wb_dbms* db) { m_db = db; }
 
-wb_dbms_get_ohead::~wb_dbms_get_ohead()
-{
-}
+wb_dbms_get_ohead::~wb_dbms_get_ohead() {}
 
 int wb_dbms_get_ohead::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2777,14 +2411,9 @@ int wb_dbms_get_ohead::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_ins_ohead::wb_dbms_ins_ohead(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_ins_ohead::wb_dbms_ins_ohead(wb_dbms* db) { m_db = db; }
 
-wb_dbms_ins_ohead::~wb_dbms_ins_ohead()
-{
-}
+wb_dbms_ins_ohead::~wb_dbms_ins_ohead() {}
 
 int wb_dbms_ins_ohead::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2797,14 +2426,9 @@ int wb_dbms_ins_ohead::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_upd_ohead::wb_dbms_upd_ohead(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_upd_ohead::wb_dbms_upd_ohead(wb_dbms* db) { m_db = db; }
 
-wb_dbms_upd_ohead::~wb_dbms_upd_ohead()
-{
-}
+wb_dbms_upd_ohead::~wb_dbms_upd_ohead() {}
 
 int wb_dbms_upd_ohead::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2817,14 +2441,9 @@ int wb_dbms_upd_ohead::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_del_ohead::wb_dbms_del_ohead(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_del_ohead::wb_dbms_del_ohead(wb_dbms* db) { m_db = db; }
 
-wb_dbms_del_ohead::~wb_dbms_del_ohead()
-{
-}
+wb_dbms_del_ohead::~wb_dbms_del_ohead() {}
 
 int wb_dbms_del_ohead::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2836,17 +2455,11 @@ int wb_dbms_del_ohead::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_cursor_ohead::wb_dbms_cursor_ohead(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_cursor_ohead::wb_dbms_cursor_ohead(wb_dbms* db) { m_db = db; }
 
-wb_dbms_cursor_ohead::~wb_dbms_cursor_ohead()
-{
-}
+wb_dbms_cursor_ohead::~wb_dbms_cursor_ohead() {}
 
-int wb_dbms_cursor_ohead::bind(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_cursor_ohead::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   prepare("select oid, head from ohead", 2, 0);
 
@@ -2857,14 +2470,9 @@ int wb_dbms_cursor_ohead::bind(
   return 0;
 }
 
-wb_dbms_get_dbody::wb_dbms_get_dbody(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_get_dbody::wb_dbms_get_dbody(wb_dbms* db) { m_db = db; }
 
-wb_dbms_get_dbody::~wb_dbms_get_dbody()
-{
-}
+wb_dbms_get_dbody::~wb_dbms_get_dbody() {}
 
 int wb_dbms_get_dbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2877,14 +2485,9 @@ int wb_dbms_get_dbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_ins_dbody::wb_dbms_ins_dbody(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_ins_dbody::wb_dbms_ins_dbody(wb_dbms* db) { m_db = db; }
 
-wb_dbms_ins_dbody::~wb_dbms_ins_dbody()
-{
-}
+wb_dbms_ins_dbody::~wb_dbms_ins_dbody() {}
 
 int wb_dbms_ins_dbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2897,14 +2500,9 @@ int wb_dbms_ins_dbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_upd_dbody::wb_dbms_upd_dbody(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_upd_dbody::wb_dbms_upd_dbody(wb_dbms* db) { m_db = db; }
 
-wb_dbms_upd_dbody::~wb_dbms_upd_dbody()
-{
-}
+wb_dbms_upd_dbody::~wb_dbms_upd_dbody() {}
 
 int wb_dbms_upd_dbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2917,14 +2515,9 @@ int wb_dbms_upd_dbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_del_dbody::wb_dbms_del_dbody(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_del_dbody::wb_dbms_del_dbody(wb_dbms* db) { m_db = db; }
 
-wb_dbms_del_dbody::~wb_dbms_del_dbody()
-{
-}
+wb_dbms_del_dbody::~wb_dbms_del_dbody() {}
 
 int wb_dbms_del_dbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2936,17 +2529,11 @@ int wb_dbms_del_dbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_cursor_dbody::wb_dbms_cursor_dbody(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_cursor_dbody::wb_dbms_cursor_dbody(wb_dbms* db) { m_db = db; }
 
-wb_dbms_cursor_dbody::~wb_dbms_cursor_dbody()
-{
-}
+wb_dbms_cursor_dbody::~wb_dbms_cursor_dbody() {}
 
-int wb_dbms_cursor_dbody::bind(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_cursor_dbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   prepare("select oid, body from dbody", 2, 0);
 
@@ -2957,14 +2544,9 @@ int wb_dbms_cursor_dbody::bind(
   return 0;
 }
 
-wb_dbms_get_rbody::wb_dbms_get_rbody(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_get_rbody::wb_dbms_get_rbody(wb_dbms* db) { m_db = db; }
 
-wb_dbms_get_rbody::~wb_dbms_get_rbody()
-{
-}
+wb_dbms_get_rbody::~wb_dbms_get_rbody() {}
 
 int wb_dbms_get_rbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2977,14 +2559,9 @@ int wb_dbms_get_rbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_ins_rbody::wb_dbms_ins_rbody(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_ins_rbody::wb_dbms_ins_rbody(wb_dbms* db) { m_db = db; }
 
-wb_dbms_ins_rbody::~wb_dbms_ins_rbody()
-{
-}
+wb_dbms_ins_rbody::~wb_dbms_ins_rbody() {}
 
 int wb_dbms_ins_rbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -2997,14 +2574,9 @@ int wb_dbms_ins_rbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_upd_rbody::wb_dbms_upd_rbody(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_upd_rbody::wb_dbms_upd_rbody(wb_dbms* db) { m_db = db; }
 
-wb_dbms_upd_rbody::~wb_dbms_upd_rbody()
-{
-}
+wb_dbms_upd_rbody::~wb_dbms_upd_rbody() {}
 
 int wb_dbms_upd_rbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -3017,14 +2589,9 @@ int wb_dbms_upd_rbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_del_rbody::wb_dbms_del_rbody(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_del_rbody::wb_dbms_del_rbody(wb_dbms* db) { m_db = db; }
 
-wb_dbms_del_rbody::~wb_dbms_del_rbody()
-{
-}
+wb_dbms_del_rbody::~wb_dbms_del_rbody() {}
 
 int wb_dbms_del_rbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -3036,17 +2603,11 @@ int wb_dbms_del_rbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_cursor_rbody::wb_dbms_cursor_rbody(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_cursor_rbody::wb_dbms_cursor_rbody(wb_dbms* db) { m_db = db; }
 
-wb_dbms_cursor_rbody::~wb_dbms_cursor_rbody()
-{
-}
+wb_dbms_cursor_rbody::~wb_dbms_cursor_rbody() {}
 
-int wb_dbms_cursor_rbody::bind(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_cursor_rbody::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   prepare("select oid, body from rbody", 2, 0);
 
@@ -3057,14 +2618,9 @@ int wb_dbms_cursor_rbody::bind(
   return 0;
 }
 
-wb_dbms_get_class::wb_dbms_get_class(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_get_class::wb_dbms_get_class(wb_dbms* db) { m_db = db; }
 
-wb_dbms_get_class::~wb_dbms_get_class()
-{
-}
+wb_dbms_get_class::~wb_dbms_get_class() {}
 
 int wb_dbms_get_class::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -3077,17 +2633,11 @@ int wb_dbms_get_class::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_succ_class::wb_dbms_succ_class(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_succ_class::wb_dbms_succ_class(wb_dbms* db) { m_db = db; }
 
-wb_dbms_succ_class::~wb_dbms_succ_class()
-{
-}
+wb_dbms_succ_class::~wb_dbms_succ_class() {}
 
-int wb_dbms_succ_class::bind(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_succ_class::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   prepare("select MIN(cidoix) from class where cidoix > ?", 1, 1);
 
@@ -3098,17 +2648,11 @@ int wb_dbms_succ_class::bind(
   return 0;
 }
 
-wb_dbms_pred_class::wb_dbms_pred_class(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_pred_class::wb_dbms_pred_class(wb_dbms* db) { m_db = db; }
 
-wb_dbms_pred_class::~wb_dbms_pred_class()
-{
-}
+wb_dbms_pred_class::~wb_dbms_pred_class() {}
 
-int wb_dbms_pred_class::bind(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_pred_class::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   prepare("select MAX(cidoix) from class where cidoix < ?", 1, 1);
 
@@ -3119,14 +2663,9 @@ int wb_dbms_pred_class::bind(
   return 0;
 }
 
-wb_dbms_ins_class::wb_dbms_ins_class(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_ins_class::wb_dbms_ins_class(wb_dbms* db) { m_db = db; }
 
-wb_dbms_ins_class::~wb_dbms_ins_class()
-{
-}
+wb_dbms_ins_class::~wb_dbms_ins_class() {}
 
 int wb_dbms_ins_class::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -3138,14 +2677,9 @@ int wb_dbms_ins_class::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_del_class::wb_dbms_del_class(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_del_class::wb_dbms_del_class(wb_dbms* db) { m_db = db; }
 
-wb_dbms_del_class::~wb_dbms_del_class()
-{
-}
+wb_dbms_del_class::~wb_dbms_del_class() {}
 
 int wb_dbms_del_class::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -3157,17 +2691,11 @@ int wb_dbms_del_class::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   return 0;
 }
 
-wb_dbms_cursor_class::wb_dbms_cursor_class(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_cursor_class::wb_dbms_cursor_class(wb_dbms* db) { m_db = db; }
 
-wb_dbms_cursor_class::~wb_dbms_cursor_class()
-{
-}
+wb_dbms_cursor_class::~wb_dbms_cursor_class() {}
 
-int wb_dbms_cursor_class::bind(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_cursor_class::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   prepare("select cidoix from class", 1, 0);
 
@@ -3177,14 +2705,9 @@ int wb_dbms_cursor_class::bind(
   return 0;
 }
 
-wb_dbms_get_name::wb_dbms_get_name(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_get_name::wb_dbms_get_name(wb_dbms* db) { m_db = db; }
 
-wb_dbms_get_name::~wb_dbms_get_name()
-{
-}
+wb_dbms_get_name::~wb_dbms_get_name() {}
 
 int wb_dbms_get_name::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -3194,21 +2717,15 @@ int wb_dbms_get_name::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 
   bindResult(0, MYSQL_TYPE_LONGLONG, (char*)data->data(), data->size());
   bindParam(0, MYSQL_TYPE_LONGLONG, (char*)&nk->poid, sizeof(nk->poid));
-  bindParam(
-      1, MYSQL_TYPE_TINY_BLOB, (char*)&nk->normname, sizeof(nk->normname));
+  bindParam(1, MYSQL_TYPE_TINY_BLOB, (char*)&nk->normname, sizeof(nk->normname));
   bindQuery();
 
   return 0;
 }
 
-wb_dbms_ins_name::wb_dbms_ins_name(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_ins_name::wb_dbms_ins_name(wb_dbms* db) { m_db = db; }
 
-wb_dbms_ins_name::~wb_dbms_ins_name()
-{
-}
+wb_dbms_ins_name::~wb_dbms_ins_name() {}
 
 int wb_dbms_ins_name::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -3217,22 +2734,16 @@ int wb_dbms_ins_name::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   dbms_sNameKey* nk = (dbms_sNameKey*)key->data();
 
   bindParam(0, MYSQL_TYPE_LONGLONG, (char*)&nk->poid, sizeof(nk->poid));
-  bindParam(
-      1, MYSQL_TYPE_TINY_BLOB, (char*)&nk->normname, sizeof(nk->normname));
+  bindParam(1, MYSQL_TYPE_TINY_BLOB, (char*)&nk->normname, sizeof(nk->normname));
   bindParam(2, MYSQL_TYPE_LONGLONG, (char*)data->data(), data->size());
   bindQuery();
 
   return 0;
 }
 
-wb_dbms_del_name::wb_dbms_del_name(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_del_name::wb_dbms_del_name(wb_dbms* db) { m_db = db; }
 
-wb_dbms_del_name::~wb_dbms_del_name()
-{
-}
+wb_dbms_del_name::~wb_dbms_del_name() {}
 
 int wb_dbms_del_name::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
@@ -3241,32 +2752,24 @@ int wb_dbms_del_name::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
   dbms_sNameKey* nk = (dbms_sNameKey*)key->data();
 
   bindParam(0, MYSQL_TYPE_LONGLONG, (char*)&nk->poid, sizeof(nk->poid));
-  bindParam(
-      1, MYSQL_TYPE_TINY_BLOB, (char*)&nk->normname, sizeof(nk->normname));
+  bindParam(1, MYSQL_TYPE_TINY_BLOB, (char*)&nk->normname, sizeof(nk->normname));
   bindQuery();
 
   return 0;
 }
 
-wb_dbms_cursor_name::wb_dbms_cursor_name(wb_dbms* db)
-{
-  m_db = db;
-}
+wb_dbms_cursor_name::wb_dbms_cursor_name(wb_dbms* db) { m_db = db; }
 
-wb_dbms_cursor_name::~wb_dbms_cursor_name()
-{
-}
+wb_dbms_cursor_name::~wb_dbms_cursor_name() {}
 
-int wb_dbms_cursor_name::bind(
-    wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
+int wb_dbms_cursor_name::bind(wb_dbms_txn* txn, wb_dbms_qe* key, wb_dbms_qe* data)
 {
   prepare("select poid, normname, oid from name", 3, 0);
 
   dbms_sNameKey* nk = (dbms_sNameKey*)key->data();
 
   bindResult(0, MYSQL_TYPE_LONGLONG, (char*)&nk->poid, sizeof(nk->poid));
-  bindResult(
-      1, MYSQL_TYPE_TINY_BLOB, (char*)&nk->normname, sizeof(nk->normname));
+  bindResult(1, MYSQL_TYPE_TINY_BLOB, (char*)&nk->normname, sizeof(nk->normname));
   bindResult(2, MYSQL_TYPE_LONGLONG, (char*)data->data(), data->size());
   bindQuery();
 

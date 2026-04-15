@@ -147,13 +147,12 @@
 #define DPS_DIAG_BIT_EXT_DIAG_OVERFLOW 0x04
 #define DPS_DIAG_BIT_WAIT_UNTIL_FETCHED 0x80
 
-#define DPS_DIAG_BIT_STATUS_MASK                                               \
-  (DPS_DIAG_BIT_EXT_DIAG | DPS_DIAG_BIT_STAT_DIAG |                            \
-   DPS_DIAG_BIT_EXT_DIAG_OVERFLOW)
+#define DPS_DIAG_BIT_STATUS_MASK                                                                             \
+  (DPS_DIAG_BIT_EXT_DIAG | DPS_DIAG_BIT_STAT_DIAG | DPS_DIAG_BIT_EXT_DIAG_OVERFLOW)
 
-#define DPS_DIAG_BIT_MASK                                                      \
-  (DPS_DIAG_BIT_EXT_DIAG | DPS_DIAG_BIT_STAT_DIAG |                            \
-   DPS_DIAG_BIT_EXT_DIAG_OVERFLOW | DPS_DIAG_BIT_WAIT_UNTIL_FETCHED)
+#define DPS_DIAG_BIT_MASK                                                                                    \
+  (DPS_DIAG_BIT_EXT_DIAG | DPS_DIAG_BIT_STAT_DIAG | DPS_DIAG_BIT_EXT_DIAG_OVERFLOW |                         \
+   DPS_DIAG_BIT_WAIT_UNTIL_FETCHED)
 
 /*--- DPS SPC3 SPECIAL USR_PRM_BYTE ----------------------------------------*/
 
@@ -161,9 +160,8 @@
 #define DPS_SPC3_USR_PRM_DISABLE_STOPBIT 0x02
 #define DPS_SPC3_USR_PRM_WD_BASE_1MS 0x04
 
-#define DPS_SPC3_USR_PRM_MASK                                                  \
-  (DPS_SPC3_USR_PRM_DISABLE_STARTBIT | DPS_SPC3_USR_PRM_DISABLE_STOPBIT |      \
-   DPS_SPC3_USR_PRM_WD_BASE_1MS)
+#define DPS_SPC3_USR_PRM_MASK                                                                                \
+  (DPS_SPC3_USR_PRM_DISABLE_STARTBIT | DPS_SPC3_USR_PRM_DISABLE_STOPBIT | DPS_SPC3_USR_PRM_WD_BASE_1MS)
 
 /*--- DPS INPUT / OUTPUT STATUS --------------------------------------------*/
 
@@ -220,7 +218,7 @@ typedef struct _T_DPS_CON_IND
 typedef struct _T_DPS_INIT_SLAVE_REQ
 {
   USIGN8
-      slave_add; /* 0..125, DPS_DEFAULT_SLAVE_ADD, DPS_NON_VOLATILE_SLAVE_ADD */
+  slave_add;       /* 0..125, DPS_DEFAULT_SLAVE_ADD, DPS_NON_VOLATILE_SLAVE_ADD */
   USIGN8 min_tsdr; /* min. station delay responder, default 0, 11..255 */
 
   PB_BOOL auto_cfg_response;   /* CFG check by DPS_USR ? PB_FALSE : PB_TRUE */
@@ -244,7 +242,7 @@ typedef struct _T_DPS_INIT_SLAVE_REQ
 
   USIGN8 reserved[4]; /* reserved for extensions, set to 0 */
 
-  USIGN8 cfg_data_len; /* length of cfg_data, 1..DP_MAX_CFG_DATA_LEN */
+  USIGN8 cfg_data_len;           /* length of cfg_data, 1..DP_MAX_CFG_DATA_LEN */
   USIGN8 enhanced_init_data_len; /* reserved for extensions, set to 0 */
 
   USIGN8 cfg_data[DP_MAX_CFG_DATA_LEN]; /* initial CFG data */
@@ -316,7 +314,7 @@ typedef struct _T_DPS_SLAVE_DIAG_REQ
 {
   USIGN8 diag_state; /* diagnostic state of DP slave, DPS_DIAG_BIT_xxx */
 
-  USIGN8 ext_diag_data_len; /* 0..DP_MAX_EXT_DIAG_DATA_LEN */
+  USIGN8 ext_diag_data_len;                       /* 0..DP_MAX_EXT_DIAG_DATA_LEN */
   USIGN8 ext_diag_data[DP_MAX_EXT_DIAG_DATA_LEN]; /* ext_diag_data_len */
 
 } T_DPS_SLAVE_DIAG_REQ;

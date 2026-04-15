@@ -40,61 +40,32 @@
 #include "co_procom.h"
 #include "remote_pvd_udp.h"
 
-class remote_pvd_pwrcli : public co_provider {
+class remote_pvd_pwrcli : public co_provider
+{
 public:
-  remote_pvd_pwrcli(pvd_eEnv env = pvd_eEnv_Rt) : co_provider(env)
-  {
-  }
-  virtual void object(co_procom* pcom)
-  {
-  }
+  remote_pvd_pwrcli(pvd_eEnv env = pvd_eEnv_Rt) : co_provider(env) {}
+  virtual void object(co_procom* pcom) {}
   virtual void objectOid(co_procom* pcom, pwr_tOix oix);
   virtual void objectName(co_procom* pcom, char* name, pwr_tOix poix);
-  virtual void objectBody(co_procom* pcom, pwr_tOix oix)
-  {
-  }
-  virtual void createObject(
-      co_procom* pcom, pwr_tOix destoix, int desttype, pwr_tCid cid, char* name)
-  {
-  }
-  virtual void moveObject(
-      co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, int desttype)
-  {
-  }
-  virtual void copyObject(
-      co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, int desttype, char* name)
-  {
-  }
-  virtual void deleteObject(co_procom* pcom, pwr_tOix oix)
-  {
-  }
-  virtual void deleteFamily(co_procom* pcom, pwr_tOix oix)
-  {
-  }
-  virtual void renameObject(co_procom* pcom, pwr_tOix oix, char* name)
-  {
-  }
-  virtual void writeAttribute(co_procom* pcom, pwr_tOix oix,
-      unsigned int offset, unsigned int size, char* buffer);
-  virtual void readAttribute(
-      co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size);
-  virtual void subAssociateBuffer(co_procom* pcom, void** buff, int oix,
-      int offset, int size, pwr_tSubid sid);
+  virtual void objectBody(co_procom* pcom, pwr_tOix oix) {}
+  virtual void createObject(co_procom* pcom, pwr_tOix destoix, int desttype, pwr_tCid cid, char* name) {}
+  virtual void moveObject(co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, int desttype) {}
+  virtual void copyObject(co_procom* pcom, pwr_tOix oix, pwr_tOix destoix, int desttype, char* name) {}
+  virtual void deleteObject(co_procom* pcom, pwr_tOix oix) {}
+  virtual void deleteFamily(co_procom* pcom, pwr_tOix oix) {}
+  virtual void renameObject(co_procom* pcom, pwr_tOix oix, char* name) {}
+  virtual void writeAttribute(co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size,
+                              char* buffer);
+  virtual void readAttribute(co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size);
+  virtual void subAssociateBuffer(co_procom* pcom, void** buff, int oix, int offset, int size,
+                                  pwr_tSubid sid);
   virtual void subDisassociateBuffer(co_procom* pcom, pwr_tSubid sid);
-  virtual void commit(co_procom* pcom)
-  {
-  }
-  virtual void abort(co_procom* pcom)
-  {
-  }
+  virtual void commit(co_procom* pcom) {}
+  virtual void abort(co_procom* pcom) {}
 
-  virtual void save(pwr_tStatus* sts)
-  {
-  }
+  virtual void save(pwr_tStatus* sts) {}
 
-  virtual void load(pwr_tStatus* rsts)
-  {
-  }
+  virtual void load(pwr_tStatus* rsts) {}
 
   virtual void cyclic(co_procom* pcom);
 

@@ -42,8 +42,7 @@
 
 #include "rt_cvol.h"
 
-gdb_sMountedOn* cvolsm_AddMountedOn(
-    pwr_tStatus* sts, pwr_tVolumeId vid, gdb_sNode* np);
+gdb_sMountedOn* cvolsm_AddMountedOn(pwr_tStatus* sts, pwr_tVolumeId vid, gdb_sNode* np);
 
 void cvolsm_FlushNode(pwr_tStatus* sts, gdb_sNode* np);
 

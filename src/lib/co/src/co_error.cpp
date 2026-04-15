@@ -36,31 +36,16 @@
 
 #include "co_error.h"
 
-co_error::co_error()
-{
-}
-co_error::co_error(pwr_tStatus sts) : co_status(sts)
-{
-}
+co_error::co_error() {}
+co_error::co_error(pwr_tStatus sts) : co_status(sts) {}
 
-std::string co_error::what() const
-{
-  return co_status::what();
-}
+std::string co_error::what() const { return co_status::what(); }
 
-co_error_str::co_error_str(std::string str) : m_error_str(str)
-{
-}
+co_error_str::co_error_str(std::string str) : m_error_str(str) {}
 
-co_error_str::co_error_str(std::string str, int line_cnt)
-{
-  m_error_str = str + std::to_string(line_cnt);
-}
+co_error_str::co_error_str(std::string str, int line_cnt) { m_error_str = str + std::to_string(line_cnt); }
 
-co_error_str::co_error_str(pwr_tStatus sts, std::string str)
-    : co_error(sts), m_error_str(str)
-{
-}
+co_error_str::co_error_str(pwr_tStatus sts, std::string str) : co_error(sts), m_error_str(str) {}
 
 std::string co_error_str::what() const
 {

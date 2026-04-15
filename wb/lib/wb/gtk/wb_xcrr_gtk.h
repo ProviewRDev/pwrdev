@@ -44,11 +44,11 @@
 #include "wb_ldh.h"
 #include "wb_xcrr.h"
 
-class WCrrGtk : public WCrr {
+class WCrrGtk : public WCrr
+{
 public:
-  WCrrGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
-      ldh_tSesContext xa_ldhses, pwr_sAttrRef* xa_objar, int xa_advanced_user,
-      int* xa_sts);
+  WCrrGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx, ldh_tSesContext xa_ldhses, pwr_sAttrRef* xa_objar,
+          int xa_advanced_user, int* xa_sts);
   ~WCrrGtk();
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
@@ -64,8 +64,7 @@ public:
   static void activate_print(GtkWidget* w, gpointer data);
   static void activate_openplc(GtkWidget* w, gpointer data);
   static void activate_help(GtkWidget* w, gpointer data);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
 };
 
 #endif

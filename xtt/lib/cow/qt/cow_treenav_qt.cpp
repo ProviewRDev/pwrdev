@@ -41,16 +41,14 @@
 
 #include "flow_browwidget_qt.h"
 
-TreeNavQt::TreeNavQt(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist,
-    int xn_item_cnt, unsigned int xn_options, pwr_tStatus (*xn_get_object_info)(
-        void*, pwr_tAttrRef*, char*, int, char*, char*, int),
-    pwr_tStatus (*xn_get_node_info)(void*, char*, char*, int), QWidget** w,
-    pwr_tStatus* status)
-    : TreeNav(xn_parent_ctx, xn_itemlist, xn_item_cnt, xn_options,
-          xn_get_object_info, xn_get_node_info, status)
+TreeNavQt::TreeNavQt(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist, int xn_item_cnt, unsigned int xn_options,
+                     pwr_tStatus (*xn_get_object_info)(void*, pwr_tAttrRef*, char*, int, char*, char*, int),
+                     pwr_tStatus (*xn_get_node_info)(void*, char*, char*, int), QWidget** w,
+                     pwr_tStatus* status)
+    : TreeNav(xn_parent_ctx, xn_itemlist, xn_item_cnt, xn_options, xn_get_object_info, xn_get_node_info,
+              status)
 {
-  form_widget
-      = scrolledbrowwidgetqt_new(TreeNav::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetqt_new(TreeNav::init_brow_cb, this, &brow_widget);
 
   // Create the root item
   *w = form_widget;
@@ -64,7 +62,4 @@ TreeNavQt::~TreeNavQt()
   form_widget->close();
 }
 
-void TreeNavQt::set_inputfocus()
-{
-  brow_widget->setFocus();
-}
+void TreeNavQt::set_inputfocus() { brow_widget->setFocus(); }

@@ -50,7 +50,8 @@
 
 class GrowCtx;
 
-class GlowCustomColors {
+class GlowCustomColors
+{
 public:
   //! Constructor
   GlowCustomColors() : colortheme_lightness(0), is_default_colortheme(0)
@@ -67,14 +68,8 @@ public:
   void reset_colors();
   int write_colorfile(char* name);
   int read_colorfile(GrowCtx* ctx, char* name);
-  void set_colortheme_lightness(int lightness)
-  {
-    colortheme_lightness = lightness;
-  }
-  void set_colortheme_is_default(int isdefault)
-  {
-    is_default_colortheme = isdefault;
-  }
+  void set_colortheme_lightness(int lightness) { colortheme_lightness = lightness; }
+  void set_colortheme_is_default(int isdefault) { is_default_colortheme = isdefault; }
   int is_empty();
   static int get_colortheme_colors(char* file, double** colorvect, int* size);
 

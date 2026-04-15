@@ -43,19 +43,14 @@
 
 class CoWow;
 
-class Block {
+class Block
+{
 public:
-  Block(void* b_parent_ctx, pwr_sAttrRef* b_oar, char* name, unsigned int priv,
-      pwr_tStatus* status);
+  Block(void* b_parent_ctx, pwr_sAttrRef* b_oar, char* name, unsigned int priv, pwr_tStatus* status);
   virtual ~Block();
 
-  virtual int execute()
-  {
-    return 0;
-  }
-  virtual void update()
-  {
-  }
+  virtual int execute() { return 0; }
+  virtual void update() {}
 
   void* parent_ctx;
   pwr_sAttrRef oar;

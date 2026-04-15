@@ -50,10 +50,7 @@ void CoXHelp::open_URL(void* ctx, char* url)
     (xhelp->open_URL_cb)(xhelp->parent_ctx, url);
 }
 
-void CoXHelp::find_ok(CoXHelp* xhelp, char* search_str)
-{
-  xhelp->xhelpnav->search(search_str, false);
-}
+void CoXHelp::find_ok(CoXHelp* xhelp, char* search_str) { xhelp->xhelpnav->search(search_str, false); }
 
 void CoXHelp::pop()
 {
@@ -67,37 +64,25 @@ void CoXHelp::clear()
   xhelpnav->clear();
 }
 
-int CoXHelp::help(const char* key, const char* help_bookmark,
-    navh_eHelpFile file_type, const char* file_name, bool strict)
+int CoXHelp::help(const char* key, const char* help_bookmark, navh_eHelpFile file_type, const char* file_name,
+                  bool strict)
 {
   return xhelpnav->help(key, help_bookmark, file_type, file_name, 0, strict);
 }
 
-int CoXHelp::home()
-{
-  return xhelpnav->home();
-}
+int CoXHelp::home() { return xhelpnav->home(); }
 
-int CoXHelp::back()
-{
-  return xhelpnav->back();
-}
+int CoXHelp::back() { return xhelpnav->back(); }
 
-int CoXHelp::next_topic()
-{
-  return xhelpnav->next_topic();
-}
+int CoXHelp::next_topic() { return xhelpnav->next_topic(); }
 
-int CoXHelp::previous_topic()
-{
-  return xhelpnav->previous_topic();
-}
+int CoXHelp::previous_topic() { return xhelpnav->previous_topic(); }
 
 //
 //  Static function to call help for the default xhelp
 //
-int CoXHelp::dhelp(const char* key, const char* help_bookmark,
-    navh_eHelpFile file_type, const char* file_name, bool strict)
+int CoXHelp::dhelp(const char* key, const char* help_bookmark, navh_eHelpFile file_type,
+                   const char* file_name, bool strict)
 {
   if (!default_xhelp)
     return 0;
@@ -122,13 +107,11 @@ int CoXHelp::dhelp_index(navh_eHelpFile file_type, const char* file_name)
   return default_xhelp->help_index(file_type, file_name);
 }
 
-CoXHelp::~CoXHelp()
-{
-}
+CoXHelp::~CoXHelp() {}
 
 CoXHelp::CoXHelp(void* xa_parent_ctx, xhelp_eUtility utility, int* xa_sts)
-    : parent_ctx(xa_parent_ctx), client_data(0), close_cb(0), open_URL_cb(0),
-      set_focus_disabled(0), displayed(0)
+    : parent_ctx(xa_parent_ctx), client_data(0), close_cb(0), open_URL_cb(0), set_focus_disabled(0),
+      displayed(0)
 {
   *xa_sts = 1;
 }

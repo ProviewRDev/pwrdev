@@ -41,11 +41,11 @@
 
 #include "wb_nav.h"
 
-class NavGtk : public Nav {
+class NavGtk : public Nav
+{
 public:
-  NavGtk(void* parent_ctx, GtkWidget* parent_wid, const char* name,
-      ldh_tSesContext ldhses, const char* root_name, GtkWidget** w,
-      pwr_tStatus* status);
+  NavGtk(void* parent_ctx, GtkWidget* parent_wid, const char* name, ldh_tSesContext ldhses,
+         const char* root_name, GtkWidget** w, pwr_tStatus* status);
   ~NavGtk();
 
   GtkWidget* parent_wid;

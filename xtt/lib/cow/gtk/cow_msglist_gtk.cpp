@@ -36,7 +36,8 @@
 
 /* co_msglist_gtk.cpp -- Message list */
 
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 #include "co_time.h"
 }
@@ -45,12 +46,10 @@ extern "C" {
 
 #include "flow_browwidget_gtk.h"
 
-MsgListGtk::MsgListGtk(
-    void* ev_parent_ctx, GtkWidget* ev_parent_wid, GtkWidget** w)
+MsgListGtk::MsgListGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, GtkWidget** w)
     : MsgList(ev_parent_ctx), parent_wid(ev_parent_wid)
 {
-  form_widget
-      = scrolledbrowwidgetgtk_new(MsgList::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetgtk_new(MsgList::init_brow_cb, this, &brow_widget);
 
   gtk_widget_show_all(brow_widget);
 
@@ -67,7 +66,4 @@ MsgListGtk::~MsgListGtk()
   gtk_widget_destroy(form_widget);
 }
 
-void MsgListGtk::set_input_focus()
-{
-  gtk_widget_grab_focus(brow_widget);
-}
+void MsgListGtk::set_input_focus() { gtk_widget_grab_focus(brow_widget); }

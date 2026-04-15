@@ -42,7 +42,8 @@
 #if defined PWRE_CONF_LIBDB
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #include "rt_elog.h"
 }
 #endif
@@ -58,10 +59,10 @@ extern "C" {
 class CoWow;
 class XttMethodToolbar;
 
-class Hist {
+class Hist
+{
 public:
-  Hist(void* hist_parent_ctx, char* hist_name, pwr_tAttrRef* arp,
-      pwr_tStatus* status);
+  Hist(void* hist_parent_ctx, char* hist_name, pwr_tAttrRef* arp, pwr_tStatus* status);
   virtual ~Hist();
 
   void* parent_ctx;
@@ -74,8 +75,7 @@ public:
   void (*display_in_xnav_cb)(void*, pwr_sAttrRef*);
   void (*update_info_cb)(void*);
   void (*help_cb)(void*, const char*);
-  void (*popup_menu_cb)(
-      void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  void (*popup_menu_cb)(void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
   EvList* hist;
 
   int hist_size;
@@ -120,20 +120,10 @@ public:
   XttMethodToolbar* methodtoolbar;
   XttMethodToolbar* sup_methodtoolbar;
 
-  virtual void set_num_of_events(int nrOfEvents)
-  {
-  }
-  virtual void set_search_string(
-      const char* s1, const char* s2, const char* s3, const char* s4)
-  {
-  }
-  virtual void SetListTime(
-      pwr_tTime StartTime, pwr_tTime StopTime, int Sensitive)
-  {
-  }
-  virtual void insert_eventname(const char* name)
-  {
-  }
+  virtual void set_num_of_events(int nrOfEvents) {}
+  virtual void set_search_string(const char* s1, const char* s2, const char* s3, const char* s4) {}
+  virtual void SetListTime(pwr_tTime StartTime, pwr_tTime StopTime, int Sensitive) {}
+  virtual void insert_eventname(const char* name) {}
 
   void activate_print();
   void activate_export();
@@ -142,33 +132,29 @@ public:
   void activate_helpevent();
   void time_cb(time_ePeriod period);
   void stat();
-  int export_events(const char *filename);
+  int export_events(const char* filename);
 
-  static int GoBackMonth(
-      pwr_tTime TimeIn, pwr_tTime* FromTime, pwr_tTime* ToTime);
-  static int GoBackWeek(
-      pwr_tTime TimeIn, pwr_tTime* FromTime, pwr_tTime* ToTime);
-  static void SetListTime(
-      Hist* histOP, pwr_tTime StartTime, pwr_tTime StopTime, int Sensitive);
-  static pwr_tStatus AdjustForDayBreak(
-      Hist* histOP, pwr_tTime* Time, pwr_tTime* NewTime);
+  static int GoBackMonth(pwr_tTime TimeIn, pwr_tTime* FromTime, pwr_tTime* ToTime);
+  static int GoBackWeek(pwr_tTime TimeIn, pwr_tTime* FromTime, pwr_tTime* ToTime);
+  static void SetListTime(Hist* histOP, pwr_tTime StartTime, pwr_tTime StopTime, int Sensitive);
+  static pwr_tStatus AdjustForDayBreak(Hist* histOP, pwr_tTime* Time, pwr_tTime* NewTime);
 
   static void hist_display_in_xnav_cb(void* ctx, pwr_sAttrRef* arp);
   static void hist_start_trace_cb(void* ctx, pwr_tObjid objid, char* name);
-  static void hist_popup_menu_cb(void* ctx, pwr_sAttrRef attrref,
-      unsigned long item_type, unsigned long utility, char* arg, int x, int y);
+  static void hist_popup_menu_cb(void* ctx, pwr_sAttrRef attrref, unsigned long item_type,
+                                 unsigned long utility, char* arg, int x, int y);
   static void help_event_cb(void* ctx, void* item);
   static void selection_changed_cb(void* ctx);
   static void hist_init_cb(void* ctx);
-  static void export_file_selected_cb(void *ctx, char *filename, wow_eFileSelType file_type);
+  static void export_file_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type);
 };
 
 #else
 // Dummy for other platforms then OS_LINUX
-class Hist {
+class Hist
+{
 public:
-  Hist(void* hist_parent_ctx, char* hist_name, pwr_tAttrRef* arp,
-      pwr_tStatus* status)
+  Hist(void* hist_parent_ctx, char* hist_name, pwr_tAttrRef* arp, pwr_tStatus* status)
       : parent_ctx(hist_parent_ctx)
   {
   }
@@ -178,8 +164,7 @@ public:
   void (*display_in_xnav_cb)(void*, pwr_sAttrRef*);
   void (*update_info_cb)(void*);
   void (*help_cb)(void*, const char*);
-  void (*popup_menu_cb)(
-      void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  void (*popup_menu_cb)(void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
 };
 
 #endif

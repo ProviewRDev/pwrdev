@@ -42,10 +42,11 @@
 #include "cow_logw.h"
 #include "cow_wow_gtk.h"
 
-class CoLogWGtk : public CoLogW {
+class CoLogWGtk : public CoLogW
+{
 public:
-  CoLogWGtk(void* msg_parent_ctx, GtkWidget* msg_parent_wid,
-      const char* msg_name, int l_show_item, pwr_tStatus* status);
+  CoLogWGtk(void* msg_parent_ctx, GtkWidget* msg_parent_wid, const char* msg_name, int l_show_item,
+            pwr_tStatus* status);
   ~CoLogWGtk();
 
   GtkWidget* parent_wid;
@@ -57,8 +58,7 @@ public:
 
   void print();
 
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_print(GtkWidget* w, gpointer data);
   static void activate_zoom_in(GtkWidget* w, gpointer data);

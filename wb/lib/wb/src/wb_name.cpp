@@ -40,17 +40,21 @@ const char* wb_name::m_emptyString = "";
 
 wb_name::wb_name(const char* name)
 {
-  if (name == 0) {
+  if (name == 0)
+  {
     m_sts = LDH__NONAME;
     m_nrep = 0;
     return;
   }
 
-  try {
+  try
+  {
     m_nrep = new wb_nrep(name);
     m_sts = LDH__SUCCESS;
     m_nrep->ref();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     m_sts = e.sts();
     m_nrep = 0;
   }
@@ -95,10 +99,7 @@ wb_name& wb_name::operator=(const wb_name& n)
   return *this;
 }
 
-wb_name::operator bool() const
-{
-  return oddSts();
-}
+wb_name::operator bool() const { return oddSts(); }
 
 #if 0
 #pragma GCC diagnostic push
@@ -334,15 +335,9 @@ void wb_name::setShadowed(bool shadowed)
   m_nrep->setShadowed(shadowed);
 }
 
-char* wb_name::unatName(const char* name)
-{
-  return wb_nrep::unatName(name);
-}
+char* wb_name::unatName(const char* name) { return wb_nrep::unatName(name); }
 
-bool wb_name::checkObjectName(const char* name)
-{
-  return wb_nrep::checkObjectName(name);
-}
+bool wb_name::checkObjectName(const char* name) { return wb_nrep::checkObjectName(name); }
 
 void wb_name::check() const
 {

@@ -47,7 +47,8 @@
 
 class WPkgQtWidget;
 
-class WPkgQt : public WPkg {
+class WPkgQt : public WPkg
+{
 public:
   WPkgQt(void* wa_parent_ctx);
   ~WPkgQt();
@@ -67,7 +68,8 @@ private:
   WPkgQtWidget* toplevel;
 };
 
-class WPkgQtWidget : public QWidget {
+class WPkgQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

@@ -59,7 +59,8 @@
 // WGre is the graphics editor used inside FOE. It owns the flow canvas state,
 // keeps track of selections and redraws, and maps between the plc/vldh model
 // and the graphical representation shown in the editor.
-class WGre {
+class WGre
+{
 public:
   void* parent_ctx;
   flow_tCtx flow_ctx;
@@ -128,8 +129,8 @@ public:
   void (*gre_setup_window)(WGre*);
   void (*gre_node_created)(WGre*, unsigned long, float, float);
   void (*gre_node_floating_created)(WGre*, vldh_t_node);
-  void (*gre_con_created)(WGre*, double, double, vldh_t_node, unsigned long,
-      vldh_t_node, unsigned long, int, int*);
+  void (*gre_con_created)(WGre*, double, double, vldh_t_node, unsigned long, vldh_t_node, unsigned long, int,
+                          int*);
   void (*gre_node_moved)(WGre*);
   void (*gre_delete)(WGre*, void*, unsigned long);
   void (*gre_cut)(WGre*, void*, unsigned long);
@@ -149,15 +150,9 @@ public:
   WGre(void* parent_ctx, const char* name);
   virtual ~WGre();
 
-  virtual void trace_start()
-  {
-  }
-  virtual void trace_stop()
-  {
-  }
-  virtual void get_popup_position(int* x, int* y)
-  {
-  }
+  virtual void trace_start() {}
+  virtual void trace_stop() {}
+  virtual void get_popup_position(int* x, int* y) {}
 
   int node_sethighlight(vldh_t_node node, unsigned long highlight_flag);
   int node_gethighlight(vldh_t_node node, unsigned long* highlight_flag);
@@ -183,48 +178,39 @@ public:
   int window_draw();
   int get_selnodes(unsigned long* node_count, vldh_t_node** nodelist);
   int get_selcons(unsigned long* con_count, vldh_t_con** conlist);
-  int get_nodeclass(pwr_tClassId cid, ldh_tSesContext ldhses,
-      unsigned long node_type, unsigned int* mask, unsigned long subwindowmark,
-      unsigned long node_width, flow_tNodeClass* node_class, vldh_t_node node);
+  int get_nodeclass(pwr_tClassId cid, ldh_tSesContext ldhses, unsigned long node_type, unsigned int* mask,
+                    unsigned long subwindowmark, unsigned long node_width, flow_tNodeClass* node_class,
+                    vldh_t_node node);
   int init();
   int edit_setup();
   int view_setup();
   int setup_backcalls(void (*setup_window_bc)(WGre*),
-      void (*node_created_bc)(WGre*, unsigned long, float, float),
-      void (*node_floating_created_bc)(WGre*, vldh_t_node),
-      void (*con_created_bc)(WGre*, double, double, vldh_t_node, unsigned long,
-          vldh_t_node, unsigned long, int, int*),
-      void (*node_moved_bc)(WGre*),
-      void (*delete_bc)(WGre*, void*, unsigned long),
-      void (*cut_bc)(WGre*, void*, unsigned long),
-      void (*copy_bc)(WGre*, void*, unsigned long),
-      void (*paste_bc)(WGre*, float, float),
-      void (*attribute_bc)(WGre*, vldh_t_node),
-      void (*subwindow_bc)(WGre*, vldh_t_node, unsigned long),
-      void (*reserv_bc)(),
-      void (*popupmenu_bc)(WGre*, int, int, int, vldh_t_node, int),
-      void (*getobj_bc)(WGre*, vldh_t_node, unsigned long),
-      void (*undelete_bc)(WGre*), void (*unselect_bc)(WGre*),
-      void (*help_bc)(WGre*, char*), void (*regionmoved_bc)(WGre*),
-      void (*message_bc)(WGre*, const char*));
+                      void (*node_created_bc)(WGre*, unsigned long, float, float),
+                      void (*node_floating_created_bc)(WGre*, vldh_t_node),
+                      void (*con_created_bc)(WGre*, double, double, vldh_t_node, unsigned long, vldh_t_node,
+                                             unsigned long, int, int*),
+                      void (*node_moved_bc)(WGre*), void (*delete_bc)(WGre*, void*, unsigned long),
+                      void (*cut_bc)(WGre*, void*, unsigned long),
+                      void (*copy_bc)(WGre*, void*, unsigned long), void (*paste_bc)(WGre*, float, float),
+                      void (*attribute_bc)(WGre*, vldh_t_node),
+                      void (*subwindow_bc)(WGre*, vldh_t_node, unsigned long), void (*reserv_bc)(),
+                      void (*popupmenu_bc)(WGre*, int, int, int, vldh_t_node, int),
+                      void (*getobj_bc)(WGre*, vldh_t_node, unsigned long), void (*undelete_bc)(WGre*),
+                      void (*unselect_bc)(WGre*), void (*help_bc)(WGre*, char*),
+                      void (*regionmoved_bc)(WGre*), void (*message_bc)(WGre*, const char*));
   int create_node(pwr_tClassId cid, float x, float y, vldh_t_node* node);
-  int create_node_floating(
-      pwr_tClassId cid, float x, float y, vldh_t_node* node);
-  int create_con(pwr_tClassId cid, vldh_t_node source_obj,
-      unsigned long source_point, vldh_t_node destination_obj,
-      unsigned long destination_point, unsigned long drawtype);
+  int create_node_floating(pwr_tClassId cid, float x, float y, vldh_t_node* node);
+  int create_con(pwr_tClassId cid, vldh_t_node source_obj, unsigned long source_point,
+                 vldh_t_node destination_obj, unsigned long destination_point, unsigned long drawtype);
   int print_docobj(vldh_t_node doc_obj);
-  int measure_object(
-      vldh_t_node node, float* ll_x, float* ll_y, float* width, float* height);
-  int print_rectangle(
-      float ll_x, float ll_y, float ur_x, float ur_y, char* file_id);
-  int print_pdf_rectangle(
-      float ll_x, float ll_y, float ur_x, float ur_y, char* file_id);
+  int measure_object(vldh_t_node node, float* ll_x, float* ll_y, float* width, float* height);
+  int print_rectangle(float ll_x, float ll_y, float ur_x, float ur_y, char* file_id);
+  int print_pdf_rectangle(float ll_x, float ll_y, float ur_x, float ur_y, char* file_id);
   void paste(float cursor_x, float cursor_y, int paste_type);
   int subwindow_mark(vldh_t_node object);
   pwr_tStatus node_update_points(vldh_t_node node, unsigned long old_input_mask,
-      unsigned long old_output_mask, unsigned long new_input_mask,
-      unsigned long new_output_mask, int* point_array, int* point_count);
+                                 unsigned long old_output_mask, unsigned long new_input_mask,
+                                 unsigned long new_output_mask, int* point_array, int* point_count);
   int node_update(vldh_t_node object);
   int node_update_floating(vldh_t_node object);
   void zoom(float zoom);
@@ -242,8 +228,8 @@ public:
   int save(char* filename);
   void set_grid_size(double size);
   void disable_button_events();
-  int get_conclass(pwr_tClassId cid, ldh_tSesContext ldhses,
-      unsigned long con_type, flow_tConClass* con_class);
+  int get_conclass(pwr_tClassId cid, ldh_tSesContext ldhses, unsigned long con_type,
+                   flow_tConClass* con_class);
   void pixel_to_position(int pix_x, int pix_y, double* x, double* y);
 
   void select_node(vldh_t_node node);
@@ -251,25 +237,19 @@ public:
   void select_next_conpoint(flow_eDirection dir);
   void move_object(flow_eDirection dir);
   void pending_paste_stop();
-  int get_conpoint_select(
-      unsigned long* node_count, vldh_t_node** nodelist, int** numlist);
-  int get_conpoint(
-      vldh_t_node node, int num, double* x, double* y, flow_eDirection* dir);
-  void conpoint_lock(int lock)
-  {
-    conpoint_locked = lock;
-  }
+  int get_conpoint_select(unsigned long* node_count, vldh_t_node** nodelist, int** numlist);
+  int get_conpoint(vldh_t_node node, int num, double* x, double* y, flow_eDirection* dir);
+  void conpoint_lock(int lock) { conpoint_locked = lock; }
   void scroll(flow_eDirection dir);
   void set_node_visible(vldh_t_node node);
 
-  static int get_annot_width(flow_tNodeClass nodeclass, float* annot_width,
-      char* annot_str, int annot_count, int annot_size);
-  static int get_annotations(vldh_t_node node, char* annot_str, int* annot_nr,
-      int* annot_count, int annot_max, int annot_size);
+  static int get_annot_width(flow_tNodeClass nodeclass, float* annot_width, char* annot_str, int annot_count,
+                             int annot_size);
+  static int get_annotations(vldh_t_node node, char* annot_str, int* annot_nr, int* annot_count,
+                             int annot_max, int annot_size);
   static int modif_annot(vldh_t_node node, int annotation, char* str);
   static int node_annotations_draw(vldh_t_node node, int paste);
-  static int node_annot_message(
-      vldh_t_node node, char* message, int msg_size, int annot_max_size);
+  static int node_annot_message(vldh_t_node node, char* message, int msg_size, int annot_max_size);
   static int flow_cb(FlowCtx* ctx, flow_tEvent event);
   static int init_flow(FlowCtx* ctx, void* client_data);
 };

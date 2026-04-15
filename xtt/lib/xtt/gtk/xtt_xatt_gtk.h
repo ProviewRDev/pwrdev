@@ -43,10 +43,11 @@
 
 #include "cow_wow_gtk.h"
 
-class XAttGtk : public XAtt {
+class XAttGtk : public XAtt
+{
 public:
-  XAttGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx, pwr_sAttrRef* xa_objar,
-      int xa_advanced_user, int* xa_sts);
+  XAttGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user,
+          int* xa_sts);
   ~XAttGtk();
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
@@ -83,14 +84,12 @@ public:
   static void activate_open_classgraph(GtkWidget* w, gpointer data);
   static void activate_open_plc(GtkWidget* w, gpointer data);
   static void activate_help(GtkWidget* w, gpointer data);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void valchanged_cmd_input(GtkWidget* w, gpointer data);
   static void activate_cmd_input(GtkWidget* w, gpointer data);
   static void activate_cmd_scrolled_ok(GtkWidget* w, gpointer data);
   static void activate_cmd_scrolled_ca(GtkWidget* w, gpointer data);
-  static void action_text_inserted(
-      GtkTextBuffer* w, GtkTextIter* iter, gchar* str, gint len, gpointer data);
+  static void action_text_inserted(GtkTextBuffer* w, GtkTextIter* iter, gchar* str, gint len, gpointer data);
 };
 
 #endif

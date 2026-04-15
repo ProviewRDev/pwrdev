@@ -43,20 +43,24 @@
 
 class CnvReadWbl;
 
-class CnvWblToPs : public CnvWblTo {
-  public:
+class CnvWblToPs : public CnvWblTo
+{
+public:
   CnvWblToPs(CnvCtx* cnv_ctx) : ctx(cnv_ctx), conf_pass(false)
   {
-    if (ctx->generate_pdf) {
+    if (ctx->generate_pdf)
+    {
       tops = new CnvToPdf();
-    } else {
+    }
+    else
+    {
       tops = new CnvToPs();
     }
   }
   virtual ~CnvWblToPs();
 
   CnvCtx* ctx;
-  CnvToPs *tops;
+  CnvToPs* tops;
   bool conf_pass;
 
   int init(char* first);
@@ -67,23 +71,14 @@ class CnvWblToPs : public CnvWblTo {
   int attribute_exec();
   int typedef_exec();
   int bit_exec();
-  Cnv_eWblToType type()
-  {
-    return Cnv_eWblToType_Ps;
-  }
-  int index_open()
-  {
-    return 0;
-  }
+  Cnv_eWblToType type() { return Cnv_eWblToType_Ps; }
+  int index_open() { return 0; }
   void set_confpass(bool conf)
   {
     tops->set_confpass(conf);
     conf_pass = conf;
   }
-  bool confpass()
-  {
-    return true;
-  }
+  bool confpass() { return true; }
 };
 
 #endif

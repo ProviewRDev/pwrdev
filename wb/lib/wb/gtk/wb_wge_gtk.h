@@ -41,7 +41,8 @@
 
 #include "cow_wow_gtk.h"
 
-class WGeGtk : public WGe {
+class WGeGtk : public WGe
+{
 public:
   GtkWidget* parent_wid;
   GtkWidget* grow_widget;
@@ -64,15 +65,13 @@ public:
   void set_subwindow_release();
   void create_confirm_dialog();
 
-  WGeGtk(GtkWidget* parent_wid, void* parent_ctx, char* name, char* filename,
-      int scrollbar, int menu, int navigator, int width, int height, int x,
-      int y, char* object_name, int modal);
+  WGeGtk(GtkWidget* parent_wid, void* parent_ctx, char* name, char* filename, int scrollbar, int menu,
+         int navigator, int width, int height, int x, int y, char* object_name, int modal);
   ~WGeGtk();
 
   static void enable_set_focus(WGeGtk* ge);
   static void disable_set_focus(WGeGtk* ge, int time);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void change_value_cb(void* ge_ctx, void* value_object, char* text);
   static void confirm_cb(void* ge_ctx, void* confirm_object, char* text);
   static void message_dialog_cb(void* ge_ctx, const char* text);
@@ -88,8 +87,7 @@ public:
   static void create_message_dia(GtkWidget* w, gpointer data);
   static void create_menu(GtkWidget* w, gpointer data);
   static void create_value_input(GtkWidget* w, gpointer data);
-  static void action_resize(
-      GtkWidget* w, GtkAllocation* allocation, gpointer data);
+  static void action_resize(GtkWidget* w, GtkAllocation* allocation, gpointer data);
 };
 
 #endif

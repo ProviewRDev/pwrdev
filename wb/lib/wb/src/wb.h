@@ -40,19 +40,21 @@
 /* wb.h -- work bench */
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #define WB_CLASS_NAME "PWR_DEV"
 
-typedef enum {
-  wb_eType_Volume,
-  wb_eType_Directory,
-  wb_eType_Class,
-  wb_eType_Buffer,
-  wb_eType_ClassEditor,
-  wb_eType_ExternVolume
-} wb_eType;
+  typedef enum
+  {
+    wb_eType_Volume,
+    wb_eType_Directory,
+    wb_eType_Class,
+    wb_eType_Buffer,
+    wb_eType_ClassEditor,
+    wb_eType_ExternVolume
+  } wb_eType;
 
 #if defined __cplusplus
 }

@@ -14,24 +14,28 @@ void ra_status::test_status()
   pwr_tOid noid;
   pwr_tOName name;
 
-  m_sts = gdh_GetNodeObject(0, &noid);  
-  if (EVEN(m_sts)) {
+  m_sts = gdh_GetNodeObject(0, &noid);
+  if (EVEN(m_sts))
+  {
     m_log->log('E', "gdh_GetNodeObject", m_sts);
     return;
   }
   m_sts = gdh_ObjidToName(noid, name, sizeof(name), cdh_mName_volumeStrict);
-  if (EVEN(m_sts)) {
+  if (EVEN(m_sts))
+  {
     m_log->log('E', "gdh_ObjidToName", m_sts);
     return;
   }
   strcat(name, ".SystemStatus");
   m_sts = gdh_GetObjectInfo(name, &system_sts, sizeof(system_sts));
-  if (EVEN(m_sts)) {
+  if (EVEN(m_sts))
+  {
     m_log->log('E', "gdh_GetObjectInfo", m_sts);
     return;
   }
 
-  switch (errh_Severity(system_sts)) {
+  switch (errh_Severity(system_sts))
+  {
   case errh_eSeverity_Success:
     m_log->log('S', "Success system status", system_sts);
     break;
@@ -50,8 +54,6 @@ void ra_status::test_status()
   }
 }
 
-
-
 // Constructor
 ra_status::ra_status()
 {
@@ -60,17 +62,15 @@ ra_status::ra_status()
     printf("** Unable to open log file");
 
   m_sts = gdh_Init("ra_status");
-  if (EVEN(m_sts)) {
+  if (EVEN(m_sts))
+  {
     m_log->log('F', "gdh_Init", m_sts);
     exit(0);
-  }  
+  }
 }
 
 // Destructor
-ra_status::~ra_status()
-{
-  delete m_log;
-}
+ra_status::~ra_status() { delete m_log; }
 
 int main()
 {

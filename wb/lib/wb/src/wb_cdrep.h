@@ -48,7 +48,8 @@ class wb_orepdbs;
 class wb_merep;
 class wb_attribute;
 
-class wb_cdrep {
+class wb_cdrep
+{
   int m_nRef;
   wb_orep* m_orep;
   pwr_tStatus m_sts;
@@ -56,7 +57,7 @@ class wb_cdrep {
 
 public:
   wb_cdrep();
-  wb_cdrep(wb_adrep*); // x = other_object
+  wb_cdrep(wb_adrep*);      // x = other_object
   wb_cdrep(const wb_orep&); // x = other orep
   wb_cdrep(wb_mvrep*, const wb_orep&);
   wb_cdrep(wb_mvrep*, pwr_tCid);
@@ -84,10 +85,8 @@ public:
   wb_cdrep* super(pwr_tStatus* sts);
 
   void templateBody(pwr_tStatus* sts, pwr_eBix bix, void* p, pwr_tOid oid);
-  void attrTemplateBody(
-      pwr_tStatus* sts, pwr_eBix bix, void* p, wb_attribute& a);
-  void dbCallBack(pwr_tStatus* sts, ldh_eDbCallBack cb, char** methodName,
-      pwr_sDbCallBack** o);
+  void attrTemplateBody(pwr_tStatus* sts, pwr_eBix bix, void* p, wb_attribute& a);
+  void dbCallBack(pwr_tStatus* sts, ldh_eDbCallBack cb, char** methodName, pwr_sDbCallBack** o);
   wb_orep* menu(pwr_tStatus* sts, void** o);
   wb_orep* menuAfter(pwr_tStatus* sts, wb_orep* orep, void** o);
   wb_orep* menuFirst(pwr_tStatus* sts, wb_orep* orep, void** o);
@@ -95,25 +94,16 @@ public:
   pwr_tTime ohTime();
   pwr_tTime modTime();
   pwr_tTime structModTime();
-  void convertSubClass(
-      pwr_tCid cid, wb_merep* merep, void* body_source, void* body_target);
-  void convertObject(wb_merep* merep, void* rbody, void* dbody,
-      size_t* cnv_rbody_size, size_t* cnv_dbody_size, void** cnv_rbody,
-      void** cnv_dbody);
+  void convertSubClass(pwr_tCid cid, wb_merep* merep, void* body_source, void* body_target);
+  void convertObject(wb_merep* merep, void* rbody, void* dbody, size_t* cnv_rbody_size,
+                     size_t* cnv_dbody_size, void** cnv_rbody, void** cnv_dbody);
 
-  void updateTemplateSubClass(
-      wb_adrep* subattr, char* body, pwr_tOid oid, pwr_tOid toid, int aoffs);
+  void updateTemplateSubClass(wb_adrep* subattr, char* body, pwr_tOid oid, pwr_tOid toid, int aoffs);
   void updateTemplate(pwr_eBix bix, void* b, pwr_tOid oid, pwr_tOid toid);
-  pwr_tStatus sts()
-  {
-    return m_sts;
-  }
+  pwr_tStatus sts() { return m_sts; }
   ldh_eVolRep vtype() const;
   bool renameClass(pwr_tStatus* sts, wb_name& name);
-  void merep(wb_merep* me)
-  {
-    m_merep = me;
-  }
+  void merep(wb_merep* me) { m_merep = me; }
 };
 
 #endif

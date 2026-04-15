@@ -64,11 +64,11 @@ static char* SemName()
   static char id[32];
   static char* str = NULL;
 
-  if (str == NULL) {
+  if (str == NULL)
+  {
     if ((str = getenv(pwr_dEnvBusId)) == NULL)
       return NULL;
-    sprintf(
-        id, "%s%.*s", SEM_NAME, (int)(sizeof(id) - strlen(SEM_NAME) - 1), str);
+    sprintf(id, "%s%.*s", SEM_NAME, (int)(sizeof(id) - strlen(SEM_NAME) - 1), str);
     str = id;
   }
   return str;
@@ -84,9 +84,9 @@ static pwr_tUInt32 map()
   if ((name = SemName()) == NULL)
     return 2;
   sem = posix_sem_open(name, oflags);
-  if (sem == (sem_t*)-1) {
-    errh_Error(
-        "rt_mh_utl: map. sem_open(\"%s\") failed, %m", name, errno_GetStatus());
+  if (sem == (sem_t*)-1)
+  {
+    errh_Error("rt_mh_utl: map. sem_open(\"%s\") failed, %m", name, errno_GetStatus());
     return 2;
   }
   return 1;
@@ -96,7 +96,8 @@ static pwr_tUInt32 unmap()
 {
   if (sem == (sem_t*)-1)
     return 1;
-  if (posix_sem_close(sem) == -1) {
+  if (posix_sem_close(sem) == -1)
+  {
     perror("rt_mh_utl: unmap. sem_close failed, ");
     sem = (sem_t*)-1; /* If you can't close it, it cannot be valid" */
     return 2;
@@ -162,10 +163,11 @@ pwr_tStatus mh_UtilDestroyEvent()
     return 2;
 
   if (sem != (sem_t*)-1)
-  posix_sem_close(sem);
+    posix_sem_close(sem);
   sem = (sem_t*)-1;
 
-  if (posix_sem_unlink(name) == -1) {
+  if (posix_sem_unlink(name) == -1)
+  {
     perror("mh_UtilDestroyEvent: sem_unlink");
     return 2;
   }
@@ -182,7 +184,8 @@ pwr_tBoolean mh_UtilIsStartedMh()
   if (EVEN(sts))
     return FALSE;
   sts = posix_sem_trywait(sem);
-  if (sts == 0) {
+  if (sts == 0)
+  {
     posix_sem_post(sem);
     unmap();
   }

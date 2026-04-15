@@ -44,29 +44,30 @@
 #include "wb_bdrep.h"
 #include "wb_adrep.h"
 #include "wb_attribute.h"
-extern "C" {
+extern "C"
+{
 #include "rt_conv.h"
 }
 
 static pwr_tString32 callBackName[] = {
-  "__", // ldh_eDbCallBack__
-  "AnteCreate", // ldh_eDbCallBack_AnteCreate
-  "PostCreate", // ldh_eDbCallBack_PostCreate
-  "AnteDelete", // ldh_eDbCallBack_AnteDelete
-  "PostDelete", // ldh_eDbCallBack_PostDelete
-  "AnteMove", // ldh_eDbCallBack_AnteMove
-  "PostMove", // ldh_eDbCallBack_PostMove
-  "AnteRename", // ldh_eDbCallBack_AnteRename
-  "PostRename", // ldh_eDbCallBack_PostRename
-  "AnteAdopt", // ldh_eDbCallBack_AnteAdopt
-  "PostAdopt", // ldh_eDbCallBack_PostAdopt
-  "AnteUnadopt", // ldh_eDbCallBack_AnteUnadopt
-  "PostUnadopt", // ldh_eDbCallBack_PostUnadopt
-  "AnteUpdate", // ldh_eDbCallBack_AnteUpdate
-  "PostUpdate", // ldh_eDbCallBack_PostUpdate
-  "SyntaxCheck", // ldh_eDbCallBack_SyntaxCheck
-  "PostCopy", // ldh_eDbCallBack_PostCopy
-  "-" // ldh_eDbCallBack_
+    "__",          // ldh_eDbCallBack__
+    "AnteCreate",  // ldh_eDbCallBack_AnteCreate
+    "PostCreate",  // ldh_eDbCallBack_PostCreate
+    "AnteDelete",  // ldh_eDbCallBack_AnteDelete
+    "PostDelete",  // ldh_eDbCallBack_PostDelete
+    "AnteMove",    // ldh_eDbCallBack_AnteMove
+    "PostMove",    // ldh_eDbCallBack_PostMove
+    "AnteRename",  // ldh_eDbCallBack_AnteRename
+    "PostRename",  // ldh_eDbCallBack_PostRename
+    "AnteAdopt",   // ldh_eDbCallBack_AnteAdopt
+    "PostAdopt",   // ldh_eDbCallBack_PostAdopt
+    "AnteUnadopt", // ldh_eDbCallBack_AnteUnadopt
+    "PostUnadopt", // ldh_eDbCallBack_PostUnadopt
+    "AnteUpdate",  // ldh_eDbCallBack_AnteUpdate
+    "PostUpdate",  // ldh_eDbCallBack_PostUpdate
+    "SyntaxCheck", // ldh_eDbCallBack_SyntaxCheck
+    "PostCopy",    // ldh_eDbCallBack_PostCopy
+    "-"            // ldh_eDbCallBack_
 };
 
 void wb_cdrep::unref()
@@ -81,9 +82,7 @@ wb_cdrep* wb_cdrep::ref()
   return this;
 }
 
-wb_cdrep::wb_cdrep() : m_nRef(0), m_orep(0), m_sts(LDH__NOCLASS), m_merep(0)
-{
-}
+wb_cdrep::wb_cdrep() : m_nRef(0), m_orep(0), m_sts(LDH__NOCLASS), m_merep(0) {}
 
 wb_cdrep::~wb_cdrep()
 {
@@ -91,8 +90,7 @@ wb_cdrep::~wb_cdrep()
     m_orep->unref();
 }
 
-wb_cdrep::wb_cdrep(wb_mvrep* mvrep, pwr_tCid cid)
-    : m_nRef(0), m_orep(0), m_merep(0)
+wb_cdrep::wb_cdrep(wb_mvrep* mvrep, pwr_tCid cid) : m_nRef(0), m_orep(0), m_merep(0)
 {
   pwr_tOid oid = cdh_ClassIdToObjid(cid);
   m_orep = mvrep->object(&m_sts, oid);
@@ -103,28 +101,31 @@ wb_cdrep::wb_cdrep(wb_mvrep* mvrep, pwr_tCid cid)
   m_sts = LDH__SUCCESS;
 }
 
-wb_cdrep::wb_cdrep(wb_mvrep* mvrep, wb_name name)
-    : m_nRef(0), m_orep(0), m_merep(0)
+wb_cdrep::wb_cdrep(wb_mvrep* mvrep, wb_name name) : m_nRef(0), m_orep(0), m_merep(0)
 {
   char str[80];
   strcpy(str, "Class-");
   strcat(str, name.object());
   wb_name n = wb_name(str);
   m_orep = mvrep->object(&m_sts, n);
-  if (ODD(m_sts) && m_orep->cid() != pwr_eClass_ClassDef) {
+  if (ODD(m_sts) && m_orep->cid() != pwr_eClass_ClassDef)
+  {
     m_sts = LDH__NOCLASS;
     m_orep->ref();
     m_orep->unref();
   }
-  if (EVEN(m_sts)) {
+  if (EVEN(m_sts))
+  {
     wb_name n = wb_name("Class");
     wb_orep* c_orep = mvrep->object(&m_sts, n);
     if (EVEN(m_sts))
       throw wb_error(m_sts);
     c_orep->ref();
-    for (wb_orep* orep = mvrep->first(&m_sts, c_orep); ODD(m_sts);) {
+    for (wb_orep* orep = mvrep->first(&m_sts, c_orep); ODD(m_sts);)
+    {
       orep->ref();
-      if (orep->cid() == pwr_eClass_ClassHier) {
+      if (orep->cid() == pwr_eClass_ClassHier)
+      {
         strcpy(str, "Class-");
         strcat(str, orep->name());
         strcat(str, "-");
@@ -164,8 +165,7 @@ wb_cdrep::wb_cdrep(wb_mvrep* mvrep, wb_name name)
   m_sts = LDH__SUCCESS;
 }
 
-wb_cdrep::wb_cdrep(wb_mvrep* mvrep, const wb_orep& o)
-    : m_nRef(0), m_orep(0), m_merep(0)
+wb_cdrep::wb_cdrep(wb_mvrep* mvrep, const wb_orep& o) : m_nRef(0), m_orep(0), m_merep(0)
 {
   pwr_tOid oid = cdh_ClassIdToObjid(o.cid());
   m_orep = mvrep->object(&m_sts, oid);
@@ -182,7 +182,8 @@ wb_cdrep::wb_cdrep(const wb_orep& o) : m_nRef(0), m_orep(0), m_merep(0)
 
   wb_cdrep* cdrep = o.vrep()->merep()->cdrep(&sts, o);
   m_sts = sts;
-  if (ODD(m_sts)) {
+  if (ODD(m_sts))
+  {
     m_orep = cdrep->m_orep;
     m_orep->ref();
     delete cdrep;
@@ -219,9 +220,10 @@ wb_bdrep* wb_cdrep::bdrep(pwr_tStatus* sts, pwr_eBix bix)
 {
   wb_orep* orep = m_orep->vrep()->first(sts, m_orep);
   wb_orep* old;
-  while (ODD(*sts)) {
-    if (orep->cid() == pwr_eClass_ObjBodyDef
-        && cdh_oixToBix(orep->oid().oix) == bix) {
+  while (ODD(*sts))
+  {
+    if (orep->cid() == pwr_eClass_ObjBodyDef && cdh_oixToBix(orep->oid().oix) == bix)
+    {
       wb_bdrep* bdrep = new wb_bdrep(*orep);
       bdrep->merep(m_merep);
       return bdrep;
@@ -239,20 +241,23 @@ wb_bdrep* wb_cdrep::bdrep(pwr_tStatus* sts, pwr_eBix bix)
 wb_adrep* wb_cdrep::adrep(pwr_tStatus* sts, const char* aname)
 {
   wb_attrname n = wb_attrname(aname);
-  if (n.evenSts()) {
+  if (n.evenSts())
+  {
     *sts = n.sts();
     return 0;
   }
 
   wb_bdrep* bd = bdrep(sts, pwr_eBix_rt);
-  if (ODD(*sts)) {
+  if (ODD(*sts))
+  {
     wb_adrep* adrep = bd->adrep(sts, aname);
     delete bd;
     if (ODD(*sts))
       return adrep;
   }
   bd = bdrep(sts, pwr_eBix_dev);
-  if (ODD(*sts)) {
+  if (ODD(*sts))
+  {
     wb_adrep* adrep = bd->adrep(sts, aname);
     delete bd;
     if (ODD(*sts))
@@ -273,10 +278,7 @@ wb_orep* wb_cdrep::classBody(pwr_tStatus* sts, const char* bname)
   return orep;
 }
 
-pwr_tCid wb_cdrep::cid()
-{
-  return cdh_ClassObjidToId(m_orep->oid());
-}
+pwr_tCid wb_cdrep::cid() { return cdh_ClassObjidToId(m_orep->oid()); }
 
 void wb_cdrep::templateBody(pwr_tStatus* sts, pwr_eBix bix, void* p, pwr_tOid o)
 {
@@ -284,15 +286,18 @@ void wb_cdrep::templateBody(pwr_tStatus* sts, pwr_eBix bix, void* p, pwr_tOid o)
 
   // Search for template in localWb
   wb_vrep* localwb = m_orep->vrep()->erep()->volume(&status, ldh_cWBVolLocal);
-  if (ODD(status)) {
+  if (ODD(status))
+  {
     char name[120];
     sprintf(name, "Templates-%s", m_orep->name());
     wb_name n = wb_name(name);
     wb_orep* templ = localwb->object(&status, n);
-    if (ODD(status) && templ->cid() == cid()) {
+    if (ODD(status) && templ->cid() == cid())
+    {
       templ->ref();
       localwb->readBody(&status, templ, bix, p);
-      if (ODD(status)) {
+      if (ODD(status))
+      {
         if (cdh_ObjidIsNotNull(o))
           updateTemplate(bix, p, o, templ->oid());
         *sts = LDH__SUCCESS;
@@ -322,32 +327,34 @@ void wb_cdrep::templateBody(pwr_tStatus* sts, pwr_eBix bix, void* p, pwr_tOid o)
   orep->unref();
 }
 
-void wb_cdrep::attrTemplateBody(
-    pwr_tStatus* sts, pwr_eBix bix, void* p, wb_attribute& a)
+void wb_cdrep::attrTemplateBody(pwr_tStatus* sts, pwr_eBix bix, void* p, wb_attribute& a)
 {
   pwr_tStatus status;
   pwr_tAttrRef aref;
 
   aref = a.aref();
-  if (aref.Flags.b.Object) {
+  if (aref.Flags.b.Object)
+  {
     templateBody(sts, bix, p, a.aoid());
     return;
   }
 
   // Search for template in localWb
   wb_vrep* localwb = m_orep->vrep()->erep()->volume(&status, ldh_cWBVolLocal);
-  if (ODD(status)) {
+  if (ODD(status))
+  {
     char name[120];
     sprintf(name, "Templates-%s", m_orep->name());
     wb_name n = wb_name(name);
     wb_orep* templ = localwb->object(&status, n);
-    if (ODD(status) && templ->cid() == cid()) {
+    if (ODD(status) && templ->cid() == cid())
+    {
       templ->ref();
       localwb->readBody(&status, templ, bix, p);
-      if (ODD(status)) {
+      if (ODD(status))
+      {
         if (cdh_ObjidIsNotNull(a.aoid()))
-          updateTemplateSubClass(
-              a.adrep(), (char*)p, a.aoid(), templ->oid(), aref.Offset);
+          updateTemplateSubClass(a.adrep(), (char*)p, a.aoid(), templ->oid(), aref.Offset);
         *sts = LDH__SUCCESS;
         templ->unref();
         return;
@@ -367,7 +374,8 @@ void wb_cdrep::attrTemplateBody(
     return;
 
   m_orep->vrep()->readBody(sts, orep, bix, p);
-  if (cdh_ObjidIsNotNull(oid)) {
+  if (cdh_ObjidIsNotNull(oid))
+  {
     updateTemplateSubClass(a.adrep(), (char*)p, a.aoid(), oid, aref.Offset);
   }
 
@@ -381,8 +389,7 @@ pwr_mClassDef wb_cdrep::flags()
   pwr_sClassDef* classdef;
   pwr_tStatus sts;
 
-  classdef
-      = (pwr_sClassDef*)m_orep->vrep()->readBody(&sts, m_orep, pwr_eBix_sys, 0);
+  classdef = (pwr_sClassDef*)m_orep->vrep()->readBody(&sts, m_orep, pwr_eBix_sys, 0);
   if (EVEN(sts))
     throw wb_error(sts);
 
@@ -403,18 +410,11 @@ size_t wb_cdrep::size(pwr_eBix bix)
   return size;
 }
 
-const char* wb_cdrep::name() const
-{
-  return m_orep->name();
-}
+const char* wb_cdrep::name() const { return m_orep->name(); }
 
-wb_name wb_cdrep::longName()
-{
-  return m_orep->longName();
-}
+wb_name wb_cdrep::longName() { return m_orep->longName(); }
 
-void wb_cdrep::dbCallBack(pwr_tStatus* sts, ldh_eDbCallBack cb,
-    char** methodName, pwr_sDbCallBack** o)
+void wb_cdrep::dbCallBack(pwr_tStatus* sts, ldh_eDbCallBack cb, char** methodName, pwr_sDbCallBack** o)
 {
   wb_name cb_name = wb_name(callBackName[cb]);
   wb_orep* orep = m_orep->vrep()->child(sts, m_orep, cb_name);
@@ -422,7 +422,8 @@ void wb_cdrep::dbCallBack(pwr_tStatus* sts, ldh_eDbCallBack cb,
     return;
   orep->ref();
 
-  if (orep->cid() != pwr_eClass_DbCallBack) {
+  if (orep->cid() != pwr_eClass_DbCallBack)
+  {
     *sts = LDH__NOSUCHOBJ;
     orep->unref();
     return;
@@ -430,9 +431,9 @@ void wb_cdrep::dbCallBack(pwr_tStatus* sts, ldh_eDbCallBack cb,
 
   pwr_sDbCallBack* dbcallback;
 
-  dbcallback
-      = (pwr_sDbCallBack*)m_orep->vrep()->readBody(sts, orep, pwr_eBix_sys, 0);
-  if (EVEN(*sts)) {
+  dbcallback = (pwr_sDbCallBack*)m_orep->vrep()->readBody(sts, orep, pwr_eBix_sys, 0);
+  if (EVEN(*sts))
+  {
     orep->unref();
     return;
   }
@@ -448,8 +449,10 @@ wb_orep* wb_cdrep::menu(pwr_tStatus* sts, void** o)
 {
   wb_orep* prev;
   wb_orep* orep = m_orep->vrep()->first(sts, m_orep);
-  while (ODD(*sts)) {
-    switch (orep->cid()) {
+  while (ODD(*sts))
+  {
+    switch (orep->cid())
+    {
     case pwr_eClass_Menu:
     case pwr_eClass_MenuButton:
     case pwr_eClass_MenuCascade:
@@ -462,7 +465,8 @@ wb_orep* wb_cdrep::menu(pwr_tStatus* sts, void** o)
     prev->ref();
     prev->unref();
   }
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -470,7 +474,8 @@ wb_orep* wb_cdrep::menu(pwr_tStatus* sts, void** o)
   void* menubody;
 
   menubody = m_orep->vrep()->readBody(sts, orep, pwr_eBix_sys, 0);
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     orep->ref();
     orep->unref();
     return 0;
@@ -491,8 +496,10 @@ wb_orep* wb_cdrep::menuAfter(pwr_tStatus* sts, wb_orep* orep, void** o)
     return 0;
 
   bool found = false;
-  while (ODD(*sts)) {
-    switch (after->cid()) {
+  while (ODD(*sts))
+  {
+    switch (after->cid())
+    {
     case pwr_eClass_Menu:
     case pwr_eClass_MenuButton:
     case pwr_eClass_MenuCascade:
@@ -508,7 +515,8 @@ wb_orep* wb_cdrep::menuAfter(pwr_tStatus* sts, wb_orep* orep, void** o)
     prev->ref();
     prev->unref();
   }
-  if (!found) {
+  if (!found)
+  {
     *sts = LDH__NOSUCHOBJ;
     return 0;
   }
@@ -516,7 +524,8 @@ wb_orep* wb_cdrep::menuAfter(pwr_tStatus* sts, wb_orep* orep, void** o)
   void* menubody;
 
   menubody = after->vrep()->readBody(sts, after, pwr_eBix_sys, 0);
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     after->ref();
     after->unref();
     return 0;
@@ -535,7 +544,8 @@ wb_orep* wb_cdrep::menuFirst(pwr_tStatus* sts, wb_orep* orep, void** o)
   if (EVEN(*sts))
     return 0;
 
-  switch (first->cid()) {
+  switch (first->cid())
+  {
   case pwr_eClass_Menu:
   case pwr_eClass_MenuButton:
   case pwr_eClass_MenuCascade:
@@ -549,7 +559,8 @@ wb_orep* wb_cdrep::menuFirst(pwr_tStatus* sts, wb_orep* orep, void** o)
   void* menubody;
 
   menubody = first->vrep()->readBody(sts, first, pwr_eBix_sys, 0);
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     first->ref();
     first->unref();
     return 0;
@@ -560,15 +571,9 @@ wb_orep* wb_cdrep::menuFirst(pwr_tStatus* sts, wb_orep* orep, void** o)
   return first;
 }
 
-pwr_tTime wb_cdrep::ohTime()
-{
-  return m_orep->ohTime();
-}
+pwr_tTime wb_cdrep::ohTime() { return m_orep->ohTime(); }
 
-pwr_tTime wb_cdrep::modTime()
-{
-  return m_orep->treeModTime();
-}
+pwr_tTime wb_cdrep::modTime() { return m_orep->treeModTime(); }
 
 pwr_tTime wb_cdrep::structModTime()
 {
@@ -576,14 +581,16 @@ pwr_tTime wb_cdrep::structModTime()
   pwr_tTime t = m_orep->modTime();
 
   wb_bdrep* rbd = bdrep(&sts, pwr_eBix_rt);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     pwr_tTime rbt = rbd->modTime();
     if (time_Acomp(&rbt, &t) == 1)
       t = rbt;
     delete rbd;
   }
   wb_bdrep* dbd = bdrep(&sts, pwr_eBix_dev);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     pwr_tTime dbt = dbd->modTime();
     if (time_Acomp(&dbt, &t) == 1)
       t = dbt;
@@ -598,13 +605,15 @@ wb_cdrep* wb_cdrep::super(pwr_tStatus* sts)
     return 0;
 
   wb_adrep* adrep = bd->super(sts);
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     delete bd;
     return 0;
   }
 
   wb_cdrep* cdrep = m_orep->vrep()->merep()->cdrep(sts, adrep->subClass());
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     delete adrep;
     delete bd;
     return 0;
@@ -615,8 +624,7 @@ wb_cdrep* wb_cdrep::super(pwr_tStatus* sts)
   return cdrep;
 }
 
-void wb_cdrep::convertSubClass(
-    pwr_tCid cid, wb_merep* merep, void* body_source, void* body_target)
+void wb_cdrep::convertSubClass(pwr_tCid cid, wb_merep* merep, void* body_source, void* body_target)
 {
   pwr_tStatus sts;
   wb_cdrep* cdrep_source = merep->cdrep(&sts, cid);
@@ -639,12 +647,15 @@ void wb_cdrep::convertSubClass(
   wb_adrep* adrep_source = bdrep_source->adrep(&sts);
 
   // Indentify attribute with the same aix
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     bool found = false;
 
     wb_adrep* adrep_target = bdrep_target->adrep(&sts);
-    while (ODD(sts)) {
-      if (adrep_source->aix() == adrep_target->aix()) {
+    while (ODD(sts))
+    {
+      if (adrep_source->aix() == adrep_target->aix())
+      {
         found = true;
         break;
       }
@@ -652,9 +663,10 @@ void wb_cdrep::convertSubClass(
       adrep_target = adrep_target->next(&sts);
       delete prev;
     }
-    if (found) {
-      if (adrep_source->flags() & pwr_mAdef_pointer
-          || adrep_target->flags() & pwr_mAdef_pointer) {
+    if (found)
+    {
+      if (adrep_source->flags() & pwr_mAdef_pointer || adrep_target->flags() & pwr_mAdef_pointer)
+      {
         wb_adrep* prev = adrep_source;
         adrep_source = adrep_source->next(&sts);
         delete prev;
@@ -662,8 +674,10 @@ void wb_cdrep::convertSubClass(
         continue;
       }
 
-      if (adrep_source->isClass()) {
-        if (adrep_source->subClass() != adrep_target->subClass()) {
+      if (adrep_source->isClass())
+      {
+        if (adrep_source->subClass() != adrep_target->subClass())
+        {
           wb_adrep* prev = adrep_source;
           adrep_source = adrep_source->next(&sts);
           delete prev;
@@ -671,28 +685,33 @@ void wb_cdrep::convertSubClass(
         }
 
         // Convert subclass
-        if (adrep_source->isArray()) {
-          for (int j = 0;
-               j < MIN(adrep_source->nElement(), adrep_target->nElement());
-               j++) {
+        if (adrep_source->isArray())
+        {
+          for (int j = 0; j < MIN(adrep_source->nElement(), adrep_target->nElement()); j++)
+          {
             convertSubClass(adrep_target->subClass(), merep,
-                (char*)body_source + adrep_source->offset()
-                    + j * (adrep_source->size() / adrep_source->nElement()),
-                (char*)body_target + adrep_target->offset()
-                    + j * (adrep_target->size() / adrep_target->nElement()));
+                            (char*)body_source + adrep_source->offset() +
+                                j * (adrep_source->size() / adrep_source->nElement()),
+                            (char*)body_target + adrep_target->offset() +
+                                j * (adrep_target->size() / adrep_target->nElement()));
           }
-        } else {
-          convertSubClass(adrep_target->subClass(), merep,
-              (char*)body_source + adrep_source->offset(),
-              (char*)body_target + adrep_target->offset());
         }
-      } else {
+        else
+        {
+          convertSubClass(adrep_target->subClass(), merep, (char*)body_source + adrep_source->offset(),
+                          (char*)body_target + adrep_target->offset());
+        }
+      }
+      else
+      {
         // Convert attribute
-        if (adrep_source->type() == adrep_target->type()) {
-          memcpy((char*)body_target + adrep_target->offset(),
-              (char*)body_source + adrep_source->offset(),
-              MIN(adrep_target->size(), adrep_source->size()));
-        } else {
+        if (adrep_source->type() == adrep_target->type())
+        {
+          memcpy((char*)body_target + adrep_target->offset(), (char*)body_source + adrep_source->offset(),
+                 MIN(adrep_target->size(), adrep_source->size()));
+        }
+        else
+        {
           int cidx = conv_GetIdx(adrep_source->type(), adrep_target->type());
           if (cidx == conv_eIdx_invalid)
             cidx = conv_eIdx_zero; /* Zero the attribute */
@@ -701,12 +720,10 @@ void wb_cdrep::convertSubClass(
           pwr_mAdef flags;
           flags.m = adrep_target->flags();
 
-          if (!conv_Fctn[cidx](adrep_target->nElement(),
-                  adrep_target->size() / adrep_target->nElement(),
-                  (char*)body_target + adrep_target->offset(), &size,
-                  adrep_source->nElement(),
-                  adrep_source->size() / adrep_source->nElement(),
-                  (char*)body_source + adrep_source->offset(), flags))
+          if (!conv_Fctn[cidx](adrep_target->nElement(), adrep_target->size() / adrep_target->nElement(),
+                               (char*)body_target + adrep_target->offset(), &size, adrep_source->nElement(),
+                               adrep_source->size() / adrep_source->nElement(),
+                               (char*)body_source + adrep_source->offset(), flags))
             throw wb_error(LDH__ATTRCONV);
         }
       }
@@ -722,9 +739,8 @@ void wb_cdrep::convertSubClass(
   delete cdrep_source;
 }
 
-void wb_cdrep::convertObject(wb_merep* merep, void* rbody, void* dbody,
-    size_t* cnv_rbody_size, size_t* cnv_dbody_size, void** cnv_rbody,
-    void** cnv_dbody)
+void wb_cdrep::convertObject(wb_merep* merep, void* rbody, void* dbody, size_t* cnv_rbody_size,
+                             size_t* cnv_dbody_size, void** cnv_rbody, void** cnv_dbody)
 {
   pwr_tStatus sts;
   int source_input_cnt = 0;
@@ -738,22 +754,29 @@ void wb_cdrep::convertObject(wb_merep* merep, void* rbody, void* dbody,
   if (EVEN(sts))
     throw wb_error(sts);
 
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 2; i++)
+  {
     int size_target, size_source;
     void *body_target, *body_source;
     pwr_eBix bix = i ? pwr_eBix_dev : pwr_eBix_rt;
 
     wb_bdrep* bdrep_target = bdrep(&sts, bix);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       size_target = 0;
       body_target = 0;
-    } else {
+    }
+    else
+    {
       wb_bdrep* bdrep_source = cdrep_source->bdrep(&sts, bix);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         // New body, return empty body
         size_target = bdrep_target->size();
         body_target = calloc(1, size_target);
-      } else {
+      }
+      else
+      {
         // Convert body
         size_source = bdrep_source->size();
         body_source = (bix == pwr_eBix_rt) ? rbody : dbody;
@@ -764,10 +787,13 @@ void wb_cdrep::convertObject(wb_merep* merep, void* rbody, void* dbody,
         wb_adrep* adrep_source = bdrep_source->adrep(&sts);
 
         // Indentify attribute with the same aix
-        while (ODD(sts)) {
-          if (bix == pwr_eBix_rt) {
+        while (ODD(sts))
+        {
+          if (bix == pwr_eBix_rt)
+          {
             // Count inputs and outputs in source
-            switch (adrep_source->cid()) {
+            switch (adrep_source->cid())
+            {
             case pwr_eClass_Input:
               source_input_cnt++;
               break;
@@ -782,10 +808,13 @@ void wb_cdrep::convertObject(wb_merep* merep, void* rbody, void* dbody,
           wb_adrep* adrep_target = bdrep_target->adrep(&sts);
           target_input_cnt = 0;
           target_output_cnt = 0;
-          while (ODD(sts)) {
-            if (bix == pwr_eBix_rt) {
+          while (ODD(sts))
+          {
+            if (bix == pwr_eBix_rt)
+            {
               // Count inputs and outputs in target
-              switch (adrep_target->cid()) {
+              switch (adrep_target->cid())
+              {
               case pwr_eClass_Input:
                 target_input_cnt++;
                 break;
@@ -796,7 +825,8 @@ void wb_cdrep::convertObject(wb_merep* merep, void* rbody, void* dbody,
               }
             }
 
-            if (adrep_source->aix() == adrep_target->aix()) {
+            if (adrep_source->aix() == adrep_target->aix())
+            {
               found = true;
               break;
             }
@@ -805,25 +835,33 @@ void wb_cdrep::convertObject(wb_merep* merep, void* rbody, void* dbody,
             delete prev;
           }
 
-          if (bix == pwr_eBix_rt) {
+          if (bix == pwr_eBix_rt)
+          {
             // Check if input or output mask has to be modified
-            switch (adrep_source->cid()) {
+            switch (adrep_source->cid())
+            {
             case pwr_eClass_Input:
-              if (found) {
+              if (found)
+              {
                 input_idx[source_input_cnt - 1] = target_input_cnt - 1;
                 if (source_input_cnt != target_input_cnt)
                   update_input_mask = 1;
-              } else {
+              }
+              else
+              {
                 input_idx[source_input_cnt - 1] = -1;
                 update_input_mask = 1;
               }
               break;
             case pwr_eClass_Output:
-              if (found) {
+              if (found)
+              {
                 output_idx[source_output_cnt - 1] = target_output_cnt - 1;
                 if (source_output_cnt != target_output_cnt)
                   update_output_mask = 1;
-              } else {
+              }
+              else
+              {
                 output_idx[source_output_cnt - 1] = -1;
                 update_output_mask = 1;
               }
@@ -832,9 +870,10 @@ void wb_cdrep::convertObject(wb_merep* merep, void* rbody, void* dbody,
             }
           }
 
-          if (found) {
-            if (adrep_source->flags() & pwr_mAdef_pointer
-                || adrep_target->flags() & pwr_mAdef_pointer) {
+          if (found)
+          {
+            if (adrep_source->flags() & pwr_mAdef_pointer || adrep_target->flags() & pwr_mAdef_pointer)
+            {
               wb_adrep* prev = adrep_source;
               adrep_source = adrep_source->next(&sts);
               delete prev;
@@ -842,86 +881,85 @@ void wb_cdrep::convertObject(wb_merep* merep, void* rbody, void* dbody,
               continue;
             }
 
-            if (adrep_source->isClass()) {
-              if (adrep_source->subClass() != adrep_target->subClass()) {
+            if (adrep_source->isClass())
+            {
+              if (adrep_source->subClass() != adrep_target->subClass())
+              {
                 wb_adrep* prev = adrep_source;
                 adrep_source = adrep_source->next(&sts);
                 delete prev;
                 continue;
               }
               // Convert subclass
-              if (adrep_source->isArray()) {
-                for (int j = 0; j
-                     < MIN(adrep_source->nElement(), adrep_target->nElement());
-                     j++) {
+              if (adrep_source->isArray())
+              {
+                for (int j = 0; j < MIN(adrep_source->nElement(), adrep_target->nElement()); j++)
+                {
                   convertSubClass(adrep_target->subClass(), merep,
-                      (char*)body_source + adrep_source->offset()
-                          + j * (adrep_source->size()
-                                    / adrep_source->nElement()),
-                      (char*)body_target + adrep_target->offset()
-                          + j * (adrep_target->size()
-                                    / adrep_target->nElement()));
+                                  (char*)body_source + adrep_source->offset() +
+                                      j * (adrep_source->size() / adrep_source->nElement()),
+                                  (char*)body_target + adrep_target->offset() +
+                                      j * (adrep_target->size() / adrep_target->nElement()));
                 }
-              } else {
-                convertSubClass(adrep_target->subClass(), merep,
-                    (char*)body_source + adrep_source->offset(),
-                    (char*)body_target + adrep_target->offset());
+              }
+              else
+              {
+                convertSubClass(adrep_target->subClass(), merep, (char*)body_source + adrep_source->offset(),
+                                (char*)body_target + adrep_target->offset());
               }
 
               // Convert input and output mask
-              if (bix == pwr_eBix_dev
-                  && adrep_source->cid() == pwr_eClass_Buffer
-                  && adrep_source->type() == (pwr_eType)pwr_eClass_PlcNode) {
-                if (update_input_mask) {
-                  unsigned int source_mask = ((pwr_sPlcNode*)((char*)body_source
-                                                  + adrep_source->offset()))
-                                                 ->mask[0];
-                  unsigned int source_inv_mask
-                      = ((pwr_sPlcNode*)((char*)body_source
-                             + adrep_source->offset()))
-                            ->mask[2];
+              if (bix == pwr_eBix_dev && adrep_source->cid() == pwr_eClass_Buffer &&
+                  adrep_source->type() == (pwr_eType)pwr_eClass_PlcNode)
+              {
+                if (update_input_mask)
+                {
+                  unsigned int source_mask =
+                      ((pwr_sPlcNode*)((char*)body_source + adrep_source->offset()))->mask[0];
+                  unsigned int source_inv_mask =
+                      ((pwr_sPlcNode*)((char*)body_source + adrep_source->offset()))->mask[2];
                   unsigned int target_mask = 0;
                   unsigned int target_inv_mask = 0;
 
-                  for (int j = 0; j < source_input_cnt; j++) {
+                  for (int j = 0; j < source_input_cnt; j++)
+                  {
                     if (source_mask & (1 << j) && input_idx[j] != -1)
                       target_mask |= (1 << input_idx[j]);
                     if (source_inv_mask & (1 << j) && input_idx[j] != -1)
                       target_inv_mask |= (1 << input_idx[j]);
                   }
 
-                  ((pwr_sPlcNode*)((char*)body_target + adrep_target->offset()))
-                      ->mask[0]
-                      = target_mask;
-                  ((pwr_sPlcNode*)((char*)body_target + adrep_target->offset()))
-                      ->mask[2]
-                      = target_inv_mask;
+                  ((pwr_sPlcNode*)((char*)body_target + adrep_target->offset()))->mask[0] = target_mask;
+                  ((pwr_sPlcNode*)((char*)body_target + adrep_target->offset()))->mask[2] = target_inv_mask;
                 }
-                if (update_output_mask) {
-                  unsigned int source_mask = ((pwr_sPlcNode*)((char*)body_source
-                                                  + adrep_source->offset()))
-                                                 ->mask[1];
+                if (update_output_mask)
+                {
+                  unsigned int source_mask =
+                      ((pwr_sPlcNode*)((char*)body_source + adrep_source->offset()))->mask[1];
                   unsigned int target_mask = 0;
 
-                  for (int j = 0; j < source_output_cnt; j++) {
+                  for (int j = 0; j < source_output_cnt; j++)
+                  {
                     if (source_mask & (1 << j) && output_idx[j] != -1)
                       target_mask |= (1 << output_idx[j]);
                   }
 
-                  ((pwr_sPlcNode*)((char*)body_target + adrep_target->offset()))
-                      ->mask[1]
-                      = target_mask;
+                  ((pwr_sPlcNode*)((char*)body_target + adrep_target->offset()))->mask[1] = target_mask;
                 }
               }
-            } else {
+            }
+            else
+            {
               // Convert attribute
-              if (adrep_source->type() == adrep_target->type()) {
+              if (adrep_source->type() == adrep_target->type())
+              {
                 memcpy((char*)body_target + adrep_target->offset(),
-                    (char*)body_source + adrep_source->offset(),
-                    MIN(adrep_target->size(), adrep_source->size()));
-              } else {
-                int cidx
-                    = conv_GetIdx(adrep_source->type(), adrep_target->type());
+                       (char*)body_source + adrep_source->offset(),
+                       MIN(adrep_target->size(), adrep_source->size()));
+              }
+              else
+              {
+                int cidx = conv_GetIdx(adrep_source->type(), adrep_target->type());
                 if (cidx == conv_eIdx_invalid)
                   cidx = conv_eIdx_zero; /* Zero the attribute */
 
@@ -929,10 +967,9 @@ void wb_cdrep::convertObject(wb_merep* merep, void* rbody, void* dbody,
                 pwr_mAdef flags;
                 flags.m = adrep_target->flags();
 
-                if (!conv_Fctn[cidx](adrep_target->nElement(),
-                        adrep_target->size() / adrep_target->nElement(),
-                        (char*)body_target + adrep_target->offset(), &size,
-                        adrep_source->nElement(),
+                if (!conv_Fctn[cidx](
+                        adrep_target->nElement(), adrep_target->size() / adrep_target->nElement(),
+                        (char*)body_target + adrep_target->offset(), &size, adrep_source->nElement(),
                         adrep_source->size() / adrep_source->nElement(),
                         (char*)body_source + adrep_source->offset(), flags))
                   throw wb_error(LDH__ATTRCONV);
@@ -948,10 +985,13 @@ void wb_cdrep::convertObject(wb_merep* merep, void* rbody, void* dbody,
       }
       delete bdrep_target;
     }
-    if (bix == pwr_eBix_rt) {
+    if (bix == pwr_eBix_rt)
+    {
       *cnv_rbody_size = size_target;
       *cnv_rbody = body_target;
-    } else {
+    }
+    else
+    {
       *cnv_dbody_size = size_target;
       *cnv_dbody = body_target;
     }
@@ -959,8 +999,7 @@ void wb_cdrep::convertObject(wb_merep* merep, void* rbody, void* dbody,
   delete cdrep_source;
 }
 
-void wb_cdrep::updateTemplateSubClass(
-    wb_adrep* subattr, char* body, pwr_tOid oid, pwr_tOid toid, int aoffs)
+void wb_cdrep::updateTemplateSubClass(wb_adrep* subattr, char* body, pwr_tOid oid, pwr_tOid toid, int aoffs)
 {
   pwr_tStatus sts;
   pwr_tCid cid = subattr->subClass();
@@ -977,31 +1016,40 @@ void wb_cdrep::updateTemplateSubClass(
 
   int subattr_elements = subattr->isArray() ? subattr->nElement() : 1;
 
-  for (int i = 0; i < subattr_elements; i++) {
+  for (int i = 0; i < subattr_elements; i++)
+  {
     wb_adrep* adrep = bdrep->adrep(&sts);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       int elements = adrep->isArray() ? adrep->nElement() : 1;
-      if (adrep->isClass()) {
-        updateTemplateSubClass(adrep,
-            body + i * (subattr->size() / subattr_elements) + adrep->offset(),
-            oid, toid, aoffs);
-      } else {
-        switch (adrep->type()) {
-        case pwr_eType_Objid: {
-          pwr_tOid* oidp = (pwr_tOid*)(body
-              + i * (subattr->size() / subattr_elements) + adrep->offset());
-          for (int j = 0; j < elements; j++) {
+      if (adrep->isClass())
+      {
+        updateTemplateSubClass(adrep, body + i * (subattr->size() / subattr_elements) + adrep->offset(), oid,
+                               toid, aoffs);
+      }
+      else
+      {
+        switch (adrep->type())
+        {
+        case pwr_eType_Objid:
+        {
+          pwr_tOid* oidp = (pwr_tOid*)(body + i * (subattr->size() / subattr_elements) + adrep->offset());
+          for (int j = 0; j < elements; j++)
+          {
             if (cdh_ObjidIsEqual(*oidp, toid))
               *oidp = oid;
             oidp++;
           }
           break;
         }
-        case pwr_eType_AttrRef: {
-          pwr_sAttrRef* arp = (pwr_sAttrRef*)(body
-              + i * (subattr->size() / subattr_elements) + adrep->offset());
-          for (int j = 0; j < elements; j++) {
-            if (cdh_ObjidIsEqual(arp->Objid, toid)) {
+        case pwr_eType_AttrRef:
+        {
+          pwr_sAttrRef* arp =
+              (pwr_sAttrRef*)(body + i * (subattr->size() / subattr_elements) + adrep->offset());
+          for (int j = 0; j < elements; j++)
+          {
+            if (cdh_ObjidIsEqual(arp->Objid, toid))
+            {
               arp->Objid = oid;
               arp->Offset += aoffs;
             }
@@ -1021,8 +1069,7 @@ void wb_cdrep::updateTemplateSubClass(
   delete cdrep;
 }
 
-void wb_cdrep::updateTemplate(
-    pwr_eBix bix, void* b, pwr_tOid oid, pwr_tOid toid)
+void wb_cdrep::updateTemplate(pwr_eBix bix, void* b, pwr_tOid oid, pwr_tOid toid)
 {
   pwr_tStatus sts;
   int i;
@@ -1033,24 +1080,33 @@ void wb_cdrep::updateTemplate(
     throw wb_error(sts);
 
   wb_adrep* adrep = bd->adrep(&sts);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     int elements = adrep->isArray() ? adrep->nElement() : 1;
-    if (adrep->isClass()) {
+    if (adrep->isClass())
+    {
       updateTemplateSubClass(adrep, body + adrep->offset(), oid, toid, 0);
-    } else {
-      switch (adrep->type()) {
-      case pwr_eType_Objid: {
+    }
+    else
+    {
+      switch (adrep->type())
+      {
+      case pwr_eType_Objid:
+      {
         pwr_tOid* oidp = (pwr_tOid*)(body + adrep->offset());
-        for (i = 0; i < elements; i++) {
+        for (i = 0; i < elements; i++)
+        {
           if (cdh_ObjidIsEqual(*oidp, toid))
             *oidp = oid;
           oidp++;
         }
         break;
       }
-      case pwr_eType_AttrRef: {
+      case pwr_eType_AttrRef:
+      {
         pwr_sAttrRef* arp = (pwr_sAttrRef*)(body + adrep->offset());
-        for (i = 0; i < elements; i++) {
+        for (i = 0; i < elements; i++)
+        {
           if (cdh_ObjidIsEqual(arp->Objid, toid))
             arp->Objid = oid;
           arp++;
@@ -1067,10 +1123,7 @@ void wb_cdrep::updateTemplate(
   delete bd;
 }
 
-ldh_eVolRep wb_cdrep::vtype() const
-{
-  return m_orep->vtype();
-}
+ldh_eVolRep wb_cdrep::vtype() const { return m_orep->vtype(); }
 
 bool wb_cdrep::renameClass(pwr_tStatus* sts, wb_name& name)
 {

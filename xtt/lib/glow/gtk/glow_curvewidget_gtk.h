@@ -41,23 +41,16 @@
 #include "glow_curvectx.h"
 
 #define CURVEWIDGETGTK_TYPE (curvewidgetgtk_get_type())
-#define CURVEWIDGETGTK(obj)                                                    \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), CURVEWIDGETGTK_TYPE, CurveWidgetGtk))
-#define CURVEWIDGETGTK_CLASS(obj)                                              \
-  (G_TYPE_CHECK_CLASS_CAST((obj), CURVEWIDGETGTK, CurveWidgetGtkClass))
-#define IS_CURVEWIDGETGTK(obj)                                                 \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), CURVEWIDGETGTK_TYPE))
-#define IS_CURVEWIDGETGTK_CLASS(obj)                                           \
-  (G_TYPE_CHECK_CLASS_TYPE((obj), CURVEWIDGETGTK_TYPE))
-#define CURVEWIDGETGTK_GET_CLASS                                               \
-  (G_TYPE_INSTANCE_GET_CLASS((obj), CURVEWIDGETGTK, CurveWidgetGtkClass))
+#define CURVEWIDGETGTK(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), CURVEWIDGETGTK_TYPE, CurveWidgetGtk))
+#define CURVEWIDGETGTK_CLASS(obj) (G_TYPE_CHECK_CLASS_CAST((obj), CURVEWIDGETGTK, CurveWidgetGtkClass))
+#define IS_CURVEWIDGETGTK(obj) (G_TYPE_CHECK_INSTANCE_TYPE((obj), CURVEWIDGETGTK_TYPE))
+#define IS_CURVEWIDGETGTK_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE((obj), CURVEWIDGETGTK_TYPE))
+#define CURVEWIDGETGTK_GET_CLASS (G_TYPE_INSTANCE_GET_CLASS((obj), CURVEWIDGETGTK, CurveWidgetGtkClass))
 
 GType curvewidgetgtk_get_type(void);
 
-GtkWidget* curvewidgetgtk_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data);
-GtkWidget* scrolledcurvewidgetgtk_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
-    GtkWidget** curvewidget);
+GtkWidget* curvewidgetgtk_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data);
+GtkWidget* scrolledcurvewidgetgtk_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
+                                      GtkWidget** curvewidget);
 
 GtkWidget* curvenavwidgetgtk_new(GtkWidget* main_curve);

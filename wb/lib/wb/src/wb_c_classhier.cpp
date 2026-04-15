@@ -43,17 +43,16 @@
 #include "wb_pwrs.h"
 #include "wb_pwrs_msg.h"
 
-static pwr_tStatus AnteCreate(
-    ldh_tSesContext Session, pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus AnteCreate(ldh_tSesContext Session, pwr_tObjid Father, pwr_tClassId Class)
 {
   // ClassHier should be a top object or under object Class
-  if (Father.oix != 0) {
+  if (Father.oix != 0)
+  {
     pwr_tStatus sts;
     pwr_tOName name;
     int size;
 
-    sts = ldh_ObjidToName(
-        Session, Father, ldh_eName_Hierarchy, name, sizeof(name), &size);
+    sts = ldh_ObjidToName(Session, Father, ldh_eName_Hierarchy, name, sizeof(name), &size);
     if (EVEN(sts))
       return sts;
 
@@ -63,5 +62,4 @@ static pwr_tStatus AnteCreate(
   return PWRS__SUCCESS;
 }
 
-pwr_dExport pwr_BindMethods($ClassHier)
-    = { pwr_BindMethod(AnteCreate), pwr_NullMethod };
+pwr_dExport pwr_BindMethods($ClassHier) = {pwr_BindMethod(AnteCreate), pwr_NullMethod};

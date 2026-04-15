@@ -1846,10 +1846,10 @@ int re_match_2(struct regex* pbufp, char* string1_arg, int size1, char* string2_
     case charset:
     case charset_not:
     {
-      int not= 0; /* Nonzero for charset_not.  */
+      int not = 0; /* Nonzero for charset_not.  */
       register int c;
       if (*(p - 1) == (unsigned char)charset_not)
-        not= 1;
+        not = 1;
 
       PREFETCH; /* Fetch a data character. */
 
@@ -1859,7 +1859,7 @@ int re_match_2(struct regex* pbufp, char* string1_arg, int size1, char* string2_
         c = *d;
 
       if (c < *p * BYTEWIDTH && p[1 + c / BYTEWIDTH] & (1 << (c % BYTEWIDTH)))
-        not= !not;
+        not = !not;
 
       p += 1 + *p;
 
@@ -1927,9 +1927,9 @@ int re_match_2(struct regex* pbufp, char* string1_arg, int size1, char* string2_
             p[-3] = (unsigned char)finalize_jump;
           else if (p1[3] == (unsigned char)charset || p1[3] == (unsigned char)charset_not)
           {
-            int not= p1[3] == (unsigned char)charset_not;
+            int not = p1[3] == (unsigned char)charset_not;
             if (c < p1[4] * BYTEWIDTH && p1[5 + c / BYTEWIDTH] & (1 << (c % BYTEWIDTH)))
-              not= !not;
+              not = !not;
             /* `not' is 1 if c would match.  */
             /* That means it is not safe to finalize.  */
             if (!not)

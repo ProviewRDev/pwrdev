@@ -35,31 +35,31 @@
  */
 
 /*************************************************************************
-*
-* Filename:             remio_utils.c
-*
-*                       Date    Pgm.    Read.   Remark
-* Modified
-*
-* Description:		Remote I/O utilities
-*
-**************************************************************************/
+ *
+ * Filename:             remio_utils.c
+ *
+ *                       Date    Pgm.    Read.   Remark
+ * Modified
+ *
+ * Description:		Remote I/O utilities
+ *
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
-#include "pwr_systemclasses.h"
-#include "rt_gdh.h"
 #include "co_cdh.h"
 #include "pwr_baseclasses.h"
 #include "pwr_remoteclasses.h"
-#include "rs_remote_msg.h"
+#include "pwr_systemclasses.h"
 #include "remote.h"
 #include "remote_remio_utils.h"
+#include "rs_remote_msg.h"
+#include "rt_gdh.h"
 
 /*************************************************************************
 **************************************************************************
@@ -70,8 +70,7 @@
 ***************************************************************************
 **************************************************************************/
 
-pwr_tFloat32 ConvAItoAct(pwr_tInt16 raw, pwr_sClass_RemChan_Ai* body)
-{
+pwr_tFloat32 ConvAItoAct(pwr_tInt16 raw, pwr_sClass_RemChan_Ai *body) {
   pwr_tFloat32 fraw;
   pwr_tFloat32 actval;
   double dval;
@@ -81,8 +80,8 @@ pwr_tFloat32 ConvAItoAct(pwr_tInt16 raw, pwr_sClass_RemChan_Ai* body)
   if (body->SensorPolyType == 1)
     actval = body->SensorPolyCoef0 + body->SensorPolyCoef1 * fraw;
   else if (body->SensorPolyType == 2)
-    actval = body->SensorPolyCoef0
-        + fraw * (body->SensorPolyCoef1 + body->SensorPolyCoef2 * fraw);
+    actval = body->SensorPolyCoef0 +
+             fraw * (body->SensorPolyCoef1 + body->SensorPolyCoef2 * fraw);
   else if (body->SensorPolyType == 3) {
     dval = body->SensorPolyCoef0 + body->SensorPolyCoef1 * fraw;
     if (dval >= 0)
@@ -103,8 +102,7 @@ pwr_tFloat32 ConvAItoAct(pwr_tInt16 raw, pwr_sClass_RemChan_Ai* body)
 
 /************************************************************/
 
-pwr_tFloat32 ConvAOtoAct(pwr_tInt16 raw, pwr_sClass_RemChan_Ao* body)
-{
+pwr_tFloat32 ConvAOtoAct(pwr_tInt16 raw, pwr_sClass_RemChan_Ao *body) {
   pwr_tFloat32 fraw;
   pwr_tFloat32 actval;
 
@@ -118,8 +116,7 @@ pwr_tFloat32 ConvAOtoAct(pwr_tInt16 raw, pwr_sClass_RemChan_Ao* body)
 
 /************************************************************/
 
-pwr_tInt16 ConvAOtoRaw(pwr_tFloat32 act, pwr_sClass_RemChan_Ao* body)
-{
+pwr_tInt16 ConvAOtoRaw(pwr_tFloat32 act, pwr_sClass_RemChan_Ao *body) {
   pwr_tInt16 raw;
   pwr_tFloat32 actval;
 
@@ -149,33 +146,32 @@ pwr_tInt16 ConvAOtoRaw(pwr_tFloat32 act, pwr_sClass_RemChan_Ao* body)
 **************************************************************************
 **************************************************************************/
 
-pwr_tStatus RemIO_Init_ALCM(remnode_item* remnode)
-{
+pwr_tStatus RemIO_Init_ALCM(remnode_item *remnode) {
   pwr_tObjid childobjid, chanobjid, sigobjid;
   pwr_tClassId class;
-  pwr_sClass_Di* dip;
-  pwr_sClass_Do* dop;
-  pwr_sClass_Dv* dvp;
-  pwr_sClass_Ai* aip;
-  pwr_sClass_Ao* aop;
-  pwr_sClass_Co* cop;
-  pwr_sClass_RemChan_Di* chandip;
-  pwr_sClass_RemChan_Dv* chandvp;
-  pwr_sClass_RemChan_Do* chandop;
-  pwr_sClass_RemChan_Ai* chanaip;
-  pwr_sClass_RemChan_Ao* chanaop;
-  pwr_sClass_RemChan_Co* chancop;
-  remdi_item* remdi;
-  remdo_item* remdo;
-  remdv_item* remdv;
-  remai_item* remai;
-  remao_item* remao;
-  remco_item* remco;
+  pwr_sClass_Di *dip;
+  pwr_sClass_Do *dop;
+  pwr_sClass_Dv *dvp;
+  pwr_sClass_Ai *aip;
+  pwr_sClass_Ao *aop;
+  pwr_sClass_Co *cop;
+  pwr_sClass_RemChan_Di *chandip;
+  pwr_sClass_RemChan_Dv *chandvp;
+  pwr_sClass_RemChan_Do *chandop;
+  pwr_sClass_RemChan_Ai *chanaip;
+  pwr_sClass_RemChan_Ao *chanaop;
+  pwr_sClass_RemChan_Co *chancop;
+  remdi_item *remdi;
+  remdo_item *remdo;
+  remdv_item *remdv;
+  remai_item *remai;
+  remao_item *remao;
+  remco_item *remco;
   pwr_tStatus sts;
-  pwr_sClass_RemnodeALCM* objp;
+  pwr_sClass_RemnodeALCM *objp;
 
   /* Get pointer to remnodeALCM-object */
-  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress*)&objp);
+  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress *)&objp);
 
   /* Initialize remnode_item and RemNode-object*/
   remnode->remdi = remdi = NULL;
@@ -198,9 +194,9 @@ pwr_tStatus RemIO_Init_ALCM(remnode_item* remnode)
 
   /* Get I/O dataarea for RemIO */
   chanobjid = objp->IODataArea;
-  sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&remnode->remio_data);
+  sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&remnode->remio_data);
   if (ODD(sts))
-    sts = gdh_GetObjectSize(chanobjid, (unsigned int*)&remnode->remio_size);
+    sts = gdh_GetObjectSize(chanobjid, (unsigned int *)&remnode->remio_size);
   else
     remnode->remio_size = 0;
 
@@ -216,23 +212,23 @@ pwr_tStatus RemIO_Init_ALCM(remnode_item* remnode)
       while (ODD(sts)) {
         sts = gdh_GetObjectClass(chanobjid, &class);
         if (class == pwr_cClass_RemChan_Di) {
-          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&chandip);
+          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&chandip);
           if (ODD(sts)) {
             sigobjid = chandip->SigChanCon;
             sts = gdh_GetObjectClass(sigobjid, &class);
             if (class == pwr_cClass_Di) {
-              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress*)&dip);
+              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress *)&dip);
               /* Create new item and link it */
               remdi = malloc(sizeof(remdi_item));
               if (remdi == 0)
                 exit(REM__NOMEMORY);
-              remdi->next = (struct remdi_item*)remnode->remdi;
+              remdi->next = (struct remdi_item *)remnode->remdi;
               remnode->remdi = remdi;
 
               /* Initialize remdi_item */
               objp->NumberOfDI++;
               remdi->objp = chandip;
-              remdi->actval = (pwr_tBoolean*)gdh_TranslateRtdbPointer(
+              remdi->actval = (pwr_tBoolean *)gdh_TranslateRtdbPointer(
                   (unsigned long)dip->ActualValue);
               if (class == pwr_cClass_Di)
                 chandip->ActualValue = dip->ActualValue;
@@ -252,24 +248,24 @@ pwr_tStatus RemIO_Init_ALCM(remnode_item* remnode)
       while (ODD(sts)) {
         sts = gdh_GetObjectClass(chanobjid, &class);
         if (class == pwr_cClass_RemChan_Do) {
-          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&chandop);
+          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&chandop);
           if (ODD(sts)) {
             sigobjid = chandop->SigChanCon;
             sts = gdh_GetObjectClass(sigobjid, &class);
             if (class == pwr_cClass_Do) {
-              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress*)&dop);
+              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress *)&dop);
               /* Create new item and link it */
               remdo = malloc(sizeof(remdo_item));
               if (remdo == 0)
                 exit(REM__NOMEMORY);
-              remdo->next = (struct remdo_item*)remnode->remdo;
+              remdo->next = (struct remdo_item *)remnode->remdo;
               remnode->remdo = remdo;
 
               /* Initialize remdo_item */
               objp->NumberOfDO++;
               remdo->objp = chandop;
-              remdo->actval
-                  = gdh_TranslateRtdbPointer((unsigned long)dop->ActualValue);
+              remdo->actval =
+                  gdh_TranslateRtdbPointer((unsigned long)dop->ActualValue);
               if (class == pwr_cClass_Do)
                 chandop->ActualValue = dop->ActualValue;
               remdo->objp->BuffOff = remdo->objp->ConvOff / 8;
@@ -289,24 +285,24 @@ pwr_tStatus RemIO_Init_ALCM(remnode_item* remnode)
       while (ODD(sts)) {
         sts = gdh_GetObjectClass(chanobjid, &class);
         if (class == pwr_cClass_RemChan_Dv) {
-          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&chandvp);
+          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&chandvp);
           if (ODD(sts)) {
             sigobjid = chandvp->SigChanCon;
             sts = gdh_GetObjectClass(sigobjid, &class);
             if (class == pwr_cClass_Dv) {
-              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress*)&dvp);
+              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress *)&dvp);
               /* Create new item and link it */
               remdv = malloc(sizeof(remdv_item));
               if (remdv == 0)
                 exit(REM__NOMEMORY);
-              remdv->next = (struct remdv_item*)remnode->remdv;
+              remdv->next = (struct remdv_item *)remnode->remdv;
               remnode->remdv = remdv;
 
               /* Initialize Dv, RemChanDv and remdv_item */
               objp->NumberOfDV++;
               remdv->objp = chandvp;
-              remdv->actval
-                  = gdh_TranslateRtdbPointer((unsigned long)dvp->ActualValue);
+              remdv->actval =
+                  gdh_TranslateRtdbPointer((unsigned long)dvp->ActualValue);
               chandvp->ActualValue = dvp->ActualValue;
               remdv->objp->OldValue = *remdv->actval;
               remdv->objp->BuffOff = remdv->objp->ConvOff / 8;
@@ -325,26 +321,26 @@ pwr_tStatus RemIO_Init_ALCM(remnode_item* remnode)
       while (ODD(sts)) {
         sts = gdh_GetObjectClass(chanobjid, &class);
         if (class == pwr_cClass_RemChan_Ai) {
-          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&chanaip);
+          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&chanaip);
           if (ODD(sts)) {
             sigobjid = chanaip->SigChanCon;
             sts = gdh_GetObjectClass(sigobjid, &class);
             if (class == pwr_cClass_Ai) {
-              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress*)&aip);
+              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress *)&aip);
               /* Create new item and link it */
               remai = malloc(sizeof(remai_item));
               if (remai == 0)
                 exit(REM__NOMEMORY);
-              remai->next = (struct remai_item*)remnode->remai;
+              remai->next = (struct remai_item *)remnode->remai;
               remnode->remai = remai;
 
               /* Initialize Ai, RemChanAi and remai_item */
               objp->NumberOfAI++;
               remai->objp = chanaip;
-              remai->actval = (pwr_tFloat32*)gdh_TranslateRtdbPointer(
+              remai->actval = (pwr_tFloat32 *)gdh_TranslateRtdbPointer(
                   (unsigned long)aip->ActualValue);
               chanaip->ActualValue = aip->ActualValue;
-              remai->rawval = (short int*)&aip->RawValue;
+              remai->rawval = (short int *)&aip->RawValue;
             } /* END Class Ai */
           } /* END Object Ai */
         } /* END Class RemChanAi */
@@ -359,26 +355,26 @@ pwr_tStatus RemIO_Init_ALCM(remnode_item* remnode)
       while (ODD(sts)) {
         sts = gdh_GetObjectClass(chanobjid, &class);
         if (class == pwr_cClass_RemChan_Ao) {
-          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&chanaop);
+          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&chanaop);
           if (ODD(sts)) {
             sigobjid = chanaop->SigChanCon;
             sts = gdh_GetObjectClass(sigobjid, &class);
             if (class == pwr_cClass_Ao) {
-              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress*)&aop);
+              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress *)&aop);
               /* Create new item and link it */
               remao = malloc(sizeof(remao_item));
               if (remao == 0)
                 exit(REM__NOMEMORY);
-              remao->next = (struct remao_item*)remnode->remao;
+              remao->next = (struct remao_item *)remnode->remao;
               remnode->remao = remao;
 
               /* Initialize Ao, RemChanAo and remao_item */
               objp->NumberOfAO++;
               remao->objp = chanaop;
-              remao->actval = (pwr_tFloat32*)gdh_TranslateRtdbPointer(
+              remao->actval = (pwr_tFloat32 *)gdh_TranslateRtdbPointer(
                   (unsigned long)aop->ActualValue);
               chanaop->ActualValue = aop->ActualValue;
-              remao->rawval = (short int*)&aop->RawValue;
+              remao->rawval = (short int *)&aop->RawValue;
               remao->objp->OldValue = aop->RawValue;
             } /* END Class Ao */
           } /* END Object Ao */
@@ -394,26 +390,26 @@ pwr_tStatus RemIO_Init_ALCM(remnode_item* remnode)
       while (ODD(sts)) {
         sts = gdh_GetObjectClass(chanobjid, &class);
         if (class == pwr_cClass_RemChan_Co) {
-          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&chancop);
+          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&chancop);
           if (ODD(sts)) {
             sigobjid = chancop->SigChanCon;
             sts = gdh_GetObjectClass(sigobjid, &class);
             if (class == pwr_cClass_Co) {
-              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress*)&cop);
+              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress *)&cop);
               /* Create new item and link it */
               remco = malloc(sizeof(remco_item));
               if (remco == 0)
                 exit(REM__NOMEMORY);
-              remco->next = (struct remco_item*)remnode->remco;
+              remco->next = (struct remco_item *)remnode->remco;
               remnode->remco = remco;
 
               /* Initialize Co, RemChanCo and remco_item */
               objp->NumberOfCo++;
               remco->objp = chancop;
-              remco->extval = (pwr_tInt32*)gdh_TranslateRtdbPointer(
+              remco->extval = (pwr_tInt32 *)gdh_TranslateRtdbPointer(
                   (unsigned long)cop->AbsValue);
               chancop->ExtendedValue = cop->AbsValue;
-              remco->actval = (pwr_tInt32*)gdh_TranslateRtdbPointer(
+              remco->actval = (pwr_tInt32 *)gdh_TranslateRtdbPointer(
                   (unsigned long)cop->RawValue);
               chancop->ActualValue = cop->RawValue;
             } /* END Class Co */
@@ -446,19 +442,18 @@ pwr_tStatus RemIO_Init_ALCM(remnode_item* remnode)
 **************************************************************************
 **************************************************************************/
 
-pwr_tStatus RemIO_Stall_ALCM(remnode_item* remnode)
-{
-  remdi_item* remdi;
-  remdo_item* remdo;
-  remdv_item* remdv;
-  remai_item* remai;
-  remao_item* remao;
+pwr_tStatus RemIO_Stall_ALCM(remnode_item *remnode) {
+  remdi_item *remdi;
+  remdo_item *remdo;
+  remdv_item *remdv;
+  remai_item *remai;
+  remao_item *remao;
 
-  pwr_sClass_RemnodeALCM* objp;
+  pwr_sClass_RemnodeALCM *objp;
   pwr_tStatus sts;
 
   /* Get pointer to remnodeALCM-object */
-  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress*)&objp);
+  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress *)&objp);
 
   /* Set StallFlag */
   if (!objp->IOStallFlag) {
@@ -469,28 +464,28 @@ pwr_tStatus RemIO_Stall_ALCM(remnode_item* remnode)
       remdi = remnode->remdi;
       while (remdi != 0) {
         *remdi->actval = false;
-        remdi = (remdi_item*)remdi->next;
+        remdi = (remdi_item *)remdi->next;
       } /* END while */
 
       remdo = remnode->remdo;
       while (remdo != 0) {
         if (!remdo->objp->PwrIsMaster)
           *remdo->actval = false;
-        remdo = (remdo_item*)remdo->next;
+        remdo = (remdo_item *)remdo->next;
       } /* END while */
 
       remdv = remnode->remdv;
       while (remdv != 0) {
         if (!remdv->objp->PwrIsMaster)
           *remdv->actval = false;
-        remdv = (remdv_item*)remdv->next;
+        remdv = (remdv_item *)remdv->next;
       } /* END while */
 
       remai = remnode->remai;
       while (remai) {
         *remai->rawval = 0;
         *remai->actval = ConvAItoAct(*remai->rawval, remai->objp);
-        remai = (remai_item*)remai->next;
+        remai = (remai_item *)remai->next;
       } /* END while */
 
       remao = remnode->remao;
@@ -499,7 +494,7 @@ pwr_tStatus RemIO_Stall_ALCM(remnode_item* remnode)
           *remao->rawval = 0;
           *remao->actval = ConvAOtoAct(*remao->rawval, remao->objp);
         }
-        remao = (remao_item*)remao->next;
+        remao = (remao_item *)remao->next;
       } /* END while */
     } /* END if (IOStallAction... */
   } /* END if new IOStallFlag */
@@ -526,8 +521,8 @@ pwr_tStatus RemIO_Stall_ALCM(remnode_item* remnode)
 **************************************************************************
 **************************************************************************/
 
-pwr_tStatus RemIO_Receive_ALCM(
-    remnode_item* remnode, bsp_buffer* buffer, int size)
+pwr_tStatus RemIO_Receive_ALCM(remnode_item *remnode, bsp_buffer *buffer,
+                               int size)
 
 #define MAX16 32767
 #define MIN16 -32767
@@ -537,25 +532,25 @@ pwr_tStatus RemIO_Receive_ALCM(
 #define MAXCO24 16777216
 
 {
-  char* bytep;
-  short int* wordp;
-  int* longp;
-  remdi_item* remdi;
-  remdo_item* remdo;
-  remdv_item* remdv;
-  remai_item* remai;
-  remao_item* remao;
-  remco_item* remco;
+  char *bytep;
+  short int *wordp;
+  int *longp;
+  remdi_item *remdi;
+  remdo_item *remdo;
+  remdv_item *remdv;
+  remai_item *remai;
+  remao_item *remao;
+  remco_item *remco;
   int nochan;
   pwr_tInt32 longval;
   pwr_tInt32 diff;
   pwr_tStatus err;
 
-  pwr_sClass_RemnodeALCM* objp;
+  pwr_sClass_RemnodeALCM *objp;
   pwr_tStatus sts;
 
   /* Get pointer to remnodeALCM-object */
-  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress*)&objp);
+  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress *)&objp);
 
   /* Update IOPollDiff */
   objp->IOPollDiff--;
@@ -567,8 +562,8 @@ pwr_tStatus RemIO_Receive_ALCM(
     memcpy(remnode->remio_data, buffer, size);
 
   /* Pack up di-bits, set actval */
-  bytep = (char*)&buffer->di_offset + buffer->di_offset;
-  wordp = (short int*)bytep;
+  bytep = (char *)&buffer->di_offset + buffer->di_offset;
+  wordp = (short int *)bytep;
   nochan = *wordp;
   remnode->maxremdi = nochan * 8;
   bytep += 2;
@@ -576,8 +571,8 @@ pwr_tStatus RemIO_Receive_ALCM(
   while (remdi != 0) {
     if (remdi->objp->BuffOff < nochan)
       *remdi->actval = (remdi->objp->ConvMask & *(bytep + remdi->objp->BuffOff))
-          ? true
-          : false;
+                           ? true
+                           : false;
     else {
       err = true;
       if (!remnode->remio_err) {
@@ -585,21 +580,21 @@ pwr_tStatus RemIO_Receive_ALCM(
         printf(" REMIO fel Di offset %d\n", remdi->objp->ConvOff);
       }
     }
-    remdi = (remdi_item*)remdi->next;
+    remdi = (remdi_item *)remdi->next;
   } /* END while */
 
   /* Pack up do-bits, set actval if not PwrIsMaster */
-  bytep = (char*)&buffer->do_offset + buffer->do_offset;
-  wordp = (short int*)bytep;
+  bytep = (char *)&buffer->do_offset + buffer->do_offset;
+  wordp = (short int *)bytep;
   nochan = *wordp;
   remnode->maxremdo = nochan * 8;
   bytep += 2;
   remdo = remnode->remdo;
   while (remdo != 0) {
     if (remdo->objp->BuffOff < nochan) {
-      remdo->objp->OldValue
-          = (remdo->objp->ConvMask & *(bytep + remdo->objp->BuffOff)) ? true
-                                                                      : false;
+      remdo->objp->OldValue =
+          (remdo->objp->ConvMask & *(bytep + remdo->objp->BuffOff)) ? true
+                                                                    : false;
       if (!remdo->objp->PwrIsMaster)
         *remdo->actval = remdo->objp->OldValue;
     } else {
@@ -609,21 +604,21 @@ pwr_tStatus RemIO_Receive_ALCM(
         printf(" REMIO fel Do offset %d\n", remdo->objp->ConvOff);
       }
     }
-    remdo = (remdo_item*)remdo->next;
+    remdo = (remdo_item *)remdo->next;
   } /* END while */
 
   /* Pack up dv-bits, set actval if not PwrIsMaster */
-  bytep = (char*)&buffer->dv_offset + buffer->dv_offset;
-  wordp = (short int*)bytep;
+  bytep = (char *)&buffer->dv_offset + buffer->dv_offset;
+  wordp = (short int *)bytep;
   nochan = *wordp;
   remnode->maxremdv = nochan * 8;
   bytep += 2;
   remdv = remnode->remdv;
   while (remdv != 0) {
     if (remdv->objp->BuffOff < nochan) {
-      remdv->objp->OldValue
-          = (remdv->objp->ConvMask & *(bytep + remdv->objp->BuffOff)) ? true
-                                                                      : false;
+      remdv->objp->OldValue =
+          (remdv->objp->ConvMask & *(bytep + remdv->objp->BuffOff)) ? true
+                                                                    : false;
       if (!remdv->objp->PwrIsMaster)
         *remdv->actval = remdv->objp->OldValue;
     } else {
@@ -633,12 +628,12 @@ pwr_tStatus RemIO_Receive_ALCM(
         printf(" REMIO fel Dv offset %d\n", remdv->objp->ConvOff);
       }
     }
-    remdv = (remdv_item*)remdv->next;
+    remdv = (remdv_item *)remdv->next;
   } /* END while */
 
   /*Convert raw AI values to actual values */
-  bytep = (char*)&buffer->ai_offset + buffer->ai_offset;
-  wordp = (short int*)bytep;
+  bytep = (char *)&buffer->ai_offset + buffer->ai_offset;
+  wordp = (short int *)bytep;
   remnode->maxremai = nochan = *wordp;
   /* Stega förbi den oanvända arean som är lika stor som antalet AI (se dekl av
    * bsp_buffer) */
@@ -655,13 +650,13 @@ pwr_tStatus RemIO_Receive_ALCM(
         printf(" REMIO fel Ai offset %d\n", remai->objp->ConvOff);
       }
     }
-    remai = (remai_item*)remai->next;
+    remai = (remai_item *)remai->next;
   } /* END while */
 
   /* Convert raw AO values to actual values, set oldvalue,
         set actval if not PwrIsMaster */
-  bytep = (char*)&buffer->ao_offset + buffer->ao_offset;
-  wordp = (short int*)bytep;
+  bytep = (char *)&buffer->ao_offset + buffer->ao_offset;
+  wordp = (short int *)bytep;
   remnode->maxremao = nochan = *wordp;
   wordp++;
   remao = remnode->remao;
@@ -679,15 +674,15 @@ pwr_tStatus RemIO_Receive_ALCM(
         printf(" REMIO fel Ao offset %d\n", remao->objp->ConvOff);
       }
     }
-    remao = (remao_item*)remao->next;
+    remao = (remao_item *)remao->next;
   } /* END while */
 
   /* Store Co values in COVALUEBASE and CAVALUEBASE */
-  bytep = (char*)&buffer->co_offset + buffer->co_offset;
-  wordp = (short int*)bytep;
+  bytep = (char *)&buffer->co_offset + buffer->co_offset;
+  wordp = (short int *)bytep;
   remnode->maxremco = nochan = *wordp;
   wordp++;
-  longp = (int*)wordp;
+  longp = (int *)wordp;
   longp += nochan;
   remco = remnode->remco;
   while (remco) {
@@ -718,7 +713,7 @@ pwr_tStatus RemIO_Receive_ALCM(
         printf(" REMIO fel Co offset %d\n", remco->objp->ConvOff);
       }
     }
-    remco = (remco_item*)remco->next;
+    remco = (remco_item *)remco->next;
   } /* END while */
 
   /* Was all remote I/O inside buffer ? */
@@ -744,43 +739,44 @@ pwr_tStatus RemIO_Receive_ALCM(
 **************************************************************************
 **************************************************************************/
 
-pwr_tStatus RemIO_Cyclic_ALCM(remnode_item* remnode,
-    void (*send_pollbuff)(remnode_item* remnode, pssupd_buffer* buf))
-{
-  remdo_item* remdo;
-  remdv_item* remdv;
-  remao_item* remao;
+pwr_tStatus RemIO_Cyclic_ALCM(remnode_item *remnode,
+                              void (*send_pollbuff)(remnode_item *remnode,
+                                                    pssupd_buffer *buf)) {
+  remdo_item *remdo;
+  remdv_item *remdv;
+  remao_item *remao;
   pssupd_buffer askbuff;
-  pssupd_order_header* buffhead;
+  pssupd_order_header *buffhead;
   unsigned char buffdata[MAX_ORDERS_DATASIZE];
-  unsigned char* datap;
+  unsigned char *datap;
   unsigned int buffsize, datasize;
 
-  pwr_sClass_RemnodeALCM* objp;
+  pwr_sClass_RemnodeALCM *objp;
   pwr_tStatus sts;
 
   /* Get pointer to remnodeALCM-object */
-  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress*)&objp);
+  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress *)&objp);
 
   /* Step through do, dv and ao to see if they should be
         updated remote */
-  buffhead = (pssupd_order_header*)&askbuff.data;
+  buffhead = (pssupd_order_header *)&askbuff.data;
   askbuff.no_of_updates = 0;
   datap = buffdata;
   datasize = buffsize = 0;
 
   remdo = remnode->remdo;
   while (remdo) {
-    if (remdo->objp->PwrIsMaster && (remdo->objp->ConvOff < remnode->maxremdo)
-        && (remdo->objp->OldValue != *remdo->actval)) {
+    if (remdo->objp->PwrIsMaster &&
+        (remdo->objp->ConvOff < remnode->maxremdo) &&
+        (remdo->objp->OldValue != *remdo->actval)) {
       if ((buffsize + sizeof(pssupd_order_header) + 1) > MAX_ORDER_BUFFERSIZE) {
         /* Send buffer and re-initiate it! */
-        askbuff.length
-            = buffsize + sizeof(pssupd_buffer) - MAX_ORDER_BUFFERSIZE;
+        askbuff.length =
+            buffsize + sizeof(pssupd_buffer) - MAX_ORDER_BUFFERSIZE;
         memcpy(buffhead, &buffdata, datasize);
         (send_pollbuff)(remnode, &askbuff);
         objp->IOPollDiff++;
-        buffhead = (pssupd_order_header*)&askbuff.data;
+        buffhead = (pssupd_order_header *)&askbuff.data;
         askbuff.no_of_updates = 0;
         datap = buffdata;
         datasize = buffsize = 0;
@@ -795,21 +791,22 @@ pwr_tStatus RemIO_Cyclic_ALCM(remnode_item* remnode,
       datasize++;
       buffsize += sizeof(pssupd_order_header) + 1;
     }
-    remdo = (remdo_item*)remdo->next;
+    remdo = (remdo_item *)remdo->next;
   }
 
   remdv = remnode->remdv;
   while (remdv) {
-    if (remdv->objp->PwrIsMaster && (remdv->objp->ConvOff < remnode->maxremdv)
-        && remdv->objp->OldValue != *remdv->actval) {
+    if (remdv->objp->PwrIsMaster &&
+        (remdv->objp->ConvOff < remnode->maxremdv) &&
+        remdv->objp->OldValue != *remdv->actval) {
       if ((buffsize + sizeof(pssupd_order_header) + 1) > MAX_ORDER_BUFFERSIZE) {
         /* Send buffer and re-initiate it! */
-        askbuff.length
-            = buffsize + sizeof(pssupd_buffer) - MAX_ORDER_BUFFERSIZE;
+        askbuff.length =
+            buffsize + sizeof(pssupd_buffer) - MAX_ORDER_BUFFERSIZE;
         memcpy(buffhead, &buffdata, datasize);
         (send_pollbuff)(remnode, &askbuff);
         objp->IOPollDiff++;
-        buffhead = (pssupd_order_header*)&askbuff.data;
+        buffhead = (pssupd_order_header *)&askbuff.data;
         askbuff.no_of_updates = 0;
         datap = buffdata;
         datasize = buffsize = 0;
@@ -824,7 +821,7 @@ pwr_tStatus RemIO_Cyclic_ALCM(remnode_item* remnode,
       datasize++;
       buffsize += sizeof(pssupd_order_header) + 1;
     }
-    remdv = (remdv_item*)remdv->next;
+    remdv = (remdv_item *)remdv->next;
   }
 
   remao = remnode->remao;
@@ -832,15 +829,15 @@ pwr_tStatus RemIO_Cyclic_ALCM(remnode_item* remnode,
     if (remao->objp->PwrIsMaster && remao->objp->ConvOff < remnode->maxremao) {
       *remao->rawval = ConvAOtoRaw(*remao->actval, remao->objp);
       if (remao->objp->OldValue != *remao->rawval) {
-        if ((buffsize + sizeof(pssupd_order_header) + 2)
-            > MAX_ORDER_BUFFERSIZE) {
+        if ((buffsize + sizeof(pssupd_order_header) + 2) >
+            MAX_ORDER_BUFFERSIZE) {
           /* Send buffer and re-initiate it! */
-          askbuff.length
-              = buffsize + sizeof(pssupd_buffer) - MAX_ORDER_BUFFERSIZE;
+          askbuff.length =
+              buffsize + sizeof(pssupd_buffer) - MAX_ORDER_BUFFERSIZE;
           memcpy(buffhead, &buffdata, datasize);
           (send_pollbuff)(remnode, &askbuff);
           objp->IOPollDiff++;
-          buffhead = (pssupd_order_header*)&askbuff.data;
+          buffhead = (pssupd_order_header *)&askbuff.data;
           askbuff.no_of_updates = 0;
           datap = buffdata;
           datasize = buffsize = 0;
@@ -850,20 +847,20 @@ pwr_tStatus RemIO_Cyclic_ALCM(remnode_item* remnode,
         buffhead->size = 2;
         buffhead->signal = remao->objp->ConvOff;
         buffhead++;
-        *(short int*)datap = *remao->rawval;
+        *(short int *)datap = *remao->rawval;
         datap += 2;
         datasize += 2;
         buffsize += sizeof(pssupd_order_header) + 2;
       }
     }
-    remao = (remao_item*)remao->next;
+    remao = (remao_item *)remao->next;
   }
 
   /* Sendbuffer if updates or poll */
   if ((askbuff.no_of_updates > 0) || objp->IOPoll) {
     askbuff.length = buffsize + sizeof(pssupd_buffer) - MAX_ORDER_BUFFERSIZE;
     memcpy(buffhead, &buffdata, datasize); /* Copy data after headers */
-    (send_pollbuff)(remnode, &askbuff); /* Send orders */
+    (send_pollbuff)(remnode, &askbuff);    /* Send orders */
     objp->IOPollDiff++;
   }
 
@@ -884,34 +881,33 @@ pwr_tStatus RemIO_Cyclic_ALCM(remnode_item* remnode,
 **************************************************************************
 **************************************************************************/
 
-pwr_tStatus RemIO_Init_3964R(remnode_item* remnode)
-{
+pwr_tStatus RemIO_Init_3964R(remnode_item *remnode) {
   pwr_tObjid childobjid, chanobjid, sigobjid;
   pwr_tClassId class;
-  pwr_sClass_Di* dip;
-  pwr_sClass_Do* dop;
-  pwr_sClass_Dv* dvp;
-  pwr_sClass_Ai* aip;
-  pwr_sClass_Ao* aop;
-  pwr_sClass_Co* cop;
-  pwr_sClass_RemChan_Di* chandip;
-  pwr_sClass_RemChan_Dv* chandvp;
-  pwr_sClass_RemChan_Do* chandop;
-  pwr_sClass_RemChan_Ai* chanaip;
-  pwr_sClass_RemChan_Ao* chanaop;
-  pwr_sClass_RemChan_Co* chancop;
-  remdi_item* remdi;
-  remdo_item* remdo;
-  remdv_item* remdv;
-  remai_item* remai;
-  remao_item* remao;
-  remco_item* remco;
+  pwr_sClass_Di *dip;
+  pwr_sClass_Do *dop;
+  pwr_sClass_Dv *dvp;
+  pwr_sClass_Ai *aip;
+  pwr_sClass_Ao *aop;
+  pwr_sClass_Co *cop;
+  pwr_sClass_RemChan_Di *chandip;
+  pwr_sClass_RemChan_Dv *chandvp;
+  pwr_sClass_RemChan_Do *chandop;
+  pwr_sClass_RemChan_Ai *chanaip;
+  pwr_sClass_RemChan_Ao *chanaop;
+  pwr_sClass_RemChan_Co *chancop;
+  remdi_item *remdi;
+  remdo_item *remdo;
+  remdv_item *remdv;
+  remai_item *remai;
+  remao_item *remao;
+  remco_item *remco;
   pwr_tStatus sts;
-  pwr_sClass_Remnode3964R* objp;
+  pwr_sClass_Remnode3964R *objp;
   char name[80];
 
   /* Get pointer to remnode3964R-object */
-  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress*)&objp);
+  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress *)&objp);
 
   /* Initialize remnode_item and RemNode-object*/
   remnode->remdi = remdi = NULL;
@@ -938,10 +934,11 @@ pwr_tStatus RemIO_Init_3964R(remnode_item* remnode)
   while (ODD(sts)) {
     sts = gdh_ObjidToName(childobjid, name, sizeof(name), cdh_mName_object);
     if (strstr(name, "IO_AREA")) {
-      sts = gdh_ObjidToPointer(childobjid, (pwr_tAddress*)&remnode->remio_data);
+      sts =
+          gdh_ObjidToPointer(childobjid, (pwr_tAddress *)&remnode->remio_data);
       if (ODD(sts))
-        sts = gdh_GetObjectSize(
-            childobjid, (unsigned int*)&remnode->remio_size);
+        sts =
+            gdh_GetObjectSize(childobjid, (unsigned int *)&remnode->remio_size);
       break;
     }
     sts = gdh_GetNextSibling(childobjid, &childobjid);
@@ -959,23 +956,23 @@ pwr_tStatus RemIO_Init_3964R(remnode_item* remnode)
       while (ODD(sts)) {
         sts = gdh_GetObjectClass(chanobjid, &class);
         if (class == pwr_cClass_RemChan_Di) {
-          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&chandip);
+          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&chandip);
           if (ODD(sts)) {
             sigobjid = chandip->SigChanCon;
             sts = gdh_GetObjectClass(sigobjid, &class);
             if (class == pwr_cClass_Di) {
-              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress*)&dip);
+              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress *)&dip);
               /* Create new item and link it */
               remdi = malloc(sizeof(remdi_item));
               if (remdi == 0)
                 exit(REM__NOMEMORY);
-              remdi->next = (struct remdi_item*)remnode->remdi;
+              remdi->next = (struct remdi_item *)remnode->remdi;
               remnode->remdi = remdi;
 
               /* Initialize remdi_item */
               //                objp->NumberOfDI++;
               remdi->objp = chandip;
-              remdi->actval = (pwr_tBoolean*)gdh_TranslateRtdbPointer(
+              remdi->actval = (pwr_tBoolean *)gdh_TranslateRtdbPointer(
                   (unsigned long)dip->ActualValue);
               if (class == pwr_cClass_Di)
                 chandip->ActualValue = dip->ActualValue;
@@ -995,24 +992,24 @@ pwr_tStatus RemIO_Init_3964R(remnode_item* remnode)
       while (ODD(sts)) {
         sts = gdh_GetObjectClass(chanobjid, &class);
         if (class == pwr_cClass_RemChan_Do) {
-          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&chandop);
+          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&chandop);
           if (ODD(sts)) {
             sigobjid = chandop->SigChanCon;
             sts = gdh_GetObjectClass(sigobjid, &class);
             if (class == pwr_cClass_Do) {
-              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress*)&dop);
+              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress *)&dop);
               /* Create new item and link it */
               remdo = malloc(sizeof(remdo_item));
               if (remdo == 0)
                 exit(REM__NOMEMORY);
-              remdo->next = (struct remdo_item*)remnode->remdo;
+              remdo->next = (struct remdo_item *)remnode->remdo;
               remnode->remdo = remdo;
 
               /* Initialize remdo_item */
               //                objp->NumberOfDO++;
               remdo->objp = chandop;
-              remdo->actval
-                  = gdh_TranslateRtdbPointer((unsigned long)dop->ActualValue);
+              remdo->actval =
+                  gdh_TranslateRtdbPointer((unsigned long)dop->ActualValue);
               if (class == pwr_cClass_Do)
                 chandop->ActualValue = dop->ActualValue;
               remdo->objp->BuffOff = remdo->objp->ConvOff / 8;
@@ -1032,24 +1029,24 @@ pwr_tStatus RemIO_Init_3964R(remnode_item* remnode)
       while (ODD(sts)) {
         sts = gdh_GetObjectClass(chanobjid, &class);
         if (class == pwr_cClass_RemChan_Dv) {
-          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&chandvp);
+          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&chandvp);
           if (ODD(sts)) {
             sigobjid = chandvp->SigChanCon;
             sts = gdh_GetObjectClass(sigobjid, &class);
             if (class == pwr_cClass_Dv) {
-              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress*)&dvp);
+              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress *)&dvp);
               /* Create new item and link it */
               remdv = malloc(sizeof(remdv_item));
               if (remdv == 0)
                 exit(REM__NOMEMORY);
-              remdv->next = (struct remdv_item*)remnode->remdv;
+              remdv->next = (struct remdv_item *)remnode->remdv;
               remnode->remdv = remdv;
 
               /* Initialize Dv, RemChanDv and remdv_item */
               //                objp->NumberOfDV++;
               remdv->objp = chandvp;
-              remdv->actval
-                  = gdh_TranslateRtdbPointer((unsigned long)dvp->ActualValue);
+              remdv->actval =
+                  gdh_TranslateRtdbPointer((unsigned long)dvp->ActualValue);
               chandvp->ActualValue = dvp->ActualValue;
               remdv->objp->OldValue = *remdv->actval;
               remdv->objp->BuffOff = remdv->objp->ConvOff / 8;
@@ -1068,26 +1065,26 @@ pwr_tStatus RemIO_Init_3964R(remnode_item* remnode)
       while (ODD(sts)) {
         sts = gdh_GetObjectClass(chanobjid, &class);
         if (class == pwr_cClass_RemChan_Ai) {
-          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&chanaip);
+          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&chanaip);
           if (ODD(sts)) {
             sigobjid = chanaip->SigChanCon;
             sts = gdh_GetObjectClass(sigobjid, &class);
             if (class == pwr_cClass_Ai) {
-              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress*)&aip);
+              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress *)&aip);
               /* Create new item and link it */
               remai = malloc(sizeof(remai_item));
               if (remai == 0)
                 exit(REM__NOMEMORY);
-              remai->next = (struct remai_item*)remnode->remai;
+              remai->next = (struct remai_item *)remnode->remai;
               remnode->remai = remai;
 
               /* Initialize Ai, RemChanAi and remai_item */
               //                objp->NumberOfAI++;
               remai->objp = chanaip;
-              remai->actval = (pwr_tFloat32*)gdh_TranslateRtdbPointer(
+              remai->actval = (pwr_tFloat32 *)gdh_TranslateRtdbPointer(
                   (unsigned long)aip->ActualValue);
               chanaip->ActualValue = aip->ActualValue;
-              remai->rawval = (short int*)&aip->RawValue;
+              remai->rawval = (short int *)&aip->RawValue;
             } /* END Class Ai */
           } /* END Object Ai */
         } /* END Class RemChanAi */
@@ -1102,26 +1099,26 @@ pwr_tStatus RemIO_Init_3964R(remnode_item* remnode)
       while (ODD(sts)) {
         sts = gdh_GetObjectClass(chanobjid, &class);
         if (class == pwr_cClass_RemChan_Ao) {
-          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&chanaop);
+          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&chanaop);
           if (ODD(sts)) {
             sigobjid = chanaop->SigChanCon;
             sts = gdh_GetObjectClass(sigobjid, &class);
             if (class == pwr_cClass_Ao) {
-              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress*)&aop);
+              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress *)&aop);
               /* Create new item and link it */
               remao = malloc(sizeof(remao_item));
               if (remao == 0)
                 exit(REM__NOMEMORY);
-              remao->next = (struct remao_item*)remnode->remao;
+              remao->next = (struct remao_item *)remnode->remao;
               remnode->remao = remao;
 
               /* Initialize Ao, RemChanAo and remao_item */
               //                objp->NumberOfAO++;
               remao->objp = chanaop;
-              remao->actval = (pwr_tFloat32*)gdh_TranslateRtdbPointer(
+              remao->actval = (pwr_tFloat32 *)gdh_TranslateRtdbPointer(
                   (unsigned long)aop->ActualValue);
               chanaop->ActualValue = aop->ActualValue;
-              remao->rawval = (short int*)&aop->RawValue;
+              remao->rawval = (short int *)&aop->RawValue;
               remao->objp->OldValue = aop->RawValue;
             } /* END Class Ao */
           } /* END Object Ao */
@@ -1137,26 +1134,26 @@ pwr_tStatus RemIO_Init_3964R(remnode_item* remnode)
       while (ODD(sts)) {
         sts = gdh_GetObjectClass(chanobjid, &class);
         if (class == pwr_cClass_RemChan_Co) {
-          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress*)&chancop);
+          sts = gdh_ObjidToPointer(chanobjid, (pwr_tAddress *)&chancop);
           if (ODD(sts)) {
             sigobjid = chancop->SigChanCon;
             sts = gdh_GetObjectClass(sigobjid, &class);
             if (class == pwr_cClass_Co) {
-              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress*)&cop);
+              sts = gdh_ObjidToPointer(sigobjid, (pwr_tAddress *)&cop);
               /* Create new item and link it */
               remco = malloc(sizeof(remco_item));
               if (remco == 0)
                 exit(REM__NOMEMORY);
-              remco->next = (struct remco_item*)remnode->remco;
+              remco->next = (struct remco_item *)remnode->remco;
               remnode->remco = remco;
 
               /* Initialize Co, RemChanCo and remco_item */
               //                objp->NumberOfCo++;
               remco->objp = chancop;
-              remco->extval = (pwr_tInt32*)gdh_TranslateRtdbPointer(
+              remco->extval = (pwr_tInt32 *)gdh_TranslateRtdbPointer(
                   (unsigned long)cop->AbsValue);
               chancop->ExtendedValue = cop->AbsValue;
-              remco->actval = (pwr_tInt32*)gdh_TranslateRtdbPointer(
+              remco->actval = (pwr_tInt32 *)gdh_TranslateRtdbPointer(
                   (unsigned long)cop->RawValue);
               chancop->ActualValue = cop->RawValue;
             } /* END Class Co */
@@ -1189,19 +1186,18 @@ pwr_tStatus RemIO_Init_3964R(remnode_item* remnode)
 **************************************************************************
 **************************************************************************/
 
-pwr_tStatus RemIO_Stall_3964R(remnode_item* remnode, int stall_action)
-{
-  remdi_item* remdi;
-  remdo_item* remdo;
-  remdv_item* remdv;
-  remai_item* remai;
-  remao_item* remao;
+pwr_tStatus RemIO_Stall_3964R(remnode_item *remnode, int stall_action) {
+  remdi_item *remdi;
+  remdo_item *remdo;
+  remdv_item *remdv;
+  remai_item *remai;
+  remao_item *remao;
 
-  pwr_sClass_Remnode3964R* objp;
+  pwr_sClass_Remnode3964R *objp;
   pwr_tStatus sts;
 
   /* Get pointer to remnode-object */
-  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress*)&objp);
+  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress *)&objp);
 
   /* Set StallFlag */
   if (objp->LinkUp != 0) {
@@ -1212,28 +1208,28 @@ pwr_tStatus RemIO_Stall_3964R(remnode_item* remnode, int stall_action)
       remdi = remnode->remdi;
       while (remdi != 0) {
         *remdi->actval = false;
-        remdi = (remdi_item*)remdi->next;
+        remdi = (remdi_item *)remdi->next;
       } /* END while */
 
       remdo = remnode->remdo;
       while (remdo != 0) {
         if (!remdo->objp->PwrIsMaster)
           *remdo->actval = false;
-        remdo = (remdo_item*)remdo->next;
+        remdo = (remdo_item *)remdo->next;
       } /* END while */
 
       remdv = remnode->remdv;
       while (remdv != 0) {
         if (!remdv->objp->PwrIsMaster)
           *remdv->actval = false;
-        remdv = (remdv_item*)remdv->next;
+        remdv = (remdv_item *)remdv->next;
       } /* END while */
 
       remai = remnode->remai;
       while (remai) {
         *remai->rawval = 0;
         *remai->actval = ConvAItoAct(*remai->rawval, remai->objp);
-        remai = (remai_item*)remai->next;
+        remai = (remai_item *)remai->next;
       } /* END while */
 
       remao = remnode->remao;
@@ -1242,7 +1238,7 @@ pwr_tStatus RemIO_Stall_3964R(remnode_item* remnode, int stall_action)
           *remao->rawval = 0;
           *remao->actval = ConvAOtoAct(*remao->rawval, remao->objp);
         }
-        remao = (remao_item*)remao->next;
+        remao = (remao_item *)remao->next;
       } /* END while */
     } /* END if (IOStallAction... */
   } /* END if new IOStallFlag */
@@ -1269,8 +1265,8 @@ pwr_tStatus RemIO_Stall_3964R(remnode_item* remnode, int stall_action)
 **************************************************************************
 **************************************************************************/
 
-pwr_tStatus RemIO_Receive_3964R(
-    remnode_item* remnode, unsigned char* buffer, int size)
+pwr_tStatus RemIO_Receive_3964R(remnode_item *remnode, unsigned char *buffer,
+                                int size)
 
 #define MAX16 32767
 #define MIN16 -32767
@@ -1280,15 +1276,15 @@ pwr_tStatus RemIO_Receive_3964R(
 #define MAXCO24 16777216
 
 {
-  unsigned char* bytep;
-  short int* wordp;
-  int* longp;
-  remdi_item* remdi;
-  remdo_item* remdo;
-  remdv_item* remdv;
-  remai_item* remai;
-  remao_item* remao;
-  remco_item* remco;
+  unsigned char *bytep;
+  short int *wordp;
+  int *longp;
+  remdi_item *remdi;
+  remdo_item *remdo;
+  remdv_item *remdv;
+  remai_item *remai;
+  remao_item *remao;
+  remco_item *remco;
   int nochan;
   pwr_tInt32 longval;
   pwr_tInt32 diff;
@@ -1306,7 +1302,7 @@ pwr_tStatus RemIO_Receive_3964R(
 
   /* Pack up di-bits, set actval */
   bytep = buffer;
-  wordp = (short int*)bytep;
+  wordp = (short int *)bytep;
   nochan = *wordp * 2; /* Convert to bytes */
   remnode->maxremdi = nochan * 8;
   bytep += 2;
@@ -1314,8 +1310,8 @@ pwr_tStatus RemIO_Receive_3964R(
   while (remdi != 0) {
     if (remdi->objp->BuffOff < nochan)
       *remdi->actval = (remdi->objp->ConvMask & *(bytep + remdi->objp->BuffOff))
-          ? true
-          : false;
+                           ? true
+                           : false;
     else {
       err = true;
       if (!remnode->remio_err) {
@@ -1323,21 +1319,21 @@ pwr_tStatus RemIO_Receive_3964R(
         printf(" REMIO fel Di offset %d\n", remdi->objp->ConvOff);
       }
     }
-    remdi = (remdi_item*)remdi->next;
+    remdi = (remdi_item *)remdi->next;
   } /* END while */
 
   /* Pack up do-bits, set actval if not PwrIsMaster */
   bytep += nochan;
-  wordp = (short int*)bytep;
+  wordp = (short int *)bytep;
   nochan = *wordp * 2; /* Convert to bytes */
   remnode->maxremdo = nochan * 8;
   bytep += 2;
   remdo = remnode->remdo;
   while (remdo != 0) {
     if (remdo->objp->BuffOff < nochan) {
-      remdo->objp->OldValue
-          = (remdo->objp->ConvMask & *(bytep + remdo->objp->BuffOff)) ? true
-                                                                      : false;
+      remdo->objp->OldValue =
+          (remdo->objp->ConvMask & *(bytep + remdo->objp->BuffOff)) ? true
+                                                                    : false;
       if (!remdo->objp->PwrIsMaster)
         *remdo->actval = remdo->objp->OldValue;
     } else {
@@ -1347,21 +1343,21 @@ pwr_tStatus RemIO_Receive_3964R(
         printf(" REMIO fel Do offset %d\n", remdo->objp->ConvOff);
       }
     }
-    remdo = (remdo_item*)remdo->next;
+    remdo = (remdo_item *)remdo->next;
   } /* END while */
 
   /* Pack up dv-bits, set actval if not PwrIsMaster */
   bytep += nochan;
-  wordp = (short int*)bytep;
+  wordp = (short int *)bytep;
   nochan = *wordp * 2; /* Convert to bytes */
   remnode->maxremdv = nochan * 8;
   bytep += 2;
   remdv = remnode->remdv;
   while (remdv != 0) {
     if (remdv->objp->BuffOff < nochan) {
-      remdv->objp->OldValue
-          = (remdv->objp->ConvMask & *(bytep + remdv->objp->BuffOff)) ? true
-                                                                      : false;
+      remdv->objp->OldValue =
+          (remdv->objp->ConvMask & *(bytep + remdv->objp->BuffOff)) ? true
+                                                                    : false;
       if (!remdv->objp->PwrIsMaster)
         *remdv->actval = remdv->objp->OldValue;
     } else {
@@ -1371,12 +1367,12 @@ pwr_tStatus RemIO_Receive_3964R(
         printf(" REMIO fel Dv offset %d\n", remdv->objp->ConvOff);
       }
     }
-    remdv = (remdv_item*)remdv->next;
+    remdv = (remdv_item *)remdv->next;
   } /* END while */
 
   /*Convert raw AI values to actual values */
   bytep += nochan;
-  wordp = (short int*)bytep;
+  wordp = (short int *)bytep;
   remnode->maxremai = nochan = *wordp;
   bytep += 2;
   wordp += 1;
@@ -1392,13 +1388,13 @@ pwr_tStatus RemIO_Receive_3964R(
         printf(" REMIO fel Ai offset %d\n", remai->objp->ConvOff);
       }
     }
-    remai = (remai_item*)remai->next;
+    remai = (remai_item *)remai->next;
   } /* END while */
 
   /* Convert raw AO values to actual values, set oldvalue,
         set actval if not PwrIsMaster */
   bytep += nochan * 2; /* Convert to bytes */
-  wordp = (short int*)bytep;
+  wordp = (short int *)bytep;
   remnode->maxremao = nochan = *wordp;
   bytep += 2;
   wordp += 1;
@@ -1417,15 +1413,15 @@ pwr_tStatus RemIO_Receive_3964R(
         printf(" REMIO fel Ao offset %d\n", remao->objp->ConvOff);
       }
     }
-    remao = (remao_item*)remao->next;
+    remao = (remao_item *)remao->next;
   } /* END while */
 
   /* Store Co values in COVALUEBASE and CAVALUEBASE */
   bytep += nochan * 2; /* Convert to bytes */
-  wordp = (short int*)bytep;
+  wordp = (short int *)bytep;
   remnode->maxremco = nochan = *wordp;
   wordp += 1;
-  longp = (int*)wordp;
+  longp = (int *)wordp;
   remco = remnode->remco;
   while (remco) {
     if (remco->objp->ConvOff < nochan) {
@@ -1455,7 +1451,7 @@ pwr_tStatus RemIO_Receive_3964R(
         printf(" REMIO fel Co offset %d\n", remco->objp->ConvOff);
       }
     }
-    remco = (remco_item*)remco->next;
+    remco = (remco_item *)remco->next;
   } /* END while */
 
   /* Was all remote I/O inside buffer ? */
@@ -1481,31 +1477,32 @@ pwr_tStatus RemIO_Receive_3964R(
 **************************************************************************
 **************************************************************************/
 
-pwr_tStatus RemIO_Cyclic_3964R(remnode_item* remnode,
-    void (*send_pollbuff)(remnode_item* remnode, pssupd_buffer_vnet* buf))
-{
-  remdo_item* remdo;
-  remdv_item* remdv;
-  remao_item* remao;
+pwr_tStatus RemIO_Cyclic_3964R(remnode_item *remnode,
+                               void (*send_pollbuff)(remnode_item *remnode,
+                                                     pssupd_buffer_vnet *buf)) {
+  remdo_item *remdo;
+  remdv_item *remdv;
+  remao_item *remao;
   pssupd_buffer_vnet askbuff;
-  pssupd_order_header* buffhead;
+  pssupd_order_header *buffhead;
   unsigned char buffdata[MAX_ORDERS_DATASIZE];
-  unsigned char* datap;
+  unsigned char *datap;
   unsigned int buffsize, datasize;
 
   /* Step through do, dv and ao to see if they should be
         updated remote */
-  buffhead = (pssupd_order_header*)&askbuff.data;
+  buffhead = (pssupd_order_header *)&askbuff.data;
   askbuff.no_of_updates = 0;
   datap = buffdata;
   datasize = buffsize = 0;
 
   remdo = remnode->remdo;
   while (remdo) {
-    if (remdo->objp->PwrIsMaster && (remdo->objp->ConvOff < remnode->maxremdo)
-        && (remdo->objp->OldValue != *remdo->actval)) {
-      if ((buffsize + 2 * (sizeof(pssupd_order_header) + 1))
-          > MAX_ORDER_BUFFERSIZE_VNET) {
+    if (remdo->objp->PwrIsMaster &&
+        (remdo->objp->ConvOff < remnode->maxremdo) &&
+        (remdo->objp->OldValue != *remdo->actval)) {
+      if ((buffsize + 2 * (sizeof(pssupd_order_header) + 1)) >
+          MAX_ORDER_BUFFERSIZE_VNET) {
         /* Add a follow on telegram header. */
         askbuff.no_of_updates++;
         buffhead->type = PSS_Follow_On;
@@ -1513,14 +1510,14 @@ pwr_tStatus RemIO_Cyclic_3964R(remnode_item* remnode,
         *datap = 0;
         buffsize += sizeof(pssupd_order_header) + 1;
         /* Send buffer and re-initiate it! */
-        askbuff.length = (buffsize + sizeof(pssupd_buffer_vnet)
-                             - MAX_ORDER_BUFFERSIZE_VNET + 1)
-            / 2;
+        askbuff.length = (buffsize + sizeof(pssupd_buffer_vnet) -
+                          MAX_ORDER_BUFFERSIZE_VNET + 1) /
+                         2;
         buffhead++;
         memcpy(buffhead, &buffdata, datasize);
         (send_pollbuff)(remnode, &askbuff);
         //        remnode->objp->PollDiff++;
-        buffhead = (pssupd_order_header*)&askbuff.data;
+        buffhead = (pssupd_order_header *)&askbuff.data;
         askbuff.no_of_updates = 0;
         datap = buffdata;
         datasize = buffsize = 0;
@@ -1535,15 +1532,16 @@ pwr_tStatus RemIO_Cyclic_3964R(remnode_item* remnode,
       datasize++;
       buffsize += sizeof(pssupd_order_header) + 1;
     }
-    remdo = (remdo_item*)remdo->next;
+    remdo = (remdo_item *)remdo->next;
   }
 
   remdv = remnode->remdv;
   while (remdv) {
-    if (remdv->objp->PwrIsMaster && (remdv->objp->ConvOff < remnode->maxremdv)
-        && remdv->objp->OldValue != *remdv->actval) {
-      if ((buffsize + 2 * (sizeof(pssupd_order_header) + 1))
-          > MAX_ORDER_BUFFERSIZE_VNET) {
+    if (remdv->objp->PwrIsMaster &&
+        (remdv->objp->ConvOff < remnode->maxremdv) &&
+        remdv->objp->OldValue != *remdv->actval) {
+      if ((buffsize + 2 * (sizeof(pssupd_order_header) + 1)) >
+          MAX_ORDER_BUFFERSIZE_VNET) {
         /* Add a follow on telegram header. */
         askbuff.no_of_updates++;
         buffhead->type = PSS_Follow_On;
@@ -1551,14 +1549,14 @@ pwr_tStatus RemIO_Cyclic_3964R(remnode_item* remnode,
         *datap = 0;
         buffsize += sizeof(pssupd_order_header) + 1;
         /* Send buffer and re-initiate it! */
-        askbuff.length = (buffsize + sizeof(pssupd_buffer_vnet)
-                             - MAX_ORDER_BUFFERSIZE_VNET + 1)
-            / 2;
+        askbuff.length = (buffsize + sizeof(pssupd_buffer_vnet) -
+                          MAX_ORDER_BUFFERSIZE_VNET + 1) /
+                         2;
         buffhead++;
         memcpy(buffhead, &buffdata, datasize);
         (send_pollbuff)(remnode, &askbuff);
         //        remnode->objp->PollDiff++;
-        buffhead = (pssupd_order_header*)&askbuff.data;
+        buffhead = (pssupd_order_header *)&askbuff.data;
         askbuff.no_of_updates = 0;
         datap = buffdata;
         datasize = buffsize = 0;
@@ -1573,7 +1571,7 @@ pwr_tStatus RemIO_Cyclic_3964R(remnode_item* remnode,
       datasize++;
       buffsize += sizeof(pssupd_order_header) + 1;
     }
-    remdv = (remdv_item*)remdv->next;
+    remdv = (remdv_item *)remdv->next;
   }
 
   remao = remnode->remao;
@@ -1581,23 +1579,23 @@ pwr_tStatus RemIO_Cyclic_3964R(remnode_item* remnode,
     if (remao->objp->PwrIsMaster && remao->objp->ConvOff < remnode->maxremao) {
       *remao->rawval = ConvAOtoRaw(*remao->actval, remao->objp);
       if (remao->objp->OldValue != *remao->rawval) {
-        if ((buffsize + 2 * (sizeof(pssupd_order_header) + 2))
-            > MAX_ORDER_BUFFERSIZE_VNET) {
+        if ((buffsize + 2 * (sizeof(pssupd_order_header) + 2)) >
+            MAX_ORDER_BUFFERSIZE_VNET) {
           /* Add a follow on telegram header. */
           askbuff.no_of_updates++;
           buffhead->type = PSS_Follow_On;
           buffhead->size = buffhead->signal = 0;
-          *(short int*)datap = 0;
+          *(short int *)datap = 0;
           buffsize += sizeof(pssupd_order_header) + 2;
           /* Send buffer and re-initiate it! */
-          askbuff.length = (buffsize + sizeof(pssupd_buffer_vnet)
-                               - MAX_ORDER_BUFFERSIZE_VNET + 1)
-              / 2;
+          askbuff.length = (buffsize + sizeof(pssupd_buffer_vnet) -
+                            MAX_ORDER_BUFFERSIZE_VNET + 1) /
+                           2;
           buffhead++;
           memcpy(buffhead, &buffdata, datasize);
           (send_pollbuff)(remnode, &askbuff);
           //          remnode->objp->PollDiff++;
-          buffhead = (pssupd_order_header*)&askbuff.data;
+          buffhead = (pssupd_order_header *)&askbuff.data;
           askbuff.no_of_updates = 0;
           datap = buffdata;
           datasize = buffsize = 0;
@@ -1607,22 +1605,22 @@ pwr_tStatus RemIO_Cyclic_3964R(remnode_item* remnode,
         buffhead->size = 2;
         buffhead->signal = remao->objp->ConvOff;
         buffhead++;
-        *(short int*)datap = *remao->rawval;
+        *(short int *)datap = *remao->rawval;
         datap += 2;
         datasize += 2;
         buffsize += sizeof(pssupd_order_header) + 2;
       }
     }
-    remao = (remao_item*)remao->next;
+    remao = (remao_item *)remao->next;
   }
 
   /* Always send */
   //  if ((askbuff.no_of_updates > 0) /* || remnode->objp->Poll */) {
-  askbuff.length
-      = (buffsize + sizeof(pssupd_buffer_vnet) - MAX_ORDER_BUFFERSIZE_VNET + 1)
-      / 2;
+  askbuff.length =
+      (buffsize + sizeof(pssupd_buffer_vnet) - MAX_ORDER_BUFFERSIZE_VNET + 1) /
+      2;
   memcpy(buffhead, &buffdata, datasize); /* Add data after headers */
-  (send_pollbuff)(remnode, &askbuff); /* Send orders */
+  (send_pollbuff)(remnode, &askbuff);    /* Send orders */
   //    remnode->objp->PollDiff++;
   //  }
 

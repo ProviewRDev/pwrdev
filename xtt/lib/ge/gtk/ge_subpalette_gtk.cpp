@@ -37,7 +37,8 @@
 #include <ctype.h>
 #include <string.h>
 
-extern "C" {
+extern "C"
+{
 #include "pwr_baseclasses.h"
 #include "co_cdh.h"
 #include "co_dcli.h"
@@ -56,12 +57,11 @@ extern "C" {
 //
 // Create the navigator widget
 //
-SubPaletteGtk::SubPaletteGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-    const char* xn_name, GtkWidget** w, pwr_tStatus* status)
+SubPaletteGtk::SubPaletteGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name,
+                             GtkWidget** w, pwr_tStatus* status)
     : SubPalette(xn_parent_ctx, xn_name, status), parent_wid(xn_parent_wid)
 {
-  form_widget
-      = scrolledbrowwidgetgtk_new(SubPalette::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetgtk_new(SubPalette::init_brow_cb, this, &brow_widget);
 
   // Create the root item
   *w = form_widget;
@@ -111,8 +111,7 @@ void SubPaletteGtk::create_popup_menu(char* filename, int x, int y)
   gtk_menu_popup_at_pointer(menu, &ev);
 }
 
-void SubPaletteGtk::menu_position_func(
-    GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data)
+void SubPaletteGtk::menu_position_func(GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data)
 {
   SubPaletteGtk* subpalette = (SubPaletteGtk*)data;
   *x = subpalette->popupmenu_x;

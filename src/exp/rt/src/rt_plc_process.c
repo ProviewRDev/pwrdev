@@ -692,7 +692,7 @@ static void create_thread(plc_sThread* tp, plc_sProctbl* ptp, plc_sProcess* pp)
     return;
   }
 
-  sts = thread_Create(&tp->tid, tp->name, (void* (*)())&plc_thread, tp);
+  sts = thread_Create(&tp->tid, tp->name, (void* (*)()) & plc_thread, tp);
   if (EVEN(sts))
   {
     errh_Error("Creating thread \"%s\", %m", tp->name, sts);

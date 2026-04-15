@@ -18,7 +18,8 @@
 #ifndef pwr_cClass_Ssab_BaseDiCard
 #define pwr_cClass_Ssab_BaseDiCard 4194631704UL
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description pwr_dAlignLW;
   pwr_tUInt32 ErrorCount pwr_dAlignW;
   pwr_tUInt32 ErrorSoftLimit pwr_dAlignW;
@@ -40,7 +41,8 @@ typedef struct {
 #ifndef pwr_cClass_Ssab_BaseDoCard
 #define pwr_cClass_Ssab_BaseDoCard 4194631712UL
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description pwr_dAlignLW;
   pwr_tUInt32 ErrorCount pwr_dAlignW;
   pwr_tUInt32 ErrorSoftLimit pwr_dAlignW;
@@ -66,7 +68,8 @@ typedef struct {
 #ifndef pwr_cClass_Ssab_CO4uP
 #define pwr_cClass_Ssab_CO4uP 4194631752UL
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 Description pwr_dAlignLW;
   pwr_tUInt32 ErrorCount pwr_dAlignW;
   pwr_tUInt32 ErrorSoftLimit pwr_dAlignW;

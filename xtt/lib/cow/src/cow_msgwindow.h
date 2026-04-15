@@ -43,14 +43,25 @@
 
 #include "cow_msglist.h"
 
-typedef enum { msgw_ePop_No, msgw_ePop_Yes, msgw_ePop_Default } msgw_ePop;
+typedef enum
+{
+  msgw_ePop_No,
+  msgw_ePop_Yes,
+  msgw_ePop_Default
+} msgw_ePop;
 
-typedef enum { msgw_eRow_, msgw_eRow_Plc, msgw_eRow_Ge } msgw_eRow;
+typedef enum
+{
+  msgw_eRow_,
+  msgw_eRow_Plc,
+  msgw_eRow_Ge
+} msgw_eRow;
 
 class CoWow;
 class CoWowFocusTimer;
 
-class MsgWindow {
+class MsgWindow
+{
 public:
   MsgWindow(void* msg_parent_ctx, const char* msg_name, pwr_tStatus* status);
   virtual ~MsgWindow();
@@ -76,31 +87,25 @@ public:
   virtual void print();
 
   int is_mapped();
-  void insert(int severity, const char* text, pwr_tOid oid = pwr_cNOid,
-      msgw_eRow row = msgw_eRow_);
-  void insert(int severity, const char* text, char* object, void* utility,
-      msgw_eRow row = msgw_eRow_);
+  void insert(int severity, const char* text, pwr_tOid oid = pwr_cNOid, msgw_eRow row = msgw_eRow_);
+  void insert(int severity, const char* text, char* object, void* utility, msgw_eRow row = msgw_eRow_);
   void set_nodraw();
   void reset_nodraw();
-  void msg(int severity, const char* text, msgw_ePop pop = msgw_ePop_Default,
-      pwr_tOid oid = pwr_cNOid, msgw_eRow row = msgw_eRow_);
+  void msg(int severity, const char* text, msgw_ePop pop = msgw_ePop_Default, pwr_tOid oid = pwr_cNOid,
+           msgw_eRow row = msgw_eRow_);
   void activate_print();
   static void set_default(MsgWindow* msgw);
   static int has_default();
-  static void message(int severity, const char* text,
-      msgw_ePop pop = msgw_ePop_Default, pwr_tOid oid = pwr_cNOid,
-      msgw_eRow row = msgw_eRow_);
-  static void message(int severity, const char* text, msgw_ePop pop,
-      char* object, void* utility, msgw_eRow row = msgw_eRow_);
-  static void message(const co_error& e, const char* text1 = 0,
-      const char* text2 = 0, pwr_tOid oid = pwr_cNOid,
-      msgw_eRow row = msgw_eRow_);
-  static void message(int severity, const char* text1, const char* text2,
-      const char* text3 = 0, pwr_tOid oid = pwr_cNOid,
-      msgw_eRow row = msgw_eRow_);
-  static void message(int severity, const char* text1, const char* text2,
-      const char* text3, char* object, void* utility,
-      msgw_eRow row = msgw_eRow_);
+  static void message(int severity, const char* text, msgw_ePop pop = msgw_ePop_Default,
+                      pwr_tOid oid = pwr_cNOid, msgw_eRow row = msgw_eRow_);
+  static void message(int severity, const char* text, msgw_ePop pop, char* object, void* utility,
+                      msgw_eRow row = msgw_eRow_);
+  static void message(const co_error& e, const char* text1 = 0, const char* text2 = 0,
+                      pwr_tOid oid = pwr_cNOid, msgw_eRow row = msgw_eRow_);
+  static void message(int severity, const char* text1, const char* text2, const char* text3 = 0,
+                      pwr_tOid oid = pwr_cNOid, msgw_eRow row = msgw_eRow_);
+  static void message(int severity, const char* text1, const char* text2, const char* text3, char* object,
+                      void* utility, msgw_eRow row = msgw_eRow_);
   static bool has_window();
   static CoWow* get_wow();
   static void map_default();

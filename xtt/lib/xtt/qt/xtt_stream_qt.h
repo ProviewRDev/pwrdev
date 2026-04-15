@@ -51,10 +51,11 @@
 
 class XttStreamQtWidget;
 
-class XttStreamQt : public XttStream {
+class XttStreamQt : public XttStream
+{
 public:
   Phonon::VideoPlayer* playbin2; /* Our one and only pipeline */
-  Phonon::State state; /* Current state of the pipeline */
+  Phonon::State state;           /* Current state of the pipeline */
   pwr_tTime mb_press_time;
   int mb_press_x;
   int mb_press_y;
@@ -72,19 +73,15 @@ public:
   CoWowTimer* reconnect_timerid;
   int no_uri;
 
-  XttStreamQt(void* parent_ctx, const char* name, const char* uri, int width,
-      int height, int x, int y, double scan_time, unsigned int options,
-      int embedded, pwr_tAttrRef* arp, pwr_tStatus* sts);
+  XttStreamQt(void* parent_ctx, const char* name, const char* uri, int width, int height, int x, int y,
+              double scan_time, unsigned int options, int embedded, pwr_tAttrRef* arp, pwr_tStatus* sts);
   ~XttStreamQt();
 
   void pop();
   void set_size(int width, int height);
   void hidePtz();
 
-  void* get_widget()
-  {
-    return toplevel;
-  }
+  void* get_widget() { return toplevel; }
 
   void create_popup_menu(int x, int y);
   void erase_window();
@@ -95,7 +92,8 @@ public:
   XttStreamQtWidget* toplevel;
 };
 
-class XttStreamQtWidget : public QWidget {
+class XttStreamQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

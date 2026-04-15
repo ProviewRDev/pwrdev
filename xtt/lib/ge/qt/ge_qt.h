@@ -50,7 +50,8 @@
 
 class GeQtWidget;
 
-class GeQt : public Ge {
+class GeQt : public Ge
+{
 public:
   GeQtWidget* toplevel;
   QWidget* grow_widget;
@@ -79,41 +80,36 @@ public:
   CoWowEntryQt* recall_entry;
 
 public:
-  GeQt(void* parent_ctx, ldh_tSesContext ldhses, int exit_when_close,
-        unsigned int options, char* graph_name);
+  GeQt(void* parent_ctx, ldh_tSesContext ldhses, int exit_when_close, unsigned int options, char* graph_name);
   ~GeQt();
 
   virtual void set_title(char* title);
-  virtual void open_input_dialog(const char* text, const char* title,
-      const char* init_text, void (*india_ok_cb)(Ge*, char*));
+  virtual void open_input_dialog(const char* text, const char* title, const char* init_text,
+                                 void (*india_ok_cb)(Ge*, char*));
   virtual void message(char severity, const char* message);
   virtual void status_msg(char* pos_str);
-  virtual void open_yesnodia(const char* text, const char* title,
-      void (*yes_cb)(Ge*), void (*no_cb)(Ge*));
+  virtual void open_yesnodia(const char* text, const char* title, void (*yes_cb)(Ge*), void (*no_cb)(Ge*));
   virtual void set_prompt(const char* prompt);
   virtual void subgraphs_new();
   virtual void update();
   virtual int get_plant_select(char* name, int size);
-  virtual void* create_list(const char* title, const char* texts,
-      void(action_cb)(void*, char*, int), void(cancel_cb)(void*), void* ctx);
-  virtual int create_modal_dialog(const char* title, const char* text,
-      const char* button1, const char* button2, const char* button3,
-      const char* image);
+  virtual void* create_list(const char* title, const char* texts, void(action_cb)(void*, char*, int),
+                            void(cancel_cb)(void*), void* ctx);
+  virtual int create_modal_dialog(const char* title, const char* text, const char* button1,
+                                  const char* button2, const char* button3, const char* image);
 
   static void change_text_cb(void* ge_ctx, void* text_object, const char* text);
   static void change_name_cb(void* ge_ctx, void* text_object, char* text);
   static void change_value_cb(void* ge_ctx, void* value_object, char* text);
-  static void objectnav_change_value_cb(
-      void* ge_ctx, int multiline, int size, char* text);
+  static void objectnav_change_value_cb(void* ge_ctx, int multiline, int size, char* text);
   static void confirm_cb(void* ge_ctx, void* confirm_object, char* text);
 
-  static void graph_file_selected_cb(
-      void* ctx, char* filename, wow_eFileSelType file_type);
-  static void image_file_selected_cb(
-      void* ctx, char* filename, wow_eFileSelType file_type);
+  static void graph_file_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type);
+  static void image_file_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type);
 };
 
-class GeQtWidget : public QWidget {
+class GeQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

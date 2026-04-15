@@ -70,61 +70,68 @@ static pthread_mutex_t l_mutex;
 
 void Count(pwr_tBoolean receive, pwr_tNodeId nid, qcom_sType* type);
 
-static pwr_tBoolean ConvertPut(
-    pwr_tStatus* sts, qcom_sQid* qid, qcom_sPut* put, void* data);
+static pwr_tBoolean ConvertPut(pwr_tStatus* sts, qcom_sQid* qid, qcom_sPut* put, void* data);
 
 static pwr_tBoolean ConvertGet(pwr_tStatus* sts, qcom_sGet* get, void* data);
 
 static pwr_tBoolean Send(pwr_tStatus* sts, qcom_sQid* tgt, qcom_sPut* put);
 
-static pwr_tBoolean Put(pwr_tStatus* sts, qcom_sQid* tgt, void* mp,
-    net_eMsg subtype, unsigned int id, unsigned int size);
+static pwr_tBoolean Put(pwr_tStatus* sts, qcom_sQid* tgt, void* mp, net_eMsg subtype, unsigned int id,
+                        unsigned int size);
 
 static void* Receive(pwr_tStatus* sts, qcom_sGet* get, int tmo);
 
 static pwr_tBoolean Reply(pwr_tStatus* sts, qcom_sGet* get, qcom_sPut* put);
 
-static void* Request(pwr_tStatus* sts, qcom_sQid* tgt, qcom_sPut* put,
-    qcom_sGet* get, net_eMsg subtype, pwr_tBitMask flags);
+static void* Request(pwr_tStatus* sts, qcom_sQid* tgt, qcom_sPut* put, qcom_sGet* get, net_eMsg subtype,
+                     pwr_tBitMask flags);
 
 typedef bool_t (*tFuncXdr)(XDR*, void*);
 
 static tFuncXdr func_xdr[net_eMsg_] = {
-  (tFuncXdr)xdr_net_sError, /* A network error was detected */
+    (tFuncXdr)xdr_net_sError, /* A network error was detected */
 
-  (tFuncXdr)xdr_net_sId, /* Nethandler identification */
-  (tFuncXdr)xdr_net_sId, /* Nethandler identification acknowlege */
-  (tFuncXdr)xdr_net_sIdAck2, /* Nethandler idAck acknowlege */
+    (tFuncXdr)xdr_net_sId,     /* Nethandler identification */
+    (tFuncXdr)xdr_net_sId,     /* Nethandler identification acknowlege */
+    (tFuncXdr)xdr_net_sIdAck2, /* Nethandler idAck acknowlege */
 
-  (tFuncXdr)xdr_net_sVolumes, /*  */
-  (tFuncXdr)xdr_net_sVolumesR, /*  */
+    (tFuncXdr)xdr_net_sVolumes,  /*  */
+    (tFuncXdr)xdr_net_sVolumesR, /*  */
 
-  (tFuncXdr)xdr_net_sSubAdd, /* Add subscription */
-  (tFuncXdr)xdr_net_sSubRemove, /* Remove subscription */
-  (tFuncXdr)xdr_net_sSubMessage, /* Subscription data transfer */
+    (tFuncXdr)xdr_net_sSubAdd,     /* Add subscription */
+    (tFuncXdr)xdr_net_sSubRemove,  /* Remove subscription */
+    (tFuncXdr)xdr_net_sSubMessage, /* Subscription data transfer */
 
-  (tFuncXdr)xdr_net_sSanAdd, /* Add subscription */
-  (tFuncXdr)xdr_net_sSanRemove, /* Remove subscription */
-  (tFuncXdr)xdr_net_sSanUpdate, /* Subscription data transfer */
+    (tFuncXdr)xdr_net_sSanAdd,    /* Add subscription */
+    (tFuncXdr)xdr_net_sSanRemove, /* Remove subscription */
+    (tFuncXdr)xdr_net_sSanUpdate, /* Subscription data transfer */
 
-  (tFuncXdr)xdr_net_sNameToObject, /* Cache inquiry, fetch name */
-  (tFuncXdr)xdr_net_sOidToObject, /* Cache inquiry, fetch objid */
-  (tFuncXdr)xdr_net_sObjectR, /* response */
+    (tFuncXdr)xdr_net_sNameToObject, /* Cache inquiry, fetch name */
+    (tFuncXdr)xdr_net_sOidToObject,  /* Cache inquiry, fetch objid */
+    (tFuncXdr)xdr_net_sObjectR,      /* response */
 
-  (tFuncXdr)xdr_net_sGetObjectInfo, (tFuncXdr)xdr_net_sGetObjectInfoR,
-  (tFuncXdr)xdr_net_sSetObjectInfo, (tFuncXdr)xdr_net_sSetObjectInfoR,
+    (tFuncXdr)xdr_net_sGetObjectInfo,
+    (tFuncXdr)xdr_net_sGetObjectInfoR,
+    (tFuncXdr)xdr_net_sSetObjectInfo,
+    (tFuncXdr)xdr_net_sSetObjectInfoR,
 
-  NULL, /*xdr_net_sFlush,*/ /* Cache flush request */
+    NULL,
+    /*xdr_net_sFlush,*/ /* Cache flush request */
 
-  (tFuncXdr)xdr_net_sCreateObject, (tFuncXdr)xdr_net_sDeleteObject,
-  (tFuncXdr)xdr_net_sMoveObject, (tFuncXdr)xdr_net_sRenameObject,
+    (tFuncXdr)xdr_net_sCreateObject,
+    (tFuncXdr)xdr_net_sDeleteObject,
+    (tFuncXdr)xdr_net_sMoveObject,
+    (tFuncXdr)xdr_net_sRenameObject,
 
-  (tFuncXdr)xdr_net_sNodeUp, /* A node is up */
-  NULL, /*xdr_net_sNodeDown*/ /* A node is down */
+    (tFuncXdr)xdr_net_sNodeUp, /* A node is up */
+    NULL,
+    /*xdr_net_sNodeDown*/ /* A node is down */
 
-  (tFuncXdr)xdr_net_sGetCclass, (tFuncXdr)xdr_net_sGetCclassR,
-  (tFuncXdr)xdr_net_sGetGclass, (tFuncXdr)xdr_net_sGetGclassR,
-  (tFuncXdr)xdr_net_sId /* Sever connect */
+    (tFuncXdr)xdr_net_sGetCclass,
+    (tFuncXdr)xdr_net_sGetCclassR,
+    (tFuncXdr)xdr_net_sGetGclass,
+    (tFuncXdr)xdr_net_sGetGclassR,
+    (tFuncXdr)xdr_net_sId /* Sever connect */
 
 };
 
@@ -139,7 +146,8 @@ void Count(pwr_tBoolean receive, pwr_tNodeId nid, qcom_sType* type)
   if (np == NULL)
     return;
 
-  if ((msgtype >= net_eMsg_) || (msgtype <= net_eMsg__)) {
+  if ((msgtype >= net_eMsg_) || (msgtype <= net_eMsg__))
+  {
     if (msgtype != net_eMsg_volumes7)
       return;
     msgtype = net_eMsg_volumes;
@@ -151,8 +159,7 @@ void Count(pwr_tBoolean receive, pwr_tNodeId nid, qcom_sType* type)
     np->txmsg[msgtype]++;
 }
 
-static pwr_tBoolean ConvertPut(
-    pwr_tStatus* sts, qcom_sQid* qid, qcom_sPut* put, void* data)
+static pwr_tBoolean ConvertPut(pwr_tStatus* sts, qcom_sQid* qid, qcom_sPut* put, void* data)
 {
   pwr_tStatus lsts;
   XDR xdrs;
@@ -172,17 +179,20 @@ static pwr_tBoolean ConvertPut(
    * Neth version 7 and later. If this is needed for more messages
    * then a generic solution must be implemented.
    */
-  if (put->type.s == (qcom_eStype)net_eMsg_volumes7) {
+  if (put->type.s == (qcom_eStype)net_eMsg_volumes7)
+  {
     put->type.s = (qcom_eStype)net_eMsg_volumes;
     fXdr = (tFuncXdr)xdr_net_sVolumes7;
-  } else {
-    if ((int)put->type.s <= (int)net_eMsg__
-        || (int)put->type.s >= (int)net_eMsg_)
+  }
+  else
+  {
+    if ((int)put->type.s <= (int)net_eMsg__ || (int)put->type.s >= (int)net_eMsg_)
       pwr_Return(FALSE, sts, NET__NOSUCHQCOMSUBT);
     fXdr = func_xdr[(int)put->type.s];
   }
 
-  if (np == qdb->my_node || np->bo == qdb->my_node->bo) {
+  if (np == qdb->my_node || np->bo == qdb->my_node->bo)
+  {
     if (put->data != data)
       memcpy(put->data, data, put->size);
     pwr_Return(TRUE, sts, NET__SUCCESS);
@@ -218,7 +228,8 @@ static pwr_tBoolean ConvertGet(pwr_tStatus* sts, qcom_sGet* get, void* data)
    * then a generic solution must be implemented.
    */
   fXdr = func_xdr[(int)get->type.s];
-  if (get->type.s == (qcom_eStype)net_eMsg_volumes) {
+  if (get->type.s == (qcom_eStype)net_eMsg_volumes)
+  {
     gdb_ScopeLock
     {
       gnp = hash_Search(&lsts, gdbroot->nid_ht, &np->nid);
@@ -226,7 +237,8 @@ static pwr_tBoolean ConvertGet(pwr_tStatus* sts, qcom_sGet* get, void* data)
     }
     gdb_ScopeUnlock;
 
-    if (netver == 7) {
+    if (netver == 7)
+    {
       get->type.s = (qcom_eStype)net_eMsg_volumes7;
       fXdr = (tFuncXdr)xdr_net_sVolumes7;
     }
@@ -234,12 +246,15 @@ static pwr_tBoolean ConvertGet(pwr_tStatus* sts, qcom_sGet* get, void* data)
 
   /* Fix for getGclassR message from from V4.8.2 with incompatible ClassDef
    * element */
-  if (get->type.s == (qcom_eStype)net_eMsg_getGclassR) {
+  if (get->type.s == (qcom_eStype)net_eMsg_getGclassR)
+  {
     int sts = ((net_sGetGclassR*)get->data)->sts;
-    if (sts & 1) {
+    if (sts & 1)
+    {
       int* ip = (int*)&((net_sGetGclassR*)get->data)->gclass.bo;
       int size = get->size - ((char*)ip - (char*)get->data) - 4;
-      if (*ip == 0 && ((net_sGetGclassR*)get->data)->attr[0].ao.oid.vid == 0) {
+      if (*ip == 0 && ((net_sGetGclassR*)get->data)->attr[0].ao.oid.vid == 0)
+      {
         char* tmp = malloc(size);
         memcpy(tmp, ip + 1, size);
         memcpy(ip, tmp, size);
@@ -248,7 +263,8 @@ static pwr_tBoolean ConvertGet(pwr_tStatus* sts, qcom_sGet* get, void* data)
 
         int i;
         int acount = ((net_sGetGclassR*)get->data)->gclass.acount;
-        for (i = 0; i < acount; i++) {
+        for (i = 0; i < acount; i++)
+        {
           ip = (int*)&((net_sGetGclassR*)get->data)->attr[i];
           size = get->size - ((char*)ip - (char*)get->data) - 4;
           if (size <= 0)
@@ -263,7 +279,8 @@ static pwr_tBoolean ConvertGet(pwr_tStatus* sts, qcom_sGet* get, void* data)
     }
   }
 
-  if (np == qdb->my_node || np->bo == qdb->my_node->bo) {
+  if (np == qdb->my_node || np->bo == qdb->my_node->bo)
+  {
     if (get->data != data)
       memcpy(data, get->data, get->size);
     pwr_Return(TRUE, sts, NET__SUCCESS);
@@ -279,8 +296,7 @@ static pwr_tBoolean ConvertGet(pwr_tStatus* sts, qcom_sGet* get, void* data)
 
 static pwr_tBoolean Reply(pwr_tStatus* sts, qcom_sGet* get, qcom_sPut* put)
 {
-  pwr_Assert((put->size == 0 && put->data == NULL)
-      || (put->size != 0 && put->data != NULL));
+  pwr_Assert((put->size == 0 && put->data == NULL) || (put->size != 0 && put->data != NULL));
 
   put->type.b = net_cMsgClass;
   put->reply = gdbroot->my_qid;
@@ -298,8 +314,7 @@ static pwr_tBoolean Reply(pwr_tStatus* sts, qcom_sGet* get, qcom_sPut* put)
 
 static pwr_tBoolean Send(pwr_tStatus* sts, qcom_sQid* tgt, qcom_sPut* put)
 {
-  pwr_Assert((put->size == 0 && put->data == NULL)
-      || (put->size != 0 && put->data != NULL));
+  pwr_Assert((put->size == 0 && put->data == NULL) || (put->size != 0 && put->data != NULL));
 
   put->type.b = net_cMsgClass;
   put->reply = gdbroot->my_qid;
@@ -315,8 +330,8 @@ static pwr_tBoolean Send(pwr_tStatus* sts, qcom_sQid* tgt, qcom_sPut* put)
   return TRUE;
 }
 
-static pwr_tBoolean Put(pwr_tStatus* sts, qcom_sQid* tgt, void* mp,
-    net_eMsg subtype, unsigned int id, unsigned int size)
+static pwr_tBoolean Put(pwr_tStatus* sts, qcom_sQid* tgt, void* mp, net_eMsg subtype, unsigned int id,
+                        unsigned int size)
 {
   pwr_tStatus lsts;
   qcom_sPut put;
@@ -332,12 +347,14 @@ static pwr_tBoolean Put(pwr_tStatus* sts, qcom_sQid* tgt, void* mp,
   if (put.data == NULL)
     pwr_Return(FALSE, sts, NET__NULLDATA);
 
-  if (!ConvertPut(sts, tgt, &put, mp)) {
+  if (!ConvertPut(sts, tgt, &put, mp))
+  {
     qcom_Free(NULL, put.data);
     return FALSE;
   }
 
-  if (!qcom_Put(sts, tgt, &put)) {
+  if (!qcom_Put(sts, tgt, &put))
+  {
     qcom_Free(NULL, put.data);
     return FALSE;
   }
@@ -357,9 +374,11 @@ static void* Receive(pwr_tStatus* sts, qcom_sGet* get, int tmo)
   if (p == NULL)
     return NULL;
 
-  if (get->type.b == net_cMsgClass) {
+  if (get->type.b == net_cMsgClass)
+  {
     Count(1, get->sender.nid, &get->type);
-    if (!ConvertGet(sts, get, p)) {
+    if (!ConvertGet(sts, get, p))
+    {
       qcom_Free(NULL, p);
       return NULL;
     }
@@ -368,14 +387,13 @@ static void* Receive(pwr_tStatus* sts, qcom_sGet* get, int tmo)
   return p;
 }
 
-static void* Request(pwr_tStatus* sts, qcom_sQid* tgt, qcom_sPut* put,
-    qcom_sGet* get, net_eMsg subtype, pwr_tBitMask flags)
+static void* Request(pwr_tStatus* sts, qcom_sQid* tgt, qcom_sPut* put, qcom_sGet* get, net_eMsg subtype,
+                     pwr_tBitMask flags)
 {
   void* gmp;
   qcom_sGet lget;
 
-  pwr_Assert((put->size == 0 && put->data == NULL)
-      || (put->size != 0 && put->data != NULL));
+  pwr_Assert((put->size == 0 && put->data == NULL) || (put->size != 0 && put->data != NULL));
 
   if (get == NULL)
     get = &lget;
@@ -388,19 +406,20 @@ static void* Request(pwr_tStatus* sts, qcom_sQid* tgt, qcom_sPut* put,
   if (!ConvertPut(sts, tgt, put, put->data))
     return NULL;
 
-  gmp = qcom_Request(
-      sts, tgt, put, &gdbroot->my_qid, get, net_cSendRcvTmo, flags);
+  gmp = qcom_Request(sts, tgt, put, &gdbroot->my_qid, get, net_cSendRcvTmo, flags);
   if (gmp == NULL)
     return NULL;
 
   Count(0, tgt->nid, &put->type);
 
-  if (get->type.b != net_cMsgClass || get->type.s != (qcom_eStype)subtype) {
+  if (get->type.b != net_cMsgClass || get->type.s != (qcom_eStype)subtype)
+  {
     qcom_Free(NULL, gmp);
     pwr_Return(NULL, sts, QCOM__WEIRD);
   }
 
-  if (!ConvertGet(sts, get, gmp)) {
+  if (!ConvertGet(sts, get, gmp))
+  {
     qcom_Free(NULL, gmp);
     return NULL;
   }
@@ -464,8 +483,7 @@ pwr_tBoolean net_Send(pwr_tStatus* status, qcom_sQid* tgt, qcom_sPut* put)
 /* Same as net_Send, but used when replying to a request.
    Gives possibility to control msn.  */
 
-pwr_tBoolean net_Reply(
-    pwr_tStatus* status, qcom_sGet* get, qcom_sPut* put, pwr_tSid sid)
+pwr_tBoolean net_Reply(pwr_tStatus* status, qcom_sGet* get, qcom_sPut* put, pwr_tSid sid)
 {
   pwr_tBoolean ok;
   pwr_dStatus(sts, status, NET__SUCCESS);
@@ -480,8 +498,8 @@ pwr_tBoolean net_Reply(
   return ok;
 }
 
-pwr_tBoolean net_Put(pwr_tStatus* status, qcom_sQid* tgt, void* mp,
-    net_eMsg type, unsigned int id, int size, pwr_tSid sid)
+pwr_tBoolean net_Put(pwr_tStatus* status, qcom_sQid* tgt, void* mp, net_eMsg type, unsigned int id, int size,
+                     pwr_tSid sid)
 {
   pwr_tBoolean ok;
   pwr_dStatus(sts, status, NET__SUCCESS);
@@ -510,8 +528,8 @@ void* net_Receive(pwr_tStatus* status, qcom_sGet* get, int tmo)
   return p;
 }
 
-void* net_Request(pwr_tStatus* status, qcom_sQid* tgt, qcom_sPut* put,
-    qcom_sGet* get, net_eMsg gtype, pwr_tBitMask flags, pwr_tSid sid)
+void* net_Request(pwr_tStatus* status, qcom_sQid* tgt, qcom_sPut* put, qcom_sGet* get, net_eMsg gtype,
+                  pwr_tBitMask flags, pwr_tSid sid)
 {
   void* p;
   pwr_dStatus(sts, status, NET__SUCCESS);
@@ -528,13 +546,13 @@ void* net_Request(pwr_tStatus* status, qcom_sQid* tgt, qcom_sPut* put,
   return p;
 }
 
-pwr_tBoolean net_Connect(pwr_tStatus* status, qcom_sAid* aid, qcom_sQid* qid,
-    qcom_sQattr* attr, const char* name)
+pwr_tBoolean net_Connect(pwr_tStatus* status, qcom_sAid* aid, qcom_sQid* qid, qcom_sQattr* attr,
+                         const char* name)
 {
   pwr_tBoolean ok;
   pwr_dStatus(sts, status, NET__SUCCESS);
 
-/* Initialize. This routine should be called exactly once... */
+  /* Initialize. This routine should be called exactly once... */
 
   {
     pthread_mutexattr_t mattr;
@@ -547,7 +565,8 @@ pwr_tBoolean net_Connect(pwr_tStatus* status, qcom_sAid* aid, qcom_sQid* qid,
   }
 
   qcom_sQattr lattr;
-  if (!attr) {
+  if (!attr)
+  {
     lattr.type = qcom_eQtype_private;
     lattr.quota = 5000;
     attr = &lattr;
@@ -635,7 +654,8 @@ int net_GetTime(net_sTime* nt)
 int net_StringToAddr(char* str, struct in_addr* naddr)
 {
   naddr->s_addr = inet_network(str);
-  if (naddr->s_addr == (unsigned int)-1) {
+  if (naddr->s_addr == (unsigned int)-1)
+  {
     /* Try name instead */
     struct addrinfo hints;
     struct addrinfo* res;
@@ -645,11 +665,13 @@ int net_StringToAddr(char* str, struct in_addr* naddr)
     hints.ai_socktype = SOCK_STREAM;
 
     err = getaddrinfo(str, 0, &hints, &res);
-    if (err < 0) {
+    if (err < 0)
+    {
       return 0;
     }
 
-    switch (res->ai_family) {
+    switch (res->ai_family)
+    {
     case AF_INET:
       memcpy(&naddr->s_addr, (char*)&res->ai_addr->sa_data + 2, 4);
       naddr->s_addr = ntohl(naddr->s_addr);

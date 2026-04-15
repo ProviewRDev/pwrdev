@@ -62,14 +62,12 @@
 
 static void* graph_list_files();
 static gpointer graph_list_store(char*);
-static void directory_changed(
-    GFileMonitor*, GFile*, GFile*, GFileMonitorEvent, gpointer);
+static void directory_changed(GFileMonitor*, GFile*, GFile*, GFileMonitorEvent, gpointer);
 static gboolean button_press_tree_widget(GtkWidget*, GdkEvent*, gpointer);
 static void select_tree_item_pos(GtkWidget*, gint, gint);
 static void autosave_toggled(GtkToggleButton*, gpointer);
 
-GeItemViewGtk::GeItemViewGtk(gpointer gectx)
-    : ge_ctx(gectx), toplevel_widget(0), tree_widget(0)
+GeItemViewGtk::GeItemViewGtk(gpointer gectx) : ge_ctx(gectx), toplevel_widget(0), tree_widget(0)
 {
   GtkCellRenderer* text_renderer;
   GtkTreeViewColumn* name_column;
@@ -78,36 +76,30 @@ GeItemViewGtk::GeItemViewGtk(gpointer gectx)
   GFileMonitor* monitor;
   char full_path[256];
 
-  tree_widget = (GtkWidget*)g_object_new(GTK_TYPE_TREE_VIEW, "rules-hint", TRUE,
-      "headers-visible", FALSE, "reorderable", TRUE, "enable-search", TRUE,
-      "search-column", 0, NULL);
+  tree_widget =
+      (GtkWidget*)g_object_new(GTK_TYPE_TREE_VIEW, "rules-hint", TRUE, "headers-visible", FALSE,
+                               "reorderable", TRUE, "enable-search", TRUE, "search-column", 0, NULL);
 
-  g_signal_connect(
-      tree_widget, "row-activated", G_CALLBACK(activate_tree_widget), this);
+  g_signal_connect(tree_widget, "row-activated", G_CALLBACK(activate_tree_widget), this);
 
-  g_signal_connect(tree_widget, "button-press-event",
-      G_CALLBACK(button_press_tree_widget), this);
+  g_signal_connect(tree_widget, "button-press-event", G_CALLBACK(button_press_tree_widget), this);
 
-  g_signal_connect(
-      tree_widget, "focus-out-event", G_CALLBACK(focus_out_tree_widget), this);
+  g_signal_connect(tree_widget, "focus-out-event", G_CALLBACK(focus_out_tree_widget), this);
 
   text_renderer = gtk_cell_renderer_text_new();
-  name_column = gtk_tree_view_column_new_with_attributes(
-      "", text_renderer, "text", 0, NULL);
+  name_column = gtk_tree_view_column_new_with_attributes("", text_renderer, "text", 0, NULL);
   g_object_set(name_column, "resizable", FALSE, "clickable", TRUE, NULL);
   gtk_tree_view_append_column(GTK_TREE_VIEW(tree_widget), name_column);
 
   autosave_button = gtk_check_button_new_with_label("Autosave");
   autosave_toggled(GTK_TOGGLE_BUTTON(autosave_button), (gpointer)TRUE);
-  g_signal_connect(autosave_button, "toggled", G_CALLBACK(autosave_toggled),
-      (gpointer)FALSE);
+  g_signal_connect(autosave_button, "toggled", G_CALLBACK(autosave_toggled), (gpointer)FALSE);
 
   scrolled_widget = gtk_scrolled_window_new(NULL, NULL);
   gtk_container_add(GTK_CONTAINER(scrolled_widget), tree_widget);
 
   toplevel_widget = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_box_pack_start(
-      GTK_BOX(toplevel_widget), autosave_button, FALSE, FALSE, 8);
+  gtk_box_pack_start(GTK_BOX(toplevel_widget), autosave_button, FALSE, FALSE, 8);
   gtk_box_pack_start(GTK_BOX(toplevel_widget), scrolled_widget, TRUE, TRUE, 0);
 
   update();
@@ -118,15 +110,9 @@ GeItemViewGtk::GeItemViewGtk(gpointer gectx)
   g_signal_connect(monitor, "changed", G_CALLBACK(directory_changed), this);
 }
 
-GeItemViewGtk::~GeItemViewGtk()
-{
-  gtk_widget_destroy(toplevel_widget);
-}
+GeItemViewGtk::~GeItemViewGtk() { gtk_widget_destroy(toplevel_widget); }
 
-GtkWidget* GeItemViewGtk::widget() const
-{
-  return toplevel_widget;
-}
+GtkWidget* GeItemViewGtk::widget() const { return toplevel_widget; }
 
 void GeItemViewGtk::update()
 {
@@ -164,10 +150,12 @@ void GeItemViewGtk::update(char* full_name, int event)
   store = gtk_tree_view_get_model(GTK_TREE_VIEW(tree_widget));
   rv = gtk_tree_model_get_iter_first(store, &iter);
 
-  if (event == G_FILE_MONITOR_EVENT_CREATED) {
+  if (event == G_FILE_MONITOR_EVENT_CREATED)
+  {
     GtkTreeIter sibl;
 
-    while (rv) {
+    while (rv)
+    {
       gtk_tree_model_get(store, &iter, 0, &value, -1);
       if (strcmp(name_p, value) < 0)
         break;
@@ -181,10 +169,14 @@ void GeItemViewGtk::update(char* full_name, int event)
       gtk_list_store_append(GTK_LIST_STORE(store), &iter);
 
     gtk_list_store_set(GTK_LIST_STORE(store), &iter, 0, nameutf8, -1);
-  } else if (event == G_FILE_MONITOR_EVENT_DELETED) {
-    while (rv) {
+  }
+  else if (event == G_FILE_MONITOR_EVENT_DELETED)
+  {
+    while (rv)
+    {
       gtk_tree_model_get(store, &iter, 0, &value, -1);
-      if (streq(name_p, value)) {
+      if (streq(name_p, value))
+      {
         gtk_list_store_remove(GTK_LIST_STORE(store), &iter);
         break;
       }
@@ -213,10 +205,7 @@ char* GeItemViewGtk::selected_text(GtkWidget* tree_widget)
   return sel_text;
 }
 
-char* GeItemViewGtk::selected_text() const
-{
-  return selected_text(tree_widget);
-}
+char* GeItemViewGtk::selected_text() const { return selected_text(tree_widget); }
 
 void GeItemViewGtk::activate_menu_open(GtkWidget* w, gpointer data)
 {
@@ -225,15 +214,16 @@ void GeItemViewGtk::activate_menu_open(GtkWidget* w, gpointer data)
 
   item_view = (GeItemViewGtk*)data;
   ge = (GeGtk*)item_view->ge_ctx;
-  if (ge->graph->is_modified()) {
+  if (ge->graph->is_modified())
+  {
     int rv;
     char title[] = "Save changes";
     char message[64];
 
     sprintf(message, "Your changes will be lost. Do you want to save?");
-    rv = ge->create_modal_dialog(
-        title, message, "Yes", "Discard", "Cancel", NULL);
-    switch (rv) {
+    rv = ge->create_modal_dialog(title, message, "Yes", "Discard", "Cancel", NULL);
+    switch (rv)
+    {
     case wow_eModalDialogReturn_Button1:
       // Yes
       GeGtk::activate_save(NULL, item_view->ge_ctx);
@@ -256,7 +246,8 @@ void GeItemViewGtk::activate_menu_delete(GtkWidget* w, gpointer data)
 
   item_view = (GeItemViewGtk*)data;
   sel_text = item_view->selected_text();
-  if (sel_text) {
+  if (sel_text)
+  {
     int rv;
     char title[] = "Delete graph";
     char message[64];
@@ -295,18 +286,24 @@ void* graph_list_files()
   file_cnt = 0;
   allocated = 0;
   sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_INIT);
-  while (ODD(sts)) {
-    if (strstr(found_file, "__p")) {
+  while (ODD(sts))
+  {
+    if (strstr(found_file, "__p"))
+    {
       // Skip subgraph pages
       sts = dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_NEXT);
       continue;
     }
     file_cnt++;
-    if (file_cnt > allocated - 1) {
-      if (allocated == 0) {
+    if (file_cnt > allocated - 1)
+    {
+      if (allocated == 0)
+      {
         allocated = 100;
         file_p = (pwr_tString80*)malloc(allocated * sizeof(*file_p));
-      } else {
+      }
+      else
+      {
         old_file_p = file_p;
         old_allocated = allocated;
         allocated += 100;
@@ -323,7 +320,8 @@ void* graph_list_files()
   }
   dcli_search_file(fname, found_file, DCLI_DIR_SEARCH_END);
 
-  if (!file_cnt) {
+  if (!file_cnt)
+  {
     return 0;
   }
 
@@ -345,7 +343,8 @@ gpointer graph_list_store(char* texts)
   name_p = texts;
   store = gtk_list_store_new(1, G_TYPE_STRING);
 
-  while (!streq(name_p, "")) {
+  while (!streq(name_p, ""))
+  {
     nameutf8 = g_convert(name_p, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
 
     gtk_list_store_append(store, &iter);
@@ -358,12 +357,12 @@ gpointer graph_list_store(char* texts)
   return store;
 }
 
-void directory_changed(GFileMonitor*, GFile* file, GFile*,
-    GFileMonitorEvent event, gpointer item_view)
+void directory_changed(GFileMonitor*, GFile* file, GFile*, GFileMonitorEvent event, gpointer item_view)
 {
   char* name;
 
-  switch (event) {
+  switch (event)
+  {
   case G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
     break;
 
@@ -380,8 +379,8 @@ void directory_changed(GFileMonitor*, GFile* file, GFile*,
   }
 }
 
-void GeItemViewGtk::activate_tree_widget(GtkTreeView* tree_widget,
-    GtkTreePath* path, GtkTreeViewColumn* column, gpointer data)
+void GeItemViewGtk::activate_tree_widget(GtkTreeView* tree_widget, GtkTreePath* path,
+                                         GtkTreeViewColumn* column, gpointer data)
 {
   char* sel_text;
   gboolean autosave;
@@ -390,31 +389,34 @@ void GeItemViewGtk::activate_tree_widget(GtkTreeView* tree_widget,
 
   sel_text = GeItemViewGtk::selected_text(GTK_WIDGET(tree_widget));
 
-  if (path && column) {
+  if (path && column)
+  {
     item_view = (GeItemViewGtk*)data;
     ge = (GeGtk*)item_view->ge_ctx;
 
-    autosave = gtk_toggle_button_get_active(
-        GTK_TOGGLE_BUTTON(item_view->autosave_button));
-    if (ge->graph->is_modified()) {
+    autosave = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(item_view->autosave_button));
+    if (ge->graph->is_modified())
+    {
       char name[80];
       ge->graph->get_name(name);
-      if (streq(name, "")) {
+      if (streq(name, ""))
+      {
         ge->wow->DisplayError("Not saved", "Save current graph first");
         return;
       }
 
       if (autosave)
         GeGtk::activate_save(NULL, item_view->ge_ctx);
-      else {
+      else
+      {
         int rv;
         char title[] = "Save changes";
         char message[64];
 
         sprintf(message, "Your changes will be lost.\nDo you want to save?");
-        rv = ge->create_modal_dialog(
-            title, message, "Yes", "Discard", "Cancel", NULL);
-        switch (rv) {
+        rv = ge->create_modal_dialog(title, message, "Yes", "Discard", "Cancel", NULL);
+        switch (rv)
+        {
         case wow_eModalDialogReturn_Button1:
           // Yes
           GeGtk::activate_save(NULL, item_view->ge_ctx);
@@ -427,18 +429,19 @@ void GeItemViewGtk::activate_tree_widget(GtkTreeView* tree_widget,
         }
       }
     }
-
-  } else {
+  }
+  else
+  {
     ge = (GeGtk*)data;
   }
 
-  if (sel_text) {
+  if (sel_text)
+  {
     ge->open_graph(sel_text, 0);
   }
 }
 
-gboolean GeItemViewGtk::focus_out_tree_widget(
-    GtkWidget* tree_widget, GdkEvent*, gpointer)
+gboolean GeItemViewGtk::focus_out_tree_widget(GtkWidget* tree_widget, GdkEvent*, gpointer)
 {
   GtkTreeIter iter;
   GtkTreeModel* store;
@@ -454,16 +457,17 @@ gboolean GeItemViewGtk::focus_out_tree_widget(
   return FALSE;
 }
 
-gboolean button_press_tree_widget(
-    GtkWidget* tree_widget, GdkEvent* event, gpointer data)
+gboolean button_press_tree_widget(GtkWidget* tree_widget, GdkEvent* event, gpointer data)
 {
   GdkEventButton* ev;
   GtkMenu* menu;
   GtkWidget* menu_item;
-  static const char* item_text[] = { "Open", " ", "Delete", "" };
+  static const char* item_text[] = {"Open", " ", "Delete", ""};
   static GCallback item_cb[] = {
-    G_CALLBACK(GeItemViewGtk::activate_menu_open), NULL,
-    G_CALLBACK(GeItemViewGtk::activate_menu_delete), NULL,
+      G_CALLBACK(GeItemViewGtk::activate_menu_open),
+      NULL,
+      G_CALLBACK(GeItemViewGtk::activate_menu_delete),
+      NULL,
   };
 
   ev = (GdkEventButton*)event;
@@ -471,10 +475,14 @@ gboolean button_press_tree_widget(
     return FALSE;
 
   menu = (GtkMenu*)gtk_menu_new();
-  for (int i = 0; item_text[i][0]; i++) {
-    if (item_text[i][0] == ' ') {
+  for (int i = 0; item_text[i][0]; i++)
+  {
+    if (item_text[i][0] == ' ')
+    {
       menu_item = gtk_separator_menu_item_new();
-    } else {
+    }
+    else
+    {
       menu_item = gtk_menu_item_new_with_label(item_text[i]);
       g_signal_connect(menu_item, "activate", G_CALLBACK(item_cb[i]), data);
     }
@@ -483,7 +491,7 @@ gboolean button_press_tree_widget(
   }
 
   select_tree_item_pos(tree_widget, ev->x, ev->y);
-  gtk_menu_popup_at_pointer(menu, (GdkEvent *)ev);
+  gtk_menu_popup_at_pointer(menu, (GdkEvent*)ev);
 
   return TRUE;
 }
@@ -495,18 +503,16 @@ void select_tree_item_pos(GtkWidget* tree_widget, gint x, gint y)
 
   selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree_widget));
   sel_count = gtk_tree_selection_count_selected_rows(selection);
-  if (sel_count <= 1) {
+  if (sel_count <= 1)
+  {
     GtkTreePath* path;
 
     /* Get tree path for row that was clicked */
-    gtk_tree_view_get_path_at_pos(
-        GTK_TREE_VIEW(tree_widget), x, y, &path, NULL, NULL, NULL);
+    gtk_tree_view_get_path_at_pos(GTK_TREE_VIEW(tree_widget), x, y, &path, NULL, NULL, NULL);
     gtk_tree_selection_unselect_all(selection);
     gtk_tree_selection_select_path(selection, path);
     gtk_tree_path_free(path);
   }
 }
 
-void autosave_toggled(GtkToggleButton* autosave_button, gpointer read)
-{
-}
+void autosave_toggled(GtkToggleButton* autosave_button, gpointer read) {}

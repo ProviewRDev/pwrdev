@@ -67,32 +67,32 @@ class CoWowTimer;
   and
   reconfigure the curves. XttFast uses the GeCurve class to display the curves.
 */
-class XttFast {
+class XttFast
+{
 public:
-  void* xnav; //!< Pointer to parent XNav.
-  int fast_cnt; //!< Number of fast curves.
-  GeCurveData* gcd; //!< Curve data for GeCurve object.
-  GeCurve* curve; //!< Curve window.
-  pwr_tRefId new_subid; //!< Subid of New attribute in DsFastCurve.
-  pwr_tBoolean*
-      new_p; //!< Pointer to New attribute, which indicates new curve data.
-  pwr_sAttrRef time_buff; //!< Attrref to data array for time axis.
+  void* xnav;                     //!< Pointer to parent XNav.
+  int fast_cnt;                   //!< Number of fast curves.
+  GeCurveData* gcd;               //!< Curve data for GeCurve object.
+  GeCurve* curve;                 //!< Curve window.
+  pwr_tRefId new_subid;           //!< Subid of New attribute in DsFastCurve.
+  pwr_tBoolean* new_p;            //!< Pointer to New attribute, which indicates new curve data.
+  pwr_sAttrRef time_buff;         //!< Attrref to data array for time axis.
   pwr_sAttrRef buff[FAST_CURVES]; //!< Attrefs to data arrays for curves.
-  pwr_eType type[FAST_CURVES]; //!< Types of curves.
-  int fast_idx[FAST_CURVES]; //!< Conversion from DsFastCurve index to
+  pwr_eType type[FAST_CURVES];    //!< Types of curves.
+  int fast_idx[FAST_CURVES];      //!< Conversion from DsFastCurve index to
   //! GeCurveData index.
   int curve_idx[XTT_FAST_MAX]; //!< Conversion from GeCurveData index to
   //! DsFastCurve index.
-  int element_size[XTT_FAST_MAX]; //!< Size of data element in curves.
-  int max_points; //!< Max number of points in curves.
-  CoWowTimer* timerid; //!< Time id for scan.
-  void (*close_cb)(void*, XttFast*); //!< Close callback to parent.
+  int element_size[XTT_FAST_MAX];      //!< Size of data element in curves.
+  int max_points;                      //!< Max number of points in curves.
+  CoWowTimer* timerid;                 //!< Time id for scan.
+  void (*close_cb)(void*, XttFast*);   //!< Close callback to parent.
   void (*help_cb)(void*, const char*); //!< Open help window.
-  pwr_tBoolean old_new; //!< Old value of new. Used to detect edge of New.
-  pwr_tMask fast_function; //!< Function configured in DsFastCurve object.
-  bool first_scan; //!< Indicates that this is the first scan.
-  bool axis_configured; //!< Axis range is configured in DsFastCurve object.
-  pwr_sAttrRef trigg_index_attr; //!< Attrref to TriggIndex attribute in
+  pwr_tBoolean old_new;                //!< Old value of new. Used to detect edge of New.
+  pwr_tMask fast_function;             //!< Function configured in DsFastCurve object.
+  bool first_scan;                     //!< Indicates that this is the first scan.
+  bool axis_configured;                //!< Axis range is configured in DsFastCurve object.
+  pwr_sAttrRef trigg_index_attr;       //!< Attrref to TriggIndex attribute in
   //! DsFastCurve object.
   pwr_sAttrRef first_index_attr; //!< Attrref to FirstIndex attribute in
   //! DsFastCurve object.
@@ -105,10 +105,8 @@ public:
   int color_theme;
 
   //! Constructor
-  XttFast(void* xn_parent_ctx, char* xn_name, pwr_sAttrRef* fast_arp,
-      int color_theme, int* sts);
-  XttFast(void* parent_ctx, const char* name, char* filename, int color_theme,
-      int* sts);
+  XttFast(void* xn_parent_ctx, char* xn_name, pwr_sAttrRef* fast_arp, int color_theme, int* sts);
+  XttFast(void* parent_ctx, const char* name, char* filename, int color_theme, int* sts);
 
   //! Destructor
   virtual ~XttFast();
@@ -117,15 +115,11 @@ public:
   void pop();
   void setup();
   int read_export(char* filename);
-  void update_color_theme(int ct)
-  {
-    curve->update_color_theme(ct);
-  }
+  void update_color_theme(int ct) { curve->update_color_theme(ct); }
 
   static void fast_close_cb(void* ctx);
   static void fast_help_cb(void* ctx);
-  static int fast_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to, int rows,
-      int idx, char* filename);
+  static int fast_export_cb(void* ctx, pwr_tTime* from, pwr_tTime* to, int rows, int idx, char* filename);
   static void fast_scan(void* data);
 };
 

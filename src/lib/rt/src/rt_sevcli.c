@@ -71,7 +71,8 @@ int sevcli_init(pwr_tStatus* sts, sevcli_tCtx* ctx)
   attr.type = qcom_eQtype_private;
   attr.quota = 100;
 
-  if (!qcom_CreateQ(sts, &(*ctx)->qid, &attr, "SevXtt")) {
+  if (!qcom_CreateQ(sts, &(*ctx)->qid, &attr, "SevXtt"))
+  {
     return 0;
   }
   *sts = SEV__SUCCESS;
@@ -86,7 +87,8 @@ int sevcli_init(pwr_tStatus* sts, sevcli_tCtx* ctx)
 int sevcli_close(pwr_tStatus* sts, sevcli_tCtx ctx)
 {
   // Delete queue
-  if (!qcom_DeleteQ(sts, &ctx->qid)) {
+  if (!qcom_DeleteQ(sts, &ctx->qid))
+  {
     return 0;
   }
   if (ctx == stored_ctx)
@@ -102,10 +104,7 @@ int sevcli_close(pwr_tStatus* sts, sevcli_tCtx ctx)
  * with.
  * The server is stated with node identity.
  */
-void sevcli_set_servernid(sevcli_tCtx ctx, pwr_tNid nid)
-{
-  ctx->server = nid;
-}
+void sevcli_set_servernid(sevcli_tCtx ctx, pwr_tNid nid) { ctx->server = nid; }
 
 /**
  * @brief Set server from node name.
@@ -120,7 +119,8 @@ int sevcli_set_servernode(pwr_tStatus* sts, sevcli_tCtx ctx, char* nodename)
   qcom_sNode node;
   pwr_tNid nid;
 
-  if (!nodename || streq(nodename, "")) {
+  if (!nodename || streq(nodename, ""))
+  {
     ctx->server = ctx->qid.nid;
     *sts = SEV__SUCCESS;
     return 1;
@@ -131,15 +131,18 @@ int sevcli_set_servernode(pwr_tStatus* sts, sevcli_tCtx ctx, char* nodename)
   if (EVEN(*sts))
     return 0;
 
-  if (str_NoCaseStrcmp(node.name, nodename) == 0 || str_NoCaseStrcmp(nodename, "localhost") == 0) {
+  if (str_NoCaseStrcmp(node.name, nodename) == 0 || str_NoCaseStrcmp(nodename, "localhost") == 0)
+  {
     ctx->server = node.nid;
     *sts = SEV__SUCCESS;
     return 1;
   }
 
   // Try other qcom nodes
-  for (nid = qcom_cNNid; qcom_NextNode(sts, &node, nid); nid = node.nid) {
-    if (str_NoCaseStrcmp(nodename, node.name) == 0) {
+  for (nid = qcom_cNNid; qcom_NextNode(sts, &node, nid); nid = node.nid)
+  {
+    if (str_NoCaseStrcmp(nodename, node.name) == 0)
+    {
       ctx->server = node.nid;
       *sts = SEV__SUCCESS;
       return 1;
@@ -153,8 +156,7 @@ int sevcli_set_servernode(pwr_tStatus* sts, sevcli_tCtx ctx, char* nodename)
  * @brief Fetches a list with the stored attributes of the server.
  * @return pwr_tStatus
  */
-int sevcli_get_itemlist(pwr_tStatus* sts, sevcli_tCtx ctx,
-    sevcli_sHistItem** list, unsigned int* cnt)
+int sevcli_get_itemlist(pwr_tStatus* sts, sevcli_tCtx ctx, sevcli_sHistItem** list, unsigned int* cnt)
 {
   sev_sMsgAny* msg;
   qcom_sQid tgt;
@@ -184,7 +186,8 @@ int sevcli_get_itemlist(pwr_tStatus* sts, sevcli_tCtx ctx,
   msg->Type = sev_eMsgType_HistItemsRequest;
   msg->Version = sev_cNetVersion;
 
-  if (!qcom_Put(sts, &tgt, &put)) {
+  if (!qcom_Put(sts, &tgt, &put))
+  {
     qcom_Free(&lsts, put.data);
     return 0;
   }
@@ -193,14 +196,15 @@ int sevcli_get_itemlist(pwr_tStatus* sts, sevcli_tCtx ctx,
 
   memset(&get, 0, sizeof(get));
 
-  for (;;) {
+  for (;;)
+  {
     rmsg = (sev_sMsgHistItems*)qcom_Get(sts, &ctx->qid, &get, tmo);
-    if (*sts == QCOM__TMO || !rmsg) {
+    if (*sts == QCOM__TMO || !rmsg)
+    {
       return 0;
     }
 
-    if (get.type.b == sev_cMsgClass
-        && get.type.s == (qcom_eStype)sev_eMsgType_HistItems)
+    if (get.type.b == sev_cMsgClass && get.type.s == (qcom_eStype)sev_eMsgType_HistItems)
       break;
 
     qcom_Free(sts, rmsg);
@@ -215,13 +219,14 @@ int sevcli_get_itemlist(pwr_tStatus* sts, sevcli_tCtx ctx,
   int item_cnt = rmsg->NumItems;
   int attr_cnt = rmsg->NumAttributes;
 
-  unsigned int data_size = (item_cnt * sizeof(sevcli_sHistItem))
-      + ((attr_cnt - item_cnt) * sizeof(sevcli_sHistAttr));
+  unsigned int data_size =
+      (item_cnt * sizeof(sevcli_sHistItem)) + ((attr_cnt - item_cnt) * sizeof(sevcli_sHistAttr));
   lp = (sevcli_sHistItem*)malloc(data_size);
   sevcli_sHistItem* lp2 = lp;
 
   sev_sHistItem* itemPtr = ((sev_sMsgHistItems*)rmsg)->Items;
-  for (i = 0; i < item_cnt; i++) {
+  for (i = 0; i < item_cnt; i++)
+  {
     lp->oid = itemPtr->oid;
     strncpy(lp->oname, itemPtr->oname, sizeof(lp->oname));
     lp->storagetime = net_NetTimeToDeltaTime(&itemPtr->storagetime);
@@ -234,13 +239,12 @@ int sevcli_get_itemlist(pwr_tStatus* sts, sevcli_tCtx ctx,
 
     lp->attrnum = itemPtr->attrnum;
     size_t j = 0;
-    for (j = 0; j < lp->attrnum; j++) {
+    for (j = 0; j < lp->attrnum; j++)
+    {
       lp->attr[j].type = itemPtr->attr[j].type;
       lp->attr[j].size = itemPtr->attr[j].size;
-      strncpy(
-          lp->attr[j].aname, itemPtr->attr[j].aname, sizeof(lp->attr[0].aname));
-      strncpy(
-          lp->attr[j].unit, itemPtr->attr[j].unit, sizeof(lp->attr[0].unit));
+      strncpy(lp->attr[j].aname, itemPtr->attr[j].aname, sizeof(lp->attr[0].aname));
+      strncpy(lp->attr[j].unit, itemPtr->attr[j].unit, sizeof(lp->attr[0].unit));
     }
     itemPtr = (sev_sHistItem*)&itemPtr->attr[j];
     lp = (sevcli_sHistItem*)&lp->attr[j];
@@ -352,10 +356,9 @@ sizeof(lp[0].attr[0].unit));
  *
  * @return pwr_tStatus
  */
-int sevcli_get_itemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
-    char* aname, pwr_tTime starttime, pwr_tTime endtime, int numpoints,
-    pwr_tTime** tbuf, void** vbuf, int* rows, pwr_eType* vtype,
-    unsigned int* vsize)
+int sevcli_get_itemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid, char* aname, pwr_tTime starttime,
+                        pwr_tTime endtime, int numpoints, pwr_tTime** tbuf, void** vbuf, int* rows,
+                        pwr_eType* vtype, unsigned int* vsize)
 {
   sev_sMsgHistDataGetRequest* msg;
   qcom_sQid tgt;
@@ -364,18 +367,21 @@ int sevcli_get_itemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
   qcom_sGet get;
   pwr_tStatus lsts;
 
-  if (tmo == 0) {
+  if (tmo == 0)
+  {
     int value;
     char value_str[20];
     int nr;
 
-    if (cnf_get_value("sevTimeout", value_str, sizeof(value_str))) {
+    if (cnf_get_value("sevTimeout", value_str, sizeof(value_str)))
+    {
       nr = sscanf(value_str, "%d", &value);
       if (nr != 1)
         tmo = 30000;
       else
         tmo = 1000 * value;
-    } else
+    }
+    else
       tmo = 30000;
   }
 
@@ -407,7 +413,8 @@ int sevcli_get_itemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
   sev_sMsgHistDataGet* rmsg;
 
   memset(&get, 0, sizeof(get));
-  for (;;) {
+  for (;;)
+  {
     rmsg = (sev_sMsgHistDataGet*)qcom_Get(sts, &ctx->qid, &get, 0);
 
     if (!rmsg)
@@ -415,34 +422,37 @@ int sevcli_get_itemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
     qcom_Free(sts, rmsg);
   }
 
-  if (!qcom_Put(sts, &tgt, &put)) {
+  if (!qcom_Put(sts, &tgt, &put))
+  {
     qcom_Free(&lsts, put.data);
     return 0;
   }
 
   memset(&get, 0, sizeof(get));
 
-  for (;;) {
+  for (;;)
+  {
     rmsg = (sev_sMsgHistDataGet*)qcom_Get(sts, &ctx->qid, &get, tmo);
-    if (*sts == QCOM__TMO || !rmsg) {
+    if (*sts == QCOM__TMO || !rmsg)
+    {
       return 0;
     }
 
-    if (get.type.b == sev_cMsgClass
-        && get.type.s == (qcom_eStype)sev_eMsgType_HistDataGet
-        && cdh_ObjidIsEqual(oid, rmsg->Oid)
-        && str_NoCaseStrcmp(aname, rmsg->AName) == 0)
+    if (get.type.b == sev_cMsgClass && get.type.s == (qcom_eStype)sev_eMsgType_HistDataGet &&
+        cdh_ObjidIsEqual(oid, rmsg->Oid) && str_NoCaseStrcmp(aname, rmsg->AName) == 0)
       break;
 
     qcom_Free(sts, rmsg);
   }
 
   *sts = rmsg->Status;
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     qcom_Free(&lsts, rmsg);
     return 0;
   }
-  if (rmsg->NumPoints == 0) {
+  if (rmsg->NumPoints == 0)
+  {
     qcom_Free(sts, rmsg);
     *sts = SEV__NOPOINTS;
     return 0;
@@ -454,8 +464,7 @@ int sevcli_get_itemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
   *vbuf = malloc(item_cnt * rmsg->VSize);
 
   memcpy(*tbuf, &rmsg->Data, item_cnt * sizeof(pwr_tTime));
-  memcpy(*vbuf, (char*)&rmsg->Data + item_cnt * sizeof(pwr_tTime),
-      item_cnt * rmsg->VSize);
+  memcpy(*vbuf, (char*)&rmsg->Data + item_cnt * sizeof(pwr_tTime), item_cnt * rmsg->VSize);
   *rows = item_cnt;
   *vtype = rmsg->VType;
   *vsize = rmsg->VSize;
@@ -471,10 +480,9 @@ int sevcli_get_itemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
  *
  * @return pwr_tStatus
  */
-int sevcli_get_objectitemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
-    char* aname, pwr_tTime starttime, pwr_tTime endtime, int numpoints,
-    pwr_tTime** tbuf, void** vbuf, int* rows, sevcli_sHistAttr** histattr,
-    int* numattributes)
+int sevcli_get_objectitemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid, char* aname,
+                              pwr_tTime starttime, pwr_tTime endtime, int numpoints, pwr_tTime** tbuf,
+                              void** vbuf, int* rows, sevcli_sHistAttr** histattr, int* numattributes)
 {
   sev_sMsgHistDataGetRequest* msg;
   qcom_sQid tgt;
@@ -512,13 +520,15 @@ int sevcli_get_objectitemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
 
   memset(&get, 0, sizeof(get));
 
-  for (;;) {
+  for (;;)
+  {
     rmsg = (sev_sMsgHistObjectDataGet*)qcom_Get(sts, &ctx->qid, &get, 0);
     if (!rmsg)
       break;
   }
 
-  if (!qcom_Put(sts, &tgt, &put)) {
+  if (!qcom_Put(sts, &tgt, &put))
+  {
     qcom_Free(&lsts, put.data);
     *sts = 0;
     return 0;
@@ -526,28 +536,30 @@ int sevcli_get_objectitemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
 
   memset(&get, 0, sizeof(get));
 
-  for (;;) {
+  for (;;)
+  {
     rmsg = (sev_sMsgHistObjectDataGet*)qcom_Get(sts, &ctx->qid, &get, tmo);
-    if (*sts == QCOM__TMO || !rmsg) {
+    if (*sts == QCOM__TMO || !rmsg)
+    {
       *sts = 0;
       return 0;
     }
 
-    if (get.type.b == sev_cMsgClass
-        && get.type.s == (qcom_eStype)sev_eMsgType_HistObjectDataGet
-        && cdh_ObjidIsEqual(oid, rmsg->Oid)
-        && str_NoCaseStrcmp(aname, rmsg->AName) == 0)
+    if (get.type.b == sev_cMsgClass && get.type.s == (qcom_eStype)sev_eMsgType_HistObjectDataGet &&
+        cdh_ObjidIsEqual(oid, rmsg->Oid) && str_NoCaseStrcmp(aname, rmsg->AName) == 0)
       break;
 
     qcom_Free(sts, rmsg);
   }
 
   *sts = rmsg->Status;
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     qcom_Free(&lsts, rmsg);
     return 0;
   }
-  if (rmsg->NumPoints == 0) {
+  if (rmsg->NumPoints == 0)
+  {
     qcom_Free(sts, rmsg);
     *sts = SEV__NOPOINTS;
     return 0;
@@ -569,7 +581,8 @@ int sevcli_get_objectitemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
   *rows = item_cnt;
 
   int i = 0;
-  for (i = 0; i < rmsg->NumAttributes; i++) {
+  for (i = 0; i < rmsg->NumAttributes; i++)
+  {
     strncpy(attrptr[i].aname, rmsg->Attr[i].aname, sizeof(attrptr[0].aname));
     attrptr[i].type = rmsg->Attr[i].type;
     attrptr[i].size = rmsg->Attr[i].size;
@@ -587,8 +600,7 @@ int sevcli_get_objectitemdata(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
  *
  * @return pwr_tStatus
  */
-int sevcli_delete_item(
-    pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid, char* aname)
+int sevcli_delete_item(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid, char* aname)
 {
   sev_sMsgHistItemDelete* msg;
   qcom_sQid tgt;
@@ -618,7 +630,8 @@ int sevcli_delete_item(
   msg->Oid = oid;
   strncpy(msg->AName, aname, sizeof(msg->AName));
 
-  if (!qcom_Put(sts, &tgt, &put)) {
+  if (!qcom_Put(sts, &tgt, &put))
+  {
     qcom_Free(&lsts, put.data);
     return 0;
   }
@@ -627,15 +640,14 @@ int sevcli_delete_item(
 
   memset(&get, 0, sizeof(get));
 
-  for (;;) {
+  for (;;)
+  {
     rmsg = (sev_sMsgHistItemStatus*)qcom_Get(sts, &ctx->qid, &get, tmo);
     if (*sts == QCOM__TMO || !rmsg)
       return 0;
 
-    if (get.type.b == sev_cMsgClass
-        && get.type.s == (qcom_eStype)sev_eMsgType_HistItemStatus
-        && cdh_ObjidIsEqual(oid, rmsg->Oid)
-        && str_NoCaseStrcmp(aname, rmsg->AName) == 0)
+    if (get.type.b == sev_cMsgClass && get.type.s == (qcom_eStype)sev_eMsgType_HistItemStatus &&
+        cdh_ObjidIsEqual(oid, rmsg->Oid) && str_NoCaseStrcmp(aname, rmsg->AName) == 0)
       break;
 
     qcom_Free(sts, rmsg);
@@ -648,13 +660,11 @@ int sevcli_delete_item(
   return 1;
 }
 
-
 /**
  * @brief Fetches a list with the stored eventlists of the server.
  * @return pwr_tStatus
  */
-int sevcli_get_eventsitemlist(pwr_tStatus* sts, sevcli_tCtx ctx,
-			      sevcli_sEventsItem** list, unsigned int* cnt)
+int sevcli_get_eventsitemlist(pwr_tStatus* sts, sevcli_tCtx ctx, sevcli_sEventsItem** list, unsigned int* cnt)
 {
   sev_sMsgAny* msg;
   qcom_sQid tgt;
@@ -684,7 +694,8 @@ int sevcli_get_eventsitemlist(pwr_tStatus* sts, sevcli_tCtx ctx,
   msg->Type = sev_eMsgType_EventsItemsRequest;
   msg->Version = sev_cNetVersion;
 
-  if (!qcom_Put(sts, &tgt, &put)) {
+  if (!qcom_Put(sts, &tgt, &put))
+  {
     qcom_Free(&lsts, put.data);
     return 0;
   }
@@ -693,14 +704,15 @@ int sevcli_get_eventsitemlist(pwr_tStatus* sts, sevcli_tCtx ctx,
 
   memset(&get, 0, sizeof(get));
 
-  for (;;) {
+  for (;;)
+  {
     rmsg = (sev_sMsgEventsItems*)qcom_Get(sts, &ctx->qid, &get, tmo);
-    if (*sts == QCOM__TMO || !rmsg) {
+    if (*sts == QCOM__TMO || !rmsg)
+    {
       return 0;
     }
 
-    if (get.type.b == sev_cMsgClass
-        && get.type.s == (qcom_eStype)sev_eMsgType_EventsItems)
+    if (get.type.b == sev_cMsgClass && get.type.s == (qcom_eStype)sev_eMsgType_EventsItems)
       break;
 
     qcom_Free(sts, rmsg);
@@ -717,7 +729,8 @@ int sevcli_get_eventsitemlist(pwr_tStatus* sts, sevcli_tCtx ctx,
   sevcli_sEventsItem* lp2 = lp;
 
   sev_sEventsItem* itemPtr = ((sev_sMsgEventsItems*)rmsg)->Items;
-  for (i = 0; i < item_cnt; i++) {
+  for (i = 0; i < item_cnt; i++)
+  {
     lp->oid = itemPtr->oid;
     strncpy(lp->oname, itemPtr->oname, sizeof(lp->oname));
     strncpy(lp->description, itemPtr->description, sizeof(lp->description));
@@ -736,16 +749,14 @@ int sevcli_get_eventsitemlist(pwr_tStatus* sts, sevcli_tCtx ctx,
   return 1;
 }
 
-
 /**
  * @brief Fetch stored historical events for an events item.
  *
  * @return pwr_tStatus
  */
-int sevcli_get_events(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
-		      pwr_tTime starttime, pwr_tTime endtime, pwr_tUInt32 eventtypemask,
-		      pwr_tUInt32 eventpriomask, pwr_tString80 eventtext, pwr_tOName eventname,
-		      unsigned int maxevents, sevcli_sEvents **list, unsigned int* cnt)
+int sevcli_get_events(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid, pwr_tTime starttime, pwr_tTime endtime,
+                      pwr_tUInt32 eventtypemask, pwr_tUInt32 eventpriomask, pwr_tString80 eventtext,
+                      pwr_tOName eventname, unsigned int maxevents, sevcli_sEvents** list, unsigned int* cnt)
 {
   sev_sMsgEventsGetRequest* msg;
   qcom_sQid tgt;
@@ -753,22 +764,25 @@ int sevcli_get_events(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
   static int tmo = 0;
   qcom_sGet get;
   pwr_tStatus lsts;
-  sevcli_sEvents *lp;
-  sev_sEvents *ip;
+  sevcli_sEvents* lp;
+  sev_sEvents* ip;
   int i;
 
-  if (tmo == 0) {
+  if (tmo == 0)
+  {
     int value;
     char value_str[20];
     int nr;
 
-    if (cnf_get_value("sevTimeout", value_str, sizeof(value_str))) {
+    if (cnf_get_value("sevTimeout", value_str, sizeof(value_str)))
+    {
       nr = sscanf(value_str, "%d", &value);
       if (nr != 1)
         tmo = 30000;
       else
         tmo = 1000 * value;
-    } else
+    }
+    else
       tmo = 30000;
   }
 
@@ -803,7 +817,8 @@ int sevcli_get_events(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
   sev_sMsgEventsGet* rmsg;
 
   memset(&get, 0, sizeof(get));
-  for (;;) {
+  for (;;)
+  {
     rmsg = (sev_sMsgEventsGet*)qcom_Get(sts, &ctx->qid, &get, 0);
 
     if (!rmsg)
@@ -811,35 +826,39 @@ int sevcli_get_events(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
     qcom_Free(sts, rmsg);
   }
 
-  if (!qcom_Put(sts, &tgt, &put)) {
+  if (!qcom_Put(sts, &tgt, &put))
+  {
     qcom_Free(&lsts, put.data);
     return 0;
   }
 
   memset(&get, 0, sizeof(get));
 
-  for (;;) {
+  for (;;)
+  {
     rmsg = (sev_sMsgEventsGet*)qcom_Get(sts, &ctx->qid, &get, tmo);
-    if (*sts == QCOM__TMO || !rmsg) {
+    if (*sts == QCOM__TMO || !rmsg)
+    {
       if (!rmsg)
-	*sts = 0;
+        *sts = 0;
       return 0;
     }
 
-    if (get.type.b == sev_cMsgClass
-        && get.type.s == (qcom_eStype)sev_eMsgType_EventsGet
-        && cdh_ObjidIsEqual(oid, rmsg->Oid))
+    if (get.type.b == sev_cMsgClass && get.type.s == (qcom_eStype)sev_eMsgType_EventsGet &&
+        cdh_ObjidIsEqual(oid, rmsg->Oid))
       break;
 
     qcom_Free(sts, rmsg);
   }
 
   *sts = rmsg->Status;
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     qcom_Free(&lsts, rmsg);
     return 0;
   }
-  if (rmsg->NumEvents == 0) {
+  if (rmsg->NumEvents == 0)
+  {
     qcom_Free(sts, rmsg);
     *sts = SEV__NOPOINTS;
     return 0;
@@ -851,7 +870,8 @@ int sevcli_get_events(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
 
   lp = *list;
   ip = rmsg->Events;
-  for (i = 0; i < item_cnt; i++) {
+  for (i = 0; i < item_cnt; i++)
+  {
     lp->Time = net_NetTimeToTime(&ip->Time);
     lp->EventType = ip->EventType;
     lp->EventPrio = ip->EventPrio;
@@ -876,16 +896,9 @@ int sevcli_get_events(pwr_tStatus* sts, sevcli_tCtx ctx, pwr_tOid oid,
 /**
  * @brief Store context.
  */
-void sevcli_store_ctx(sevcli_tCtx ctx)
-{
-  stored_ctx = ctx;
-}
+void sevcli_store_ctx(sevcli_tCtx ctx) { stored_ctx = ctx; }
 
 /**
  * @brief Get stored context.
  */
-sevcli_tCtx sevcli_get_stored_ctx(void)
-{
-  return stored_ctx;
-}
-
+sevcli_tCtx sevcli_get_stored_ctx(void) { return stored_ctx; }

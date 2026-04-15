@@ -46,12 +46,12 @@
 
    @aref initstep InitStep
 */
-#define initstep_exec(obj, reset, chain)                                       \
-  if (reset)                                                                   \
-    obj->Status[0] = false;                                                    \
-  else if (obj->ResetOld)                                                      \
-    obj->Status[0] = true;                                                     \
-  obj->ResetOld = reset;                                                       \
+#define initstep_exec(obj, reset, chain)                                                                     \
+  if (reset)                                                                                                 \
+    obj->Status[0] = false;                                                                                  \
+  else if (obj->ResetOld)                                                                                    \
+    obj->Status[0] = true;                                                                                   \
+  obj->ResetOld = reset;                                                                                     \
   chain obj->Status[1] = obj->Status[0]
 
 /*_*
@@ -63,9 +63,9 @@
     @aref step Step
 */
 
-#define step_exec(obj, reset, chain)                                           \
-  if (reset)                                                                   \
-    obj->Status[0] = false;                                                    \
+#define step_exec(obj, reset, chain)                                                                         \
+  if (reset)                                                                                                 \
+    obj->Status[0] = false;                                                                                  \
   chain obj->Status[1] = obj->Status[0]
 
 /*_*
@@ -77,9 +77,9 @@
    @aref substep SubStep
 */
 
-#define substep_exec(obj, reset, subseq, chain)                                \
-  if (reset)                                                                   \
-    obj->Status[0] = false;                                                    \
+#define substep_exec(obj, reset, subseq, chain)                                                              \
+  if (reset)                                                                                                 \
+    obj->Status[0] = false;                                                                                  \
   chain subseq
 
 /*_*
@@ -91,12 +91,12 @@
    @aref ssbegin SsBegin
 */
 
-#define ssbegin_exec(obj, substep, reset, chain)                               \
-  if (substep->Status[0] && !obj->StatusOld)                                   \
-    obj->Status[0] = true;                                                     \
-  if (reset)                                                                   \
-    obj->Status[0] = false;                                                    \
-  obj->StatusOld = substep->Status[0];                                         \
+#define ssbegin_exec(obj, substep, reset, chain)                                                             \
+  if (substep->Status[0] && !obj->StatusOld)                                                                 \
+    obj->Status[0] = true;                                                                                   \
+  if (reset)                                                                                                 \
+    obj->Status[0] = false;                                                                                  \
+  obj->StatusOld = substep->Status[0];                                                                       \
   chain obj->Status[1] = obj->Status[0]
 
 /*_*
@@ -108,9 +108,9 @@
    @aref ssend SsEnd
 */
 
-#define ssend_exec(obj, substep, reset, chain)                                 \
-  if (reset || !substep->Status[0])                                            \
-    obj->Status[0] = false;                                                    \
+#define ssend_exec(obj, substep, reset, chain)                                                               \
+  if (reset || !substep->Status[0])                                                                          \
+    obj->Status[0] = false;                                                                                  \
   chain substep->Status[1] = obj->Status[1] = obj->Status[0]
 
 /*_*
@@ -122,37 +122,40 @@
    @aref trans Trans
 */
 
-#define trans_exec(obj, insteplist, outsteplist, cond)                         \
-  {                                                                            \
-    pwr_tBoolean* inptr[] = insteplist;                                        \
-    pwr_tBoolean* outptr[] = outsteplist;                                      \
-    pwr_tBoolean test;                                                         \
-    int idx;                                                                   \
-                                                                               \
-    /* Test condition */                                                       \
-    cond if (obj->Man) obj->Cond = obj->OpCond;                                \
-    if (obj->Cond) {                                                           \
-      /* Test if step(s) above are active */                                   \
-      test = true;                                                             \
-      idx = 0;                                                                 \
-      while (test && inptr[idx] != NULL) {                                     \
-        if (!*inptr[idx])                                                      \
-          test = false;                                                        \
-        else if (!*(inptr[idx] + 1))                                           \
-          test = false;                                                        \
-        idx++;                                                                 \
-      }                                                                        \
-      /* Transfer active status to step(s) below */                            \
-      if (test) {                                                              \
-        idx = 0;                                                               \
-        while (inptr[idx] != NULL)                                             \
-          *inptr[idx++] = false;                                               \
-        idx = 0;                                                               \
-        while (outptr[idx] != NULL)                                            \
-          *outptr[idx++] = true;                                               \
-        obj->OpCond = false;                                                   \
-      }                                                                        \
-    }                                                                          \
+#define trans_exec(obj, insteplist, outsteplist, cond)                                                       \
+  {                                                                                                          \
+    pwr_tBoolean* inptr[] = insteplist;                                                                      \
+    pwr_tBoolean* outptr[] = outsteplist;                                                                    \
+    pwr_tBoolean test;                                                                                       \
+    int idx;                                                                                                 \
+                                                                                                             \
+    /* Test condition */                                                                                     \
+    cond if (obj->Man) obj->Cond = obj->OpCond;                                                              \
+    if (obj->Cond)                                                                                           \
+    {                                                                                                        \
+      /* Test if step(s) above are active */                                                                 \
+      test = true;                                                                                           \
+      idx = 0;                                                                                               \
+      while (test && inptr[idx] != NULL)                                                                     \
+      {                                                                                                      \
+        if (!*inptr[idx])                                                                                    \
+          test = false;                                                                                      \
+        else if (!*(inptr[idx] + 1))                                                                         \
+          test = false;                                                                                      \
+        idx++;                                                                                               \
+      }                                                                                                      \
+      /* Transfer active status to step(s) below */                                                          \
+      if (test)                                                                                              \
+      {                                                                                                      \
+        idx = 0;                                                                                             \
+        while (inptr[idx] != NULL)                                                                           \
+          *inptr[idx++] = false;                                                                             \
+        idx = 0;                                                                                             \
+        while (outptr[idx] != NULL)                                                                          \
+          *outptr[idx++] = true;                                                                             \
+        obj->OpCond = false;                                                                                 \
+      }                                                                                                      \
+    }                                                                                                        \
   }
 
 /*_*
@@ -160,15 +163,15 @@
    @aref order Order
 */
 
-#define order_exec(obj, stepobj, chain)                                        \
-  {                                                                            \
-    pwr_tBoolean order_old;                                                    \
-    order_old = obj->Status[0];                                                \
-    obj->Status[0] = stepobj->Status[0];                                       \
-    if (obj->Status[0] || order_old || stepobj->Status[0]                      \
-        || stepobj->Status[1]) {                                               \
-      chain                                                                    \
-    }                                                                          \
+#define order_exec(obj, stepobj, chain)                                                                      \
+  {                                                                                                          \
+    pwr_tBoolean order_old;                                                                                  \
+    order_old = obj->Status[0];                                                                              \
+    obj->Status[0] = stepobj->Status[0];                                                                     \
+    if (obj->Status[0] || order_old || stepobj->Status[0] || stepobj->Status[1])                             \
+    {                                                                                                        \
+      chain                                                                                                  \
+    }                                                                                                        \
   }
 
 /*_*
@@ -176,20 +179,25 @@
   @aref dorder DOrder
 */
 
-#define dorder_exec(obj, stepobj)                                              \
-  timer2_scan(tp, obj);                                                        \
-  if (stepobj->Status[0]) {                                                    \
-    if (!obj->Old) {                                                           \
-      timer2_in(tp, obj);                                                      \
-    }                                                                          \
-    obj->Status[0] = (obj->TimerFlag) ? false : true;                          \
-  } else {                                                                     \
-    if (obj->Status[0]) {                                                      \
-      obj->TimerCount = 0;                                                     \
-      obj->Status[0] = false;                                                  \
-    }                                                                          \
-  }                                                                            \
-  obj->Status[1] = stepobj->Status[0] || stepobj->Status[1];                   \
+#define dorder_exec(obj, stepobj)                                                                            \
+  timer2_scan(tp, obj);                                                                                      \
+  if (stepobj->Status[0])                                                                                    \
+  {                                                                                                          \
+    if (!obj->Old)                                                                                           \
+    {                                                                                                        \
+      timer2_in(tp, obj);                                                                                    \
+    }                                                                                                        \
+    obj->Status[0] = (obj->TimerFlag) ? false : true;                                                        \
+  }                                                                                                          \
+  else                                                                                                       \
+  {                                                                                                          \
+    if (obj->Status[0])                                                                                      \
+    {                                                                                                        \
+      obj->TimerCount = 0;                                                                                   \
+      obj->Status[0] = false;                                                                                \
+    }                                                                                                        \
+  }                                                                                                          \
+  obj->Status[1] = stepobj->Status[0] || stepobj->Status[1];                                                 \
   obj->Old = stepobj->Status[0];
 
 /*_*
@@ -197,21 +205,27 @@
    @aref lorder LOrder
 */
 
-#define lorder_exec(obj, stepobj)                                              \
-  timer2_scan(tp, obj);                                                        \
-  if (stepobj->Status[0]) {                                                    \
-    if (!obj->StatusOld) {                                                     \
-      timer2_in(tp, obj);                                                      \
-      obj->Status[0] = true;                                                   \
-    } else                                                                     \
-      obj->Status[0] = obj->TimerFlag;                                         \
-  } else {                                                                     \
-    if (obj->Status[0]) {                                                      \
-      obj->TimerCount = 0;                                                     \
-      obj->Status[0] = false;                                                  \
-    }                                                                          \
-  }                                                                            \
-  obj->Status[1] = stepobj->Status[0] || stepobj->Status[1];                   \
+#define lorder_exec(obj, stepobj)                                                                            \
+  timer2_scan(tp, obj);                                                                                      \
+  if (stepobj->Status[0])                                                                                    \
+  {                                                                                                          \
+    if (!obj->StatusOld)                                                                                     \
+    {                                                                                                        \
+      timer2_in(tp, obj);                                                                                    \
+      obj->Status[0] = true;                                                                                 \
+    }                                                                                                        \
+    else                                                                                                     \
+      obj->Status[0] = obj->TimerFlag;                                                                       \
+  }                                                                                                          \
+  else                                                                                                       \
+  {                                                                                                          \
+    if (obj->Status[0])                                                                                      \
+    {                                                                                                        \
+      obj->TimerCount = 0;                                                                                   \
+      obj->Status[0] = false;                                                                                \
+    }                                                                                                        \
+  }                                                                                                          \
+  obj->Status[1] = stepobj->Status[0] || stepobj->Status[1];                                                 \
   obj->StatusOld = stepobj->Status[0]
 
 /*_*
@@ -219,9 +233,9 @@
    @aref porder POrder
 */
 
-#define porder_exec(obj, stepobj)                                              \
-  obj->Status[0] = (stepobj->Status[0] && !obj->StatusOld);                    \
-  obj->Status[1] = stepobj->Status[0] || stepobj->Status[1];                   \
+#define porder_exec(obj, stepobj)                                                                            \
+  obj->Status[0] = (stepobj->Status[0] && !obj->StatusOld);                                                  \
+  obj->Status[1] = stepobj->Status[0] || stepobj->Status[1];                                                 \
   obj->StatusOld = stepobj->Status[0]
 
 /*_*
@@ -229,8 +243,8 @@
    @aref corder COrder
 */
 
-#define corder_exec(obj, stepobj, condition)                                   \
-  condition obj->Status[0] = stepobj->Status[0] && obj->Cond;                  \
+#define corder_exec(obj, stepobj, condition)                                                                 \
+  condition obj->Status[0] = stepobj->Status[0] && obj->Cond;                                                \
   obj->Status[1] = stepobj->Status[0] || stepobj->Status[1]
 
 /*_*
@@ -238,13 +252,13 @@
    @aref sorder SOrder
 */
 
-#define sorder_exec(obj, stepobj, reset)                                       \
-  if (obj->Reset || reset)                                                     \
-    obj->Status[0] = false;                                                    \
-  if (stepobj->Status[0] && !obj->Old)                                         \
-    obj->Status[0] = true;                                                     \
-  obj->Old = stepobj->Status[0];                                               \
-  obj->Status[1] = obj->Status[0] || stepobj->Status[1];                       \
+#define sorder_exec(obj, stepobj, reset)                                                                     \
+  if (obj->Reset || reset)                                                                                   \
+    obj->Status[0] = false;                                                                                  \
+  if (stepobj->Status[0] && !obj->Old)                                                                       \
+    obj->Status[0] = true;                                                                                   \
+  obj->Old = stepobj->Status[0];                                                                             \
+  obj->Status[1] = obj->Status[0] || stepobj->Status[1];                                                     \
   obj->Reset = false
 
 /*_*
@@ -252,8 +266,8 @@
   @aref reset_so Reset_SO
 */
 
-#define reset_so_exec(sorderobj, in)                                           \
-  if (in)                                                                      \
+#define reset_so_exec(sorderobj, in)                                                                         \
+  if (in)                                                                                                    \
   sorderobj->Reset = true
 
 /*_*
@@ -272,7 +286,8 @@
    @aref csub CSub
 */
 
-#define csub_exec(in, chain)                                                   \
-  if (in) {                                                                    \
-    chain                                                                      \
+#define csub_exec(in, chain)                                                                                 \
+  if (in)                                                                                                    \
+  {                                                                                                          \
+    chain                                                                                                    \
   }

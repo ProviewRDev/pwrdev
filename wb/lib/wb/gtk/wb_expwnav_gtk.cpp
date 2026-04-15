@@ -42,13 +42,11 @@
 
 #include "wb_expwnav_gtk.h"
 
-WbExpWNavGtk::WbExpWNavGtk(void* l_parent_ctx, GtkWidget* l_parent_wid,
-    ldh_tSession l_ldhses, int l_type, int l_editmode, GtkWidget** w)
-    : WbExpWNav(l_parent_ctx, l_ldhses, l_type, l_editmode),
-      parent_wid(l_parent_wid)
+WbExpWNavGtk::WbExpWNavGtk(void* l_parent_ctx, GtkWidget* l_parent_wid, ldh_tSession l_ldhses, int l_type,
+                           int l_editmode, GtkWidget** w)
+    : WbExpWNav(l_parent_ctx, l_ldhses, l_type, l_editmode), parent_wid(l_parent_wid)
 {
-  form_widget
-      = scrolledbrowwidgetgtk_new(WbExpWNav::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetgtk_new(WbExpWNav::init_brow_cb, this, &brow_widget);
 
   gtk_widget_show_all(brow_widget);
 
@@ -65,7 +63,4 @@ WbExpWNavGtk::~WbExpWNavGtk()
   gtk_widget_destroy(form_widget);
 }
 
-void WbExpWNavGtk::set_input_focus()
-{
-  gtk_widget_grab_focus(brow_widget);
-}
+void WbExpWNavGtk::set_input_focus() { gtk_widget_grab_focus(brow_widget); }

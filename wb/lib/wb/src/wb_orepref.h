@@ -41,7 +41,8 @@
 
 class wb_vrepref;
 
-class wb_orepref : public wb_orep {
+class wb_orepref : public wb_orep
+{
   wb_vrepref* m_vrep;
   unsigned int m_refCount;
   pwr_tCid m_cid;

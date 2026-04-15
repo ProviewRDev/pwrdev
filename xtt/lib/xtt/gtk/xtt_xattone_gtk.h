@@ -43,11 +43,11 @@
 
 #include "cow_wow_gtk.h"
 
-class XAttOneGtk : public XAttOne {
+class XAttOneGtk : public XAttOne
+{
 public:
-  XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
-      pwr_sAttrRef* xa_objar, char* xa_title, unsigned int xa_priv,
-      int* xa_sts);
+  XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx, pwr_sAttrRef* xa_objar, char* xa_title,
+             unsigned int xa_priv, int* xa_sts);
   ~XAttOneGtk();
 
   GtkWidget* parent_wid;
@@ -77,8 +77,7 @@ public:
 
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_help(GtkWidget* w, gpointer data);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void valchanged_cmd_input(GtkWidget* w, gpointer data);
   static void activate_cmd_input(GtkWidget* w, gpointer data);
   static void activate_cmd_scrolled_ok(GtkWidget* w, gpointer data);

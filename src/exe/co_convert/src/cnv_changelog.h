@@ -41,8 +41,9 @@
 
 #include "cnv_ctx.h"
 
-class LogEntry {
-  public:
+class LogEntry
+{
+public:
   LogEntry()
   {
     strcpy(signature, "");
@@ -73,8 +74,9 @@ class LogEntry {
   char text[400];
 };
 
-class CnvChangeLog {
-  public:
+class CnvChangeLog
+{
+public:
   std::vector<LogEntry> entries;
   CnvCtx* ctx;
   int from;

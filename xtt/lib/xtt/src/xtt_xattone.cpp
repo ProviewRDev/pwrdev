@@ -51,14 +51,12 @@ int XAttOne::open_changevalue(char* name)
   return XATT__SUCCESS;
 }
 
-XAttOne::~XAttOne()
-{
-}
+XAttOne::~XAttOne() {}
 
-XAttOne::XAttOne(void* xa_parent_ctx, pwr_sAttrRef* xa_aref, char* xa_title,
-    unsigned int xa_priv, int* xa_sts)
-    : parent_ctx(xa_parent_ctx), aref(*xa_aref), priv(xa_priv), input_open(0),
-      input_multiline(0), close_cb(0), client_data(0)
+XAttOne::XAttOne(void* xa_parent_ctx, pwr_sAttrRef* xa_aref, char* xa_title, unsigned int xa_priv,
+                 int* xa_sts)
+    : parent_ctx(xa_parent_ctx), aref(*xa_aref), priv(xa_priv), input_open(0), input_multiline(0),
+      close_cb(0), client_data(0)
 {
   *xa_sts = XATT__SUCCESS;
 }

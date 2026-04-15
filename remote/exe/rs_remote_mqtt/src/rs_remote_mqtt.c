@@ -67,21 +67,24 @@
 #define debug 0
 #define remote_cMsgClass 204
 
-typedef enum {
+typedef enum
+{
   eCon_NotConnected = 0,
   eCon_Connected = 1,
   eCon_WaitConnect = 2
 } eCon;
 
-typedef struct {
-  struct mosquitto *mosq;
+typedef struct
+{
+  struct mosquitto* mosq;
   pwr_sClass_RemnodeMQTT* op;
   int is_subscriber;
   int is_publisher;
   eCon connected;
 } mqtt_sCtx, *mqtt_tCtx;
 
-typedef struct {
+typedef struct
+{
   unsigned int msg_size;
   unsigned short int msg_id[2];
 } mqtt_header;
@@ -112,7 +115,8 @@ pwr_tStatus mqtt_error_to_sts(int err)
 {
   pwr_tStatus sts = 0;
 
-  switch (err) {
+  switch (err)
+  {
   case MOSQ_ERR_CONN_PENDING:
     sts = REM__TT_CONN_PENDING;
     break;
@@ -183,27 +187,28 @@ pwr_tStatus mqtt_error_to_sts(int err)
   return sts;
 }
 
-void mqtt_close()
-{
-  mosquitto_disconnect(ctx->mosq);
-}
+void mqtt_close() { mosquitto_disconnect(ctx->mosq); }
 
 /* Callback from mosquitto when connection is done */
 
-void connect_cb(struct mosquitto *mosq, void *obj, int result)
+void connect_cb(struct mosquitto* mosq, void* obj, int result)
 {
-  if(result){
+  if (result)
+  {
     ctx->op->Status = mqtt_error_to_sts(result);
     if (debug)
       printf("%s\n", mosquitto_connack_string(result));
     ctx->connected = eCon_NotConnected;
-    if (result == MOSQ_ERR_CONN_REFUSED) {
+    if (result == MOSQ_ERR_CONN_REFUSED)
+    {
       errh_Fatal("Remote mqtt terminated, %s", mosquitto_connack_string(result));
       exit(0);
     }
   }
-  else {
-    if (ctx->is_subscriber) {
+  else
+  {
+    if (ctx->is_subscriber)
+    {
       mosquitto_subscribe(ctx->mosq, NULL, ctx->op->SubscribeTopic, 0);
     }
     ctx->op->Status = REM__TT_CONNECTED;
@@ -213,8 +218,7 @@ void connect_cb(struct mosquitto *mosq, void *obj, int result)
 
 /* Callback from mosquitto when message is received */
 
-void message_cb(struct mosquitto *mosq, void *obj, 
-    const struct mosquitto_message *msg)
+void message_cb(struct mosquitto* mosq, void* obj, const struct mosquitto_message* msg)
 {
   bool match = 0;
   pwr_tStatus sts;
@@ -222,36 +226,42 @@ void message_cb(struct mosquitto *mosq, void *obj,
   remtrans_item* remtrans;
   mqtt_header header;
   int msg_received = 0;
-  
-  if (msg->payloadlen > 0 && rn_mqtt->DisableHeader) {
+
+  if (msg->payloadlen > 0 && rn_mqtt->DisableHeader)
+  {
     /* Header disabled, take the first receive remtrans object */
 
     remtrans = rn.remtrans;
     search_remtrans = 1;
 
-    while (remtrans && search_remtrans) {
+    while (remtrans && search_remtrans)
+    {
       /* Match? */
-      if (remtrans->objp->Direction == REMTRANS_IN) {
-	if (ctx->is_subscriber == 1 && strcmp(remtrans->objp->TransName, "") == 0)
-	  match = 1;
-	else
-	  mosquitto_topic_matches_sub(remtrans->objp->TransName, msg->topic, &match);
-      
-	if (match) {
-	  search_remtrans = false;
-	  sts = RemTrans_Receive(remtrans, (char*)msg->payload,
-              msg->payloadlen);
-	  msg_received = 1;
-	  break;
-	}
+      if (remtrans->objp->Direction == REMTRANS_IN)
+      {
+        if (ctx->is_subscriber == 1 && strcmp(remtrans->objp->TransName, "") == 0)
+          match = 1;
+        else
+          mosquitto_topic_matches_sub(remtrans->objp->TransName, msg->topic, &match);
+
+        if (match)
+        {
+          search_remtrans = false;
+          sts = RemTrans_Receive(remtrans, (char*)msg->payload, msg->payloadlen);
+          msg_received = 1;
+          break;
+        }
       }
       remtrans = (remtrans_item*)remtrans->next;
     }
-    if (search_remtrans) {
+    if (search_remtrans)
+    {
       rn_mqtt->ErrCount++;
       errh_Info("MQTT Receive no remtrans %s", rn_mqtt->SubscribeTopic);
     }
-  } else if (msg->payloadlen >= sizeof(mqtt_header)) {
+  }
+  else if (msg->payloadlen >= sizeof(mqtt_header))
+  {
     memcpy(&header, msg->payload, sizeof(mqtt_header));
 
     /* Convert the header to host byte order */
@@ -261,27 +271,27 @@ void message_cb(struct mosquitto *mosq, void *obj,
 
     search_remtrans = 1;
     remtrans = rn.remtrans;
-    while (remtrans && search_remtrans) {
-      if (remtrans->objp->Address[0] == header.msg_id[0]
-          && remtrans->objp->Address[1] == header.msg_id[1]
-          && remtrans->objp->Direction == REMTRANS_IN) {
+    while (remtrans && search_remtrans)
+    {
+      if (remtrans->objp->Address[0] == header.msg_id[0] && remtrans->objp->Address[1] == header.msg_id[1] &&
+          remtrans->objp->Direction == REMTRANS_IN)
+      {
         search_remtrans = false;
-        sts = RemTrans_Receive(remtrans,
-            (char*)msg->payload + sizeof(mqtt_header),
-            msg->payloadlen - sizeof(mqtt_header));
+        sts = RemTrans_Receive(remtrans, (char*)msg->payload + sizeof(mqtt_header),
+                               msg->payloadlen - sizeof(mqtt_header));
         if (sts != STATUS_OK && sts != STATUS_BUFF)
-          errh_Error("Error from RemTrans_Receive, topic %s, status %d",
-              rn_mqtt->SubscribeTopic, sts, 0);
+          errh_Error("Error from RemTrans_Receive, topic %s, status %d", rn_mqtt->SubscribeTopic, sts, 0);
         msg_received = 1;
         break;
       }
       remtrans = (remtrans_item*)remtrans->next;
     }
-    if (search_remtrans) {
+    if (search_remtrans)
+    {
       rn_mqtt->ErrCount++;
       msg_received = 1;
-      errh_Info("No remtrans for received message, topic %s, class %d, type %d",
-          rn_mqtt->SubscribeTopic, header.msg_id[0], header.msg_id[1]);
+      errh_Info("No remtrans for received message, topic %s, class %d, type %d", rn_mqtt->SubscribeTopic,
+                header.msg_id[0], header.msg_id[1]);
     }
   }
 }
@@ -304,10 +314,11 @@ int mqtt_connect()
   int rc;
   char id[20];
 
-  if (!ctx->mosq) {
+  if (!ctx->mosq)
+  {
     sprintf(id, "%u", rn.objid.oix);
     ctx->mosq = mosquitto_new(id, true, NULL);
-  
+
     mosquitto_connect_callback_set(ctx->mosq, connect_cb);
     if (ctx->is_subscriber)
       mosquitto_message_callback_set(ctx->mosq, message_cb);
@@ -317,15 +328,18 @@ int mqtt_connect()
     // mosquitto_tls_set(ctx->mosq, "ca-cert.pem", NULL, NULL, NULL, NULL);
 
     rc = mosquitto_connect(ctx->mosq, ctx->op->Server, ctx->op->Port, 60);
-    if (rc) {
+    if (rc)
+    {
       ctx->op->Status = mqtt_error_to_sts(rc);
       return ctx->op->Status;
     }
     ctx->connected = eCon_WaitConnect;
   }
-  else {
+  else
+  {
     rc = mosquitto_reconnect(ctx->mosq);
-    if (rc) {
+    if (rc)
+    {
       ctx->op->Status = mqtt_error_to_sts(rc);
       return ctx->op->Status;
     }
@@ -341,11 +355,12 @@ void reconnect()
     return;
 
   RemoteSleep(2);
-  
+
   rc = mosquitto_connect(ctx->mosq, ctx->op->Server, ctx->op->Port, 60);
   if (debug)
     printf("reconnect: %s\n", mosquitto_connack_string(rc));
-  if (!rc) {
+  if (!rc)
+  {
     ctx->op->Status = mqtt_error_to_sts(rc);
     ctx->connected = eCon_Connected;
     return;
@@ -367,18 +382,20 @@ void reconnect()
 **************************************************************************
 **************************************************************************/
 
-unsigned int mqtt_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
-    char* buf, int buf_size)
+unsigned int mqtt_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans, char* buf, int buf_size)
 {
   char* tmpbuf;
   unsigned int tmpbuf_size;
   int retain;
   int rc;
 
-  if (rn_mqtt->DisableHeader) {
+  if (rn_mqtt->DisableHeader)
+  {
     tmpbuf = buf;
     tmpbuf_size = buf_size;
-  } else {
+  }
+  else
+  {
     tmpbuf_size = sizeof(mqtt_header) + buf_size;
     tmpbuf = malloc(tmpbuf_size);
     memcpy(tmpbuf + sizeof(mqtt_header), buf, buf_size);
@@ -391,12 +408,11 @@ unsigned int mqtt_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
   retain = remtrans->Address[3] == 1 ? 1 : 0;
 
   if (rn_mqtt->DisableHeader)
-    rc = mosquitto_publish(ctx->mosq, NULL, remtrans->TransName, tmpbuf_size, 
-	tmpbuf, 1, retain);
+    rc = mosquitto_publish(ctx->mosq, NULL, remtrans->TransName, tmpbuf_size, tmpbuf, 1, retain);
   else
-    rc = mosquitto_publish(ctx->mosq, NULL, rn_mqtt->PublishTopic, tmpbuf_size, 
-	tmpbuf, 1, retain);
-  if (rc) {
+    rc = mosquitto_publish(ctx->mosq, NULL, rn_mqtt->PublishTopic, tmpbuf_size, tmpbuf, 1, retain);
+  if (rc)
+  {
     ctx->op->Status = mqtt_error_to_sts(rc);
   }
   if (!rn_mqtt->DisableHeader)
@@ -442,7 +458,8 @@ int main(int argc, char* argv[])
 
   /* Init of gdh */
   sts = gdh_Init((char*)pname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -454,7 +471,8 @@ int main(int argc, char* argv[])
   sts = 0;
   if (argc >= 3)
     sts = cdh_StringToObjid(argv[2], &rn.objid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("cdh_StringToObjid, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -462,13 +480,15 @@ int main(int argc, char* argv[])
 
   /* Get pointer to RemnodeMQTT object and store locally */
   sts = gdh_ObjidToPointer(rn.objid, (pwr_tAddress*)&rn_mqtt);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("cdh_ObjidToPointer, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
-  if (streq(rn_mqtt->Server, "")) {
+  if (streq(rn_mqtt->Server, ""))
+  {
     errh_Fatal("Process terminated, server not configured, %s", id);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -486,7 +506,8 @@ int main(int argc, char* argv[])
 
   sts = RemTrans_Init(&rn);
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("RemTrans_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -495,27 +516,28 @@ int main(int argc, char* argv[])
   /* Store remtrans objects objid in remnode_qcom object */
   remtrans = rn.remtrans;
   i = 0;
-  while (remtrans) {
+  while (remtrans)
+  {
     if (remtrans->objp->Direction == REMTRANS_OUT)
       ctx->is_publisher++;
     else if (remtrans->objp->Direction == REMTRANS_IN)
       ctx->is_subscriber++;
 
     rn_mqtt->RemTransObjects[i++] = remtrans->objid;
-    if (i >= (int)(sizeof(rn_mqtt->RemTransObjects)
-                 / sizeof(rn_mqtt->RemTransObjects[0])))
+    if (i >= (int)(sizeof(rn_mqtt->RemTransObjects) / sizeof(rn_mqtt->RemTransObjects[0])))
       break;
     remtrans = (remtrans_item*)remtrans->next;
   }
 
   /* Connect to mqtt server */
   sts = mqtt_connect();
-  while(1) {
+  while (1)
+  {
     if (debug)
       printf("Wait for connection\n");
     if (ctx->connected != eCon_WaitConnect)
       break;
-    
+
     rc = mosquitto_loop(ctx->mosq, TIME_INCR * 1000, 1);
   }
 
@@ -529,38 +551,46 @@ int main(int argc, char* argv[])
 
   /* Loop forever */
 
-  while (!doomsday) {
-    if (rn_mqtt->Disable == 1) {
+  while (!doomsday)
+  {
+    if (rn_mqtt->Disable == 1)
+    {
       errh_Fatal("Disabled, exiting");
       errh_SetStatus(PWR__SRVTERM);
       exit(0);
     }
     aproc_TimeStamp(TIME_INCR, 5);
 
-    if (ctx->connected == eCon_NotConnected) {
+    if (ctx->connected == eCon_NotConnected)
+    {
       reconnect();
       continue;
     }
 
-    if (ctx->is_publisher) {
+    if (ctx->is_publisher)
+    {
       rc = mosquitto_loop(ctx->mosq, TIME_INCR * 1000, 1);
       if (rc)
-	ctx->op->Status = mqtt_error_to_sts(rc);
+        ctx->op->Status = mqtt_error_to_sts(rc);
       RemoteSleep(TIME_INCR);
     }
-    else {
+    else
+    {
       rc = mosquitto_loop(ctx->mosq, -1, 1);
-      if (rc) {
-	ctx->op->Status = mqtt_error_to_sts(rc);
-	if (rc == MOSQ_ERR_NO_CONN || MOSQ_ERR_CONN_LOST) {
-	  ctx->connected = eCon_NotConnected;
-	  continue;
-	}
+      if (rc)
+      {
+        ctx->op->Status = mqtt_error_to_sts(rc);
+        if (rc == MOSQ_ERR_NO_CONN || MOSQ_ERR_CONN_LOST)
+        {
+          ctx->connected = eCon_NotConnected;
+          continue;
+        }
       }
     }
 
     time_since_scan += TIME_INCR;
-    if (time_since_scan >= rn_mqtt->ScanTime) {
+    if (time_since_scan >= rn_mqtt->ScanTime)
+    {
       if (ctx->is_publisher)
         sts = RemTrans_Cyclic(&rn, &mqtt_send);
       time_since_scan = 0.0;

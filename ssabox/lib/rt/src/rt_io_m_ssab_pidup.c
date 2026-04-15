@@ -36,32 +36,32 @@
 
 /* rt_io_m_ssab_pid.c -- io methods for ssab cards. */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <errno.h>
-#include <unistd.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "co_cdh.h"
 #include "co_time.h"
 #include "pwr_basecomponentclasses.h"
 #include "pwr_ssaboxclasses.h"
+#include "qbus_io.h"
 #include "rt_io_base.h"
+#include "rt_io_bfbeth.h"
+#include "rt_io_card_close.h"
+#include "rt_io_card_init.h"
+#include "rt_io_card_read.h"
+#include "rt_io_m_ssab_locals.h"
 #include "rt_io_msg.h"
 #include "rt_io_ssab.h"
-#include "rt_io_card_init.h"
-#include "rt_io_card_close.h"
-#include "rt_io_card_read.h"
-#include "qbus_io.h"
-#include "rt_io_m_ssab_locals.h"
-#include "rt_io_bfbeth.h"
 
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
 
-//#define init_mask 0x0001
+// #define init_mask 0x0001
 #define inc3p_mask 0x0002
 #define pos3p_mask 0x0004
 #define ao_mask 0x0008
@@ -69,10 +69,10 @@
 #define stall_freeze_mask 0x0020
 #define stall_cont_mask 0x0040
 #define setup_req_mask 0x1000 // bit 12
-#define act_dat_mask 0x2000 // bit 13
-#define setup_mask 0x4000 // bit 14
-#define dyn_mask 0x8000 // bit 15
-#define typ_mask 0xf001 // bit 12, 13, 14, 15 + bit 1
+#define act_dat_mask 0x2000   // bit 13
+#define setup_mask 0x4000     // bit 14
+#define dyn_mask 0x8000       // bit 15
+#define typ_mask 0xf001       // bit 12, 13, 14, 15 + bit 1
 
 typedef struct {
   unsigned short csr1;
@@ -127,8 +127,8 @@ typedef struct {
 } card_stat;
 
 typedef struct {
-  float Max; /* Max ingenjörsvärde */
-  float Min; /* Min ingenjörsvärde */
+  float Max;    /* Max ingenjörsvärde */
+  float Min;    /* Min ingenjörsvärde */
   float RawMax; /* Råvärde vid Max (+- 30000) */
   float RawMin; /* Råvärde vid Min (+- 30000) */
 } card_range;
@@ -142,7 +142,7 @@ typedef struct {
   card_range ProcRange;
   card_range BiasRange;
   card_range PosRange;
-  pwr_sClass_PidX* objP;
+  pwr_sClass_PidX *objP;
   unsigned int Address;
   int Qbus_fp;
   unsigned short dyn_ind;
@@ -155,8 +155,7 @@ typedef struct {
   unsigned short Valid;
 } io_sLocal;
 
-void swap_word(unsigned int* out, unsigned int* in)
-{
+void swap_word(unsigned int *out, unsigned int *in) {
   unsigned int result = 0;
   ;
   result = (*in << 16) & 0xFFFF0000;
@@ -164,9 +163,8 @@ void swap_word(unsigned int* out, unsigned int* in)
   *out = result;
 }
 
-static int ssabpid_read(
-    unsigned short index, unsigned short* data, io_sLocal* local)
-{
+static int ssabpid_read(unsigned short index, unsigned short *data,
+                        io_sLocal *local) {
   qbus_io_read rb;
   qbus_io_write wb;
   int sts;
@@ -184,9 +182,8 @@ static int ssabpid_read(
 
   return sts;
 }
-static int ssabpid_write(
-    unsigned short index, unsigned short* data, io_sLocal* local)
-{
+static int ssabpid_write(unsigned short index, unsigned short *data,
+                         io_sLocal *local) {
   qbus_io_write wb;
   int sts;
 
@@ -203,22 +200,21 @@ static int ssabpid_write(
 
   return sts;
 }
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
-{
-  pwr_sClass_Ssab_PIDuP* op;
-  io_sLocal* local;
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent *ap, io_sRack *rp,
+                              io_sCard *cp) {
+  pwr_sClass_Ssab_PIDuP *op;
+  io_sLocal *local;
   pwr_tStatus sts;
 
-  op = (pwr_sClass_Ssab_PIDuP*)cp->op;
+  op = (pwr_sClass_Ssab_PIDuP *)cp->op;
   local = calloc(1, sizeof(*local));
   cp->Local = local;
   local->Address = op->RegAddress;
-  local->Qbus_fp = ((io_sRackLocal*)(rp->Local))->Qbus_fp;
+  local->Qbus_fp = ((io_sRackLocal *)(rp->Local))->Qbus_fp;
 
   errh_Info("Init of pid card '%s'", cp->Name);
 
-  sts = gdh_ObjidToPointer(op->PidXCon, (void*)&local->objP);
+  sts = gdh_ObjidToPointer(op->PidXCon, (void *)&local->objP);
 
   if (EVEN(sts)) {
     errh_Error("PID-card not properly connected, %s", cp->Name);
@@ -227,10 +223,10 @@ static pwr_tStatus IoCardInit(
 
   /* Calculate indexes in I/O-area */
 
-  local->dyn_ind = ((char*)&local->Dyn - (char*)local) / 2;
-  local->par_ind = ((char*)&local->Par - (char*)local) / 2;
-  local->stat_ind = ((char*)&local->Stat - (char*)local) / 2;
-  local->ran_ind = ((char*)&local->AoRange - (char*)local) / 2;
+  local->dyn_ind = ((char *)&local->Dyn - (char *)local) / 2;
+  local->par_ind = ((char *)&local->Par - (char *)local) / 2;
+  local->stat_ind = ((char *)&local->Stat - (char *)local) / 2;
+  local->ran_ind = ((char *)&local->AoRange - (char *)local) / 2;
 
   local->ErrReset = 1.0 / ctx->ScanTime + 0.5;
   if (local->ErrReset < 2)
@@ -242,15 +238,14 @@ static pwr_tStatus IoCardInit(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
-{
-  io_sLocal* local;
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent *ap, io_sRack *rp,
+                               io_sCard *cp) {
+  io_sLocal *local;
 
   errh_Info("IO closing pid card '%s'", cp->Name);
 
-  local = (io_sLocal*)cp->Local;
-  free((char*)local);
+  local = (io_sLocal *)cp->Local;
+  free((char *)local);
 
   return 1;
 }
@@ -258,18 +253,17 @@ static pwr_tStatus IoCardClose(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
-{
-  io_sLocal* local;
-  pwr_sClass_Ssab_PIDuP* op;
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent *ap, io_sRack *rp,
+                              io_sCard *cp) {
+  io_sLocal *local;
+  pwr_sClass_Ssab_PIDuP *op;
   int sts, ii;
   card_stat c_stat;
-  unsigned short* datap;
+  unsigned short *datap;
   unsigned short diff;
 
-  local = (io_sLocal*)cp->Local;
-  op = (pwr_sClass_Ssab_PIDuP*)cp->op;
+  local = (io_sLocal *)cp->Local;
+  op = (pwr_sClass_Ssab_PIDuP *)cp->op;
 
   sts = ssabpid_read(0, &local->Istat[0], local);
   if (sts != -1) {
@@ -287,7 +281,7 @@ static pwr_tStatus IoCardRead(
   memset(&c_stat, 0, sizeof(c_stat));
 
   if (local->Valid && (diff & act_dat_mask)) {
-    for (ii = local->stat_ind, datap = (unsigned short*)&c_stat;
+    for (ii = local->stat_ind, datap = (unsigned short *)&c_stat;
          ii < local->ran_ind; ii++, datap++) {
       sts = ssabpid_read(ii, datap, local);
 
@@ -306,16 +300,17 @@ static pwr_tStatus IoCardRead(
 
     /* Move data to PidX-object */
 
-    swap_word(
-        (unsigned int*)&local->objP->ProcVal, (unsigned int*)&c_stat.ProcVal);
-    swap_word(
-        (unsigned int*)&local->objP->PosVal, (unsigned int*)&c_stat.PosVal);
-    swap_word(
-        (unsigned int*)&local->objP->OutVal, (unsigned int*)&c_stat.OutVal);
-    swap_word((unsigned int*)&local->objP->ControlDiff,
-        (unsigned int*)&c_stat.ControlDiff);
+    swap_word((unsigned int *)&local->objP->ProcVal,
+              (unsigned int *)&c_stat.ProcVal);
+    swap_word((unsigned int *)&local->objP->PosVal,
+              (unsigned int *)&c_stat.PosVal);
+    swap_word((unsigned int *)&local->objP->OutVal,
+              (unsigned int *)&c_stat.OutVal);
+    swap_word((unsigned int *)&local->objP->ControlDiff,
+              (unsigned int *)&c_stat.ControlDiff);
     if (!feqf(local->objP->BiasGain, 0.0f))
-      swap_word((unsigned int*)&local->objP->Bias, (unsigned int*)&c_stat.Bias);
+      swap_word((unsigned int *)&local->objP->Bias,
+                (unsigned int *)&c_stat.Bias);
     local->objP->EndMin = c_stat.EndMin;
     local->objP->EndMax = c_stat.EndMax;
     //    local->objP->ScanTime = c_stat.ScanTime;
@@ -324,8 +319,8 @@ static pwr_tStatus IoCardRead(
   }
 
   if (op->ErrorCount >= op->ErrorHardLimit) {
-    errh_Error(
-        "IO Error hard limit reached on card '%s', IO stopped", cp->Name);
+    errh_Error("IO Error hard limit reached on card '%s', IO stopped",
+               cp->Name);
     ctx->Node->EmergBreakTrue = 1;
     ctx->IOHandler->CardErrorHardLimit = 1;
     ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
@@ -337,11 +332,10 @@ static pwr_tStatus IoCardRead(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
-{
-  io_sLocal* local;
-  pwr_sClass_Ssab_PIDuP* op;
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent *ap, io_sRack *rp,
+                               io_sCard *cp) {
+  io_sLocal *local;
+  pwr_sClass_Ssab_PIDuP *op;
   int ii;
   int sts;
   unsigned short diff;
@@ -349,10 +343,10 @@ static pwr_tStatus IoCardWrite(
   card_par c_par;
   int paramc = 0;
   int dynparc = 0;
-  unsigned short* datap;
+  unsigned short *datap;
 
-  local = (io_sLocal*)cp->Local;
-  op = (pwr_sClass_Ssab_PIDuP*)cp->op;
+  local = (io_sLocal *)cp->Local;
+  op = (pwr_sClass_Ssab_PIDuP *)cp->op;
 
   if (!local->Valid)
     return 1;
@@ -363,33 +357,33 @@ static pwr_tStatus IoCardWrite(
     paramc = 1, dynparc = 1;
 
   /* Check if static parameters has changed */
-  if ((local->objP->PidAlg != local->Par.PidAlg)
-      || (local->objP->Inverse != local->Par.Inverse)
-      || !feqf(local->objP->PidGain, local->Par.PidGain)
-      || !feqf(local->objP->IntTime, local->Par.IntTime)
-      || !feqf(local->objP->DerTime, local->Par.DerTime)
-      || !feqf(local->objP->DerGain, local->Par.DerGain)
-      || !feqf(local->objP->BiasGain, local->Par.BiasGain)
-      || !feqf(local->objP->MinOut, local->Par.MinOut)
-      || !feqf(local->objP->MaxOut, local->Par.MaxOut)
-      || !feqf(local->objP->EndHys, local->Par.EndHys)
-      || !feqf(local->objP->ProcFiltTime, local->Par.ProcFiltTime)
-      || !feqf(local->objP->ProcMax, local->ProcRange.Max)
-      || !feqf(local->objP->ProcMin, local->ProcRange.Min)
-      || !feqf(local->objP->AoMax, local->AoRange.Max)
-      || !feqf(local->objP->AoMin, local->AoRange.Min)
-      || !feqf(local->Par.inc3pGain, local->objP->Inc3pGain)
-      || !feqf(local->Par.MinTim, local->objP->MinTim)
-      || !feqf(local->Par.MaxTim, local->objP->MaxTim)
-      || !feqf(local->Par.MaxInteg, local->objP->MaxInteg))
+  if ((local->objP->PidAlg != local->Par.PidAlg) ||
+      (local->objP->Inverse != local->Par.Inverse) ||
+      !feqf(local->objP->PidGain, local->Par.PidGain) ||
+      !feqf(local->objP->IntTime, local->Par.IntTime) ||
+      !feqf(local->objP->DerTime, local->Par.DerTime) ||
+      !feqf(local->objP->DerGain, local->Par.DerGain) ||
+      !feqf(local->objP->BiasGain, local->Par.BiasGain) ||
+      !feqf(local->objP->MinOut, local->Par.MinOut) ||
+      !feqf(local->objP->MaxOut, local->Par.MaxOut) ||
+      !feqf(local->objP->EndHys, local->Par.EndHys) ||
+      !feqf(local->objP->ProcFiltTime, local->Par.ProcFiltTime) ||
+      !feqf(local->objP->ProcMax, local->ProcRange.Max) ||
+      !feqf(local->objP->ProcMin, local->ProcRange.Min) ||
+      !feqf(local->objP->AoMax, local->AoRange.Max) ||
+      !feqf(local->objP->AoMin, local->AoRange.Min) ||
+      !feqf(local->Par.inc3pGain, local->objP->Inc3pGain) ||
+      !feqf(local->Par.MinTim, local->objP->MinTim) ||
+      !feqf(local->Par.MaxTim, local->objP->MaxTim) ||
+      !feqf(local->Par.MaxInteg, local->objP->MaxInteg))
     paramc = 1;
 
   /* Check if dynamic parameters has changed */
-  if (!feqf(local->objP->SetVal, local->Dyn.SetVal)
-      || !feqf(local->objP->Bias, local->Dyn.BiasD)
-      || !feqf(local->objP->ForcVal, local->Dyn.ForcVal)
-      || (local->objP->IntOff != local->Dyn.IntOff)
-      || (local->objP->Force != local->Dyn.Force))
+  if (!feqf(local->objP->SetVal, local->Dyn.SetVal) ||
+      !feqf(local->objP->Bias, local->Dyn.BiasD) ||
+      !feqf(local->objP->ForcVal, local->Dyn.ForcVal) ||
+      (local->objP->IntOff != local->Dyn.IntOff) ||
+      (local->objP->Force != local->Dyn.Force))
     dynparc = 1;
 
   /* Move parameters to local */
@@ -404,40 +398,42 @@ static pwr_tStatus IoCardWrite(
     local->ProcRange.RawMax = local->objP->ProcRawMax;
     local->ProcRange.RawMin = local->objP->ProcRawMin;
     if (!feqf(local->ProcRange.RawMax, local->ProcRange.RawMin)) {
-      local->Par.AVcoeff[0] = (local->ProcRange.Max - local->ProcRange.Min)
-          / (local->ProcRange.RawMax - local->ProcRange.RawMin);
-      local->Par.AVcoeff[1] = local->ProcRange.Min
-          - local->ProcRange.RawMin * local->Par.AVcoeff[0];
+      local->Par.AVcoeff[0] =
+          (local->ProcRange.Max - local->ProcRange.Min) /
+          (local->ProcRange.RawMax - local->ProcRange.RawMin);
+      local->Par.AVcoeff[1] = local->ProcRange.Min -
+                              local->ProcRange.RawMin * local->Par.AVcoeff[0];
     }
     local->BiasRange.Max = local->objP->BiasMax;
     local->BiasRange.Min = local->objP->BiasMin;
     local->BiasRange.RawMax = local->objP->BiasRawMax;
     local->BiasRange.RawMin = local->objP->BiasRawMin;
     if (!feqf(local->BiasRange.RawMax, local->BiasRange.RawMin)) {
-      local->Par.BVcoeff[0] = (local->BiasRange.Max - local->BiasRange.Min)
-          / (local->BiasRange.RawMax - local->BiasRange.RawMin);
-      local->Par.BVcoeff[1] = local->BiasRange.Min
-          - local->BiasRange.RawMin * local->Par.BVcoeff[0];
+      local->Par.BVcoeff[0] =
+          (local->BiasRange.Max - local->BiasRange.Min) /
+          (local->BiasRange.RawMax - local->BiasRange.RawMin);
+      local->Par.BVcoeff[1] = local->BiasRange.Min -
+                              local->BiasRange.RawMin * local->Par.BVcoeff[0];
     }
     local->AoRange.Max = local->objP->AoMax;
     local->AoRange.Min = local->objP->AoMin;
     local->AoRange.RawMax = local->objP->AoRawMax;
     local->AoRange.RawMin = local->objP->AoRawMin;
     if (!feqf(local->AoRange.Max, local->AoRange.Min)) {
-      local->Par.OVcoeff[0] = (local->AoRange.RawMax - local->AoRange.RawMin)
-          / (local->AoRange.Max - local->AoRange.Min);
-      local->Par.OVcoeff[1]
-          = local->AoRange.RawMin - local->AoRange.Min * local->Par.OVcoeff[0];
+      local->Par.OVcoeff[0] = (local->AoRange.RawMax - local->AoRange.RawMin) /
+                              (local->AoRange.Max - local->AoRange.Min);
+      local->Par.OVcoeff[1] =
+          local->AoRange.RawMin - local->AoRange.Min * local->Par.OVcoeff[0];
     }
     local->PosRange.Max = local->objP->PosMax;
     local->PosRange.Min = local->objP->PosMin;
     local->PosRange.RawMax = local->objP->PosRawMax;
     local->PosRange.RawMin = local->objP->PosRawMin;
     if (!feqf(local->PosRange.RawMax, local->PosRange.RawMin)) {
-      local->Par.PVcoeff[0] = (local->PosRange.Max - local->PosRange.Min)
-          / (local->PosRange.RawMax - local->PosRange.RawMin);
-      local->Par.PVcoeff[1] = local->PosRange.Min
-          - local->PosRange.RawMin * local->Par.PVcoeff[0];
+      local->Par.PVcoeff[0] = (local->PosRange.Max - local->PosRange.Min) /
+                              (local->PosRange.RawMax - local->PosRange.RawMin);
+      local->Par.PVcoeff[1] =
+          local->PosRange.Min - local->PosRange.RawMin * local->Par.PVcoeff[0];
     }
 
     local->Par.PidAlg = local->objP->PidAlg;
@@ -460,53 +456,60 @@ static pwr_tStatus IoCardWrite(
     /* Write parameters to card */
     c_par.PidAlg = local->Par.PidAlg;
     c_par.Inverse = local->Par.Inverse;
-    swap_word(
-        (unsigned int*)&c_par.inc3pGain, (unsigned int*)&local->Par.inc3pGain);
-    swap_word((unsigned int*)&c_par.MinTim, (unsigned int*)&local->Par.MinTim);
-    swap_word((unsigned int*)&c_par.MaxTim, (unsigned int*)&local->Par.MaxTim);
-    swap_word(
-        (unsigned int*)&c_par.MaxInteg, (unsigned int*)&local->Par.MaxInteg);
-    swap_word((unsigned int*)&c_par.AVcoeff[0],
-        (unsigned int*)&local->Par.AVcoeff[0]);
-    swap_word((unsigned int*)&c_par.AVcoeff[1],
-        (unsigned int*)&local->Par.AVcoeff[1]);
-    swap_word((unsigned int*)&c_par.BVcoeff[0],
-        (unsigned int*)&local->Par.BVcoeff[0]);
-    swap_word((unsigned int*)&c_par.BVcoeff[1],
-        (unsigned int*)&local->Par.BVcoeff[1]);
-    swap_word((unsigned int*)&c_par.OVcoeff[0],
-        (unsigned int*)&local->Par.OVcoeff[0]);
-    swap_word((unsigned int*)&c_par.OVcoeff[1],
-        (unsigned int*)&local->Par.OVcoeff[1]);
-    swap_word(
-        (unsigned int*)&c_par.PidGain, (unsigned int*)&local->Par.PidGain);
-    swap_word(
-        (unsigned int*)&c_par.IntTime, (unsigned int*)&local->Par.IntTime);
-    swap_word(
-        (unsigned int*)&c_par.DerTime, (unsigned int*)&local->Par.DerTime);
-    swap_word(
-        (unsigned int*)&c_par.DerGain, (unsigned int*)&local->Par.DerGain);
-    swap_word(
-        (unsigned int*)&c_par.BiasGain, (unsigned int*)&local->Par.BiasGain);
-    swap_word((unsigned int*)&c_par.MinOut, (unsigned int*)&local->Par.MinOut);
-    swap_word((unsigned int*)&c_par.MaxOut, (unsigned int*)&local->Par.MaxOut);
-    swap_word((unsigned int*)&c_par.EndHys, (unsigned int*)&local->Par.EndHys);
-    swap_word((unsigned int*)&c_par.PVcoeff[0],
-        (unsigned int*)&local->Par.PVcoeff[0]);
-    swap_word((unsigned int*)&c_par.PVcoeff[1],
-        (unsigned int*)&local->Par.PVcoeff[1]);
-    swap_word((unsigned int*)&c_par.ErrSta, (unsigned int*)&local->Par.ErrSta);
-    swap_word((unsigned int*)&c_par.ErrSto, (unsigned int*)&local->Par.ErrSto);
-    swap_word(
-        (unsigned int*)&c_par.pos3pGain, (unsigned int*)&local->Par.pos3pGain);
-    swap_word((unsigned int*)&c_par.ProcFiltTime,
-        (unsigned int*)&local->Par.ProcFiltTime);
-    swap_word((unsigned int*)&c_par.BiasFiltTime,
-        (unsigned int*)&local->Par.BiasFiltTime);
-    swap_word((unsigned int*)&c_par.PosFiltTime,
-        (unsigned int*)&local->Par.PosFiltTime);
+    swap_word((unsigned int *)&c_par.inc3pGain,
+              (unsigned int *)&local->Par.inc3pGain);
+    swap_word((unsigned int *)&c_par.MinTim,
+              (unsigned int *)&local->Par.MinTim);
+    swap_word((unsigned int *)&c_par.MaxTim,
+              (unsigned int *)&local->Par.MaxTim);
+    swap_word((unsigned int *)&c_par.MaxInteg,
+              (unsigned int *)&local->Par.MaxInteg);
+    swap_word((unsigned int *)&c_par.AVcoeff[0],
+              (unsigned int *)&local->Par.AVcoeff[0]);
+    swap_word((unsigned int *)&c_par.AVcoeff[1],
+              (unsigned int *)&local->Par.AVcoeff[1]);
+    swap_word((unsigned int *)&c_par.BVcoeff[0],
+              (unsigned int *)&local->Par.BVcoeff[0]);
+    swap_word((unsigned int *)&c_par.BVcoeff[1],
+              (unsigned int *)&local->Par.BVcoeff[1]);
+    swap_word((unsigned int *)&c_par.OVcoeff[0],
+              (unsigned int *)&local->Par.OVcoeff[0]);
+    swap_word((unsigned int *)&c_par.OVcoeff[1],
+              (unsigned int *)&local->Par.OVcoeff[1]);
+    swap_word((unsigned int *)&c_par.PidGain,
+              (unsigned int *)&local->Par.PidGain);
+    swap_word((unsigned int *)&c_par.IntTime,
+              (unsigned int *)&local->Par.IntTime);
+    swap_word((unsigned int *)&c_par.DerTime,
+              (unsigned int *)&local->Par.DerTime);
+    swap_word((unsigned int *)&c_par.DerGain,
+              (unsigned int *)&local->Par.DerGain);
+    swap_word((unsigned int *)&c_par.BiasGain,
+              (unsigned int *)&local->Par.BiasGain);
+    swap_word((unsigned int *)&c_par.MinOut,
+              (unsigned int *)&local->Par.MinOut);
+    swap_word((unsigned int *)&c_par.MaxOut,
+              (unsigned int *)&local->Par.MaxOut);
+    swap_word((unsigned int *)&c_par.EndHys,
+              (unsigned int *)&local->Par.EndHys);
+    swap_word((unsigned int *)&c_par.PVcoeff[0],
+              (unsigned int *)&local->Par.PVcoeff[0]);
+    swap_word((unsigned int *)&c_par.PVcoeff[1],
+              (unsigned int *)&local->Par.PVcoeff[1]);
+    swap_word((unsigned int *)&c_par.ErrSta,
+              (unsigned int *)&local->Par.ErrSta);
+    swap_word((unsigned int *)&c_par.ErrSto,
+              (unsigned int *)&local->Par.ErrSto);
+    swap_word((unsigned int *)&c_par.pos3pGain,
+              (unsigned int *)&local->Par.pos3pGain);
+    swap_word((unsigned int *)&c_par.ProcFiltTime,
+              (unsigned int *)&local->Par.ProcFiltTime);
+    swap_word((unsigned int *)&c_par.BiasFiltTime,
+              (unsigned int *)&local->Par.BiasFiltTime);
+    swap_word((unsigned int *)&c_par.PosFiltTime,
+              (unsigned int *)&local->Par.PosFiltTime);
 
-    for (ii = local->par_ind, datap = (unsigned short*)&c_par;
+    for (ii = local->par_ind, datap = (unsigned short *)&c_par;
          ii < local->stat_ind; ii++, datap++) {
       sts = ssabpid_write(ii, datap, local);
 
@@ -542,14 +545,15 @@ static pwr_tStatus IoCardWrite(
 
     /* Write parameters to card */
 
-    swap_word((unsigned int*)&c_dyn.SetVal, (unsigned int*)&local->Dyn.SetVal);
-    swap_word((unsigned int*)&c_dyn.BiasD, (unsigned int*)&local->Dyn.BiasD);
-    swap_word(
-        (unsigned int*)&c_dyn.ForcVal, (unsigned int*)&local->Dyn.ForcVal);
+    swap_word((unsigned int *)&c_dyn.SetVal,
+              (unsigned int *)&local->Dyn.SetVal);
+    swap_word((unsigned int *)&c_dyn.BiasD, (unsigned int *)&local->Dyn.BiasD);
+    swap_word((unsigned int *)&c_dyn.ForcVal,
+              (unsigned int *)&local->Dyn.ForcVal);
     c_dyn.Force = local->Dyn.Force;
     c_dyn.IntOff = local->Dyn.IntOff;
 
-    for (ii = local->dyn_ind, datap = (unsigned short*)&c_dyn;
+    for (ii = local->dyn_ind, datap = (unsigned short *)&c_dyn;
          ii < local->par_ind; ii++, datap++) {
       sts = ssabpid_write(ii, datap, local);
 
@@ -592,8 +596,8 @@ static pwr_tStatus IoCardWrite(
     op->ErrorCount++;
 
   if (op->ErrorCount >= op->ErrorHardLimit) {
-    errh_Error(
-        "IO Error hard limit reached on card '%s', IO stopped", cp->Name);
+    errh_Error("IO Error hard limit reached on card '%s', IO stopped",
+               cp->Name);
     ctx->Node->EmergBreakTrue = 1;
     ctx->IOHandler->CardErrorHardLimit = 1;
     ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
@@ -615,6 +619,7 @@ static pwr_tStatus IoCardWrite(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Ssab_PIDuP) = { pwr_BindIoMethod(IoCardInit),
-  pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead),
-  pwr_BindIoMethod(IoCardWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Ssab_PIDuP) = {
+    pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+    pwr_BindIoMethod(IoCardRead), pwr_BindIoMethod(IoCardWrite),
+    pwr_NullMethod};

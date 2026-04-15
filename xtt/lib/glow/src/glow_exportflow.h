@@ -47,11 +47,10 @@ class GrowText;
 class GrowSubAnnot;
 class GrowArc;
 
-class GlowExportFlow {
+class GlowExportFlow
+{
 public:
-  GlowExportFlow(GrowCtx* glow_ctx) : ctx(glow_ctx)
-  {
-  }
+  GlowExportFlow(GrowCtx* glow_ctx) : ctx(glow_ctx) {}
   int export_flow(char* filename);
   void array(GlowArray* o);
   void rect(GrowRect* o);

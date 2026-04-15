@@ -42,17 +42,15 @@
 
 static tree_sNode* allocNode(tree_sTable* tp, void* key);
 
-static void treePrintInorder(
-    tree_sTable* tp, tree_sNode* np, void (*printNode)(tree_sNode*));
+static void treePrintInorder(tree_sTable* tp, tree_sNode* np, void (*printNode)(tree_sNode*));
 
 static tree_sTable* cloneTree(pwr_tStatus* sts, tree_sTable* tp);
 
-static tree_sNode* copyNodes(
-    tree_sTable* ntp, tree_sNode* parent, tree_sTable* otp, tree_sNode* onp);
+static tree_sNode* copyNodes(tree_sTable* ntp, tree_sNode* parent, tree_sTable* otp, tree_sNode* onp);
 
-static tree_sTable* createTree(pwr_tStatus* sts, size_t keySize,
-    ptrdiff_t keyOffset, size_t recordSize, unsigned int allocCount,
-    int (*compareFunc)(tree_sTable* tp, tree_sNode* x, tree_sNode* y));
+static tree_sTable* createTree(pwr_tStatus* sts, size_t keySize, ptrdiff_t keyOffset, size_t recordSize,
+                               unsigned int allocCount,
+                               int (*compareFunc)(tree_sTable* tp, tree_sNode* x, tree_sNode* y));
 
 static void deleteTree(pwr_tStatus* sts, tree_sTable* tp);
 
@@ -76,8 +74,8 @@ static tree_sNode* deleteNode(tree_sTable* tp, tree_sNode* z);
 
 static tree_sNode* insertNode(tree_sTable* tp, tree_sNode* z);
 
-static void treeCheck(tree_sTable* tp, tree_sNode* np, int* count,
-    int* maxlevel, int* hight, int level, char* (*printKey)(tree_sNode*));
+static void treeCheck(tree_sTable* tp, tree_sNode* np, int* count, int* maxlevel, int* hight, int level,
+                      char* (*printKey)(tree_sNode*));
 
 static tree_sNode* allocNode(tree_sTable* tp, void* key)
 {
@@ -87,10 +85,10 @@ static tree_sNode* allocNode(tree_sTable* tp, void* key)
   tree_sAlloc* ap;
   int i;
 
-  if ((np = tp->free) == NULL) {
+  if ((np = tp->free) == NULL)
+  {
     tp->nMalloc++;
-    ap = (tree_sAlloc*)calloc(
-        1, tp->allocCount * tp->recordSize + sizeof(tree_sAlloc));
+    ap = (tree_sAlloc*)calloc(1, tp->allocCount * tp->recordSize + sizeof(tree_sAlloc));
     ap->next = tp->firstAlloc;
     tp->firstAlloc = ap;
     np = fp = (tree_sNode*)(ap + 1);
@@ -99,12 +97,15 @@ static tree_sNode* allocNode(tree_sTable* tp, void* key)
     fp = (tree_sNode*)(tp->recordSize + (char*)fp);
     tp->free = fp;
     tp->nFree += tp->allocCount;
-    for (i = 1, op = tp->free; i < tp->allocCount - 1; i++) {
+    for (i = 1, op = tp->free; i < tp->allocCount - 1; i++)
+    {
       fp = (tree_sNode*)(tp->recordSize + (char*)fp);
       op->right = fp;
       op = fp;
     }
-  } else {
+  }
+  else
+  {
     tp->free = np->right;
   }
   tp->nAlloc++;
@@ -115,8 +116,7 @@ static tree_sNode* allocNode(tree_sTable* tp, void* key)
   return np;
 }
 
-static void treePrintInorder(
-    tree_sTable* tp, tree_sNode* np, void (*printNode)(tree_sNode*))
+static void treePrintInorder(tree_sTable* tp, tree_sNode* np, void (*printNode)(tree_sNode*))
 {
   if (np->right != tp->null)
     treePrintInorder(tp, np->right, printNode);
@@ -155,8 +155,7 @@ static tree_sTable* cloneTree(pwr_tStatus* sts, tree_sTable* otp)
   return ntp;
 }
 
-static tree_sNode* copyNodes(
-    tree_sTable* ntp, tree_sNode* parent, tree_sTable* otp, tree_sNode* onp)
+static tree_sNode* copyNodes(tree_sTable* ntp, tree_sNode* parent, tree_sTable* otp, tree_sNode* onp)
 {
   tree_sNode* nnp;
 
@@ -173,9 +172,9 @@ static tree_sNode* copyNodes(
   return nnp;
 }
 
-static tree_sTable* createTree(pwr_tStatus* sts, size_t keySize,
-    ptrdiff_t keyOffset, size_t recordSize, unsigned int allocCount,
-    int (*compareFunc)(tree_sTable* tp, tree_sNode* x, tree_sNode* y))
+static tree_sTable* createTree(pwr_tStatus* sts, size_t keySize, ptrdiff_t keyOffset, size_t recordSize,
+                               unsigned int allocCount,
+                               int (*compareFunc)(tree_sTable* tp, tree_sNode* x, tree_sNode* y))
 {
   tree_sTable* tp;
 
@@ -209,7 +208,8 @@ static void deleteTree(pwr_tStatus* sts, tree_sTable* tp)
   if (tp == NULL)
     return;
 
-  for (ap = tp->firstAlloc; ap != NULL;) {
+  for (ap = tp->firstAlloc; ap != NULL;)
+  {
     fap = ap;
     ap = ap->next;
     free((char*)fap);
@@ -226,7 +226,8 @@ static void emptyTree(pwr_tStatus* sts, tree_sTable* tp)
   if (tp == NULL)
     return;
 
-  for (mp = minimumNode(tp, tp->root); mp != NULL;) {
+  for (mp = minimumNode(tp, tp->root); mp != NULL;)
+  {
     if (mp == tp->null)
       return;
     np = successorNode(tp, mp);
@@ -255,7 +256,8 @@ static tree_sNode* findNearNode(tree_sTable* tp, void* key)
   /* use key node for comparisons */
   memcpy(tp->keyOffset + (char*)tp->key, key, tp->keySize);
 
-  for (np = tp->last = tp->root; np != tp->null; tp->lastComp = comp) {
+  for (np = tp->last = tp->root; np != tp->null; tp->lastComp = comp)
+  {
     tp->last = np;
     comp = tp->compareFunc(tp, tp->key, np);
     if (comp == 0)
@@ -282,7 +284,8 @@ static tree_sNode* findNode(tree_sTable* tp, void* key)
   /* use key node for comparisons */
   memcpy(tp->keyOffset + (char*)tp->key, key, tp->keySize);
 
-  for (np = tp->root;;) {
+  for (np = tp->root;;)
+  {
     comp = tp->compareFunc(tp, tp->key, np);
     if (comp == 0)
       break;
@@ -358,13 +361,18 @@ static tree_sNode* deleteNode(tree_sTable* tp, tree_sNode* z)
     x = y->right;
 
   x->parent = y->parent;
-  if (y->parent == tp->null) {
+  if (y->parent == tp->null)
+  {
     tp->root = x;
     h = 0;
-  } else if (y == y->parent->left) {
+  }
+  else if (y == y->parent->left)
+  {
     y->parent->left = x;
     h = 1; /* left branch has shrunk */
-  } else {
+  }
+  else
+  {
     y->parent->right = x;
     h = -1; /* right branch has shrunk */
   }
@@ -374,14 +382,20 @@ static tree_sNode* deleteNode(tree_sTable* tp, tree_sNode* z)
   else
     p = y->parent;
 
-  if (z != y) { /* Replace z with y */
+  if (z != y)
+  { /* Replace z with y */
     y->bal = z->bal;
     y->parent = z->parent;
-    if (z->parent == tp->null) {
+    if (z->parent == tp->null)
+    {
       tp->root = y;
-    } else if (z == z->parent->left) {
+    }
+    else if (z == z->parent->left)
+    {
       z->parent->left = y;
-    } else {
+    }
+    else
+    {
       z->parent->right = y;
     }
     y->left = z->left;
@@ -392,9 +406,12 @@ static tree_sNode* deleteNode(tree_sTable* tp, tree_sNode* z)
       z->right->parent = y;
   }
 
-  for (; p != tp->null && h != 0; p = p->parent) {
-    if (h == -1) { /* right branch has shrunk */
-      switch (p->bal) {
+  for (; p != tp->null && h != 0; p = p->parent)
+  {
+    if (h == -1)
+    { /* right branch has shrunk */
+      switch (p->bal)
+      {
       case 1:
         p->bal = 0;
         break;
@@ -405,16 +422,20 @@ static tree_sNode* deleteNode(tree_sTable* tp, tree_sNode* z)
       case -1:
         p1 = p->left;
         b1 = p1->bal;
-        if (b1 < 1) { /* single LL rotation */
+        if (b1 < 1)
+        { /* single LL rotation */
           tp->nLL++;
           p->left = p1->right;
           p1->right->parent = p;
           p1->right = p;
-          if (b1 == 0) {
+          if (b1 == 0)
+          {
             p->bal = -1;
             p1->bal = 1;
             h = 0;
-          } else {
+          }
+          else
+          {
             p->bal = p1->bal = 0;
           }
           p1->parent = p->parent;
@@ -426,7 +447,9 @@ static tree_sNode* deleteNode(tree_sTable* tp, tree_sNode* z)
             p->parent->right = p1;
           p->parent = p1;
           p = p1;
-        } else { /* double LR rotation */
+        }
+        else
+        { /* double LR rotation */
           tp->nLR++;
           p2 = p1->right;
           b2 = p2->bal;
@@ -457,8 +480,11 @@ static tree_sNode* deleteNode(tree_sTable* tp, tree_sNode* z)
         }
         break;
       }
-    } else { /* left branch has grown */
-      switch (p->bal) {
+    }
+    else
+    { /* left branch has grown */
+      switch (p->bal)
+      {
       case -1:
         p->bal = 0;
         break;
@@ -469,16 +495,20 @@ static tree_sNode* deleteNode(tree_sTable* tp, tree_sNode* z)
       case 1:
         p1 = p->right;
         b1 = p1->bal;
-        if (b1 > -1) { /* single RR rotation */
+        if (b1 > -1)
+        { /* single RR rotation */
           tp->nRR++;
           p->right = p1->left;
           p1->left->parent = p;
           p1->left = p;
-          if (b1 == 0) {
+          if (b1 == 0)
+          {
             p->bal = 1;
             p1->bal = -1;
             h = 0;
-          } else {
+          }
+          else
+          {
             p->bal = p1->bal = 0;
           }
           p1->parent = p->parent;
@@ -490,7 +520,9 @@ static tree_sNode* deleteNode(tree_sTable* tp, tree_sNode* z)
             p->parent->right = p1;
           p->parent = p1;
           p = p1;
-        } else { /* double RL rotation */
+        }
+        else
+        { /* double RL rotation */
           tp->nRL++;
           p2 = p1->left;
           b2 = p2->bal;
@@ -541,23 +573,32 @@ static tree_sNode* insertNode(tree_sTable* tp, tree_sNode* z)
   int comp = 0;
   int h;
 
-  for (y = tp->null, x = tp->root; x != tp->null;) {
+  for (y = tp->null, x = tp->root; x != tp->null;)
+  {
     y = x;
     comp = tp->compareFunc(tp, z, x);
     if (comp == 0)
       return x; /* already exists */
-    if (comp < 0) {
+    if (comp < 0)
+    {
       x = x->left;
-    } else {
+    }
+    else
+    {
       x = x->right;
     }
   }
   z->parent = y;
-  if (y == tp->null) {
+  if (y == tp->null)
+  {
     tp->root = z;
-  } else if (comp < 0) {
+  }
+  else if (comp < 0)
+  {
     y->left = z;
-  } else {
+  }
+  else
+  {
     y->right = z;
   }
 
@@ -566,10 +607,12 @@ static tree_sNode* insertNode(tree_sTable* tp, tree_sNode* z)
   tp->nNode++;
   tp->nInsert++;
 
-  for (h = 1, y = z, p = z->parent; p != tp->null && h != 0;
-       y = p, p = p->parent) {
-    if (y == p->left) { /* left branch has grown */
-      switch (p->bal) {
+  for (h = 1, y = z, p = z->parent; p != tp->null && h != 0; y = p, p = p->parent)
+  {
+    if (y == p->left)
+    { /* left branch has grown */
+      switch (p->bal)
+      {
       case 1:
         p->bal = 0;
         h = 0;
@@ -579,7 +622,8 @@ static tree_sNode* insertNode(tree_sTable* tp, tree_sNode* z)
         break;
       case -1:
         p1 = p->left;
-        if (p1->bal == -1) { /* single LL rotation */
+        if (p1->bal == -1)
+        { /* single LL rotation */
           tp->nLL++;
           p->left = p1->right;
           p1->right->parent = p;
@@ -595,7 +639,9 @@ static tree_sNode* insertNode(tree_sTable* tp, tree_sNode* z)
           p->bal = p1->bal = 0;
           p = p1;
           h = 0;
-        } else { /* double LR rotation */
+        }
+        else
+        { /* double LR rotation */
           tp->nLR++;
           p2 = p1->right;
           p1->right = p2->left;
@@ -626,8 +672,11 @@ static tree_sNode* insertNode(tree_sTable* tp, tree_sNode* z)
         }
         break;
       }
-    } else { /* right branch has grown */
-      switch (p->bal) {
+    }
+    else
+    { /* right branch has grown */
+      switch (p->bal)
+      {
       case -1:
         p->bal = 0;
         h = 0;
@@ -637,7 +686,8 @@ static tree_sNode* insertNode(tree_sTable* tp, tree_sNode* z)
         break;
       case 1:
         p1 = p->right;
-        if (p1->bal == 1) { /* single RR rotation */
+        if (p1->bal == 1)
+        { /* single RR rotation */
           tp->nRR++;
           p->right = p1->left;
           p1->left->parent = p;
@@ -653,7 +703,9 @@ static tree_sNode* insertNode(tree_sTable* tp, tree_sNode* z)
           p->bal = p1->bal = 0;
           p = p1;
           h = 0;
-        } else { /* double RL rotation */
+        }
+        else
+        { /* double RL rotation */
           tp->nRL++;
           p2 = p1->left;
           p1->left = p2->right;
@@ -690,14 +742,15 @@ static tree_sNode* insertNode(tree_sTable* tp, tree_sNode* z)
   return z;
 }
 
-static void treeCheck(tree_sTable* tp, tree_sNode* np, int* count,
-    int* maxlevel, int* hight, int level, char* (*printKey)(tree_sNode*))
+static void treeCheck(tree_sTable* tp, tree_sNode* np, int* count, int* maxlevel, int* hight, int level,
+                      char* (*printKey)(tree_sNode*))
 {
   int comp;
   int hleft;
   int hright;
 
-  if (np == tp->null) {
+  if (np == tp->null)
+  {
     *hight = 0;
     return;
   }
@@ -706,66 +759,58 @@ static void treeCheck(tree_sTable* tp, tree_sNode* np, int* count,
     *maxlevel = level;
 
   treeCheck(tp, np->left, count, maxlevel, &hleft, level + 1, printKey);
-  if (np->left != tp->null) {
-    if (printKey && np->left->parent != np) {
-      printf("leftLinkerror: Node key: %s not linked to parent key: %s\n",
-          printKey(np->left), printKey(np));
+  if (np->left != tp->null)
+  {
+    if (printKey && np->left->parent != np)
+    {
+      printf("leftLinkerror: Node key: %s not linked to parent key: %s\n", printKey(np->left), printKey(np));
     }
     comp = tp->compareFunc(tp, np, np->left);
-    if (printKey && comp < 1) {
-      printf("leftLink sort error: Node key: %s not less than key: %s\n",
-          printKey(np->left), printKey(np));
+    if (printKey && comp < 1)
+    {
+      printf("leftLink sort error: Node key: %s not less than key: %s\n", printKey(np->left), printKey(np));
     }
   }
 
   (*count)++;
   treeCheck(tp, np->right, count, maxlevel, &hright, level + 1, printKey);
-  if (np->right != tp->null) {
-    if (printKey && np->right->parent != np) {
-      printf("rightLinkerror: Node key: %s not linked to parent key: %s\n",
-          printKey(np->right), printKey(np));
+  if (np->right != tp->null)
+  {
+    if (printKey && np->right->parent != np)
+    {
+      printf("rightLinkerror: Node key: %s not linked to parent key: %s\n", printKey(np->right),
+             printKey(np));
     }
     comp = tp->compareFunc(tp, np, np->right);
-    if (printKey && comp > -1) {
-      printf("rightLink sort error: Node key: %s not greater than key: %s\n",
-          printKey(np->right), printKey(np));
+    if (printKey && comp > -1)
+    {
+      printf("rightLink sort error: Node key: %s not greater than key: %s\n", printKey(np->right),
+             printKey(np));
     }
   }
 
-  if (printKey && (hright - hleft) != np->bal) {
-    printf("balerror key: %s, level: %d, hr: %d, hl: %d, bal: %d\n",
-        printKey(np), level, hright, hleft, np->bal);
+  if (printKey && (hright - hleft) != np->bal)
+  {
+    printf("balerror key: %s, level: %d, hr: %d, hl: %d, bal: %d\n", printKey(np), level, hright, hleft,
+           np->bal);
   }
   *hight = (hright > hleft ? hright : hleft) + 1;
 }
 
-int tree_Cardinality(pwr_tStatus* sts, tree_sTable* tp)
+int tree_Cardinality(pwr_tStatus* sts, tree_sTable* tp) { return tp->nNode; }
+
+tree_sTable* tree_CloneTable(pwr_tStatus* sts, tree_sTable* tp) { return cloneTree(sts, tp); }
+
+tree_sTable* tree_CreateTable(pwr_tStatus* sts, size_t keySize, ptrdiff_t keyOffset, size_t recordSize,
+                              unsigned int allocCount,
+                              int (*compareFunc)(tree_sTable* tp, tree_sNode* x, tree_sNode* y))
 {
-  return tp->nNode;
+  return createTree(sts, keySize, keyOffset, recordSize, allocCount, compareFunc);
 }
 
-tree_sTable* tree_CloneTable(pwr_tStatus* sts, tree_sTable* tp)
-{
-  return cloneTree(sts, tp);
-}
+void tree_DeleteTable(pwr_tStatus* sts, tree_sTable* tp) { deleteTree(sts, tp); }
 
-tree_sTable* tree_CreateTable(pwr_tStatus* sts, size_t keySize,
-    ptrdiff_t keyOffset, size_t recordSize, unsigned int allocCount,
-    int (*compareFunc)(tree_sTable* tp, tree_sNode* x, tree_sNode* y))
-{
-  return createTree(
-      sts, keySize, keyOffset, recordSize, allocCount, compareFunc);
-}
-
-void tree_DeleteTable(pwr_tStatus* sts, tree_sTable* tp)
-{
-  deleteTree(sts, tp);
-}
-
-void tree_EmptyTable(pwr_tStatus* sts, tree_sTable* tp)
-{
-  emptyTree(sts, tp);
-}
+void tree_EmptyTable(pwr_tStatus* sts, tree_sTable* tp) { emptyTree(sts, tp); }
 
 void* tree_Insert(pwr_tStatus* sts, tree_sTable* tp, void* key)
 {
@@ -780,9 +825,12 @@ void* tree_Insert(pwr_tStatus* sts, tree_sTable* tp, void* key)
   if (np == NULL)
     return NULL;
   op = insertNode(tp, np);
-  if (np == op) {
+  if (np == op)
+  {
     pwr_Return((void*)np, sts, TREE__INSERTED);
-  } else {
+  }
+  else
+  {
     freeNode(tp, np);
     pwr_Return(NULL, sts, TREE__ERROR);
   }
@@ -793,9 +841,12 @@ void* tree_Find(pwr_tStatus* sts, tree_sTable* tp, void* key)
   tree_sNode* np;
 
   np = findNode(tp, key);
-  if (np == tp->null) {
+  if (np == tp->null)
+  {
     pwr_Return(NULL, sts, TREE__NOTFOUND);
-  } else {
+  }
+  else
+  {
     pwr_Return((void*)np, sts, TREE__FOUND);
   }
 }
@@ -808,17 +859,25 @@ void* tree_FindPredecessor(pwr_tStatus* sts, tree_sTable* tp, void* key)
   if (tp->last == tp->null)
     pwr_Return(NULL, sts, TREE__NOTFOUND);
 
-  if (np != tp->null) {
+  if (np != tp->null)
+  {
     np = predecessorNode(tp, np);
-  } else if (tp->lastComp < 0) {
+  }
+  else if (tp->lastComp < 0)
+  {
     np = predecessorNode(tp, tp->last);
-  } else {
+  }
+  else
+  {
     np = tp->last;
   }
 
-  if (np == tp->null) {
+  if (np == tp->null)
+  {
     pwr_Return(NULL, sts, TREE__NOTFOUND);
-  } else {
+  }
+  else
+  {
     pwr_Return((void*)np, sts, TREE__FOUND);
   }
 }
@@ -831,34 +890,42 @@ void* tree_FindSuccessor(pwr_tStatus* sts, tree_sTable* tp, void* key)
   if (tp->last == tp->null)
     pwr_Return(NULL, sts, TREE__NOTFOUND);
 
-  if (np != tp->null) {
+  if (np != tp->null)
+  {
     np = successorNode(tp, np);
-  } else if (tp->lastComp < 0) {
+  }
+  else if (tp->lastComp < 0)
+  {
     np = tp->last;
-  } else {
+  }
+  else
+  {
     np = successorNode(tp, tp->last);
   }
 
-  if (np == tp->null) {
+  if (np == tp->null)
+  {
     pwr_Return(NULL, sts, TREE__NOTFOUND);
-  } else {
+  }
+  else
+  {
     pwr_Return((void*)np, sts, TREE__FOUND);
   }
 }
 
-int tree_TableIsEmpty(pwr_tStatus* sts, tree_sTable* tp)
-{
-  return tp->nNode == 0;
-}
+int tree_TableIsEmpty(pwr_tStatus* sts, tree_sTable* tp) { return tp->nNode == 0; }
 
 void* tree_Maximum(pwr_tStatus* sts, tree_sTable* tp)
 {
   tree_sNode* np;
 
   np = maximumNode(tp, tp->root);
-  if (np == tp->null) {
+  if (np == tp->null)
+  {
     pwr_Return(NULL, sts, TREE__NOTFOUND);
-  } else {
+  }
+  else
+  {
     pwr_Return((void*)np, sts, TREE__FOUND);
   }
 }
@@ -868,9 +935,12 @@ void* tree_Minimum(pwr_tStatus* sts, tree_sTable* tp)
   tree_sNode* np;
 
   np = minimumNode(tp, tp->root);
-  if (np == tp->null) {
+  if (np == tp->null)
+  {
     pwr_Return(NULL, sts, TREE__NOTFOUND);
-  } else {
+  }
+  else
+  {
     pwr_Return((void*)np, sts, TREE__FOUND);
   }
 }
@@ -878,15 +948,18 @@ void* tree_Minimum(pwr_tStatus* sts, tree_sTable* tp)
 void* tree_Predecessor(pwr_tStatus* sts, tree_sTable* tp, void* np)
 {
   np = predecessorNode(tp, np);
-  if (np == tp->null) {
+  if (np == tp->null)
+  {
     pwr_Return(NULL, sts, TREE__NOTFOUND);
-  } else {
+  }
+  else
+  {
     pwr_Return(np, sts, TREE__FOUND);
   }
 }
 
-void tree_PrintTable(pwr_tStatus* sts, tree_sTable* tp,
-    void (*printNode)(tree_sNode*), char* (*printKey)(tree_sNode*))
+void tree_PrintTable(pwr_tStatus* sts, tree_sTable* tp, void (*printNode)(tree_sNode*),
+                     char* (*printKey)(tree_sNode*))
 {
   int count = 0;
   int maxlevel = 0;
@@ -920,7 +993,8 @@ void tree_Remove(pwr_tStatus* sts, tree_sTable* tp, void* key)
   tree_sNode* np;
 
   np = findNode(tp, key);
-  if (np != tp->null) {
+  if (np != tp->null)
+  {
     np = deleteNode(tp, np);
     freeNode(tp, np);
   }
@@ -930,9 +1004,12 @@ void tree_Remove(pwr_tStatus* sts, tree_sTable* tp, void* key)
 void* tree_Successor(pwr_tStatus* sts, tree_sTable* tp, void* np)
 {
   np = successorNode(tp, np);
-  if (np == tp->null) {
+  if (np == tp->null)
+  {
     return NULL;
-  } else {
+  }
+  else
+  {
     return np;
   }
 }
@@ -1020,14 +1097,16 @@ int tree_Comp_oid(tree_sTable* tp, tree_sNode* x, tree_sNode* y)
   pwr_tOid* xKey = (pwr_tOid*)(tp->keyOffset + (char*)x);
   pwr_tOid* yKey = (pwr_tOid*)(tp->keyOffset + (char*)y);
 
-  if (xKey->vid == yKey->vid) {
+  if (xKey->vid == yKey->vid)
+  {
     if (xKey->oix == yKey->oix)
       return 0;
     else if (xKey->oix < yKey->oix)
       return -1;
     else
       return 1;
-  } else if (xKey->vid < yKey->vid)
+  }
+  else if (xKey->vid < yKey->vid)
     return -1;
   else
     return 1;
@@ -1038,14 +1117,16 @@ int tree_Comp_time(tree_sTable* tp, tree_sNode* x, tree_sNode* y)
   pwr_tTime* xKey = (pwr_tTime*)(tp->keyOffset + (char*)x);
   pwr_tTime* yKey = (pwr_tTime*)(tp->keyOffset + (char*)y);
 
-  if (xKey->tv_sec == yKey->tv_sec) {
+  if (xKey->tv_sec == yKey->tv_sec)
+  {
     if (xKey->tv_nsec == yKey->tv_nsec)
       return 0;
     else if ((int)xKey->tv_nsec < (int)yKey->tv_nsec)
       return -1;
     else
       return 1;
-  } else if ((int)xKey->tv_sec < (int)yKey->tv_sec)
+  }
+  else if ((int)xKey->tv_sec < (int)yKey->tv_sec)
     return -1;
   else
     return 1;

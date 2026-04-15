@@ -41,7 +41,7 @@
 #include <string.h>
 
 #include "cow_qt_helpers.h"
-//#include "cow_style_qt.h"
+// #include "cow_style_qt.h"
 
 #include "wb_foe_msg.h"
 #include "wb_foe_qt.h"
@@ -51,50 +51,51 @@
 
 static int qt_initialized = 0;
 
-int wb_utl_qt::utl_foe_new(const char* name, pwr_tOid plcpgm,
-    ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, WFoe** foe,
-    int map_window, ldh_eAccess access)
+int wb_utl_qt::utl_foe_new(const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx,
+                           ldh_tSesContext ldhsesctx, WFoe** foe, int map_window, ldh_eAccess access)
 {
   pwr_tStatus sts = 1;
 
   *foe = WFoe::get(plcpgm);
-  if (!*foe) {
-    *foe = new WFoeQt(0, name, plcpgm, ldhwbctx, ldhsesctx, map_window, access,
-        0, &sts);
+  if (!*foe)
+  {
+    *foe = new WFoeQt(0, name, plcpgm, ldhwbctx, ldhsesctx, map_window, access, 0, &sts);
   }
   return sts;
 }
 
-int wb_utl_qt::utl_foe_new_local(WFoe* foe, const char* name, pwr_tOid plcpgm,
-    ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, vldh_t_node nodeobject,
-    unsigned long windowindex, unsigned long new_window, WFoe** return_foe,
-    int map_window, ldh_eAccess access, foe_eFuncAccess function_access)
+int wb_utl_qt::utl_foe_new_local(WFoe* foe, const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx,
+                                 ldh_tSesContext ldhsesctx, vldh_t_node nodeobject, unsigned long windowindex,
+                                 unsigned long new_window, WFoe** return_foe, int map_window,
+                                 ldh_eAccess access, foe_eFuncAccess function_access)
 {
   pwr_tStatus sts = 1;
 
   *return_foe = WFoe::get(plcpgm);
-  if (!*return_foe) {
-    *return_foe = new WFoeQt(foe, name, plcpgm, ldhwbctx, ldhsesctx, nodeobject,
-        windowindex, new_window, map_window, access, function_access, 0, &sts);
+  if (!*return_foe)
+  {
+    *return_foe = new WFoeQt(foe, name, plcpgm, ldhwbctx, ldhsesctx, nodeobject, windowindex, new_window,
+                             map_window, access, function_access, 0, &sts);
   }
   return sts;
 }
 
 /*************************************************************************
-*
-* Name:		utl_create_mainwindow()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_create_mainwindow()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 int wb_utl_qt::create_mainwindow(int argc, char** argv)
 {
-  if (!qt_initialized) {
+  if (!qt_initialized)
+  {
     setlocale(LC_ALL, "en_US");
     setlocale(LC_NUMERIC, "POSIX");
     setlocale(LC_TIME, "en_US");
@@ -106,9 +107,10 @@ int wb_utl_qt::create_mainwindow(int argc, char** argv)
   widget->setAttribute(Qt::WA_DeleteOnClose);
   widget->show();
 
-  if (!qt_initialized) {
+  if (!qt_initialized)
+  {
     QApplication app(argc, argv);
-    //QApplication::setStyle(new PwrStyle());
+    // QApplication::setStyle(new PwrStyle());
     qt_initialized = 1;
     app.exec();
   }

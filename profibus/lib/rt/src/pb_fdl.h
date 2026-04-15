@@ -57,28 +57,28 @@
 /***     Status of FDL confirmations, indications (error_code)             ***/
 /*****************************************************************************/
 #define FDL_UE 0x01 /* neg. ack., remote user error            */
-#define FDL_RR                                                                 \
-  0x02 /* neg. ack., resource of remote FDL                                    \
+#define FDL_RR                                                                                               \
+  0x02 /* neg. ack., resource of remote FDL                                                                  \
           entity not available or sufficient      */
-#define FDL_RS                                                                 \
-  0x03              /* neg. ack., service at remote SAP                        \
+#define FDL_RS                                                                                               \
+  0x03              /* neg. ack., service at remote SAP                                                      \
                        or remote SAP not activated             */
 #define FDL_RA 0x04 /* neg. ack., access of remote SAP blocked */
-#define FDL_DL                                                                 \
-  0x08              /* pos. ack. for sent data, reply data                     \
+#define FDL_DL                                                                                               \
+  0x08              /* pos. ack. for sent data, reply data                                                   \
                        with low priority available             */
 #define FDL_NR 0x09 /* pos. ack. for sent data, no reply data  */
-#define FDL_DH                                                                 \
-  0x0a /* pos. ack. for sent data, reply data                                  \
+#define FDL_DH                                                                                               \
+  0x0a /* pos. ack. for sent data, reply data                                                                \
           with high priority available            */
-#define FDL_RDL                                                                \
-  0x0c /* neg. ack. for sent data, reply data                                  \
+#define FDL_RDL                                                                                              \
+  0x0c /* neg. ack. for sent data, reply data                                                                \
           with low priority available             */
-#define FDL_RDH                                                                \
-  0x0d /* neg. ack. for sent data, reply data                                  \
+#define FDL_RDH                                                                                              \
+  0x0d /* neg. ack. for sent data, reply data                                                                \
           with high priority available            */
-#define FDL_LS                                                                 \
-  0x10                     /* service at local SAP or local SAP not            \
+#define FDL_LS                                                                                               \
+  0x10                     /* service at local SAP or local SAP not                                          \
                               activated                               */
 #define FDL_NA 0x11        /* no reaction from remote station         */
 #define FDL_DS 0x12        /* local FDL entity disconnected           */

@@ -69,38 +69,51 @@ int main()
   printf("time_AtoFormAscii, MINUTE\t %s\n", tsStr);
 
   sts = time_AsciiToD("3 23:34:56.34", &d2);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("time_AsciiToD. 3 23:34:56.34 is not a valid DeltaTime\n");
-  } else {
+  }
+  else
+  {
     time_DtoAscii(&d2, 1, tsStr, sizeof(tsStr));
     printf("%s is a valid delta time\n", tsStr);
   }
 
   sts = time_AsciiToD("23:34:56.34", &d2);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("time_AsciiToD. 23:34:56.34 is not a valid DeltaTime\n");
-  } else {
+  }
+  else
+  {
     time_DtoAscii(&d2, 1, tsStr, sizeof(tsStr));
     printf("%s is a valid delta time\n", tsStr);
   }
 
   sts = time_AsciiToD("23:34:56", &d2);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("time_AsciiToD. 23:34:56 is not a valid DeltaTime\n");
-  } else {
+  }
+  else
+  {
     time_DtoAscii(&d2, 0, tsStr, sizeof(tsStr));
     printf("%s is a valid delta time\n", tsStr);
   }
 
   sts = time_AsciiToD("3 23:354:56.34", &d2);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("time_AsciiToD. 3 23:354:56.34 is not a valid DeltaTime\n");
-  } else {
+  }
+  else
+  {
     time_DtoAscii(&d2, 1, tsStr, sizeof(tsStr));
     printf("%s is a valid delta time\n", tsStr);
   }
 
-  while (1) {
+  while (1)
+  {
     char buf[64];
     char buf2[64];
     int len;
@@ -115,7 +128,8 @@ int main()
 
     if (EVEN(time_AsciiToA(buf, &ts1)))
       printf("Error in date format, Str not valid\n");
-    else {
+    else
+    {
       printf("time_AsciiToA: String OK\n");
       sts = time_AtoAscii(&ts1, 0, buf, sizeof(buf));
       if (ODD(sts))

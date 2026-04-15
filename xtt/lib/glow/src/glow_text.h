@@ -50,7 +50,8 @@
   connections.
 */
 
-class GlowText : public GlowArrayElem {
+class GlowText : public GlowArrayElem
+{
 public:
   //! Constuctor
   /*!
@@ -64,14 +65,11 @@ public:
     \param display_lev	Level when the object is visible.
   */
   GlowText(GrowCtx* glow_ctx, const char* text1, double x = 0, double y = 0,
-      glow_eDrawType d_type = glow_eDrawType_TextHelveticaBold,
-      glow_eDrawType color_d_type = glow_eDrawType_Line, int t_size = 2,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1);
+           glow_eDrawType d_type = glow_eDrawType_TextHelveticaBold,
+           glow_eDrawType color_d_type = glow_eDrawType_Line, int t_size = 2,
+           glow_mDisplayLevel display_lev = glow_mDisplayLevel_1);
 
-  ~GlowText()
-  {
-    free(text);
-  }
+  ~GlowText() { free(text); }
 
   friend std::ostream& operator<<(std::ostream& o, const GlowText t);
 
@@ -81,7 +79,7 @@ public:
   //! Adjust pixel coordinates for navigaion window to current zoom factor.
   void nav_zoom();
 
-  void print_zoom(); //!< Not used.
+  void print_zoom();           //!< Not used.
   void traverse(int x, int y); //!< Not used.
 
   //! Event handler
@@ -95,11 +93,10 @@ public:
 
     Detects if the object is hit by the event.
   */
-  int event_handler(
-      GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
+  int event_handler(GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
 
   //! Not implemented
-  void conpoint_select(void* pos, int x, int y, double* distance, void** cp){}
+  void conpoint_select(void* pos, int x, int y, double* distance, void** cp) {}
 
   //! Save the content of the object to file.
   /*!
@@ -166,30 +163,23 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left,
-      double* y_high, double* y_low, void* node);
+  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,
+                   void* node);
 
-  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir)
-  {
-    return 0;
-  }
+  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir) { return 0; }
 
   //! Get the object type
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_Text;
-  }
+  glow_eObjectType type() { return glow_eObjectType_Text; }
 
-  GlowPoint p; //!< Position point.
-  char* text; //!< The text.
-  glow_eDrawType draw_type; //!< Drawtype for the text.
-  int text_size; //!< Text size.
-  glow_mDisplayLevel
-      display_level; //!< Display level when the object is visible.
-  glow_eDrawType color_drawtype; //!< Text color.
+  GlowPoint p;                      //!< Position point.
+  char* text;                       //!< The text.
+  glow_eDrawType draw_type;         //!< Drawtype for the text.
+  int text_size;                    //!< Text size.
+  glow_mDisplayLevel display_level; //!< Display level when the object is visible.
+  glow_eDrawType color_drawtype;    //!< Text color.
 };
 
 /*@}*/

@@ -40,7 +40,8 @@
 #include <string.h>
 #include "statussrv_net.h"
 
-class statussrv_client {
+class statussrv_client
+{
 public:
   pwr_tStatus m_sts;
   unsigned short m_port;
@@ -56,23 +57,19 @@ public:
   unsigned int m_response_time;
   float m_max_timeout;
   int m_timeout;
-  statussrv_client() : m_port(3889), m_busid(0), m_sock(0), m_reconnect_limit(500), m_trans_id(0),
-		    m_expected_msgs(0), m_last_try_connect_time(pwr_cNTime),
-		    m_timeout_time(pwr_cNTime), m_response_time(500), m_max_timeout(2), 
-		    m_timeout(0) {
+  statussrv_client()
+      : m_port(3889), m_busid(0), m_sock(0), m_reconnect_limit(500), m_trans_id(0), m_expected_msgs(0),
+        m_last_try_connect_time(pwr_cNTime), m_timeout_time(pwr_cNTime), m_response_time(500),
+        m_max_timeout(2), m_timeout(0)
+  {
     strcpy(m_address, "127.0.0.1");
   }
   int server_connect();
   int send_request(stssrv_eMsgType type);
-  pwr_tStatus receive(stssrv_eMsgType *type, char **msg);
-  void set_busid(int busid) {
-    m_busid = busid;
-  }
-  void set_address(char *address) {
-    strncpy(m_address, address, sizeof(m_address));
-  }
-  static void get_port(pwr_tStatus *sts, unsigned short *port);
+  pwr_tStatus receive(stssrv_eMsgType* type, char** msg);
+  void set_busid(int busid) { m_busid = busid; }
+  void set_address(char* address) { strncpy(m_address, address, sizeof(m_address)); }
+  static void get_port(pwr_tStatus* sts, unsigned short* port);
 };
-
 
 #endif

@@ -52,22 +52,17 @@
 
 static char null_str[] = "";
 
-static void subgraphs_attr_close_cb(
-    void* ctx, void* attrctx, grow_tObject object, void* info, int keep);
-static void subgraphs_attr_redraw_cb(
-    void* sctx, void* attrctx, grow_tObject o, void* info);
+static void subgraphs_attr_close_cb(void* ctx, void* attrctx, grow_tObject object, void* info, int keep);
+static void subgraphs_attr_redraw_cb(void* sctx, void* attrctx, grow_tObject o, void* info);
 static int subgraphs_trace_scan_bc(brow_tObject object, void* p);
-static int subgraphs_trace_connect_bc(brow_tObject object, char* name,
-    char* attr, flow_eTraceType type, /* flow_eDrawType color, */ void** p);
+static int subgraphs_trace_connect_bc(brow_tObject object, char* name, char* attr, flow_eTraceType type,
+                                      /* flow_eDrawType color, */ void** p);
 static int subgraphs_trace_disconnect_bc(brow_tObject object);
 
 //
 // Convert attribute string to value
 //
-void SubGraphs::message(char sev, char* text)
-{
-  (message_cb)(parent_ctx, sev, text);
-}
+void SubGraphs::message(char sev, char* text) { (message_cb)(parent_ctx, sev, text); }
 
 //
 //  Free pixmaps
@@ -94,10 +89,9 @@ void SubGraphsBrow::allocate_pixmaps()
 //
 // Create the navigator widget
 //
-SubGraphs::SubGraphs(void* xn_parent_ctx, const char* xn_name, void* xn_growctx,
-    pwr_tStatus* status)
-    : parent_ctx(xn_parent_ctx), trace_started(0), message_cb(NULL),
-      close_cb(NULL), grow_ctx(xn_growctx), attrlist(NULL)
+SubGraphs::SubGraphs(void* xn_parent_ctx, const char* xn_name, void* xn_growctx, pwr_tStatus* status)
+    : parent_ctx(xn_parent_ctx), trace_started(0), message_cb(NULL), close_cb(NULL), grow_ctx(xn_growctx),
+      attrlist(NULL)
 {
   strcpy(name, xn_name);
   *status = 1;
@@ -106,19 +100,11 @@ SubGraphs::SubGraphs(void* xn_parent_ctx, const char* xn_name, void* xn_growctx,
 //
 //  Delete a nav context
 //
-SubGraphs::~SubGraphs()
-{
-}
+SubGraphs::~SubGraphs() {}
 
-SubGraphsBrow::~SubGraphsBrow()
-{
-  free_pixmaps();
-}
+SubGraphsBrow::~SubGraphsBrow() { free_pixmaps(); }
 
-void SubGraphs::set_inputfocus()
-{
-  brow_SetInputFocus(brow->ctx);
-}
+void SubGraphs::set_inputfocus() { brow_SetInputFocus(brow->ctx); }
 
 //
 //  Return associated class of selected object
@@ -151,7 +137,8 @@ int SubGraphs::set_all_extern(int eval)
   if (!node_count)
     return 0;
 
-  for (int i = 0; i < node_count; i++) {
+  for (int i = 0; i < node_count; i++)
+  {
     brow_GetUserData(node_list[i], (void**)&item);
     if (item->type == subgraphs_eItemType_SubGraph)
       ((ItemSubGraph*)item)->set_extern(eval);
@@ -168,7 +155,8 @@ static int subgraphs_brow_cb(FlowCtx* ctx, flow_tEvent event)
   SubGraphs* subgraphs;
   ItemSubGraph* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
@@ -176,23 +164,30 @@ static int subgraphs_brow_cb(FlowCtx* ctx, flow_tEvent event)
 
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&subgraphs);
   subgraphs->message(' ', null_str);
-  switch (event->event) {
-  case flow_eEvent_Key_Up: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(subgraphs->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLast(subgraphs->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
+    }
+    else
+    {
       sts = brow_GetPrevious(subgraphs->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         sts = brow_GetLast(subgraphs->brow->ctx, &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -208,22 +203,28 @@ static int subgraphs_brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(subgraphs->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirst(subgraphs->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
+    }
+    else
+    {
       sts = brow_GetNext(subgraphs->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         sts = brow_GetFirst(subgraphs->brow->ctx, &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -244,11 +245,15 @@ static int subgraphs_brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   case flow_eEvent_MB1Click:
     // Select
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
-      if (brow_FindSelectedObject(subgraphs->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(subgraphs->brow->ctx, event->object.object))
+      {
         brow_SelectClear(subgraphs->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(subgraphs->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(subgraphs->brow->ctx, event->object.object);
@@ -259,7 +264,8 @@ static int subgraphs_brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   case flow_eEvent_Key_Return:
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     int node_count;
 
@@ -268,7 +274,8 @@ static int subgraphs_brow_cb(FlowCtx* ctx, flow_tEvent event)
       break;
     brow_GetUserData(node_list[0], (void**)&item);
     free(node_list);
-    switch (item->type) {
+    switch (item->type)
+    {
     case subgraphs_eItemType_SubGraph:
       break;
     default:;
@@ -276,7 +283,8 @@ static int subgraphs_brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_Key_PF4:
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
 
@@ -286,7 +294,8 @@ static int subgraphs_brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (!node_count)
       break;
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case subgraphs_eItemType_SubGraph:
       break;
     default:;
@@ -300,10 +309,12 @@ static int subgraphs_brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_MB1DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case subgraphs_eItemType_SubGraph:
         subgraphs->edit_attributes(item->nodeclass);
         break;
@@ -327,92 +338,61 @@ void SubGraphsBrow::create_nodeclasses()
 
   // Create common-class
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
+  brow_CreateNodeClass(ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
   brow_AddAnnotPixmap(nc_object, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_object, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_object, 9, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_object, 11, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_object, 9, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 11, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_object, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create attribute nodeclass
 
   brow_CreateNodeClass(ctx, "NavigatorAttr", flow_eNodeGroup_Common, &nc_attr);
   brow_AddAnnotPixmap(nc_attr, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_attr, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_attr, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_attr, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_attr, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_attr, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create table nodeclass
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorTable", flow_eNodeGroup_Common, &nc_table);
+  brow_CreateNodeClass(ctx, "NavigatorTable", flow_eNodeGroup_Common, &nc_table);
   brow_AddAnnotPixmap(nc_table, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_table, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_table, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 12, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 16, 0.6, 3, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 20, 0.6, 4, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 24, 0.6, 5, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 28, 0.6, 6, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 32, 0.6, 7, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 35, 0.6, 8, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 38, 0.6, 9, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 12, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 16, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 20, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 24, 0.6, 5, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 28, 0.6, 6, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 32, 0.6, 7, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 35, 0.6, 8, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 38, 0.6, 9, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_table, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create Header
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorHead", flow_eNodeGroup_Common, &nc_header);
+  brow_CreateNodeClass(ctx, "NavigatorHead", flow_eNodeGroup_Common, &nc_header);
   brow_AddAnnotPixmap(nc_header, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_header, 2, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_header, 8, 0.6, 1, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_header, 2, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_header, 8, 0.6, 1, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_header, 0, 0, 20, 0.83, flow_eDrawType_LineGray, 2, 1);
 
   // Create TableHeader
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorTableHead", flow_eNodeGroup_Common, &nc_table_header);
+  brow_CreateNodeClass(ctx, "NavigatorTableHead", flow_eNodeGroup_Common, &nc_table_header);
   brow_AddAnnotPixmap(nc_table_header, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_table_header, 2, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 8, 0.6, 1, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 12, 0.6, 2, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 16, 0.6, 3, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 20, 0.6, 4, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 24, 0.6, 5, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 28, 0.6, 6, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 32, 0.6, 7, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 35, 0.6, 8, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 38, 0.6, 9, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 2, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 8, 0.6, 1, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 12, 0.6, 2, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 16, 0.6, 3, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 20, 0.6, 4, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 24, 0.6, 5, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 28, 0.6, 6, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 32, 0.6, 7, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 35, 0.6, 8, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 38, 0.6, 9, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_table_header, 0, 0, 20, 0.83, flow_eDrawType_LineGray, 2, 1);
 }
 
@@ -428,18 +408,20 @@ int SubGraphs::object_attr()
   brow_SetNodraw(brow->ctx);
 
   list_p = list;
-  for (i = 0; i < list_cnt; i++) {
+  for (i = 0; i < list_cnt; i++)
+  {
     grow_sAttrInfo *grow_info, *grow_info_p;
     int grow_info_cnt;
     int* extern_p;
 
-    grow_GetObjectAttrInfo(
-        (grow_tObject)*list_p, NULL, &grow_info, &grow_info_cnt);
+    grow_GetObjectAttrInfo((grow_tObject)*list_p, NULL, &grow_info, &grow_info_cnt);
 
     grow_info_p = grow_info;
     extern_p = 0;
-    for (j = 0; j < grow_info_cnt; j++) {
-      if (streq("Extern", grow_info_p->name)) {
+    for (j = 0; j < grow_info_cnt; j++)
+    {
+      if (streq("Extern", grow_info_p->name))
+      {
         extern_p = (int*)grow_info_p->value_p;
         break;
       }
@@ -449,12 +431,12 @@ int SubGraphs::object_attr()
 
     grow_GetNodeClassName(*list_p, name, sizeof(name));
 
-    if (streq("mbtoolbar", name)) {
+    if (streq("mbtoolbar", name))
+    {
       list_p++;
       continue;
     }
-    new ItemSubGraph(
-        this, name, extern_p, *list_p, grow_ctx, NULL, flow_eDest_IntoLast);
+    new ItemSubGraph(this, name, extern_p, *list_p, grow_ctx, NULL, flow_eDest_IntoLast);
     list_p++;
   }
 
@@ -476,28 +458,17 @@ void SubGraphsBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, subgraphs);
 
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, subgraphs_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-      subgraphs_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF4, flow_eEventType_CallBack, subgraphs_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Return, flow_eEventType_CallBack, subgraphs_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, subgraphs_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, subgraphs_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack,
-      subgraphs_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack,
-      subgraphs_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, subgraphs_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, subgraphs_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, subgraphs_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, subgraphs_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, subgraphs_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF4, flow_eEventType_CallBack, subgraphs_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Return, flow_eEventType_CallBack, subgraphs_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, subgraphs_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, subgraphs_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, subgraphs_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, subgraphs_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, subgraphs_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, subgraphs_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, subgraphs_brow_cb);
 }
 
 //
@@ -518,8 +489,8 @@ int SubGraphs::init_brow_cb(FlowCtx* fctx, void* client_data)
   // Create the root item
   subgraphs->object_attr();
 
-  sts = brow_TraceInit(ctx, subgraphs_trace_connect_bc,
-      subgraphs_trace_disconnect_bc, subgraphs_trace_scan_bc);
+  sts =
+      brow_TraceInit(ctx, subgraphs_trace_connect_bc, subgraphs_trace_disconnect_bc, subgraphs_trace_scan_bc);
   subgraphs->trace_started = 1;
 
   subgraphs->trace_start();
@@ -527,17 +498,15 @@ int SubGraphs::init_brow_cb(FlowCtx* fctx, void* client_data)
   return 1;
 }
 
-ItemSubGraph::ItemSubGraph(SubGraphs* subgraphs, char* item_name,
-    int* item_extern_p, void* item_nodeclass, void* item_grow_ctx,
-    brow_tNode dest, flow_eDest dest_code)
-    : SubGraphBaseItem(subgraphs_eItemType_SubGraph), grow_ctx(item_grow_ctx),
-      nodeclass(item_nodeclass), extern_p(item_extern_p), old_extern(0),
-      first_scan(0)
+ItemSubGraph::ItemSubGraph(SubGraphs* subgraphs, char* item_name, int* item_extern_p, void* item_nodeclass,
+                           void* item_grow_ctx, brow_tNode dest, flow_eDest dest_code)
+    : SubGraphBaseItem(subgraphs_eItemType_SubGraph), grow_ctx(item_grow_ctx), nodeclass(item_nodeclass),
+      extern_p(item_extern_p), old_extern(0), first_scan(0)
 {
   strcpy(name, item_name);
 
-  brow_CreateNode(subgraphs->brow->ctx, item_name, subgraphs->brow->nc_object,
-      dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(subgraphs->brow->ctx, item_name, subgraphs->brow->nc_object, dest, dest_code, (void*)this,
+                  1, &node);
 
   brow_SetAnnotPixmap(node, 0, subgraphs->brow->pixmap_leaf);
 
@@ -563,17 +532,18 @@ int SubGraphs::edit_attributes(void* object)
   int dyn_action_type1;
   int dyn_action_type2;
 
-  grow_GetObjectAttrInfo(
-      (grow_tObject)object, NULL, &grow_info, &grow_info_cnt);
-  grow_GetNodeClassDynType(
-      object, &trace_type, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
+  grow_GetObjectAttrInfo((grow_tObject)object, NULL, &grow_info, &grow_info_cnt);
+  grow_GetNodeClassDynType(object, &trace_type, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
 
   grow_info_p = grow_info;
-  for (i = 0; i < grow_info_cnt; i++) {
+  for (i = 0; i < grow_info_cnt; i++)
+  {
     items[i].value = grow_info_p->value_p;
     strcpy(items[i].name, grow_info_p->name);
-    if (grow_info_p->type == glow_eType_TraceColor) {
-      switch (trace_type) {
+    if (grow_info_p->type == glow_eType_TraceColor)
+    {
+      switch (trace_type)
+      {
       case graph_eTrace_DigTone:
       case graph_eTrace_DigToneWithError:
         items[i].type = glow_eType_ToneOrColor;
@@ -581,7 +551,8 @@ int SubGraphs::edit_attributes(void* object)
       default:
         items[i].type = glow_eType_Color;
       }
-    } else
+    }
+    else
       items[i].type = grow_info_p->type;
     items[i].size = grow_info_p->size;
     items[i].minlimit = 0;
@@ -607,8 +578,7 @@ int SubGraphs::edit_attributes(void* object)
   return 1;
 }
 
-static void subgraphs_attr_close_cb(
-    void* sctx, void* attrctx, grow_tObject object, void* info, int keep)
+static void subgraphs_attr_close_cb(void* sctx, void* attrctx, grow_tObject object, void* info, int keep)
 {
   SubGraphs* subgraphs = (SubGraphs*)sctx;
   subgraphs_tAttr attrlist_p, prev_p;
@@ -621,8 +591,10 @@ static void subgraphs_attr_close_cb(
   // Remove from attrlist
   attrlist_p = subgraphs->attrlist;
   prev_p = NULL;
-  while (attrlist_p) {
-    if (attrlist_p->attrctx == attrctx) {
+  while (attrlist_p)
+  {
+    if (attrlist_p->attrctx == attrctx)
+    {
       if (prev_p)
         prev_p->next = attrlist_p->next;
       else
@@ -637,8 +609,7 @@ static void subgraphs_attr_close_cb(
   delete (Attr*)attrctx;
 }
 
-static void subgraphs_attr_redraw_cb(
-    void* sctx, void* attrctx, grow_tObject o, void* info)
+static void subgraphs_attr_redraw_cb(void* sctx, void* attrctx, grow_tObject o, void* info)
 {
   printf("Here in attr redraw\n");
 }
@@ -650,16 +621,20 @@ static int subgraphs_trace_scan_bc(brow_tObject object, void* p)
   int len;
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type) {
-  case subgraphs_eItemType_SubGraph: {
+  switch (base_item->type)
+  {
+  case subgraphs_eItemType_SubGraph:
+  {
     ItemSubGraph* item;
 
     item = (ItemSubGraph*)base_item;
-    if (!item->first_scan) {
+    if (!item->first_scan)
+    {
       if (*item->extern_p == item->old_extern)
         // No change since last time
         return 1;
-    } else
+    }
+    else
       item->first_scan = 0;
 
     if (*item->extern_p)
@@ -675,8 +650,8 @@ static int subgraphs_trace_scan_bc(brow_tObject object, void* p)
   return 1;
 }
 
-static int subgraphs_trace_connect_bc(brow_tObject object, char* name,
-    char* attr, flow_eTraceType type, /* flow_eDrawType color, */ void** p)
+static int subgraphs_trace_connect_bc(brow_tObject object, char* name, char* attr, flow_eTraceType type,
+                                      /* flow_eDrawType color, */ void** p)
 {
   SubGraphBaseItem* base_item;
 
@@ -684,8 +659,10 @@ static int subgraphs_trace_connect_bc(brow_tObject object, char* name,
     return 1;
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type) {
-  case subgraphs_eItemType_SubGraph: {
+  switch (base_item->type)
+  {
+  case subgraphs_eItemType_SubGraph:
+  {
     ItemSubGraph* item;
 
     item = (ItemSubGraph*)base_item;
@@ -702,7 +679,8 @@ static int subgraphs_trace_disconnect_bc(brow_tObject object)
   SubGraphBaseItem* base_item;
 
   brow_GetUserData(object, (void**)&base_item);
-  switch (base_item->type) {
+  switch (base_item->type)
+  {
   default:;
   }
   return 1;

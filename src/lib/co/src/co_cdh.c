@@ -46,8 +46,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "co_cdh_msg.h"
 #include "co_cdh.h"
+#include "co_cdh_msg.h"
 #include "co_string.h"
 #include "co_time.h"
 
@@ -64,8 +64,7 @@
 -   return >0 if Object_1 > Object_2.
 */
 
-int cdh_ObjidCompare(pwr_tObjid Objid_1, pwr_tObjid Objid_2)
-{
+int cdh_ObjidCompare(pwr_tObjid Objid_1, pwr_tObjid Objid_2) {
   if (Objid_1.vid == Objid_2.vid) {
     if (Objid_1.oix == Objid_2.oix)
       return 0;
@@ -85,8 +84,7 @@ int cdh_ObjidCompare(pwr_tObjid Objid_1, pwr_tObjid Objid_2)
 -   return  0 if Object_1 != Object_2.
 */
 
-int cdh_ObjidIsEqual(pwr_tObjid Objid_1, pwr_tObjid Objid_2)
-{
+int cdh_ObjidIsEqual(pwr_tObjid Objid_1, pwr_tObjid Objid_2) {
   return (Objid_1.vid == Objid_2.vid) && (Objid_1.oix == Objid_2.oix);
 }
 
@@ -96,8 +94,7 @@ int cdh_ObjidIsEqual(pwr_tObjid Objid_1, pwr_tObjid Objid_2)
 -   return  0 if Object_1 == Object_2.
 */
 
-int cdh_ObjidIsNotEqual(pwr_tObjid Objid_1, pwr_tObjid Objid_2)
-{
+int cdh_ObjidIsNotEqual(pwr_tObjid Objid_1, pwr_tObjid Objid_2) {
   return (Objid_1.vid != Objid_2.vid) || (Objid_1.oix != Objid_2.oix);
 }
 
@@ -107,8 +104,7 @@ int cdh_ObjidIsNotEqual(pwr_tObjid Objid_1, pwr_tObjid Objid_2)
 -   return  0 if Object_1 != pwr_cNObjid.
 */
 
-int cdh_ObjidIsNull(pwr_tObjid Objid)
-{
+int cdh_ObjidIsNull(pwr_tObjid Objid) {
   return (Objid.vid == pwr_cNObjid.vid) && (Objid.oix == pwr_cNObjid.oix);
 }
 
@@ -118,109 +114,92 @@ int cdh_ObjidIsNull(pwr_tObjid Objid)
 -   return  0 if Object_1 == pwr_cNObjid.
 */
 
-int cdh_ObjidIsNotNull(pwr_tObjid Objid)
-{
+int cdh_ObjidIsNotNull(pwr_tObjid Objid) {
   return (Objid.vid != pwr_cNObjid.vid) || (Objid.oix != pwr_cNObjid.oix);
 }
 
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-int cdh_RefIdCompare(pwr_tRefId Reference_1, pwr_tRefId Reference_2)
-{
-  return cdh_ObjidCompare(
-      *(pwr_tObjid*)&Reference_1, *(pwr_tObjid*)&Reference_2);
+int cdh_RefIdCompare(pwr_tRefId Reference_1, pwr_tRefId Reference_2) {
+  return cdh_ObjidCompare(*(pwr_tObjid *)&Reference_1,
+                          *(pwr_tObjid *)&Reference_2);
 }
 
-int cdh_RefIdIsEqual(pwr_tRefId Reference_1, pwr_tRefId Reference_2)
-{
-  return cdh_ObjidIsEqual(
-      *(pwr_tObjid*)&Reference_1, *(pwr_tObjid*)&Reference_2);
+int cdh_RefIdIsEqual(pwr_tRefId Reference_1, pwr_tRefId Reference_2) {
+  return cdh_ObjidIsEqual(*(pwr_tObjid *)&Reference_1,
+                          *(pwr_tObjid *)&Reference_2);
 }
 
-int cdh_RefIdIsNotEqual(pwr_tRefId Reference_1, pwr_tRefId Reference_2)
-{
-  return cdh_ObjidIsNotEqual(
-      *(pwr_tObjid*)&Reference_1, *(pwr_tObjid*)&Reference_2);
+int cdh_RefIdIsNotEqual(pwr_tRefId Reference_1, pwr_tRefId Reference_2) {
+  return cdh_ObjidIsNotEqual(*(pwr_tObjid *)&Reference_1,
+                             *(pwr_tObjid *)&Reference_2);
 }
 
-int cdh_RefIdIsNull(pwr_tRefId Reference)
-{
-  return cdh_ObjidIsNull(*(pwr_tObjid*)&Reference);
+int cdh_RefIdIsNull(pwr_tRefId Reference) {
+  return cdh_ObjidIsNull(*(pwr_tObjid *)&Reference);
 }
 
-int cdh_RefIdIsNotNull(pwr_tRefId Reference)
-{
-  return cdh_ObjidIsNotNull(*(pwr_tObjid*)&Reference);
+int cdh_RefIdIsNotNull(pwr_tRefId Reference) {
+  return cdh_ObjidIsNotNull(*(pwr_tObjid *)&Reference);
 }
 
-int cdh_SubidCompare(pwr_tSubid Subscription_1, pwr_tSubid Subscription_2)
-{
-  return cdh_ObjidCompare(
-      *(pwr_tObjid*)&Subscription_1, *(pwr_tObjid*)&Subscription_2);
+int cdh_SubidCompare(pwr_tSubid Subscription_1, pwr_tSubid Subscription_2) {
+  return cdh_ObjidCompare(*(pwr_tObjid *)&Subscription_1,
+                          *(pwr_tObjid *)&Subscription_2);
 }
 
-int cdh_SubidIsEqual(pwr_tSubid Subscription_1, pwr_tSubid Subscription_2)
-{
-  return cdh_ObjidIsEqual(
-      *(pwr_tObjid*)&Subscription_1, *(pwr_tObjid*)&Subscription_2);
+int cdh_SubidIsEqual(pwr_tSubid Subscription_1, pwr_tSubid Subscription_2) {
+  return cdh_ObjidIsEqual(*(pwr_tObjid *)&Subscription_1,
+                          *(pwr_tObjid *)&Subscription_2);
 }
 
-int cdh_SubidIsNotEqual(pwr_tSubid Subscription_1, pwr_tSubid Subscription_2)
-{
-  return cdh_ObjidIsNotEqual(
-      *(pwr_tObjid*)&Subscription_1, *(pwr_tObjid*)&Subscription_2);
+int cdh_SubidIsNotEqual(pwr_tSubid Subscription_1, pwr_tSubid Subscription_2) {
+  return cdh_ObjidIsNotEqual(*(pwr_tObjid *)&Subscription_1,
+                             *(pwr_tObjid *)&Subscription_2);
 }
 
-int cdh_SubidIsNull(pwr_tSubid Subscription)
-{
-  return cdh_ObjidIsNull(*(pwr_tObjid*)&Subscription);
+int cdh_SubidIsNull(pwr_tSubid Subscription) {
+  return cdh_ObjidIsNull(*(pwr_tObjid *)&Subscription);
 }
 
-int cdh_SubidIsNotNull(pwr_tSubid Subscription)
-{
-  return cdh_ObjidIsNotNull(*(pwr_tObjid*)&Subscription);
+int cdh_SubidIsNotNull(pwr_tSubid Subscription) {
+  return cdh_ObjidIsNotNull(*(pwr_tObjid *)&Subscription);
 }
 
-int cdh_DlidCompare(pwr_tDlid DirectLink_1, pwr_tDlid DirectLink_2)
-{
-  return cdh_ObjidCompare(
-      *(pwr_tObjid*)&DirectLink_1, *(pwr_tObjid*)&DirectLink_2);
+int cdh_DlidCompare(pwr_tDlid DirectLink_1, pwr_tDlid DirectLink_2) {
+  return cdh_ObjidCompare(*(pwr_tObjid *)&DirectLink_1,
+                          *(pwr_tObjid *)&DirectLink_2);
 }
 
-int cdh_DlidIsEqual(pwr_tDlid DirectLink_1, pwr_tDlid DirectLink_2)
-{
-  return cdh_ObjidIsEqual(
-      *(pwr_tObjid*)&DirectLink_1, *(pwr_tObjid*)&DirectLink_2);
+int cdh_DlidIsEqual(pwr_tDlid DirectLink_1, pwr_tDlid DirectLink_2) {
+  return cdh_ObjidIsEqual(*(pwr_tObjid *)&DirectLink_1,
+                          *(pwr_tObjid *)&DirectLink_2);
 }
 
-int cdh_DlidIsNotEqual(pwr_tDlid DirectLink_1, pwr_tDlid DirectLink_2)
-{
-  return cdh_ObjidIsNotEqual(
-      *(pwr_tObjid*)&DirectLink_1, *(pwr_tObjid*)&DirectLink_2);
+int cdh_DlidIsNotEqual(pwr_tDlid DirectLink_1, pwr_tDlid DirectLink_2) {
+  return cdh_ObjidIsNotEqual(*(pwr_tObjid *)&DirectLink_1,
+                             *(pwr_tObjid *)&DirectLink_2);
 }
 
-int cdh_DlidIsNull(pwr_tDlid DirectLink)
-{
-  return cdh_ObjidIsNull(*(pwr_tObjid*)&DirectLink);
+int cdh_DlidIsNull(pwr_tDlid DirectLink) {
+  return cdh_ObjidIsNull(*(pwr_tObjid *)&DirectLink);
 }
 
-int cdh_DlidIsNotNull(pwr_tDlid DirectLink)
-{
-  return cdh_ObjidIsNotNull(*(pwr_tObjid*)&DirectLink);
+int cdh_DlidIsNotNull(pwr_tDlid DirectLink) {
+  return cdh_ObjidIsNotNull(*(pwr_tObjid *)&DirectLink);
 }
 
 #pragma GCC diagnostic pop
 
-int cdh_ArefIsEqual(pwr_sAttrRef* arp1, pwr_sAttrRef* arp2)
-{
+int cdh_ArefIsEqual(pwr_sAttrRef *arp1, pwr_sAttrRef *arp2) {
   if (arp1->Flags.b.Object && arp2->Flags.b.Object)
-    return (arp1->Objid.vid == arp2->Objid.vid
-        && arp1->Objid.oix == arp2->Objid.oix);
+    return (arp1->Objid.vid == arp2->Objid.vid &&
+            arp1->Objid.oix == arp2->Objid.oix);
   else
-    return (arp1->Objid.vid == arp2->Objid.vid
-        && arp1->Objid.oix == arp2->Objid.oix && arp1->Offset == arp2->Offset
-        && (arp1->Size == 0 || arp2->Size == 0 || arp1->Size == arp2->Size));
+    return (arp1->Objid.vid == arp2->Objid.vid &&
+            arp1->Objid.oix == arp2->Objid.oix &&
+            arp1->Offset == arp2->Offset &&
+            (arp1->Size == 0 || arp2->Size == 0 || arp1->Size == arp2->Size));
 }
 
 //! Convert Objid to ClassId.
@@ -229,8 +208,7 @@ int cdh_ArefIsEqual(pwr_sAttrRef* arp1, pwr_sAttrRef* arp2)
   \return 	ClassId.
 */
 
-pwr_tClassId cdh_ClassObjidToId(pwr_tObjid Objid)
-{
+pwr_tClassId cdh_ClassObjidToId(pwr_tObjid Objid) {
   cdh_uTypeId cid;
   cdh_uObjid oid;
 
@@ -251,8 +229,7 @@ pwr_tClassId cdh_ClassObjidToId(pwr_tObjid Objid)
   \return 	Objid for $ClassDef object of class.
 */
 
-pwr_tObjid cdh_ClassIdToObjid(pwr_tClassId Class)
-{
+pwr_tObjid cdh_ClassIdToObjid(pwr_tClassId Class) {
   cdh_uObjid oid;
   cdh_uTypeId cid;
 
@@ -277,8 +254,7 @@ pwr_tObjid cdh_ClassIdToObjid(pwr_tClassId Class)
   \return	TypeId.
 */
 
-pwr_tTypeId cdh_TypeObjidToId(pwr_tObjid Objid)
-{
+pwr_tTypeId cdh_TypeObjidToId(pwr_tObjid Objid) {
   cdh_uObjid oid;
   cdh_uTypeId tid;
 
@@ -312,8 +288,7 @@ pwr_tTypeId cdh_TypeObjidToId(pwr_tObjid Objid)
 
 //! Convert TypeId to index.
 
-int cdh_TypeIdToIndex(pwr_tTypeId Type)
-{
+int cdh_TypeIdToIndex(pwr_tTypeId Type) {
   cdh_uTypeId tid;
 
   tid.pwr = Type;
@@ -323,8 +298,7 @@ int cdh_TypeIdToIndex(pwr_tTypeId Type)
 
 //! Convert TypeId to Objid.
 
-pwr_tObjid cdh_TypeIdToObjid(pwr_tTypeId Type)
-{
+pwr_tObjid cdh_TypeIdToObjid(pwr_tTypeId Type) {
   cdh_uObjid oid;
   cdh_uTypeId tid;
 
@@ -356,8 +330,7 @@ pwr_tObjid cdh_TypeIdToObjid(pwr_tTypeId Type)
 }
 
 //! Converts an objid to an attrref.
-pwr_sAttrRef cdh_ObjidToAref(pwr_tObjid Objid)
-{
+pwr_sAttrRef cdh_ObjidToAref(pwr_tObjid Objid) {
   pwr_sAttrRef a = pwr_cNAttrRef;
   a.Objid = Objid;
   a.Flags.b.Object = 1;
@@ -367,15 +340,14 @@ pwr_sAttrRef cdh_ObjidToAref(pwr_tObjid Objid)
 
 //! Converts an attribute given in internal binary format to a text string.
 
-pwr_tStatus cdh_AttrValueToString(
-    pwr_eType Type, void* Value, char* String, int MaxSize)
-{
+pwr_tStatus cdh_AttrValueToString(pwr_eType Type, void *Value, char *String,
+                                  int MaxSize) {
   pwr_tStatus sts = CDH__SUCCESS;
   char timbuf[24];
 
   switch (Type) {
   case pwr_eType_Boolean:
-    if (*(pwr_tBoolean*)Value)
+    if (*(pwr_tBoolean *)Value)
       strcpy(String, "1");
     else
       strcpy(String, "0");
@@ -393,42 +365,42 @@ pwr_tStatus cdh_AttrValueToString(
     break;
   }
   case pwr_eType_Char:
-    if (*(pwr_tChar*)Value == 0)
+    if (*(pwr_tChar *)Value == 0)
       *String = '\0';
     else
-      sprintf(String, "%c", *(pwr_tChar*)Value);
+      sprintf(String, "%c", *(pwr_tChar *)Value);
     break;
   case pwr_eType_Int8:
-    snprintf(String, MaxSize, "%d", *(pwr_tInt8*)Value);
+    snprintf(String, MaxSize, "%d", *(pwr_tInt8 *)Value);
     break;
   case pwr_eType_Int16:
-    snprintf(String, MaxSize, "%hd", *(pwr_tInt16*)Value);
+    snprintf(String, MaxSize, "%hd", *(pwr_tInt16 *)Value);
     break;
   case pwr_eType_Int32:
   case pwr_eType_Status:
   case pwr_eType_NetStatus:
   case pwr_eType_Enum:
-    snprintf(String, MaxSize, "%d", *(pwr_tInt32*)Value);
+    snprintf(String, MaxSize, "%d", *(pwr_tInt32 *)Value);
     break;
   case pwr_eType_Int64:
-    snprintf(String, MaxSize, pwr_dFormatInt64, *(pwr_tInt64*)Value);
+    snprintf(String, MaxSize, pwr_dFormatInt64, *(pwr_tInt64 *)Value);
     break;
   case pwr_eType_UInt8:
-    snprintf(String, MaxSize, "%u", *(pwr_tUInt8*)Value);
+    snprintf(String, MaxSize, "%u", *(pwr_tUInt8 *)Value);
     break;
   case pwr_eType_UInt16:
-    snprintf(String, MaxSize, "%hu", *(pwr_tUInt16*)Value);
+    snprintf(String, MaxSize, "%hu", *(pwr_tUInt16 *)Value);
     break;
   case pwr_eType_UInt32:
   case pwr_eType_Mask:
-    snprintf(String, MaxSize, "%u", *(pwr_tUInt32*)Value);
+    snprintf(String, MaxSize, "%u", *(pwr_tUInt32 *)Value);
     break;
   case pwr_eType_UInt64:
-    snprintf(String, MaxSize, pwr_dFormatUInt64, *(pwr_tUInt64*)Value);
+    snprintf(String, MaxSize, pwr_dFormatUInt64, *(pwr_tUInt64 *)Value);
     break;
   case pwr_eType_Time:
-    if (ODD(time_AtoAscii(
-            Value, time_eFormat_DateAndTime, timbuf, sizeof(timbuf)))) {
+    if (ODD(time_AtoAscii(Value, time_eFormat_DateAndTime, timbuf,
+                          sizeof(timbuf)))) {
       strncpy(String, timbuf, MaxSize);
     } else {
       strncpy(String, "*** Bad time value ***", MaxSize);
@@ -445,10 +417,10 @@ pwr_tStatus cdh_AttrValueToString(
     break;
   case pwr_eType_String:
   case pwr_eType_Text:
-    snprintf(String, MaxSize, "%s", (char*)Value);
+    snprintf(String, MaxSize, "%s", (char *)Value);
     break;
   case pwr_eType_ProString: {
-    int len = MIN(strlen((char*)Value), MaxSize-1);
+    int len = MIN(strlen((char *)Value), MaxSize - 1);
     int i;
     strcpy(String, "");
     for (i = 0; i < len; i++)
@@ -467,9 +439,8 @@ pwr_tStatus cdh_AttrValueToString(
 //! Converts an attribute value given as a text string, to internal binary
 //! format.
 
-pwr_tStatus cdh_StringToAttrValue(
-    pwr_eType Type, const char* String, void* Value)
-{
+pwr_tStatus cdh_StringToAttrValue(pwr_eType Type, const char *String,
+                                  void *Value) {
   pwr_tStatus sts = CDH__SUCCESS;
   pwr_tBoolean bval = 0;
   pwr_tInt8 i8val = 0;
@@ -490,7 +461,7 @@ pwr_tStatus cdh_StringToAttrValue(
   pwr_tDeltaTime dtimeval;
   char timbuf[24];
   unsigned int timlen;
-  char* endp;
+  char *endp;
 
   errno = 0;
 
@@ -534,14 +505,14 @@ pwr_tStatus cdh_StringToAttrValue(
     break;
 
   case pwr_eType_Char:
-    *((char*)Value) = *String;
+    *((char *)Value) = *String;
     break;
 
   case pwr_eType_Int8:
     if (*String != '\0') {
       i32val = strtol(String, &endp, 0);
-      if (errno == ERANGE || *endp != '\0' || i32val > SCHAR_MAX
-          || i32val < SCHAR_MIN) {
+      if (errno == ERANGE || *endp != '\0' || i32val > SCHAR_MAX ||
+          i32val < SCHAR_MIN) {
         sts = CDH__INVINT8;
         break;
       }
@@ -553,8 +524,8 @@ pwr_tStatus cdh_StringToAttrValue(
   case pwr_eType_Int16:
     if (*String != '\0') {
       i32val = strtol(String, &endp, 0);
-      if (errno == ERANGE || *endp != '\0' || i32val > SHRT_MAX
-          || i32val < SHRT_MIN) {
+      if (errno == ERANGE || *endp != '\0' || i32val > SHRT_MAX ||
+          i32val < SHRT_MIN) {
         sts = CDH__INVINT16;
         break;
       }
@@ -569,8 +540,8 @@ pwr_tStatus cdh_StringToAttrValue(
   case pwr_eType_Enum:
     if (*String != '\0') {
       i32val = strtol(String, &endp, 0);
-      if (errno == ERANGE || *endp != '\0' || i32val > INT_MAX
-          || i32val < INT_MIN) {
+      if (errno == ERANGE || *endp != '\0' || i32val > INT_MAX ||
+          i32val < INT_MIN) {
         sts = CDH__INVINT32;
         break;
       }
@@ -593,8 +564,8 @@ pwr_tStatus cdh_StringToAttrValue(
       String++;
     if (*String != '\0') {
       ui32val = strtoul(String, &endp, 0);
-      if (errno == ERANGE || *endp != '\0' || ui32val > UCHAR_MAX
-          || *String == '-') {
+      if (errno == ERANGE || *endp != '\0' || ui32val > UCHAR_MAX ||
+          *String == '-') {
         sts = CDH__INVUINT8;
         break;
       }
@@ -608,8 +579,8 @@ pwr_tStatus cdh_StringToAttrValue(
       String++;
     if (*String != '\0') {
       ui32val = strtoul(String, &endp, 0);
-      if (errno == ERANGE || *endp != '\0' || ui32val > USHRT_MAX
-          || *String == '-') {
+      if (errno == ERANGE || *endp != '\0' || ui32val > USHRT_MAX ||
+          *String == '-') {
         sts = CDH__INVUINT16;
         break;
       }
@@ -624,8 +595,8 @@ pwr_tStatus cdh_StringToAttrValue(
       String++;
     if (*String != '\0') {
       ui32val = strtoul(String, &endp, 0);
-      if (errno == ERANGE || *endp != '\0' || ui32val > UINT_MAX
-          || *String == '-') {
+      if (errno == ERANGE || *endp != '\0' || ui32val > UINT_MAX ||
+          *String == '-') {
         sts = CDH__INVUINT32;
         break;
       }
@@ -736,8 +707,7 @@ pwr_tStatus cdh_StringToAttrValue(
 //! Converts a bitmask to a binary string.
 //! Sizes of str should be larger than noofbits.
 
-void cdh_MaskToBinaryString(unsigned int mask, int noofbits, char* str)
-{
+void cdh_MaskToBinaryString(unsigned int mask, int noofbits, char *str) {
   unsigned int m;
   int i;
 
@@ -761,8 +731,7 @@ void cdh_MaskToBinaryString(unsigned int mask, int noofbits, char* str)
   \param cid	ClassId.
   \return	Status of the operation. CDH__SUCCESS or CDH__INVCID.
 */
-pwr_tStatus cdh_StringToClassId(const char* s, pwr_tClassId* cid)
-{
+pwr_tStatus cdh_StringToClassId(const char *s, pwr_tClassId *cid) {
   unsigned int vid_0;
   unsigned int vid_1;
   unsigned int cix;
@@ -802,8 +771,7 @@ pwr_tStatus cdh_StringToClassId(const char* s, pwr_tClassId* cid)
   \param oid	Objid.
   \return	Status of the operation. CDH__SUCCESS or CDH__INVCID.
 */
-pwr_tStatus cdh_StringToObjid(const char* s, pwr_tObjid* oid)
-{
+pwr_tStatus cdh_StringToObjid(const char *s, pwr_tObjid *oid) {
   unsigned int vid_0;
   unsigned int vid_1;
   unsigned int vid_2;
@@ -825,8 +793,8 @@ pwr_tStatus cdh_StringToObjid(const char* s, pwr_tObjid* oid)
   if (sscanf(s, "%d.%d.%d.%d:%u%*s", &vid_3, &vid_2, &vid_1, &vid_0, &oix) != 5)
     return CDH__INVOID;
 
-  if (vid_3 > cdh_cMaxVidGroup || vid_2 > cdh_cMaxVidGroup
-      || vid_1 > cdh_cMaxVidGroup || vid_0 > cdh_cMaxVidGroup) {
+  if (vid_3 > cdh_cMaxVidGroup || vid_2 > cdh_cMaxVidGroup ||
+      vid_1 > cdh_cMaxVidGroup || vid_0 > cdh_cMaxVidGroup) {
     return CDH__INVOID;
   }
 
@@ -845,15 +813,14 @@ pwr_tStatus cdh_StringToObjid(const char* s, pwr_tObjid* oid)
 /*!
   Convert a string of format "_A1.2.3.4:34(_T44.33:0.5.1)[760.4]" ('_A' is
   optional), where
-  1.2.3.4 is the volume id and 34 is the object index, 
+  1.2.3.4 is the volume id and 34 is the object index,
   _T44.33:0.5.1 is the body typeid, 760 the offset and 4 the size.
 
   \param s	String.
   \param aref	Attribute reference.
   \return	Status of the operation. CDH__SUCCESS or CDH__INVCID.
 */
-pwr_tStatus cdh_StringToAref(const char* s, pwr_tAttrRef* aref)
-{
+pwr_tStatus cdh_StringToAref(const char *s, pwr_tAttrRef *aref) {
   char oid_str[40] = "";
   char body_str[40];
   char offset_str[40];
@@ -862,7 +829,7 @@ pwr_tStatus cdh_StringToAref(const char* s, pwr_tAttrRef* aref)
   pwr_tStatus sts;
   unsigned int idx;
   unsigned int state;
-  const char* t;
+  const char *t;
 
   pwr_Assert(aref != NULL);
 
@@ -939,8 +906,7 @@ pwr_tStatus cdh_StringToAref(const char* s, pwr_tAttrRef* aref)
   \param tid	TypeId.
   \return	Status of the operation. CDH__SUCCESS or CDH__INVTID.
 */
-pwr_tStatus cdh_StringToTypeId(const char* s, pwr_tTypeId* tid)
-{
+pwr_tStatus cdh_StringToTypeId(const char *s, pwr_tTypeId *tid) {
   unsigned int vid_0;
   unsigned int vid_1;
   unsigned int bit;
@@ -997,8 +963,7 @@ pwr_tStatus cdh_StringToTypeId(const char* s, pwr_tTypeId* tid)
   \param vid	Volume id.
   \return	Status of the operation. CDH__SUCCESS or CDH__INVTID.
 */
-pwr_tStatus cdh_StringToVolumeId(const char* s, pwr_tVolumeId* vid)
-{
+pwr_tStatus cdh_StringToVolumeId(const char *s, pwr_tVolumeId *vid) {
   unsigned int vid_0;
   unsigned int vid_1;
   unsigned int vid_2;
@@ -1021,8 +986,8 @@ pwr_tStatus cdh_StringToVolumeId(const char* s, pwr_tVolumeId* vid)
   if (sscanf(s, "%d.%d.%d.%d%*s", &vid_3, &vid_2, &vid_1, &vid_0) != 4)
     return CDH__INVVID;
 
-  if (vid_3 > cdh_cMaxVidGroup || vid_2 > cdh_cMaxVidGroup
-      || vid_1 > cdh_cMaxVidGroup || vid_0 > cdh_cMaxVidGroup)
+  if (vid_3 > cdh_cMaxVidGroup || vid_2 > cdh_cMaxVidGroup ||
+      vid_1 > cdh_cMaxVidGroup || vid_0 > cdh_cMaxVidGroup)
     return CDH__INVVID;
 
   lvid.v.vid_3 = vid_3;
@@ -1044,8 +1009,7 @@ pwr_tStatus cdh_StringToVolumeId(const char* s, pwr_tVolumeId* vid)
   \param oix	ObjectIx.
   \return	Status of the operation. CDH__SUCCESS or CDH__INVOIX.
 */
-pwr_tStatus cdh_StringToObjectIx(const char* s, pwr_tObjectIx* oix)
-{
+pwr_tStatus cdh_StringToObjectIx(const char *s, pwr_tObjectIx *oix) {
   pwr_tObjectIx loix = pwr_cNObjectIx;
 
   pwr_Assert(oix != NULL);
@@ -1065,8 +1029,7 @@ pwr_tStatus cdh_StringToObjectIx(const char* s, pwr_tObjectIx* oix)
   return CDH__SUCCESS;
 }
 
-pwr_tStatus cdh_StringToSubid(const char* s, pwr_tSubid* sid)
-{
+pwr_tStatus cdh_StringToSubid(const char *s, pwr_tSubid *sid) {
   unsigned int vid_0;
   unsigned int vid_1;
   unsigned int vid_2;
@@ -1086,8 +1049,8 @@ pwr_tStatus cdh_StringToSubid(const char* s, pwr_tSubid* sid)
   if (sscanf(s, "%d.%d.%d.%d:%u%*s", &vid_3, &vid_2, &vid_1, &vid_0, &six) != 5)
     return CDH__INVSID;
 
-  if (vid_3 != cdh_eVid3_subid || vid_2 > cdh_cMaxVidGroup
-      || vid_1 > cdh_cMaxVidGroup || vid_0 > cdh_cMaxVidGroup) {
+  if (vid_3 != cdh_eVid3_subid || vid_2 > cdh_cMaxVidGroup ||
+      vid_1 > cdh_cMaxVidGroup || vid_0 > cdh_cMaxVidGroup) {
     return CDH__INVSID;
   }
 
@@ -1102,8 +1065,7 @@ pwr_tStatus cdh_StringToSubid(const char* s, pwr_tSubid* sid)
   return CDH__SUCCESS;
 }
 
-pwr_tStatus cdh_StringToDlid(const char* s, pwr_tDlid* did)
-{
+pwr_tStatus cdh_StringToDlid(const char *s, pwr_tDlid *did) {
   unsigned int vid_0;
   unsigned int vid_1;
   unsigned int vid_2;
@@ -1123,8 +1085,8 @@ pwr_tStatus cdh_StringToDlid(const char* s, pwr_tDlid* did)
   if (sscanf(s, "%d.%d.%d.%d:%u%*s", &vid_3, &vid_2, &vid_1, &vid_0, &dix) != 5)
     return CDH__INVDID;
 
-  if (vid_3 != cdh_eVid3_dlid || vid_2 > cdh_cMaxVidGroup
-      || vid_1 > cdh_cMaxVidGroup || vid_0 > cdh_cMaxVidGroup) {
+  if (vid_3 != cdh_eVid3_dlid || vid_2 > cdh_cMaxVidGroup ||
+      vid_1 > cdh_cMaxVidGroup || vid_0 > cdh_cMaxVidGroup) {
     return CDH__INVDID;
   }
 
@@ -1153,8 +1115,7 @@ pwr_tStatus cdh_StringToDlid(const char* s, pwr_tDlid* did)
     the resultant string.
 */
 
-void cdh_ClassIdToString(char* s, int size, pwr_tClassId cid, int prefix)
-{
+void cdh_ClassIdToString(char *s, int size, pwr_tClassId cid, int prefix) {
   cdh_uTypeId lcid;
 
   lcid.pwr = cid;
@@ -1162,10 +1123,10 @@ void cdh_ClassIdToString(char* s, int size, pwr_tClassId cid, int prefix)
   if (/*  Check validity of class identifier. */
       lcid.c.bix != 0 || lcid.c.must_be_zero != 0) {
     snprintf(s, size, "%s%u.%u:?%u?", (prefix ? "_C" : ""), lcid.c.vid_1,
-        lcid.c.vid_0, lcid.c.cix);
+             lcid.c.vid_0, lcid.c.cix);
   } else {
     snprintf(s, size, "%s%u.%u:%u", (prefix ? "_C" : ""), lcid.c.vid_1,
-        lcid.c.vid_0, lcid.c.cix);
+             lcid.c.vid_0, lcid.c.cix);
   }
 }
 
@@ -1190,18 +1151,17 @@ void cdh_ClassIdToString(char* s, int size, pwr_tClassId cid, int prefix)
     the resultant string.
 */
 
-void cdh_TypeIdToString(char* s, int size, pwr_tTypeId tid, int prefix)
-{
+void cdh_TypeIdToString(char *s, int size, pwr_tTypeId tid, int prefix) {
   cdh_uTypeId ltid;
 
   ltid.pwr = tid;
 
   if (ltid.t.must_be_one == 0) { /*  This is a class TypeId.  */
     snprintf(s, size, "%s%u.%u:0.%u.%u", (prefix ? "_T" : ""), ltid.c.vid_1,
-        ltid.c.vid_0, ltid.c.cix, ltid.c.bix);
+             ltid.c.vid_0, ltid.c.cix, ltid.c.bix);
   } else { /*	This i s a type TypeId.  */
     snprintf(s, size, "%s%u.%u:1.%u.%u", (prefix ? "_T" : ""), ltid.t.vid_1,
-        ltid.t.vid_0, ltid.t.tyg, ltid.t.tix);
+             ltid.t.vid_0, ltid.t.tyg, ltid.t.tix);
   }
 }
 
@@ -1218,8 +1178,7 @@ void cdh_TypeIdToString(char* s, int size, pwr_tTypeId tid, int prefix)
     the resultant string.
 */
 
-void cdh_ObjectIxToString(char* s, int size, pwr_tObjectIx oix, int prefix)
-{
+void cdh_ObjectIxToString(char *s, int size, pwr_tObjectIx oix, int prefix) {
   snprintf(s, size, "%s%u", (prefix ? "_X" : ""), oix);
 }
 
@@ -1233,8 +1192,7 @@ void cdh_ObjectIxToString(char* s, int size, pwr_tObjectIx oix, int prefix)
     the resultant string.
 */
 
-void cdh_ArefToString(char* s, int size, pwr_sAttrRef* aref, int prefix)
-{
+void cdh_ArefToString(char *s, int size, pwr_sAttrRef *aref, int prefix) {
   char ls[200];
   char tmp[40];
 
@@ -1268,8 +1226,7 @@ void cdh_ArefToString(char* s, int size, pwr_sAttrRef* aref, int prefix)
     Not threadsafe.
 */
 
-char* cdh_AttrRefToString(pwr_sAttrRef* aref, int prefix)
-{
+char *cdh_AttrRefToString(pwr_sAttrRef *aref, int prefix) {
   static char ls[200];
 
   cdh_ArefToString(ls, sizeof(ls), aref, prefix);
@@ -1292,15 +1249,14 @@ char* cdh_AttrRefToString(pwr_sAttrRef* aref, int prefix)
     the resultant string.
 */
 
-char* cdh_NodeIdToString(char* s, pwr_tNodeId nid, int prefix, int suffix)
-{
+char *cdh_NodeIdToString(char *s, pwr_tNodeId nid, int prefix, int suffix) {
   cdh_uVolumeId lvid;
   static char ls[sizeof("_N255.255.255.255:")];
 
   lvid.pwr = (pwr_tVolumeId)nid;
 
   sprintf(ls, "%s%u.%u.%u.%u%s", (prefix ? "_N" : ""), lvid.v.vid_3,
-      lvid.v.vid_2, lvid.v.vid_1, lvid.v.vid_0, (suffix ? ":" : ""));
+          lvid.v.vid_2, lvid.v.vid_1, lvid.v.vid_0, (suffix ? ":" : ""));
 
   if (s != NULL)
     return strcat(s, ls);
@@ -1318,14 +1274,13 @@ char* cdh_NodeIdToString(char* s, pwr_tNodeId nid, int prefix, int suffix)
     the resultant string.
 */
 
-void cdh_OidToString(char* s, int size, pwr_tObjid oid, int prefix)
-{
+void cdh_OidToString(char *s, int size, pwr_tObjid oid, int prefix) {
   cdh_uObjid loid;
 
   loid.pwr = oid;
 
   snprintf(s, size, "%s%u.%u.%u.%u:%u", (prefix ? "_O" : ""), loid.o.vid_3,
-      loid.o.vid_2, loid.o.vid_1, loid.o.vid_0, loid.o.oix);
+           loid.o.vid_2, loid.o.vid_1, loid.o.vid_0, loid.o.oix);
 }
 
 //!  Converts a object identifier, 'oid' to a string.
@@ -1342,15 +1297,14 @@ void cdh_OidToString(char* s, int size, pwr_tObjid oid, int prefix)
     Not threadsafe.
 */
 
-char* cdh_ObjidToString(pwr_tObjid oid, int prefix)
-{
+char *cdh_ObjidToString(pwr_tObjid oid, int prefix) {
   cdh_uObjid loid;
   static char ls[sizeof("_O255.255.255.255:4294967295")];
 
   loid.pwr = oid;
 
   sprintf(ls, "%s%u.%u.%u.%u:%u", (prefix ? "_O" : ""), loid.o.vid_3,
-      loid.o.vid_2, loid.o.vid_1, loid.o.vid_0, loid.o.oix);
+          loid.o.vid_2, loid.o.vid_1, loid.o.vid_0, loid.o.oix);
   return ls;
 }
 
@@ -1369,15 +1323,14 @@ char* cdh_ObjidToString(pwr_tObjid oid, int prefix)
     Not threadsafe.
 */
 
-char* cdh_ObjidToFnString(char* s, pwr_tOid oid)
-{
+char *cdh_ObjidToFnString(char *s, pwr_tOid oid) {
   cdh_uObjid loid;
   static char str[40];
 
   loid.pwr = oid;
 
   sprintf(str, "%3.3u_%3.3u_%3.3u_%3.3u_%8.8x", loid.o.vid_3, loid.o.vid_2,
-      loid.o.vid_1, loid.o.vid_0, loid.o.oix);
+          loid.o.vid_1, loid.o.vid_0, loid.o.oix);
 
   if (s != NULL)
     return strcat(s, str);
@@ -1403,9 +1356,8 @@ char* cdh_ObjidToFnString(char* s, pwr_tOid oid)
     Not threadsafe if 's' is null.
 */
 
-char* cdh_VolumeIdToString(
-    char* s, int size, pwr_tVolumeId vid, int prefix, int suffix)
-{
+char *cdh_VolumeIdToString(char *s, int size, pwr_tVolumeId vid, int prefix,
+                           int suffix) {
   cdh_uVolumeId lvid;
   static char ls[sizeof("_V255.255.255.255:")];
 
@@ -1413,11 +1365,11 @@ char* cdh_VolumeIdToString(
 
   if (s) {
     snprintf(s, size, "%s%u.%u.%u.%u%s", (prefix ? "_V" : ""), lvid.v.vid_3,
-        lvid.v.vid_2, lvid.v.vid_1, lvid.v.vid_0, (suffix ? ":" : ""));
+             lvid.v.vid_2, lvid.v.vid_1, lvid.v.vid_0, (suffix ? ":" : ""));
     return s;
   } else
     sprintf(ls, "%s%u.%u.%u.%u%s", (prefix ? "_V" : ""), lvid.v.vid_3,
-        lvid.v.vid_2, lvid.v.vid_1, lvid.v.vid_0, (suffix ? ":" : ""));
+            lvid.v.vid_2, lvid.v.vid_1, lvid.v.vid_0, (suffix ? ":" : ""));
   return ls;
 }
 
@@ -1430,14 +1382,13 @@ char* cdh_VolumeIdToString(
     where xxx are the volume id in decimal form.
 */
 
-char* cdh_VolumeIdToFnString(char* s, int size, pwr_tVolumeId vid)
-{
+char *cdh_VolumeIdToFnString(char *s, int size, pwr_tVolumeId vid) {
   cdh_uVolumeId lvid;
 
   lvid.pwr = vid;
 
   snprintf(s, size, "%3.3u_%3.3u_%3.3u_%3.3u", lvid.v.vid_3, lvid.v.vid_2,
-      lvid.v.vid_1, lvid.v.vid_0);
+           lvid.v.vid_1, lvid.v.vid_0);
 
   return s;
 }
@@ -1452,14 +1403,13 @@ char* cdh_VolumeIdToFnString(char* s, int size, pwr_tVolumeId vid)
     the resultant string.
 */
 
-void cdh_SubidToString(char* s, int size, pwr_tSubid sid, int prefix)
-{
+void cdh_SubidToString(char *s, int size, pwr_tSubid sid, int prefix) {
   cdh_uRefId lrid;
 
   lrid.pwr = sid;
 
   snprintf(s, size, "%s%u.%u.%u.%u:%u", (prefix ? "_S" : ""), lrid.r.vid_3,
-      lrid.r.vid_2, lrid.r.vid_1, lrid.r.vid_0, lrid.r.rix);
+           lrid.r.vid_2, lrid.r.vid_1, lrid.r.vid_0, lrid.r.rix);
 }
 
 //! Converts a direct link identifier, 'did' to a string.
@@ -1472,26 +1422,23 @@ void cdh_SubidToString(char* s, int size, pwr_tSubid sid, int prefix)
     the resultant string.
 */
 
-void cdh_DlidToString(char* s, int size, pwr_tDlid did, int prefix)
-{
+void cdh_DlidToString(char *s, int size, pwr_tDlid did, int prefix) {
   cdh_uRefId lrid;
 
   lrid.pwr = did;
 
   snprintf(s, size, "%s%u.%u.%u.%u:%u", (prefix ? "_D" : ""), lrid.r.vid_3,
-      lrid.r.vid_2, lrid.r.vid_1, lrid.r.vid_0, lrid.r.rix);
+           lrid.r.vid_2, lrid.r.vid_1, lrid.r.vid_0, lrid.r.rix);
 }
 
-cdh_sFamily* cdh_Family(cdh_sFamily* f, const char* name, pwr_tObjid poid)
-{
+cdh_sFamily *cdh_Family(cdh_sFamily *f, const char *name, pwr_tObjid poid) {
   cdh_ObjName(&f->name, name);
   f->poid = poid;
 
   return f;
 }
 
-cdh_sObjName* cdh_ObjName(cdh_sObjName* on, const char* name)
-{
+cdh_sObjName *cdh_ObjName(cdh_sObjName *on, const char *name) {
   strncpy(on->orig, name, sizeof(pwr_tObjName));
   on->orig[sizeof(pwr_tObjName) - 1] = '\0';
   str_ToUpper(on->norm, on->orig);
@@ -1500,20 +1447,20 @@ cdh_sObjName* cdh_ObjName(cdh_sObjName* on, const char* name)
   return on;
 }
 
-cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
-    pwr_tObjid poid, const char* name, pwr_tUInt32 flags)
-{
+cdh_sParseName *cdh_ParseName(pwr_tStatus *sts, cdh_sParseName *pn,
+                              pwr_tObjid poid, const char *name,
+                              pwr_tUInt32 flags) {
   pwr_tStatus lsts = 1;
-  const char* inp;
-  char* outp;
-  char* outcp;
+  const char *inp;
+  char *outp;
+  char *outcp;
   pwr_tUInt32 len;
   pwr_tUInt32 seglen = 0;
   pwr_tUInt32 number = 0;
   unsigned char c;
   unsigned char cc;
-  char* segp;
-  char* segcp;
+  char *segp;
+  char *segcp;
   pwr_tInt32 state;
   static cdh_sParseName ParseName;
   char origName[256];
@@ -1529,8 +1476,9 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
      ~ : end of string
      */
 
-  static const char* cvttab[] = { /* 0: init */
-    "\
+  static const char *cvttab[] = {
+      /* 0: init */
+      "\
 ~+++++++++++++++++++++++++++++++\
 +*******************************\
 ********************************\
@@ -1540,8 +1488,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 ********************************\
 ********************************\
 ",
-    /* 1: id() before '(' */
-    "\
+      /* 1: id() before '(' */
+      "\
 ~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!*!!!!-.!0123456789:!!!!!\
 !A!CD!!!!!!!!!!O!!!ST!V!X!!!!!!_\
@@ -1551,8 +1499,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ",
-    /* 2: id(bname)attribute[index],  (bvol:Class-b-b-b) before ':' */
-    "\
+      /* 2: id(bname)attribute[index],  (bvol:Class-b-b-b) before ':' */
+      "\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!$!!!!!!!!!!!0123456789*!!!!!\
 !ABCDEFGHIJKLMNOPQRSTUVWXYZ!!!!_\
@@ -1562,8 +1510,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ",
-    /* 3: id(bname)attribute[index],  (bvol:Class-b-b-b) before ')'  */
-    "\
+      /* 3: id(bname)attribute[index],  (bvol:Class-b-b-b) before ')'  */
+      "\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!$!!!!*!!!-!!0123456789!!!!!!\
 !ABCDEFGHIJKLMNOPQRSTUVWXYZ!!!!_\
@@ -1573,8 +1521,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ",
-    /* 4: id(bname)attribute[index],  attribute before '['  */
-    "\
+      /* 4: id(bname)attribute[index],  attribute before '['  */
+      "\
 ~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!$!!!!!!!!!!!0123456789!!!!!!\
 !ABCDEFGHIJKLMNOPQRSTUVWXYZ*!!!_\
@@ -1584,8 +1532,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ!ÑÒÓÔÕÖ×ØÙÚÛÜÝ!!\
 ^^^^^^^^^^^^^^^^!^^^^^^^^^^^^^!!\
 ",
-    /* 5: id(bname)attribute[index], index before ']'  */
-    "\
+      /* 5: id(bname)attribute[index], index before ']'  */
+      "\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!0123456789!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!*!!\
@@ -1595,8 +1543,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ",
-    /* 6: id(bname)attribute[index], after  ']'  */
-    "\
+      /* 6: id(bname)attribute[index], after  ']'  */
+      "\
 ~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
@@ -1606,8 +1554,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ",
-    /* 7: id(bid)[offset.size], bid before ')'  */
-    "\
+      /* 7: id(bid)[offset.size], bid before ')'  */
+      "\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!*!!!!.!0123456789:!!!!!\
 !!!!!!!!!!!!!!!!!!!!T!!!!!!!!!!_\
@@ -1617,8 +1565,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ",
-    /* 8: id(bid)[offset.size], offset before '.'  */
-    "\
+      /* 8: id(bid)[offset.size], offset before '.'  */
+      "\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!*!0123456789!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
@@ -1628,8 +1576,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ",
-    /* 9: id(bid)[offset.size], size before ']'  */
-    "\
+      /* 9: id(bid)[offset.size], size before ']'  */
+      "\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!0123456789!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!*!!\
@@ -1639,8 +1587,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ",
-    /* 10: id(bid)[offset.size], after  ']'  */
-    "\
+      /* 10: id(bid)[offset.size], after  ']'  */
+      "\
 ~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
@@ -1650,8 +1598,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ",
-    /* 11: name.attribute[index], name before ':'  */
-    "\
+      /* 11: name.attribute[index], name before ':'  */
+      "\
 ~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!$!!!!!!!!**!0123456789*!!!!!\
 !ABCDEFGHIJKLMNOPQRSTUVWXYZ!!!!_\
@@ -1661,8 +1609,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ!ÑÒÓÔÕÖ×ØÙÚÛÜÝ!!\
 ^^^^^^^^^^^^^^^^!^^^^^^^^^^^^^!!\
 ",
-    /* 12: name.attribute[index], name before '.'  */
-    "\
+      /* 12: name.attribute[index], name before '.'  */
+      "\
 ~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!$!!!!!!!!-*!0123456789!!!!!!\
 !ABCDEFGHIJKLMNOPQRSTUVWXYZ!!!!_\
@@ -1672,8 +1620,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ!ÑÒÓÔÕÖ×ØÙÚÛÜÝ!!\
 ^^^^^^^^^^^^^^^^!^^^^^^^^^^^^^!!\
 ",
-    /* 13: name.attribute[index], attribute before '[' or '.' */
-    "\
+      /* 13: name.attribute[index], attribute before '[' or '.' */
+      "\
 ~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!$!!!!!!!!!.!0123456789!!!!!!\
 !ABCDEFGHIJKLMNOPQRSTUVWXYZ*!!!_\
@@ -1683,8 +1631,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ!ÑÒÓÔÕÖ×ØÙÚÛÜÝ!!\
 ^^^^^^^^^^^^^^^^!^^^^^^^^^^^^^!!\
 ",
-    /* 14: name.attribute[index], index before ']'  */
-    "\
+      /* 14: name.attribute[index], index before ']'  */
+      "\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!0123456789!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!*!!\
@@ -1694,8 +1642,8 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ",
-    /* 15: name.attribute[index], after  ']'  */
-    "\
+      /* 15: name.attribute[index], after  ']'  */
+      "\
 ~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!*!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
@@ -1705,7 +1653,7 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ",
-    "\
+      "\
 ~!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!$!!!!!!!!-.!0123456789:!!!!!\
 !ABCDEFGHIJKLMNOPQRSTUVWXYZ[!]!_\
@@ -1713,14 +1661,13 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ!ÑÒÓÔÕÖ×ØÙÚÛÜÝ!!\
-^^^^^^^^^^^^^^^^!^^^^^^^^^^^^^!!"
-  };
+^^^^^^^^^^^^^^^^!^^^^^^^^^^^^^!!"};
 
   /* Conversion table.
      ! : do not convert
      any other copy as is.  */
 
-  static const char ascii7tab[] = { "\
+  static const char ascii7tab[] = {"\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
@@ -1729,7 +1676,7 @@ cdh_sParseName* cdh_ParseName(pwr_tStatus* sts, cdh_sParseName* pn,
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 AAAAAAACEEEEIIII!NOOOOOOOUUUUY!!\
 aaaaaaaceeeeiiii!nooooooouuuuy!!\
-" };
+"};
 
   len = strlen(name);
   if (len >= sizeof(origName)) {
@@ -2248,9 +2195,9 @@ aaaaaaaceeeeiiii!nooooooouuuuy!!\
       }
       inp++;
       break;
-    case 5: /* 5: id(bname)attribute[index], index before ']'  */
-    case 8: /* 8: id(bid)[offset.size], offset before '.'  */
-    case 9: /* 9: id(bid)[offset.size], size before ']'  */
+    case 5:  /* 5: id(bname)attribute[index], index before ']'  */
+    case 8:  /* 8: id(bid)[offset.size], offset before '.'  */
+    case 9:  /* 9: id(bid)[offset.size], size before ']'  */
     case 14: /* 14: name.attribute[index], index before ']'  */
       if (c == '*') {
         switch (state) {
@@ -2281,7 +2228,7 @@ aaaaaaaceeeeiiii!nooooooouuuuy!!\
       }
       inp++;
       break;
-    case 6: /* 6:  id(bname)attribute[index], after  ']'  */
+    case 6:  /* 6:  id(bname)attribute[index], after  ']'  */
     case 10: /* 10: id(bid)[offset.size], after  ']'  */
     case 15: /* 15: name.attribute[index], after  ']'  */
       if (c == '*') {
@@ -2304,11 +2251,10 @@ error:
   return NULL;
 }
 
-pwr_tUInt32 cdh_PackName(const char* name)
-{
+pwr_tUInt32 cdh_PackName(const char *name) {
   cdh_uPackName pack;
   unsigned int len = strlen(name);
-  const char* s = name;
+  const char *s = name;
   unsigned char hash = 0;
 
   while (*s)
@@ -2328,8 +2274,7 @@ pwr_tUInt32 cdh_PackName(const char* name)
 
   NOTE! The function should only be called once in one expression.
 */
-char* cdh_Low(const char* s)
-{
+char *cdh_Low(const char *s) {
   static char buf[500];
 
   return str_ToLower(buf, s);
@@ -2343,8 +2288,7 @@ char* cdh_Low(const char* s)
   \param opsys	Operating system.
   \return 	String
 */
-char* cdh_OpSysToStr(pwr_mOpSys opsys)
-{
+char *cdh_OpSysToStr(pwr_mOpSys opsys) {
   static char str[32];
 
   switch (opsys) {
@@ -2389,8 +2333,7 @@ char* cdh_OpSysToStr(pwr_mOpSys opsys)
   \param opsys	Operating system.
   \return 	String
 */
-char* cdh_OpSysToDirStr(pwr_mOpSys opsys)
-{
+char *cdh_OpSysToDirStr(pwr_mOpSys opsys) {
   static char str[80];
 
   switch (opsys) {
@@ -2427,15 +2370,14 @@ char* cdh_OpSysToDirStr(pwr_mOpSys opsys)
   return str;
 }
 
-int cdh_IsClassVolume(pwr_tVid vid)
-{
-  return ((cdh_cSystemClassVolMin <= vid && vid <= cdh_cSystemClassVolMax)
-      || (cdh_cManufactClassVolMin <= vid && vid <= cdh_cManufactClassVolMax)
-      || (cdh_cUserClassVolMin <= vid && vid <= cdh_cUserClassVolMax));
+int cdh_IsClassVolume(pwr_tVid vid) {
+  return (
+      (cdh_cSystemClassVolMin <= vid && vid <= cdh_cSystemClassVolMax) ||
+      (cdh_cManufactClassVolMin <= vid && vid <= cdh_cManufactClassVolMax) ||
+      (cdh_cUserClassVolMin <= vid && vid <= cdh_cUserClassVolMax));
 }
 
-pwr_sAttrRef cdh_ArefToCastAref(pwr_sAttrRef* arp)
-{
+pwr_sAttrRef cdh_ArefToCastAref(pwr_sAttrRef *arp) {
   pwr_sAttrRef cast_aref;
 
   cast_aref = *arp;
@@ -2449,8 +2391,7 @@ pwr_sAttrRef cdh_ArefToCastAref(pwr_sAttrRef* arp)
   return cast_aref;
 }
 
-pwr_sAttrRef cdh_ArefToDisableAref(pwr_sAttrRef* arp)
-{
+pwr_sAttrRef cdh_ArefToDisableAref(pwr_sAttrRef *arp) {
   pwr_sAttrRef dis_aref;
 
   dis_aref = *arp;
@@ -2462,8 +2403,7 @@ pwr_sAttrRef cdh_ArefToDisableAref(pwr_sAttrRef* arp)
   return dis_aref;
 }
 
-pwr_sAttrRef cdh_ArefAdd(pwr_sAttrRef* arp1, pwr_sAttrRef* arp2)
-{
+pwr_sAttrRef cdh_ArefAdd(pwr_sAttrRef *arp1, pwr_sAttrRef *arp2) {
   pwr_sAttrRef aref = *arp1;
   aref.Offset += arp2->Offset;
   aref.Size = arp2->Size;
@@ -2471,16 +2411,14 @@ pwr_sAttrRef cdh_ArefAdd(pwr_sAttrRef* arp1, pwr_sAttrRef* arp2)
   return aref;
 }
 
-void cdh_SuppressSuper(char* out, char* in)
-{
-  char* s = in;
+void cdh_SuppressSuper(char *out, char *in) {
+  char *s = in;
   while (str_StartsWith(s, "Super."))
     s += 6;
   strcpy(out, s);
 }
 
-void cdh_SuppressSuperAll(char* out, char* in)
-{
+void cdh_SuppressSuperAll(char *out, char *in) {
   char *s, *t;
 
   for (s = in, t = out; *s;) {
@@ -2495,8 +2433,7 @@ void cdh_SuppressSuperAll(char* out, char* in)
   *t = 0;
 }
 
-int cdh_TypeToMaxStrSize(pwr_eType type, int attr_size, int attr_elements)
-{
+int cdh_TypeToMaxStrSize(pwr_eType type, int attr_size, int attr_elements) {
   int size;
 
   switch (type) {
@@ -2567,8 +2504,7 @@ int cdh_TypeToMaxStrSize(pwr_eType type, int attr_size, int attr_elements)
   return size;
 }
 
-int cdh_TypeToSize(pwr_eType type)
-{
+int cdh_TypeToSize(pwr_eType type) {
   int size;
 
   switch (type) {
@@ -2659,8 +2595,7 @@ int cdh_TypeToSize(pwr_eType type)
   \param s	In string.
   \return 	Returns t.
 */
-char* cdh_StringToObjectName(char* t, const char* s)
-{
+char *cdh_StringToObjectName(char *t, const char *s) {
   static const char valtab[] = "\
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 !!!!$!!!!!!!!!!!0123456789!!!!!!\
@@ -2670,8 +2605,8 @@ char* cdh_StringToObjectName(char* t, const char* s)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\
 ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ!ÑÒÓÔÕÖ×ØÙÚÛÜÝ!!\
 ^^^^^^^^^^^^^^^^!^^^^^^^^^^^^^!!";
-  char* rs = t;
-  const char* s1 = s;
+  char *rs = t;
+  const char *s1 = s;
 
   if (t == NULL)
     return NULL;
@@ -2703,8 +2638,7 @@ char* cdh_StringToObjectName(char* t, const char* s)
   \param s	In string.
   \return 	Status.
 */
-pwr_tStatus cdh_NextObjectName(char* t, const char* s)
-{
+pwr_tStatus cdh_NextObjectName(char *t, const char *s) {
   int i;
   int num;
   int len = strlen(s);
@@ -2741,9 +2675,8 @@ pwr_tStatus cdh_NextObjectName(char* t, const char* s)
   \param name		In string.
   \param segments	Number of segments to return.
 */
-void cdh_CutNameSegments(char* outname, char* name, int segments)
-{
-  char* s[20];
+void cdh_CutNameSegments(char *outname, char *name, int segments) {
+  char *s[20];
   int i, j, last_i = 0;
 
   if (segments == 0) {
@@ -2774,8 +2707,7 @@ void cdh_CutNameSegments(char* outname, char* name, int segments)
 /*!
   Get the attribute size from parinfo.
 */
-pwr_tUInt32 cdh_AttrSize(pwr_sParInfo* info)
-{
+pwr_tUInt32 cdh_AttrSize(pwr_sParInfo *info) {
   if (info->Flags & PWR_MASK_POINTER && !(info->Flags & PWR_MASK_PRIVATE))
     /* Return pointer size, info size contains size of pointed entity */
     return sizeof(pwr_tUInt64) * info->Elements;
@@ -2787,8 +2719,7 @@ pwr_tUInt32 cdh_AttrSize(pwr_sParInfo* info)
 /*!
   Get the array elements size of an array attribut from parinfo.
 */
-pwr_tUInt32 cdh_AttrElemSize(pwr_sParInfo* info)
-{
+pwr_tUInt32 cdh_AttrElemSize(pwr_sParInfo *info) {
   return cdh_AttrSize(info) / info->Elements;
 }
 

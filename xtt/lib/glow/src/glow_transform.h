@@ -41,12 +41,14 @@
 
 #include "glow.h"
 
-class GlowTransform {
+class GlowTransform
+{
 public:
   GlowTransform()
-      : a11(1), a12(0), a13(0), a21(0), a22(1), a23(0), rotation(0), s_a11(1),
-        s_a12(0), s_a13(0), s_a21(0), s_a22(1), s_a23(0), s_rotation(0),
-        stored(false){}
+      : a11(1), a12(0), a13(0), a21(0), a22(1), a23(0), rotation(0), s_a11(1), s_a12(0), s_a13(0), s_a21(0),
+        s_a22(1), s_a23(0), s_rotation(0), stored(false)
+  {
+  }
   GlowTransform operator*(const GlowTransform p);
   void scale(double sx, double sy, double x0, double y0);
   void rotate(double angle, double x0, double y0);
@@ -67,14 +69,8 @@ public:
   bool reverse(double x, double y, double* rx, double* ry);
   void save(std::ofstream& fp, glow_eSaveMode mode);
   void open(std::ifstream& fp);
-  double rot(GlowTransform* t)
-  {
-    return t->rotation + rotation;
-  }
-  double rot()
-  {
-    return rotation;
-  }
+  double rot(GlowTransform* t) { return t->rotation + rotation; }
+  double rot() { return rotation; }
   void store()
   {
     s_a11 = a11;
@@ -101,17 +97,10 @@ public:
   void move_from_stored(double x0, double y0);
   void set_from_stored(GlowTransform* t);
   double vertical_scale(GlowTransform* t);
-  void store_reset()
-  {
-    stored = false;
-  }
-  bool is_stored()
-  {
-    return stored;
-  }
+  void store_reset() { stored = false; }
+  bool is_stored() { return stored; }
   void pos_inverse(GlowTransform* t);
-  void init(double ia11, double ia12, double ia13, double ia21, 
-      double ia22, double ia23, double irotation)
+  void init(double ia11, double ia12, double ia13, double ia21, double ia22, double ia23, double irotation)
   {
     a11 = ia11;
     a12 = ia12;
@@ -123,7 +112,7 @@ public:
   }
   bool is_modified()
   {
-    return !(feq(a11,1.0) && a12 == 0 && a13 == 0 && a21 == 0 && feq(a22,1.0) && a23 == 0 && rotation == 0);
+    return !(feq(a11, 1.0) && a12 == 0 && a13 == 0 && a21 == 0 && feq(a22, 1.0) && a23 == 0 && rotation == 0);
   }
   double a11;
   double a12;

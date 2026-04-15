@@ -42,8 +42,7 @@
 
 #include "xtt_clognav_qt.h"
 
-CLogNavQt::CLogNavQt(void* clog_parent_ctx, QWidget** w)
-    : CLogNav(clog_parent_ctx)
+CLogNavQt::CLogNavQt(void* clog_parent_ctx, QWidget** w) : CLogNav(clog_parent_ctx)
 {
   form_widget = scrolledbrowwidgetqt_new(init_brow_cb, this, &brow_widget);
   *w = form_widget;
@@ -55,7 +54,4 @@ CLogNavQt::~CLogNavQt()
   form_widget->close();
 }
 
-void CLogNavQt::set_input_focus()
-{
-  brow_widget->setFocus();
-}
+void CLogNavQt::set_input_focus() { brow_widget->setFocus(); }

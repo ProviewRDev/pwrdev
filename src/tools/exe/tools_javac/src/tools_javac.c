@@ -39,11 +39,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define streq(a,b) (strcmp((a),(b)) == 0)
+#define streq(a, b) (strcmp((a), (b)) == 0)
 #define str_StartsWith(str, prefix) (strncmp(str, prefix, strlen(prefix)) == 0)
 
-char prefix[][10] = { "gdhr", "gdh", "cdhr", "cdh", "pwrb", "pwrt", "pwr", "rt",
-  "co", "jop", "ge", "qcomr", "qcom", "cli" };
+char prefix[][10] = {"gdhr", "gdh", "cdhr", "cdh", "pwrb",  "pwrt", "pwr",
+                     "rt",   "co",  "jop",  "ge",  "qcomr", "qcom", "cli"};
 
 int main(int argc, char* argv[])
 {
@@ -53,23 +53,30 @@ int main(int argc, char* argv[])
   int i;
   int sts;
 
-  if (argc > 3 && streq(argv[1], "-d")) {
+  if (argc > 3 && streq(argv[1], "-d"))
+  {
     strncpy(destination, argv[2], sizeof(destination));
 
     /* Cut last to segments in directory (package name) */
-    if ((s = strrchr(destination, '/'))) {
+    if ((s = strrchr(destination, '/')))
+    {
       *s = 0;
-      if ((s = strrchr(destination, '/'))) {
+      if ((s = strrchr(destination, '/')))
+      {
         *s = 0;
         if ((s = strrchr(destination, '/')))
           *s = 0;
       }
     }
     strncpy(filename, argv[3], sizeof(filename));
-  } else if (argc > 1) {
+  }
+  else if (argc > 1)
+  {
     strncpy(filename, argv[1], sizeof(filename));
     strncpy(destination, "", sizeof(destination));
-  } else {
+  }
+  else
+  {
     printf("Usage:\n");
     printf("	-d	target directory\n");
     printf("	arg	filename\n");
@@ -117,9 +124,12 @@ int main(int argc, char* argv[])
     strcpy(s, "JopLoginApplet.java");
   else if (streq(s, "joploginframe.java"))
     strcpy(s, "JopLoginFrame.java");
-  else {
-    for (i = 0; i < sizeof(prefix) / sizeof(prefix[0]); i++) {
-      if (str_StartsWith(s, prefix[i])) {
+  else
+  {
+    for (i = 0; i < sizeof(prefix) / sizeof(prefix[0]); i++)
+    {
+      if (str_StartsWith(s, prefix[i]))
+      {
         *s = _toupper(*s);
         if (strlen(s) > strlen(prefix[i]))
           *(s + strlen(prefix[i])) = _toupper(*(s + strlen(prefix[i])));

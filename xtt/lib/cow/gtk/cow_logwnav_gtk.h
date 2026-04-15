@@ -43,10 +43,10 @@
 
 #include "cow_logwnav.h"
 
-class CoLogWNavGtk : public CoLogWNav {
+class CoLogWNavGtk : public CoLogWNav
+{
 public:
-  CoLogWNavGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, int l_show_item,
-      GtkWidget** w);
+  CoLogWNavGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, int l_show_item, GtkWidget** w);
   ~CoLogWNavGtk();
 
   GtkWidget* parent_wid;

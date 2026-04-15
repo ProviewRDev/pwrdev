@@ -43,34 +43,21 @@
 
 #include "wb_expwnav.h"
 
-class WbExpW {
+class WbExpW
+{
 public:
-  WbExpW(void* l_parent_ctx, ldh_tSesContext l_ldhses, const char* expw_name,
-      int l_type, int l_editmode, pwr_tStatus* status);
+  WbExpW(void* l_parent_ctx, ldh_tSesContext l_ldhses, const char* expw_name, int l_type, int l_editmode,
+         pwr_tStatus* status);
   virtual ~WbExpW();
 
-  virtual void set_title(char* title)
-  {
-  }
+  virtual void set_title(char* title) {}
   void show();
   void update();
   void activate_export();
-  void activate_update()
-  {
-    expwnav->update();
-  }
-  void activate_check_all()
-  {
-    expwnav->check_all();
-  }
-  void activate_check_clear()
-  {
-    expwnav->check_clear();
-  }
-  void activate_check_reset()
-  {
-    expwnav->check_reset();
-  }
+  void activate_update() { expwnav->update(); }
+  void activate_check_all() { expwnav->check_all(); }
+  void activate_check_clear() { expwnav->check_clear(); }
+  void activate_check_reset() { expwnav->check_reset(); }
 
   static void export_ok(void* ctx, void* data);
 

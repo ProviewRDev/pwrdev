@@ -3,19 +3,22 @@
 #ifndef ra_io_m_onewire_h
 #define ra_io_m_onewire_h
 
-typedef struct {
+typedef struct
+{
   FILE* value_fp;
   int interval_cnt;
   pwr_tTime last_try;
 } io_sLocalDS18B20;
 
-typedef struct {
+typedef struct
+{
   FILE* value_fp;
   int interval_cnt;
   pwr_tTime last_try;
 } io_sLocalAiDevice;
 
-typedef struct {
+typedef struct
+{
   FILE* value_fp;
   int interval_cnt;
   pwr_tTime last_try;

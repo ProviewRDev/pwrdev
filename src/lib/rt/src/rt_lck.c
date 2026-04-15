@@ -41,8 +41,7 @@
 #include "rt_gdh.h"
 #include "rt_lck.h"
 
-static char lck_cName[lck_eLock__][40]
-    = { "/tmp/pwr_nmps_lock", "/tmp/pwr_time_lock", "/tmp/pwr_str_lock" };
+static char lck_cName[lck_eLock__][40] = {"/tmp/pwr_nmps_lock", "/tmp/pwr_time_lock", "/tmp/pwr_str_lock"};
 
 sect_sHead* lck_locksect[lck_eLock__] = {0, 0, 0};
 
@@ -50,26 +49,27 @@ void lck_Create(pwr_tStatus* sts, lck_eLock lock)
 {
   pwr_tBoolean created;
 
-  if (lock >= lck_eLock__) {
+  if (lock >= lck_eLock__)
+  {
     *sts = 0;
     return;
   }
-  if (lck_locksect[lock]) {
+  if (lck_locksect[lock])
+  {
     /* Already created */
     *sts = 1;
     return;
   }
 
-  lck_locksect[lock] = sect_Alloc(sts, &created, 0, sizeof(sect_sMutex),
-      lck_cName[lock], sect_mFlags_Create);
+  lck_locksect[lock] = sect_Alloc(sts, &created, 0, sizeof(sect_sMutex), lck_cName[lock], sect_mFlags_Create);
   if (ODD(*sts) && created)
-    sect_InitLock(
-        sts, lck_locksect[lock], (sect_sMutex*)lck_locksect[lock]->base);
+    sect_InitLock(sts, lck_locksect[lock], (sect_sMutex*)lck_locksect[lock]->base);
 }
 
 void lck_Unlink(pwr_tStatus* sts, lck_eLock lock)
 {
-  if (lock >= lck_eLock__ || !lck_locksect[lock]) {
+  if (lock >= lck_eLock__ || !lck_locksect[lock])
+  {
     *sts = 0;
     return;
   }
@@ -82,7 +82,8 @@ void lck_Unlink(pwr_tStatus* sts, lck_eLock lock)
 
 void lck_Delete(pwr_tStatus* sts, lck_eLock lock)
 {
-  if (lock >= lck_eLock__ || !lck_locksect[lock]) {
+  if (lock >= lck_eLock__ || !lck_locksect[lock])
+  {
     *sts = 0;
     return;
   }

@@ -41,7 +41,8 @@
 
 #include <stdlib.h>
 
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 #include "co_dcli.h"
 }
@@ -54,28 +55,30 @@ extern "C" {
 
 #define CNV_TAB 25
 
-void CnvXtthelpToText::subject_to_fname(
-    char* fname, const char* subject, int path)
+void CnvXtthelpToText::subject_to_fname(char* fname, const char* subject, int path)
 {
-  if (path) {
+  if (path)
+  {
     strcpy(fname, ctx->dir);
     strcat(fname, ctx->rx->name);
-  } else
+  }
+  else
     strcpy(fname, ctx->rx->name);
   strcat(fname, ".txt");
 }
 
 CnvXtthelpToText::~CnvXtthelpToText()
 {
-  if (fp.is_open()) {
+  if (fp.is_open())
+  {
     fp.close();
   }
 }
 
-void* CnvXtthelpToText::insert(navh_eItemType item_type, const char* text1,
-    const char* text2, const char* text3, const char* alink,
-    const char* link_bookmark, const char* file_name, navh_eHelpFile file_type,
-    int help_index, const char* bookmark, int coding)
+void* CnvXtthelpToText::insert(navh_eItemType item_type, const char* text1, const char* text2,
+                               const char* text3, const char* alink, const char* link_bookmark,
+                               const char* file_name, navh_eHelpFile file_type, int help_index,
+                               const char* bookmark, int coding)
 {
   if (print_disable)
     return NULL;
@@ -83,7 +86,8 @@ void* CnvXtthelpToText::insert(navh_eItemType item_type, const char* text1,
   if (item_type != navh_eItemType_Topic && !in_topic)
     return NULL;
 
-  switch (item_type) {
+  switch (item_type)
+  {
   case navh_eItemType_DocTitlePage:
   case navh_eItemType_DocInfoPage:
   case navh_eItemType_Style:
@@ -93,8 +97,10 @@ void* CnvXtthelpToText::insert(navh_eItemType item_type, const char* text1,
   case navh_eItemType_EndHeaderLevel:
   case navh_eItemType_Image:
     return NULL;
-  case navh_eItemType_Topic: {
-    if (first_topic) {
+  case navh_eItemType_Topic:
+  {
+    if (first_topic)
+    {
       pwr_tFileName fname;
 
       subject_to_fname(fname, text1, 1);
@@ -109,7 +115,8 @@ void* CnvXtthelpToText::insert(navh_eItemType item_type, const char* text1,
   case navh_eItemType_EndTopic:
     in_topic = 0;
     break;
-  case navh_eItemType_PageBreak: {
+  case navh_eItemType_PageBreak:
+  {
     fp << "\f";
     return NULL;
   }
@@ -118,16 +125,19 @@ void* CnvXtthelpToText::insert(navh_eItemType item_type, const char* text1,
   case navh_eItemType_HelpBold:
   case navh_eItemType_Header:
   case navh_eItemType_HeaderLarge:
-  case navh_eItemType_HelpHeader: {
+  case navh_eItemType_HelpHeader:
+  {
     fp << text1;
 
-    if (text2) {
+    if (text2)
+    {
       fp << " ";
       for (int i = 0; i < (int)(CNV_TAB - strlen(text1) - 1); i++)
         fp << " ";
       fp << text2;
 
-      if (text3) {
+      if (text3)
+      {
         fp << " ";
         for (int i = 0; i < (int)(CNV_TAB - strlen(text2) - 1); i++)
           fp << " ";
@@ -138,14 +148,16 @@ void* CnvXtthelpToText::insert(navh_eItemType item_type, const char* text1,
 
     break;
   }
-  case navh_eItemType_HorizontalLine: {
+  case navh_eItemType_HorizontalLine:
+  {
     for (int i = 0; i < 80; i++)
       fp << "-";
     fp << '\n';
 
     return NULL;
   }
-  case navh_eItemType_Option: {
+  case navh_eItemType_Option:
+  {
     if (streq(text1, "printdisable"))
       print_disable = 1;
     else if (streq(text1, "printenable"))

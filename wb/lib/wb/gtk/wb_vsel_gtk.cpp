@@ -69,11 +69,11 @@ static void vsel_exit_qb_yes(void* ctx, void* cbdata)
 }
 
 /*************************************************************************
-* Name:		void	vsel_activate_ok()
-*
-* Description:
-*	Callback from the pushbutton.
-**************************************************************************/
+ * Name:		void	vsel_activate_ok()
+ *
+ * Description:
+ *	Callback from the pushbutton.
+ **************************************************************************/
 
 void WVselGtk::activate_ok(GtkWidget* w, gpointer data)
 {
@@ -87,9 +87,9 @@ void WVselGtk::activate_ok(GtkWidget* w, gpointer data)
   int sts;
   char* s;
 
-  GtkTreeSelection* selection
-      = gtk_tree_view_get_selection(GTK_TREE_VIEW(vsel->widgets.volumelist));
-  if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
+  GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(vsel->widgets.volumelist));
+  if (gtk_tree_selection_get_selected(selection, NULL, &iter))
+  {
     gtk_tree_model_get(GTK_TREE_MODEL(vsel->store), &iter, 0, &text, -1);
     strcpy(selected_text, text);
   }
@@ -102,8 +102,7 @@ void WVselGtk::activate_ok(GtkWidget* w, gpointer data)
   if (EVEN(sts))
     return;
 
-  volume_ptr
-      = (pwr_tVolumeId*)calloc(vsel->volume_count, sizeof(pwr_tVolumeId));
+  volume_ptr = (pwr_tVolumeId*)calloc(vsel->volume_count, sizeof(pwr_tVolumeId));
   *volume_ptr = vid;
   volume_cnt = 1;
 
@@ -111,21 +110,24 @@ void WVselGtk::activate_ok(GtkWidget* w, gpointer data)
     sts = (vsel->vsel_bc_success)(vsel, volume_ptr, volume_cnt);
   free((char*)volume_ptr);
 
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     if (vsel->vsel_bc_cancel != NULL)
       (vsel->vsel_bc_cancel)();
     delete vsel;
-  } else if (sts == LDH__VOLALRATT || LDH__VOLIDALREXI) {
+  }
+  else if (sts == LDH__VOLALRATT || LDH__VOLIDALREXI)
+  {
     vsel->wow->DisplayError("Error", "Volume is already open");
   }
 }
 
 /*************************************************************************
-* Name:		void	vsel_activate_cancel()
-*
-* Description:
-*	Callback from the pushbutton.
-**************************************************************************/
+ * Name:		void	vsel_activate_cancel()
+ *
+ * Description:
+ *	Callback from the pushbutton.
+ **************************************************************************/
 
 void WVselGtk::activate_cancel(GtkWidget* w, gpointer data)
 {
@@ -137,20 +139,23 @@ void WVselGtk::activate_cancel(GtkWidget* w, gpointer data)
 }
 
 /*************************************************************************
-* Name:		void	vsel_activate_close()
-*
-* Description:
-*	Callback from the pushbutton.
-**************************************************************************/
+ * Name:		void	vsel_activate_close()
+ *
+ * Description:
+ *	Callback from the pushbutton.
+ **************************************************************************/
 
 void WVselGtk::activate_close(GtkWidget* w, gpointer data)
 {
   WVsel* vsel = (WVsel*)data;
 
-  if ((vsel->vsel_bc_time_to_exit)(vsel->parent_ctx)) {
-    vsel->wow->DisplayQuestion(vsel, "Pwr exit", "Do you really want to exit ?",
-        vsel_exit_qb_yes, NULL, NULL);
-  } else {
+  if ((vsel->vsel_bc_time_to_exit)(vsel->parent_ctx))
+  {
+    vsel->wow->DisplayQuestion(vsel, "Pwr exit", "Do you really want to exit ?", vsel_exit_qb_yes, NULL,
+                               NULL);
+  }
+  else
+  {
     if (vsel->vsel_bc_cancel != NULL)
       (vsel->vsel_bc_cancel)();
     delete vsel;
@@ -158,11 +163,11 @@ void WVselGtk::activate_close(GtkWidget* w, gpointer data)
 }
 
 /*************************************************************************
-* Name:		void	vsel_activate_showall()
-*
-* Description:
-*	Callback from the pushbutton.
-**************************************************************************/
+ * Name:		void	vsel_activate_showall()
+ *
+ * Description:
+ *	Callback from the pushbutton.
+ **************************************************************************/
 
 void WVselGtk::activate_showall(GtkWidget* w, gpointer data)
 {
@@ -177,27 +182,25 @@ void WVselGtk::activate_showall(GtkWidget* w, gpointer data)
 }
 
 /*************************************************************************
-*
-* Name:		int	vsel_new()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* void 		*parent_ctx	I	Parent context adress
-* Widget	parent_wid	I	Parent Widget adress
-* char *	name		I	Name of the created object
-*
-* Description:
-*	Create a new login window
-**************************************************************************/
+ *
+ * Name:		int	vsel_new()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * void 		*parent_ctx	I	Parent context adress
+ * Widget	parent_wid	I	Parent Widget adress
+ * char *	name		I	Name of the created object
+ *
+ * Description:
+ *	Create a new login window
+ **************************************************************************/
 
-WVselGtk::WVselGtk(pwr_tStatus* status, void* wv_parent_ctx,
-    GtkWidget* wv_parent_wid, const char* wv_name, ldh_tWBContext wv_wbctx,
-    char* volumename, int (*bc_success)(void*, pwr_tVolumeId*, int),
-    void (*bc_cancel)(), int (*bc_time_to_exit)(void*), int show_volumes,
-    wb_eType wv_wb_type)
-    : WVsel(status, wv_parent_ctx, wv_name, wv_wbctx, volumename, bc_success,
-          bc_cancel, bc_time_to_exit, show_volumes, wv_wb_type),
+WVselGtk::WVselGtk(pwr_tStatus* status, void* wv_parent_ctx, GtkWidget* wv_parent_wid, const char* wv_name,
+                   ldh_tWBContext wv_wbctx, char* volumename, int (*bc_success)(void*, pwr_tVolumeId*, int),
+                   void (*bc_cancel)(), int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wv_wb_type)
+    : WVsel(status, wv_parent_ctx, wv_name, wv_wbctx, volumename, bc_success, bc_cancel, bc_time_to_exit,
+            show_volumes, wv_wb_type),
       parent_wid(wv_parent_wid)
 {
   int sts;
@@ -215,25 +218,29 @@ WVselGtk::WVselGtk(pwr_tStatus* status, void* wv_parent_ctx,
   if (volumename != NULL && *volumename != 0 && !show_volumes)
     /* Start the navigater for this volume */
     strcpy(volname, volumename);
-  else if (!show_volumes && wb_type != wb_eType_Buffer) {
+  else if (!show_volumes && wb_type != wb_eType_Buffer)
+  {
     /* If there is only one volume in the db, select this volume */
     volume_count = 0;
 
     sts = ldh_GetVolumeList(wbctx, &volume);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       sts = ldh_GetVolumeClass(wbctx, volume, &classid);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         *status = sts;
         return;
       }
 
-      if (cdh_isClassVolumeClass(classid)
-          || classid == pwr_eClass_WorkBenchVolume || volume == ldh_cRtVolume) {
+      if (cdh_isClassVolumeClass(classid) || classid == pwr_eClass_WorkBenchVolume || volume == ldh_cRtVolume)
+      {
         sts = ldh_GetNextVolume(wbctx, volume, &volume);
         continue;
       }
       sts = ldh_VolumeIdToName(wbctx, volume, volname, sizeof(volname), &size);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         *status = sts;
         return;
       }
@@ -251,40 +258,40 @@ WVselGtk::WVselGtk(pwr_tStatus* status, void* wv_parent_ctx,
     /* Check syntax, if new volumes is found, show the window */
     sts = check_volumelist(1, &display_window);
 
-  if (strcmp(volname, "") && !display_window) {
+  if (strcmp(volname, "") && !display_window)
+  {
     sts = ldh_VolumeNameToId(wbctx, volname, &volid);
     WFoe::error_msg(sts);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       (vsel_bc_success)((void*)this, &volid, 1);
       if (vsel_bc_cancel != NULL)
         (vsel_bc_cancel)();
 
       *status = LOGIN__SUCCESS;
       return;
-    } else
+    }
+    else
       printf("-- Unable to open volume '%s', volume doesn't exist\n", volname);
   }
 
   // Create the window
-  widgets.toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      400, "default-width", 500, "title", name, NULL);
+  widgets.toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 400, "default-width", 500,
+                                              "title", name, NULL);
 
   CoWowGtk::SetWindowIcon(widgets.toplevel);
 
   // Menu
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(widgets.toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File Entry
-  GtkWidget* file_close
-      = gtk_menu_item_new_with_mnemonic("_Close");
-  g_signal_connect(
-      file_close, "activate", G_CALLBACK(WVselGtk::activate_close), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
+  g_signal_connect(file_close, "activate", G_CALLBACK(WVselGtk::activate_close), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
@@ -294,31 +301,27 @@ WVselGtk::WVselGtk(pwr_tStatus* status, void* wv_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // Functions Entry
-  GtkWidget* functions_showall
-      = gtk_check_menu_item_new_with_mnemonic("_Show All Volumes");
-  g_signal_connect(functions_showall, "activate",
-      G_CALLBACK(WVselGtk::activate_showall), this);
-  gtk_widget_add_accelerator(functions_showall, "activate", accel_g, 'a',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  GtkWidget* functions_showall = gtk_check_menu_item_new_with_mnemonic("_Show All Volumes");
+  g_signal_connect(functions_showall, "activate", G_CALLBACK(WVselGtk::activate_showall), this);
+  gtk_widget_add_accelerator(functions_showall, "activate", accel_g, 'a', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* functions_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_showall);
 
   GtkWidget* functions = gtk_menu_item_new_with_mnemonic("F_unctions");
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), functions);
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
 
   // List widget
   store = gtk_list_store_new(1, G_TYPE_STRING);
 
-  widgets.volumelist = (GtkWidget*)g_object_new(GTK_TYPE_TREE_VIEW, "model",
-      store, "rules-hint", TRUE, "headers-visible", FALSE, "reorderable", TRUE,
-      "enable-search", TRUE, "search-column", 0, NULL);
+  widgets.volumelist =
+      (GtkWidget*)g_object_new(GTK_TYPE_TREE_VIEW, "model", store, "rules-hint", TRUE, "headers-visible",
+                               FALSE, "reorderable", TRUE, "enable-search", TRUE, "search-column", 0, NULL);
 
   text_renderer = gtk_cell_renderer_text_new();
-  name_column = gtk_tree_view_column_new_with_attributes(
-      NULL, text_renderer, "text", 0, NULL);
+  name_column = gtk_tree_view_column_new_with_attributes(NULL, text_renderer, "text", 0, NULL);
 
   g_object_set(name_column, "resizable", TRUE, "clickable", TRUE, NULL);
 
@@ -371,10 +374,7 @@ WVselGtk::~WVselGtk()
   gtk_widget_destroy(widgets.toplevel);
 }
 
-void WVselGtk::list_clear()
-{
-  gtk_list_store_clear(store);
-}
+void WVselGtk::list_clear() { gtk_list_store_clear(store); }
 
 void WVselGtk::list_add_item(char* str)
 {

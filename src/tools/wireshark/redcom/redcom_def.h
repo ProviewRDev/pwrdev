@@ -1,7 +1,8 @@
 
 /* From rt_redcom.c */
 
-typedef enum {
+typedef enum
+{
   eAction__ = 0,
   eAction_export,
   eAction_import,
@@ -9,7 +10,8 @@ typedef enum {
   eAction_
 } eAction;
 
-typedef enum {
+typedef enum
+{
   eEvent__ = 0,
   eEvent_connect,
   eEvent_down,
@@ -42,7 +44,8 @@ typedef enum {
 #define qcom_cInacp (1 << 31 | 106)
 #define qcom_cIini (1 << 31 | 107)
 
-typedef enum {
+typedef enum
+{
   qcom_eBtype__ = 0,
   qcom_eBtype_system,
   qcom_eBtype_qcom,
@@ -50,7 +53,8 @@ typedef enum {
   qcom_eBtype_ = 200
 } qcom_eBtype;
 
-typedef enum {
+typedef enum
+{
   qcom_eStype__ = 0,
   qcom_eStype_linkConnect,
   qcom_eStype_linkDisconnect,
@@ -75,7 +79,8 @@ typedef enum {
 #define redu_cQixPrio9 ((1 << 31) | 13)
 #define redu_cQixPrio10 ((1 << 31) | 14)
 
-typedef enum {
+typedef enum
+{
   redu_eMsgType_Table,
   redu_eMsgType_Cyclic,
   redu_eMsgType_TableRequest,
@@ -83,7 +88,8 @@ typedef enum {
   redu_eMsgType_TableVersion
 } redu_eMsgType;
 
-typedef enum {
+typedef enum
+{
   redu_ePrio_0 = 0,
   redu_ePrio_1 = 1,
   redu_ePrio_2 = 2,

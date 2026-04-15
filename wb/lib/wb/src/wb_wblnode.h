@@ -48,7 +48,8 @@ class wb_dbs;
 class wb_import;
 class wb_treeimport;
 
-typedef enum {
+typedef enum
+{
   wbl_eNodeType_No,
   wbl_eNodeType_Type,
   wbl_eNodeType_TypeDef,
@@ -65,47 +66,44 @@ typedef enum {
 
 typedef wb_wblnode* ref_wblnode;
 
-typedef struct {
+typedef struct
+{
   const char* sym;
   int value;
 } wbl_sSym;
 
-class wbl_class {
+class wbl_class
+{
 public:
-  wbl_class() : cid(0), cix(0), templ(0), code(0)
-  {
-  }
+  wbl_class() : cid(0), cix(0), templ(0), code(0) {}
   pwr_tCid cid;
   int cix;
   ref_wblnode templ;
   ref_wblnode code;
 };
 
-class wbl_type {
+class wbl_type
+{
 public:
-  wbl_type() : tid(0), type(pwr_eType_), elements(0), size(0)
-  {
-  }
+  wbl_type() : tid(0), type(pwr_eType_), elements(0), size(0) {}
   pwr_tTid tid;
   pwr_eType type;
   int elements;
   size_t size;
 };
 
-class wbl_body {
+class wbl_body
+{
 public:
-  wbl_body() : bix(pwr_eBix__), size(0)
-  {
-  }
+  wbl_body() : bix(pwr_eBix__), size(0) {}
   pwr_eBix bix;
   size_t size;
 };
 
-class wbl_attribute {
+class wbl_attribute
+{
 public:
-  wbl_attribute() : tid(0), size(0), offset(0), elements(0), flags(0), index(0)
-  {
-  }
+  wbl_attribute() : tid(0), size(0), offset(0), elements(0), flags(0), index(0) {}
   pwr_tTid tid;
   size_t size;
   size_t offset;
@@ -115,15 +113,15 @@ public:
   pwr_eType type;
 };
 
-class wbl_template {
+class wbl_template
+{
 public:
-  wbl_template() : created(0)
-  {
-  }
+  wbl_template() : created(0) {}
   bool created;
 };
 
-class wbl_object {
+class wbl_object
+{
 public:
   wbl_object();
   ~wbl_object()
@@ -160,13 +158,12 @@ public:
   wbl_template templ;
 };
 
-class wb_wblnode : public wbl_ast_node {
+class wb_wblnode : public wbl_ast_node
+{
   friend class wb_vrepwbl;
 
 public:
-  wb_wblnode() : node_type(wbl_eNodeType_No), file(0), o(0)
-  {
-  }
+  wb_wblnode() : node_type(wbl_eNodeType_No), file(0), o(0) {}
   ~wb_wblnode()
   {
     if (o)
@@ -174,14 +171,8 @@ public:
   }
 
   void info(int level);
-  wb_wblnode* getFirstChild()
-  {
-    return (wb_wblnode*)fch;
-  }
-  wb_wblnode* getNextSibling()
-  {
-    return (wb_wblnode*)fws;
-  }
+  wb_wblnode* getFirstChild() { return (wb_wblnode*)fch; }
+  wb_wblnode* getNextSibling() { return (wb_wblnode*)fws; }
   void setNextSibling(wb_wblnode* n)
   {
     n->fws = fws;
@@ -197,50 +188,17 @@ public:
       lch = c;
     fch = c;
   }
-  bool isType()
-  {
-    return (node_type == wbl_eNodeType_Type);
-  }
-  bool isTypeDef()
-  {
-    return (node_type == wbl_eNodeType_TypeDef);
-  }
-  bool isClassDef()
-  {
-    return (node_type == wbl_eNodeType_ClassDef);
-  }
-  bool isObjBodyDef()
-  {
-    return (node_type == wbl_eNodeType_ObjBodyDef);
-  }
-  bool isAttribute()
-  {
-    return (node_type == wbl_eNodeType_Attribute);
-  }
-  bool isBodyNode()
-  {
-    return (node_type == wbl_eNodeType_BodyNode);
-  }
-  bool isAttrNode()
-  {
-    return (node_type == wbl_eNodeType_AttrNode);
-  }
-  bool isTemplate()
-  {
-    return (node_type == wbl_eNodeType_Template);
-  }
-  bool isCode()
-  {
-    return (node_type == wbl_eNodeType_Code);
-  }
-  bool isVolume()
-  {
-    return (node_type == wbl_eNodeType_Volume);
-  }
-  bool isBuffer()
-  {
-    return (node_type == wbl_eNodeType_Buffer);
-  }
+  bool isType() { return (node_type == wbl_eNodeType_Type); }
+  bool isTypeDef() { return (node_type == wbl_eNodeType_TypeDef); }
+  bool isClassDef() { return (node_type == wbl_eNodeType_ClassDef); }
+  bool isObjBodyDef() { return (node_type == wbl_eNodeType_ObjBodyDef); }
+  bool isAttribute() { return (node_type == wbl_eNodeType_Attribute); }
+  bool isBodyNode() { return (node_type == wbl_eNodeType_BodyNode); }
+  bool isAttrNode() { return (node_type == wbl_eNodeType_AttrNode); }
+  bool isTemplate() { return (node_type == wbl_eNodeType_Template); }
+  bool isCode() { return (node_type == wbl_eNodeType_Code); }
+  bool isVolume() { return (node_type == wbl_eNodeType_Volume); }
+  bool isBuffer() { return (node_type == wbl_eNodeType_Buffer); }
 
   void setFile(wb_wblfile* f);
   char* getFileName()
@@ -255,8 +213,9 @@ public:
   {
     if (file)
       return file->time;
-    else {
-      pwr_tTime t = { 0, 0 };
+    else
+    {
+      pwr_tTime t = {0, 0};
       return t;
     }
   }
@@ -264,31 +223,23 @@ public:
   void build(bool recursive);
   void postBuild();
   void buildObjBodyDef(ref_wblnode classdef);
-  void buildAttribute(ref_wblnode classdef, ref_wblnode objbodydef, int* bindex,
-      size_t* boffset);
-  void buildBuffer(ref_wblnode classdef, ref_wblnode objbodydef, int* bindex,
-      size_t* boffset);
+  void buildAttribute(ref_wblnode classdef, ref_wblnode objbodydef, int* bindex, size_t* boffset);
+  void buildBuffer(ref_wblnode classdef, ref_wblnode objbodydef, int* bindex, size_t* boffset);
   void buildTemplate(ref_wblnode classdef);
   void buildBody(ref_wblnode object);
   void buildAttr(ref_wblnode object, pwr_eBix bix);
-  void buildBuff(ref_wblnode object, pwr_eBix bix, pwr_tCid buffer_cid,
-      int buffer_offset, int buffer_size);
-  void buildBuffAttr(ref_wblnode object, pwr_eBix bix, pwr_tCid buffer_cid,
-      size_t buffer_offset, size_t buffer_size);
-  void link(
-      wb_vrepwbl* vol, ref_wblnode father_node, ref_wblnode parent_ast = 0);
+  void buildBuff(ref_wblnode object, pwr_eBix bix, pwr_tCid buffer_cid, int buffer_offset, int buffer_size);
+  void buildBuffAttr(ref_wblnode object, pwr_eBix bix, pwr_tCid buffer_cid, size_t buffer_offset,
+                     size_t buffer_size);
+  void link(wb_vrepwbl* vol, ref_wblnode father_node, ref_wblnode parent_ast = 0);
   void info_link(int level);
   ref_wblnode find(wb_name* oname, int level);
   ref_wblnode get_o_lch();
   int classNameToCid(char* cname, pwr_tCid* cid);
   int stringToOix(const char* buf, pwr_tOix* oix) const;
   int stringToTime(const char* buf, pwr_tTime* time) const;
-  pwr_tCid Cid()
-  {
-    return o->c.cid;
-  }
-  int attrStringToValue(int type_id, char* value_str, void* buffer_ptr,
-      size_t buff_size, size_t attr_size);
+  pwr_tCid Cid() { return o->c.cid; }
+  int attrStringToValue(int type_id, char* value_str, void* buffer_ptr, size_t buff_size, size_t attr_size);
 
   bool exportHead(wb_import& i);
   bool exportDbody(wb_import& i);
@@ -298,10 +249,7 @@ public:
 
   static int lookup(int* type, const char* keyword, wbl_sSym* table);
   static int convconst(int* val, char* str);
-  const char* name()
-  {
-    return getText();
-  }
+  const char* name() { return getText(); }
   bool docBlock(char** block, int* size) const;
 
   wbl_eNodeType node_type;

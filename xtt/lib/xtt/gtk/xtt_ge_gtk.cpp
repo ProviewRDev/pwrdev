@@ -53,29 +53,29 @@ typedef void* Widget;
 #include "xtt_log.h"
 #include "xtt_xnav.h"
 
-void XttGeGtk::get_context_menu(void* mdata,
-    xmenu_mUtility caller, unsigned int priv, char* arg, int x, int y)
+void XttGeGtk::get_context_menu(void* mdata, xmenu_mUtility caller, unsigned int priv, char* arg, int x,
+                                int y)
 {
   GtkWidget* popup;
-  ge_sContextMenuData *menudata = (ge_sContextMenuData *)mdata;
-  GtkWidget *mb;
+  ge_sContextMenuData* menudata = (ge_sContextMenuData*)mdata;
+  GtkWidget* mb;
 
   popup = (GtkWidget*)g_object_new(GTK_TYPE_MENU, NULL);
   contextmenudata = menudata;
 
-  for (int i = 0; i < int(sizeof(menudata->item_text)/sizeof(menudata->item_text[0])); i++) {
+  for (int i = 0; i < int(sizeof(menudata->item_text) / sizeof(menudata->item_text[0])); i++)
+  {
     if (streq(menudata->item_text[i], ""))
       break;
     mb = gtk_menu_item_new_with_label(CoWowGtk::translate_utf8(menudata->item_text[i]));
     g_object_set_data((GObject*)mb, "userdata", (gpointer)((long int)i));
-    g_signal_connect(mb, "activate", G_CALLBACK(activate_context_menu_button),
-        this);
+    g_signal_connect(mb, "activate", G_CALLBACK(activate_context_menu_button), this);
     gtk_menu_shell_append(GTK_MENU_SHELL(popup), mb);
     gtk_widget_show(mb);
   }
 
-  //popupmenu_x = x;
-  //popupmenu_y = y;
+  // popupmenu_x = x;
+  // popupmenu_y = y;
 
   GdkEvent ev;
   memset(&ev, 0, sizeof(ev));
@@ -86,8 +86,7 @@ void XttGeGtk::get_context_menu(void* mdata,
   gtk_menu_popup_at_pointer(GTK_MENU(popup), &ev);
 }
 
-gboolean XttGeGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean XttGeGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   XttGeGtk* ge = (XttGeGtk*)data;
 
@@ -109,18 +108,18 @@ void XttGeGtk::iconify(int val)
     gtk_window_deiconify(GTK_WINDOW(toplevel));
 }
 
-void XttGeGtk::set_below(int val)
-{
-  gtk_window_set_keep_below(GTK_WINDOW(toplevel), val);
-}
+void XttGeGtk::set_below(int val) { gtk_window_set_keep_below(GTK_WINDOW(toplevel), val); }
 
-void XttGeGtk::set_aspect_ratio(int width, int height) {
+void XttGeGtk::set_aspect_ratio(int width, int height)
+{
   static float rd = 0.0;
   static int rd_read = 0;
 
-  if (!rd_read) {
+  if (!rd_read)
+  {
     char str[80];
-    if (cnf_get_value("geAspectRatioDelta", str, sizeof(str))) {
+    if (cnf_get_value("geAspectRatioDelta", str, sizeof(str)))
+    {
       sscanf(str, "%f", &rd);
     }
     if (width < 300 || height < 300)
@@ -132,8 +131,7 @@ void XttGeGtk::set_aspect_ratio(int width, int height) {
   GdkGeometry geometry;
   geometry.min_aspect = gdouble(width) / height * (1.0 - rd);
   geometry.max_aspect = gdouble(width) / height * (1.0 + rd);
-  gtk_window_set_geometry_hints(
-      GTK_WINDOW(toplevel), GTK_WIDGET(toplevel), &geometry, GDK_HINT_ASPECT);
+  gtk_window_set_geometry_hints(GTK_WINDOW(toplevel), GTK_WIDGET(toplevel), &geometry, GDK_HINT_ASPECT);
 }
 
 void XttGeGtk::set_size(int width, int height)
@@ -151,15 +149,18 @@ void XttGeGtk::set_size(int width, int height)
   if (graph->is_dashboard())
     default_height += 10;
 
-  //gtk_window_resize(GTK_WINDOW(toplevel), default_width, default_height);
+  // gtk_window_resize(GTK_WINDOW(toplevel), default_width, default_height);
 
   // This condition is due to a bug in Reflection X 11.0.5...
-  if (!((XNav*)parent_ctx)->gbl.no_graph_ratio) {
+  if (!((XNav*)parent_ctx)->gbl.no_graph_ratio)
+  {
     // Note, equal min and max aspect will cause recursive resize on LXDE
-    if (!resize_restrictions_set) {
-      if (!(options & ge_mOptions_ResizeFree)) {
-	if (grow_GetWindowResize(graph->grow->ctx) == 0)
-	  set_aspect_ratio(default_width, default_height);
+    if (!resize_restrictions_set)
+    {
+      if (!(options & ge_mOptions_ResizeFree))
+      {
+        if (grow_GetWindowResize(graph->grow->ctx) == 0)
+          set_aspect_ratio(default_width, default_height);
       }
       resize_restrictions_set = 1;
     }
@@ -171,8 +172,8 @@ void XttGeGtk::set_size(int width, int height)
 void XttGeGtk::menu_setup(int edit)
 {
   int sensitive = edit;
-  
-  //gtk_widget_set_sensitive(file_save, sensitive);
+
+  // gtk_widget_set_sensitive(file_save, sensitive);
   gtk_widget_set_sensitive(edit_add, sensitive);
   gtk_widget_set_sensitive(edit_delete, sensitive);
   gtk_widget_set_sensitive(edit_copy, sensitive);
@@ -187,7 +188,8 @@ void XttGeGtk::ge_change_value_cb(void* ge_ctx, void* value_object, char* text)
 {
   XttGeGtk* ge = (XttGeGtk*)ge_ctx;
 
-  if (ge->value_input_open) {
+  if (ge->value_input_open)
+  {
     g_object_set(ge->value_dialog, "visible", FALSE, NULL);
     ge->value_input_open = 0;
     return;
@@ -200,8 +202,7 @@ void XttGeGtk::ge_change_value_cb(void* ge_ctx, void* value_object, char* text)
 
   gint pos = 0;
   gtk_editable_delete_text(GTK_EDITABLE(ge->value_input), 0, -1);
-  gtk_editable_insert_text(
-      GTK_EDITABLE(ge->value_input), text, strlen(text), &pos);
+  gtk_editable_insert_text(GTK_EDITABLE(ge->value_input), text, strlen(text), &pos);
   gtk_editable_set_position(GTK_EDITABLE(ge->value_input), -1);
   gtk_editable_select_region(GTK_EDITABLE(ge->value_input), 0, -1);
 
@@ -213,7 +214,8 @@ void XttGeGtk::confirm_cb(void* ge_ctx, void* confirm_object, char* text)
 {
   XttGe* ge = (XttGe*)ge_ctx;
 
-  if (ge->confirm_open) {
+  if (ge->confirm_open)
+  {
     g_object_set(((XttGeGtk*)ge)->confirm_widget, "visible", FALSE, NULL);
     ge->confirm_open = 0;
     return;
@@ -251,7 +253,8 @@ void XttGeGtk::activate_value_input(GtkWidget* w, gpointer data)
   char* text;
 
   text = gtk_editable_get_chars(GTK_EDITABLE(w), 0, -1);
-  if (ge->value_input_open) {
+  if (ge->value_input_open)
+  {
     ge->graph->change_value(ge->current_value_object, text);
     g_object_set(((XttGeGtk*)ge)->value_dialog, "visible", FALSE, NULL);
     ge->value_input_open = 0;
@@ -288,15 +291,15 @@ void XttGeGtk::activate_confirm_cancel(GtkWidget* w, gpointer data)
   ge->confirm_open = 0;
   g_object_set(((XttGeGtk*)ge)->confirm_widget, "visible", FALSE, NULL);
   if (ge->eventlog_cb)
-    (ge->eventlog_cb)(
-        ge->parent_ctx, ge, xttlog_eCategory_GeConfirmCancel, 0, 0);
+    (ge->eventlog_cb)(ge->parent_ctx, ge, xttlog_eCategory_GeConfirmCancel, 0, 0);
 }
 
 void XttGeGtk::activate_exit(GtkWidget* w, gpointer data)
 {
   XttGe* ge = (XttGe*)data;
 
-  if (ge->graph->is_dashboard() && ge->graph->is_modified()) {
+  if (ge->graph->is_dashboard() && ge->graph->is_modified())
+  {
     ge->activate_exit_modified();
     return;
   }
@@ -309,76 +312,45 @@ void XttGeGtk::activate_exit(GtkWidget* w, gpointer data)
 
 void XttGeGtk::activate_edit(GtkWidget* w, gpointer data)
 {
-  int edit = (int)gtk_check_menu_item_get_active(
-      GTK_CHECK_MENU_ITEM(((XttGeGtk*)data)->file_edit));
+  int edit = (int)gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(((XttGeGtk*)data)->file_edit));
 
-  ((XttGe *)data)->activate_edit(edit);
-  ((XttGeGtk *)data)->menu_setup(edit);
+  ((XttGe*)data)->activate_edit(edit);
+  ((XttGeGtk*)data)->menu_setup(edit);
 }
 
-void XttGeGtk::activate_open(GtkWidget* w, gpointer data)
-{
-  ((XttGe *)data)->activate_open();
-}
+void XttGeGtk::activate_open(GtkWidget* w, gpointer data) { ((XttGe*)data)->activate_open(); }
 
-void XttGeGtk::activate_add(GtkWidget* w, gpointer data)
-{
-  ((XttGe *)data)->activate_add();
-}
+void XttGeGtk::activate_add(GtkWidget* w, gpointer data) { ((XttGe*)data)->activate_add(); }
 
-void XttGeGtk::activate_delete(GtkWidget* w, gpointer data)
-{
-  ((XttGe *)data)->activate_delete();
-}
+void XttGeGtk::activate_delete(GtkWidget* w, gpointer data) { ((XttGe*)data)->activate_delete(); }
 
-void XttGeGtk::activate_copy(GtkWidget* w, gpointer data)
-{
-  ((XttGe *)data)->activate_copy();
-}
+void XttGeGtk::activate_copy(GtkWidget* w, gpointer data) { ((XttGe*)data)->activate_copy(); }
 
-void XttGeGtk::activate_paste(GtkWidget* w, gpointer data)
-{
-  ((XttGe *)data)->activate_paste();
-}
+void XttGeGtk::activate_paste(GtkWidget* w, gpointer data) { ((XttGe*)data)->activate_paste(); }
 
-void XttGeGtk::activate_connect(GtkWidget* w, gpointer data)
-{
-  ((XttGe *)data)->activate_connect();
-}
+void XttGeGtk::activate_connect(GtkWidget* w, gpointer data) { ((XttGe*)data)->activate_connect(); }
 
-void XttGeGtk::activate_merge(GtkWidget* w, gpointer data)
-{
-  ((XttGe *)data)->activate_merge();
-}
+void XttGeGtk::activate_merge(GtkWidget* w, gpointer data) { ((XttGe*)data)->activate_merge(); }
 
-void XttGeGtk::activate_clear(GtkWidget* w, gpointer data)
-{
-  ((XttGe *)data)->activate_clear();
-}
+void XttGeGtk::activate_clear(GtkWidget* w, gpointer data) { ((XttGe*)data)->activate_clear(); }
 
 void XttGeGtk::activate_cellattributes(GtkWidget* w, gpointer data)
 {
-  ((XttGe *)data)->activate_cellattributes();
+  ((XttGe*)data)->activate_cellattributes();
 }
 
 void XttGeGtk::activate_graphattributes(GtkWidget* w, gpointer data)
 {
-  ((XttGe *)data)->activate_graphattributes();
+  ((XttGe*)data)->activate_graphattributes();
 }
 
-void XttGeGtk::activate_save(GtkWidget* w, gpointer data)
-{
-  ((XttGe *)data)->activate_save();
-}
+void XttGeGtk::activate_save(GtkWidget* w, gpointer data) { ((XttGe*)data)->activate_save(); }
 
-void XttGeGtk::activate_saveas(GtkWidget* w, gpointer data)
-{
-  ((XttGe *)data)->activate_saveas();
-}
+void XttGeGtk::activate_saveas(GtkWidget* w, gpointer data) { ((XttGe*)data)->activate_saveas(); }
 
 void XttGeGtk::activate_setcolortheme(GtkWidget* w, gpointer data)
 {
-  ((XttGe *)data)->activate_setcolortheme();
+  ((XttGe*)data)->activate_setcolortheme();
 }
 
 void XttGeGtk::activate_zoom_in(GtkWidget* w, gpointer data)
@@ -413,7 +385,7 @@ void XttGeGtk::activate_context_menu_button(GtkWidget* w, gpointer data)
 {
   XttGe* ge = (XttGe*)data;
   int idx;
-  ge_sContextMenuData *menudata = (ge_sContextMenuData *)ge->contextmenudata;
+  ge_sContextMenuData* menudata = (ge_sContextMenuData*)ge->contextmenudata;
 
   idx = (int)(unsigned long)g_object_get_data((GObject*)w, "userdata");
 
@@ -423,8 +395,7 @@ void XttGeGtk::activate_context_menu_button(GtkWidget* w, gpointer data)
     (ge->command_cb)(ge->parent_ctx, menudata->item_action[idx], 0, 0, ge);
 }
 
-void XttGeGtk::action_resize(
-    GtkWidget* w, GtkAllocation* allocation, gpointer data)
+void XttGeGtk::action_resize(GtkWidget* w, GtkAllocation* allocation, gpointer data)
 {
   XttGe* ge = (XttGe*)data;
 
@@ -445,40 +416,34 @@ XttGeGtk::~XttGeGtk()
     gtk_widget_destroy(toplevel);
 }
 
-void XttGeGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void XttGeGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
-void XttGeGtk::iconify()
-{
-  gtk_window_iconify(GTK_WINDOW(toplevel));
-}
+void XttGeGtk::iconify() { gtk_window_iconify(GTK_WINDOW(toplevel)); }
 
-void XttGeGtk::set_title(char *t)
+void XttGeGtk::set_title(char* t)
 {
-  char* titleutf8
-      = g_convert(t, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  char* titleutf8 = g_convert(t, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
 
   gtk_window_set_title(GTK_WINDOW(toplevel), titleutf8);
 
   g_free(titleutf8);
 }
 
-static char* filename_to_widgetname(char *fname)
+static char* filename_to_widgetname(char* fname)
 {
   static pwr_tFileName str;
-  char *s;
+  char* s;
 
   s = strrchr(fname, '/');
   if (s)
-    strncpy(str, s+1, sizeof(str));
-  else {
+    strncpy(str, s + 1, sizeof(str));
+  else
+  {
     if (fname[0] == '@')
       strncpy(str, &fname[1], sizeof(str));
     else
       strncpy(str, fname, sizeof(str));
-  }  
+  }
   s = strchr(str, '.');
   if (s)
     *s = 0;
@@ -493,31 +458,23 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer ge)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-static gint nav_delete_event(GtkWidget* w, GdkEvent* event, gpointer ge)
-{
-  return TRUE;
-}
+static gint nav_delete_event(GtkWidget* w, GdkEvent* event, gpointer ge) { return TRUE; }
 
-XttGeGtk::XttGeGtk(GtkWidget* xg_parent_wid, void* xg_parent_ctx,
-    const char* xg_name, const char* xg_filename, int xg_scrollbar, int xg_menu,
-    int xg_navigator, int xg_width, int xg_height, int x, int y,
-    double scan_time, const char* object_name, int use_default_access,
-    unsigned int access, unsigned int options, void* basewidget,
-    double* borders, int color_theme, int dashboard,
-    int (*xg_command_cb)(void*, char*, char*, char *, void*),
-    int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-    int (*xg_is_authorized_cb)(void*, unsigned int),
-    void (*xg_keyboard_cb)(void*, void*, int, int))
-    : XttGe(xg_parent_ctx, xg_name, xg_filename, xg_scrollbar, xg_menu,
-          xg_navigator, xg_width, xg_height, x, y, scan_time, object_name,
-          use_default_access, access, options, color_theme, xg_command_cb,
-          xg_get_current_objects_cb, xg_is_authorized_cb, xg_keyboard_cb),
-      parent_wid(xg_parent_wid), nav_shell(0), value_dialog(0),
-      confirm_widget(0), message_dia_widget(0)
+XttGeGtk::XttGeGtk(GtkWidget* xg_parent_wid, void* xg_parent_ctx, const char* xg_name,
+                   const char* xg_filename, int xg_scrollbar, int xg_menu, int xg_navigator, int xg_width,
+                   int xg_height, int x, int y, double scan_time, const char* object_name,
+                   int use_default_access, unsigned int access, unsigned int options, void* basewidget,
+                   double* borders, int color_theme, int dashboard,
+                   int (*xg_command_cb)(void*, char*, char*, char*, void*),
+                   int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+                   int (*xg_is_authorized_cb)(void*, unsigned int),
+                   void (*xg_keyboard_cb)(void*, void*, int, int))
+    : XttGe(xg_parent_ctx, xg_name, xg_filename, xg_scrollbar, xg_menu, xg_navigator, xg_width, xg_height, x,
+            y, scan_time, object_name, use_default_access, access, options, color_theme, xg_command_cb,
+            xg_get_current_objects_cb, xg_is_authorized_cb, xg_keyboard_cb),
+      parent_wid(xg_parent_wid), nav_shell(0), value_dialog(0), confirm_widget(0), message_dia_widget(0)
 {
   int window_width = 600;
   int window_height = 500;
@@ -526,26 +483,29 @@ XttGeGtk::XttGeGtk(GtkWidget* xg_parent_wid, void* xg_parent_ctx,
   char title[300];
   int dashboard_reconfigure = 0;
 
-  if (xg_width != 0 && xg_height != 0) {
+  if (xg_width != 0 && xg_height != 0)
+  {
     window_width = xg_width;
     window_height = xg_height;
-  } else {
-    sts = Graph::get_dimension(
-	filename, "pwrp_exe:", dashboard, &window_width, &window_height);
-    if (EVEN(sts)) {
+  }
+  else
+  {
+    sts = Graph::get_dimension(filename, "pwrp_exe:", dashboard, &window_width, &window_height);
+    if (EVEN(sts))
+    {
       window_width = 600;
       window_height = 500;
       dashboard_reconfigure = 1;
     }
   }
   str_StrncpyCutOff(title, name, sizeof(title), 1);
-  char* titleutf8
-      = g_convert(title, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  char* titleutf8 = g_convert(title, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
 
   // Gtk
-  if (!(options & ge_mOptions_Embedded)) {
-    toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-        window_height, "default-width", window_width, "title", titleutf8, NULL);
+  if (!(options & ge_mOptions_Embedded))
+  {
+    toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height, "default-width",
+                                        window_width, "title", titleutf8, NULL);
     g_free(titleutf8);
 
     if (options & ge_mOptions_ResizeFree)
@@ -557,35 +517,34 @@ XttGeGtk::XttGeGtk(GtkWidget* xg_parent_wid, void* xg_parent_ctx,
     if (options & ge_mOptions_HideDecorations)
       gtk_window_set_decorated(GTK_WINDOW(toplevel), FALSE);
 
-    if (options & ge_mOptions_Dialog) {
-      gtk_window_set_type_hint(
-          GTK_WINDOW(toplevel), GDK_WINDOW_TYPE_HINT_DIALOG);
-      gtk_widget_set_size_request(
-          GTK_WIDGET(toplevel), window_width, window_height);
+    if (options & ge_mOptions_Dialog)
+    {
+      gtk_window_set_type_hint(GTK_WINDOW(toplevel), GDK_WINDOW_TYPE_HINT_DIALOG);
+      gtk_widget_set_size_request(GTK_WIDGET(toplevel), window_width, window_height);
       gtk_window_set_resizable(GTK_WINDOW(toplevel), FALSE);
     }
 
     g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
     g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-    g_signal_connect(
-        toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
+    g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
     CoWowGtk::SetWindowIcon(toplevel);
 
-    if (basewidget) {
-      gtk_window_set_transient_for(
-          GTK_WINDOW(toplevel), GTK_WINDOW(basewidget));
+    if (basewidget)
+    {
+      gtk_window_set_transient_for(GTK_WINDOW(toplevel), GTK_WINDOW(basewidget));
     }
     if (options & ge_mOptions_IsMain)
       CoWow::SetTransient(toplevel);
-
-  } else {
+  }
+  else
+  {
     toplevel = parent_wid;
   }
 
-  if (xg_menu || dashboard) {
-    GtkAccelGroup* accel_g
-        = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  if (xg_menu || dashboard)
+  {
+    GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
     gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
     menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
@@ -593,178 +552,137 @@ XttGeGtk::XttGeGtk(GtkWidget* xg_parent_wid, void* xg_parent_ctx,
     // File Entry
     GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
 
-    if (dashboard) {
-      file_edit = gtk_check_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("_Edit"));
-      g_signal_connect(
-          file_edit, "activate", G_CALLBACK(activate_edit), this);
-      gtk_widget_add_accelerator(file_edit, "activate", accel_g, 'e',
-	  GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    if (dashboard)
+    {
+      file_edit = gtk_check_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Edit"));
+      g_signal_connect(file_edit, "activate", G_CALLBACK(activate_edit), this);
+      gtk_widget_add_accelerator(file_edit, "activate", accel_g, 'e', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
       gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_edit);
 
-      GtkWidget* file_open = gtk_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("_Open"));
-      g_signal_connect(
-          file_open, "activate", G_CALLBACK(activate_open), this);
+      GtkWidget* file_open = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Open"));
+      g_signal_connect(file_open, "activate", G_CALLBACK(activate_open), this);
       gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_open);
 
-      GtkWidget* file_save = gtk_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("_Save"));
-      g_signal_connect(
-          file_save, "activate", G_CALLBACK(activate_save), this);
-      gtk_widget_add_accelerator(file_save, "activate", accel_g, 's',
-	  GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+      GtkWidget* file_save = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Save"));
+      g_signal_connect(file_save, "activate", G_CALLBACK(activate_save), this);
+      gtk_widget_add_accelerator(file_save, "activate", accel_g, 's', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
       gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_save);
 
-      GtkWidget* file_saveas = gtk_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("S_ave as"));
-      g_signal_connect(
-          file_saveas, "activate", G_CALLBACK(activate_saveas), this);
+      GtkWidget* file_saveas = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("S_ave as"));
+      g_signal_connect(file_saveas, "activate", G_CALLBACK(activate_saveas), this);
       gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_saveas);
 
-      if (strcmp(title, "PwR Dashboard") == 0) {
-	GtkWidget *file_clear = gtk_menu_item_new_with_mnemonic(
-	    CoWowGtk::translate_utf8("C_lear"));
-	g_signal_connect(
-            file_clear, "activate", G_CALLBACK(activate_clear), this);
-	gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_clear);
+      if (strcmp(title, "PwR Dashboard") == 0)
+      {
+        GtkWidget* file_clear = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("C_lear"));
+        g_signal_connect(file_clear, "activate", G_CALLBACK(activate_clear), this);
+        gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_clear);
       }
 
-      GtkWidget* file_setcolortheme = gtk_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("S_et Colortheme"));
-      g_signal_connect(
-          file_setcolortheme, "activate", G_CALLBACK(activate_setcolortheme), this);
-      gtk_widget_add_accelerator(file_setcolortheme, "activate", accel_g, 't',
-	  GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+      GtkWidget* file_setcolortheme =
+          gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("S_et Colortheme"));
+      g_signal_connect(file_setcolortheme, "activate", G_CALLBACK(activate_setcolortheme), this);
+      gtk_widget_add_accelerator(file_setcolortheme, "activate", accel_g, 't', GDK_CONTROL_MASK,
+                                 GTK_ACCEL_VISIBLE);
       gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_setcolortheme);
     }
 
-    GtkWidget* file_close
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Close"));
+    GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Close"));
     g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
-    gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-	GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
     gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
 
-    GtkWidget* file
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
+    GtkWidget* file = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
     // Edit Entry
-    if (dashboard) {
+    if (dashboard)
+    {
       GtkMenu* edit_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
 
-      edit_add = gtk_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("_Add"));
-      g_signal_connect(
-          edit_add, "activate", G_CALLBACK(activate_add), this);
+      edit_add = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Add"));
+      g_signal_connect(edit_add, "activate", G_CALLBACK(activate_add), this);
       gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_add);
 
-      edit_delete = gtk_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("_Delete"));
-      g_signal_connect(
-          edit_delete, "activate", G_CALLBACK(activate_delete), this);
+      edit_delete = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Delete"));
+      g_signal_connect(edit_delete, "activate", G_CALLBACK(activate_delete), this);
       gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_delete);
 
-      edit_copy = gtk_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("_Copy"));
-      g_signal_connect(
-          edit_copy, "activate", G_CALLBACK(activate_copy), this);
-      gtk_widget_add_accelerator(edit_copy, "activate", accel_g, 'c',
-	  GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+      edit_copy = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Copy"));
+      g_signal_connect(edit_copy, "activate", G_CALLBACK(activate_copy), this);
+      gtk_widget_add_accelerator(edit_copy, "activate", accel_g, 'c', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
       gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_copy);
 
-      edit_paste = gtk_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("_Paste"));
-      g_signal_connect(
-          edit_paste, "activate", G_CALLBACK(activate_paste), this);
-      gtk_widget_add_accelerator(edit_paste, "activate", accel_g, 'v',
-	  GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+      edit_paste = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Paste"));
+      g_signal_connect(edit_paste, "activate", G_CALLBACK(activate_paste), this);
+      gtk_widget_add_accelerator(edit_paste, "activate", accel_g, 'v', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
       gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_paste);
 
-      edit_connect = gtk_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("C_onnect"));
-      g_signal_connect(
-          edit_connect, "activate", G_CALLBACK(activate_connect), this);
+      edit_connect = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("C_onnect"));
+      g_signal_connect(edit_connect, "activate", G_CALLBACK(activate_connect), this);
       gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_connect);
 
-      edit_merge = gtk_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("_Merge"));
-      g_signal_connect(
-          edit_merge, "activate", G_CALLBACK(activate_merge), this);
+      edit_merge = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Merge"));
+      g_signal_connect(edit_merge, "activate", G_CALLBACK(activate_merge), this);
       gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_merge);
 
-      edit_cellattributes = gtk_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("Cell_Attributes"));
-      g_signal_connect(
-          edit_cellattributes, "activate", G_CALLBACK(activate_cellattributes), this);
+      edit_cellattributes = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Cell_Attributes"));
+      g_signal_connect(edit_cellattributes, "activate", G_CALLBACK(activate_cellattributes), this);
       gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_cellattributes);
 
-      edit_graphattributes = gtk_menu_item_new_with_mnemonic(
-          CoWowGtk::translate_utf8("_GraphAttributes"));
-      g_signal_connect(
-          edit_graphattributes, "activate", G_CALLBACK(activate_graphattributes), this);
-      gtk_widget_add_accelerator(edit_cellattributes, "activate", accel_g, 'a',
-	  GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+      edit_graphattributes = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_GraphAttributes"));
+      g_signal_connect(edit_graphattributes, "activate", G_CALLBACK(activate_graphattributes), this);
+      gtk_widget_add_accelerator(edit_cellattributes, "activate", accel_g, 'a', GDK_CONTROL_MASK,
+                                 GTK_ACCEL_VISIBLE);
       gtk_menu_shell_append(GTK_MENU_SHELL(edit_menu), edit_graphattributes);
 
-      GtkWidget* edit
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Edit"));
+      GtkWidget* edit = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Edit"));
       gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), edit);
       gtk_menu_item_set_submenu(GTK_MENU_ITEM(edit), GTK_WIDGET(edit_menu));
     }
 
     // View menu
-    if (!dashboard) {
-      GtkWidget* view_zoom_in
-          = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _in"));
-      g_signal_connect(
-          view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
-      gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-          GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+    if (!dashboard)
+    {
+      GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _in"));
+      g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoom_in), this);
+      gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-      GtkWidget* view_zoom_out
-          = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _out"));
-      g_signal_connect(
-          view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
-      gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-          GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+      GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _out"));
+      g_signal_connect(view_zoom_out, "activate", G_CALLBACK(activate_zoom_out), this);
+      gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GDK_CONTROL_MASK,
+                                 GTK_ACCEL_VISIBLE);
 
-      GtkWidget* view_zoom_reset
-          = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _reset"));
-      g_signal_connect(
-          view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
+      GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _reset"));
+      g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(activate_zoom_reset), this);
 
       GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
       gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_in);
       gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_out);
       gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_reset);
 
-      GtkWidget* view
-          = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
+      GtkWidget* view = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
       gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), view);
       gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
     }
 
     // Menu Help
-    GtkWidget* help_help
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+    GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
     g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
 
     GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
 
-    GtkWidget* help
-        = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+    GtkWidget* help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
   }
 
   graph_form = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  graph = new GraphGtk(this, graph_form, "Plant", &grow_widget, &sts,
-      "pwrp_exe:", graph_eMode_Runtime, scrollbar, 1, object_name,
-      use_default_access, access, 0, color_theme, dashboard, ge_keyboard_cb);
+  graph =
+      new GraphGtk(this, graph_form, "Plant", &grow_widget, &sts, "pwrp_exe:", graph_eMode_Runtime, scrollbar,
+                   1, object_name, use_default_access, access, 0, color_theme, dashboard, ge_keyboard_cb);
   // graph->set_scantime( scan_time);
   graph->get_current_colors_cb = &get_current_colors_cb;
   graph->set_current_colors_cb = &set_current_colors_cb;
@@ -789,36 +707,34 @@ XttGeGtk::XttGeGtk(GtkWidget* xg_parent_wid, void* xg_parent_ctx,
 
   // g_signal_connect( graph_form, "check_resize", G_CALLBACK(action_resize),
   // this);
-  g_signal_connect(((GraphGtk*)graph)->grow_widget, "size_allocate",
-      G_CALLBACK(action_resize), this);
+  g_signal_connect(((GraphGtk*)graph)->grow_widget, "size_allocate", G_CALLBACK(action_resize), this);
 
   if (xg_menu)
-    gtk_box_pack_start(
-        GTK_BOX(graph_form), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
-  gtk_box_pack_start(
-      GTK_BOX(graph_form), GTK_WIDGET(grow_widget), TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(graph_form), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(graph_form), GTK_WIDGET(grow_widget), TRUE, TRUE, 0);
 
-  if (!(options & ge_mOptions_Embedded)) {
+  if (!(options & ge_mOptions_Embedded))
+  {
     gtk_container_add(GTK_CONTAINER(toplevel), graph_form);
 
     gtk_widget_show_all(toplevel);
 
-    if (navigator) {
+    if (navigator)
+    {
       // Create navigator popup
-      nav_shell = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-          200, "default-width", 200, "title", "Navigator", NULL);
-      g_signal_connect(
-          nav_shell, "delete_event", G_CALLBACK(nav_delete_event), this);
+      nav_shell = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 200, "default-width", 200,
+                                           "title", "Navigator", NULL);
+      g_signal_connect(nav_shell, "delete_event", G_CALLBACK(nav_delete_event), this);
 
       ((GraphGtk*)graph)->create_navigator(nav_shell);
-      gtk_container_add(
-          GTK_CONTAINER(nav_shell), ((GraphGtk*)graph)->nav_widget);
+      gtk_container_add(GTK_CONTAINER(nav_shell), ((GraphGtk*)graph)->nav_widget);
 
       gtk_widget_show_all(nav_shell);
       ((Graph*)graph)->set_nav_background_color();
     }
 
-    if (!(x == 0 && y == 0)) {
+    if (!(x == 0 && y == 0))
+    {
       // Set position
       gtk_window_move(GTK_WINDOW(toplevel), x, y);
     }
@@ -833,14 +749,17 @@ XttGeGtk::XttGeGtk(GtkWidget* xg_parent_wid, void* xg_parent_ctx,
       gtk_window_iconify(GTK_WINDOW(toplevel));
     else if (options & ge_mOptions_Invisible)
       g_object_set(toplevel, "visible", FALSE, NULL);
-  } else {
+  }
+  else
+  {
     gtk_widget_set_size_request(graph_form, window_width, window_height);
   }
 
   if (borders)
     ((Graph*)graph)->set_borders(borders);
 
-  if (streq(filename, "_none_") && xg_width == 0 && xg_height == 0) {
+  if (streq(filename, "_none_") && xg_width == 0 && xg_height == 0)
+  {
     // Set size from current layout
     double x0, y0, x1, y1, zoom;
     float rd = 0.05;
@@ -872,7 +791,8 @@ XttGeGtk::XttGeGtk(GtkWidget* xg_parent_wid, void* xg_parent_ctx,
     gtk_widget_set_size_request(toplevel, window_width, window_height);
   }
 
-  if (dashboard) {
+  if (dashboard)
+  {
     menu_setup(0);
     if (dashboard_reconfigure)
       graph->dashboard_reconfigure();
@@ -890,49 +810,40 @@ void XttGeGtk::create_confirm_dialog()
 {
   pwr_tFileName fname;
 
-  if (confirm_widget) {
+  if (confirm_widget)
+  {
     g_object_set(confirm_widget, "visible", TRUE, NULL);
     return;
   }
 
   // Create a confirm window
-  confirm_widget = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      150, "default-width", 400, "title", CoWowGtk::translate_utf8("Confirm"),
-      NULL);
-  g_signal_connect(
-      confirm_widget, "delete_event", G_CALLBACK(confirm_delete_event), this);
+  confirm_widget = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 150, "default-width", 400,
+                                            "title", CoWowGtk::translate_utf8("Confirm"), NULL);
+  g_signal_connect(confirm_widget, "delete_event", G_CALLBACK(confirm_delete_event), this);
   confirm_label = gtk_label_new("");
   dcli_translate_filename(fname, "$pwr_exe/xtt_question.png");
   GtkWidget* confirm_image = gtk_image_new_from_file(fname);
 
-  GtkWidget* confirm_ok
-      = gtk_button_new_with_label(CoWowGtk::translate_utf8("Yes"));
+  GtkWidget* confirm_ok = gtk_button_new_with_label(CoWowGtk::translate_utf8("Yes"));
   gtk_widget_set_size_request(confirm_ok, 70, 25);
-  g_signal_connect(
-      confirm_ok, "clicked", G_CALLBACK(activate_confirm_ok), this);
+  g_signal_connect(confirm_ok, "clicked", G_CALLBACK(activate_confirm_ok), this);
 
-  GtkWidget* confirm_cancel
-      = gtk_button_new_with_label(CoWowGtk::translate_utf8("No"));
+  GtkWidget* confirm_cancel = gtk_button_new_with_label(CoWowGtk::translate_utf8("No"));
   gtk_widget_set_size_request(confirm_cancel, 70, 25);
-  g_signal_connect(
-      confirm_cancel, "clicked", G_CALLBACK(activate_confirm_cancel), this);
+  g_signal_connect(confirm_cancel, "clicked", G_CALLBACK(activate_confirm_cancel), this);
 
   GtkWidget* confirm_hboxtext = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-  gtk_box_pack_start(
-      GTK_BOX(confirm_hboxtext), confirm_image, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(confirm_hboxtext), confirm_image, FALSE, FALSE, 15);
   gtk_box_pack_start(GTK_BOX(confirm_hboxtext), confirm_label, TRUE, TRUE, 15);
 
   GtkWidget* confirm_hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(confirm_hboxbuttons), confirm_ok, FALSE, FALSE, 30);
-  gtk_box_pack_end(
-      GTK_BOX(confirm_hboxbuttons), confirm_cancel, FALSE, FALSE, 30);
+  gtk_box_pack_end(GTK_BOX(confirm_hboxbuttons), confirm_cancel, FALSE, FALSE, 30);
 
   GtkWidget* confirm_vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(confirm_vbox), confirm_hboxtext, TRUE, TRUE, 30);
-  gtk_box_pack_start(
-      GTK_BOX(confirm_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
-  gtk_box_pack_end(
-      GTK_BOX(confirm_vbox), confirm_hboxbuttons, FALSE, FALSE, 15);
+  gtk_box_pack_start(GTK_BOX(confirm_vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
+  gtk_box_pack_end(GTK_BOX(confirm_vbox), confirm_hboxbuttons, FALSE, FALSE, 15);
   gtk_container_add(GTK_CONTAINER(confirm_widget), confirm_vbox);
   gtk_widget_show_all(confirm_widget);
 }

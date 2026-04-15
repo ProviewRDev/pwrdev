@@ -61,24 +61,12 @@ typedef struct
 
 #define pwr_BindMethods(Class) pwr_sMethodBinding pwr_g##Class##_Methods[]
 #define pwr_BindClasses(Type) pwr_sClassBinding pwr_g##Type##_ClassMethods[]
-#define pwr_BindClass(Class)                                                                                 \
-  {                                                                                                          \
-#Class, (pwr_sMethodBinding(*)[])pwr_g##Class##_Methods                                                  \
-  }
-#define pwr_BindMethod(Method)                                                                               \
-  {                                                                                                          \
-#Method, (pwr_tStatus(*)())Method                                                                        \
-  }
+#define pwr_BindClass(Class) {#Class, (pwr_sMethodBinding(*)[])pwr_g##Class##_Methods}
+#define pwr_BindMethod(Method) {#Method, (pwr_tStatus(*)())Method}
 
-#define pwr_NullMethod                                                                                       \
-  {                                                                                                          \
-    "", NULL                                                                                                 \
-  }
+#define pwr_NullMethod {"", NULL}
 
-#define pwr_NullClass                                                                                        \
-  {                                                                                                          \
-    "", NULL                                                                                                 \
-  }
+#define pwr_NullClass {"", NULL}
 
 /*----------------------------------------------------------------------------*\
   Prototypes for DbCallbacks

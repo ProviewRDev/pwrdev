@@ -5,7 +5,8 @@
 #include "rt_gdh.h"
 #include "co_tst_log.h"
 
-class wa_ldhtest {
+class wa_ldhtest
+{
   pwr_tStatus m_sts;
   ldh_tWorkbench m_ldhwb;
   ldh_tSession m_ldhses;
@@ -13,7 +14,7 @@ class wa_ldhtest {
   pwr_tObjName m_vname;
   pwr_tVid m_vid;
 
-  tst_log *m_log;
+  tst_log* m_log;
   pwr_tOid m_test;
   pwr_tOid m_test_h1;
   pwr_tOid m_test_h2;
@@ -21,10 +22,10 @@ class wa_ldhtest {
 
   pwr_tStatus check_object(pwr_tOid oid);
 
- public:
+public:
   wa_ldhtest();
   ~wa_ldhtest();
-  void vname(char *n) {strncpy(m_vname, n, sizeof(m_vname));}
+  void vname(char* n) { strncpy(m_vname, n, sizeof(m_vname)); }
   void Init();
   void Close();
   void ObjidToName();

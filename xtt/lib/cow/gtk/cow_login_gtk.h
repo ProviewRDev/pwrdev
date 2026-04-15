@@ -41,7 +41,8 @@
 
 #include "cow_login.h"
 
-struct login_widgets {
+struct login_widgets
+{
   GtkWidget* toplevel;
   GtkWidget* login_window;
   GtkWidget* label;
@@ -50,14 +51,14 @@ struct login_widgets {
   GtkWidget* passwordvalue;
 };
 
-class CoLoginGtk : public CoLogin {
+class CoLoginGtk : public CoLogin
+{
 public:
   GtkWidget* parent_wid;
   struct login_widgets widgets;
 
-  CoLoginGtk(void* wl_parent_ctx, GtkWidget* wl_parent_wid, const char* wl_name,
-      const char* wl_groupname, void (*wl_bc_success)(void*),
-      void (*wl_bc_cancel)(void*), void* base_widget, pwr_tStatus* sts);
+  CoLoginGtk(void* wl_parent_ctx, GtkWidget* wl_parent_wid, const char* wl_name, const char* wl_groupname,
+             void (*wl_bc_success)(void*), void (*wl_bc_cancel)(void*), void* base_widget, pwr_tStatus* sts);
   ~CoLoginGtk();
 
   pwr_tStatus get_values();

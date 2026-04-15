@@ -46,64 +46,77 @@
 
 /* Local function definitions */
 
-static void ASup_exec_io(io_tSupCtx Ctx, sASupLstLink* TimerLstP,
-    pwr_sClass_ASup* o, pwr_tFloat32 In, pwr_tBoolean con);
-static void DSup_exec_io(io_tSupCtx Ctx, sDSupLstLink* TimerLstP,
-    pwr_sClass_DSup* o, pwr_tBoolean In, pwr_tBoolean con);
+static void ASup_exec_io(io_tSupCtx Ctx, sASupLstLink* TimerLstP, pwr_sClass_ASup* o, pwr_tFloat32 In,
+                         pwr_tBoolean con);
+static void DSup_exec_io(io_tSupCtx Ctx, sDSupLstLink* TimerLstP, pwr_sClass_DSup* o, pwr_tBoolean In,
+                         pwr_tBoolean con);
 
-static pwr_tStatus io_ConnectToAnaSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
-    pwr_tObjid ObjId, pwr_tAddress ObjP /* Pointer to the object */
-    );
+static pwr_tStatus io_ConnectToAnaSupLst(io_tSupCtx Ctx, pwr_tClassId Class, pwr_tObjid ObjId,
+                                         pwr_tAddress ObjP /* Pointer to the object */
+);
 
-static pwr_tStatus io_ConnectToDigSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
-    pwr_tObjid ObjId, pwr_tAddress ObjP /* Pointer to the object */
-    );
+static pwr_tStatus io_ConnectToDigSupLst(io_tSupCtx Ctx, pwr_tClassId Class, pwr_tObjid ObjId,
+                                         pwr_tAddress ObjP /* Pointer to the object */
+);
 
 /*------------------------------------------------------------------------------
-* Detect an ASup object.
-* NOTE:
-*   This should be the same as the macro used by PLC,
-*   in rplc_src:rt_plc_macro_sup.h
-*/
-static void ASup_exec_io(io_tSupCtx Ctx, sASupLstLink* TimerLstP,
-    pwr_sClass_ASup* o, pwr_tFloat32 In, pwr_tBoolean con)
+ * Detect an ASup object.
+ * NOTE:
+ *   This should be the same as the macro used by PLC,
+ *   in rplc_src:rt_plc_macro_sup.h
+ */
+static void ASup_exec_io(io_tSupCtx Ctx, sASupLstLink* TimerLstP, pwr_sClass_ASup* o, pwr_tFloat32 In,
+                         pwr_tBoolean con)
 {
   sASupLstLink *NextLstP = NULL, *NextP; /* Diff. */
 
-  if ((o->High && In <= (o->CtrlLimit - o->Hysteres))
-      || (!o->High && In >= (o->CtrlLimit + o->Hysteres))) {
+  if ((o->High && In <= (o->CtrlLimit - o->Hysteres)) || (!o->High && In >= (o->CtrlLimit + o->Hysteres)))
+  {
     if (o->Action)
       o->Action = FALSE;
-    if (o->ReturnCheck) {
+    if (o->ReturnCheck)
+    {
       time_GetTime(&o->ReturnTime);
       o->ReturnCheck = FALSE;
       o->ReturnSend = TRUE;
     }
-    if (o->AlarmCheck && !o->DetectCheck) {
+    if (o->AlarmCheck && !o->DetectCheck)
+    {
       o->TimerFlag = FALSE;
       o->DetectCheck = TRUE;
     }
-  } else if (con
-      && ((o->High && In > o->CtrlLimit) || (!o->High && In < o->CtrlLimit))) {
+  }
+  else if (con && ((o->High && In > o->CtrlLimit) || (!o->High && In < o->CtrlLimit)))
+  {
     if (!o->Action)
       o->Action = TRUE;
-    if (o->AlarmCheck && o->DetectOn && !o->Blocked) {
-      if (o->DetectCheck) {
+    if (o->AlarmCheck && o->DetectOn && !o->Blocked)
+    {
+      if (o->DetectCheck)
+      {
         o->ActualValue = In;
 
         /* timer_in(o); */
 
         o->TimerCount = o->TimerTime / Ctx->TimerTime;
-        if (!o->TimerFlag && o->TimerCount > 0) {
+        if (!o->TimerFlag && o->TimerCount > 0)
+        {
           TimerLstP->TimerP = (plc_sTimer*)&o->TimerFlag;
-          if (Ctx->TimerLstP == NULL) {
+          if (Ctx->TimerLstP == NULL)
+          {
             Ctx->TimerLstP = TimerLstP;
-          } else {
-            if (Ctx->TimerLstP->NextTimerP == NULL) {
+          }
+          else
+          {
+            if (Ctx->TimerLstP->NextTimerP == NULL)
+            {
               Ctx->TimerLstP->NextTimerP = TimerLstP;
-            } else {
+            }
+            else
+            {
               NextP = Ctx->TimerLstP->NextTimerP;
-              while (NextP != NULL) {
+              while (NextP != NULL)
+              {
                 NextLstP = NextP;
                 NextP = NextP->NextTimerP;
               }
@@ -116,7 +129,8 @@ static void ASup_exec_io(io_tSupCtx Ctx, sASupLstLink* TimerLstP,
         time_GetTime(&o->DetectTime);
         o->DetectCheck = FALSE;
       }
-      if (!o->TimerFlag) {
+      if (!o->TimerFlag)
+      {
         o->DetectSend = TRUE;
         o->ReturnCheck = TRUE;
         o->Acked = FALSE;
@@ -127,48 +141,63 @@ static void ASup_exec_io(io_tSupCtx Ctx, sASupLstLink* TimerLstP,
 }
 
 /*------------------------------------------------------------------------------
-* Detect an DSup object.
-* NOTE:
-*   This should be the same as the macro used by PLC,
-*   in rplc_src:rt_plc_macro_sup.h
-*/
-static void DSup_exec_io(io_tSupCtx Ctx, sDSupLstLink* TimerLstP,
-    pwr_sClass_DSup* o, pwr_tBoolean In, pwr_tBoolean con)
+ * Detect an DSup object.
+ * NOTE:
+ *   This should be the same as the macro used by PLC,
+ *   in rplc_src:rt_plc_macro_sup.h
+ */
+static void DSup_exec_io(io_tSupCtx Ctx, sDSupLstLink* TimerLstP, pwr_sClass_DSup* o, pwr_tBoolean In,
+                         pwr_tBoolean con)
 {
   sDSupLstLink *NextLstP = NULL, *NextP; /* Diff. */
 
-  if (In != o->CtrlPosition) {
+  if (In != o->CtrlPosition)
+  {
     if (o->Action)
       o->Action = FALSE;
-    if (o->ReturnCheck) {
+    if (o->ReturnCheck)
+    {
       time_GetTime(&o->ReturnTime);
       o->ReturnCheck = FALSE;
       o->ReturnSend = TRUE;
     }
-    if (o->AlarmCheck && !o->DetectCheck) {
+    if (o->AlarmCheck && !o->DetectCheck)
+    {
       o->TimerCount = 0;
       o->DetectCheck = TRUE;
     }
-  } else if (con) {
+  }
+  else if (con)
+  {
     if (!o->Action)
       o->Action = TRUE;
-    if (o->AlarmCheck && o->DetectOn && !o->Blocked) {
-      if (o->DetectCheck) {
+    if (o->AlarmCheck && o->DetectOn && !o->Blocked)
+    {
+      if (o->DetectCheck)
+      {
         o->ActualValue = In;
 
         /* timer_in(o); */
 
         o->TimerCount = o->TimerTime / Ctx->TimerTime;
-        if (!o->TimerFlag && o->TimerCount > 0) {
+        if (!o->TimerFlag && o->TimerCount > 0)
+        {
           TimerLstP->TimerP = (plc_sTimer*)&o->TimerFlag;
-          if (Ctx->TimerLstP == NULL) {
+          if (Ctx->TimerLstP == NULL)
+          {
             Ctx->TimerLstP = (sASupLstLink*)TimerLstP;
-          } else {
-            if (Ctx->TimerLstP->NextTimerP == NULL) {
+          }
+          else
+          {
+            if (Ctx->TimerLstP->NextTimerP == NULL)
+            {
               Ctx->TimerLstP->NextTimerP = (sASupLstLink*)TimerLstP;
-            } else {
+            }
+            else
+            {
               NextP = (sDSupLstLink*)Ctx->TimerLstP->NextTimerP;
-              while (NextP != NULL) {
+              while (NextP != NULL)
+              {
                 NextLstP = NextP;
                 NextP = NextP->NextTimerP;
               }
@@ -181,7 +210,8 @@ static void DSup_exec_io(io_tSupCtx Ctx, sDSupLstLink* TimerLstP,
         time_GetTime(&o->DetectTime);
         o->DetectCheck = FALSE;
       }
-      if (!o->TimerFlag) {
+      if (!o->TimerFlag)
+      {
         o->DetectSend = TRUE;
         o->ReturnCheck = TRUE;
         o->Acked = FALSE;
@@ -192,23 +222,24 @@ static void DSup_exec_io(io_tSupCtx Ctx, sDSupLstLink* TimerLstP,
 }
 
 /*
-* Name:
-*   io_ConnectToSupLst
-*
-*
-* Function:
-*   Initialize list of Sup object for bus connected in- or output
-*   signals.
-* Description:
-*
-*/
-pwr_tStatus io_ConnectToSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
-    pwr_tObjid ObjId, pwr_tAddress ObjP /* Pointer to the object */
-    )
+ * Name:
+ *   io_ConnectToSupLst
+ *
+ *
+ * Function:
+ *   Initialize list of Sup object for bus connected in- or output
+ *   signals.
+ * Description:
+ *
+ */
+pwr_tStatus io_ConnectToSupLst(io_tSupCtx Ctx, pwr_tClassId Class, pwr_tObjid ObjId,
+                               pwr_tAddress ObjP /* Pointer to the object */
+)
 {
   pwr_tStatus sts;
 
-  switch (Class) {
+  switch (Class)
+  {
   case pwr_cClass_Di:
   case pwr_cClass_Do:
   case pwr_cClass_Po:
@@ -225,19 +256,19 @@ pwr_tStatus io_ConnectToSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
 }
 
 /*
-* Name:
-*   io_ConnectToAnaSupLst
-*
-*
-* Function:
-*   Initialize list of ASup object for bus connected analog in- och output
-*   signals.
-* Description:
-*
-*/
-static pwr_tStatus io_ConnectToAnaSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
-    pwr_tObjid ObjId, pwr_tAddress ObjP /* Pointer to the object */
-    )
+ * Name:
+ *   io_ConnectToAnaSupLst
+ *
+ *
+ * Function:
+ *   Initialize list of ASup object for bus connected analog in- och output
+ *   signals.
+ * Description:
+ *
+ */
+static pwr_tStatus io_ConnectToAnaSupLst(io_tSupCtx Ctx, pwr_tClassId Class, pwr_tObjid ObjId,
+                                         pwr_tAddress ObjP /* Pointer to the object */
+)
 {
   pwr_tStatus Sts;
   pwr_sClass_ASup* ASupP;
@@ -249,7 +280,8 @@ static pwr_tStatus io_ConnectToAnaSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
   sASupLstLink* ASupLstP;
   sASupLstLink *NextASupLstP = NULL, *NextP;
 
-  switch (Class) {
+  switch (Class)
+  {
   case pwr_cClass_Ai:
     AiP = (pwr_sClass_Ai*)ObjP;
     Float32P = gdh_TranslateRtdbPointer((unsigned long)AiP->ActualValue);
@@ -266,12 +298,14 @@ static pwr_tStatus io_ConnectToAnaSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
 
   /* Get child with class ASup */
   Sts = gdh_GetChild(ObjId, &SupId);
-  while (ODD(Sts)) {
+  while (ODD(Sts))
+  {
     Sts = gdh_GetObjectClass(SupId, &ObjClass);
     if (EVEN(Sts))
       return (Sts);
 
-    if (ObjClass == pwr_cClass_ASup) {
+    if (ObjClass == pwr_cClass_ASup)
+    {
       Sts = gdh_ObjidToPointer(SupId, (pwr_tAddress*)&ASupP);
       if (EVEN(Sts))
         return (Sts);
@@ -280,14 +314,21 @@ static pwr_tStatus io_ConnectToAnaSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
       ASupLstP->SupP = ASupP;
       ASupLstP->ValueP = Float32P;
 
-      if (Ctx->ASupAnaLstP == NULL) {
+      if (Ctx->ASupAnaLstP == NULL)
+      {
         Ctx->ASupAnaLstP = ASupLstP;
-      } else {
-        if (Ctx->ASupAnaLstP->NextP == NULL) {
+      }
+      else
+      {
+        if (Ctx->ASupAnaLstP->NextP == NULL)
+        {
           Ctx->ASupAnaLstP->NextP = ASupLstP;
-        } else {
+        }
+        else
+        {
           NextP = Ctx->ASupAnaLstP->NextP;
-          while (NextP != NULL) {
+          while (NextP != NULL)
+          {
             NextASupLstP = NextP;
             NextP = NextP->NextP;
           }
@@ -303,18 +344,18 @@ static pwr_tStatus io_ConnectToAnaSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
 } /* END io_ConnectToAnaSupLst */
 
 /*
-* Name:
-*   io_ConnectToDigSupLst
-*
-*
-* Function:
-*   Initialize list of DSup object for digitala in- och output signals.
-* Description:
-*
-*/
-static pwr_tStatus io_ConnectToDigSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
-    pwr_tObjid ObjId, pwr_tAddress ObjP /* Pointer to the object */
-    )
+ * Name:
+ *   io_ConnectToDigSupLst
+ *
+ *
+ * Function:
+ *   Initialize list of DSup object for digitala in- och output signals.
+ * Description:
+ *
+ */
+static pwr_tStatus io_ConnectToDigSupLst(io_tSupCtx Ctx, pwr_tClassId Class, pwr_tObjid ObjId,
+                                         pwr_tAddress ObjP /* Pointer to the object */
+)
 {
   pwr_tStatus Sts;
   pwr_sClass_DSup* DSupP;
@@ -327,7 +368,8 @@ static pwr_tStatus io_ConnectToDigSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
   sDSupLstLink* DSupLstP;
   sDSupLstLink *NextDSupLstP = NULL, *NextP;
 
-  switch (Class) {
+  switch (Class)
+  {
   case pwr_cClass_Di:
     DiP = (pwr_sClass_Di*)ObjP;
     BooleanP = gdh_TranslateRtdbPointer((unsigned long)DiP->ActualValue);
@@ -349,12 +391,14 @@ static pwr_tStatus io_ConnectToDigSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
 
   /* Get child with class DSup */
   Sts = gdh_GetChild(ObjId, &SupId);
-  while (ODD(Sts)) {
+  while (ODD(Sts))
+  {
     Sts = gdh_GetObjectClass(SupId, &ObjClass);
     if (EVEN(Sts))
       return (Sts);
 
-    if (ObjClass == pwr_cClass_DSup) {
+    if (ObjClass == pwr_cClass_DSup)
+    {
       Sts = gdh_ObjidToPointer(SupId, (pwr_tAddress*)&DSupP);
       if (EVEN(Sts))
         return (Sts);
@@ -364,14 +408,21 @@ static pwr_tStatus io_ConnectToDigSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
       DSupLstP->ValueP = BooleanP;
       DSupLstP->SupP->TimerDO = &(DSupLstP->SupP->TimerDODum);
 
-      if (Ctx->DSupDigLstP == NULL) {
+      if (Ctx->DSupDigLstP == NULL)
+      {
         Ctx->DSupDigLstP = DSupLstP;
-      } else {
-        if (Ctx->DSupDigLstP->NextP == NULL) {
+      }
+      else
+      {
+        if (Ctx->DSupDigLstP->NextP == NULL)
+        {
           Ctx->DSupDigLstP->NextP = DSupLstP;
-        } else {
+        }
+        else
+        {
           NextP = Ctx->DSupDigLstP->NextP;
-          while (NextP != NULL) {
+          while (NextP != NULL)
+          {
             NextDSupLstP = NextP;
             NextP = NextP->NextP;
           }
@@ -387,15 +438,15 @@ static pwr_tStatus io_ConnectToDigSupLst(io_tSupCtx Ctx, pwr_tClassId Class,
 } /* END io_ConnectToDigSupLst */
 
 /*
-* Name:
-*   io_InitSupLst
-*
-*
-* Function:
-*   Initialize timer used for bus connected analog in- and outputs.
-* Description:
-*
-*/
+ * Name:
+ *   io_InitSupLst
+ *
+ *
+ * Function:
+ *   Initialize timer used for bus connected analog in- and outputs.
+ * Description:
+ *
+ */
 pwr_tStatus io_InitSupLst(io_tSupCtx* Ctx, pwr_tFloat32 CycleTime)
 {
   *Ctx = calloc(1, sizeof(**Ctx));
@@ -408,15 +459,15 @@ pwr_tStatus io_InitSupLst(io_tSupCtx* Ctx, pwr_tFloat32 CycleTime)
 } /* END io_InitTimer */
 
 /*
-* Name:
-*   io_ScanAnaSupLst
-*
-*
-* Function:
-*   Scan bus connected analog in- and outputs ASup list.
-* Description:
-*
-*/
+ * Name:
+ *   io_ScanAnaSupLst
+ *
+ *
+ * Function:
+ *   Scan bus connected analog in- and outputs ASup list.
+ * Description:
+ *
+ */
 pwr_tStatus io_ScanSupLst(io_tSupCtx Ctx)
 {
   sASupLstLink* ASupLstP;
@@ -424,14 +475,16 @@ pwr_tStatus io_ScanSupLst(io_tSupCtx Ctx)
 
   /* Scan through the ASup list and execute ASup */
   ASupLstP = Ctx->ASupAnaLstP;
-  while (ASupLstP != NULL) {
+  while (ASupLstP != NULL)
+  {
     ASup_exec_io(Ctx, ASupLstP, ASupLstP->SupP, *ASupLstP->ValueP, TRUE);
     ASupLstP = ASupLstP->NextP;
   }
 
   /* Scan through DSup list and execute macro DSup_exec */
   DSupLstP = Ctx->DSupDigLstP;
-  while (DSupLstP != NULL) {
+  while (DSupLstP != NULL)
+  {
     DSup_exec_io(Ctx, DSupLstP, DSupLstP->SupP, *DSupLstP->ValueP, TRUE);
     DSupLstP = DSupLstP->NextP;
   }
@@ -442,15 +495,15 @@ pwr_tStatus io_ScanSupLst(io_tSupCtx Ctx)
 } /* END io_ScanSupLst */
 
 /*
-* Name:
-*   io_ScanSupTimerLst
-*
-*
-* Function:
-*   Scan timerlist.
-* Description:
-*
-*/
+ * Name:
+ *   io_ScanSupTimerLst
+ *
+ *
+ * Function:
+ *   Scan timerlist.
+ * Description:
+ *
+ */
 pwr_tStatus io_ScanSupTimerLst(io_tSupCtx Ctx)
 {
   sASupLstLink *TimerLstP, *PrevP = NULL;
@@ -459,9 +512,11 @@ pwr_tStatus io_ScanSupTimerLst(io_tSupCtx Ctx)
 
   /* Scan through the timer list */
   TimerLstP = Ctx->TimerLstP;
-  while (TimerLstP != NULL) {
+  while (TimerLstP != NULL)
+  {
     TimerP = TimerLstP->TimerP;
-    if ((TimerP->TimerCount <= 1) || !TimerP->TimerFlag) {
+    if ((TimerP->TimerCount <= 1) || !TimerP->TimerFlag)
+    {
       TimerP->TimerCount = 0;
       TimerP->TimerFlag = FALSE;
       if (PrevP != NULL)
@@ -471,7 +526,9 @@ pwr_tStatus io_ScanSupTimerLst(io_tSupCtx Ctx)
       NextTimerP = TimerLstP->NextTimerP;
       TimerLstP->NextTimerP = NULL;
       TimerLstP = NextTimerP;
-    } else {
+    }
+    else
+    {
       TimerP->TimerCount--;
       PrevP = TimerLstP;
       TimerLstP = TimerLstP->NextTimerP;
@@ -481,15 +538,15 @@ pwr_tStatus io_ScanSupTimerLst(io_tSupCtx Ctx)
 }
 
 /*
-* Name:
-*   io_ClearSupLst
-*
-*
-* Function:
-*   Free Sup lists.
-* Description:
-*
-*/
+ * Name:
+ *   io_ClearSupLst
+ *
+ *
+ * Function:
+ *   Free Sup lists.
+ * Description:
+ *
+ */
 pwr_tStatus io_ClearSupLst(io_tSupCtx Ctx)
 {
   sASupLstLink* ASupLstP;
@@ -501,7 +558,8 @@ pwr_tStatus io_ClearSupLst(io_tSupCtx Ctx)
 
   /* Reset all timers... */
   TimerLstP = Ctx->TimerLstP;
-  while (TimerLstP != NULL) {
+  while (TimerLstP != NULL)
+  {
     TimerP = TimerLstP->TimerP;
     TimerP->TimerCount = 0;
     TimerP->TimerFlag = FALSE;
@@ -513,7 +571,8 @@ pwr_tStatus io_ClearSupLst(io_tSupCtx Ctx)
   /* Free DSup list */
   DSupLstP = Ctx->DSupDigLstP;
   Ctx->DSupDigLstP = NULL;
-  while (DSupLstP != NULL) {
+  while (DSupLstP != NULL)
+  {
     DNextP = DSupLstP->NextP;
     free((char*)DSupLstP);
     DSupLstP = DNextP;
@@ -522,7 +581,8 @@ pwr_tStatus io_ClearSupLst(io_tSupCtx Ctx)
   /* Free ASup list */
   ASupLstP = Ctx->ASupAnaLstP;
   Ctx->ASupAnaLstP = NULL;
-  while (ASupLstP != NULL) {
+  while (ASupLstP != NULL)
+  {
     ANextP = ASupLstP->NextP;
     free((char*)ASupLstP);
     ASupLstP = ANextP;

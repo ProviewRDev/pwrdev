@@ -45,19 +45,22 @@
 
 class sev_server;
 
-class sev_node {
+class sev_node
+{
 public:
   pwr_tNodeId nid;
   char name[80];
 };
 
-typedef struct {
+typedef struct
+{
   tree_sNode node;
   pwr_tRefId id;
   int idx;
 } sev_sRefid;
 
-typedef struct {
+typedef struct
+{
   sev_server* sev;
   qcom_sQid tgt;
   sev_sMsgHistDataGetRequest* rmsg;
@@ -65,7 +68,8 @@ typedef struct {
   unsigned int item_idx;
 } sev_sHistDataThread;
 
-typedef struct {
+typedef struct
+{
   sev_server* sev;
   qcom_sQid tgt;
   sev_sMsgEventsGetRequest* rmsg;
@@ -73,7 +77,8 @@ typedef struct {
   unsigned int item_idx;
 } sev_sEventsThread;
 
-typedef struct {
+typedef struct
+{
   int key;
   pthread_t thread;
   que_sQue queue;
@@ -83,27 +88,35 @@ typedef struct {
   unsigned int reconnect_cnt;
 } sev_sThread;
 
-typedef struct {
+typedef struct
+{
   void* ctx;
   sev_sThread* th;
 } sev_sReceiveHistDataThread;
 
-typedef enum { sev_eQMsgType_HistData, sev_eQMsgType_Event } sev_eQMsgType;
+typedef enum
+{
+  sev_eQMsgType_HistData,
+  sev_eQMsgType_Event
+} sev_eQMsgType;
 
-typedef struct {
+typedef struct
+{
   sev_eQMsgType type;
   unsigned int version;
   lst_sEntry e;
   int size;
 } sev_sQMsgHeader;
 
-typedef struct {
+typedef struct
+{
   sev_sQMsgHeader h;
   net_sTime time;
   char data[1];
 } sev_sQMsgHistData;
 
-typedef struct {
+typedef struct
+{
   sev_sQMsgHeader h;
   int num_events;
   int item_idx;
@@ -112,12 +125,12 @@ typedef struct {
 
 typedef std::map<int, sev_sThread*>::iterator threadlist_iterator;
 
-class sev_server {
+class sev_server
+{
 public:
   sev_server()
-      : m_server_status(0), m_refid(0), m_msg_id(0), m_storage_cnt(0),
-        m_write_cnt(0), m_total_queue_cnt(0), m_db_type(sev_eDbType_Sqlite),
-        m_config(0), m_thread_cnt(0), m_read_threads(0), m_thread_key_node(0)
+      : m_server_status(0), m_refid(0), m_msg_id(0), m_storage_cnt(0), m_write_cnt(0), m_total_queue_cnt(0),
+        m_db_type(sev_eDbType_Sqlite), m_config(0), m_thread_cnt(0), m_read_threads(0), m_thread_key_node(0)
   {
     memset(&m_stat, 0, sizeof(m_stat));
   }
@@ -149,12 +162,9 @@ public:
   int request_items(pwr_tNid nid);
   int mainloop();
   int check_histitems(sev_sMsgHistItems* msg, unsigned int size);
-  int receive_histdata(
-      sev_sMsgHistDataStore* msg, unsigned int size, pwr_tNid nid);
-  int send_histdata(
-      qcom_sQid tgt, sev_sMsgHistDataGetRequest* msg, unsigned int size);
-  int send_objecthistdata(
-      qcom_sQid tgt, sev_sMsgHistDataGetRequest* rmsg, unsigned int size);
+  int receive_histdata(sev_sMsgHistDataStore* msg, unsigned int size, pwr_tNid nid);
+  int send_histdata(qcom_sQid tgt, sev_sMsgHistDataGetRequest* msg, unsigned int size);
+  int send_objecthistdata(qcom_sQid tgt, sev_sMsgHistDataGetRequest* rmsg, unsigned int size);
   static void* send_objecthistdata_thread(void* arg);
   int send_events(qcom_sQid tgt, sev_sMsgEventsGetRequest* rmsg, unsigned int size);
   static void* send_events_thread(void* arg);
@@ -162,16 +172,12 @@ public:
   int send_eventsitemlist(qcom_sQid tgt);
   int send_server_status(qcom_sQid tgt);
   int delete_item(qcom_sQid tgt, sev_sMsgHistItemDelete* rmsg);
-  int receive_events(
-      sev_sMsgEventsStore* msg, unsigned int size, pwr_tNodeId nid);
+  int receive_events(sev_sMsgEventsStore* msg, unsigned int size, pwr_tNodeId nid);
   void create_garbage_collector_thread();
   static void* garbage_collector_thread(void* arg);
   void garbage_collector(void* thread);
   void garbage_item(void* thread, int idx);
-  void set_dbtype(sev_eDbType type)
-  {
-    m_db_type = type;
-  }
+  void set_dbtype(sev_eDbType type) { m_db_type = type; }
   sev_sThread* find_thread(int key);
   static void* receive_histdata_thread(void* arg);
   sev_sThread* create_thread(int key);

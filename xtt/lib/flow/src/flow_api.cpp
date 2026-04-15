@@ -44,115 +44,55 @@
 #include "flow_triangle.h"
 #include "flow_api.h"
 
-int flow_Save(flow_tCtx ctx, char* filename)
-{
-  return ctx->save(filename, flow_eSaveMode_Edit);
-}
+int flow_Save(flow_tCtx ctx, char* filename) { return ctx->save(filename, flow_eSaveMode_Edit); }
 
-int flow_Open(flow_tCtx ctx, char* filename)
-{
-  return ctx->open(filename, flow_eSaveMode_Edit);
-}
+int flow_Open(flow_tCtx ctx, char* filename) { return ctx->open(filename, flow_eSaveMode_Edit); }
 
-int flow_SaveTrace(flow_tCtx ctx, char* filename)
-{
-  return ctx->save(filename, flow_eSaveMode_Trace);
-}
+int flow_SaveTrace(flow_tCtx ctx, char* filename) { return ctx->save(filename, flow_eSaveMode_Trace); }
 
-int flow_OpenTrace(flow_tCtx ctx, char* filename)
-{
-  return ctx->open(filename, flow_eSaveMode_Trace);
-}
+int flow_OpenTrace(flow_tCtx ctx, char* filename) { return ctx->open(filename, flow_eSaveMode_Trace); }
 
-void flow_DeleteAll(flow_tCtx ctx)
-{
-  ctx->delete_all();
-}
+void flow_DeleteAll(flow_tCtx ctx) { ctx->delete_all(); }
 
-void flow_DeleteNode(flow_tNode node)
-{
-  ((FlowNode*)node)->ctx->delete_object((FlowArrayElem*)node);
-}
+void flow_DeleteNode(flow_tNode node) { ((FlowNode*)node)->ctx->delete_object((FlowArrayElem*)node); }
 
-void flow_DeleteConnection(flow_tCon con)
-{
-  ((FlowCon*)con)->ctx->delete_object((FlowArrayElem*)con);
-}
+void flow_DeleteConnection(flow_tCon con) { ((FlowCon*)con)->ctx->delete_object((FlowArrayElem*)con); }
 
 int flow_FindSelectedObject(flow_tCtx ctx, flow_tObject object)
 {
   return ctx->select_find((FlowArrayElem*)object);
 }
 
-void flow_ResetHighlightAll(flow_tCtx ctx)
-{
-  ctx->set_highlight(0);
-}
+void flow_ResetHighlightAll(flow_tCtx ctx) { ctx->set_highlight(0); }
 
-void flow_ResetDimmedAll(flow_tCtx ctx)
-{
-  ctx->set_dimmed(0);
-}
+void flow_ResetDimmedAll(flow_tCtx ctx) { ctx->set_dimmed(0); }
 
-void flow_ResetInverseAll(flow_tCtx ctx)
-{
-  ctx->set_inverse(0);
-}
+void flow_ResetInverseAll(flow_tCtx ctx) { ctx->set_inverse(0); }
 
-void flow_ResetSelectHighlight(flow_tCtx ctx)
-{
-  ctx->set_select_highlight(0);
-}
+void flow_ResetSelectHighlight(flow_tCtx ctx) { ctx->set_select_highlight(0); }
 
-void flow_SetSelectHighlight(flow_tCtx ctx)
-{
-  ctx->set_select_highlight(1);
-}
+void flow_SetSelectHighlight(flow_tCtx ctx) { ctx->set_select_highlight(1); }
 
-void flow_ResetSelectInverse(flow_tCtx ctx)
-{
-  ctx->set_select_inverse(0);
-}
+void flow_ResetSelectInverse(flow_tCtx ctx) { ctx->set_select_inverse(0); }
 
-void flow_SetSelectInverse(flow_tCtx ctx)
-{
-  ctx->set_select_inverse(1);
-}
+void flow_SetSelectInverse(flow_tCtx ctx) { ctx->set_select_inverse(1); }
 
-void flow_SelectInsert(flow_tCtx ctx, flow_tObject object)
-{
-  ctx->select_insert((FlowArrayElem*)object);
-}
+void flow_SelectInsert(flow_tCtx ctx, flow_tObject object) { ctx->select_insert((FlowArrayElem*)object); }
 
-void flow_SelectRemove(flow_tCtx ctx, flow_tObject object)
-{
-  ctx->select_remove((FlowArrayElem*)object);
-}
+void flow_SelectRemove(flow_tCtx ctx, flow_tObject object) { ctx->select_remove((FlowArrayElem*)object); }
 
-void flow_SelectClear(flow_tCtx ctx)
-{
-  ctx->select_clear();
-}
+void flow_SelectClear(flow_tCtx ctx) { ctx->select_clear(); }
 
-void flow_PasteInsert(flow_tCtx ctx, flow_tObject object)
-{
-  ctx->paste_insert((FlowArrayElem*)object);
-}
+void flow_PasteInsert(flow_tCtx ctx, flow_tObject object) { ctx->paste_insert((FlowArrayElem*)object); }
 
-void flow_PasteRemove(flow_tCtx ctx, flow_tObject object)
-{
-  ctx->paste_remove((FlowArrayElem*)object);
-}
+void flow_PasteRemove(flow_tCtx ctx, flow_tObject object) { ctx->paste_remove((FlowArrayElem*)object); }
 
 void flow_ConPointSelectInsert(flow_tCtx ctx, flow_tObject object, int num)
 {
   ctx->conpoint_select((FlowArrayElem*)object, num);
 }
 
-void flow_ConPointSelectClear(flow_tCtx ctx)
-{
-  ctx->conpoint_select_clear();
-}
+void flow_ConPointSelectClear(flow_tCtx ctx) { ctx->conpoint_select_clear(); }
 
 void flow_GetSelectedNodes(flow_tCtx ctx, flow_tNode** nodes, int* num)
 {
@@ -164,33 +104,21 @@ void flow_GetSelectedCons(flow_tCtx ctx, flow_tCon** cons, int* num)
   ctx->get_selected_cons((FlowArrayElem***)cons, num);
 }
 
-void flow_SetHighlight(flow_tObject object, int value)
-{
-  ((FlowArrayElem*)object)->set_highlight(value);
-}
+void flow_SetHighlight(flow_tObject object, int value) { ((FlowArrayElem*)object)->set_highlight(value); }
 
 void flow_GetHighlight(flow_tObject object, int* value)
 {
   *value = ((FlowArrayElem*)object)->get_highlight();
 }
 
-void flow_SetDimmed(flow_tObject object, int value)
-{
-  ((FlowArrayElem*)object)->set_dimmed(value);
-}
+void flow_SetDimmed(flow_tObject object, int value) { ((FlowArrayElem*)object)->set_dimmed(value); }
 
-void flow_GetDimmed(flow_tObject object, int* value)
-{
-  *value = ((FlowArrayElem*)object)->get_dimmed();
-}
+void flow_GetDimmed(flow_tObject object, int* value) { *value = ((FlowArrayElem*)object)->get_dimmed(); }
 
-void flow_SetInverse(flow_tObject object, int value)
-{
-  ((FlowArrayElem*)object)->set_inverse(value);
-}
+void flow_SetInverse(flow_tObject object, int value) { ((FlowArrayElem*)object)->set_inverse(value); }
 
-void flow_CreateNode(flow_tCtx ctx, const char* name, flow_tNodeClass nc,
-    double x, double y, void* user_data, flow_tNode* node)
+void flow_CreateNode(flow_tCtx ctx, const char* name, flow_tNodeClass nc, double x, double y, void* user_data,
+                     flow_tNode* node)
 {
   FlowNode* n1;
   n1 = new FlowNode(ctx, name, (FlowNodeClass*)nc, x, y);
@@ -200,15 +128,13 @@ void flow_CreateNode(flow_tCtx ctx, const char* name, flow_tNodeClass nc,
   *node = (flow_tNode)n1;
 }
 
-void flow_CreateCon(flow_tCtx ctx, char* name, flow_tConClass cc,
-    flow_tNode source, flow_tNode dest, int source_conpoint, int dest_conpoint,
-    void* user_data, flow_tCon* con, int point_num, double* x_vect,
-    double* y_vect, int* rsts)
+void flow_CreateCon(flow_tCtx ctx, char* name, flow_tConClass cc, flow_tNode source, flow_tNode dest,
+                    int source_conpoint, int dest_conpoint, void* user_data, flow_tCon* con, int point_num,
+                    double* x_vect, double* y_vect, int* rsts)
 {
   FlowCon* c1;
-  c1 = new FlowCon(ctx, name, (FlowConClass*)cc, (FlowNode*)source,
-      (FlowNode*)dest, source_conpoint, dest_conpoint, rsts, 0, point_num,
-      x_vect, y_vect);
+  c1 = new FlowCon(ctx, name, (FlowConClass*)cc, (FlowNode*)source, (FlowNode*)dest, source_conpoint,
+                   dest_conpoint, rsts, 0, point_num, x_vect, y_vect);
   if (EVEN(*rsts))
     return;
 
@@ -218,8 +144,8 @@ void flow_CreateCon(flow_tCtx ctx, char* name, flow_tConClass cc,
   *con = (flow_tCon)c1;
 }
 
-void flow_CreatePasteNode(flow_tCtx ctx, char* name, flow_tNodeClass nc,
-    double x, double y, void* user_data, flow_tNode* node)
+void flow_CreatePasteNode(flow_tCtx ctx, char* name, flow_tNodeClass nc, double x, double y, void* user_data,
+                          flow_tNode* node)
 {
   FlowNode* n1;
   n1 = new FlowNode(ctx, name, (FlowNodeClass*)nc, x, y, 1);
@@ -228,15 +154,13 @@ void flow_CreatePasteNode(flow_tCtx ctx, char* name, flow_tNodeClass nc,
   *node = (flow_tNode)n1;
 }
 
-void flow_CreatePasteCon(flow_tCtx ctx, char* name, flow_tConClass cc,
-    flow_tNode source, flow_tNode dest, int source_conpoint, int dest_conpoint,
-    void* user_data, flow_tCon* con, int point_num, double* x_vect,
-    double* y_vect, int* rsts)
+void flow_CreatePasteCon(flow_tCtx ctx, char* name, flow_tConClass cc, flow_tNode source, flow_tNode dest,
+                         int source_conpoint, int dest_conpoint, void* user_data, flow_tCon* con,
+                         int point_num, double* x_vect, double* y_vect, int* rsts)
 {
   FlowCon* c1;
-  c1 = new FlowCon(ctx, name, (FlowConClass*)cc, (FlowNode*)source,
-      (FlowNode*)dest, source_conpoint, dest_conpoint, rsts, 1, point_num,
-      x_vect, y_vect);
+  c1 = new FlowCon(ctx, name, (FlowConClass*)cc, (FlowNode*)source, (FlowNode*)dest, source_conpoint,
+                   dest_conpoint, rsts, 1, point_num, x_vect, y_vect);
   if (EVEN(*rsts))
     return;
 
@@ -250,184 +174,147 @@ void flow_SetAnnotation(flow_tNode node, int number, const char* text, int size)
   ((FlowNode*)node)->set_annotation(number, text, size, 0);
 }
 
-void flow_SetPasteNodeAnnotation(
-    flow_tNode node, int number, char* text, int size)
+void flow_SetPasteNodeAnnotation(flow_tNode node, int number, char* text, int size)
 {
   ((FlowNode*)node)->set_annotation(number, text, size, 1);
 }
 
-void flow_EnableEvent(FlowCtx* ctx, flow_eEvent event,
-    flow_eEventType event_type,
-    int (*event_cb)(FlowCtx* ctx, flow_tEvent event))
+void flow_EnableEvent(FlowCtx* ctx, flow_eEvent event, flow_eEventType event_type,
+                      int (*event_cb)(FlowCtx* ctx, flow_tEvent event))
 {
   ctx->enable_event(event, event_type, event_cb);
 }
 
-void flow_DisableEvent(FlowCtx* ctx, flow_eEvent event)
+void flow_DisableEvent(FlowCtx* ctx, flow_eEvent event) { ctx->disable_event(event); }
+
+void flow_DisableEventAll(FlowCtx* ctx) { ctx->disable_event_all(); }
+
+void flow_Cut(flow_tCtx ctx) { ctx->cut(); }
+
+void flow_Copy(flow_tCtx ctx) { ctx->copy(); }
+
+void flow_Paste(flow_tCtx ctx) { ctx->paste(); }
+
+void flow_PasteClear(flow_tCtx ctx) { ctx->paste_clear(); }
+
+void flow_CreateRect(flow_tCtx ctx, double x, double y, double width, double height, flow_eDrawType draw_type,
+                     int line_width, flow_tObject* rect)
 {
-  ctx->disable_event(event);
+  *rect = (flow_tObject) new FlowRect(ctx, x, y, width, height, draw_type, line_width);
 }
 
-void flow_DisableEventAll(FlowCtx* ctx)
+void flow_CreateLine(flow_tCtx ctx, double x1, double y1, double x2, double y2, flow_eDrawType draw_type,
+                     int line_width, flow_tObject* line)
 {
-  ctx->disable_event_all();
+  *line = (flow_tObject) new FlowLine(ctx, x1, y1, x2, y2, draw_type, line_width);
 }
 
-void flow_Cut(flow_tCtx ctx)
+void flow_CreateArc(flow_tCtx ctx, double x1, double y1, double x2, double y2, int angle1, int angle2,
+                    flow_eDrawType draw_type, int line_width, flow_tObject* arc)
 {
-  ctx->cut();
+  *arc = (flow_tObject) new FlowArc(ctx, x1, y1, x2, y2, angle1, angle2, draw_type, line_width);
 }
 
-void flow_Copy(flow_tCtx ctx)
+void flow_CreateText(flow_tCtx ctx, char* text_str, double x, double y, flow_eDrawType draw_type,
+                     int text_size, flow_tObject* text)
 {
-  ctx->copy();
+  *text = (flow_tObject) new FlowText(ctx, text_str, x, y, draw_type, text_size);
 }
 
-void flow_Paste(flow_tCtx ctx)
+void flow_CreatePixmap(flow_tCtx ctx, flow_sPixmapData* pixmap_data, double x, double y,
+                       flow_eDrawType draw_type, int size, flow_tObject* pixmap)
 {
-  ctx->paste();
+  *pixmap = (flow_tObject) new FlowPixmap(ctx, pixmap_data, x, y, draw_type, size);
 }
 
-void flow_PasteClear(flow_tCtx ctx)
+void flow_CreateAnnot(flow_tCtx ctx, double x, double y, int number, flow_eDrawType draw_type, int text_size,
+                      flow_tObject* annot)
 {
-  ctx->paste_clear();
+  *annot = (flow_tObject) new FlowAnnot(ctx, x, y, number, draw_type, text_size);
 }
 
-void flow_CreateRect(flow_tCtx ctx, double x, double y, double width,
-    double height, flow_eDrawType draw_type, int line_width, flow_tObject* rect)
-{
-  *rect = (flow_tObject) new FlowRect(
-      ctx, x, y, width, height, draw_type, line_width);
-}
-
-void flow_CreateLine(flow_tCtx ctx, double x1, double y1, double x2, double y2,
-    flow_eDrawType draw_type, int line_width, flow_tObject* line)
-{
-  *line
-      = (flow_tObject) new FlowLine(ctx, x1, y1, x2, y2, draw_type, line_width);
-}
-
-void flow_CreateArc(flow_tCtx ctx, double x1, double y1, double x2, double y2,
-    int angle1, int angle2, flow_eDrawType draw_type, int line_width,
-    flow_tObject* arc)
-{
-  *arc = (flow_tObject) new FlowArc(
-      ctx, x1, y1, x2, y2, angle1, angle2, draw_type, line_width);
-}
-
-void flow_CreateText(flow_tCtx ctx, char* text_str, double x, double y,
-    flow_eDrawType draw_type, int text_size, flow_tObject* text)
-{
-  *text
-      = (flow_tObject) new FlowText(ctx, text_str, x, y, draw_type, text_size);
-}
-
-void flow_CreatePixmap(flow_tCtx ctx, flow_sPixmapData* pixmap_data, double x,
-    double y, flow_eDrawType draw_type, int size, flow_tObject* pixmap)
-{
-  *pixmap
-      = (flow_tObject) new FlowPixmap(ctx, pixmap_data, x, y, draw_type, size);
-}
-
-void flow_CreateAnnot(flow_tCtx ctx, double x, double y, int number,
-    flow_eDrawType draw_type, int text_size, flow_tObject* annot)
-{
-  *annot
-      = (flow_tObject) new FlowAnnot(ctx, x, y, number, draw_type, text_size);
-}
-
-void flow_CreateConPoint(flow_tCtx ctx, double x, double y, int number,
-    flow_eDirection direction, flow_tObject* conpoint)
+void flow_CreateConPoint(flow_tCtx ctx, double x, double y, int number, flow_eDirection direction,
+                         flow_tObject* conpoint)
 {
   *conpoint = (flow_tObject) new FlowConPoint(ctx, x, y, number, direction);
 }
 
-void flow_AddRect(flow_tNodeClass nc, double x, double y, double width,
-    double height, flow_eDrawType draw_type, int line_width,
-    flow_mDisplayLevel display_level)
+void flow_AddRect(flow_tNodeClass nc, double x, double y, double width, double height,
+                  flow_eDrawType draw_type, int line_width, flow_mDisplayLevel display_level)
 {
-  FlowRect* rect = new FlowRect(((FlowNodeClass*)nc)->ctx, x, y, width, height,
-      draw_type, line_width, 0, display_level);
+  FlowRect* rect =
+      new FlowRect(((FlowNodeClass*)nc)->ctx, x, y, width, height, draw_type, line_width, 0, display_level);
   ((FlowNodeClass*)nc)->insert(rect);
 }
 
-void flow_AddFilledRect(flow_tNodeClass nc, double x, double y, double width,
-    double height, flow_eDrawType draw_type, flow_mDisplayLevel display_level)
+void flow_AddFilledRect(flow_tNodeClass nc, double x, double y, double width, double height,
+                        flow_eDrawType draw_type, flow_mDisplayLevel display_level)
 {
-  FlowRect* rect = new FlowRect(((FlowNodeClass*)nc)->ctx, x, y, width, height,
-      draw_type, 0, 0, display_level, 1);
+  FlowRect* rect =
+      new FlowRect(((FlowNodeClass*)nc)->ctx, x, y, width, height, draw_type, 0, 0, display_level, 1);
   ((FlowNodeClass*)nc)->insert(rect);
 }
 
-void flow_AddTriangle(flow_tNodeClass nc, double x, double y, double width,
-    double height, flow_eDrawType draw_type, int line_width,
-    flow_mDisplayLevel display_level)
+void flow_AddTriangle(flow_tNodeClass nc, double x, double y, double width, double height,
+                      flow_eDrawType draw_type, int line_width, flow_mDisplayLevel display_level)
 {
-  FlowTriangle* triangle = new FlowTriangle(((FlowNodeClass*)nc)->ctx, x, y,
-      width, height, draw_type, line_width, 0, display_level);
+  FlowTriangle* triangle = new FlowTriangle(((FlowNodeClass*)nc)->ctx, x, y, width, height, draw_type,
+                                            line_width, 0, display_level);
   ((FlowNodeClass*)nc)->insert(triangle);
 }
 
-void flow_AddFilledTriangle(flow_tNodeClass nc, double x, double y,
-    double width, double height, flow_eDrawType draw_type,
-    flow_mDisplayLevel display_level)
+void flow_AddFilledTriangle(flow_tNodeClass nc, double x, double y, double width, double height,
+                            flow_eDrawType draw_type, flow_mDisplayLevel display_level)
 {
-  FlowTriangle* triangle = new FlowTriangle(((FlowNodeClass*)nc)->ctx, x, y,
-      width, height, draw_type, 0, 0, display_level, 1);
+  FlowTriangle* triangle =
+      new FlowTriangle(((FlowNodeClass*)nc)->ctx, x, y, width, height, draw_type, 0, 0, display_level, 1);
   ((FlowNodeClass*)nc)->insert(triangle);
 }
 
-void flow_AddLine(flow_tNodeClass nc, double x1, double y1, double x2,
-    double y2, flow_eDrawType draw_type, int line_width)
+void flow_AddLine(flow_tNodeClass nc, double x1, double y1, double x2, double y2, flow_eDrawType draw_type,
+                  int line_width)
 {
-  FlowLine* line = new FlowLine(
-      ((FlowNodeClass*)nc)->ctx, x1, y1, x2, y2, draw_type, line_width);
+  FlowLine* line = new FlowLine(((FlowNodeClass*)nc)->ctx, x1, y1, x2, y2, draw_type, line_width);
   ((FlowNodeClass*)nc)->insert(line);
 }
 
-void flow_AddArc(flow_tNodeClass nc, double x1, double y1, double x2, double y2,
-    int angle1, int angle2, flow_eDrawType draw_type, int line_width)
+void flow_AddArc(flow_tNodeClass nc, double x1, double y1, double x2, double y2, int angle1, int angle2,
+                 flow_eDrawType draw_type, int line_width)
 {
-  FlowArc* arc = new FlowArc(((FlowNodeClass*)nc)->ctx, x1, y1, x2, y2, angle1,
-      angle2, draw_type, line_width);
+  FlowArc* arc =
+      new FlowArc(((FlowNodeClass*)nc)->ctx, x1, y1, x2, y2, angle1, angle2, draw_type, line_width);
   ((FlowNodeClass*)nc)->insert(arc);
 }
 
-void flow_AddText(flow_tNodeClass nc, const char* text_str, double x, double y,
-    flow_eDrawType draw_type, int text_size)
+void flow_AddText(flow_tNodeClass nc, const char* text_str, double x, double y, flow_eDrawType draw_type,
+                  int text_size)
 {
-  FlowText* text = new FlowText(
-      ((FlowNodeClass*)nc)->ctx, text_str, x, y, draw_type, text_size);
+  FlowText* text = new FlowText(((FlowNodeClass*)nc)->ctx, text_str, x, y, draw_type, text_size);
   ((FlowNodeClass*)nc)->insert(text);
 }
 
-void flow_AddAnnot(flow_tNodeClass nc, double x, double y, int number,
-    flow_eDrawType draw_type, int text_size, flow_eAnnotType annot_type,
-    flow_mDisplayLevel display_level)
+void flow_AddAnnot(flow_tNodeClass nc, double x, double y, int number, flow_eDrawType draw_type,
+                   int text_size, flow_eAnnotType annot_type, flow_mDisplayLevel display_level)
 {
-  FlowAnnot* annot = new FlowAnnot(((FlowNodeClass*)nc)->ctx, x, y, number,
-      draw_type, text_size, annot_type, 0, display_level);
+  FlowAnnot* annot = new FlowAnnot(((FlowNodeClass*)nc)->ctx, x, y, number, draw_type, text_size, annot_type,
+                                   0, display_level);
   ((FlowNodeClass*)nc)->insert(annot);
 }
 
-void flow_AddConPoint(flow_tNodeClass nc, double x, double y, int number,
-    flow_eDirection direction)
+void flow_AddConPoint(flow_tNodeClass nc, double x, double y, int number, flow_eDirection direction)
 {
-  FlowConPoint* conpoint
-      = new FlowConPoint(((FlowNodeClass*)nc)->ctx, x, y, number, direction);
+  FlowConPoint* conpoint = new FlowConPoint(((FlowNodeClass*)nc)->ctx, x, y, number, direction);
   ((FlowNodeClass*)nc)->insert(conpoint);
 }
 
-void flow_CreatePushButton(flow_tCtx ctx, char* text, double x, double y,
-    double width, double height, flow_tObject* pushbutton)
+void flow_CreatePushButton(flow_tCtx ctx, char* text, double x, double y, double width, double height,
+                           flow_tObject* pushbutton)
 {
-  *pushbutton
-      = (flow_tObject) new FlowPushButton(ctx, text, x, y, width, height);
+  *pushbutton = (flow_tObject) new FlowPushButton(ctx, text, x, y, width, height);
   ctx->insert((FlowArrayElem*)*pushbutton);
 }
 
-void flow_CreateNodeClass(flow_tCtx ctx, const char* name,
-    flow_eNodeGroup group, flow_tNodeClass* nodeclass)
+void flow_CreateNodeClass(flow_tCtx ctx, const char* name, flow_eNodeGroup group, flow_tNodeClass* nodeclass)
 {
   *nodeclass = (flow_tNodeClass) new FlowNodeClass(ctx, name, group);
   ctx->nodeclass_insert((FlowArrayElem*)*nodeclass);
@@ -438,26 +325,18 @@ void flow_NodeClassAdd(flow_tNodeClass nc, flow_tObject object)
   ((FlowNodeClass*)nc)->insert((FlowArrayElem*)object);
 }
 
-void flow_CreateConClass(flow_tCtx ctx, const char* name,
-    flow_eConType con_type, flow_eCorner corner, flow_eDrawType line_type,
-    int line_width, double arrow_width, double arrow_length,
-    double round_corner_amount, flow_eConGroup group, flow_tConClass* conclass)
+void flow_CreateConClass(flow_tCtx ctx, const char* name, flow_eConType con_type, flow_eCorner corner,
+                         flow_eDrawType line_type, int line_width, double arrow_width, double arrow_length,
+                         double round_corner_amount, flow_eConGroup group, flow_tConClass* conclass)
 {
-  *conclass = (flow_tConClass) new FlowConClass(ctx, name, con_type, corner,
-      line_type, line_width, arrow_width, arrow_length, round_corner_amount,
-      group);
+  *conclass = (flow_tConClass) new FlowConClass(ctx, name, con_type, corner, line_type, line_width,
+                                                arrow_width, arrow_length, round_corner_amount, group);
   ctx->conclass_insert((FlowArrayElem*)*conclass);
 }
 
-void flow_SetDefaultConClass(flow_tCtx ctx, flow_tConClass conclass)
-{
-  ctx->set_default_conclass(conclass);
-}
+void flow_SetDefaultConClass(flow_tCtx ctx, flow_tConClass conclass) { ctx->set_default_conclass(conclass); }
 
-flow_tConClass flow_GetDefaultConClass(flow_tCtx ctx)
-{
-  return ctx->get_default_conclass();
-}
+flow_tConClass flow_GetDefaultConClass(flow_tCtx ctx) { return ctx->get_default_conclass(); }
 
 void flow_GetSelectList(flow_tCtx ctx, flow_tObject** list, int* cnt)
 {
@@ -474,49 +353,40 @@ void flow_GetObjectList(flow_tCtx ctx, flow_tObject** list, int* cnt)
   ctx->get_objectlist((FlowArrayElem***)list, cnt);
 }
 
-void flow_GetConPointSelectList(
-    flow_tCtx ctx, flow_tObject** list, int** num_list, int* cnt)
+void flow_GetConPointSelectList(flow_tCtx ctx, flow_tObject** list, int** num_list, int* cnt)
 {
   ctx->get_conpoint_selectlist((FlowArrayElem***)list, num_list, cnt);
 }
 
-flow_eObjectType flow_GetObjectType(flow_tObject object)
-{
-  return ((FlowArrayElem*)object)->type();
-}
+flow_eObjectType flow_GetObjectType(flow_tObject object) { return ((FlowArrayElem*)object)->type(); }
 
-void flow_MeasureNode(
-    flow_tNode node, double* ll_x, double* ll_y, double* ur_x, double* ur_y)
+void flow_MeasureNode(flow_tNode node, double* ll_x, double* ll_y, double* ur_x, double* ur_y)
 {
   ((FlowNode*)node)->measure(ll_x, ll_y, ur_x, ur_y);
 }
 
-int flow_PrintRegion(flow_tCtx ctx, double ll_x, double ll_y, double ur_x,
-    double ur_y, char* filename)
+int flow_PrintRegion(flow_tCtx ctx, double ll_x, double ll_y, double ur_x, double ur_y, char* filename)
 {
   return ctx->print_region(ll_x, ll_y, ur_x, ur_y, filename);
 }
 
-int flow_PrintPdfRegion(flow_tCtx ctx, double ll_x, double ll_y, double ur_x,
-    double ur_y, char* filename)
+int flow_PrintPdfRegion(flow_tCtx ctx, double ll_x, double ll_y, double ur_x, double ur_y, char* filename)
 {
   return ctx->print_pdf_region(ll_x, ll_y, ur_x, ur_y, filename);
 }
 
-void flow_PrintDrawPage(flow_tCtx ctx, void* context, const char* title,
-    int page, flow_eOrientation orientation, double scale)
+void flow_PrintDrawPage(flow_tCtx ctx, void* context, const char* title, int page,
+                        flow_eOrientation orientation, double scale)
 {
   ctx->print_draw_page(context, title, page, orientation, scale);
 }
 
-void flow_PrintGetPages(
-    flow_tCtx ctx, flow_eOrientation orientation, double scale, int* pages)
+void flow_PrintGetPages(flow_tCtx ctx, flow_eOrientation orientation, double scale, int* pages)
 {
   ctx->print_get_pages(orientation, scale, pages);
 }
 
-void flow_PrintDrawGetOrientation(
-    flow_tCtx ctx, int page_nr, flow_eOrientation* orientation)
+void flow_PrintDrawGetOrientation(flow_tCtx ctx, int page_nr, flow_eOrientation* orientation)
 {
   ctx->print_get_orientation(page_nr, orientation);
 }
@@ -531,15 +401,9 @@ void flow_SetUserData(flow_tObject object, void* user_data)
   ((FlowArrayElem*)object)->set_user_data(user_data);
 }
 
-void flow_GetCtxUserData(flow_tCtx ctx, void** user_data)
-{
-  ((FlowCtx*)ctx)->get_user_data(user_data);
-}
+void flow_GetCtxUserData(flow_tCtx ctx, void** user_data) { ((FlowCtx*)ctx)->get_user_data(user_data); }
 
-void flow_SetCtxUserData(flow_tCtx ctx, void* user_data)
-{
-  ((FlowCtx*)ctx)->set_user_data(user_data);
-}
+void flow_SetCtxUserData(flow_tCtx ctx, void* user_data) { ((FlowCtx*)ctx)->set_user_data(user_data); }
 
 void flow_GetCtxUserVersion(flow_tCtx ctx, unsigned int* user_version)
 {
@@ -551,68 +415,39 @@ void flow_SetCtxUserVersion(flow_tCtx ctx, unsigned int user_version)
   ((FlowCtx*)ctx)->set_user_version(user_version);
 }
 
-flow_tCtx flow_GetCtx(flow_tObject object)
+flow_tCtx flow_GetCtx(flow_tObject object) { return (flow_tCtx)((FlowArrayElem*)object)->get_ctx(); }
+
+void flow_SetTraceAttr(flow_tObject object, char* trace_object, char* trace_attribute,
+                       flow_eTraceType trace_attr_type, int inverted)
 {
-  return (flow_tCtx)((FlowArrayElem*)object)->get_ctx();
+  ((FlowArrayElem*)object)->set_trace_attr(trace_object, trace_attribute, trace_attr_type, inverted);
 }
 
-void flow_SetTraceAttr(flow_tObject object, char* trace_object,
-    char* trace_attribute, flow_eTraceType trace_attr_type, int inverted)
-{
-  ((FlowArrayElem*)object)
-      ->set_trace_attr(
-          trace_object, trace_attribute, trace_attr_type, inverted);
-}
-
-FlowTraceAttr flow_GetTraceAttr(flow_tObject object)
-{
-  return ((FlowArrayElem*)object)->get_trace_attr();
-}
+FlowTraceAttr flow_GetTraceAttr(flow_tObject object) { return ((FlowArrayElem*)object)->get_trace_attr(); }
 
 int flow_TraceInit(flow_tCtx ctx,
-    int (*trace_connect_func)(
-        flow_tObject, char*, char*, flow_eTraceType, void**),
-    int (*trace_disconnect_func)(flow_tObject),
-    int (*trace_scan_func)(flow_tObject, void*))
+                   int (*trace_connect_func)(flow_tObject, char*, char*, flow_eTraceType, void**),
+                   int (*trace_disconnect_func)(flow_tObject), int (*trace_scan_func)(flow_tObject, void*))
 {
-  return ctx->trace_init(
-      trace_connect_func, trace_disconnect_func, trace_scan_func);
+  return ctx->trace_init(trace_connect_func, trace_disconnect_func, trace_scan_func);
 }
 
-void flow_TraceClose(flow_tCtx ctx)
-{
-  ctx->trace_close();
-}
+void flow_TraceClose(flow_tCtx ctx) { ctx->trace_close(); }
 
-void flow_TraceScan(flow_tCtx ctx)
-{
-  ctx->trace_scan();
-}
+void flow_TraceScan(flow_tCtx ctx) { ctx->trace_scan(); }
 
-void flow_RemoveTraceObjects(flow_tCtx ctx)
-{
-  ctx->remove_trace_objects();
-}
+void flow_RemoveTraceObjects(flow_tCtx ctx) { ctx->remove_trace_objects(); }
 
-void flow_Zoom(flow_tCtx ctx, double zoom_factor)
-{
-  ctx->zoom(zoom_factor);
-}
+void flow_Zoom(flow_tCtx ctx, double zoom_factor) { ctx->zoom(zoom_factor); }
 
-void flow_ZoomAbsolute(flow_tCtx ctx, double zoom_factor)
-{
-  ctx->zoom_absolute(zoom_factor);
-}
+void flow_ZoomAbsolute(flow_tCtx ctx, double zoom_factor) { ctx->zoom_absolute(zoom_factor); }
 
-void flow_Scroll(flow_tCtx ctx, double x, double y)
-{
-  ctx->scroll(x, y);
-}
+void flow_Scroll(flow_tCtx ctx, double x, double y) { ctx->scroll(x, y); }
 
-void flow_SetAttributes(
-    flow_tCtx ctx, flow_sAttributes* attr, unsigned long mask)
+void flow_SetAttributes(flow_tCtx ctx, flow_sAttributes* attr, unsigned long mask)
 {
-  if (mask & flow_eAttr_base_zoom_factor) {
+  if (mask & flow_eAttr_base_zoom_factor)
+  {
     ctx->zoom_factor *= attr->base_zoom_factor / ctx->base_zoom_factor;
     ctx->base_zoom_factor = attr->base_zoom_factor;
   }
@@ -671,30 +506,21 @@ void flow_GetAttributes(flow_tCtx ctx, flow_sAttributes* attr)
   attr->zoom_factor = ctx->zoom_factor;
 }
 
-void flow_PositionToPixel(
-    flow_tCtx ctx, double x, double y, int* pix_x, int* pix_y)
+void flow_PositionToPixel(flow_tCtx ctx, double x, double y, int* pix_x, int* pix_y)
 {
   ctx->position_to_pixel(x, y, pix_x, pix_y);
 }
 
-void flow_PixelToPosition(
-    flow_tCtx ctx, int pix_x, int pix_y, double* x, double* y)
+void flow_PixelToPosition(flow_tCtx ctx, int pix_x, int pix_y, double* x, double* y)
 {
   ctx->pixel_to_position(pix_x, pix_y, x, y);
 }
 
-void flow_UnZoom(flow_tCtx ctx)
-{
-  ctx->unzoom();
-}
+void flow_UnZoom(flow_tCtx ctx) { ctx->unzoom(); }
 
-void flow_CenterObject(flow_tCtx ctx, flow_tObject object)
-{
-  ctx->center_object((FlowArrayElem*)object);
-}
+void flow_CenterObject(flow_tCtx ctx, flow_tObject object) { ctx->center_object((FlowArrayElem*)object); }
 
-void flow_MoveSelectedNodes(
-    flow_tCtx ctx, double delta_x, double delta_y, int grid)
+void flow_MoveSelectedNodes(flow_tCtx ctx, double delta_x, double delta_y, int grid)
 {
   ctx->move_selected_nodes(delta_x, delta_y, grid);
 }
@@ -704,65 +530,37 @@ void flow_GetNodePosition(flow_tNode node, double* x, double* y)
   ((FlowNode*)node)->get_node_position(x, y);
 }
 
-void flow_GetConPosition(
-    flow_tCon con, double* x_arr[], double* y_arr[], int* num)
+void flow_GetConPosition(flow_tCon con, double* x_arr[], double* y_arr[], int* num)
 {
   ((FlowCon*)con)->get_con_position(x_arr, y_arr, num);
 }
 
-void flow_MeasureAnnotation(flow_tNodeClass node_class, int number, char* text,
-    double* width, double* height)
+void flow_MeasureAnnotation(flow_tNodeClass node_class, int number, char* text, double* width, double* height)
 {
   ((FlowNodeClass*)node_class)->measure_annotation(number, text, width, height);
 }
 
-void flow_MeasureAnnotText(flow_tCtx ctx, char* text, flow_eDrawType draw_type,
-    int text_size, flow_eAnnotType annot_type, double* width, double* height,
-    int* rows)
+void flow_MeasureAnnotText(flow_tCtx ctx, char* text, flow_eDrawType draw_type, int text_size,
+                           flow_eAnnotType annot_type, double* width, double* height, int* rows)
 {
-  flow_measure_annot_text(
-      ctx, text, draw_type, text_size, annot_type, width, height, rows);
+  flow_measure_annot_text(ctx, text, draw_type, text_size, annot_type, width, height, rows);
 }
 
-flow_eNodeGroup flow_GetNodeGroup(flow_tNode node)
-{
-  return ((FlowNode*)node)->get_group();
-}
+flow_eNodeGroup flow_GetNodeGroup(flow_tNode node) { return ((FlowNode*)node)->get_group(); }
 
-flow_eConGroup flow_GetConGroup(flow_tCon con)
-{
-  return ((FlowCon*)con)->get_group();
-}
+flow_eConGroup flow_GetConGroup(flow_tCon con) { return ((FlowCon*)con)->get_group(); }
 
-void flow_DeleteNodeCons(flow_tNode node)
-{
-  ((FlowNode*)node)->ctx->delete_node_cons(node);
-}
+void flow_DeleteNodeCons(flow_tNode node) { ((FlowNode*)node)->ctx->delete_node_cons(node); }
 
-void flow_GetObjectName(flow_tObject object, char* name)
-{
-  ((FlowNode*)object)->get_object_name(name);
-}
+void flow_GetObjectName(flow_tObject object, char* name) { ((FlowNode*)object)->get_object_name(name); }
 
-void flow_Reconfigure(flow_tCtx ctx)
-{
-  ctx->reconfigure();
-}
+void flow_Reconfigure(flow_tCtx ctx) { ctx->reconfigure(); }
 
-void flow_SetNodraw(flow_tCtx ctx)
-{
-  ctx->set_nodraw();
-}
+void flow_SetNodraw(flow_tCtx ctx) { ctx->set_nodraw(); }
 
-void flow_ResetNodraw(flow_tCtx ctx)
-{
-  ctx->reset_nodraw();
-}
+void flow_ResetNodraw(flow_tCtx ctx) { ctx->reset_nodraw(); }
 
-void flow_Redraw(flow_tCtx ctx)
-{
-  ctx->redraw();
-}
+void flow_Redraw(flow_tCtx ctx) { ctx->redraw(); }
 
 int flow_FindByName(flow_tCtx ctx, char* name, flow_tObject* object)
 {
@@ -779,34 +577,27 @@ FlowTraceAttr flow_GetConPointTraceAttr(flow_tObject object, int num)
   return ((FlowNode*)object)->get_conpoint_trace_attr(num);
 }
 
-int flow_GetConPoint(
-    flow_tObject object, int num, double* x, double* y, flow_eDirection* dir)
+int flow_GetConPoint(flow_tObject object, int num, double* x, double* y, flow_eDirection* dir)
 {
   return ((FlowNode*)object)->get_conpoint(num, x, y, dir);
 }
 
-void flow_SetClickSensitivity(flow_tCtx ctx, int value)
-{
-  ctx->fdraw->set_click_sensitivity(ctx, value);
-}
+void flow_SetClickSensitivity(flow_tCtx ctx, int value) { ctx->fdraw->set_click_sensitivity(ctx, value); }
 
 void flow_SetNoConObstacle(flow_tNodeClass nc, int no_obstacle)
 {
   ((FlowNodeClass*)nc)->set_no_con_obstacle(no_obstacle);
 }
 
-int flow_GetNextObject(
-    flow_tCtx ctx, flow_tNode object, flow_eDirection dir, flow_tNode* next)
+int flow_GetNextObject(flow_tCtx ctx, flow_tNode object, flow_eDirection dir, flow_tNode* next)
 {
-  return ctx->get_next_object(
-      (FlowArrayElem*)object, dir, (FlowArrayElem**)next);
+  return ctx->get_next_object((FlowArrayElem*)object, dir, (FlowArrayElem**)next);
 }
 
-int flow_GetNextConPoint(flow_tCtx ctx, flow_tNode object, int cp_num,
-    flow_eDirection dir, flow_tNode* next, int* next_cp_num)
+int flow_GetNextConPoint(flow_tCtx ctx, flow_tNode object, int cp_num, flow_eDirection dir, flow_tNode* next,
+                         int* next_cp_num)
 {
-  return ctx->get_next_conpoint(
-      (FlowArrayElem*)object, cp_num, dir, (FlowArrayElem**)next, next_cp_num);
+  return ctx->get_next_conpoint((FlowArrayElem*)object, cp_num, dir, (FlowArrayElem**)next, next_cp_num);
 }
 
 int flow_IsVisible(flow_tCtx ctx, flow_tObject object, flow_eVisible type)
@@ -816,61 +607,32 @@ int flow_IsVisible(flow_tCtx ctx, flow_tObject object, flow_eVisible type)
 
 int flow_LoadNodeClass(flow_tCtx ctx, char* fname, flow_tNodeClass* nodeclass)
 {
-  *nodeclass
-      = (flow_tNodeClass) new FlowNodeClass(ctx, "tmp", flow_eNodeGroup_Common);
+  *nodeclass = (flow_tNodeClass) new FlowNodeClass(ctx, "tmp", flow_eNodeGroup_Common);
   int sts = (*(FlowNodeClass**)nodeclass)->load(fname);
   if (ODD(sts))
     ctx->nodeclass_insert((FlowArrayElem*)*nodeclass);
   return sts;
 }
 
-void flow_SetTipText(
-    flow_tCtx ctx, flow_tObject object, char* text, int x, int y)
+void flow_SetTipText(flow_tCtx ctx, flow_tObject object, char* text, int x, int y)
 {
   ctx->tiptext->draw_text((FlowArrayElem*)object, text, x, y);
 }
 
-void flow_RemoveTipText(flow_tCtx ctx)
-{
-  ctx->tiptext->remove();
-}
+void flow_RemoveTipText(flow_tCtx ctx) { ctx->tiptext->remove(); }
 
-int flow_PasteStop(flow_tCtx ctx)
-{
-  return ctx->paste_stop();
-}
+int flow_PasteStop(flow_tCtx ctx) { return ctx->paste_stop(); }
 
-int flow_GetPasteActive(flow_tCtx ctx)
-{
-  return ctx->get_paste_active();
-}
+int flow_GetPasteActive(flow_tCtx ctx) { return ctx->get_paste_active(); }
 
-int flow_GetAutoscrollingActive(flow_tCtx ctx)
-{
-  return ctx->get_autoscrolling_active();
-}
+int flow_GetAutoscrollingActive(flow_tCtx ctx) { return ctx->get_autoscrolling_active(); }
 
-int flow_PendingPaste(flow_tCtx ctx)
-{
-  return ctx->pending_paste();
-}
+int flow_PendingPaste(flow_tCtx ctx) { return ctx->pending_paste(); }
 
-int flow_PendingPasteStop(flow_tCtx ctx)
-{
-  return ctx->pending_paste_stop();
-}
+int flow_PendingPasteStop(flow_tCtx ctx) { return ctx->pending_paste_stop(); }
 
-int flow_GetConCreateActive(flow_tCtx ctx)
-{
-  return ctx->get_con_create_active();
-}
+int flow_GetConCreateActive(flow_tCtx ctx) { return ctx->get_con_create_active(); }
 
-int flow_ConCreateStop(flow_tCtx ctx)
-{
-  return ctx->con_create_stop();
-}
+int flow_ConCreateStop(flow_tCtx ctx) { return ctx->con_create_stop(); }
 
-int flow_ConIsReference(flow_tCon con)
-{
-  return ((FlowCon*)con)->is_reference();
-}
+int flow_ConIsReference(flow_tCon con) { return ((FlowCon*)con)->is_reference(); }

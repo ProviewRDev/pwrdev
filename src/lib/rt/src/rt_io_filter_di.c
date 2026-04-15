@@ -57,12 +57,13 @@ typedef struct s_FilterData_1 sFilterData_1;
 typedef struct s_FilterData_100 sFilterData_100;
 
 /*
-* Name:
-*   _eState_1
-* Description:
-*   The different states used in filter type = 1
-*/
-enum e_State_1 {
+ * Name:
+ *   _eState_1
+ * Description:
+ *   The different states used in filter type = 1
+ */
+enum e_State_1
+{
   _eState__ = 0,
   _eState_1_Neutral = 1,
   _eState_1_DelayOn = 2,
@@ -74,12 +75,13 @@ enum e_State_1 {
 typedef enum e_State_1 _eState_1;
 
 /*
-* Name:
-*   sFilterData_1
-* Description:
-*   The structure of filter data used in filter type = 1
-*/
-struct s_FilterData_1 {
+ * Name:
+ *   sFilterData_1
+ * Description:
+ *   The structure of filter data used in filter type = 1
+ */
+struct s_FilterData_1
+{
   _eState_1 Type;
   pwr_tFloat32 ScanTime;
   pwr_tUInt32 TimerDelayOn;
@@ -89,27 +91,27 @@ struct s_FilterData_1 {
 };
 
 /*
-* Name:
-*   sFilterData_100
-* Description:
-*   The user structure of filter data used in filter type = 100
-*/
-struct s_FilterData_100 {
+ * Name:
+ *   sFilterData_100
+ * Description:
+ *   The user structure of filter data used in filter type = 100
+ */
+struct s_FilterData_100
+{
   pwr_tFloat32 Dummy;
 };
 
 /*
-* Name:
-*   io_FilterDi
-*
-*
-* Function:
-*   Filtration of Di.
-* Description:
-*
-*/
-pwr_tStatus io_DiFilter(
-    pwr_sClass_Di* SignalObj[], pwr_tUInt16* Data, void* FilterData[])
+ * Name:
+ *   io_FilterDi
+ *
+ *
+ * Function:
+ *   Filtration of Di.
+ * Description:
+ *
+ */
+pwr_tStatus io_DiFilter(pwr_sClass_Di* SignalObj[], pwr_tUInt16* Data, void* FilterData[])
 {
   pwr_tUInt16 Mask, OldData;
   pwr_tUInt16 ResetMask;
@@ -124,11 +126,13 @@ pwr_tStatus io_DiFilter(
 
   /* Scan through the signals and do the filtration */
 
-  for (Mask = 1, Idx = 0; Idx < _MaxNoOfDi; Idx++, Mask <<= 1) {
+  for (Mask = 1, Idx = 0; Idx < _MaxNoOfDi; Idx++, Mask <<= 1)
+  {
     if (SignalObj[Idx] == NULL)
       continue;
 
-    switch (SignalObj[Idx]->FilterType) {
+    switch (SignalObj[Idx]->FilterType)
+    {
     case _FilterType_0:
       break;
 
@@ -138,26 +142,26 @@ pwr_tStatus io_DiFilter(
       ResetMask = 0;
       Data_1 = (sFilterData_1*)FilterData[Idx];
 
-      if ((pwr_tBoolean)((*Data & Mask) != 0) == TRUE
-          && Data_1->OldValue == FALSE) { /* Pos. flank */
-        switch (Data_1->Type) {
+      if ((pwr_tBoolean)((*Data & Mask) != 0) == TRUE && Data_1->OldValue == FALSE)
+      { /* Pos. flank */
+        switch (Data_1->Type)
+        {
         case _eState_1_Neutral:
-          Data_1->TimerDelayOn
-              = SignalObj[Idx]->FilterAttribute[0] / Data_1->ScanTime + 0.5;
+          Data_1->TimerDelayOn = SignalObj[Idx]->FilterAttribute[0] / Data_1->ScanTime + 0.5;
           *Data ^= Mask; /* Invert bit */
           Data_1->Type = _eState_1_DelayOn;
           break;
 
         case _eState_1_DelayOn:
-          Data_1->TimerDelayOn
-              = SignalObj[Idx]->FilterAttribute[0] / Data_1->ScanTime + 0.5;
+          Data_1->TimerDelayOn = SignalObj[Idx]->FilterAttribute[0] / Data_1->ScanTime + 0.5;
           *Data ^= Mask; /* Invert bit */
           break;
 
         case _eState_1_DelayOff:
           if (Data_1->TimerDelayOff > 0)
             Data_1->TimerDelayOff--;
-          else {
+          else
+          {
             Data_1->Type = _eState_1_Neutral;
             break;
           }
@@ -167,12 +171,13 @@ pwr_tStatus io_DiFilter(
         default:
           break;
         }
-      } else if ((pwr_tBoolean)((*Data & Mask) != 0) == FALSE
-          && Data_1->OldValue == TRUE) { /* Neg. flank */
-        switch (Data_1->Type) {
+      }
+      else if ((pwr_tBoolean)((*Data & Mask) != 0) == FALSE && Data_1->OldValue == TRUE)
+      { /* Neg. flank */
+        switch (Data_1->Type)
+        {
         case _eState_1_Neutral:
-          Data_1->TimerDelayOff
-              = SignalObj[Idx]->FilterAttribute[1] / Data_1->ScanTime + 0.5;
+          Data_1->TimerDelayOff = SignalObj[Idx]->FilterAttribute[1] / Data_1->ScanTime + 0.5;
           *Data ^= Mask; /* Invert bit */
           Data_1->Type = _eState_1_DelayOff;
           break;
@@ -180,7 +185,8 @@ pwr_tStatus io_DiFilter(
         case _eState_1_DelayOn:
           if (Data_1->TimerDelayOn > 0)
             Data_1->TimerDelayOn--;
-          else {
+          else
+          {
             Data_1->Type = _eState_1_Neutral;
             *Data ^= Mask; /* Invert bit */
             break;
@@ -189,23 +195,26 @@ pwr_tStatus io_DiFilter(
           break;
 
         case _eState_1_DelayOff:
-          Data_1->TimerDelayOff
-              = SignalObj[Idx]->FilterAttribute[1] / Data_1->ScanTime + 0.5;
+          Data_1->TimerDelayOff = SignalObj[Idx]->FilterAttribute[1] / Data_1->ScanTime + 0.5;
           *Data ^= Mask; /* Invert bit */
           break;
 
         default:
           break;
         }
-      } else { /* No flank */
-        switch (Data_1->Type) {
+      }
+      else
+      { /* No flank */
+        switch (Data_1->Type)
+        {
         case _eState_1_Neutral:
           break;
 
         case _eState_1_DelayOn:
           if (Data_1->TimerDelayOn > 0)
             Data_1->TimerDelayOn--;
-          else {
+          else
+          {
             Data_1->Type = _eState_1_Neutral;
             break;
           }
@@ -217,7 +226,8 @@ pwr_tStatus io_DiFilter(
         case _eState_1_DelayOff:
           if (Data_1->TimerDelayOff > 0)
             Data_1->TimerDelayOff--;
-          else {
+          else
+          {
             Data_1->Type = _eState_1_Neutral;
             break;
           }
@@ -248,17 +258,17 @@ pwr_tStatus io_DiFilter(
 } /* END io_FilterDi */
 
 /*
-* Name:
-*   io_InitFilterDi
-*
-*
-* Function:
-*   Initialize filter for max 16 Di ( one Di-card ).
-* Description:
-*
-*/
-pwr_tStatus io_InitDiFilter(pwr_sClass_Di* SignalObj[], pwr_tBoolean* Filter,
-    void* FilterData[], pwr_tFloat32 ScanTime)
+ * Name:
+ *   io_InitFilterDi
+ *
+ *
+ * Function:
+ *   Initialize filter for max 16 Di ( one Di-card ).
+ * Description:
+ *
+ */
+pwr_tStatus io_InitDiFilter(pwr_sClass_Di* SignalObj[], pwr_tBoolean* Filter, void* FilterData[],
+                            pwr_tFloat32 ScanTime)
 {
   int Idx;
   sFilterData_1* Data_1;
@@ -266,24 +276,24 @@ pwr_tStatus io_InitDiFilter(pwr_sClass_Di* SignalObj[], pwr_tBoolean* Filter,
 
   *Filter = FALSE; /* Supose no signals with filter */
 
-  for (Idx = 0; Idx < _MaxNoOfDi; Idx++) {
+  for (Idx = 0; Idx < _MaxNoOfDi; Idx++)
+  {
     if (SignalObj[Idx] == NULL)
       continue;
 
-    switch (SignalObj[Idx]->FilterType) {
+    switch (SignalObj[Idx]->FilterType)
+    {
     case _FilterType_0:
       break;
 
     case _FilterType_1:
-      if (ScanTime > 0) {
+      if (ScanTime > 0)
+      {
         Data_1 = (sFilterData_1*)malloc(sizeof(sFilterData_1));
         Data_1->ScanTime = ScanTime;
-        Data_1->TimerDelayOn
-            = SignalObj[Idx]->FilterAttribute[0] / Data_1->ScanTime + 0.5;
-        Data_1->TimerDelayOff
-            = SignalObj[Idx]->FilterAttribute[1] / Data_1->ScanTime + 0.5;
-        Data_1->ActualValue = gdh_TranslateRtdbPointer(
-            (unsigned long)SignalObj[Idx]->ActualValue);
+        Data_1->TimerDelayOn = SignalObj[Idx]->FilterAttribute[0] / Data_1->ScanTime + 0.5;
+        Data_1->TimerDelayOff = SignalObj[Idx]->FilterAttribute[1] / Data_1->ScanTime + 0.5;
+        Data_1->ActualValue = gdh_TranslateRtdbPointer((unsigned long)SignalObj[Idx]->ActualValue);
         Data_1->OldValue = *Data_1->ActualValue;
         Data_1->Type = _eState_1_Neutral;
         FilterData[Idx] = Data_1;
@@ -305,20 +315,21 @@ pwr_tStatus io_InitDiFilter(pwr_sClass_Di* SignalObj[], pwr_tBoolean* Filter,
 } /* END io_InitFilterDi */
 
 /*
-* Name:
-*   io_CloseFilterDi
-*
-*
-* Function:
-*   Close filter for max 16 Di ( one Di-card ).
-* Description:
-*
-*/
+ * Name:
+ *   io_CloseFilterDi
+ *
+ *
+ * Function:
+ *   Close filter for max 16 Di ( one Di-card ).
+ * Description:
+ *
+ */
 void io_CloseDiFilter(void* FilterData[])
 {
   int i;
 
-  for (i = 0; i < _MaxNoOfDi; i++) {
+  for (i = 0; i < _MaxNoOfDi; i++)
+  {
     if (FilterData[i] != NULL)
       free(FilterData[i]);
   }

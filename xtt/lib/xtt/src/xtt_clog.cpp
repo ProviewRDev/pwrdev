@@ -48,8 +48,8 @@
 #include "rt_xnav_msg.h"
 
 CLog::CLog(void* clog_parent_ctx, const char* clog_name, pwr_tStatus* status)
-    : parent_ctx(clog_parent_ctx), clognav(NULL), clog_displayed(0), help_cb(0),
-      close_cb(0), filesel_loaded(false)
+    : parent_ctx(clog_parent_ctx), clognav(NULL), clog_displayed(0), help_cb(0), close_cb(0),
+      filesel_loaded(false)
 {
   *status = 1;
 }
@@ -57,9 +57,7 @@ CLog::CLog(void* clog_parent_ctx, const char* clog_name, pwr_tStatus* status)
 //
 //  Delete clog
 //
-CLog::~CLog()
-{
-}
+CLog::~CLog() {}
 
 void CLog::activate_next_file()
 {
@@ -77,10 +75,7 @@ void CLog::activate_prev_file()
   reset_cursor();
 }
 
-void CLog::activate_print()
-{
-  print();
-}
+void CLog::activate_print() { print(); }
 
 void CLog::activate_help()
 {

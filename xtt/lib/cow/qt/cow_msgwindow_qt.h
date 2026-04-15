@@ -45,7 +45,8 @@
 
 class MsgWindowQtWidget;
 
-class MsgWindowQt : public MsgWindow {
+class MsgWindowQt : public MsgWindow
+{
 public:
   MsgWindowQt(void* msg_parent_ctx, const char* msg_name, pwr_tStatus* status);
 
@@ -61,7 +62,8 @@ private:
   MsgWindowQtWidget* toplevel;
 };
 
-class MsgWindowQtWidget : public QWidget {
+class MsgWindowQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

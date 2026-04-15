@@ -22,7 +22,8 @@
 #define opensocket__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #ifdef BCCWIN
@@ -31,17 +32,17 @@ extern "C" {
 #else
 #define EXPORTSPEC __declspec(dllimport)
 #endif
-EXPORTSPEC HANDLE __stdcall openSocket(const int port, const char* peer);
+  EXPORTSPEC HANDLE __stdcall openSocket(const int port, const char* peer);
 
-EXPORTSPEC int __stdcall closeSocket(HANDLE h);
+  EXPORTSPEC int __stdcall closeSocket(HANDLE h);
 
 #endif
 
 #ifdef LINUX
 #define EXPORTSPEC
-int openSocket(const int port, const char* peer);
+  int openSocket(const int port, const char* peer);
 
-int closeSocket(int h);
+  int closeSocket(int h);
 
 #endif
 

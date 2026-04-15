@@ -43,25 +43,32 @@
 
 class CnvCtx;
 
-typedef enum {
+typedef enum
+{
   ps_mStatus_xtthelp = 1 << 0,
   ps_mStatus_paragraph = 1 << 1,
   ps_mStatus_table = 1 << 2,
   ps_mStatus_topic = 1 << 3
 } ps_mStatus;
 
-typedef enum { ps_mOption_printDisable = 1 << 0 } ps_mOption;
+typedef enum
+{
+  ps_mOption_printDisable = 1 << 0
+} ps_mOption;
 
-class CnvXtthelpToPs : public CnvXtthelpTo {
-  public:
+class CnvXtthelpToPs : public CnvXtthelpTo
+{
+public:
   CnvXtthelpToPs(CnvCtx* cnv_ctx)
-      : ctx(cnv_ctx), base_ci(0), first_topic(1), user_style(0), status(0),
-        conf_pass(false), option(0)
+      : ctx(cnv_ctx), base_ci(0), first_topic(1), user_style(0), status(0), conf_pass(false), option(0)
   {
     strcpy(current_subject, "");
-    if (ctx->generate_pdf) {
+    if (ctx->generate_pdf)
+    {
       tops = new CnvToPdf();
-    } else {
+    }
+    else
+    {
       tops = new CnvToPs();
     }
   }
@@ -69,26 +76,26 @@ class CnvXtthelpToPs : public CnvXtthelpTo {
 
   Cnv_eXtthelpToType type()
   {
-    if (ctx->generate_pdf) {
+    if (ctx->generate_pdf)
+    {
       return Cnv_eXtthelpToType_Pdf;
-    } else {
+    }
+    else
+    {
       return Cnv_eXtthelpToType_Ps;
     }
   }
-  void* insert(navh_eItemType item_type, const char* text1, const char* text2,
-      const char* text3, const char* link, const char* link_bookmark,
-      const char* file_name, navh_eHelpFile file_type, int help_index,
-      const char* bookmark, int coding);
+  void* insert(navh_eItemType item_type, const char* text1, const char* text2, const char* text3,
+               const char* link, const char* link_bookmark, const char* file_name, navh_eHelpFile file_type,
+               int help_index, const char* bookmark, int coding);
   virtual void subject_to_fname(char* fname, const char* subject, int path);
-  bool confpass()
-  {
-    return true;
-  }
+  bool confpass() { return true; }
   void set_confpass(bool conf)
   {
     tops->set_confpass(conf);
     conf_pass = conf;
-    if (!conf) {
+    if (!conf)
+    {
       // Reset
       base_ci = 0;
       user_style = 0;
@@ -98,7 +105,7 @@ class CnvXtthelpToPs : public CnvXtthelpTo {
   }
 
   CnvCtx* ctx;
-  CnvToPs *tops;
+  CnvToPs* tops;
   int base_ci;
   int first_topic;
   int first_chaptertopic;

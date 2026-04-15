@@ -64,7 +64,8 @@ static pwr_tStatus mqtt_error_to_sts(int err)
 {
   pwr_tStatus sts = 0;
 
-  switch (err) {
+  switch (err)
+  {
   case MOSQ_ERR_CONN_PENDING:
     sts = REM__TT_CONN_PENDING;
     break;
@@ -135,134 +136,154 @@ static pwr_tStatus mqtt_error_to_sts(int err)
   return sts;
 }
 
-static int json_match(pwr_tCid chan_cid, const char *id, const pwr_eDataRepEnum rep, const char *msg, void *ovalue)
+static int json_match(pwr_tCid chan_cid, const char* id, const pwr_eDataRepEnum rep, const char* msg,
+                      void* ovalue)
 {
   char iname[80];
   char ivalue[80];
   strcpy(iname, id);
-  char *s1 = strchr(iname, ':');
+  char* s1 = strchr(iname, ':');
   if (!s1)
     return 0;
   *s1 = 0;
   str_trim(iname, iname);
 
-  switch (chan_cid) {
-  case pwr_cClass_ChanDi: {
-    strcpy(ivalue, s1+1);
+  switch (chan_cid)
+  {
+  case pwr_cClass_ChanDi:
+  {
+    strcpy(ivalue, s1 + 1);
     str_trim(ivalue, ivalue);
-  
-    char *s2 = strstr(msg, iname);
+
+    char* s2 = strstr(msg, iname);
     if (!s2)
       return 0;
 
     s2 += strlen(iname);
-    while (*s2) {
+    while (*s2)
+    {
       if (*s2 == ':')
-	break;
+        break;
       s2++;
     }
     if (*s2 == 0)
       return 0;
     s2++;
 
-    while (*s2) {
+    while (*s2)
+    {
       if (!(*s2 == ' ' || *s2 == '	'))
-	break;
+        break;
       s2++;
     }
     if (*s2 == 0)
       return 0;
 
-    if (strncmp(ivalue, s2, strlen(ivalue)) == 0) {
+    if (strncmp(ivalue, s2, strlen(ivalue)) == 0)
+    {
       s2 += strlen(ivalue);
-      if (*s2 == 0 || *s2 == ',' || *s2 == '}' || *s2 == ' ' || *s2 == '	') {
-	*(pwr_tBoolean *)ovalue = 1;
-	return 1;
+      if (*s2 == 0 || *s2 == ',' || *s2 == '}' || *s2 == ' ' || *s2 == '	')
+      {
+        *(pwr_tBoolean*)ovalue = 1;
+        return 1;
       }
     }
     return 0;
   }
-  case pwr_cClass_ChanDo: {
+  case pwr_cClass_ChanDo:
+  {
     char mvalue[80];
 
-    strcpy(ivalue, s1+1);
+    strcpy(ivalue, s1 + 1);
     str_trim(ivalue, ivalue);
-  
-    char *s2 = strstr(msg, iname);
+
+    char* s2 = strstr(msg, iname);
     if (!s2)
       return 0;
 
     s2 += strlen(iname);
-    while (*s2) {
+    while (*s2)
+    {
       if (*s2 == ':')
-	break;
+        break;
       s2++;
     }
     if (*s2 == 0)
       return 0;
     s2++;
 
-    while (*s2) {
+    while (*s2)
+    {
       if (!(*s2 == ' ' || *s2 == '	'))
-	break;
+        break;
       s2++;
     }
     if (*s2 == 0)
       return 0;
 
     strncpy(mvalue, s2, sizeof(mvalue));
-    mvalue[sizeof(mvalue)-1] = 0;
+    mvalue[sizeof(mvalue) - 1] = 0;
     s1 = mvalue;
-    while (*s1) {
-      if (*s1 == 0 || *s1 == ',' || *s1 == '}' || *s1 == ' ' || *s1 == '	') {
-	*s1 = 0;
-	break;
+    while (*s1)
+    {
+      if (*s1 == 0 || *s1 == ',' || *s1 == '}' || *s1 == ' ' || *s1 == '	')
+      {
+        *s1 = 0;
+        break;
       }
       s1++;
     }
-	
-    if (strncmp(mvalue, ivalue, strlen(mvalue)) == 0) {
+
+    if (strncmp(mvalue, ivalue, strlen(mvalue)) == 0)
+    {
       s2 = ivalue;
       s2 += strlen(mvalue);
-      if (*s2 == 0 || *s2 == ',' || *s2 == '}' || *s2 == ' ' || *s2 == '	') {
-	*(pwr_tBoolean *)ovalue = 1;
-	return 1;
+      if (*s2 == 0 || *s2 == ',' || *s2 == '}' || *s2 == ' ' || *s2 == '	')
+      {
+        *(pwr_tBoolean*)ovalue = 1;
+        return 1;
       }
     }
-    else {
+    else
+    {
       s2 = strchr(ivalue, ',');
       if (!s2)
-	return 0;
-    
+        return 0;
+
       s2++;
-      while (*s2) {
-	if (!(*s2 == ' ' || *s2 == '	'))
-	  break;
-	s2++;
+      while (*s2)
+      {
+        if (!(*s2 == ' ' || *s2 == '	'))
+          break;
+        s2++;
       }
       if (*s2 == 0)
-	return 0;
-    
-      if (strncmp(mvalue, s2, strlen(mvalue)) == 0) {
-	s2 += strlen(mvalue);
-	if (*s2 == 0 || *s2 == ',' || *s2 == '}' || *s2 == ' ' || *s2 == '	') {
-	  *(pwr_tBoolean *)ovalue = 0;
-	  return 1;
-	}
+        return 0;
+
+      if (strncmp(mvalue, s2, strlen(mvalue)) == 0)
+      {
+        s2 += strlen(mvalue);
+        if (*s2 == 0 || *s2 == ',' || *s2 == '}' || *s2 == ' ' || *s2 == '	')
+        {
+          *(pwr_tBoolean*)ovalue = 0;
+          return 1;
+        }
       }
     }
   }
   case pwr_cClass_ChanIi:
-  case pwr_cClass_ChanAi: {
+  case pwr_cClass_ChanAi:
+  {
     int n;
-    char *s2 = strstr(msg, iname);
+    char* s2 = strstr(msg, iname);
     if (!s2)
       return 0;
 
     s2 += strlen(iname);
-    while (*s2) {
+    while (*s2)
+    {
       if (*s2 == ':')
-	break;
+        break;
       s2++;
     }
     if (*s2 == 0)
@@ -270,9 +291,9 @@ static int json_match(pwr_tCid chan_cid, const char *id, const pwr_eDataRepEnum 
     s2++;
 
     if (rep == pwr_eDataRepEnum_Float32)
-      n = sscanf(s2, "%f", (pwr_tFloat32 *)ovalue);
+      n = sscanf(s2, "%f", (pwr_tFloat32*)ovalue);
     else
-      n = sscanf(s2, "%d", (pwr_tInt32 *)ovalue);
+      n = sscanf(s2, "%d", (pwr_tInt32*)ovalue);
     if (n > 0)
       return 1;
     return 0;
@@ -282,28 +303,31 @@ static int json_match(pwr_tCid chan_cid, const char *id, const pwr_eDataRepEnum 
   }
 }
 
-static int json_msg(char *id, pwr_tBoolean sigval, char *msg)
+static int json_msg(char* id, pwr_tBoolean sigval, char* msg)
 {
   char iname[80];
   char ivalue[80];
   strcpy(iname, id);
-  char *s1 = strchr(iname, ':');
+  char* s1 = strchr(iname, ':');
   if (!s1)
     return 0;
   *s1 = 0;
-  if (sigval) {
+  if (sigval)
+  {
     s1++;
     strcpy(ivalue, s1);
     s1 = strchr(ivalue, ',');
     if (!s1)
       return 0;
     *s1 = 0;
-  } else {
+  }
+  else
+  {
     s1++;
     s1 = strchr(s1, ',');
     if (!s1)
       return 0;
-    strcpy(ivalue, s1+1);
+    strcpy(ivalue, s1 + 1);
   }
   str_trim(ivalue, ivalue);
   str_trim(iname, iname);
@@ -316,7 +340,7 @@ static int json_msg(char *id, pwr_tBoolean sigval, char *msg)
   return 1;
 }
 
-static int json_amsg(char *id, pwr_tInt32 sigval, char *msg)
+static int json_amsg(char* id, pwr_tInt32 sigval, char* msg)
 {
   char iname[80];
 
@@ -327,128 +351,158 @@ static int json_amsg(char *id, pwr_tInt32 sigval, char *msg)
   return 1;
 }
 
-static void message_cb(struct mosquitto *mosq, void *obj, 
-    const struct mosquitto_message *msg)
+static void message_cb(struct mosquitto* mosq, void* obj, const struct mosquitto_message* msg)
 {
-  io_sRack* rp = (io_sRack *)obj;
-  io_sCard *cp;
+  io_sRack* rp = (io_sRack*)obj;
+  io_sCard* cp;
   bool match = 0;
-  pwr_sClass_MQTT_Device *cop;
+  pwr_sClass_MQTT_Device* cop;
   int i;
   int sts;
-  
-  if (msg->payloadlen > 0) {
-    for (cp = rp->cardlist; cp; cp = cp->next) {
-      cop = (pwr_sClass_MQTT_Device *)cp->op;
+
+  if (msg->payloadlen > 0)
+  {
+    for (cp = rp->cardlist; cp; cp = cp->next)
+    {
+      cop = (pwr_sClass_MQTT_Device*)cp->op;
       mosquitto_topic_matches_sub(cop->SubscribeTopic, msg->topic, &match);
-      
-      if (match) {
-	cop->SubscribeCount++;
 
-	for (i = 0; i < cp->ChanListSize; i++) {
-	  io_sChannel *chanp = &cp->chanlist[i];
-	  if (!chanp->sop)
-	    continue;
-	  switch (chanp->ChanClass) {
-	  case pwr_cClass_ChanDi: {
-	    pwr_tBoolean value;
-	    char *s1, *s2, *id;
+      if (match)
+      {
+        cop->SubscribeCount++;
 
-	    id = ((pwr_sClass_ChanDi *)chanp->cop)->Identity;
-	    if ((s1 = strstr(id, ",\"")) != 0 &&
-		(s2 = strstr(id, ":\"")) != 0) {    
-	      char ident1[40];
-	      char ident2[40];
-	      int idx1 = s1 - id;
-	      int idx2 = s2 - id;
-    
-	      chanp->udata = 2;
-	      strncpy(ident1, id, idx1);
-	      ident1[idx1] = 0;
-	      strncpy(ident2, id, idx2 + 1);
-	      strcpy(&ident2[idx2+1], &id[idx1+1]);
-	      sts = json_match(chanp->ChanClass, ident1, 0, (char*)msg->payload, &value);
-	      if (ODD(sts)) 
-		*(pwr_tBoolean *)chanp->vbp = 1;
-	      else {
-		sts = json_match(chanp->ChanClass, ident2, 0, (char*)msg->payload, &value);
-		if (ODD(sts)) 
-		  *(pwr_tBoolean *)chanp->vbp = 0;
-	      }
-	    } else {
-	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDi *)chanp->cop)->Identity, 0, (char*)msg->payload, &value);
-	      if (ODD(sts) && value) {
-		*(pwr_tBoolean *)chanp->vbp = 1;
-	      }
-	    }
-	    break;
-	  }
-	  case pwr_cClass_ChanDo: {
-	    pwr_tBoolean value;
+        for (i = 0; i < cp->ChanListSize; i++)
+        {
+          io_sChannel* chanp = &cp->chanlist[i];
+          if (!chanp->sop)
+            continue;
+          switch (chanp->ChanClass)
+          {
+          case pwr_cClass_ChanDi:
+          {
+            pwr_tBoolean value;
+            char *s1, *s2, *id;
 
-	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDo *)chanp->cop)->Identity, 0, (char*)msg->payload, &value);
-	    if (ODD(sts)) {
-	      if (*(pwr_tBoolean *)chanp->vbp != value) {
-		*(pwr_tBoolean *)chanp->vbp = value;
-	      }
-	    }
-	    break;
-	  }
-	  case pwr_cClass_ChanIi: {
-	    pwr_tInt32 value;
-	    sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanIi *)chanp->cop)->Identity, 0, (char*)msg->payload, &value);
-	    if (ODD(sts)) {
-	      *(pwr_tInt32 *)chanp->vbp = value;
-	    }
-	    break;
-	  }
-	  case pwr_cClass_ChanAi: {
-	    pwr_tInt32 ivalue;
-	    pwr_tFloat32 fvalue;
+            id = ((pwr_sClass_ChanDi*)chanp->cop)->Identity;
+            if ((s1 = strstr(id, ",\"")) != 0 && (s2 = strstr(id, ":\"")) != 0)
+            {
+              char ident1[40];
+              char ident2[40];
+              int idx1 = s1 - id;
+              int idx2 = s2 - id;
 
-	    if (((pwr_sClass_ChanAi *)chanp->cop)->Representation == pwr_eDataRepEnum_Float32) {
-	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanAi *)chanp->cop)->Identity, 
-		  ((pwr_sClass_ChanAi *)chanp->cop)->Representation, (char*)msg->payload, &fvalue);
-	      if (ODD(sts)) {
-		fvalue = ((pwr_sClass_ChanAi *)chanp->cop)->SensorPolyCoef0 + 
-                    ((pwr_sClass_ChanAi *)chanp->cop)->SensorPolyCoef1 * fvalue;
-		*(pwr_tFloat32 *)chanp->vbp = fvalue;
-	      }
-	    } else {
-	      sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanAi *)chanp->cop)->Identity, ((pwr_sClass_ChanAi *)chanp->cop)->Representation, (char*)msg->payload, &ivalue);
+              chanp->udata = 2;
+              strncpy(ident1, id, idx1);
+              ident1[idx1] = 0;
+              strncpy(ident2, id, idx2 + 1);
+              strcpy(&ident2[idx2 + 1], &id[idx1 + 1]);
+              sts = json_match(chanp->ChanClass, ident1, 0, (char*)msg->payload, &value);
+              if (ODD(sts))
+                *(pwr_tBoolean*)chanp->vbp = 1;
+              else
+              {
+                sts = json_match(chanp->ChanClass, ident2, 0, (char*)msg->payload, &value);
+                if (ODD(sts))
+                  *(pwr_tBoolean*)chanp->vbp = 0;
+              }
+            }
+            else
+            {
+              sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDi*)chanp->cop)->Identity, 0,
+                               (char*)msg->payload, &value);
+              if (ODD(sts) && value)
+              {
+                *(pwr_tBoolean*)chanp->vbp = 1;
+              }
+            }
+            break;
+          }
+          case pwr_cClass_ChanDo:
+          {
+            pwr_tBoolean value;
 
-	      if (ODD(sts)) {
-		((pwr_sClass_Ai *)chanp->sop)->RawValue = ivalue;
-		io_ConvertAi32((pwr_sClass_ChanAi *)chanp->cop, ivalue, &fvalue);
-		*(pwr_tFloat32 *)chanp->vbp = fvalue;
-	      }
-	    }
-	    break;
-	  }
-	  default: ;
-	  }
-	}
+            sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanDo*)chanp->cop)->Identity, 0,
+                             (char*)msg->payload, &value);
+            if (ODD(sts))
+            {
+              if (*(pwr_tBoolean*)chanp->vbp != value)
+              {
+                *(pwr_tBoolean*)chanp->vbp = value;
+              }
+            }
+            break;
+          }
+          case pwr_cClass_ChanIi:
+          {
+            pwr_tInt32 value;
+            sts = json_match(chanp->ChanClass, ((pwr_sClass_ChanIi*)chanp->cop)->Identity, 0,
+                             (char*)msg->payload, &value);
+            if (ODD(sts))
+            {
+              *(pwr_tInt32*)chanp->vbp = value;
+            }
+            break;
+          }
+          case pwr_cClass_ChanAi:
+          {
+            pwr_tInt32 ivalue;
+            pwr_tFloat32 fvalue;
+
+            if (((pwr_sClass_ChanAi*)chanp->cop)->Representation == pwr_eDataRepEnum_Float32)
+            {
+              sts =
+                  json_match(chanp->ChanClass, ((pwr_sClass_ChanAi*)chanp->cop)->Identity,
+                             ((pwr_sClass_ChanAi*)chanp->cop)->Representation, (char*)msg->payload, &fvalue);
+              if (ODD(sts))
+              {
+                fvalue = ((pwr_sClass_ChanAi*)chanp->cop)->SensorPolyCoef0 +
+                         ((pwr_sClass_ChanAi*)chanp->cop)->SensorPolyCoef1 * fvalue;
+                *(pwr_tFloat32*)chanp->vbp = fvalue;
+              }
+            }
+            else
+            {
+              sts =
+                  json_match(chanp->ChanClass, ((pwr_sClass_ChanAi*)chanp->cop)->Identity,
+                             ((pwr_sClass_ChanAi*)chanp->cop)->Representation, (char*)msg->payload, &ivalue);
+
+              if (ODD(sts))
+              {
+                ((pwr_sClass_Ai*)chanp->sop)->RawValue = ivalue;
+                io_ConvertAi32((pwr_sClass_ChanAi*)chanp->cop, ivalue, &fvalue);
+                *(pwr_tFloat32*)chanp->vbp = fvalue;
+              }
+            }
+            break;
+          }
+          default:;
+          }
+        }
       }
     }
   }
 }
 
-static void connect_cb(struct mosquitto *mosq, void *obj, int result)
+static void connect_cb(struct mosquitto* mosq, void* obj, int result)
 {
-  io_sRack* rp = (io_sRack *)obj;
-  io_sRackLocal* local = (io_sRackLocal *)rp->Local;
-  pwr_sClass_MQTT_Client *op = (pwr_sClass_MQTT_Client*)rp->op;
+  io_sRack* rp = (io_sRack*)obj;
+  io_sRackLocal* local = (io_sRackLocal*)rp->Local;
+  pwr_sClass_MQTT_Client* op = (pwr_sClass_MQTT_Client*)rp->op;
 
-  if(result){
+  if (result)
+  {
     op->Status = mqtt_error_to_sts(result);
     local->connected = mqtt_eCon_NotConnected;
-    if (result == MOSQ_ERR_CONN_REFUSED) {
+    if (result == MOSQ_ERR_CONN_REFUSED)
+    {
       errh_Fatal("Remote mqtt terminated, %s", mosquitto_connack_string(result));
       exit(0);
     }
   }
-  else {
-    if (local->is_subscriber) {
+  else
+  {
+    if (local->is_subscriber)
+    {
       mosquitto_subscribe(local->mosq, NULL, op->SubscribeTopic, 0);
     }
     op->Status = REM__TT_CONNECTED;
@@ -458,22 +512,25 @@ static void connect_cb(struct mosquitto *mosq, void *obj, int result)
 
 static int mqtt_connect(io_sRack* rp)
 {
-  io_sRackLocal* local = (io_sRackLocal *)rp->Local;
-  pwr_sClass_MQTT_Client *op = (pwr_sClass_MQTT_Client*)rp->op;
+  io_sRackLocal* local = (io_sRackLocal*)rp->Local;
+  pwr_sClass_MQTT_Client* op = (pwr_sClass_MQTT_Client*)rp->op;
 
   int rc;
   char id[20];
 
-  if (!local->mosq) {
+  if (!local->mosq)
+  {
     sprintf(id, "%u", rp->Objid.oix);
     local->mosq = mosquitto_new(id, true, rp);
-    if (local->mosq == NULL) {
-      if (errno == ENXIO) {
-	op->Status = IO__NOMQTT;
-	return op->Status;
+    if (local->mosq == NULL)
+    {
+      if (errno == ENXIO)
+      {
+        op->Status = IO__NOMQTT;
+        return op->Status;
       }
     }
-  
+
     mosquitto_connect_callback_set(local->mosq, connect_cb);
     if (local->is_subscriber)
       mosquitto_message_callback_set(local->mosq, message_cb);
@@ -483,15 +540,18 @@ static int mqtt_connect(io_sRack* rp)
     // mosquitto_tls_set(local->mosq, "ca-cert.pem", NULL, NULL, NULL, NULL);
 
     rc = mosquitto_connect(local->mosq, op->Server, op->Port, 60);
-    if (rc) {
+    if (rc)
+    {
       op->Status = mqtt_error_to_sts(rc);
       return op->Status;
     }
     local->connected = mqtt_eCon_WaitConnect;
   }
-  else {
+  else
+  {
     rc = mosquitto_reconnect(local->mosq);
-    if (rc) {
+    if (rc)
+    {
       op->Status = mqtt_error_to_sts(rc);
       return op->Status;
     }
@@ -501,14 +561,16 @@ static int mqtt_connect(io_sRack* rp)
 
 static void* mqtt_loop(void* arg)
 {
-  io_sRack *rp = (io_sRack *)arg;
-  pwr_sClass_MQTT_Client* op = (pwr_sClass_MQTT_Client *)rp->op;
-  io_sRackLocal* local = (io_sRackLocal *)rp->Local;
+  io_sRack* rp = (io_sRack*)arg;
+  pwr_sClass_MQTT_Client* op = (pwr_sClass_MQTT_Client*)rp->op;
+  io_sRackLocal* local = (io_sRackLocal*)rp->Local;
   int rc;
 
-  while(1) {
+  while (1)
+  {
     rc = mosquitto_loop(local->mosq, -1, 1);
-    if (rc) {
+    if (rc)
+    {
       op->Status = mqtt_error_to_sts(rc);
       sleep(10);
       mosquitto_reconnect(local->mosq);
@@ -521,13 +583,13 @@ static void* mqtt_loop(void* arg)
 static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 {
   io_sRackLocal* local;
-  pwr_sClass_MQTT_Client* op = (pwr_sClass_MQTT_Client *)rp->op;
+  pwr_sClass_MQTT_Client* op = (pwr_sClass_MQTT_Client*)rp->op;
   pwr_tStatus sts;
   pwr_tOName name;
-  pwr_sClass_MQTT_Device *cop;
-  io_sCard *cp;
+  pwr_sClass_MQTT_Device* cop;
+  io_sCard* cp;
   int i;
-  
+
   sts = gdh_ObjidToName(rp->Objid, name, sizeof(name), cdh_mNName);
   errh_Info("Init of MQTT IO Client %s", name);
 
@@ -537,27 +599,31 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   if (streq(op->Server, ""))
     strcpy(op->Server, "localhost");
 
-  for (cp = rp->cardlist; cp; cp = cp->next) {
-    cop = (pwr_sClass_MQTT_Device *)cp->op;
+  for (cp = rp->cardlist; cp; cp = cp->next)
+  {
+    cop = (pwr_sClass_MQTT_Device*)cp->op;
     if (!streq(cop->SubscribeTopic, ""))
       local->is_subscriber = 1;
     if (!streq(cop->PublishTopic, ""))
       local->is_publisher = 1;
   }
 
-  for (cp = rp->cardlist; cp; cp = cp->next) {
-    for (i = 0; i < cp->ChanListSize; i++) {
-      io_sChannel *chanp = &cp->chanlist[i];
+  for (cp = rp->cardlist; cp; cp = cp->next)
+  {
+    for (i = 0; i < cp->ChanListSize; i++)
+    {
+      io_sChannel* chanp = &cp->chanlist[i];
       if (!chanp->sop)
-	continue;
-      switch (chanp->ChanClass) {
+        continue;
+      switch (chanp->ChanClass)
+      {
       case pwr_cClass_ChanAi:
-	io_AiRangeToCoef(&cp->chanlist[i]);
-	break;
+        io_AiRangeToCoef(&cp->chanlist[i]);
+        break;
       case pwr_cClass_ChanAo:
-	io_AoRangeToCoef(&cp->chanlist[i]);
-	break;
-      default: ;
+        io_AoRangeToCoef(&cp->chanlist[i]);
+        break;
+      default:;
       }
     }
   }
@@ -575,41 +641,46 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
 static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 {
-  io_sCard *cp;
-  pwr_sClass_MQTT_Device *cop;
+  io_sCard* cp;
+  pwr_sClass_MQTT_Device* cop;
   int i;
 
-  for (cp = rp->cardlist; cp; cp = cp->next) {
-    cop = (pwr_sClass_MQTT_Device *)cp->op;
+  for (cp = rp->cardlist; cp; cp = cp->next)
+  {
+    cop = (pwr_sClass_MQTT_Device*)cp->op;
 
-    for (i = 0; i < cp->ChanListSize; i++) {
-      io_sChannel *chanp = &cp->chanlist[i];
+    for (i = 0; i < cp->ChanListSize; i++)
+    {
+      io_sChannel* chanp = &cp->chanlist[i];
       if (!chanp->sop)
-	continue;
-      switch (chanp->ChanClass) {
+        continue;
+      switch (chanp->ChanClass)
+      {
       case pwr_cClass_ChanDi:
-	if (chanp->udata == 2)
-	  break;
-	if (*(pwr_tBoolean *)chanp->vbp) {
-	  if (chanp->udata) {
-	    *(pwr_tBoolean *)chanp->vbp = 0;
-	    chanp->udata = 0;
-	  }
-	  else
-	    chanp->udata = 1;
-	}
-	break;
+        if (chanp->udata == 2)
+          break;
+        if (*(pwr_tBoolean*)chanp->vbp)
+        {
+          if (chanp->udata)
+          {
+            *(pwr_tBoolean*)chanp->vbp = 0;
+            chanp->udata = 0;
+          }
+          else
+            chanp->udata = 1;
+        }
+        break;
       case pwr_cClass_ChanAi:
-	if (((pwr_sClass_ChanAi *)chanp->cop)->CalculateNewCoef)
-	  // Request to calculate new coefficients
-	  io_AiRangeToCoef(chanp);
-	break;
+        if (((pwr_sClass_ChanAi*)chanp->cop)->CalculateNewCoef)
+          // Request to calculate new coefficients
+          io_AiRangeToCoef(chanp);
+        break;
       case pwr_cClass_ChanAo:
-	if (((pwr_sClass_ChanAo *)chanp->cop)->CalculateNewCoef)
-	  // Request to calculate new coefficients
-	  io_AoRangeToCoef(chanp);
-	break;
-      default: ;
+        if (((pwr_sClass_ChanAo*)chanp->cop)->CalculateNewCoef)
+          // Request to calculate new coefficients
+          io_AoRangeToCoef(chanp);
+        break;
+      default:;
       }
     }
   }
@@ -618,100 +689,101 @@ static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
 static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 {
-  io_sRackLocal* local = (io_sRackLocal *)rp->Local;
-  //pwr_sClass_MQTT_Client *op = (pwr_sClass_MQTT_Client*)rp->op;
-  io_sCard *cp;
-  pwr_sClass_MQTT_Device *cop;
+  io_sRackLocal* local = (io_sRackLocal*)rp->Local;
+  // pwr_sClass_MQTT_Client *op = (pwr_sClass_MQTT_Client*)rp->op;
+  io_sCard* cp;
+  pwr_sClass_MQTT_Device* cop;
   int i;
   int sts;
   int rc;
 
-  for (cp = rp->cardlist; cp; cp = cp->next) {
-    cop = (pwr_sClass_MQTT_Device *)cp->op;
+  for (cp = rp->cardlist; cp; cp = cp->next)
+  {
+    cop = (pwr_sClass_MQTT_Device*)cp->op;
 
-    for (i = 0; i < cp->ChanListSize; i++) {
-      io_sChannel *chanp = &cp->chanlist[i];
+    for (i = 0; i < cp->ChanListSize; i++)
+    {
+      io_sChannel* chanp = &cp->chanlist[i];
       if (!chanp->sop)
-	continue;
-      switch (chanp->ChanClass) {
+        continue;
+      switch (chanp->ChanClass)
+      {
       case pwr_cClass_ChanDo:
-	if (*(pwr_tBoolean *)chanp->vbp && !chanp->udata) {
-	  /* Publish set */
-	  char msg[200];
+        if (*(pwr_tBoolean*)chanp->vbp && !chanp->udata)
+        {
+          /* Publish set */
+          char msg[200];
 
-	  chanp->udata = 1;
-	  sts = json_msg(((pwr_sClass_ChanDo *)chanp->cop)->Identity, 
-			 *(pwr_tBoolean *)chanp->vbp, msg);
+          chanp->udata = 1;
+          sts = json_msg(((pwr_sClass_ChanDo*)chanp->cop)->Identity, *(pwr_tBoolean*)chanp->vbp, msg);
 
-	  rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), 
-				 msg, 1, 0);
-	  cop->PublishCount++;
-	}
-	else if (!(*(pwr_tBoolean *)chanp->vbp) && chanp->udata) {
-	  /* Publish reset */
-	  char msg[200];
+          rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), msg, 1, 0);
+          cop->PublishCount++;
+        }
+        else if (!(*(pwr_tBoolean*)chanp->vbp) && chanp->udata)
+        {
+          /* Publish reset */
+          char msg[200];
 
-	  chanp->udata = 0;
-	  sts = json_msg(((pwr_sClass_ChanDo *)chanp->cop)->Identity, 
-			 *(pwr_tBoolean *)chanp->vbp, msg);
+          chanp->udata = 0;
+          sts = json_msg(((pwr_sClass_ChanDo*)chanp->cop)->Identity, *(pwr_tBoolean*)chanp->vbp, msg);
 
-	  rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), 
-				 msg, 1, 0);
-	  cop->PublishCount++;
-	}
-	break;
+          rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), msg, 1, 0);
+          cop->PublishCount++;
+        }
+        break;
       case pwr_cClass_ChanIo:
-	if (*(pwr_tInt32 *)chanp->vbp != chanp->udata) {
-	  /* Publish set */
-	  pwr_tInt32 value;
-	  char msg[200];
+        if (*(pwr_tInt32*)chanp->vbp != chanp->udata)
+        {
+          /* Publish set */
+          pwr_tInt32 value;
+          char msg[200];
 
-	  switch(((pwr_sClass_ChanIo *)chanp->cop)->RawValueType) {
-	  case pwr_eRawValueTypeEnum_DeltaValue:
-	    value = *(pwr_tInt32 *)chanp->vbp - chanp->udata;
-	    break;
-	  default:
-	    value = *(pwr_tInt32 *)chanp->vbp;
-	  }
-	  chanp->udata = *(pwr_tInt32 *)chanp->vbp;
-	  sts = json_amsg(((pwr_sClass_ChanIo *)chanp->cop)->Identity, 
-			  value, msg);
+          switch (((pwr_sClass_ChanIo*)chanp->cop)->RawValueType)
+          {
+          case pwr_eRawValueTypeEnum_DeltaValue:
+            value = *(pwr_tInt32*)chanp->vbp - chanp->udata;
+            break;
+          default:
+            value = *(pwr_tInt32*)chanp->vbp;
+          }
+          chanp->udata = *(pwr_tInt32*)chanp->vbp;
+          sts = json_amsg(((pwr_sClass_ChanIo*)chanp->cop)->Identity, value, msg);
 
-	  rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), 
-				 msg, 1, 0);
-	  cop->PublishCount++;
-	}
-	break;
-      case pwr_cClass_ChanAo: {
-	pwr_tInt32 rawvalue, value;
+          rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), msg, 1, 0);
+          cop->PublishCount++;
+        }
+        break;
+      case pwr_cClass_ChanAo:
+      {
+        pwr_tInt32 rawvalue, value;
 
-	rawvalue = round(*(pwr_tFloat32*)chanp->vbp * 
-		      ((pwr_sClass_ChanAo *)chanp->cop)->OutPolyCoef1
-		      + ((pwr_sClass_ChanAo *)chanp->cop)->OutPolyCoef0);
+        rawvalue = round(*(pwr_tFloat32*)chanp->vbp * ((pwr_sClass_ChanAo*)chanp->cop)->OutPolyCoef1 +
+                         ((pwr_sClass_ChanAo*)chanp->cop)->OutPolyCoef0);
 
-	if (rawvalue != chanp->udata) {
-	  /* Publish set */
-	  char msg[200];
+        if (rawvalue != chanp->udata)
+        {
+          /* Publish set */
+          char msg[200];
 
-	  switch(((pwr_sClass_ChanAo *)chanp->cop)->RawValueType) {
-	  case pwr_eRawValueTypeEnum_DeltaValue:
-	    value = rawvalue - chanp->udata;
-	    break;
-	  default:
-	    value = rawvalue;
-	  }
-	  chanp->udata = rawvalue;
-	  sts = json_amsg(((pwr_sClass_ChanAo *)chanp->cop)->Identity, 
-			 value, msg);
+          switch (((pwr_sClass_ChanAo*)chanp->cop)->RawValueType)
+          {
+          case pwr_eRawValueTypeEnum_DeltaValue:
+            value = rawvalue - chanp->udata;
+            break;
+          default:
+            value = rawvalue;
+          }
+          chanp->udata = rawvalue;
+          sts = json_amsg(((pwr_sClass_ChanAo*)chanp->cop)->Identity, value, msg);
 
-	  rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), 
-				 msg, 1, 0);
-	  ((pwr_sClass_Ao *)chanp->sop)->RawValue = rawvalue;
-	  cop->PublishCount++;
-	}
-	break;
+          rc = mosquitto_publish(local->mosq, NULL, cop->PublishTopic, strlen(msg), msg, 1, 0);
+          ((pwr_sClass_Ao*)chanp->sop)->RawValue = rawvalue;
+          cop->PublishCount++;
+        }
+        break;
       }
-      default: ;
+      default:;
       }
     }
   }
@@ -721,7 +793,7 @@ static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
 static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 {
-  io_sRackLocal* local = (io_sRackLocal *)rp->Local;
+  io_sRackLocal* local = (io_sRackLocal*)rp->Local;
 
   mosquitto_disconnect(local->mosq);
   pthread_cancel(local->loop_thread);
@@ -731,26 +803,14 @@ static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 }
 
 #else
-static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__RELEASEBUILD;
-}
-static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__RELEASEBUILD;
-}
-static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__RELEASEBUILD;
-}
-static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__RELEASEBUILD;
-}
+static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__RELEASEBUILD; }
+static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__RELEASEBUILD; }
+static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__RELEASEBUILD; }
+static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__RELEASEBUILD; }
 #endif
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(MQTT_Client) = { pwr_BindIoMethod(IoRackInit),
-    pwr_BindIoMethod(IoRackClose), pwr_BindIoMethod(IoRackRead), 
-    pwr_BindIoMethod(IoRackWrite), pwr_NullMethod};
+pwr_dExport pwr_BindIoMethods(MQTT_Client) = {pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackClose),
+                                              pwr_BindIoMethod(IoRackRead), pwr_BindIoMethod(IoRackWrite),
+                                              pwr_NullMethod};

@@ -49,7 +49,8 @@
 #include "ge.h"
 #include "ge_dyn.h"
 
-extern "C" {
+extern "C"
+{
 #if LDH
 #include "wb_wccm.h"
 #endif
@@ -67,21 +68,26 @@ int Graph::convert()
 
   // Convert all objects
   grow_GetObjectList(grow->ctx, &objectlist, &object_cnt);
-  for (int i = 0; i < object_cnt; i++) {
+  for (int i = 0; i < object_cnt; i++)
+  {
     grow_GetObjectName(objectlist[i], name, sizeof(name), glow_eName_Object);
-    if (streq(name, "")) {
+    if (streq(name, ""))
+    {
       sprintf(name, "O%d", grow_IncrNextObjectNameNumber(grow->ctx));
       grow_SetObjectName(objectlist[i], name);
     }
 
-    if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup) {
+    if (grow_GetObjectType(objectlist[i]) == glow_eObjectType_GrowGroup)
+    {
       grow_tObject* grouplist;
       int group_cnt;
 
       grow_GetGroupObjectList(objectlist[i], &grouplist, &group_cnt);
-      for (int j = 0; j < group_cnt; j++) {
+      for (int j = 0; j < group_cnt; j++)
+      {
         grow_GetObjectName(grouplist[j], name, sizeof(name), glow_eName_Object);
-        if (streq(name, "")) {
+        if (streq(name, ""))
+        {
           sprintf(name, "O%d", grow_IncrNextObjectNameNumber(grow->ctx));
           grow_SetObjectName(grouplist[j], name);
         }
@@ -95,8 +101,5 @@ int Graph::convert()
 
 #else
 
-int Graph::convert()
-{
-  return 1;
-}
+int Graph::convert() { return 1; }
 #endif

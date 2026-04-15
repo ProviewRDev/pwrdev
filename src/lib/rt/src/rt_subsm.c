@@ -71,13 +71,16 @@ static void associateBuffer(sub_sServer* sp)
 
   /* Search (linear!) for a suitable buffer.  */
 
-  for (found = FALSE, bl = pool_Qsucc(NULL, gdbroot->pool, &np->nodsubb_lh);
-       bl != &np->nodsubb_lh; bl = pool_Qsucc(NULL, gdbroot->pool, bl)) {
+  for (found = FALSE, bl = pool_Qsucc(NULL, gdbroot->pool, &np->nodsubb_lh); bl != &np->nodsubb_lh;
+       bl = pool_Qsucc(NULL, gdbroot->pool, bl))
+  {
     bp = pool_Qitem(bl, sub_sBuffer, nodsubb_ll);
 
-    if (bp->totsize + sp->aref.Size < sub_cMsgSize) {
+    if (bp->totsize + sp->aref.Size < sub_cMsgSize)
+    {
       /* Within size limit */
-      if ((bp->dt < sp->dt * 2) && (bp->dt * 2 > sp->dt)) {
+      if ((bp->dt < sp->dt * 2) && (bp->dt * 2 > sp->dt))
+      {
         /* Time is within reasonable range.
            Pick this SUBBUF! */
 
@@ -89,7 +92,8 @@ static void associateBuffer(sub_sServer* sp)
 
   /* Allocate a new buffer if none was found.  */
 
-  if (!found) {
+  if (!found)
+  {
     bp = pool_Alloc(NULL, gdbroot->pool, sizeof(*bp));
 
     pool_Qinit(NULL, gdbroot->pool, &bp->subb_ll);
@@ -110,11 +114,11 @@ static void associateBuffer(sub_sServer* sp)
   /* Tie buffer and server structures together.
      Initiate data pointer and increment the refrenced object's sub counter.  */
 
-  do {
+  do
+  {
     sp->data = pool_cNRef;
 
-    ap = vol_ArefToAttribute(
-        &sp->sts, &Attribute, &sp->aref, gdb_mLo_owned, vol_mTrans_alias);
+    ap = vol_ArefToAttribute(&sp->sts, &Attribute, &sp->aref, gdb_mLo_owned, vol_mTrans_alias);
     if (ap == NULL || ap->op == NULL)
       break;
 
@@ -144,11 +148,11 @@ void subsm_ActivateBuffer(sub_sBuffer* bp, pwr_tUInt32 dt)
 {
   gdb_AssumeLocked;
 
-  if (!bp->queued) {
+  if (!bp->queued)
+  {
     bp->tmonq.dt = MIN(bp->dt, dt);
     bp->tmonq.type = gdb_eTmon_subbCheck;
-    pool_QinsertPred(
-        NULL, gdbroot->pool, &bp->tmonq.ll, &gdbroot->db->tmonq_lh);
+    pool_QinsertPred(NULL, gdbroot->pool, &bp->tmonq.ll, &gdbroot->db->tmonq_lh);
     bp->queued = TRUE;
     bp->sts = GDH__SUCCESS;
   }
@@ -172,14 +176,15 @@ void subsm_Add(qcom_sGet* get)
   gdb_ScopeLock
   {
     np = hash_Search(&sts, gdbroot->nid_ht, &get->sender.nid);
-    if (np == NULL) {
-      errh_Error("subsm_Add, node (%s), is not known",
-          cdh_NodeIdToString(NULL, get->sender.nid, 1, 0));
+    if (np == NULL)
+    {
+      errh_Error("subsm_Add, node (%s), is not known", cdh_NodeIdToString(NULL, get->sender.nid, 1, 0));
       break;
     }
 
     specp = &mp->spec[0];
-    for (i = 0; i < mp->count; i++, specp++) {
+    for (i = 0; i < mp->count; i++, specp++)
+    {
       /* For all entries in the message.  */
       sp = pool_Alloc(NULL, gdbroot->pool, sizeof(*sp));
 
@@ -191,14 +196,14 @@ void subsm_Add(qcom_sGet* get)
 
       /* Enter server in list of all servers */
 
-      pool_QinsertPred(
-          NULL, gdbroot->pool, &sp->subs_ll, &gdbroot->db->subs_lh);
+      pool_QinsertPred(NULL, gdbroot->pool, &sp->subs_ll, &gdbroot->db->subs_lh);
       gdbroot->db->subs_lc++;
       pool_QinsertPred(NULL, gdbroot->pool, &sp->nodsubs_ll, &np->nodsubs_lh);
 
       /* Enter server in the server table (keyed by pwr_tSubid) */
 
-      do {
+      do
+      {
         s2p = hash_Insert(&sts, gdbroot->subs_ht, sp);
         if (s2p != NULL)
           break;
@@ -226,9 +231,9 @@ void subsm_FlushNode(pwr_tStatus* sts, gdb_sNode* np)
 
   gdb_AssumeLocked;
 
-  for (ssl = pool_Qsucc(NULL, gdbroot->pool, &np->nodsubs_lh);
-       ssl != &np->nodsubs_lh;
-       ssl = pool_Qsucc(NULL, gdbroot->pool, &np->nodsubs_lh)) {
+  for (ssl = pool_Qsucc(NULL, gdbroot->pool, &np->nodsubs_lh); ssl != &np->nodsubs_lh;
+       ssl = pool_Qsucc(NULL, gdbroot->pool, &np->nodsubs_lh))
+  {
     subs_DeleteServer(pool_Qitem(ssl, sub_sServer, nodsubs_ll));
   }
 }
@@ -247,9 +252,11 @@ void subsm_Remove(qcom_sGet* get)
 
   gdb_ScopeLock
   {
-    for (i = 0; i < mp->count; i++) {
+    for (i = 0; i < mp->count; i++)
+    {
       sp = hash_Search(&sts, gdbroot->subs_ht, &mp->sid[i]);
-      if (sp != NULL) {
+      if (sp != NULL)
+      {
         subs_DeleteServer(sp);
       }
     }
@@ -284,7 +291,8 @@ pwr_tBoolean subsm_SendBuffer(sub_sBuffer* bp)
 
   gdb_AssumeLocked;
 
-  if (bp->bufsubs_lc == 0) {
+  if (bp->bufsubs_lc == 0)
+  {
     /* This buffer is not used and can be dequeued.  */
 
     pool_Qremove(NULL, gdbroot->pool, &bp->subb_ll);
@@ -294,13 +302,14 @@ pwr_tBoolean subsm_SendBuffer(sub_sBuffer* bp)
     return NO;
   }
 
-  if (remote) {
+  if (remote)
+  {
     /* Build a buffer containing the update message */
 
     subdatahdrsize = sizeof(*dp) - sizeof(dp->data);
-    size = bp->totsize + /* size of data */
-        bp->bufsubs_lc * subdatahdrsize + /* size of data hdrs */
-        sizeof(*mp) - sizeof(mp->subdata); /* size of msg hdr */
+    size = bp->totsize +                      /* size of data */
+           bp->bufsubs_lc * subdatahdrsize +  /* size of data hdrs */
+           sizeof(*mp) - sizeof(mp->subdata); /* size of msg hdr */
 
     size = (size + 3) & ~3; /* Size up to nearest multiple of 4.  */
 
@@ -316,32 +325,40 @@ pwr_tBoolean subsm_SendBuffer(sub_sBuffer* bp)
   pwr_Assert(np != NULL);
 
   for (/* For all subscription servers of this buffer.  */
-      i = 0, sl = pool_Qsucc(NULL, gdbroot->pool, &bp->bufsubs_lh);
-      sl != &bp->bufsubs_lh
-      && i < bp->bufsubs_lc; /* !!! To do !!! Redundant check.  */
-      i++, sl = pool_Qsucc(NULL, gdbroot->pool, sl)) {
+       i = 0, sl = pool_Qsucc(NULL, gdbroot->pool, &bp->bufsubs_lh);
+       sl != &bp->bufsubs_lh && i < bp->bufsubs_lc; /* !!! To do !!! Redundant check.  */
+       i++, sl = pool_Qsucc(NULL, gdbroot->pool, sl))
+  {
     sp = pool_Qitem(sl, sub_sServer, bufsubs_ll);
 
-    if (!remote) {
+    if (!remote)
+    {
       /* If target is on same node we can optimize a lot... */
 
       cp = hash_Search(&sp->sts, gdbroot->subc_ht, &sp->sid);
 
-      if (cp != NULL) {
-        if (cp->userdata == pool_cNRef) {
+      if (cp != NULL)
+      {
+        if (cp->userdata == pool_cNRef)
+        {
           /* If no userdata buffer, then we don't need to transfer */
           ;
-        } else {
+        }
+        else
+        {
           /* Userdata buffer needs to be filled... */
-          if (sp->data == pool_cNRef) {
+          if (sp->data == pool_cNRef)
+          {
             sp->sts = GDH__NOSUCHOBJ;
-          } else {
+          }
+          else
+          {
             data = pool_Address(&sp->sts, gdbroot->rtdb, sp->data);
           }
           cp->sts = sp->sts;
-          if (ODD(cp->sts)) {
-            memcpy(pool_Address(NULL, gdbroot->rtdb, cp->userdata), data,
-                MIN(cp->usersize, cp->aref.Size));
+          if (ODD(cp->sts))
+          {
+            memcpy(pool_Address(NULL, gdbroot->rtdb, cp->userdata), data, MIN(cp->usersize, cp->aref.Size));
           }
         }
         cp->old = FALSE;
@@ -349,7 +366,9 @@ pwr_tBoolean subsm_SendBuffer(sub_sBuffer* bp)
         time_GetTime(&cp->lastupdate);
         sp->count++;
       }
-    } else {
+    }
+    else
+    {
       /* Remote subscription.  */
       dp->sid = sp->sid;
       dp->size = sp->aref.Size;
@@ -359,25 +378,26 @@ pwr_tBoolean subsm_SendBuffer(sub_sBuffer* bp)
       data = pool_Address(&sp->sts, gdbroot->rtdb, sp->data);
       dp->sts = sp->sts;
 
-      if (ODD(sp->sts)) {
+      if (ODD(sp->sts))
+      {
         asize = sp->aref.Size;
         cid.pwr = sp->aref.Body;
         cid.c.bix = 0; /* To get the class id.  */
         classp = hash_Search(&sts, gdbroot->cid_ht, &cid.pwr);
-        if (classp != NULL) {
-          ndc_ConvertData(&lsts, np, classp, &sp->aref, dp->data, data,
-              (pwr_tUInt32*)&asize, ndc_eOp_encode, sp->aref.Offset, 0);
-	  if (EVEN(lsts))
-	    dp->sts = lsts;
-	}
+        if (classp != NULL)
+        {
+          ndc_ConvertData(&lsts, np, classp, &sp->aref, dp->data, data, (pwr_tUInt32*)&asize, ndc_eOp_encode,
+                          sp->aref.Offset, 0);
+          if (EVEN(lsts))
+            dp->sts = lsts;
+        }
         sp->count++;
       }
       mp->count++;
 
       /* Advance pointer to next sdata slot */
 
-      dp = (net_sSubData*)((unsigned long)dp + (unsigned long)sp->aref.Size
-          + subdatahdrsize);
+      dp = (net_sSubData*)((unsigned long)dp + (unsigned long)sp->aref.Size + subdatahdrsize);
     }
   }
 
@@ -385,7 +405,8 @@ pwr_tBoolean subsm_SendBuffer(sub_sBuffer* bp)
 
   subsm_ActivateBuffer(bp, bp->dt);
 
-  if (remote) {
+  if (remote)
+  {
     tgt.qix = net_cProcHandler;
     tgt.nid = np->nid;
 

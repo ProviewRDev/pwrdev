@@ -46,7 +46,8 @@ array_tCtx array_New(int elemsize, int alloc_incr)
   if (!arr)
     return NULL;
   arr->data = calloc(1, elemsize * alloc_incr);
-  if (!arr->data) {
+  if (!arr->data)
+  {
     free(arr);
     return NULL;
   }
@@ -63,14 +64,12 @@ void array_Delete(array_tCtx arr)
   free((char*)arr);
 }
 
-int array_Push(array_tCtx arr, void* elem)
-{
-  return array_Concat(arr, elem, 1);
-}
+int array_Push(array_tCtx arr, void* elem) { return array_Concat(arr, elem, 1); }
 
 int array_Concat(array_tCtx arr, void* elems, int number)
 {
-  if (arr->capacity <= arr->size + number - 1) {
+  if (arr->capacity <= arr->size + number - 1)
+  {
     int newCapacity = MAX(arr->capacity + arr->alloc_incr, arr->size + number);
     void* a_tmp = realloc(arr->data, arr->elemsize * newCapacity);
     if (!a_tmp)
@@ -78,8 +77,7 @@ int array_Concat(array_tCtx arr, void* elems, int number)
     arr->data = a_tmp;
     arr->capacity = newCapacity;
   }
-  memcpy((char*)arr->data + arr->size * arr->elemsize, elems,
-      arr->elemsize * number);
+  memcpy((char*)arr->data + arr->size * arr->elemsize, elems, arr->elemsize * number);
   arr->size += number;
   return 1;
 }

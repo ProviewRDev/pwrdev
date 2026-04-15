@@ -45,37 +45,38 @@
 #include "rt_redu.h"
 #include "rt_semaphore.h"
 
-static const unsigned int pwr_cInputOffset
-    = pwr_AlignLW(sizeof(void*)) + pwr_AlignLW(sizeof(pwr_tBoolean));
-static const unsigned int pwr_cInputOffsetAt
-    = pwr_AlignLW(sizeof(void*)) + pwr_AlignLW(sizeof(pwr_tTime));
-static const unsigned int pwr_cInputOffsetDt
-    = pwr_AlignLW(sizeof(void*)) + pwr_AlignLW(sizeof(pwr_tDeltaTime));
-static const unsigned int pwr_cInputOffsetDataRef
-    = pwr_AlignLW(sizeof(void*)) + pwr_AlignLW(sizeof(pwr_tDataRef));
-static const unsigned int pwr_cInputOffsetStr
-    = pwr_AlignLW(sizeof(void*)) + pwr_AlignLW(sizeof(pwr_tString80));
+static const unsigned int pwr_cInputOffset = pwr_AlignLW(sizeof(void*)) + pwr_AlignLW(sizeof(pwr_tBoolean));
+static const unsigned int pwr_cInputOffsetAt = pwr_AlignLW(sizeof(void*)) + pwr_AlignLW(sizeof(pwr_tTime));
+static const unsigned int pwr_cInputOffsetDt =
+    pwr_AlignLW(sizeof(void*)) + pwr_AlignLW(sizeof(pwr_tDeltaTime));
+static const unsigned int pwr_cInputOffsetDataRef =
+    pwr_AlignLW(sizeof(void*)) + pwr_AlignLW(sizeof(pwr_tDataRef));
+static const unsigned int pwr_cInputOffsetStr =
+    pwr_AlignLW(sizeof(void*)) + pwr_AlignLW(sizeof(pwr_tString80));
 
 typedef struct plc_sProcess plc_sProcess;
 typedef struct plc_sThread plc_sThread;
 typedef struct plc_sDlink plc_sDlink;
 
-struct plc_sDlink {
+struct plc_sDlink
+{
   void* p;
   pwr_tObjid oid;
   pwr_tSubid sid;
   pwr_tUInt32 size;
 };
 
-#define IO_AREA(type)                                                          \
-  struct {                                                                     \
-    type* p;                                                                   \
-    pwr_tObjid oid;                                                            \
-    pwr_tSubid sid;                                                            \
-    pwr_tUInt32 size;                                                          \
+#define IO_AREA(type)                                                                                        \
+  struct                                                                                                     \
+  {                                                                                                          \
+    type* p;                                                                                                 \
+    pwr_tObjid oid;                                                                                          \
+    pwr_tSubid sid;                                                                                          \
+    pwr_tUInt32 size;                                                                                        \
   }
 
-typedef struct {
+typedef struct
+{
   IO_AREA(pwr_sClass_AiArea) ai_a;
   IO_AREA(pwr_sClass_AoArea) ao_a;
   IO_AREA(pwr_sClass_AvArea) av_a;
@@ -112,7 +113,8 @@ typedef struct {
 
 #include "rt_io_base.h"
 
-struct plc_sThread {
+struct plc_sThread
+{
   thread_s tid;
   pwr_tOName name;
 #if defined OS_LINUX
@@ -176,7 +178,8 @@ struct plc_sThread {
   unsigned int ext_retry_connect_cnt;
 };
 
-struct plc_sProcess {
+struct plc_sProcess
+{
   int thread_count;
   plc_sThread* thread;
   pwr_sNode* Node;
@@ -195,11 +198,11 @@ struct plc_sProcess {
 };
 
 #if defined OS_LINUX
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 AreaIndex;
   pwr_tUInt32 Prio;
-  pwr_tUInt32 (*InitFunc)(
-      int DirectLink, unsigned long AreaIndex, unsigned long Prio, double Time);
+  pwr_tUInt32 (*InitFunc)(int DirectLink, unsigned long AreaIndex, unsigned long Prio, double Time);
   pwr_tUInt32 (*ExecFunc)();
 } THREAD_ARG;
 #endif

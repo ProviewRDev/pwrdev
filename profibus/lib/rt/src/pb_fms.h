@@ -389,7 +389,8 @@ typedef struct _T_ACC_SPEC
 {
   USIGN8 tag;   /* id of the access specification    */
   USIGN8 dummy; /* alignment byte                    */
-  union {
+  union
+  {
     USIGN16 index;                        /* access by index              */
     STRINGV name[MAX_ACCESS_NAME_LENGTH]; /* access by symbolic name      */
   } id;
@@ -412,16 +413,16 @@ typedef struct _T_DYN_ACC_SPEC
 /* --- Initiate-Service -----------------------------------------------------*/
 typedef struct _T_CTXT_INIT_REQ
 {
-  USIGN8 profile_number[2]; /* profile number                    */
-  PB_BOOL protection;       /* access protection                 */
-  USIGN8 password;          /* password                          */
-  USIGN8 access_groups;     /* access groups                     */
-  USIGN8 dummy;             /* alignment byte                    */
-  INT16 od_version;         /* od version                        */
-  USIGN8 snd_len_h;         /* max pdu size to send (high prio)  */
-  USIGN8 snd_len_l;         /* max pdu size to send (low prio)   */
-  USIGN8 rcv_len_h;         /* max pdu size to receive (high)    */
-  USIGN8 rcv_len_l;         /* max pdu size to receive (low)     */
+  USIGN8 profile_number[2];                 /* profile number                    */
+  PB_BOOL protection;                       /* access protection                 */
+  USIGN8 password;                          /* password                          */
+  USIGN8 access_groups;                     /* access groups                     */
+  USIGN8 dummy;                             /* alignment byte                    */
+  INT16 od_version;                         /* od version                        */
+  USIGN8 snd_len_h;                         /* max pdu size to send (high prio)  */
+  USIGN8 snd_len_l;                         /* max pdu size to send (low prio)   */
+  USIGN8 rcv_len_h;                         /* max pdu size to receive (high)    */
+  USIGN8 rcv_len_l;                         /* max pdu size to receive (low)     */
   USIGN8 supported_features[FEAT_SUPP_LEN]; /* supported features       */
 } T_CTXT_INIT_REQ;
 
@@ -437,11 +438,11 @@ typedef struct _T_CTXT_INIT_CNF
 
 typedef struct _T_CTXT_INIT_ERR_CNF
 {
-  USIGN16 class_code; /*  error class, error code          */
-  USIGN8 snd_len_h;   /*  max pdu size to send (high prio) */
-  USIGN8 snd_len_l;   /*  max pdu size to send (low prio)  */
-  USIGN8 rcv_len_h;   /*  max pdu size to receive (high)   */
-  USIGN8 rcv_len_l;   /*  max pdu size to receive (low)    */
+  USIGN16 class_code;                       /*  error class, error code          */
+  USIGN8 snd_len_h;                         /*  max pdu size to send (high prio) */
+  USIGN8 snd_len_l;                         /*  max pdu size to send (low prio)  */
+  USIGN8 rcv_len_h;                         /*  max pdu size to receive (high)   */
+  USIGN8 rcv_len_l;                         /*  max pdu size to receive (low)    */
   USIGN8 supported_features[FEAT_SUPP_LEN]; /*  supported features        */
 } T_CTXT_INIT_ERR_CNF;
 
@@ -493,7 +494,8 @@ typedef struct _T_TYPE_DESCR
 {
   USIGN8 tag;   /* type description identifier       */
   USIGN8 dummy; /* alignment byte                    */
-  union {
+  union
+  {
     T_SIMPLE_TYPE simple; /* simple type                       */
     T_ARRAY_TYPE array;   /* array type                        */
     T_RECORD_TYPE record; /* record type                       */
@@ -1041,7 +1043,8 @@ typedef struct _T_OV_ST_DS_DESCR
 #if (PB_VER >= 500)
 typedef struct _T_OBJECT_DESCR
 {
-  union {
+  union
+  {
     T_OD_OBJ_DESCR_HDR od_obj_descr;
     T_OD_NULL_OBJECT null_obj_descr;
     T_OD_ST_DT_DESCR dt_obj_descr;
@@ -1058,7 +1061,8 @@ typedef struct _T_OBJECT_DESCR
 #else
 typedef struct _T_OBJECT_DESCR
 {
-  union {
+  union
+  {
     T_OV_OBJ_DESCR_HDR ov_obj_descr;
     T_OV_NULL_OBJECT null_obj_descr;
     T_OV_ST_DT_DESCR dt_obj_descr;

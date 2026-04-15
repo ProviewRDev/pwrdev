@@ -53,8 +53,7 @@ unsigned short ssabdi_read(void* reg_diP, int grupp);
 
 void ssabdo_write(short data, void* reg_diP, int grupp);
 
-void ssabco_read(void* reg_diP, int numofword, int* co_id, unsigned short* data,
-    int channel);
+void ssabco_read(void* reg_diP, int numofword, int* co_id, unsigned short* data, int channel);
 
 void ssabco_write(unsigned short* data, void* reg_P, int channel);
 

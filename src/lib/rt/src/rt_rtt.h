@@ -215,13 +215,15 @@
 
 #define RTT_CLASSORT_SIZE 4
 
-typedef struct {
+typedef struct
+{
   int first_command;
   int last_command;
   char command[RTT_RECALL_MAX][200];
 } rtt_t_recall;
 
-typedef struct {
+typedef struct
+{
   char text[80 + RTT_CLASSORT_SIZE];
   int (*func)();
   int (*func2)();
@@ -236,7 +238,8 @@ typedef struct {
   int type;
 } rtt_t_menu;
 
-typedef struct {
+typedef struct
+{
   char text[80];
   int (*func)();
   int (*func2)();
@@ -264,7 +267,8 @@ typedef struct {
   char output_text[110];
 } rtt_t_menu_upd;
 
-typedef struct {
+typedef struct
+{
   char text[80];
   int (*func)();
   int (*func2)();
@@ -286,7 +290,8 @@ typedef struct {
   unsigned long status;
 } rtt_t_menu_alarm;
 
-typedef struct {
+typedef struct
+{
   unsigned long ctx_type;
   void* parent_ctx;
   unsigned long commandmode_id;
@@ -313,7 +318,8 @@ typedef struct {
   int (*appl_func)();
 } rtt_t_menu_ctx, *menu_ctx;
 
-typedef struct {
+typedef struct
+{
   unsigned long ctx_type;
   menu_ctx parent_ctx;
   char title[80];
@@ -327,22 +333,25 @@ typedef struct {
   int first;
   char* read_sts;
   int buff_read_complete;
-} * view_ctx;
+}* view_ctx;
 
-typedef struct {
+typedef struct
+{
   char command[20];
   int (*func)();
   char qualifier[30][40];
 } rtt_t_comtbl;
 
-typedef struct {
+typedef struct
+{
   int view_in_list;
   char subject[80];
   char infoline[80];
   char text[1500];
 } rtt_t_helptext;
 
-typedef struct {
+typedef struct
+{
   char text[80];
   int (*func1)();
   int (*func2)();
@@ -359,7 +368,8 @@ typedef struct {
   int declaration;
 } rtt_t_menu_update;
 
-typedef struct {
+typedef struct
+{
   int number;
   char text[80];
   char type[80];
@@ -379,7 +389,8 @@ typedef struct {
 
 typedef int rtt_t_backgr[2][80][22];
 
-typedef struct {
+typedef struct
+{
   char parameter[80];
   char* parameter_ptr;
 } rtt_t_db;
@@ -389,7 +400,8 @@ typedef struct {
 #define RTT_BUFFER_DEFSIZE 100
 #define RTT_LOGG_LINE_DEFSIZE 512
 
-typedef struct {
+typedef struct
+{
   char active;
   char occupied;
   char intern;

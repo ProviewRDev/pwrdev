@@ -41,22 +41,21 @@
 
 /* xtt_otree.h -- Object tree viewer */
 
-class XttOTree {
+class XttOTree
+{
 protected:
   void* parent_ctx;
   CowTree* cowtree;
   pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*);
 
 public:
-  XttOTree(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist, int xn_item_cnt,
-      unsigned int xn_options,
-      pwr_tStatus (*xn_action_cb)(void*, pwr_tAttrRef*));
+  XttOTree(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist, int xn_item_cnt, unsigned int xn_options,
+           pwr_tStatus (*xn_action_cb)(void*, pwr_tAttrRef*));
   void pop();
   void (*close_cb)(void*);
-  static pwr_tStatus get_object_info(void* ctx, pwr_tAttrRef* aref, char* name,
-      int nsize, char* cname, char* descr, int dsize);
-  static pwr_tStatus get_node_info(
-      void* ctx, char* name, char* descr, int dsize);
+  static pwr_tStatus get_object_info(void* ctx, pwr_tAttrRef* aref, char* name, int nsize, char* cname,
+                                     char* descr, int dsize);
+  static pwr_tStatus get_node_info(void* ctx, char* name, char* descr, int dsize);
   static pwr_tStatus action(void* ctx, pwr_tAttrRef* aref);
   static void close(void* ctx);
   virtual ~XttOTree();

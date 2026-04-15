@@ -42,25 +42,16 @@
 
 int XttMethodToolbar::m_disabled = 0;
 
-XttMethodToolbar::XttMethodToolbar(void* parent_ctx, void* xnav,
-    unsigned int op_method_mask, unsigned int mnt_method_mask,
-    const char* tooltip_suffix)
-    : m_xnav((XNav*)xnav), m_parent_ctx(parent_ctx),
-      m_op_method_mask(op_method_mask), m_mnt_method_mask(mnt_method_mask),
-      get_select_cb(0)
+XttMethodToolbar::XttMethodToolbar(void* parent_ctx, void* xnav, unsigned int op_method_mask,
+                                   unsigned int mnt_method_mask, const char* tooltip_suffix)
+    : m_xnav((XNav*)xnav), m_parent_ctx(parent_ctx), m_op_method_mask(op_method_mask),
+      m_mnt_method_mask(mnt_method_mask), get_select_cb(0)
 {
   strcpy(m_tooltip_suffix, tooltip_suffix);
 }
 
-XttMethodToolbar::~XttMethodToolbar()
-{
-}
+XttMethodToolbar::~XttMethodToolbar() {}
 
-void XttMethodToolbar::set_sensitive()
-{
-}
+void XttMethodToolbar::set_sensitive() {}
 
-void XttMethodToolbar::disable()
-{
-  m_disabled = 1;
-}
+void XttMethodToolbar::disable() { m_disabled = 1; }

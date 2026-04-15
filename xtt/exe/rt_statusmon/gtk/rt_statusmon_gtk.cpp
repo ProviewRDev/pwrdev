@@ -60,10 +60,7 @@ static void usage()
   $HOME/rt_statusmon.dat : setup file with requested nodes\n\n");
 }
 
-static void statusmon_close(void* ctx)
-{
-  exit(0);
-}
+static void statusmon_close(void* ctx) { exit(0); }
 
 int main(int argc, char* argv[])
 {
@@ -75,16 +72,24 @@ int main(int argc, char* argv[])
   pwr_tFileName conf_file = "";
   nl_mLayout layout = (nl_mLayout)0;
 
-  if (argc > 1) {
-    for (int i = 1; i < argc; i++) {
-      if (streq(argv[i], "-h")) {
+  if (argc > 1)
+  {
+    for (int i = 1; i < argc; i++)
+    {
+      if (streq(argv[i], "-h"))
+      {
         usage();
         exit(0);
-      } else if (streq(argv[i], "-l") && i + 1 < argc) {
+      }
+      else if (streq(argv[i], "-l") && i + 1 < argc)
+      {
         strncpy(language, argv[i + 1], sizeof(language));
         Lng::set(language);
-      } else if (streq(argv[i], "-m")) {
-        if (argc == i) {
+      }
+      else if (streq(argv[i], "-m"))
+      {
+        if (argc == i)
+        {
           usage();
           exit(0);
         }
@@ -98,21 +103,33 @@ int main(int argc, char* argv[])
           mode = nodelist_eMode_Status4;
         else if (streq(argv[i + 1], "5"))
           mode = nodelist_eMode_Status5;
-        else {
+        else
+        {
           usage();
           exit(0);
         }
         i++;
-      } else if (streq(argv[i], "-e")) {
+      }
+      else if (streq(argv[i], "-e"))
+      {
         layout = (nl_mLayout)(layout | nl_mLayout_view_node_descr);
-      } else if (streq(argv[i], "-t")) {
+      }
+      else if (streq(argv[i], "-t"))
+      {
         layout = (nl_mLayout)(layout | nl_mLayout_hide_rtmon);
-      } else if (streq(argv[i], "-g")) {
+      }
+      else if (streq(argv[i], "-g"))
+      {
         init_gdh = 1;
-      } else if (streq(argv[i], "-o")) {
+      }
+      else if (streq(argv[i], "-o"))
+      {
         open_map = 1;
-      } else if (streq(argv[i], "-c")) {
-        if (argc == i) {
+      }
+      else if (streq(argv[i], "-c"))
+      {
+        if (argc == i)
+        {
           usage();
           exit(0);
         }
@@ -123,9 +140,11 @@ int main(int argc, char* argv[])
 
   gtk_init(&argc, &argv);
 
-  if (init_gdh) {
+  if (init_gdh)
+  {
     sts = gdh_Init("rt_statusmon");
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       printf("** Unable to initialize gdh\n");
     }
   }
@@ -135,9 +154,7 @@ int main(int argc, char* argv[])
   CoXHelp* xhelp = new CoXHelpGtk(0, 0, xhelp_eUtility_Xtt, &sts);
   CoXHelp::set_default(xhelp);
 
-  Nodelist* nl = new NodelistGtk(
-      0, 0, "Status Monitor", mode, layout, msgw_ePop_No, 
-      conf_file, &sts);
+  Nodelist* nl = new NodelistGtk(0, 0, "Status Monitor", mode, layout, msgw_ePop_No, conf_file, &sts);
   nl->close_cb = statusmon_close;
   nl->set_scantime(3);
   if (open_map)

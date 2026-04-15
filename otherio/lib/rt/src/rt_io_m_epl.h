@@ -37,7 +37,8 @@
 #ifndef rt_io_m_epl_h
 #define rt_io_m_epl_h
 
-typedef struct {
+typedef struct
+{
   short init;
   short timeoutStatus;
   int prevState;
@@ -50,7 +51,8 @@ typedef struct {
   short inputResetEnabled;
 } io_sLocalEpl_MN;
 
-typedef struct {
+typedef struct
+{
   int prevState;
   short timeoutStatus;
   int byte_ordering;
@@ -58,7 +60,8 @@ typedef struct {
   struct timespec tpe, tps;
 } io_sLocalEpl_CN;
 
-typedef struct {
+typedef struct
+{
   short init;
   short timeoutStatus;
   int prevState;

@@ -50,51 +50,50 @@
 
 static int gtk_initialized = 0;
 
-int wb_utl_gtk::utl_foe_new(const char* name, pwr_tOid plcpgm,
-    ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, WFoe** foe,
-    int map_window, ldh_eAccess access)
+int wb_utl_gtk::utl_foe_new(const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx,
+                            ldh_tSesContext ldhsesctx, WFoe** foe, int map_window, ldh_eAccess access)
 {
   pwr_tStatus sts = 1;
 
   *foe = WFoe::get(plcpgm);
   if (!*foe)
-    *foe = new WFoeGtk(0, widget, name, plcpgm, ldhwbctx, ldhsesctx, map_window,
-        access, 0, &sts);
+    *foe = new WFoeGtk(0, widget, name, plcpgm, ldhwbctx, ldhsesctx, map_window, access, 0, &sts);
   return sts;
 }
 
-int wb_utl_gtk::utl_foe_new_local(WFoe* foe, const char* name, pwr_tOid plcpgm,
-    ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, vldh_t_node nodeobject,
-    unsigned long windowindex, unsigned long new_window, WFoe** return_foe,
-    int map_window, ldh_eAccess access, foe_eFuncAccess function_access)
+int wb_utl_gtk::utl_foe_new_local(WFoe* foe, const char* name, pwr_tOid plcpgm, ldh_tWBContext ldhwbctx,
+                                  ldh_tSesContext ldhsesctx, vldh_t_node nodeobject,
+                                  unsigned long windowindex, unsigned long new_window, WFoe** return_foe,
+                                  int map_window, ldh_eAccess access, foe_eFuncAccess function_access)
 {
   pwr_tStatus sts = 1;
 
   *return_foe = WFoe::get(plcpgm);
   if (!*return_foe)
-    *return_foe = new WFoeGtk(foe, ((WFoeGtk*)foe)->widgets.foe_window, name,
-        plcpgm, ldhwbctx, ldhsesctx, nodeobject, windowindex, new_window,
-        map_window, access, function_access, 0, &sts);
+    *return_foe =
+        new WFoeGtk(foe, ((WFoeGtk*)foe)->widgets.foe_window, name, plcpgm, ldhwbctx, ldhsesctx, nodeobject,
+                    windowindex, new_window, map_window, access, function_access, 0, &sts);
   return sts;
 }
 
 /*************************************************************************
-*
-* Name:		utl_create_mainwindow()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		utl_create_mainwindow()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 int wb_utl_gtk::create_mainwindow(int argc, char** argv)
 {
   GtkWidget* toplevel;
 
-  if (!gtk_initialized) {
+  if (!gtk_initialized)
+  {
     gtk_init(&argc, &argv);
     gtk_initialized = 1;
 
@@ -103,8 +102,8 @@ int wb_utl_gtk::create_mainwindow(int argc, char** argv)
     setlocale(LC_TIME, "en_US");
   }
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 100,
-      "default-width", 100, "title", "Pwr wb", NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 100, "default-width", 100, "title",
+                                      "Pwr wb", NULL);
   gtk_widget_show_all(toplevel);
   g_object_set(toplevel, "visible", FALSE, NULL);
 

@@ -44,10 +44,11 @@
 /*! \addtogroup Ge */
 /*@{*/
 
-class SubPaletteGtk : public SubPalette {
+class SubPaletteGtk : public SubPalette
+{
 public:
-  SubPaletteGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-      const char* xn_name, GtkWidget** w, pwr_tStatus* status);
+  SubPaletteGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name, GtkWidget** w,
+                pwr_tStatus* status);
   ~SubPaletteGtk();
 
   GtkWidget* parent_wid;
@@ -60,8 +61,7 @@ public:
 
   void set_inputfocus(int focus);
   void create_popup_menu(char* filename, int x, int y);
-  static void menu_position_func(
-      GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data);
+  static void menu_position_func(GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data);
   static void activate_help(GtkWidget* w, gpointer data);
 };
 

@@ -44,16 +44,15 @@ void make_binary_string(int, int, char*);
 // Always use INP_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
 #define INP_GPIO(g) *(gpio + ((g) / 10)) &= ~(7 << (((g) % 10) * 3))
 #define OUT_GPIO(g) *(gpio + ((g) / 10)) |= (1 << (((g) % 10) * 3))
-#define SET_GPIO_ALT(g, a)                                                     \
-  *(gpio + (((g) / 10)))                                                       \
-      |= (((a) <= 3 ? (a) + 4 : (a) == 4 ? 3 : 2) << (((g) % 10) * 3))
+#define SET_GPIO_ALT(g, a)                                                                                   \
+  *(gpio + (((g) / 10))) |= (((a) <= 3 ? (a) + 4 : (a) == 4 ? 3 : 2) << (((g) % 10) * 3))
 
-#define GPIO_SET0 *(gpio + 7) // Set GPIO high bits 0-31
+#define GPIO_SET0 *(gpio + 7)  // Set GPIO high bits 0-31
 #define GPIO_CLR0 *(gpio + 10) // Set GPIO low bits 0-31
 
 #define GPIO_IN0 *(gpio + 13) // Reads GPIO input bits 0-31
 
-#define GPIO_PULL *(gpio + 37) // Pull up/pull down
+#define GPIO_PULL *(gpio + 37)     // Pull up/pull down
 #define GPIO_PULLCLK0 *(gpio + 38) // Pull up/pull down clock
 
 //

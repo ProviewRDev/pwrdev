@@ -60,11 +60,9 @@
 //
 // Constructor
 //
-WGreGtk::WGreGtk(
-    void* wg_parent_ctx, GtkWidget* wg_parent_wid, const char* name)
-    : WGre(wg_parent_ctx, 0), parent_wid(wg_parent_wid), gre_window(0),
-      flow_widget(0), form_widget(0), nav_shell(0), nav_widget(0),
-      trace_timerid(0)
+WGreGtk::WGreGtk(void* wg_parent_ctx, GtkWidget* wg_parent_wid, const char* name)
+    : WGre(wg_parent_ctx, 0), parent_wid(wg_parent_wid), gre_window(0), flow_widget(0), form_widget(0),
+      nav_shell(0), nav_widget(0), trace_timerid(0)
 {
   ctx_init();
 
@@ -75,15 +73,18 @@ WGreGtk::WGreGtk(
 
 WGreGtk::~WGreGtk()
 {
-  if (nav_widget) {
+  if (nav_widget)
+  {
     gtk_widget_destroy(nav_widget);
     nav_widget = 0;
   }
-  if (nav_shell) {
+  if (nav_shell)
+  {
     gtk_widget_destroy(nav_shell);
     nav_shell = 0;
   }
-  if (form_widget) {
+  if (form_widget)
+  {
     gtk_widget_destroy(form_widget);
     form_widget = 0;
   }
@@ -95,10 +96,7 @@ int WGreGtk::new_navigator(GtkWidget* parent)
   return 1;
 }
 
-int WGreGtk::new_navigator_popup()
-{
-  return 1;
-}
+int WGreGtk::new_navigator_popup() { return 1; }
 
 static gboolean wgregtk_trace_scan(void* data)
 {
@@ -108,7 +106,8 @@ static gboolean wgregtk_trace_scan(void* data)
 
 void WGreGtk::trace_scan(WGreGtk* gre)
 {
-  if (gre->trace_started) {
+  if (gre->trace_started)
+  {
     flow_TraceScan(gre->flow_ctx);
 
     gre->trace_timerid = g_timeout_add(500, wgregtk_trace_scan, gre);
@@ -123,7 +122,8 @@ void WGreGtk::trace_start()
 
 void WGreGtk::trace_stop()
 {
-  if (trace_started) {
+  if (trace_started)
+  {
     trace_started = 0;
     if (trace_timerid)
       g_source_remove(trace_timerid);

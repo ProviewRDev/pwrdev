@@ -50,21 +50,14 @@ void Wda::message_cb(void* wda, char severity, const char* message)
   ((Wda*)wda)->message(severity, message);
 }
 
-void Wda::change_value_cb(void* wda)
-{
-  ((Wda*)wda)->change_value(1);
-}
+void Wda::change_value_cb(void* wda) { ((Wda*)wda)->change_value(1); }
 
-void Wda::activate_print()
-{
-  print("Speadsheet Editor");
-}
+void Wda::activate_print() { print("Speadsheet Editor"); }
 
 void Wda::print_textfile()
 {
   message(' ', "");
-  wow->CreateInputDialog(
-      this, "Save as", "Enter filename", file_selected_cb, 0, 40, 0, 0);
+  wow->CreateInputDialog(this, "Save as", "Enter filename", file_selected_cb, 0, 40, 0, 0);
 }
 
 void Wda::file_selected_cb(void* ctx, void* data, char* text)
@@ -75,7 +68,8 @@ void Wda::file_selected_cb(void* ctx, void* data, char* text)
 
   if (strchr(text, '/'))
     strcpy(filename, text);
-  else {
+  else
+  {
     strcpy(filename, "$pwrp_login/");
     strcat(filename, text);
   }
@@ -84,11 +78,14 @@ void Wda::file_selected_cb(void* ctx, void* data, char* text)
 
   dcli_translate_filename(filename, filename);
   sts = wda->wdanav->print_textfile(filename);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     char tmp[280];
     snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", filename);
     wda->message('E', tmp);
-  } else {
+  }
+  else
+  {
     char msg[300];
     strcpy(msg, "Exported to ");
     strcat(msg, filename);
@@ -98,14 +95,14 @@ void Wda::file_selected_cb(void* ctx, void* data, char* text)
 
 void Wda::import_textfile()
 {
-  if (!editmode) {
+  if (!editmode)
+  {
     message('E', "Not in edit mode");
     return;
   }
 
   message(' ', "");
-  wow->CreateFileList("Import Spreadsheet", "$pwrp_login", "*", "wda_txt",
-      import_file_cb, 0, this, 1);
+  wow->CreateFileList("Import Spreadsheet", "$pwrp_login", "*", "wda_txt", import_file_cb, 0, this, 1);
 }
 
 void Wda::import_file_cb(void* ctx, char* text, int ok_pressed)
@@ -114,7 +111,8 @@ void Wda::import_file_cb(void* ctx, char* text, int ok_pressed)
   Wda* wda = (Wda*)ctx;
   int sts;
 
-  if (!wda->editmode) {
+  if (!wda->editmode)
+  {
     wda->message('E', "Not in edit mode");
     return;
   }
@@ -123,7 +121,8 @@ void Wda::import_file_cb(void* ctx, char* text, int ok_pressed)
   dcli_translate_filename(filename, filename);
 
   sts = wda->wdanav->import_textfile(filename);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     wda->message('E', "Import error, see message window");
   }
 }
@@ -156,21 +155,24 @@ void Wda::open_class_dialog()
   int sts;
   char* s;
 
-  if (cdh_ObjidIsNotNull(objid)) {
-    sts = ldh_ObjidToName(
-        ldhses, objid, ldh_eName_Hierarchy, hierstr, sizeof(hierstr), &size);
+  if (cdh_ObjidIsNotNull(objid))
+  {
+    sts = ldh_ObjidToName(ldhses, objid, ldh_eName_Hierarchy, hierstr, sizeof(hierstr), &size);
     if (EVEN(sts))
       strcpy(hierstr, "");
-  } else
+  }
+  else
     strcpy(hierstr, "");
 
-  if (classid != 0) {
+  if (classid != 0)
+  {
     sts = ldh_ClassIdToName(ldhses, classid, classstr, sizeof(classstr), &size);
     if (EVEN(sts))
       strcpy(classstr, "");
     else if ((s = strchr(classstr, '-')))
       strcpy(classstr, s + 1);
-  } else
+  }
+  else
     strcpy(classstr, "");
 
   open_class_dialog(hierstr, classstr, search_name);
@@ -189,7 +191,8 @@ void Wda::open_attr_dialog()
 
   // Count the attributes
   attr_cnt = 0;
-  for (i = 0; i < 3; i++) {
+  for (i = 0; i < 3; i++)
+  {
     if (i == 0)
       strcpy(body, "RtBody");
     else if (i == 1)
@@ -209,7 +212,8 @@ void Wda::open_attr_dialog()
   attr_vect = (char(*)[80])calloc(attr_cnt + 1, 80);
 
   attr_cnt = 0;
-  for (i = 0; i < 3; i++) {
+  for (i = 0; i < 3; i++)
+  {
     if (i == 0)
       strcpy(body, "RtBody");
     else if (i == 1)
@@ -227,8 +231,7 @@ void Wda::open_attr_dialog()
   }
   strcpy(attr_vect[attr_cnt], "");
 
-  wow->CreateList(
-      "Attributes", (char*)attr_vect, 80, set_attr_cb, 0, (void*)this);
+  wow->CreateList("Attributes", (char*)attr_vect, 80, set_attr_cb, 0, (void*)this);
 }
 
 int Wda::next_attr()
@@ -246,7 +249,8 @@ int Wda::next_attr()
     get_next = 1;
   else
     get_next = 0;
-  for (i = 0; i < 3; i++) {
+  for (i = 0; i < 3; i++)
+  {
     if (i == 0)
       strcpy(body, "RtBody");
     else if (i == 1)
@@ -257,13 +261,14 @@ int Wda::next_attr()
     sts = ldh_GetObjectBodyDef(ldhses, classid, body, 1, &bodydef, &rows);
     if (EVEN(sts))
       continue;
-    for (j = 0; j < rows; j++) {
+    for (j = 0; j < rows; j++)
+    {
       if (str_NoCaseStrcmp(attribute, bodydef[j].ParName) == 0)
         get_next = 1;
-      else if (get_next) {
+      else if (get_next)
+      {
         strcpy(attribute, bodydef[j].ParName);
-        sts = ((WdaNav*)wdanav)
-                  ->update(objid, classid, attribute, attrobjects, search_name);
+        sts = ((WdaNav*)wdanav)->update(objid, classid, attribute, attrobjects, search_name);
         free((char*)bodydef);
         return WDA__SUCCESS;
       }
@@ -290,7 +295,8 @@ int Wda::prev_attr()
     get_last = 1;
   else
     get_last = 0;
-  for (i = 0; i < 3; i++) {
+  for (i = 0; i < 3; i++)
+  {
     if (i == 0)
       strcpy(body, "RtBody");
     else if (i == 1)
@@ -301,17 +307,20 @@ int Wda::prev_attr()
     sts = ldh_GetObjectBodyDef(ldhses, classid, body, 1, &bodydef, &rows);
     if (EVEN(sts))
       continue;
-    for (j = 0; j < rows; j++) {
-      if (str_NoCaseStrcmp(attribute, bodydef[j].ParName) == 0) {
-        if (streq(prev_attr, "")) {
+    for (j = 0; j < rows; j++)
+    {
+      if (str_NoCaseStrcmp(attribute, bodydef[j].ParName) == 0)
+      {
+        if (streq(prev_attr, ""))
+        {
           // get_last = 1;
           free((char*)bodydef);
           return WDA__NOPREVATTR;
-        } else {
+        }
+        else
+        {
           strcpy(attribute, prev_attr);
-          sts = ((WdaNav*)wdanav)
-                    ->update(
-                        objid, classid, attribute, attrobjects, search_name);
+          sts = ((WdaNav*)wdanav)->update(objid, classid, attribute, attrobjects, search_name);
           free((char*)bodydef);
           return WDA__SUCCESS;
         }
@@ -321,10 +330,10 @@ int Wda::prev_attr()
     free((char*)bodydef);
   }
 
-  if (get_last && !streq(prev_attr, "")) {
+  if (get_last && !streq(prev_attr, ""))
+  {
     strcpy(attribute, prev_attr);
-    sts = ((WdaNav*)wdanav)
-              ->update(objid, classid, attribute, attrobjects, search_name);
+    sts = ((WdaNav*)wdanav)->update(objid, classid, attribute, attrobjects, search_name);
     return WDA__SUCCESS;
   }
   return WDA__NOPREVATTR;
@@ -337,22 +346,17 @@ void Wda::set_attr_cb(void* ctx, char* text, int ok_pressed)
 
   strcpy(wda->attribute, text);
   sts = ((WdaNav*)wda->wdanav)
-            ->update(wda->objid, wda->classid, wda->attribute, wda->attrobjects,
-                wda->search_name);
+            ->update(wda->objid, wda->classid, wda->attribute, wda->attrobjects, wda->search_name);
   if (EVEN(sts))
     wda->wow->DisplayError("Spreadsheet error", wnav_get_message(sts));
 }
 
-Wda::~Wda()
-{
-}
+Wda::~Wda() {}
 
-Wda::Wda(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_tObjid wa_objid,
-    pwr_tClassId wa_classid, const char* wa_attribute, int wa_editmode,
-    int wa_advanced_user, int wa_display_objectname)
-    : parent_ctx(wa_parent_ctx), ldhses(wa_ldhses), objid(wa_objid),
-      classid(wa_classid), editmode(wa_editmode), input_open(0),
-      input_multiline(0), close_cb(0), redraw_cb(0), client_data(0),
+Wda::Wda(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_tObjid wa_objid, pwr_tClassId wa_classid,
+         const char* wa_attribute, int wa_editmode, int wa_advanced_user, int wa_display_objectname)
+    : parent_ctx(wa_parent_ctx), ldhses(wa_ldhses), objid(wa_objid), classid(wa_classid),
+      editmode(wa_editmode), input_open(0), input_multiline(0), close_cb(0), redraw_cb(0), client_data(0),
       attrobjects(0)
 {
   strcpy(attribute, wa_attribute);

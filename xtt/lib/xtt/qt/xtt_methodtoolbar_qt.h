@@ -44,14 +44,16 @@
 
 class XttMethodToolbarQt;
 
-typedef struct {
+typedef struct
+{
   XttMethodToolbarQt* mt;
   int idx;
 } xtt_sMethodButtonCb;
 
 class XttMethodToolbarQtObject;
 
-class XttMethodToolbarQt : public XttMethodToolbar {
+class XttMethodToolbarQt : public XttMethodToolbar
+{
 public:
   QToolBar* m_toolbar_w;
   QAction* m_op_button_w[32];
@@ -59,8 +61,8 @@ public:
   xtt_sMethodButtonCb m_cb[64];
   QTimer* m_timerid;
 
-  XttMethodToolbarQt(void* parent_ctx, void* xnav, unsigned int op_method_mask,
-      unsigned int mnt_method_mask, const char* tooltip_suffix);
+  XttMethodToolbarQt(void* parent_ctx, void* xnav, unsigned int op_method_mask, unsigned int mnt_method_mask,
+                     const char* tooltip_suffix);
   ~XttMethodToolbarQt();
   QWidget* build();
   void set_sensitive();
@@ -70,12 +72,12 @@ private:
   XttMethodToolbarQtObject* object;
 };
 
-class XttMethodToolbarQtObject : public QObject {
+class XttMethodToolbarQtObject : public QObject
+{
   Q_OBJECT
 
 public:
-  XttMethodToolbarQtObject(XttMethodToolbarQt* parent_ctx)
-      : QObject(), toolbar(parent_ctx) {}
+  XttMethodToolbarQtObject(XttMethodToolbarQt* parent_ctx) : QObject(), toolbar(parent_ctx) {}
 
 public slots:
   void activate_button();

@@ -49,19 +49,22 @@
 
 class ItemBase;
 
-typedef enum {
+typedef enum
+{
   lognav_eItemType_Hier,
   lognav_eItemType_Entry,
   lognav_eItemType_Detail
 } lognav_eItemType;
 
-typedef enum {
+typedef enum
+{
   lognav_mOpen_All = ~0,
   lognav_mOpen_Children = 1 << 0,
   lognav_mOpen_Attributes = 1 << 1
 } lognav_mOpen;
 
-typedef enum {
+typedef enum
+{
   lognav_eSeverity_No,
   lognav_eSeverity_Detail,
   lognav_eSeverity_DetailWarning,
@@ -73,11 +76,13 @@ typedef enum {
   lognav_eSeverity_Fatal
 } lognav_eSeverity;
 
-class LogNav_object {
+class LogNav_object
+{
 public:
 };
 
-class LogNav_hier : public LogNav_object {
+class LogNav_hier : public LogNav_object
+{
 public:
   lognav_eSeverity severity;
   lognav_eItemType type;
@@ -86,14 +91,15 @@ public:
   std::vector<LogNav_hier> child;
 
   LogNav_hier() : severity(lognav_eSeverity_No), time(pwr_cNTime) {}
-    LogNav_hier(const LogNav_hier& x) : severity(x.severity), type(x.type),
-      child(x.child) {
+  LogNav_hier(const LogNav_hier& x) : severity(x.severity), type(x.type), child(x.child)
+  {
     memcpy(&time, &x.time, sizeof(pwr_tTime));
     strcpy(text, x.text);
   }
 };
 
-typedef enum {
+typedef enum
+{
   lognav_eTreeItemType_No,
   lognav_eTreeItemType_Hier,
   lognav_eTreeItemType_Entry,
@@ -101,11 +107,10 @@ typedef enum {
 } lognav_eTreeItemType;
 
 //! Class for handling of brow.
-class LogNavBrow {
+class LogNavBrow
+{
 public:
-  LogNavBrow(BrowCtx* brow_ctx, void* xn) : ctx(brow_ctx), lognav(xn)
-  {
-  }
+  LogNavBrow(BrowCtx* brow_ctx, void* xn) : ctx(brow_ctx), lognav(xn) {}
   ~LogNavBrow();
 
   BrowCtx* ctx;
@@ -126,14 +131,15 @@ public:
 };
 
 //! The navigation area of the attribute editor.
-class LogNav {
+class LogNav
+{
 public:
-  LogNav(void* xn_parent_ctx, LogNav_hier *xn_tree, pwr_tStatus* status);
+  LogNav(void* xn_parent_ctx, LogNav_hier* xn_tree, pwr_tStatus* status);
   virtual ~LogNav();
 
   void* parent_ctx;
   LogNavBrow* brow;
-  LogNav_hier *tree;
+  LogNav_hier* tree;
   int item_cnt;
   void (*message_cb)(void*, char, const char*);
   int (*command_cb)(void*, char* cmd);
@@ -147,13 +153,12 @@ public:
   void unzoom();
 
   virtual void message(char sev, const char* text);
-  virtual void set_inputfocus()
-  {
-  }
+  virtual void set_inputfocus() {}
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
 };
 
-class ItemBase {
+class ItemBase
+{
 public:
   ItemBase(lognav_eItemType t);
   virtual ~ItemBase();
@@ -162,16 +167,14 @@ public:
 };
 
 //! Hierarchy item.
-class ItemHier : public ItemBase {
+class ItemHier : public ItemBase
+{
 public:
-  ItemHier(LogNav* lognav, LogNav_hier* item, brow_tNode dest,
-      flow_eDest dest_code);
+  ItemHier(LogNav* lognav, LogNav_hier* item, brow_tNode dest, flow_eDest dest_code);
 
-  virtual ~ItemHier()
-  {
-  }
+  virtual ~ItemHier() {}
 
-  LogNav_hier *item;
+  LogNav_hier* item;
   brow_tNode node;
 
   int open_children(LogNav* lognav, double x, double y);
@@ -179,21 +182,18 @@ public:
 };
 
 //! Log entry item.
-class ItemEntry : public ItemBase {
+class ItemEntry : public ItemBase
+{
 public:
-  ItemEntry(LogNav* lognav, LogNav_hier* item, brow_tNode dest,
-      flow_eDest dest_code);
+  ItemEntry(LogNav* lognav, LogNav_hier* item, brow_tNode dest, flow_eDest dest_code);
 
-  virtual ~ItemEntry()
-  {
-  }
+  virtual ~ItemEntry() {}
 
-  LogNav_hier *item;
+  LogNav_hier* item;
   brow_tNode node;
 
   int open_children(LogNav* lognav, double x, double y);
   int close(LogNav* lognav, double x, double y);
 };
-
 
 #endif

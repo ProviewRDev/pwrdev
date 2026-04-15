@@ -46,7 +46,8 @@ class wb_destination;
 class wb_name;
 class wb_orep;
 
-class wb_object : public wb_status {
+class wb_object : public wb_status
+{
 public:
   wb_orep* m_orep;
 
@@ -63,27 +64,19 @@ public:
   operator wb_orep*() const;
   bool operator==(wb_object&);
 
-  void uniqueName(const char*)
-  {
-  } // Fix
+  void uniqueName(const char*) {} // Fix
 
   pwr_tStatus checkXref(const char* name);
 
-  void user(void* p)
-  {
-  } // Fix  // set user data
-  void* user()
-  {
-    return 0;
-  } // Fix   // get user data
+  void user(void* p) {} // Fix  // set user data
+  void* user() { return 0; } // Fix   // get user data
 
   ldh_sRefInfo* refinfo(ldh_sRefInfo* rp); // Fix
 
   pwr_tOid oid(); ///< Object identifier of this object
   pwr_tVid vid(); ///< Volume identifier of this object
   pwr_tOix oix(); ///< Object index of this object
-  pwr_tCid
-  cid(); ///< Class identifier of class that this object is an instance of
+  pwr_tCid cid(); ///< Class identifier of class that this object is an instance of
 
   pwr_tOid poid(); ///< Object identifier of parent of this object
   pwr_tOid foid(); ///< Object identifier of first child of this object
@@ -100,14 +93,11 @@ public:
   const char* name();
   wb_name longName();
 
-  pwr_tTime ohTime(); ///< time when header of this object was last changed
-  pwr_tTime
-  rbTime(); ///< time when run time body of this object was last changed
-  pwr_tTime
-  dbTime(); ///< time when development body of this object was last changed
-  pwr_tTime modTime(); ///< time when this object was last changed
-  pwr_tTime
-  treeModTime(); ///< time when this object or any ancestor was last changed
+  pwr_tTime ohTime();      ///< time when header of this object was last changed
+  pwr_tTime rbTime();      ///< time when run time body of this object was last changed
+  pwr_tTime dbTime();      ///< time when development body of this object was last changed
+  pwr_tTime modTime();     ///< time when this object was last changed
+  pwr_tTime treeModTime(); ///< time when this object or any ancestor was last changed
 
   pwr_mClassDef flags();
 
@@ -125,15 +115,14 @@ public:
 
   wb_object ancestor();
   wb_object parent();
-  wb_object after(); ///< next sibling
+  wb_object after();  ///< next sibling
   wb_object before(); ///< previous sibling
-  wb_object first(); ///< first child
+  wb_object first();  ///< first child
   wb_object child(wb_name& name);
   wb_object last(); ///< last child
 
-  wb_object next(); ///< next in list of objects of same class in one volume
-  wb_object
-  previous(); ///< previous in list of objects of same class in one volume
+  wb_object next();     ///< next in list of objects of same class in one volume
+  wb_object previous(); ///< previous in list of objects of same class in one volume
 
   wb_destination destination(ldh_eDest dest);
 

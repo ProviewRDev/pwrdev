@@ -87,7 +87,8 @@ int main(int argc, char* argv[])
 
   pp = qnet_Open(&sts, &port);
 
-  while (qdb->g->up) {
+  while (qdb->g->up)
+  {
     np = qnet_Get(&sts, pp);
     if (np->bp == NULL)
       pwr_Bugcheck(QCOM__WEIRD, "(np->bp == NULL)");
@@ -115,19 +116,16 @@ static void down(qdb_sNode* np, char* s)
   }
   qdb_ScopeUnlock;
 
-  errh_Info("Down, link to node %s (%s): %s", np->name,
-      cdh_NodeIdToString(NULL, np->nid, 0, 0), s);
+  errh_Info("Down, link to node %s (%s): %s", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0), s);
 }
 
 static void freeBuffer(qdb_sBuffer* bp)
 {
   pwr_tStatus sts = 1;
 
-  if (bp != NULL) {
-    qdb_ScopeLock
-    {
-      qdb_Free(&sts, bp);
-    }
+  if (bp != NULL)
+  {
+    qdb_ScopeLock { qdb_Free(&sts, bp); }
     qdb_ScopeUnlock;
   }
 }
@@ -138,16 +136,14 @@ static void idError(qdb_sPort* pp, qdb_sNode* np, void* mp, char* s)
 
   qnet_S '\n' inkEvent(&sts, pp, np, qdb_eEvent_hello);
   np->state = qdb_eState_starting;
-  errh_Info("Id error, node %s (%s): %s", np->name,
-      cdh_NodeIdToString(NULL, np->nid, 0, 0), s);
+  errh_Info("Id error, node %s (%s): %s", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0), s);
   nullId(np);
 }
 
 static void impossibleEvent(qdb_sNode* np, char* s)
 {
-  errh_Info("Impossible event <%s>, node %s (%s): %s",
-      qnet_EventString(np->event), np->name,
-      cdh_NodeIdToString(NULL, np->nid, 0, 0), s);
+  errh_Info("Impossible event <%s>, node %s (%s): %s", qnet_EventString(np->event), np->name,
+            cdh_NodeIdToString(NULL, np->nid, 0, 0), s);
 }
 
 /* This is the link state machine
@@ -163,7 +159,8 @@ static void linkEvent(qdb_sPort* pp, qdb_sNode* np)
   bp = np->bp;
   np->bp = NULL;
 
-  if (np->nid == qdb->my_node->nid) {
+  if (np->nid == qdb->my_node->nid)
+  {
     /* Never to ourselves... */
     freeBuffer(bp);
     return;
@@ -171,25 +168,35 @@ static void linkEvent(qdb_sPort* pp, qdb_sNode* np)
 
   np->old_state = np->state;
 
-  if (np->old_birth != 0 && np->old_birth != np->birth) {
+  if (np->old_birth != 0 && np->old_birth != np->birth)
+  {
     np->event = qdb_eEvent_idError;
-  } else if (bp->b.type == qdb_eType_link) {
+  }
+  else if (bp->b.type == qdb_eType_link)
+  {
     lp = (qdb_sLink*)(bp + 1);
     np->event = lp->event;
-  } else if (bp->b.type == qdb_eType_user) {
+  }
+  else if (bp->b.type == qdb_eType_user)
+  {
     np->event = qdb_eEvent_user;
-  } else if (bp->b.type == qdb_eType_service) {
+  }
+  else if (bp->b.type == qdb_eType_service)
+  {
     serviceEvent(pp, np, bp);
     return;
-  } else {
+  }
+  else
+  {
     pwr_Bugcheck(2, "");
   }
 
   if (qdb->g->log.b.events)
-    errh_Info("Node %s (%s) event <%s>", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0), qnet_EventString(np->event));
+    errh_Info("Node %s (%s) event <%s>", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0),
+              qnet_EventString(np->event));
 
-  switch (np->state) {
+  switch (np->state)
+  {
   case qdb_eState_down:
     stateDown(pp, np, bp);
     break;
@@ -207,9 +214,8 @@ static void linkEvent(qdb_sPort* pp, qdb_sNode* np)
   }
 
   if (qdb->g->log.b.states && np->old_state != np->state)
-    errh_Info("Node %s (%s): new state: %s -> %s", np->name,
-        cdh_NodeIdToString(NULL, np->nid, 0, 0),
-        qnet_StateString(np->old_state), qnet_StateString(np->state));
+    errh_Info("Node %s (%s): new state: %s -> %s", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0),
+              qnet_StateString(np->old_state), qnet_StateString(np->state));
 }
 
 static void linkNotification(qdb_sNode* np)
@@ -218,7 +224,8 @@ static void linkNotification(qdb_sNode* np)
 
   qdb_AssumeLocked;
 
-  switch (np->state) {
+  switch (np->state)
+  {
   case qdb_eState_down:
     qdb_NetEvent(&sts, np, qcom_eStype_linkDown);
     break;
@@ -232,10 +239,7 @@ static void linkNotification(qdb_sNode* np)
   np->qmon_state = np->state;
 }
 
-static void nullId(qdb_sNode* np)
-{
-  np->old_birth = 0;
-}
+static void nullId(qdb_sNode* np) { np->old_birth = 0; }
 
 static void putUser(qdb_sPort* pp, qdb_sNode* np, qdb_sBuffer* bp)
 {
@@ -254,17 +258,25 @@ static void putUser(qdb_sPort* pp, qdb_sNode* np, qdb_sBuffer* bp)
   {
     flags.m = bp->c.flags.m;
     qp = qdb_Que(&sts, &qid, NULL);
-    if (bp->c.flags.b.request) {
-      if (qp == NULL) {
+    if (bp->c.flags.b.request)
+    {
+      if (qp == NULL)
+      {
         sts = QCOM__NOQ;
-      } else if (qp->type != qdb_eQue_private) {
+      }
+      else if (qp->type != qdb_eQue_private)
+      {
         sts = QCOM__QTYPE;
-      } else {
+      }
+      else
+      {
         rp = qdb_AddRequest(&sts, bp, np);
         if (rp == NULL)
           break;
-        if (sts == QDB__ALRADD) {
-          if (!pool_QisEmpty(&sts, &qdb->pool, &rp->b_lh)) {
+        if (sts == QDB__ALRADD)
+        {
+          if (!pool_QisEmpty(&sts, &qdb->pool, &rp->b_lh))
+          {
             rbl = pool_Qsucc(&sts, &qdb->pool, &rp->b_lh);
             rbp = pool_Qitem(rbl, qdb_sBuffer, c.ll);
             nbp = qdb_CopyBuffer(&sts, rbp);
@@ -273,38 +285,49 @@ static void putUser(qdb_sPort* pp, qdb_sNode* np, qdb_sBuffer* bp)
             qdb_Put(NULL, nbp, qdb->export);
           }
           qdb_Free(NULL, bp);
-        } else {
+        }
+        else
+        {
           qdb_Put(&sts, bp, qp);
         }
       }
-    } else if (bp->c.flags.b.broadcast) {
+    }
+    else if (bp->c.flags.b.broadcast)
+    {
       info = bp->b.info;
-      if (qp == NULL || np->bc_rcv_id == bp->b.info.rid) {
+      if (qp == NULL || np->bc_rcv_id == bp->b.info.rid)
+      {
         qdb_Free(NULL, bp);
-      } else {
+      }
+      else
+      {
         np->bc_rcv_id = bp->b.info.rid;
         qdb_Put(NULL, bp, qp);
       }
-    } else {
-      if (qp == NULL) {
+    }
+    else
+    {
+      if (qp == NULL)
+      {
         qdb_Free(NULL, bp);
-      } else {
+      }
+      else
+      {
         qdb_Put(NULL, bp, qp);
       }
     }
   }
   qdb_ScopeUnlock;
 
-  if (flags.b.broadcast) {
+  if (flags.b.broadcast)
+  {
     qnet_SendBcastAck(&lsts, pp, np, &info);
   }
 
-  if (EVEN(sts) && flags.b.request) {
+  if (EVEN(sts) && flags.b.request)
+  {
     qnet_SendRequestError(&lsts, pp, np, bp, sts);
-    qdb_ScopeLock
-    {
-      qdb_Free(NULL, bp);
-    }
+    qdb_ScopeLock { qdb_Free(NULL, bp); }
     qdb_ScopeUnlock;
   }
 }
@@ -320,7 +343,8 @@ static void removeBcast(qdb_sNode* np)
     return;
 
   for (bcl = pool_Qsucc(NULL, &qdb->pool, &np->bcb_lh); bcl != &np->bcb_lh;
-       bcl = pool_Qsucc(NULL, &qdb->pool, &np->bcb_lh)) {
+       bcl = pool_Qsucc(NULL, &qdb->pool, &np->bcb_lh))
+  {
     bp = pool_Qitem(bcl, qdb_sBuffer, c.ll);
 
     pool_Qremove(NULL, &qdb->pool, &bp->c.ll);
@@ -347,7 +371,8 @@ static void serviceEvent(qdb_sPort* pp, qdb_sNode* np, qdb_sBuffer* bp)
       break;
     bcbp = pool_Qitem(bcbl, qdb_sBuffer, c.ll);
 
-    if (bp->b.info.rid == bcbp->b.info.rid) {
+    if (bp->b.info.rid == bcbp->b.info.rid)
+    {
       pool_Qremove(NULL, &qdb->pool, &bcbp->c.ll);
       pool_Free(NULL, &qdb->pool, bcbp);
     }
@@ -357,10 +382,7 @@ static void serviceEvent(qdb_sPort* pp, qdb_sNode* np, qdb_sBuffer* bp)
   qdb_ScopeUnlock;
 }
 
-static void setId(qdb_sNode* np)
-{
-  np->old_birth = np->birth;
-}
+static void setId(qdb_sNode* np) { np->old_birth = np->birth; }
 
 static void setLinkInfo(qdb_sNode* np, qdb_sLink* lp)
 {
@@ -381,7 +403,8 @@ static void stateConnecting(qdb_sPort* pp, qdb_sNode* np, qdb_sBuffer* bp)
 {
   pwr_tStatus sts;
 
-  switch (np->event) {
+  switch (np->event)
+  {
   case qdb_eEvent_alive:
   case qdb_eEvent_user:
   case qdb_eEvent_hello:
@@ -418,7 +441,8 @@ static void stateDown(qdb_sPort* pp, qdb_sNode* np, qdb_sBuffer* bp)
 {
   pwr_tStatus sts;
 
-  switch (np->event) {
+  switch (np->event)
+  {
   case qdb_eEvent_alive:
   case qdb_eEvent_user:
   case qdb_eEvent_connect:
@@ -453,7 +477,8 @@ static void stateStarting(qdb_sPort* pp, qdb_sNode* np, qdb_sBuffer* bp)
 {
   pwr_tStatus sts;
 
-  switch (np->event) {
+  switch (np->event)
+  {
   case qdb_eEvent_alive:
   case qdb_eEvent_user:
     qnet_S '\n' inkEvent(&sts, pp, np, qdb_eEvent_hello);
@@ -492,13 +517,14 @@ static void stateUp(qdb_sPort* pp, qdb_sNode* np, qdb_sBuffer* bp)
 {
   pwr_tStatus sts = 1;
 
-  switch (np->event) {
+  switch (np->event)
+  {
   case qdb_eEvent_alive:
     break;
   case qdb_eEvent_user:
     putUser(pp, np, bp);
     return; /* NOTA BENE, you must return, we dont want this buffer to be freed!
-               */
+             */
   case qdb_eEvent_connect:
     qnet_S '\n' inkEvent(&sts, pp, np, qdb_eEvent_up);
     break;
@@ -523,8 +549,8 @@ static void stateUp(qdb_sPort* pp, qdb_sNode* np, qdb_sBuffer* bp)
 
 static void unhandledEvent(qdb_sNode* np)
 {
-  errh_Info("Unhandled event, node %s (%s): %s", np->name,
-      cdh_NodeIdToString(NULL, np->nid, 0, 0), qnet_EventString(np->event));
+  errh_Info("Unhandled event, node %s (%s): %s", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0),
+            qnet_EventString(np->event));
 }
 
 static void up(qdb_sNode* np, qdb_sBuffer* bp, char* s)
@@ -542,6 +568,5 @@ static void up(qdb_sNode* np, qdb_sBuffer* bp, char* s)
   }
   qdb_ScopeUnlock;
 
-  errh_Info("Up, link to node %s (%s): %s", np->name,
-      cdh_NodeIdToString(NULL, np->nid, 0, 0), s);
+  errh_Info("Up, link to node %s (%s): %s", np->name, cdh_NodeIdToString(NULL, np->nid, 0, 0), s);
 }

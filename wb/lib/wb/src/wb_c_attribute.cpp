@@ -46,8 +46,7 @@
 #include "wb_session.h"
 #include "wb_wtt.h"
 
-static pwr_tStatus AnteCreate(
-    ldh_tSesContext Session, pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus AnteCreate(ldh_tSesContext Session, pwr_tObjid Father, pwr_tClassId Class)
 {
   pwr_tCid cid;
   pwr_tStatus sts;
@@ -62,8 +61,8 @@ static pwr_tStatus AnteCreate(
   return PWRS__SUCCESS;
 }
 
-static pwr_tStatus AnteMove(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tObjid OldFather)
+static pwr_tStatus AnteMove(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father,
+                            pwr_tObjid OldFather)
 {
   // Check that that the father is the same
   if (!(Father.oix == OldFather.oix && Father.vid == OldFather.vid))
@@ -93,24 +92,27 @@ static pwr_tStatus HelpClass(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  if (cdh_tidIsCid(tid)) {
-    sts = ldh_ClassIdToName(
-        ip->PointedSession, tid, cname, sizeof(cname), &size);
+  if (cdh_tidIsCid(tid))
+  {
+    sts = ldh_ClassIdToName(ip->PointedSession, tid, cname, sizeof(cname), &size);
     if (EVEN(sts))
       return sts;
 
     strcpy(attr, "");
-  } else {
-    sts = ldh_AttrRefToName(
-        ip->PointedSession, &ip->Pointed, ldh_eName_VolPath, &namep, &size);
+  }
+  else
+  {
+    sts = ldh_AttrRefToName(ip->PointedSession, &ip->Pointed, ldh_eName_VolPath, &namep, &size);
     if (EVEN(sts))
       return sts;
 
     strcpy(oname, namep);
-    if ((s = strrchr(oname, '.'))) {
+    if ((s = strrchr(oname, '.')))
+    {
       strcpy(attr, s + 1);
       *s = 0;
-    } else
+    }
+    else
       return 0;
 
     sts = ldh_NameToAttrRef(ip->PointedSession, oname, &aref);
@@ -124,8 +126,7 @@ static pwr_tStatus HelpClass(ldh_sMenuCall* ip)
     if (!cdh_tidIsCid(tid))
       return 0;
 
-    sts = ldh_ClassIdToName(
-        ip->PointedSession, tid, cname, sizeof(cname), &size);
+    sts = ldh_ClassIdToName(ip->PointedSession, tid, cname, sizeof(cname), &size);
     if (EVEN(sts))
       return sts;
   }
@@ -134,32 +135,34 @@ static pwr_tStatus HelpClass(ldh_sMenuCall* ip)
     *s = 0;
 
   vid = cdh_CidToVid(tid);
-  if (cdh_cManufactClassVolMin <= vid && vid <= cdh_cManufactClassVolMax) {
+  if (cdh_cManufactClassVolMin <= vid && vid <= cdh_cManufactClassVolMax)
+  {
     /* Get help file for this volume */
-    sts = ldh_VolumeIdToName(
-        ldh_SessionToWB(ip->PointedSession), vid, vname, sizeof(vname), &size);
+    sts = ldh_VolumeIdToName(ldh_SessionToWB(ip->PointedSession), vid, vname, sizeof(vname), &size);
     if (EVEN(sts))
       return sts;
 
     str_ToLower(vname, vname);
     if (streq(attr, ""))
-      sprintf(cmd, "help %s /helpfile=\"$pwr_exe/%s/%s_xtthelp.dat\"/strict",
-          cname, lng_get_language_str(), vname);
+      sprintf(cmd, "help %s /helpfile=\"$pwr_exe/%s/%s_xtthelp.dat\"/strict", cname, lng_get_language_str(),
+              vname);
     else
-      sprintf(cmd,
-          "help %s /helpfile=\"$pwr_exe/%s/%s_xtthelp.dat\"/bookmark=%s/strict",
-          cname, lng_get_language_str(), vname, attr);
+      sprintf(cmd, "help %s /helpfile=\"$pwr_exe/%s/%s_xtthelp.dat\"/bookmark=%s/strict", cname,
+              lng_get_language_str(), vname, attr);
 
     ip->wnav->command(cmd);
     return 1;
   }
 
-  if (cname[0] == '$') {
+  if (cname[0] == '$')
+  {
     if (streq(attr, ""))
       sprintf(cmd, "help %s /strict", &cname[1]);
     else
       sprintf(cmd, "help %s /bookmark=%s /strict", &cname[1], attr);
-  } else {
+  }
+  else
+  {
     if (streq(attr, ""))
       sprintf(cmd, "help %s /strict", cname);
     else
@@ -170,10 +173,7 @@ static pwr_tStatus HelpClass(ldh_sMenuCall* ip)
   return 1;
 }
 
-static pwr_tStatus HelpClassFilter(ldh_sMenuCall* ip)
-{
-  return 1;
-}
+static pwr_tStatus HelpClassFilter(ldh_sMenuCall* ip) { return 1; }
 
 //
 // Set the selected objid or attrref as value
@@ -186,7 +186,8 @@ static pwr_tStatus InsertSelectedObject(ldh_sMenuCall* ip)
   if (!a_pointed)
     return a_pointed.sts();
 
-  switch (a_pointed.tid()) {
+  switch (a_pointed.tid())
+  {
   case pwr_eType_Objid:
     sp->writeAttribute(a_pointed, &ip->Selected->Objid);
     if (EVEN(sp->sts()))
@@ -212,7 +213,8 @@ static pwr_tStatus InsertSelectedObjectFilter(ldh_sMenuCall* ip)
   if (!a_pointed)
     return a_pointed.sts();
 
-  switch (a_pointed.tid()) {
+  switch (a_pointed.tid())
+  {
   case pwr_eType_Objid:
   case pwr_eType_AttrRef:
     if (ip->Pointed.Flags.b.Array)
@@ -237,13 +239,14 @@ static pwr_tStatus ChangeValue(ldh_sMenuCall* ip)
   return 1;
 }
 
-static pwr_tStatus ChangeValueFilter(ldh_sMenuCall* ip)
-{
-  return 1;
-}
+static pwr_tStatus ChangeValueFilter(ldh_sMenuCall* ip) { return 1; }
 
-pwr_dExport pwr_BindMethods($Attribute) = { pwr_BindMethod(AnteCreate),
-  pwr_BindMethod(AnteMove), pwr_BindMethod(HelpClass),
-  pwr_BindMethod(HelpClassFilter), pwr_BindMethod(InsertSelectedObject),
-  pwr_BindMethod(InsertSelectedObjectFilter), pwr_BindMethod(ChangeValue),
-  pwr_BindMethod(ChangeValueFilter), pwr_NullMethod };
+pwr_dExport pwr_BindMethods($Attribute) = {pwr_BindMethod(AnteCreate),
+                                           pwr_BindMethod(AnteMove),
+                                           pwr_BindMethod(HelpClass),
+                                           pwr_BindMethod(HelpClassFilter),
+                                           pwr_BindMethod(InsertSelectedObject),
+                                           pwr_BindMethod(InsertSelectedObjectFilter),
+                                           pwr_BindMethod(ChangeValue),
+                                           pwr_BindMethod(ChangeValueFilter),
+                                           pwr_NullMethod};

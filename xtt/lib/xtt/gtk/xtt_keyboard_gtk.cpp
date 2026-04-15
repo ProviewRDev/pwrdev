@@ -60,30 +60,26 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
 //
 // Create the keyboard widget
 //
-XttKeyboardGtk::XttKeyboardGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-    const char* xn_name, GtkWidget** w, keyboard_eKeymap xn_keymap,
-    keyboard_eType xn_type, int xn_color_theme, pwr_tStatus* status)
-    : XttKeyboard(
-          xn_parent_ctx, xn_name, xn_keymap, xn_type, xn_color_theme, status),
+XttKeyboardGtk::XttKeyboardGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name,
+                               GtkWidget** w, keyboard_eKeymap xn_keymap, keyboard_eType xn_type,
+                               int xn_color_theme, pwr_tStatus* status)
+    : XttKeyboard(xn_parent_ctx, xn_name, xn_keymap, xn_type, xn_color_theme, status),
       parent_wid(xn_parent_wid), displayed(0), closing_down(0)
 {
   int width = 1145;
   int height = 161;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", height,
-      "default-width", width, "title", CoWowGtk::translate_utf8(xn_name), NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", height, "default-width", width,
+                                      "title", CoWowGtk::translate_utf8(xn_name), NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(
-      toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
   keyboard_widget = keyboardwidgetgtk_new(init_keyboard_cb, this);
 
@@ -107,7 +103,8 @@ XttKeyboardGtk::XttKeyboardGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
   int screen_width = geom.width;
   int screen_height = geom.height;
 
-  if (width > screen_width) {
+  if (width > screen_width)
+  {
     height = ((float)screen_width) * 0.9 / width * height;
     width = screen_width * 0.9;
     keyboard_SetSize(keyboardctx, width, height);
@@ -137,17 +134,18 @@ XttKeyboardGtk::~XttKeyboardGtk()
 
 void XttKeyboardGtk::set_inputfocus()
 {
-  if (displayed) {
+  if (displayed)
+  {
     gtk_widget_grab_focus(keyboard_widget);
   }
 }
 
-gboolean XttKeyboardGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean XttKeyboardGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   XttKeyboardGtk* keyboard = (XttKeyboardGtk*)data;
 
-  if (keyboard && keyboard->displayed) {
+  if (keyboard && keyboard->displayed)
+  {
     // set_input_focus();
   }
   return FALSE;
@@ -156,10 +154,7 @@ gboolean XttKeyboardGtk::action_inputfocus(
 //
 //  Pop keyboard window
 //
-void XttKeyboardGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void XttKeyboardGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
 void XttKeyboardGtk::set_transient(void* basewidget)
 {

@@ -44,15 +44,13 @@
 
 #define cmvolc_AssumeLocked(ccp) pwr_Assert(ccp->flags.b.cacheLock)
 
-gdb_sCclass* cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np,
-    const gdb_sVolume* vp, mvol_sAttribute* ap,
-    pwr_tBoolean* equal, /**< set if classes are equal then NULL is returned */
-    pwr_tBoolean*
-        fetched, /**< true if the class has been fected from the remote node */
-    gdb_sClass* cp);
+gdb_sCclass*
+cmvolc_GetCachedClass(pwr_tStatus* sts, const gdb_sNode* np, const gdb_sVolume* vp, mvol_sAttribute* ap,
+                      pwr_tBoolean* equal,   /**< set if classes are equal then NULL is returned */
+                      pwr_tBoolean* fetched, /**< true if the class has been fected from the remote node */
+                      gdb_sClass* cp);
 
-void cmvolc_GetNonExistingClass(
-    pwr_tStatus* sts, gdb_sObject* op, pwr_tCid cid);
+void cmvolc_GetNonExistingClass(pwr_tStatus* sts, gdb_sObject* op, pwr_tCid cid);
 
 void cmvolc_LockClass(pwr_tStatus* sts, gdb_sCclass* ccp);
 

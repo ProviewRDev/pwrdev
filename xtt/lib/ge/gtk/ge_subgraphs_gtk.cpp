@@ -36,7 +36,8 @@
 
 /* ge_subgraphs_gtk.cpp -- Display object info */
 
-extern "C" {
+extern "C"
+{
 #include "pwr_baseclasses.h"
 #include "co_cdh.h"
 #include "co_dcli.h"
@@ -60,9 +61,7 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
   return FALSE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
 static void attr_focus_in_event(GtkWidget* w, GdkEvent* event, gpointer data)
 {
@@ -128,73 +127,55 @@ static void subgraphs_activate_set_all_extern(GtkWidget* w, gpointer data)
   ((SubGraphs*)subgraphs)->set_all_extern(1);
 }
 
-static void subgraphs_activate_help(GtkWidget* w, gpointer data)
-{
-}
+static void subgraphs_activate_help(GtkWidget* w, gpointer data) {}
 
 //
 // Create the navigator widget
 //
-SubGraphsGtk::SubGraphsGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-    const char* xn_name, void* xn_growctx, GtkWidget** w, pwr_tStatus* status)
-    : SubGraphs(xn_parent_ctx, xn_name, xn_growctx, status),
-      parent_wid(xn_parent_wid), trace_timerid(0)
+SubGraphsGtk::SubGraphsGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name,
+                           void* xn_growctx, GtkWidget** w, pwr_tStatus* status)
+    : SubGraphs(xn_parent_ctx, xn_name, xn_growctx, status), parent_wid(xn_parent_wid), trace_timerid(0)
 {
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 500,
-      "default-width", 300, "title", name, NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 500, "default-width", 300, "title",
+                                      name, NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(
-      toplevel, "focus_in_event", G_CALLBACK(attr_focus_in_event), this);
+  g_signal_connect(toplevel, "focus_in_event", G_CALLBACK(attr_focus_in_event), this);
 
   // Menu
   // Accelerators
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File entry
   GtkWidget* file_attributes = gtk_menu_item_new_with_mnemonic("_Attributes");
-  g_signal_connect(
-      file_attributes, "activate", G_CALLBACK(subgraphs_activate_attr), this);
-  gtk_widget_add_accelerator(file_attributes, "activate", accel_g, 'a',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(file_attributes, "activate", G_CALLBACK(subgraphs_activate_attr), this);
+  gtk_widget_add_accelerator(file_attributes, "activate", accel_g, 'a', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* file_setextern = gtk_menu_item_new_with_mnemonic("Set _Extern");
-  g_signal_connect(file_setextern, "activate",
-      G_CALLBACK(subgraphs_activate_set_extern), this);
-  gtk_widget_add_accelerator(file_setextern, "activate", accel_g, 'e',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(file_setextern, "activate", G_CALLBACK(subgraphs_activate_set_extern), this);
+  gtk_widget_add_accelerator(file_setextern, "activate", accel_g, 'e', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* file_setintern = gtk_menu_item_new_with_mnemonic("Set _Intern");
-  g_signal_connect(file_setintern, "activate",
-      G_CALLBACK(subgraphs_activate_set_intern), this);
-  gtk_widget_add_accelerator(file_setintern, "activate", accel_g, 'i',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(file_setintern, "activate", G_CALLBACK(subgraphs_activate_set_intern), this);
+  gtk_widget_add_accelerator(file_setintern, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_setallintern
-      = gtk_menu_item_new_with_mnemonic("Set _All Intern");
-  g_signal_connect(file_setallintern, "activate",
-      G_CALLBACK(subgraphs_activate_set_all_intern), this);
-  gtk_widget_add_accelerator(file_setallintern, "activate", accel_g, 'l',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* file_setallintern = gtk_menu_item_new_with_mnemonic("Set _All Intern");
+  g_signal_connect(file_setallintern, "activate", G_CALLBACK(subgraphs_activate_set_all_intern), this);
+  gtk_widget_add_accelerator(file_setallintern, "activate", accel_g, 'l', GDK_CONTROL_MASK,
+                             GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_setallextern
-      = gtk_menu_item_new_with_mnemonic("Set A_ll Extern");
-  g_signal_connect(file_setallextern, "activate",
-      G_CALLBACK(subgraphs_activate_set_all_extern), this);
-  gtk_widget_add_accelerator(file_setallextern, "activate", accel_g, 'k',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* file_setallextern = gtk_menu_item_new_with_mnemonic("Set A_ll Extern");
+  g_signal_connect(file_setallextern, "activate", G_CALLBACK(subgraphs_activate_set_all_extern), this);
+  gtk_widget_add_accelerator(file_setallextern, "activate", accel_g, 'k', GDK_CONTROL_MASK,
+                             GTK_ACCEL_VISIBLE);
 
-  GtkWidget* file_close
-      = gtk_menu_item_new_with_mnemonic("_Close");
-  g_signal_connect(
-      file_close, "activate", G_CALLBACK(subgraphs_activate_close), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
+  g_signal_connect(file_close, "activate", G_CALLBACK(subgraphs_activate_close), this);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_attributes);
@@ -209,12 +190,9 @@ SubGraphsGtk::SubGraphsGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // Help entry
-  GtkWidget* help_help
-      = gtk_menu_item_new_with_mnemonic("_Help");
-  g_signal_connect(
-      help_help, "activate", G_CALLBACK(subgraphs_activate_help), this);
-  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic("_Help");
+  g_signal_connect(help_help, "activate", G_CALLBACK(subgraphs_activate_help), this);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -223,8 +201,7 @@ SubGraphsGtk::SubGraphsGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
-  form_widget
-      = scrolledbrowwidgetgtk_new(SubGraphs::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetgtk_new(SubGraphs::init_brow_cb, this, &brow_widget);
 
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
@@ -251,7 +228,8 @@ SubGraphsGtk::~SubGraphsGtk()
   // Delete all attr-widgets in attrlist
   attrlist_p = attrlist;
   next_p = NULL;
-  while (attrlist_p) {
+  while (attrlist_p)
+  {
     next_p = attrlist_p->next;
     delete attrlist_p->attrctx;
     free((char*)attrlist_p);
@@ -263,10 +241,7 @@ SubGraphsGtk::~SubGraphsGtk()
   gtk_widget_destroy(toplevel);
 }
 
-void SubGraphsGtk::trace_start()
-{
-  SubGraphsGtk::trace_scan(this);
-}
+void SubGraphsGtk::trace_start() { SubGraphsGtk::trace_scan(this); }
 
 static gboolean subgraphsgtk_trace_scan(void* data)
 {
@@ -278,16 +253,15 @@ void SubGraphsGtk::trace_scan(SubGraphsGtk* subgraphs)
 {
   int time = 200;
 
-  if (subgraphs->trace_started) {
+  if (subgraphs->trace_started)
+  {
     brow_TraceScan(subgraphs->brow->ctx);
 
-    ((SubGraphsGtk*)subgraphs)->trace_timerid
-        = g_timeout_add(time, subgraphsgtk_trace_scan, subgraphs);
+    ((SubGraphsGtk*)subgraphs)->trace_timerid = g_timeout_add(time, subgraphsgtk_trace_scan, subgraphs);
   }
 }
 
 Attr* SubGraphsGtk::new_attr(void* object, attr_sItem* items, int num)
 {
-  return new AttrGtk(
-      parent_wid, this, attr_eType_Attributes, object, items, num, 0);
+  return new AttrGtk(parent_wid, this, attr_eType_Attributes, object, items, num, 0);
 }

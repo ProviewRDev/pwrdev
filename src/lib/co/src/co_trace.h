@@ -37,6 +37,9 @@
 #ifndef co_trace_h
 #define co_trace_h
 
-typedef enum { trace_mAttrOptions_MenuAttr = 1 << 0 } trace_mAttrOptions;
+typedef enum
+{
+  trace_mAttrOptions_MenuAttr = 1 << 0
+} trace_mAttrOptions;
 
 #endif

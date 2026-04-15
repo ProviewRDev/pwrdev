@@ -90,34 +90,32 @@ static float f_node_width;
 /*_Methods defined for this module_______________________________________*/
 
 /*************************************************************************
-*
-* Name:		goen_create_nodetype_m16()
-*
-* Type
-*
-* Type		Parameter	IOGF	Description
-*    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
-*    Widget	        widget			Neted widget
-*    unsigned long 	*mask			Mask for drawing inputs/outputs
-*    int		color			Highlight color
-*    Cursor		cursor			Hot cursor
-*    unsigned long      *node_type_id		Nodetypeid for created nodetype
-*
-* Description:
-*	Create a nodetype
-*
-**************************************************************************/
+ *
+ * Name:		goen_create_nodetype_m16()
+ *
+ * Type
+ *
+ * Type		Parameter	IOGF	Description
+ *    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
+ *    Widget	        widget			Neted widget
+ *    unsigned long 	*mask			Mask for drawing inputs/outputs
+ *    int		color			Highlight color
+ *    Cursor		cursor			Hot cursor
+ *    unsigned long      *node_type_id		Nodetypeid for created nodetype
+ *
+ * Description:
+ *	Create a nodetype
+ *
+ **************************************************************************/
 
-int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
-    ldh_tSesContext ldhses, flow_tCtx ctx, unsigned int* mask,
-    unsigned long subwindowmark, unsigned long node_width,
-    flow_tNodeClass* node_class, vldh_t_node node)
+int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid, ldh_tSesContext ldhses,
+                             flow_tCtx ctx, unsigned int* mask, unsigned long subwindowmark,
+                             unsigned long node_width, flow_tNodeClass* node_class, vldh_t_node node)
 {
   int i, sts;
   int i_inpoints, i_inpoints_top, i_inpoints_bottom;
   int i_outpoints, i_outpoints_top, i_outpoints_bottom;
-  int inputpoints, outputpoints, inputpoints_top, inputpoints_bottom,
-      outputpoints_top, outputpoints_bottom;
+  int inputpoints, outputpoints, inputpoints_top, inputpoints_bottom, outputpoints_top, outputpoints_bottom;
   int points_at_top, points_at_bottom, points_at_left, points_at_right;
   unsigned long inpointmask;
   unsigned long outpointmask;
@@ -153,27 +151,27 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 
   /* Get number of annotations and the width of the annotations */
   sts = WGre::get_annotations(node, (char*)annot_str, annot_nr, &annot_count,
-      sizeof(annot_str) / sizeof(annot_str[0]), sizeof(annot_str[0]));
+                              sizeof(annot_str) / sizeof(annot_str[0]), sizeof(annot_str[0]));
   if (EVEN(sts))
     return sts;
 
   annot_width[0] = 0;
   annot_width[1] = 0;
   annot_width[2] = 0;
-  if (annot_count > 0) {
-    flow_MeasureAnnotText(ctx, annot_str[0], flow_eDrawType_TextRoboto,
-        GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, &annot_width[0],
-        &annot_height, &annot_rows);
+  if (annot_count > 0)
+  {
+    flow_MeasureAnnotText(ctx, annot_str[0], flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
+                          flow_eAnnotType_OneLine, &annot_width[0], &annot_height, &annot_rows);
   }
-  if (annot_count > 1) {
-    flow_MeasureAnnotText(ctx, annot_str[1], flow_eDrawType_TextRoboto,
-        GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, &annot_width[1],
-        &annot_height, &annot_rows);
+  if (annot_count > 1)
+  {
+    flow_MeasureAnnotText(ctx, annot_str[1], flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
+                          flow_eAnnotType_OneLine, &annot_width[1], &annot_height, &annot_rows);
   }
-  if (annot_count > 2) {
-    flow_MeasureAnnotText(ctx, annot_str[2], flow_eDrawType_TextRoboto,
-        GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, &annot_width[2],
-        &annot_height, &annot_rows);
+  if (annot_count > 2)
+  {
+    flow_MeasureAnnotText(ctx, annot_str[2], flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
+                          flow_eAnnotType_OneLine, &annot_width[2], &annot_height, &annot_rows);
   }
 
   inmask_pointer = mask++;
@@ -189,8 +187,10 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   outputpoints_top = 0;
   inputpoints_bottom = 0;
   outputpoints_bottom = 0;
-  for (i = 0; i < rows; i++) {
-    if (bodydef[i].ParClass == pwr_eClass_Input) {
+  for (i = 0; i < rows; i++)
+  {
+    if (bodydef[i].ParClass == pwr_eClass_Input)
+    {
       if (bodydef[i].Par->Input.Graph.InputType == 1)
         inputpoints_top += ((*inmask_pointer & inpointmask) != 0);
       else if (bodydef[i].Par->Input.Graph.InputType == 2)
@@ -199,7 +199,8 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
         inputpoints += ((*inmask_pointer & inpointmask) != 0);
       inpointmask <<= 1;
     }
-    if (bodydef[i].ParClass == pwr_eClass_Output) {
+    if (bodydef[i].ParClass == pwr_eClass_Output)
+    {
       if (bodydef[i].Par->Input.Graph.InputType == 1)
         outputpoints_top += ((*outmask_pointer & outpointmask) != 0);
       else if (bodydef[i].Par->Input.Graph.InputType == 2)
@@ -218,8 +219,7 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   f_height = 3 * f_repeat + (MAX(inputpoints, outputpoints) - 1) * f_repeat;
 
   classname_width = strlen(graphbody->graphname) * f_strlength;
-  f_width = MAX(f_strlength * 4 + MAX(classname_width, annot_width[0]),
-      f_defwidth + f_strlength * 2);
+  f_width = MAX(f_strlength * 4 + MAX(classname_width, annot_width[0]), f_defwidth + f_strlength * 2);
   if (annot_count >= 2)
     f_width = MAX(f_width, f_strlength * 4 + annot_width[1]);
 
@@ -235,50 +235,49 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 
   /* Draw the rectangle for gate  */
 
-  if (graphbody->graphindex == 1) {
+  if (graphbody->graphindex == 1)
+  {
     /* Draw the rectangle for gate */
-    flow_AddRect(nc_pid, 0, -f_yoffs, f_width, f_height,
-        flow_eDrawType_LineErase, 2, flow_mDisplayLevel_1);
-    if (f_height > 2 * f_corner) {
-      flow_AddLine(nc_pid, 0, f_corner - f_yoffs, 0,
-          f_height - f_corner - f_yoffs, flow_eDrawType_Line, 2);
+    flow_AddRect(nc_pid, 0, -f_yoffs, f_width, f_height, flow_eDrawType_LineErase, 2, flow_mDisplayLevel_1);
+    if (f_height > 2 * f_corner)
+    {
+      flow_AddLine(nc_pid, 0, f_corner - f_yoffs, 0, f_height - f_corner - f_yoffs, flow_eDrawType_Line, 2);
     }
-    flow_AddArc(nc_pid, 0, f_height - 2 * f_corner - f_yoffs, 2 * f_corner,
-        f_height - f_yoffs, 180, 90, flow_eDrawType_Line, 2);
-    flow_AddLine(nc_pid, f_corner, f_height - f_yoffs, f_width - f_corner,
-        f_height - f_yoffs, flow_eDrawType_Line, 2);
-    flow_AddArc(nc_pid, f_width - 2 * f_corner,
-        f_height - 2 * f_corner - f_yoffs, f_width, f_height - f_yoffs, 270, 90,
-        flow_eDrawType_Line, 2);
-    if (f_height > 2 * f_corner) {
-      flow_AddLine(nc_pid, f_width, f_corner - f_yoffs, f_width,
-          f_height - f_corner - f_yoffs, flow_eDrawType_Line, 2);
+    flow_AddArc(nc_pid, 0, f_height - 2 * f_corner - f_yoffs, 2 * f_corner, f_height - f_yoffs, 180, 90,
+                flow_eDrawType_Line, 2);
+    flow_AddLine(nc_pid, f_corner, f_height - f_yoffs, f_width - f_corner, f_height - f_yoffs,
+                 flow_eDrawType_Line, 2);
+    flow_AddArc(nc_pid, f_width - 2 * f_corner, f_height - 2 * f_corner - f_yoffs, f_width,
+                f_height - f_yoffs, 270, 90, flow_eDrawType_Line, 2);
+    if (f_height > 2 * f_corner)
+    {
+      flow_AddLine(nc_pid, f_width, f_corner - f_yoffs, f_width, f_height - f_corner - f_yoffs,
+                   flow_eDrawType_Line, 2);
     }
-    flow_AddArc(nc_pid, f_width - 2 * f_corner, -f_yoffs, f_width,
-        2 * f_corner - f_yoffs, 0, 90, flow_eDrawType_Line, 2);
-    flow_AddLine(nc_pid, f_corner, -f_yoffs, f_width - f_corner, -f_yoffs,
-        flow_eDrawType_Line, 2);
-    flow_AddArc(nc_pid, 0, -f_yoffs, 2 * f_corner, 2 * f_corner - f_yoffs, 90,
-        90, flow_eDrawType_Line, 2);
-  } else {
-    flow_AddRect(nc_pid, 0, -f_yoffs, f_width, f_height, flow_eDrawType_Line, 2,
-        flow_mDisplayLevel_1);
+    flow_AddArc(nc_pid, f_width - 2 * f_corner, -f_yoffs, f_width, 2 * f_corner - f_yoffs, 0, 90,
+                flow_eDrawType_Line, 2);
+    flow_AddLine(nc_pid, f_corner, -f_yoffs, f_width - f_corner, -f_yoffs, flow_eDrawType_Line, 2);
+    flow_AddArc(nc_pid, 0, -f_yoffs, 2 * f_corner, 2 * f_corner - f_yoffs, 90, 90, flow_eDrawType_Line, 2);
+  }
+  else
+  {
+    flow_AddRect(nc_pid, 0, -f_yoffs, f_width, f_height, flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
   }
 
   /* Draw the separator line for header and footer			      */
 
-  if (subwindowmark == 0) {
-    flow_AddLine(nc_pid, 0, f_repeat - f_yoffs, f_width, f_repeat - f_yoffs,
-        flow_eDrawType_Line, 2);
-  } else {
-    flow_AddLine(nc_pid, 0, f_repeat - f_yoffs, f_width, f_repeat - f_yoffs,
-        flow_eDrawType_LineGray, 4);
+  if (subwindowmark == 0)
+  {
+    flow_AddLine(nc_pid, 0, f_repeat - f_yoffs, f_width, f_repeat - f_yoffs, flow_eDrawType_Line, 2);
+  }
+  else
+  {
+    flow_AddLine(nc_pid, 0, f_repeat - f_yoffs, f_width, f_repeat - f_yoffs, flow_eDrawType_LineGray, 4);
   }
 
   /* Draw the objname */
-  flow_AddText(nc_pid, graphbody->graphname, f_namepos,
-      f_repeat / 2 + f_strheight / 2 - f_yoffs, flow_eDrawType_TextRoboto,
-      GOEN_F_TEXTSIZE);
+  flow_AddText(nc_pid, graphbody->graphname, f_namepos, f_repeat / 2 + f_strheight / 2 - f_yoffs,
+               flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
 
   /* Draw the leadnames and lines					      */
 
@@ -291,115 +290,104 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   i_outpoints = 0;
   i_outpoints_top = 0;
   i_outpoints_bottom = 0;
-  for (i = 0; i < rows; i++) {
-    if (bodydef[i].ParClass == pwr_eClass_Input) {
-      if ((*inmask_pointer & inpointmask) != 0) {
-        if (bodydef[i].Par->Input.Graph.InputType == 2) {
-          flow_AddLine(nc_pid,
-              f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1),
-              f_height - f_yoffs,
-              f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1),
-              f_height + f_pinlength - f_yoffs, flow_eDrawType_Line, 2);
-          flow_AddConPoint(nc_pid,
-              f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1),
-              f_height + f_pinlength - f_yoffs, conpoint_nr++,
-              flow_eDirection_Up);
+  for (i = 0; i < rows; i++)
+  {
+    if (bodydef[i].ParClass == pwr_eClass_Input)
+    {
+      if ((*inmask_pointer & inpointmask) != 0)
+      {
+        if (bodydef[i].Par->Input.Graph.InputType == 2)
+        {
+          flow_AddLine(nc_pid, f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1), f_height - f_yoffs,
+                       f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1),
+                       f_height + f_pinlength - f_yoffs, flow_eDrawType_Line, 2);
+          flow_AddConPoint(nc_pid, f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1),
+                           f_height + f_pinlength - f_yoffs, conpoint_nr++, flow_eDirection_Up);
           i_inpoints_bottom++;
-        } else if (bodydef[i].Par->Input.Graph.InputType != 1) {
-          flow_AddText(nc_pid, bodydef[i].Par->Output.Graph.GraphName,
-              f_nameoffin,
-              f_repeat * (1.5 + i_inpoints) + f_strheight / 2 - f_yoffs,
-              flow_eDrawType_TextRoboto, 2);
+        }
+        else if (bodydef[i].Par->Input.Graph.InputType != 1)
+        {
+          flow_AddText(nc_pid, bodydef[i].Par->Output.Graph.GraphName, f_nameoffin,
+                       f_repeat * (1.5 + i_inpoints) + f_strheight / 2 - f_yoffs, flow_eDrawType_TextRoboto,
+                       2);
 
-          if ((*invertmask_pointer & inpointmask) == 0) {
-            flow_AddLine(nc_pid, 0, f_repeat * (1.5 + i_inpoints) - f_yoffs,
-                -f_pinlength, f_repeat * (1.5 + i_inpoints) - f_yoffs,
-                flow_eDrawType_Line, 2);
-          } else {
-            flow_AddLine(nc_pid,
-                f_repeat * (i_inpoints_top + i_outpoints_top + 1),
-                -f_pinlength - f_yoffs,
-                f_repeat * (i_inpoints_top + i_outpoints_top + 1), -f_yoffs,
-                flow_eDrawType_Line, 2);
-            flow_AddArc(nc_pid, -f_circle,
-                f_repeat * (1.5 + i_inpoints) - f_circle / 2 - f_yoffs, 0,
-                f_repeat * (1.5 + i_inpoints) + f_circle / 2 - f_yoffs, 0, 360,
-                flow_eDrawType_Line, 2);
+          if ((*invertmask_pointer & inpointmask) == 0)
+          {
+            flow_AddLine(nc_pid, 0, f_repeat * (1.5 + i_inpoints) - f_yoffs, -f_pinlength,
+                         f_repeat * (1.5 + i_inpoints) - f_yoffs, flow_eDrawType_Line, 2);
           }
-          flow_AddConPoint(nc_pid, -f_pinlength,
-              f_repeat * (1.5 + i_inpoints) - f_yoffs, conpoint_nr++,
-              flow_eDirection_Left);
+          else
+          {
+            flow_AddLine(nc_pid, f_repeat * (i_inpoints_top + i_outpoints_top + 1), -f_pinlength - f_yoffs,
+                         f_repeat * (i_inpoints_top + i_outpoints_top + 1), -f_yoffs, flow_eDrawType_Line, 2);
+            flow_AddArc(nc_pid, -f_circle, f_repeat * (1.5 + i_inpoints) - f_circle / 2 - f_yoffs, 0,
+                        f_repeat * (1.5 + i_inpoints) + f_circle / 2 - f_yoffs, 0, 360, flow_eDrawType_Line,
+                        2);
+          }
+          flow_AddConPoint(nc_pid, -f_pinlength, f_repeat * (1.5 + i_inpoints) - f_yoffs, conpoint_nr++,
+                           flow_eDirection_Left);
           i_inpoints++;
-        } else {
-          flow_AddLine(nc_pid,
-              f_repeat * (i_inpoints_top + i_outpoints_top + 1),
-              -f_pinlength - f_yoffs,
-              f_repeat * (i_inpoints_top + i_outpoints_top + 1), -f_yoffs,
-              flow_eDrawType_Line, 2);
-          flow_AddConPoint(nc_pid,
-              f_repeat * (i_inpoints_top + i_outpoints_top + 1),
-              -f_pinlength - f_yoffs, conpoint_nr++, flow_eDirection_Down);
+        }
+        else
+        {
+          flow_AddLine(nc_pid, f_repeat * (i_inpoints_top + i_outpoints_top + 1), -f_pinlength - f_yoffs,
+                       f_repeat * (i_inpoints_top + i_outpoints_top + 1), -f_yoffs, flow_eDrawType_Line, 2);
+          flow_AddConPoint(nc_pid, f_repeat * (i_inpoints_top + i_outpoints_top + 1), -f_pinlength - f_yoffs,
+                           conpoint_nr++, flow_eDirection_Down);
           i_inpoints_top++;
         }
       }
       inpointmask <<= 1;
     }
-    if (bodydef[i].ParClass == pwr_eClass_Output) {
-      if ((*outmask_pointer & outpointmask) != 0) {
-        if (bodydef[i].Par->Output.Graph.InputType == 2) {
-          flow_AddLine(nc_pid,
-              f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1),
-              f_height - f_yoffs,
-              f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1),
-              f_height + f_pinlength - f_yoffs, flow_eDrawType_Line, 2);
-          flow_CreateConPoint(ctx,
-              f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1),
-              f_height + f_pinlength - f_yoffs, conpoint_nr++,
-	      flow_eDirection_Up, &cp);
-	  flow_NodeClassAdd(nc_pid, cp);
+    if (bodydef[i].ParClass == pwr_eClass_Output)
+    {
+      if ((*outmask_pointer & outpointmask) != 0)
+      {
+        if (bodydef[i].Par->Output.Graph.InputType == 2)
+        {
+          flow_AddLine(nc_pid, f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1), f_height - f_yoffs,
+                       f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1),
+                       f_height + f_pinlength - f_yoffs, flow_eDrawType_Line, 2);
+          flow_CreateConPoint(ctx, f_repeat * (i_inpoints_bottom + i_outpoints_bottom + 1),
+                              f_height + f_pinlength - f_yoffs, conpoint_nr++, flow_eDirection_Up, &cp);
+          flow_NodeClassAdd(nc_pid, cp);
           i_inpoints_bottom++;
-        } else if (bodydef[i].Par->Output.Graph.InputType != 1) {
-          f_namelength
-              = strlen(bodydef[i].Par->Output.Graph.GraphName) * f_strlength;
-          flow_AddText(nc_pid, bodydef[i].Par->Output.Graph.GraphName,
-              f_width - f_nameoffout - f_namelength,
-              f_repeat * (1.5 + i_outpoints) + f_strheight / 2 - f_yoffs,
-              flow_eDrawType_TextRoboto, 2);
-          flow_AddLine(nc_pid, f_width,
-              f_repeat * (1.5 + i_outpoints) - f_yoffs, f_width + f_pinlength,
-              f_repeat * (1.5 + i_outpoints) - f_yoffs, flow_eDrawType_Line, 2);
-          flow_CreateConPoint(ctx, f_width + f_pinlength,
-              f_repeat * (i_outpoints + 1.5) - f_yoffs, conpoint_nr++,
-	      flow_eDirection_Right, &cp);
-	  flow_NodeClassAdd(nc_pid, cp);
+        }
+        else if (bodydef[i].Par->Output.Graph.InputType != 1)
+        {
+          f_namelength = strlen(bodydef[i].Par->Output.Graph.GraphName) * f_strlength;
+          flow_AddText(nc_pid, bodydef[i].Par->Output.Graph.GraphName, f_width - f_nameoffout - f_namelength,
+                       f_repeat * (1.5 + i_outpoints) + f_strheight / 2 - f_yoffs, flow_eDrawType_TextRoboto,
+                       2);
+          flow_AddLine(nc_pid, f_width, f_repeat * (1.5 + i_outpoints) - f_yoffs, f_width + f_pinlength,
+                       f_repeat * (1.5 + i_outpoints) - f_yoffs, flow_eDrawType_Line, 2);
+          flow_CreateConPoint(ctx, f_width + f_pinlength, f_repeat * (i_outpoints + 1.5) - f_yoffs,
+                              conpoint_nr++, flow_eDirection_Right, &cp);
+          flow_NodeClassAdd(nc_pid, cp);
           i_outpoints++;
-        } else {
-          flow_AddLine(nc_pid,
-              f_repeat * (i_inpoints_top + i_outpoints_top + 1),
-              -f_pinlength - f_yoffs,
-              f_repeat * (i_inpoints_top + i_outpoints_top + 1), -f_yoffs,
-              flow_eDrawType_Line, 2);
-          flow_CreateConPoint(ctx,
-              f_repeat * (i_inpoints_top + i_outpoints_top + 1),
-	      -f_pinlength - f_yoffs, conpoint_nr++, flow_eDirection_Down, &cp);
-	  flow_NodeClassAdd(nc_pid, cp);
+        }
+        else
+        {
+          flow_AddLine(nc_pid, f_repeat * (i_inpoints_top + i_outpoints_top + 1), -f_pinlength - f_yoffs,
+                       f_repeat * (i_inpoints_top + i_outpoints_top + 1), -f_yoffs, flow_eDrawType_Line, 2);
+          flow_CreateConPoint(ctx, f_repeat * (i_inpoints_top + i_outpoints_top + 1), -f_pinlength - f_yoffs,
+                              conpoint_nr++, flow_eDirection_Down, &cp);
+          flow_NodeClassAdd(nc_pid, cp);
           i_inpoints_top++;
         }
-	if (bodydef[i].Par->Output.Info.Type == pwr_eType_Float32)
-	  flow_SetTraceAttr(
-            cp, NULL, bodydef[i].ParName, flow_eTraceType_Float32, 0);
-	else if (bodydef[i].Par->Output.Info.Type == pwr_eType_Int32)
-	  flow_SetTraceAttr(
-            cp, NULL, bodydef[i].ParName, flow_eTraceType_Int32, 0);
-	else if (bodydef[i].Par->Output.Info.Type == pwr_eType_Boolean)
-	  flow_SetTraceAttr(
-            cp, NULL, bodydef[i].ParName, flow_eTraceType_Boolean, 0);
-	else if (bodydef[i].Par->Output.Info.Type == pwr_cClass_DataQBus) {
-	  char attr[80];
-	  strcpy(attr, bodydef[i].ParName);
-	  strcat(attr, ".Data");
-	  flow_SetTraceAttr(cp, NULL, attr, flow_eTraceType_DataRef, 0);
-	}
+        if (bodydef[i].Par->Output.Info.Type == pwr_eType_Float32)
+          flow_SetTraceAttr(cp, NULL, bodydef[i].ParName, flow_eTraceType_Float32, 0);
+        else if (bodydef[i].Par->Output.Info.Type == pwr_eType_Int32)
+          flow_SetTraceAttr(cp, NULL, bodydef[i].ParName, flow_eTraceType_Int32, 0);
+        else if (bodydef[i].Par->Output.Info.Type == pwr_eType_Boolean)
+          flow_SetTraceAttr(cp, NULL, bodydef[i].ParName, flow_eTraceType_Boolean, 0);
+        else if (bodydef[i].Par->Output.Info.Type == pwr_cClass_DataQBus)
+        {
+          char attr[80];
+          strcpy(attr, bodydef[i].ParName);
+          strcat(attr, ".Data");
+          flow_SetTraceAttr(cp, NULL, attr, flow_eTraceType_DataRef, 0);
+        }
       }
       outpointmask <<= 1;
     }
@@ -410,22 +398,17 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   if (node_width == 0)
     f_node_width = 6;
 
-  flow_AddAnnot(nc_pid, f_strlength,
-      f_height - (f_repeat - f_strheight) / 2.0 - f_yoffs, 0,
-      flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
-      flow_mDisplayLevel_1);
+  flow_AddAnnot(nc_pid, f_strlength, f_height - (f_repeat - f_strheight) / 2.0 - f_yoffs, 0,
+                flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
 
   /* Add execute order display */
-  flow_AddFilledRect(nc_pid, f_width - GOEN_DISPLAYNODEWIDTH, -f_yoffs,
-      GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase,
-      flow_mDisplayLevel_2);
-  flow_AddRect(nc_pid, f_width - GOEN_DISPLAYNODEWIDTH, -f_yoffs,
-      GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed, 1,
-      flow_mDisplayLevel_2);
+  flow_AddFilledRect(nc_pid, f_width - GOEN_DISPLAYNODEWIDTH, -f_yoffs, GOEN_DISPLAYNODEWIDTH,
+                     GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase, flow_mDisplayLevel_2);
+  flow_AddRect(nc_pid, f_width - GOEN_DISPLAYNODEWIDTH, -f_yoffs, GOEN_DISPLAYNODEWIDTH,
+               GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed, 1, flow_mDisplayLevel_2);
   flow_AddAnnot(nc_pid, f_width - GOEN_DISPLAYNODEWIDTH + f_strlength,
-      (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_yoffs,
-      GOEN_DISPLAYNODE_ANNOT, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
-      flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
+                (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_yoffs, GOEN_DISPLAYNODE_ANNOT,
+                flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
 
   free((char*)bodydef);
   *node_class = nc_pid;
@@ -433,30 +416,29 @@ int goen_create_nodetype_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 }
 
 /*************************************************************************
-*
-* Name:		goen_get_point_info_m16()
-*
-* Type
-*
-* Type		Parameter	IOGF	Description
-*    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
-*    unsigned long	point			Connection point nr
-*    unsigned long 	*mask			Mask for drawing inputs/outputs
-*    goen_conpoint_type	*info_pointer		Pointer to calculated data
-*
-* Description:
-*	Calculates relativ koordinates for a connectionpoint and investigates
-*	the connectionpoint type.
-*
-**************************************************************************/
-int goen_get_point_info_m16(WGre* grectx, pwr_sGraphPlcNode* graphbody,
-    unsigned long point_nr, unsigned int* mask, unsigned long node_width,
-    goen_conpoint_type* info_pointer, vldh_t_node node)
+ *
+ * Name:		goen_get_point_info_m16()
+ *
+ * Type
+ *
+ * Type		Parameter	IOGF	Description
+ *    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
+ *    unsigned long	point			Connection point nr
+ *    unsigned long 	*mask			Mask for drawing inputs/outputs
+ *    goen_conpoint_type	*info_pointer		Pointer to calculated data
+ *
+ * Description:
+ *	Calculates relativ koordinates for a connectionpoint and investigates
+ *	the connectionpoint type.
+ *
+ **************************************************************************/
+int goen_get_point_info_m16(WGre* grectx, pwr_sGraphPlcNode* graphbody, unsigned long point_nr,
+                            unsigned int* mask, unsigned long node_width, goen_conpoint_type* info_pointer,
+                            vldh_t_node node)
 {
   int point;
   int i, sts, imin, imax;
-  int inputpoints, outputpoints, inputpoints_top, inputpoints_bottom,
-      outputpoints_top, outputpoints_bottom;
+  int inputpoints, outputpoints, inputpoints_top, inputpoints_bottom, outputpoints_top, outputpoints_bottom;
   int points_top, points_bottom;
   int points_at_top, points_at_bottom, points_at_left, points_at_right;
   unsigned long inpointmask;
@@ -467,8 +449,7 @@ int goen_get_point_info_m16(WGre* grectx, pwr_sGraphPlcNode* graphbody,
   point = point_nr;
 
   /* Get the runtime paramters for this class */
-  sts = ldh_GetObjectBodyDef(
-      (node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "RtBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
@@ -481,8 +462,10 @@ int goen_get_point_info_m16(WGre* grectx, pwr_sGraphPlcNode* graphbody,
   outputpoints_top = 0;
   inputpoints_bottom = 0;
   outputpoints_bottom = 0;
-  for (i = 0; i < rows; i++) {
-    if (bodydef[i].ParClass == pwr_eClass_Input) {
+  for (i = 0; i < rows; i++)
+  {
+    if (bodydef[i].ParClass == pwr_eClass_Input)
+    {
       if (bodydef[i].Par->Input.Graph.InputType == 1)
         inputpoints_top += ((*mask & inpointmask) != 0);
       else if (bodydef[i].Par->Input.Graph.InputType == 2)
@@ -491,7 +474,8 @@ int goen_get_point_info_m16(WGre* grectx, pwr_sGraphPlcNode* graphbody,
         inputpoints += ((*mask & inpointmask) != 0);
       inpointmask <<= 1;
     }
-    if (bodydef[i].ParClass == pwr_eClass_Output) {
+    if (bodydef[i].ParClass == pwr_eClass_Output)
+    {
       if (bodydef[i].Par->Input.Graph.InputType == 1)
         outputpoints_top += ((*(mask + 1) & outpointmask) != 0);
       else if (bodydef[i].Par->Input.Graph.InputType == 2)
@@ -513,61 +497,60 @@ int goen_get_point_info_m16(WGre* grectx, pwr_sGraphPlcNode* graphbody,
   points_bottom = 0;
   imin = 0;
   imax = inputpoints_top;
-  if ((point >= imin) && (point < imax)) {
-    info_pointer->x = -f_width / 2.0
-        + f_pinlength * (points_at_left - points_at_right) / 2.0
-        + f_repeat * (point - imin + 1);
-    info_pointer->y
-        = f_height / 2.0 + f_pinlength * (1 + points_at_bottom) / 2.0;
+  if ((point >= imin) && (point < imax))
+  {
+    info_pointer->x = -f_width / 2.0 + f_pinlength * (points_at_left - points_at_right) / 2.0 +
+                      f_repeat * (point - imin + 1);
+    info_pointer->y = f_height / 2.0 + f_pinlength * (1 + points_at_bottom) / 2.0;
     info_pointer->type = CON_UP;
   }
 
   imin = imax;
   imax += inputpoints_bottom;
-  if ((point >= imin) && (point < imax)) {
-    info_pointer->x = -f_width / 2.0
-        + f_pinlength * (points_at_left - points_at_right) / 2.0
-        + f_repeat * (point - imin + 1);
+  if ((point >= imin) && (point < imax))
+  {
+    info_pointer->x = -f_width / 2.0 + f_pinlength * (points_at_left - points_at_right) / 2.0 +
+                      f_repeat * (point - imin + 1);
     info_pointer->y = -f_height / 2.0 - f_pinlength * (1 + points_at_top) / 2.0;
     info_pointer->type = CON_DOWN;
   }
 
   imin = imax;
   imax += inputpoints;
-  if ((point >= imin) && (point < imax)) {
+  if ((point >= imin) && (point < imax))
+  {
     /* Connectionpoint is an left input */
-    info_pointer->x
-        = -f_width / 2.0 - f_pinlength * (1 + points_at_right) / 2.0;
-    info_pointer->y = f_height / 2.0 - f_repeat * (point - imin + 1.5)
-        + f_pinlength * (points_at_top - points_at_bottom) / 2.0;
+    info_pointer->x = -f_width / 2.0 - f_pinlength * (1 + points_at_right) / 2.0;
+    info_pointer->y = f_height / 2.0 - f_repeat * (point - imin + 1.5) +
+                      f_pinlength * (points_at_top - points_at_bottom) / 2.0;
     info_pointer->type = CON_LEFT;
   }
   imin = imax;
   imax += outputpoints_top;
-  if ((point >= imin) && (point < imax)) {
-    info_pointer->x = -f_width / 2.0
-        + f_pinlength * (points_at_left - points_at_right) / 2.0
-        + f_repeat * (point - imin + 1);
-    info_pointer->y
-        = f_height / 2.0 + f_pinlength * (1 + points_at_bottom) / 2.0;
+  if ((point >= imin) && (point < imax))
+  {
+    info_pointer->x = -f_width / 2.0 + f_pinlength * (points_at_left - points_at_right) / 2.0 +
+                      f_repeat * (point - imin + 1);
+    info_pointer->y = f_height / 2.0 + f_pinlength * (1 + points_at_bottom) / 2.0;
     info_pointer->type = CON_UP;
   }
   imin = imax;
   imax += outputpoints_bottom;
-  if ((point >= imin) && (point < imax)) {
-    info_pointer->x = -f_width / 2.0
-        + f_pinlength * (points_at_left - points_at_right) / 2.0
-        + f_repeat * (point - imin + 1);
+  if ((point >= imin) && (point < imax))
+  {
+    info_pointer->x = -f_width / 2.0 + f_pinlength * (points_at_left - points_at_right) / 2.0 +
+                      f_repeat * (point - imin + 1);
     info_pointer->y = -f_height / 2.0 - f_pinlength * (1 + points_at_top) / 2.0;
     info_pointer->type = CON_DOWN;
     points_bottom++;
   }
   imin = imax;
   imax += outputpoints;
-  if ((point >= imin) && (point < imax)) {
+  if ((point >= imin) && (point < imax))
+  {
     info_pointer->x = f_width / 2.0 + f_pinlength * (1 + points_at_left) / 2.0;
-    info_pointer->y = f_height / 2.0 - f_repeat * (point - imin + 1.5)
-        - f_pinlength * (points_at_top - points_at_bottom) / 2.0;
+    info_pointer->y = f_height / 2.0 - f_repeat * (point - imin + 1.5) -
+                      f_pinlength * (points_at_top - points_at_bottom) / 2.0;
     info_pointer->type = CON_RIGHT;
   }
 
@@ -576,26 +559,25 @@ int goen_get_point_info_m16(WGre* grectx, pwr_sGraphPlcNode* graphbody,
 }
 
 /*************************************************************************
-*
-* Name:		goen_get_parameter_m16()
-*
-* Type
-*
-* Type		Parameter	IOGF	Description
-*    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
-*    unsigned long	point			Connection point nr
-*    unsigned long 	*mask			Mask for drawing inputs/outputs
-*    unsigned long	*par_type		Input or output parameter
-*    godd_parameter_type **par_pointer		Pointer to parameter data
-*
-* Description:
-*	Gets pointer to parameterdata for connectionpoint.
-*
-**************************************************************************/
-int goen_get_parameter_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
-    ldh_tSesContext ldhses, unsigned long con_point, unsigned int* mask,
-    unsigned long* par_type, unsigned long* par_inverted,
-    unsigned long* par_index)
+ *
+ * Name:		goen_get_parameter_m16()
+ *
+ * Type
+ *
+ * Type		Parameter	IOGF	Description
+ *    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
+ *    unsigned long	point			Connection point nr
+ *    unsigned long 	*mask			Mask for drawing inputs/outputs
+ *    unsigned long	*par_type		Input or output parameter
+ *    godd_parameter_type **par_pointer		Pointer to parameter data
+ *
+ * Description:
+ *	Gets pointer to parameterdata for connectionpoint.
+ *
+ **************************************************************************/
+int goen_get_parameter_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid, ldh_tSesContext ldhses,
+                           unsigned long con_point, unsigned int* mask, unsigned long* par_type,
+                           unsigned long* par_inverted, unsigned long* par_index)
 {
   int sts;
   unsigned long conpointcount;
@@ -617,11 +599,13 @@ int goen_get_parameter_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   pointmask = 1;
   input_found = 0;
   output_found = 0;
-  for (i = 0; i < rows; i++) {
-    if ((bodydef[i].ParClass == pwr_eClass_Input)
-        && (bodydef[i].Par->Input.Graph.InputType != 0)) {
+  for (i = 0; i < rows; i++)
+  {
+    if ((bodydef[i].ParClass == pwr_eClass_Input) && (bodydef[i].Par->Input.Graph.InputType != 0))
+    {
       conpointcount += ((*mask & pointmask) != 0);
-      if (conpointcount == (con_point + 1)) {
+      if (conpointcount == (con_point + 1))
+      {
         /* this is the input */
         *par_type = PAR_INPUT;
         *par_index = i;
@@ -637,11 +621,13 @@ int goen_get_parameter_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
     }
   }
 
-  for (i = 0; i < rows; i++) {
-    if ((bodydef[i].ParClass == pwr_eClass_Input)
-        && (bodydef[i].Par->Input.Graph.InputType == 0)) {
+  for (i = 0; i < rows; i++)
+  {
+    if ((bodydef[i].ParClass == pwr_eClass_Input) && (bodydef[i].Par->Input.Graph.InputType == 0))
+    {
       conpointcount += ((*mask & pointmask) != 0);
-      if (conpointcount == (con_point + 1)) {
+      if (conpointcount == (con_point + 1))
+      {
         /* this is the input */
         *par_type = PAR_INPUT;
         *par_index = i;
@@ -659,11 +645,13 @@ int goen_get_parameter_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   /* continue with outputs */
   mask++;
   pointmask = 1;
-  for (i = 0; i < rows; i++) {
-    if ((bodydef[i].ParClass == pwr_eClass_Output)
-        && (bodydef[i].Par->Input.Graph.InputType != 0)) {
+  for (i = 0; i < rows; i++)
+  {
+    if ((bodydef[i].ParClass == pwr_eClass_Output) && (bodydef[i].Par->Input.Graph.InputType != 0))
+    {
       conpointcount += ((*mask & pointmask) != 0);
-      if (conpointcount == (con_point + 1)) {
+      if (conpointcount == (con_point + 1))
+      {
         /* this is the output */
         *par_type = PAR_OUTPUT;
         *par_index = i;
@@ -676,11 +664,13 @@ int goen_get_parameter_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
     }
   }
 
-  for (i = 0; i < rows; i++) {
-    if ((bodydef[i].ParClass == pwr_eClass_Output)
-        && (bodydef[i].Par->Input.Graph.InputType == 0)) {
+  for (i = 0; i < rows; i++)
+  {
+    if ((bodydef[i].ParClass == pwr_eClass_Output) && (bodydef[i].Par->Input.Graph.InputType == 0))
+    {
       conpointcount += ((*mask & pointmask) != 0);
-      if (conpointcount == (con_point + 1)) {
+      if (conpointcount == (con_point + 1))
+      {
         /* this is the output */
         *par_type = PAR_OUTPUT;
         *par_index = i;
@@ -697,22 +687,21 @@ int goen_get_parameter_m16(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 }
 
 /*************************************************************************
-*
-* Name:		goen_get_location_point_m16()
-*
-* Type
-*
-* Type		Parameter	IOGF	Description
-*    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
-*    goen_point_type	*info_pointer		Locationpoint
-*
-* Description:
-*	Calculates kooridates for locationpoint relativ geomtrical center.
-*
-**************************************************************************/
-int goen_get_location_point_m16(WGre* grectx, pwr_sGraphPlcNode* graphbody,
-    unsigned int* mask, unsigned long node_width, goen_point_type* info_pointer,
-    vldh_t_node node)
+ *
+ * Name:		goen_get_location_point_m16()
+ *
+ * Type
+ *
+ * Type		Parameter	IOGF	Description
+ *    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
+ *    goen_point_type	*info_pointer		Locationpoint
+ *
+ * Description:
+ *	Calculates kooridates for locationpoint relativ geomtrical center.
+ *
+ **************************************************************************/
+int goen_get_location_point_m16(WGre* grectx, pwr_sGraphPlcNode* graphbody, unsigned int* mask,
+                                unsigned long node_width, goen_point_type* info_pointer, vldh_t_node node)
 {
   info_pointer->y = 0;
   info_pointer->x = 0;

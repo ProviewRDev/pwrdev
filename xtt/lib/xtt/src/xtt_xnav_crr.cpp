@@ -52,15 +52,15 @@
 #include "co_nav_crr.h"
 #include "co_dcli_msg.h"
 
-static void xnav_crr_insert_cb(void* ctx, void* parent_node,
-    navc_eItemType item_type, char* text1, char* text2, int write)
+static void xnav_crr_insert_cb(void* ctx, void* parent_node, navc_eItemType item_type, char* text1,
+                               char* text2, int write)
 {
   XNavBrow* brow = (XNavBrow*)ctx;
 
-  switch (item_type) {
+  switch (item_type)
+  {
   case navc_eItemType_Crossref:
-    new ItemCrossref(
-        brow, text1, text2, write, parent_node, flow_eDest_IntoLast);
+    new ItemCrossref(brow, text1, text2, write, parent_node, flow_eDest_IntoLast);
     break;
   case navc_eItemType_Header:
     new ItemHeader(brow, "crr", text1, parent_node, flow_eDest_IntoLast);
@@ -87,20 +87,23 @@ int xnav_crr_get_volume_cb(void* ctx, pwr_tVid* vid, pwr_tVid prev_vid)
   if (EVEN(sts))
     return sts;
 
-  if (prev_vid == 0) {
+  if (prev_vid == 0)
+  {
     *vid = objid.vid;
     return XNAV__SUCCESS;
   }
 
   int next = 0;
-  for (sts = gdh_GetVolumeList(&v); ODD(sts); sts = gdh_GetNextVolume(v, &v)) {
+  for (sts = gdh_GetVolumeList(&v); ODD(sts); sts = gdh_GetNextVolume(v, &v))
+  {
     int volume_found = 0;
 
     sts = gdh_GetVolumeInfo(v, &info);
     if (EVEN(sts))
       return sts;
 
-    switch (info.cid) {
+    switch (info.cid)
+    {
     case pwr_eClass_SubVolume:
     case pwr_eClass_SharedVolume:
       volume_found = 1;
@@ -110,14 +113,18 @@ int xnav_crr_get_volume_cb(void* ctx, pwr_tVid* vid, pwr_tVid prev_vid)
     if (!volume_found)
       continue;
 
-    if (prev_vid == objid.vid) {
+    if (prev_vid == objid.vid)
+    {
       *vid = v;
       return XNAV__SUCCESS;
     }
 
-    if (prev_vid == v) {
+    if (prev_vid == v)
+    {
       next = 1;
-    } else if (next) {
+    }
+    else if (next)
+    {
       *vid = v;
       return XNAV__SUCCESS;
     }
@@ -125,8 +132,7 @@ int xnav_crr_get_volume_cb(void* ctx, pwr_tVid* vid, pwr_tVid prev_vid)
   return XNAV__NOSUCHVOLUME;
 }
 
-int xnav_crr_signal(
-    XNavBrow* brow, char* filename, char* signalname, brow_tNode parent_node)
+int xnav_crr_signal(XNavBrow* brow, char* filename, char* signalname, brow_tNode parent_node)
 {
   int sts;
   NavCrr* navcrr = new NavCrr(brow, parent_node);
@@ -140,8 +146,7 @@ int xnav_crr_signal(
   return sts;
 }
 
-int xnav_crr_object(
-    XNavBrow* brow, char* filename, char* objectname, brow_tNode parent_node)
+int xnav_crr_object(XNavBrow* brow, char* filename, char* objectname, brow_tNode parent_node)
 {
   int sts;
   NavCrr* navcrr = new NavCrr(brow, parent_node);
@@ -155,8 +160,7 @@ int xnav_crr_object(
   return sts;
 }
 
-int xnav_crr_code(XNavBrow* brow, char* filename, char* str, int brief,
-    int func, int case_sensitive)
+int xnav_crr_code(XNavBrow* brow, char* filename, char* str, int brief, int func, int case_sensitive)
 {
   int sts;
   NavCrr* navcrr = new NavCrr(brow, NULL);

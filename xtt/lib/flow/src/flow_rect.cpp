@@ -77,14 +77,12 @@ void FlowRect::print(void* pos, void* node, int highlight)
 
   if (!fill)
     ctx->current_print->rect(ll.print_z_x + ((FlowPoint*)pos)->print_z_x,
-        ll.print_z_y + ((FlowPoint*)pos)->print_z_y,
-        ur.print_z_x - ll.print_z_x, ur.print_z_y - ll.print_z_y, draw_type,
-        idx, highlight);
+                             ll.print_z_y + ((FlowPoint*)pos)->print_z_y, ur.print_z_x - ll.print_z_x,
+                             ur.print_z_y - ll.print_z_y, draw_type, idx, highlight);
   else
     ctx->current_print->filled_rect(ll.print_z_x + ((FlowPoint*)pos)->print_z_x,
-        ll.print_z_y + ((FlowPoint*)pos)->print_z_y,
-        ur.print_z_x - ll.print_z_x, ur.print_z_y - ll.print_z_y, draw_type,
-        idx);
+                                    ll.print_z_y + ((FlowPoint*)pos)->print_z_y, ur.print_z_x - ll.print_z_x,
+                                    ur.print_z_y - ll.print_z_y, draw_type, idx);
 }
 
 void FlowRect::save(std::ofstream& fp, flow_eSaveMode mode)
@@ -92,8 +90,7 @@ void FlowRect::save(std::ofstream& fp, flow_eSaveMode mode)
   fp << int(flow_eSave_Rect) << '\n';
   fp << int(flow_eSave_Rect_draw_type) << FSPACE << int(draw_type) << '\n';
   fp << int(flow_eSave_Rect_line_width) << FSPACE << line_width << '\n';
-  fp << int(flow_eSave_Rect_display_level) << FSPACE << int(display_level)
-     << '\n';
+  fp << int(flow_eSave_Rect_display_level) << FSPACE << int(display_level) << '\n';
   fp << int(flow_eSave_Rect_fill) << FSPACE << fill << '\n';
   fp << int(flow_eSave_Rect_ll) << '\n';
   ll.save(fp, mode);
@@ -109,9 +106,11 @@ void FlowRect::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
+  for (;;)
+  {
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case flow_eSave_Rect:
       break;
     case flow_eSave_Rect_draw_type:
@@ -148,11 +147,9 @@ void FlowRect::open(std::ifstream& fp)
 
 void FlowRect::draw_inverse(void* pos, int hot, void* node)
 {
-  if (fill && (draw_type == flow_eDrawType_LineGray
-                  || draw_type == flow_eDrawType_LineRed
-                  || draw_type == flow_eDrawType_Green
-                  || draw_type == flow_eDrawType_DarkGray
-                  || draw_type == flow_eDrawType_Yellow))
+  if (fill && (draw_type == flow_eDrawType_LineGray || draw_type == flow_eDrawType_LineRed ||
+               draw_type == flow_eDrawType_Green || draw_type == flow_eDrawType_DarkGray ||
+               draw_type == flow_eDrawType_Yellow))
     draw(pos, 0, 0, hot, node);
   else
     erase(pos, hot, node);
@@ -163,14 +160,18 @@ void FlowRect::draw(void* pos, int highlight, int dimmed, int hot, void* node)
   if (!(display_level & ctx->display_level))
     return;
   int idx;
-  if (fix_line_width) {
+  if (fix_line_width)
+  {
     idx = line_width;
     idx += hot;
-    if (idx < 0) {
+    if (idx < 0)
+    {
       erase(pos, hot, node);
       return;
     }
-  } else {
+  }
+  else
+  {
     idx = int(ctx->zoom_factor / ctx->base_zoom_factor * line_width - 1);
     idx += hot;
   }
@@ -178,17 +179,18 @@ void FlowRect::draw(void* pos, int highlight, int dimmed, int hot, void* node)
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   if (!fill)
     ctx->fdraw->rect(ctx, ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-        ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x,
-        ur.z_y - ll.z_y, draw_type, idx, highlight, dimmed);
-  else {
+                     ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x, ur.z_y - ll.z_y,
+                     draw_type, idx, highlight, dimmed);
+  else
+  {
     flow_eDrawType dtype;
     if (node && ((FlowNode*)node)->fill_color != flow_eDrawType_Inherit)
       dtype = ((FlowNode*)node)->fill_color;
     else
       dtype = draw_type;
     ctx->fdraw->fill_rect(ctx, ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-        ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x,
-        ur.z_y - ll.z_y, dtype);
+                          ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x, ur.z_y - ll.z_y,
+                          dtype);
   }
 }
 
@@ -197,12 +199,15 @@ void FlowRect::erase(void* pos, int hot, void* node)
   if (!(display_level & ctx->display_level))
     return;
   int idx;
-  if (fix_line_width) {
+  if (fix_line_width)
+  {
     idx = line_width;
     idx += hot;
     if (idx < 0)
       return;
-  } else {
+  }
+  else
+  {
     idx = int(ctx->zoom_factor / ctx->base_zoom_factor * line_width - 1);
     idx += hot;
   }
@@ -210,12 +215,12 @@ void FlowRect::erase(void* pos, int hot, void* node)
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   if (!fill)
     ctx->fdraw->rect_erase(ctx, ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-        ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x,
-        ur.z_y - ll.z_y, idx);
+                           ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x, ur.z_y - ll.z_y,
+                           idx);
   else
     ctx->fdraw->fill_rect(ctx, ll.z_x + ((FlowPoint*)pos)->z_x - ctx->offset_x,
-        ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x,
-        ur.z_y - ll.z_y, flow_eDrawType_LineErase);
+                          ll.z_y + ((FlowPoint*)pos)->z_y - ctx->offset_y, ur.z_x - ll.z_x, ur.z_y - ll.z_y,
+                          flow_eDrawType_LineErase);
 }
 
 void FlowRect::nav_draw(void* pos, int highlight, void* node)
@@ -223,21 +228,22 @@ void FlowRect::nav_draw(void* pos, int highlight, void* node)
   if (!(display_level & ctx->display_level))
     return;
   int idx;
-  if (fix_line_width) {
+  if (fix_line_width)
+  {
     idx = line_width;
     if (idx < 0)
       return;
-  } else {
+  }
+  else
+  {
     idx = int(ctx->nav_zoom_factor / ctx->base_zoom_factor * line_width - 1);
   }
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   if (!fill)
-    ctx->fdraw->nav_rect(ctx,
-        ll.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
-        ll.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y,
-        ur.nav_z_x - ll.nav_z_x, ur.nav_z_y - ll.nav_z_y, draw_type, idx,
-        highlight);
+    ctx->fdraw->nav_rect(ctx, ll.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
+                         ll.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y, ur.nav_z_x - ll.nav_z_x,
+                         ur.nav_z_y - ll.nav_z_y, draw_type, idx, highlight);
 }
 
 void FlowRect::nav_erase(void* pos, void* node)
@@ -245,39 +251,40 @@ void FlowRect::nav_erase(void* pos, void* node)
   if (!(display_level & ctx->display_level))
     return;
   int idx;
-  if (fix_line_width) {
+  if (fix_line_width)
+  {
     idx = line_width;
     if (idx < 0)
       return;
-  } else {
+  }
+  else
+  {
     idx = int(ctx->nav_zoom_factor / ctx->base_zoom_factor * line_width - 1);
   }
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   if (!fill)
-    ctx->fdraw->nav_rect_erase(ctx,
-        ll.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
-        ll.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y,
-        ur.nav_z_x - ll.nav_z_x, ur.nav_z_y - ll.nav_z_y, idx);
+    ctx->fdraw->nav_rect_erase(ctx, ll.nav_z_x + ((FlowPoint*)pos)->nav_z_x - ctx->nav_offset_x,
+                               ll.nav_z_y + ((FlowPoint*)pos)->nav_z_y - ctx->nav_offset_y,
+                               ur.nav_z_x - ll.nav_z_x, ur.nav_z_y - ll.nav_z_y, idx);
 }
 
-int FlowRect::event_handler(
-    void* pos, flow_eEvent event, int x, int y, void* node)
+int FlowRect::event_handler(void* pos, flow_eEvent event, int x, int y, void* node)
 {
   FlowPoint* p = (FlowPoint*)pos;
 
-  if (ll.z_x + p->z_x - ctx->offset_x <= x
-      && x <= ur.z_x + p->z_x - ctx->offset_x
-      && ll.z_y + p->z_y - ctx->offset_y <= y
-      && y <= ur.z_y + p->z_y - ctx->offset_y) {
+  if (ll.z_x + p->z_x - ctx->offset_x <= x && x <= ur.z_x + p->z_x - ctx->offset_x &&
+      ll.z_y + p->z_y - ctx->offset_y <= y && y <= ur.z_y + p->z_y - ctx->offset_y)
+  {
     //    std::cout << "Event handler: Hit in rect\n";
     return 1;
-  } else
+  }
+  else
     return 0;
 }
 
-void FlowRect::get_borders(double pos_x, double pos_y, double* x_right,
-    double* x_left, double* y_high, double* y_low, void* node)
+void FlowRect::get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high,
+                           double* y_low, void* node)
 {
   if (display_level != flow_mDisplayLevel_1)
     return;
@@ -291,8 +298,7 @@ void FlowRect::get_borders(double pos_x, double pos_y, double* x_right,
     *y_high = pos_y + ur.y;
 }
 
-void FlowRect::move(
-    void* pos, double x, double y, int highlight, int dimmed, int hot)
+void FlowRect::move(void* pos, double x, double y, int highlight, int dimmed, int hot)
 {
   double width, height;
 
@@ -306,8 +312,7 @@ void FlowRect::move(
   nav_zoom();
 }
 
-void FlowRect::shift(void* pos, double delta_x, double delta_y, int highlight,
-    int dimmed, int hot)
+void FlowRect::shift(void* pos, double delta_x, double delta_y, int highlight, int dimmed, int hot)
 {
   ll.x += delta_x;
   ll.y += delta_y;
@@ -319,8 +324,7 @@ void FlowRect::shift(void* pos, double delta_x, double delta_y, int highlight,
 
 std::ostream& operator<<(std::ostream& o, const FlowRect r)
 {
-  o << '(' << r.ll.x << ',' << r.ll.y << ')' << '(' << r.ur.x << ',' << r.ur.y
-    << ')' << '[' << r.ll.z_x << ',' << r.ll.z_y << ']' << '[' << r.ur.z_x
-    << ',' << r.ur.z_y << ']';
+  o << '(' << r.ll.x << ',' << r.ll.y << ')' << '(' << r.ur.x << ',' << r.ur.y << ')' << '[' << r.ll.z_x
+    << ',' << r.ll.z_y << ']' << '[' << r.ur.z_x << ',' << r.ur.z_y << ']';
   return o;
 }

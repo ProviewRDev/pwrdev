@@ -41,15 +41,11 @@
 
 class CnvReadWbl;
 
-class CnvWblToXtthelp : public CnvWblTo {
-  public:
-  CnvWblToXtthelp(CnvCtx* cnv_ctx)
-      : ctx(cnv_ctx), xtthelp_index_open(0), xtthelp_in_topic(0), first_bit(0)
-  {
-  }
-  virtual ~CnvWblToXtthelp()
-  {
-  }
+class CnvWblToXtthelp : public CnvWblTo
+{
+public:
+  CnvWblToXtthelp(CnvCtx* cnv_ctx) : ctx(cnv_ctx), xtthelp_index_open(0), xtthelp_in_topic(0), first_bit(0) {}
+  virtual ~CnvWblToXtthelp() {}
 
   CnvCtx* ctx;
   std::ofstream fp_xtthelp_index;
@@ -67,14 +63,8 @@ class CnvWblToXtthelp : public CnvWblTo {
   int bit_exec();
   int typedef_exec();
   int typedef_close();
-  Cnv_eWblToType type()
-  {
-    return Cnv_eWblToType_Xtthelp;
-  }
-  int index_open()
-  {
-    return xtthelp_index_open;
-  }
+  Cnv_eWblToType type() { return Cnv_eWblToType_Xtthelp; }
+  int index_open() { return xtthelp_index_open; }
 };
 
 #endif

@@ -71,19 +71,22 @@ static std::string pkg_log_excerpt(const char* log_file, size_t max_size = 4000)
   if (!fp)
     return "";
 
-  if (fseek(fp, 0, SEEK_END) != 0) {
+  if (fseek(fp, 0, SEEK_END) != 0)
+  {
     fclose(fp);
     return "";
   }
 
   long size = ftell(fp);
-  if (size <= 0) {
+  if (size <= 0)
+  {
     fclose(fp);
     return "";
   }
 
   long start = size > (long)max_size ? size - (long)max_size : 0;
-  if (fseek(fp, start, SEEK_SET) != 0) {
+  if (fseek(fp, start, SEEK_SET) != 0)
+  {
     fclose(fp);
     return "";
   }
@@ -97,7 +100,8 @@ static std::string pkg_log_excerpt(const char* log_file, size_t max_size = 4000)
   if (text.empty())
     return text;
 
-  if (start > 0) {
+  if (start > 0)
+  {
     size_t nl = text.find('\n');
     if (nl != std::string::npos)
       text.erase(0, nl + 1);
@@ -112,8 +116,8 @@ static std::string pkg_log_excerpt(const char* log_file, size_t max_size = 4000)
 
 static std::string pkg_distribute_error(const char* bootnode, const char* pack_log, int sts)
 {
-  std::string msg = std::string("Distribute command failed for boot node \"")
-      + bootnode + "\" (status " + std::to_string(sts) + "), see " + pack_log;
+  std::string msg = std::string("Distribute command failed for boot node \"") + bootnode + "\" (status " +
+                    std::to_string(sts) + "), see " + pack_log;
   std::string excerpt = pkg_log_excerpt(pack_log);
 
   if (!excerpt.empty())
@@ -1079,8 +1083,7 @@ void pkg_node::copyPackage(char* pkg_name)
     {
       char log_msg[320];
 
-      snprintf(log_msg, sizeof(log_msg), "%s via SSH to %s (log %s)", pkg_name,
-          bootnodes[i], pack_log);
+      snprintf(log_msg, sizeof(log_msg), "%s via SSH to %s (log %s)", pkg_name, bootnodes[i], pack_log);
       wb_log::log(wlog_eCategory_CopyPackage, m_name, log_msg);
     }
   }

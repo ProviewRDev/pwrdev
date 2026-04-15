@@ -46,12 +46,12 @@
 
 class EvEveQtWidget;
 
-class EvEveQt : public EvEve {
+class EvEveQt : public EvEve
+{
 public:
-  EvEveQt(void* ev_parent_ctx, char* eve_name, pwr_tObjid ev_user,
-      int ev_eventname_seg, int ev_width, int ev_height, int ev_x, int ev_y,
-      pwr_tObjid ev_view, unsigned int ev_options, void* widget,
-      pwr_tStatus* status);
+  EvEveQt(void* ev_parent_ctx, char* eve_name, pwr_tObjid ev_user, int ev_eventname_seg, int ev_width,
+          int ev_height, int ev_x, int ev_y, pwr_tObjid ev_view, unsigned int ev_options, void* widget,
+          pwr_tStatus* status);
   ~EvEveQt();
 
   EvEveQtWidget* toplevel;
@@ -66,7 +66,8 @@ public:
   QWidget* get_widget();
 };
 
-class EvEveQtWidget : public QWidget {
+class EvEveQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

@@ -48,15 +48,16 @@
 //  Syntax check.
 //
 
-static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
-    int* ErrorCount, int* WarningCount)
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, int* ErrorCount,
+                               int* WarningCount)
 {
   pwr_tStatus sts;
-  pwr_tCid plcconnect_class[] = { pwr_cClass_BaseManValveFo, 0 };
+  pwr_tCid plcconnect_class[] = {pwr_cClass_BaseManValveFo, 0};
 
-  if (Object.Offset == 0) {
-    sts = wsx_CheckXAttrRef(Session, Object, "PlcConnect", "PlcConnect",
-        plcconnect_class, 0, ErrorCount, WarningCount);
+  if (Object.Offset == 0)
+  {
+    sts = wsx_CheckXAttrRef(Session, Object, "PlcConnect", "PlcConnect", plcconnect_class, 0, ErrorCount,
+                            WarningCount);
     if (EVEN(sts))
       return sts;
   }
@@ -67,5 +68,4 @@ static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
 //  Every method to be exported to the workbench should be registred here.
 //
 
-pwr_dExport pwr_BindMethods(BaseManValve)
-    = { pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(BaseManValve) = {pwr_BindMethod(SyntaxCheck), pwr_NullMethod};

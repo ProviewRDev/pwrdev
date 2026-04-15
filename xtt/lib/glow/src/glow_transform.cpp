@@ -40,15 +40,9 @@
 
 #include "glow_transform.h"
 
-double GlowTransform::x(double x1, double y1)
-{
-  return x1 * a11 + y1 * a12 + a13;
-}
+double GlowTransform::x(double x1, double y1) { return x1 * a11 + y1 * a12 + a13; }
 
-double GlowTransform::y(double x1, double y1)
-{
-  return x1 * a21 + y1 * a22 + a23;
-}
+double GlowTransform::y(double x1, double y1) { return x1 * a21 + y1 * a22 + a23; }
 
 GlowTransform GlowTransform::operator*(const GlowTransform p)
 {
@@ -84,8 +78,7 @@ void GlowTransform::scale(double sx, double sy, double x0, double y0)
   a22 *= sy;
 }
 
-void GlowTransform::scale_from_stored(
-    double sx, double sy, double x0, double y0)
+void GlowTransform::scale_from_stored(double sx, double sy, double x0, double y0)
 {
   a13 = s_a13 * sx + x0 * (1 - sx);
   a23 = s_a23 * sy + y0 * (1 - sy);
@@ -100,10 +93,13 @@ void GlowTransform::rotate(double angle, double x0, double y0)
   double sin_a;
   double cos_a;
   GlowTransform tmp(*this);
-  if (-90.01 < angle && angle < -89.99) {
+  if (-90.01 < angle && angle < -89.99)
+  {
     sin_a = -1.0;
     cos_a = 0.0;
-  } else {
+  }
+  else
+  {
     sin_a = sin(angle / 180 * 3.14159);
     cos_a = cos(angle / 180 * 3.14159);
   }
@@ -121,10 +117,13 @@ void GlowTransform::rotate_from_stored(double angle, double x0, double y0)
 {
   double sin_a;
   double cos_a;
-  if (-90.01 < s_rotation + angle && s_rotation + angle < -89.99) {
+  if (-90.01 < s_rotation + angle && s_rotation + angle < -89.99)
+  {
     sin_a = -1.0;
     cos_a = 0.0;
-  } else {
+  }
+  else
+  {
     sin_a = sin((s_rotation + angle) / 180 * 3.14159);
     cos_a = cos((s_rotation + angle) / 180 * 3.14159);
   }
@@ -172,12 +171,16 @@ double GlowTransform::y(GlowTransform* t, double x1, double y1)
 
 bool GlowTransform::reverse(double x, double y, double* rx, double* ry)
 {
-  if (feq(a11, 0.0) || feq(a12 * a21 - a11 * a22, 0.0)) {
-    if (feq(a11, 0.0) && feq(a22, 0.0) && !feq(a12, 0.0) && !feq(a21, 0.0)) {
+  if (feq(a11, 0.0) || feq(a12 * a21 - a11 * a22, 0.0))
+  {
+    if (feq(a11, 0.0) && feq(a22, 0.0) && !feq(a12, 0.0) && !feq(a21, 0.0))
+    {
       *ry = (x - a13) / a12;
       *rx = (y - a23) / a21;
       return true;
-    } else {
+    }
+    else
+    {
       *ry = *rx = 0;
       return false;
     }
@@ -216,15 +219,18 @@ void GlowTransform::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GlowTransform: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_Transform:
       break;
     case glow_eSave_Transform_a11:

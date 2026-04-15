@@ -48,11 +48,9 @@
 #include "wb_session.h"
 #include "wb_wcast_gtk.h"
 
-WCastGtk::WCastGtk(void* wc_parent_ctx, GtkWidget* wc_parent_wid,
-    const char* wc_name, ldh_tSesContext wc_ldhses, pwr_sAttrRef wc_aref,
-    pwr_tStatus* status)
-    : WCast(wc_parent_ctx, wc_name, wc_ldhses, wc_aref, status),
-      parent_wid(wc_parent_wid)
+WCastGtk::WCastGtk(void* wc_parent_ctx, GtkWidget* wc_parent_wid, const char* wc_name,
+                   ldh_tSesContext wc_ldhses, pwr_sAttrRef wc_aref, pwr_tStatus* status)
+    : WCast(wc_parent_ctx, wc_name, wc_ldhses, wc_aref, status), parent_wid(wc_parent_wid)
 {
   wow = new CoWowGtk(wc_parent_wid);
 
@@ -60,7 +58,4 @@ WCastGtk::WCastGtk(void* wc_parent_ctx, GtkWidget* wc_parent_wid,
   *status = 1;
 }
 
-WCastGtk::~WCastGtk()
-{
-  delete wow;
-}
+WCastGtk::~WCastGtk() { delete wow; }

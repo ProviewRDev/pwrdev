@@ -41,7 +41,8 @@
 #include "rt_plc_proc.h"
 
 /* Direct link table */
-struct plc_rtdbref {
+struct plc_rtdbref
+{
   void** Pointer;
   pwr_sAttrRef AttrRef;
   pwr_tClassId ObjType;

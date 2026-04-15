@@ -49,19 +49,21 @@
 
 void XttKeyboardQtWidget::closeEvent(QCloseEvent* event)
 {
-  if (kb->close_cb) {
+  if (kb->close_cb)
+  {
     (kb->close_cb)(kb->parent_ctx);
-  } else {
+  }
+  else
+  {
     delete kb;
   }
   QWidget::closeEvent(event);
 }
 
-XttKeyboardQt::XttKeyboardQt(void* xn_parent_ctx, QWidget* xn_parent_wid,
-    const char* xn_name, QWidget** w, keyboard_eKeymap xn_keymap,
-    keyboard_eType xn_type, int xn_color_theme, pwr_tStatus* status)
-    : XttKeyboard(
-          xn_parent_ctx, xn_name, xn_keymap, xn_type, xn_color_theme, status)
+XttKeyboardQt::XttKeyboardQt(void* xn_parent_ctx, QWidget* xn_parent_wid, const char* xn_name, QWidget** w,
+                             keyboard_eKeymap xn_keymap, keyboard_eType xn_type, int xn_color_theme,
+                             pwr_tStatus* status)
+    : XttKeyboard(xn_parent_ctx, xn_name, xn_keymap, xn_type, xn_color_theme, status)
 {
   int width = 1145;
   int height = 161;
@@ -84,13 +86,14 @@ XttKeyboardQt::XttKeyboardQt(void* xn_parent_ctx, QWidget* xn_parent_wid,
   int screen_width = rec.width();
   int screen_height = rec.height();
 
-  if (width > screen_width) {
+  if (width > screen_width)
+  {
     height = ((float)screen_width) * 0.9 / width * height;
     width = screen_width * 0.9;
     keyboard_SetSize(keyboardctx, width, height);
   }
 
-  aspectRatio = width / ((double) height);
+  aspectRatio = width / ((double)height);
   toplevel->resize(width, height);
   toplevel->move(screen_width / 2 - width / 2, screen_height - height);
 
@@ -99,39 +102,42 @@ XttKeyboardQt::XttKeyboardQt(void* xn_parent_ctx, QWidget* xn_parent_wid,
 
 void XttKeyboardQt::set_inputfocus()
 {
-  if (toplevel->isVisible()) {
+  if (toplevel->isVisible())
+  {
     keyboard_widget->setFocus();
   }
 }
 
 void XttKeyboardQtWidget::focusInEvent(QFocusEvent* event)
 {
-  if (isVisible()) {
+  if (isVisible())
+  {
     // kb->set_input_focus();
   }
 
   QWidget::focusInEvent(event);
 }
 
-void XttKeyboardQtWidget::resizeEvent(QResizeEvent *event)
+void XttKeyboardQtWidget::resizeEvent(QResizeEvent* event)
 {
-  if (kb->aspectRatio == 0) {
+  if (kb->aspectRatio == 0)
+  {
     return;
   }
 
-  if (event->size().width() == prevWidth) {
+  if (event->size().width() == prevWidth)
+  {
     QWidget::resize(event->size().height() * kb->aspectRatio, event->size().height());
-  } else {
+  }
+  else
+  {
     QWidget::resize(event->size().width(), event->size().width() / kb->aspectRatio);
   }
   keyboard_SetSize(kb->keyboardctx, width(), height());
   prevWidth = width();
 }
 
-void XttKeyboardQt::pop()
-{
-  ::pop(toplevel);
-}
+void XttKeyboardQt::pop() { ::pop(toplevel); }
 
 void XttKeyboardQt::set_transient(void* basewidget)
 {

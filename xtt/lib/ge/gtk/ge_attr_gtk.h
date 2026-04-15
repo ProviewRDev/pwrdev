@@ -50,12 +50,12 @@
 
 //! Attribute editor.
 /*! Displays grow attributes and dynamic attributes for an object or graph. */
-class AttrGtk : public Attr {
+class AttrGtk : public Attr
+{
 public:
-  AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
-      void* a_object, attr_sItem* itemlist, int item_cnt,
-      void (*xn_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, 
-      grow_tObject*, int));
+  AttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type, void* a_object,
+          attr_sItem* itemlist, int item_cnt,
+          void (*xn_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, grow_tObject*, int));
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
   GtkWidget* form_widget;
@@ -82,8 +82,7 @@ public:
   void set_prompt(const char* prompt);
   void change_value();
   int reconfigure_attr();
-  static void action_text_inserted(
-      GtkTextBuffer* w, GtkTextIter* iter, gchar* str, gint len, gpointer data);
+  static void action_text_inserted(GtkTextBuffer* w, GtkTextIter* iter, gchar* str, gint len, gpointer data);
 
   ~AttrGtk();
 };

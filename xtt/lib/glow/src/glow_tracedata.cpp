@@ -39,9 +39,8 @@
 #include "glow_tracedata.h"
 
 GlowTraceData::GlowTraceData()
-    : attr_type(glow_eTraceType_Boolean), color(glow_eDrawType_Inherit),
-      color2(glow_eDrawType_Inherit), p(NULL), access(glow_mAccess_RtDefault),
-      cycle(glow_eCycle_Inherit)
+    : attr_type(glow_eTraceType_Boolean), color(glow_eDrawType_Inherit), color2(glow_eDrawType_Inherit),
+      p(NULL), access(glow_mAccess_RtDefault), cycle(glow_eCycle_Inherit)
 {
   strcpy(data[0], "");
   strcpy(data[1], "");

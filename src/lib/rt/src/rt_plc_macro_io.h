@@ -85,8 +85,8 @@
   store conditionally into analog output
   @aref cstoao CStoAo
 */
-#define cstoao_exec(obj, in, cond)                                             \
-  if (cond)                                                                    \
+#define cstoao_exec(obj, in, cond)                                                                           \
+  if (cond)                                                                                                  \
     obj->ActualValue = in;
 
 /*_*
@@ -94,8 +94,8 @@
   store conditionally into analog value
   @aref cstoav CStoAv
 */
-#define cstoav_exec(obj, in, cond)                                             \
-  if (cond)                                                                    \
+#define cstoav_exec(obj, in, cond)                                                                           \
+  if (cond)                                                                                                  \
     obj->ActualValue = in;
 
 /*_*
@@ -103,8 +103,8 @@
   Store conditionally into analog parameter
   @aref cstoap CStoAp
 */
-#define cstoap_exec(ut, in, cond)                                              \
-  if (cond)                                                                    \
+#define cstoap_exec(ut, in, cond)                                                                            \
+  if (cond)                                                                                                  \
     ut = in;
 
 /*_*
@@ -112,8 +112,8 @@
   Set digital output if true
   @aref setdo SetDo
 */
-#define setdo_exec(obj, in)                                                    \
-  if (in)                                                                      \
+#define setdo_exec(obj, in)                                                                                  \
+  if (in)                                                                                                    \
     obj->ActualValue = true;
 
 /*_*
@@ -121,8 +121,8 @@
   Set digital value if true
   @aref setdv SetDv
 */
-#define setdv_exec(obj, in)                                                    \
-  if (in)                                                                      \
+#define setdv_exec(obj, in)                                                                                  \
+  if (in)                                                                                                    \
     obj->ActualValue = true;
 
 /*_*
@@ -130,8 +130,8 @@
   Set digital parameter if true
   @aref setdp SetDp
 */
-#define setdp_exec(ut, in)                                                     \
-  if (in)                                                                      \
+#define setdp_exec(ut, in)                                                                                   \
+  if (in)                                                                                                    \
     ut = true;
 
 /*_*
@@ -139,8 +139,8 @@
   Reset digital output if true
   @aref resdo ResDo
 */
-#define resdo_exec(obj, in)                                                    \
-  if (in)                                                                      \
+#define resdo_exec(obj, in)                                                                                  \
+  if (in)                                                                                                    \
     obj->ActualValue = false;
 
 /*_*
@@ -148,8 +148,8 @@
   Reset digital value if true
   @aref resdv ResDv
 */
-#define resdv_exec(obj, in)                                                    \
-  if (in)                                                                      \
+#define resdv_exec(obj, in)                                                                                  \
+  if (in)                                                                                                    \
     obj->ActualValue = false;
 
 /*_*
@@ -157,8 +157,8 @@
   Reset digital parameter if true
   @aref resdp ResDp
 */
-#define resdp_exec(ut, in)                                                     \
-  if (in)                                                                      \
+#define resdp_exec(ut, in)                                                                                   \
+  if (in)                                                                                                    \
     ut = false;
 
 /*_*
@@ -173,8 +173,8 @@
   Store conditionally integer parameter
   @aref cstoip CStoIp
 */
-#define CStoIp_exec(ut, in, cond)                                              \
-  if (cond)                                                                    \
+#define CStoIp_exec(ut, in, cond)                                                                            \
+  if (cond)                                                                                                  \
     ut = in;
 
 /*_*
@@ -189,8 +189,8 @@
   Store conditionally analog value into integer parameter
   @aref cstoatoip CStoAtoIp
 */
-#define CStoAtoIp_exec(ut, in, cond)                                           \
-  if (cond)                                                                    \
+#define CStoAtoIp_exec(ut, in, cond)                                                                         \
+  if (cond)                                                                                                  \
     ut = in > 0 ? in + 0.5 : in - 0.5;
 
 /*_*
@@ -219,8 +219,8 @@
   Set digital input if true (Simulate)
   @aref setdi SetDi
 */
-#define setdi_exec(obj, in)                                                    \
-  if (in)                                                                      \
+#define setdi_exec(obj, in)                                                                                  \
+  if (in)                                                                                                    \
     obj->ActualValue = true;
 
 /*_*
@@ -228,8 +228,8 @@
   Reset digital input if true (Simulate)
   @aref resdi ResDi
 */
-#define resdi_exec(obj, in)                                                    \
-  if (in)                                                                      \
+#define resdi_exec(obj, in)                                                                                  \
+  if (in)                                                                                                    \
     obj->ActualValue = false;
 
 /*_*
@@ -237,8 +237,8 @@
   Toggle digital input (Simulate)
   @aref toggledi ToggleDi
 */
-#define toggledi_exec(obj, in)                                                 \
-  if (in)                                                                      \
+#define toggledi_exec(obj, in)                                                                               \
+  if (in)                                                                                                    \
     obj->ActualValue = !obj->ActualValue;
 
 /*_*
@@ -253,8 +253,8 @@
   store conditionally into analog input (Simulate)
   @aref cstoai CStoAi
 */
-#define cstoai_exec(obj, in, cond)                                             \
-  if (cond)                                                                    \
+#define cstoai_exec(obj, in, cond)                                                                           \
+  if (cond)                                                                                                  \
     obj->ActualValue = in;
 
 /*_*
@@ -262,8 +262,8 @@
   store into co (Simulate)
   @aref stopi StoPi
 */
-#define stopi_exec(rawvalue, absvalue, in)                                     \
-  rawvalue->RawValue = in;                                                     \
+#define stopi_exec(rawvalue, absvalue, in)                                                                   \
+  rawvalue->RawValue = in;                                                                                   \
   absvalue->RawValue = in;
 
 /*_*
@@ -278,8 +278,8 @@
   store conditionally into integer output
   @aref cstoio CStoIo
 */
-#define cstoio_exec(obj, in, cond)                                             \
-  if (cond)                                                                    \
+#define cstoio_exec(obj, in, cond)                                                                           \
+  if (cond)                                                                                                  \
     obj->ActualValue = in;
 
 /*_*
@@ -294,8 +294,8 @@
   store conditionally into integer value
   @aref cstoiv CStoIv
 */
-#define cstoiv_exec(obj, in, cond)                                             \
-  if (cond)                                                                    \
+#define cstoiv_exec(obj, in, cond)                                                                           \
+  if (cond)                                                                                                  \
     obj->ActualValue = in;
 
 /*_*
@@ -310,8 +310,8 @@
   store conditionally into integer input (Simulate)
   @aref cstoii CStoIi
 */
-#define cstoii_exec(obj, in, cond)                                             \
-  if (cond)                                                                    \
+#define cstoii_exec(obj, in, cond)                                                                           \
+  if (cond)                                                                                                  \
     obj->ActualValue = in;
 
 /*_*
@@ -326,8 +326,8 @@
   store conditionally into buffer input (Simulate)
   @aref cstobiint32 CStoBiInt32
 */
-#define CStoBiInt32_exec(obj, in, cond)                                        \
-  if (cond)                                                                    \
+#define CStoBiInt32_exec(obj, in, cond)                                                                      \
+  if (cond)                                                                                                  \
     obj->ActualValue = in;
 
 /*_*
@@ -342,8 +342,8 @@
   store conditionally into buffer output
   @aref cstoboint32 CStoBoInt32
 */
-#define CStoBoInt32_exec(obj, in, cond)                                        \
-  if (cond)                                                                    \
+#define CStoBoInt32_exec(obj, in, cond)                                                                      \
+  if (cond)                                                                                                  \
     obj->ActualValue = in;
 
 /*_*
@@ -358,8 +358,8 @@
   store conditionally into buffer input (Simulate)
   @aref cstobifloat32 CStoBiFloat32
 */
-#define CStoBiFloat32_exec(obj, in, cond)                                      \
-  if (cond)                                                                    \
+#define CStoBiFloat32_exec(obj, in, cond)                                                                    \
+  if (cond)                                                                                                  \
     obj->ActualValue = in;
 
 /*_*
@@ -374,8 +374,8 @@
   store conditionally into buffer output
   @aref cstobofloat32 CStoBoFloat32
 */
-#define CStoBoFloat32_exec(obj, in, cond)                                      \
-  if (cond)                                                                    \
+#define CStoBoFloat32_exec(obj, in, cond)                                                                    \
+  if (cond)                                                                                                  \
     obj->ActualValue = in;
 
 /*_*
@@ -390,8 +390,8 @@
   store conditionally buffer input (Simulate)
   @aref cstobistring80 CStoBiString80
 */
-#define CStoBiString80_exec(obj, in, cond)                                     \
-  if (cond)                                                                    \
+#define CStoBiString80_exec(obj, in, cond)                                                                   \
+  if (cond)                                                                                                  \
     strncpy(obj->ActualValue, in, 80);
 
 /*_*
@@ -406,8 +406,8 @@
   store conditionally buffer input
   @aref cstobostring80 CStoBoString80
 */
-#define CStoBoString80_exec(obj, in, cond)                                     \
-  if (cond)                                                                    \
+#define CStoBoString80_exec(obj, in, cond)                                                                   \
+  if (cond)                                                                                                  \
     strncpy(obj->ActualValue, in, 80);
 
 /*_*
@@ -438,16 +438,16 @@
   SetDattr
   @aref setdattr SetDattr
 */
-#define SetDattr_exec(attr, in)                                                \
-  if (in)                                                                      \
+#define SetDattr_exec(attr, in)                                                                              \
+  if (in)                                                                                                    \
     attr = true;
 
 /*_*
   ResDattr
   @aref resdattr ResDattr
 */
-#define ResDattr_exec(attr, in)                                                \
-  if (in)                                                                      \
+#define ResDattr_exec(attr, in)                                                                              \
+  if (in)                                                                                                    \
     attr = false;
 
 /*_*
@@ -460,8 +460,8 @@
   CStoIattr
   @aref cstoiattr CStoIattr
 */
-#define CStoIattr_exec(attr, in, cond)                                         \
-  if (cond)                                                                    \
+#define CStoIattr_exec(attr, in, cond)                                                                       \
+  if (cond)                                                                                                  \
     attr = in;
 
 /*_*
@@ -474,371 +474,378 @@
   CStoAattr
   @aref cstoaattr CStoAattr
 */
-#define CStoAattr_exec(attr, in, cond)                                         \
-  if (cond)                                                                    \
+#define CStoAattr_exec(attr, in, cond)                                                                       \
+  if (cond)                                                                                                  \
     attr = in;
 
 /*_*
   StoSattr
   @aref stosattr StoSattr
 */
-#define StoSattr_exec(attr, in, size)                                          \
-  strncpy(attr, in, size);                                                     \
+#define StoSattr_exec(attr, in, size)                                                                        \
+  strncpy(attr, in, size);                                                                                   \
   attr[size - 1] = 0;
 
 /*_*
   CStoSattr
   @aref cstosattr CStoSattr
 */
-#define CStoSattr_exec(attr, in, cond, size)                                   \
-  if (cond) {                                                                  \
-    strncpy(attr, in, size);                                                   \
-    attr[size - 1] = 0;                                                        \
+#define CStoSattr_exec(attr, in, cond, size)                                                                 \
+  if (cond)                                                                                                  \
+  {                                                                                                          \
+    strncpy(attr, in, size);                                                                                 \
+    attr[size - 1] = 0;                                                                                      \
   }
 
 /*_*
   CStoExtBoolean
   @aref cstoextboolean CStoExtBoolean
 */
-#define CStoExtBoolean_exec(obj, name, in, cond)                               \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus                                                            \
-        = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tBoolean));           \
-  }                                                                            \
+#define CStoExtBoolean_exec(obj, name, in, cond)                                                             \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tBoolean));                             \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   CStoExtFloat32
   @aref cstoextfloat32 CStoExtFloat32
 */
-#define CStoExtFloat32_exec(obj, name, in, cond)                               \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus                                                            \
-        = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tFloat32));           \
-  }                                                                            \
+#define CStoExtFloat32_exec(obj, name, in, cond)                                                             \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tFloat32));                             \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   CStoExtFloat64
   @aref cstoextfloat64 CStoExtFloat64
 */
-#define CStoExtFloat64_exec(obj, name, in, cond)                               \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus                                                            \
-        = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tFloat64));           \
-  }                                                                            \
+#define CStoExtFloat64_exec(obj, name, in, cond)                                                             \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tFloat64));                             \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   CStoExtInt8
   @aref cstoextint8 CStoExtInt8
 */
-#define CStoExtInt8_exec(obj, name, in, cond)                                  \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tInt8));  \
-  }                                                                            \
+#define CStoExtInt8_exec(obj, name, in, cond)                                                                \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tInt8));                                \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   CStoExtInt16
   @aref cstoextint16 CStoExtInt16
 */
-#define CStoExtInt16_exec(obj, name, in, cond)                                 \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tInt16)); \
-  }                                                                            \
+#define CStoExtInt16_exec(obj, name, in, cond)                                                               \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tInt16));                               \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   CStoExtInt32
   @aref cstoextint32 CStoExtInt32
 */
-#define CStoExtInt32_exec(obj, name, in, cond)                                 \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tInt32)); \
-  }                                                                            \
+#define CStoExtInt32_exec(obj, name, in, cond)                                                               \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tInt32));                               \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   CStoExtInt64
   @aref cstoextint64 CStoExtInt64
 */
-#define CStoExtInt64_exec(obj, name, in, cond)                                 \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tInt64)); \
-  }                                                                            \
+#define CStoExtInt64_exec(obj, name, in, cond)                                                               \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tInt64));                               \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   CStoExtInt8
   @aref cstoextuint8 CStoExtUInt8
 */
-#define CStoExtUInt8_exec(obj, name, in, cond)                                 \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tUInt8)); \
-  }                                                                            \
+#define CStoExtUInt8_exec(obj, name, in, cond)                                                               \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tUInt8));                               \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   CStoExtUInt16
   @aref cstoextuint16 CStoExtUInt16
 */
-#define CStoExtUInt16_exec(obj, name, in, cond)                                \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus                                                            \
-        = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tUInt16));            \
-  }                                                                            \
+#define CStoExtUInt16_exec(obj, name, in, cond)                                                              \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tUInt16));                              \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   CStoExtUInt32
   @aref cstoextuint32 CStoExtUInt32
 */
-#define CStoExtUInt32_exec(obj, name, in, cond)                                \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus                                                            \
-        = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tUInt32));            \
-  }                                                                            \
+#define CStoExtUInt32_exec(obj, name, in, cond)                                                              \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tUInt32));                              \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   CStoExtUInt64
   @aref cstoextuint64 CStoExtUInt64
 */
-#define CStoExtUInt64_exec(obj, name, in, cond)                                \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus                                                            \
-        = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tUInt64));            \
-  }                                                                            \
+#define CStoExtUInt64_exec(obj, name, in, cond)                                                              \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tUInt64));                              \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   CStoExtString
   @aref cstoextstring CStoExtString
 */
-#define CStoExtString_exec(obj, name, in, cond)                                \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus                                                            \
-        = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tString80));          \
-  }                                                                            \
+#define CStoExtString_exec(obj, name, in, cond)                                                              \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tString80));                            \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   CStoExtTime
   @aref cstoexttime CStoExtTime
 */
-#define CStoExtTime_exec(obj, name, in, cond)                                  \
-  if (cond && !obj->OldCond) {                                                 \
-    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tTime));  \
-  }                                                                            \
+#define CStoExtTime_exec(obj, name, in, cond)                                                                \
+  if (cond && !obj->OldCond)                                                                                 \
+  {                                                                                                          \
+    obj->LastStatus = gdh_SetObjectInfo(name, (void*)&in, sizeof(pwr_tTime));                                \
+  }                                                                                                          \
   obj->OldCond = cond;
 
 /*_*
   GetExtFloat32
   @aref getextfloat32 GetExtFloat32
 */
-#define GetExtFloat32_init(obj, name)                                          \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tFloat32)) == GDH__NODYNLOCOBJ) \
-      obj->ExtP = 0;							       \
+#define GetExtFloat32_init(obj, name)                                                                        \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tFloat32)) == GDH__NODYNLOCOBJ)            \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtFloat32_exec(obj, name)					       \
-  if (obj->ExtP)                                                               \
-    obj->ActVal = *obj->ExtP;						       \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtFloat32_exec(obj, name)                                                                        \
+  if (obj->ExtP)                                                                                             \
+    obj->ActVal = *obj->ExtP;                                                                                \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtFloat32_init(obj, name);
 
 /*_*
   GetExtFloat64
   @aref getextfloat64 GetExtFloat64
 */
-#define GetExtFloat64_init(obj, name)                                          \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tFloat64)) == GDH__NODYNLOCOBJ) \
-      obj->ExtP = 0;							       \
+#define GetExtFloat64_init(obj, name)                                                                        \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tFloat64)) == GDH__NODYNLOCOBJ)            \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtFloat64_exec(obj, name)					\
-  if (obj->ExtP)                                                               \
-    obj->ActVal = *obj->ExtP;						       \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtFloat64_exec(obj, name)                                                                        \
+  if (obj->ExtP)                                                                                             \
+    obj->ActVal = *obj->ExtP;                                                                                \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtFloat64_init(obj, name);
 
 /*_*
   GetExtInt64
   @aref getextint64 GetExtInt64
 */
-#define GetExtInt64_init(obj, name)                                            \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tInt64)) == GDH__NODYNLOCOBJ) \
-      obj->ExtP = 0;							       \
+#define GetExtInt64_init(obj, name)                                                                          \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tInt64)) == GDH__NODYNLOCOBJ)              \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtInt64_exec(obj, name)						\
-  if (obj->ExtP)                                                               \
-    obj->ActVal = *obj->ExtP;						       \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtInt64_exec(obj, name)                                                                          \
+  if (obj->ExtP)                                                                                             \
+    obj->ActVal = *obj->ExtP;                                                                                \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtInt64_init(obj, name);
 
 /*_*
   GetExtUInt64
   @aref getextuint64 GetExtUInt64
 */
-#define GetExtUInt64_init(obj, name)                                           \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tUInt64)) == GDH__NODYNLOCOBJ) \
-      obj->ExtP = 0;							       \
+#define GetExtUInt64_init(obj, name)                                                                         \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tUInt64)) == GDH__NODYNLOCOBJ)             \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtUInt64_exec(obj, name)						\
-  if (obj->ExtP)                                                               \
-    obj->ActVal = *obj->ExtP;						       \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtUInt64_exec(obj, name)                                                                         \
+  if (obj->ExtP)                                                                                             \
+    obj->ActVal = *obj->ExtP;                                                                                \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtUInt64_init(obj, name);
 
 /*_*
   GetExtInt32
   @aref getextint32 GetExtInt32
 */
-#define GetExtInt32_init(obj, name)                                            \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tInt32)) == GDH__NODYNLOCOBJ)	\
-      obj->ExtP = 0;							       \
+#define GetExtInt32_init(obj, name)                                                                          \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tInt32)) == GDH__NODYNLOCOBJ)              \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtInt32_exec(obj, name)						\
-  if (obj->ExtP)                                                               \
-    obj->ActVal = *obj->ExtP;						       \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtInt32_exec(obj, name)                                                                          \
+  if (obj->ExtP)                                                                                             \
+    obj->ActVal = *obj->ExtP;                                                                                \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtInt32_init(obj, name);
 
 /*_*
   GetExtUInt32
   @aref getextuint32 GetExtUInt32
 */
-#define GetExtUInt32_init(obj, name)                                           \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tUInt32)) == GDH__NODYNLOCOBJ) \
-      obj->ExtP = 0;							       \
+#define GetExtUInt32_init(obj, name)                                                                         \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tUInt32)) == GDH__NODYNLOCOBJ)             \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtUInt32_exec(obj, name)						\
-  if (obj->ExtP)                                                               \
-    obj->ActVal = *obj->ExtP;						       \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtUInt32_exec(obj, name)                                                                         \
+  if (obj->ExtP)                                                                                             \
+    obj->ActVal = *obj->ExtP;                                                                                \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtUInt32_init(obj, name);
 
 /*_*
   GetExtInt16
   @aref getextint16 GetExtInt16
 */
-#define GetExtInt16_init(obj, name)                                            \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tInt16)) == GDH__NODYNLOCOBJ) \
-      obj->ExtP = 0;							       \
+#define GetExtInt16_init(obj, name)                                                                          \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tInt16)) == GDH__NODYNLOCOBJ)              \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtInt16_exec(obj, name)						\
-  if (obj->ExtP)                                                               \
-    obj->ActVal = *obj->ExtP;						       \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtInt16_exec(obj, name)                                                                          \
+  if (obj->ExtP)                                                                                             \
+    obj->ActVal = *obj->ExtP;                                                                                \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtInt16_init(obj, name);
 
 /*_*
   GetExtUInt16
   @aref getextuint16 GetExtUInt16
 */
-#define GetExtUInt16_init(obj, name)                                           \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tUInt16)) == GDH__NODYNLOCOBJ) \
-      obj->ExtP = 0;							       \
+#define GetExtUInt16_init(obj, name)                                                                         \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tUInt16)) == GDH__NODYNLOCOBJ)             \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtUInt16_exec(obj, name)						\
-  if (obj->ExtP)                                                               \
-    obj->ActVal = *obj->ExtP;						       \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtUInt16_exec(obj, name)                                                                         \
+  if (obj->ExtP)                                                                                             \
+    obj->ActVal = *obj->ExtP;                                                                                \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtUInt16_init(obj, name);
 
 /*_*
   GetExtInt8
   @aref getextint8 GetExtInt8
 */
-#define GetExtInt8_init(obj, name)                                             \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tInt8)) == GDH__NODYNLOCOBJ) \
-      obj->ExtP = 0;							       \
+#define GetExtInt8_init(obj, name)                                                                           \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tInt8)) == GDH__NODYNLOCOBJ)               \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtInt8_exec(obj, name)						\
-  if (obj->ExtP)                                                               \
-    obj->ActVal = *obj->ExtP;						       \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtInt8_exec(obj, name)                                                                           \
+  if (obj->ExtP)                                                                                             \
+    obj->ActVal = *obj->ExtP;                                                                                \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtInt8_init(obj, name);
 
 /*_*
   GetExtUInt8
   @aref getextuint8 GetExtUInt8
 */
-#define GetExtUInt8_init(obj, name)                                            \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tUInt8)) == GDH__NODYNLOCOBJ) \
-      obj->ExtP = 0;							       \
+#define GetExtUInt8_init(obj, name)                                                                          \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tUInt8)) == GDH__NODYNLOCOBJ)              \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtUInt8_exec(obj, name)						\
-  if (obj->ExtP)                                                               \
-    obj->ActVal = *obj->ExtP;						       \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtUInt8_exec(obj, name)                                                                          \
+  if (obj->ExtP)                                                                                             \
+    obj->ActVal = *obj->ExtP;                                                                                \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtUInt8_init(obj, name);
 
 /*_*
   GetExtBoolean
   @aref getextboolean GetExtBoolean
 */
-#define GetExtBoolean_init(obj, name)                                          \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tBoolean)) == GDH__NODYNLOCOBJ) \
-      obj->ExtP = 0;							       \
+#define GetExtBoolean_init(obj, name)                                                                        \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tBoolean)) == GDH__NODYNLOCOBJ)            \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtBoolean_exec(obj, name)					\
-  if (obj->ExtP)                                                               \
-    obj->ActVal = *obj->ExtP;						       \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtBoolean_exec(obj, name)                                                                        \
+  if (obj->ExtP)                                                                                             \
+    obj->ActVal = *obj->ExtP;                                                                                \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtBoolean_init(obj, name);
 
 /*_*
   GetExtString
   @aref getextstring GetExtString
 */
-#define GetExtString_init(obj, name)                                           \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tString80)) == GDH__NODYNLOCOBJ) \
-      obj->ExtP = 0;							       \
+#define GetExtString_init(obj, name)                                                                         \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tString80)) == GDH__NODYNLOCOBJ)           \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtString_exec(obj, name)						\
-  if (obj->ExtP)                                                               \
-    strncpy(obj->ActVal, (const char *)obj->ExtP, sizeof(pwr_tString80)); \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtString_exec(obj, name)                                                                         \
+  if (obj->ExtP)                                                                                             \
+    strncpy(obj->ActVal, (const char*)obj->ExtP, sizeof(pwr_tString80));                                     \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtString_init(obj, name);
 
 /*_*
   GetExtTime
   @aref getexttime GetExtTime
 */
-#define GetExtTime_init(obj, name)                                             \
-  {                                                                            \
-    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tTime)) == GDH__NODYNLOCOBJ) \
-      obj->ExtP = 0;							       \
+#define GetExtTime_init(obj, name)                                                                           \
+  {                                                                                                          \
+    if (gdh_RefObjectInfo(name, (void**)&obj->ExtP, 0, sizeof(pwr_tTime)) == GDH__NODYNLOCOBJ)               \
+      obj->ExtP = 0;                                                                                         \
   }
 
-#define GetExtTime_exec(obj, name)						\
-  if (obj->ExtP)                                                               \
-    obj->ActVal = *obj->ExtP;						       \
-  else if (tp->ext_retry_connect)					       \
+#define GetExtTime_exec(obj, name)                                                                           \
+  if (obj->ExtP)                                                                                             \
+    obj->ActVal = *obj->ExtP;                                                                                \
+  else if (tp->ext_retry_connect)                                                                            \
     GetExtTime_init(obj, name);
 
 /*_*
@@ -894,16 +901,15 @@
   Store data reference value
   @aref stodatarefv StoDataRefv
 */
-#define StoDataRefv_exec(obj, in)                                              \
-  memcpy(&obj->ActualValue, &(in), sizeof(pwr_tDataRef));
+#define StoDataRefv_exec(obj, in) memcpy(&obj->ActualValue, &(in), sizeof(pwr_tDataRef));
 
 /*_*
   CStoDataRefv
   Conditional storage of a data reference value
   @aref cstodatarefv CStoDataRefv
 */
-#define CStoDataRefv_exec(obj, in, cond)                                       \
-  if (cond)                                                                    \
+#define CStoDataRefv_exec(obj, in, cond)                                                                     \
+  if (cond)                                                                                                  \
     memcpy(&obj->ActualValue, &(in), sizeof(pwr_tDataRef));
 
 /*_*
@@ -939,8 +945,8 @@
   Set digital value by reference
   @aref setrefd SetRefD
 */
-#define SetRefD_exec(out, cond)                                                \
-  if (cond)                                                                    \
+#define SetRefD_exec(out, cond)                                                                              \
+  if (cond)                                                                                                  \
     out = true;
 
 /*_*
@@ -948,8 +954,8 @@
   Reset digital value by reference
   @aref resrefd ResRefD
 */
-#define ResRefD_exec(out, cond)                                                \
-  if (cond)                                                                    \
+#define ResRefD_exec(out, cond)                                                                              \
+  if (cond)                                                                                                  \
     out = false;
 
 /*_*
@@ -964,8 +970,8 @@
   Conditionally store integer value by reference
   @aref dstorefi DStoRefI
 */
-#define CStoRefI_exec(out, in, cond)                                           \
-  if (cond)                                                                    \
+#define CStoRefI_exec(out, in, cond)                                                                         \
+  if (cond)                                                                                                  \
     out = in;
 
 /*_*
@@ -980,6 +986,6 @@
   Conditionally store analog value by reference
   @aref cstorefa CStoRefA
 */
-#define CStoRefA_exec(out, in, cond)                                           \
-  if (cond)                                                                    \
+#define CStoRefA_exec(out, in, cond)                                                                         \
+  if (cond)                                                                                                  \
     out = in;

@@ -61,5 +61,4 @@ static pwr_tStatus Build(ldh_sMenuCall* ip)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods($NodeHier)
-    = { pwr_BindMethod(Build), pwr_NullMethod };
+pwr_dExport pwr_BindMethods($NodeHier) = {pwr_BindMethod(Build), pwr_NullMethod};

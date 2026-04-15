@@ -48,7 +48,8 @@ typedef struct ios_FilterCard_Di io_sFilterCard_Di;
 
 /* The structure of card data  */
 
-struct ios_FilterCard_Di {
+struct ios_FilterCard_Di
+{
   pwr_tBoolean Filter;
   pwr_sClass_Di* SignalObj[32];
   void* FilterData[32];
@@ -56,13 +57,12 @@ struct ios_FilterCard_Di {
 
 /* Filtration of Di.  */
 
-pwr_tStatus io_DiFilter(
-    pwr_sClass_Di* SignalObj[], pwr_tUInt16* Data, void* FilterData[]);
+pwr_tStatus io_DiFilter(pwr_sClass_Di* SignalObj[], pwr_tUInt16* Data, void* FilterData[]);
 
 /* Initialize filter for max 16 Di ( one Di-card ).  */
 
-pwr_tStatus io_InitDiFilter(pwr_sClass_Di* SignalObj[], pwr_tBoolean* Filter,
-    void* FilterData[], pwr_tFloat32 ScanTime);
+pwr_tStatus io_InitDiFilter(pwr_sClass_Di* SignalObj[], pwr_tBoolean* Filter, void* FilterData[],
+                            pwr_tFloat32 ScanTime);
 
 void io_CloseDiFilter(void* FilterData[]);
 

@@ -44,7 +44,8 @@ class wb_cdrep;
 class wb_orep;
 class wb_tdrep;
 
-class wb_mvrep : public wb_vrep {
+class wb_mvrep : public wb_vrep
+{
 public:
   wb_cdrep* cdrep(const wb_orep& o);
   wb_cdrep* cdrep(pwr_tCid cid);

@@ -43,10 +43,12 @@
 
 #include "co_help_main.h"
 
-class CoHelpQt : public CoHelpMain {
+class CoHelpQt : public CoHelpMain
+{
 public:
   CoHelpQt(int argc, char* argv[], int* sts);
   ~CoHelpQt();
+
 private:
   CoXHelp* xhelp;
 };

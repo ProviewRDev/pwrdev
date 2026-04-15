@@ -46,34 +46,30 @@
 #include <QTreeWidget>
 #include <QWidget>
 
-class CoWowEntryQt : public QLineEdit {
+class CoWowEntryQt : public QLineEdit
+{
 public:
   CoWowRecall* m_re;
   bool m_hide_on_esc;
 
   CoWowEntryQt(CoWowRecall* re = 0);
 
-  void set_recall_buffer(CoWowRecall* re)
-  {
-    m_re = re;
-  }
+  void set_recall_buffer(CoWowRecall* re) { m_re = re; }
 
-  void set_hide_on_esc(bool hide)
-  {
-    m_hide_on_esc = hide;
-  }
+  void set_hide_on_esc(bool hide) { m_hide_on_esc = hide; }
 
 protected:
   void keyPressEvent(QKeyEvent* event);
 };
 
-class CoWowModalDialogQt : public QDialog {
+class CoWowModalDialogQt : public QDialog
+{
   Q_OBJECT
 
 public:
-  CoWowModalDialogQt(QWidget* parent, const char* title, const char* text,
-      const char* button1, const char* button2, const char* button3,
-      const char* image, int input_length = 0, CoWowRecall* recall = 0);
+  CoWowModalDialogQt(QWidget* parent, const char* title, const char* text, const char* button1,
+                     const char* button2, const char* button3, const char* image, int input_length = 0,
+                     CoWowRecall* recall = 0);
   QString text();
 
 protected:
@@ -89,7 +85,8 @@ private:
   QLineEdit* textinput;
 };
 
-class CoWowFocusTimerQt : public QObject {
+class CoWowFocusTimerQt : public QObject
+{
   Q_OBJECT
 
 public:
@@ -108,7 +105,8 @@ public slots:
 };
 
 class CoWowTimerQtObject;
-class CoWowTimerQt : public CoWowTimer {
+class CoWowTimerQt : public CoWowTimer
+{
 public:
   CoWowTimerQt();
   ~CoWowTimerQt();
@@ -120,7 +118,8 @@ private:
   CoWowTimerQtObject* object;
 };
 
-class CoWowTimerQtObject : public QObject {
+class CoWowTimerQtObject : public QObject
+{
   Q_OBJECT
 
 public:
@@ -133,13 +132,14 @@ private:
   CoWowTimerQt* wow_timer;
 };
 
-class CoWowListWidgetQt : public QWidget {
+class CoWowListWidgetQt : public QWidget
+{
   Q_OBJECT
 
 public:
-  CoWowListWidgetQt(QWidget* parent, const char* title, const char* texts,
-      int textsize, void(action_cb)(void*, char*, int), void(cancel_cb)(void*),
-      void* parent_ctx, int show_apply_button);
+  CoWowListWidgetQt(QWidget* parent, const char* title, const char* texts, int textsize,
+                    void(action_cb)(void*, char*, int), void(cancel_cb)(void*), void* parent_ctx,
+                    int show_apply_button);
 
 protected:
   void focusInEvent(QFocusEvent* event);
@@ -160,7 +160,8 @@ public slots:
 
 class CoWowQtObject;
 
-class CoWowWarrantQt : public QDialog {
+class CoWowWarrantQt : public QDialog
+{
   Q_OBJECT
 
 public:
@@ -173,7 +174,8 @@ protected:
   void destroy(bool destroyWindow = true, bool destroySubWindows = true);
 };
 
-class CoWowQt : public CoWow {
+class CoWowQt : public CoWow
+{
 public:
   CoWowQtObject* object;
   QTimer* m_wait_timerid;
@@ -181,36 +183,29 @@ public:
   CoWowQt(QWidget* parent);
   ~CoWowQt();
 
-  void DisplayQuestion(void* ctx, const char* title, const char* text,
-      void (*questionbox_ok)(void*, void*),
-      void (*questionbox_cancel)(void*, void*), void* data);
-  void DisplayError(const char* title, const char* text,
-      lng_eCoding coding = lng_eCoding_ISO8859_1);
-  void DisplayText(
-      const char* title, const char* text, int width = 0, int height = 0);
+  void DisplayQuestion(void* ctx, const char* title, const char* text, void (*questionbox_ok)(void*, void*),
+                       void (*questionbox_cancel)(void*, void*), void* data);
+  void DisplayError(const char* title, const char* text, lng_eCoding coding = lng_eCoding_ISO8859_1);
+  void DisplayText(const char* title, const char* text, int width = 0, int height = 0);
   void CreateInputDialog(void* ctx, const char* title, const char* text,
-      void (*inputdialogbox_ok)(void*, void*, char*),
-      void (*inputdialogbox_cancel)(void*, void*), int input_length,
-      char* init_text, void* data);
-  void* CreateList(const char* title, const char* texts, int textsize,
-      void(action_cb)(void*, char*, int), void(cancel_cb)(void*), void* ctx,
-      int show_apply_button = 0);
+                         void (*inputdialogbox_ok)(void*, void*, char*),
+                         void (*inputdialogbox_cancel)(void*, void*), int input_length, char* init_text,
+                         void* data);
+  void* CreateList(const char* title, const char* texts, int textsize, void(action_cb)(void*, char*, int),
+                   void(cancel_cb)(void*), void* ctx, int show_apply_button = 0);
   void PopList(void* ctx);
   void DeleteList(void* ctx);
   void CreateFileSelDia(const char* title, void* parent_ctx,
-      void (*file_selected_cb)(void*, char*, wow_eFileSelType),
-      wow_eFileSelType file_type, wow_eFileSelAction action);
-  int CreateModalDialog(const char* title, const char* text,
-      const char* button1, const char* button2, const char* button3,
-      const char* image);
-  wow_sModalInputDialog* CreateModalInputDialog(const char* title,
-      const char* text, const char* button1, const char* button2,
-      const char* button3, const char* image, int input_length,
-      CoWowRecall* recall = 0);
+                        void (*file_selected_cb)(void*, char*, wow_eFileSelType), wow_eFileSelType file_type,
+                        wow_eFileSelAction action);
+  int CreateModalDialog(const char* title, const char* text, const char* button1, const char* button2,
+                        const char* button3, const char* image);
+  wow_sModalInputDialog* CreateModalInputDialog(const char* title, const char* text, const char* button1,
+                                                const char* button2, const char* button3, const char* image,
+                                                int input_length, CoWowRecall* recall = 0);
 
 public:
-  pwr_tStatus CreateMenuItem(
-      const char* name, void* menu, int pixmap, int append, void* w);
+  pwr_tStatus CreateMenuItem(const char* name, void* menu, int pixmap, int append, void* w);
   pwr_tStatus DeleteMenuItem(const char* name, void* menu);
 
   static pwr_tStatus CreateBrowPrintDialogQt(const char* title, void* flow_ctx, QWidget* brow_widget);
@@ -222,15 +217,15 @@ public:
 
   void Wait(float time);
 
-  static void PopupPosition(
-      QWidget* parent, int x_event, int y_event, int* x, int* y);
+  static void PopupPosition(QWidget* parent, int x_event, int y_event, int* x, int* y);
   static int GetSelection(char* str, int size, const char* atom);
   static void SetWindowIcon(QWidget* w);
 
   static void update_title(QWidget* w, int editmode);
 };
 
-class CoWowQtObject : public QObject {
+class CoWowQtObject : public QObject
+{
   Q_OBJECT
 
 public:

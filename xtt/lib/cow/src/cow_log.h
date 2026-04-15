@@ -41,12 +41,16 @@
 #include "co_syi.h"
 #include "cow_wow.h"
 
-typedef enum { log_mOption_Comment = 1 } log_mOption;
+typedef enum
+{
+  log_mOption_Comment = 1
+} log_mOption;
 
 class CoLog;
 class CoWow;
 
-class CoLog {
+class CoLog
+{
 protected:
   pwr_tFileName m_filename;
   char m_pid[40];
@@ -64,18 +68,11 @@ public:
     delete m_recall;
   }
 
-  void set_default()
-  {
-    m_default_log = this;
-  }
-  void log(const char* category, const char* str, const char* cmt,
-      unsigned int opt = 0);
-  void get(char categories[][20], char* item,
-      void item_cb(void*, pwr_tTime, char*, char*, char*, char*), void* ctx);
-  void push()
-  {
-    m_level++;
-  }
+  void set_default() { m_default_log = this; }
+  void log(const char* category, const char* str, const char* cmt, unsigned int opt = 0);
+  void get(char categories[][20], char* item, void item_cb(void*, pwr_tTime, char*, char*, char*, char*),
+           void* ctx);
+  void push() { m_level++; }
   void pull()
   {
     m_level--;
@@ -83,8 +80,7 @@ public:
       m_level = 1;
   }
 
-  static void dlog(
-      const char* category, const char* str, const char* cmt, unsigned int opt)
+  static void dlog(const char* category, const char* str, const char* cmt, unsigned int opt)
   {
     if (m_default_log)
       m_default_log->log(category, str, cmt, opt);
@@ -100,7 +96,7 @@ public:
       m_default_log->pull();
   }
   static void dget(char categories[][20], char* item,
-      void item_cb(void*, pwr_tTime, char*, char*, char*, char*), void* ctx)
+                   void item_cb(void*, pwr_tTime, char*, char*, char*, char*), void* ctx)
   {
     if (m_default_log)
       m_default_log->get(categories, item, item_cb, ctx);

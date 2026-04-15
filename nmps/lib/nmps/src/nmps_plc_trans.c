@@ -45,18 +45,16 @@ void datacnv_init(pwr_sClass_datacnv* object)
 {
   int sts;
 
-  sts = cvn_ConvInit(object->ToConvdefType, object->ToConvdef,
-      object->ToConvdefFile, object->FromConvdefType, object->FromConvdef,
-      object->FromConvdefFile, &object->ConvTableCount, 0,
-      (char**)object->ConvTable);
+  sts = cvn_ConvInit(object->ToConvdefType, object->ToConvdef, object->ToConvdefFile, object->FromConvdefType,
+                     object->FromConvdef, object->FromConvdefFile, &object->ConvTableCount, 0,
+                     (char**)object->ConvTable);
 }
 
 void datacnv_exec(plc_sThread* tp, pwr_sClass_datacnv* object)
 {
   if (*object->ConditionP)
-    cnv_ConvertData((cnv_t_conv_table*)object->ConvTable,
-        object->ConvTableCount, (char*)(*object->DataFromP),
-        (char*)(*object->DataToP));
+    cnv_ConvertData((cnv_t_conv_table*)object->ConvTable, object->ConvTableCount, (char*)(*object->DataFromP),
+                    (char*)(*object->DataToP));
 }
 
 void DataRequest_exec(plc_sThread* tp, pwr_sClass_DataRequest* object)
@@ -66,47 +64,58 @@ void DataRequest_exec(plc_sThread* tp, pwr_sClass_DataRequest* object)
 
   if (*object->TriggP && !object->TriggOld)
     object->TriggDetected = 1;
-  if (object->OpTrigg) {
+  if (object->OpTrigg)
+  {
     object->TriggDetected = 1;
     object->OpTrigg = 0;
   }
-  if (object->Function & NMPS_REQUESTFUNC_ACCEPTBOTH) {
+  if (object->Function & NMPS_REQUESTFUNC_ACCEPTBOTH)
+  {
     if (*object->AcceptP && !object->AcceptOld)
       object->SysAcceptDetected = 1;
-    if (object->OpAccept) {
+    if (object->OpAccept)
+    {
       object->OpAccept = 0;
       object->OpAcceptDetected = 1;
     }
-    if (object->OpAcceptDetected && object->SysAcceptDetected) {
+    if (object->OpAcceptDetected && object->SysAcceptDetected)
+    {
       object->AcceptDetected = 1;
       object->OpAcceptDetected = 0;
       object->SysAcceptDetected = 0;
     }
-  } else {
+  }
+  else
+  {
     if (*object->AcceptP && !object->AcceptOld)
       object->AcceptDetected = 1;
-    if (object->OpAccept) {
+    if (object->OpAccept)
+    {
       object->OpAccept = 0;
       object->AcceptDetected = 1;
     }
   }
-  if (*object->ResetP && !object->ResetOld) {
+  if (*object->ResetP && !object->ResetOld)
+  {
     object->ResetDetected = 1;
     object->OpAcceptDetected = 0;
     object->SysAcceptDetected = 0;
   }
-  if (object->OpReset) {
+  if (object->OpReset)
+  {
     object->ResetDetected = 1;
     object->OpReset = 0;
     object->OpAcceptDetected = 0;
     object->SysAcceptDetected = 0;
   }
 
-  if (object->DataRcvDetected) {
+  if (object->DataRcvDetected)
+  {
     object->DataReceived = 1;
     object->DataRcvDetected = 0;
   }
-  if (object->ErrorDetected) {
+  if (object->ErrorDetected)
+  {
     object->Error = 1;
     object->ErrorDetected = 0;
   }
@@ -120,43 +129,53 @@ void DataRcv_exec(plc_sThread* tp, pwr_sClass_DataRcv* object)
   object->DataReceived = 0;
   object->Error = 0;
 
-  if (object->Function & NMPS_REQUESTFUNC_ACCEPTBOTH) {
+  if (object->Function & NMPS_REQUESTFUNC_ACCEPTBOTH)
+  {
     if (*object->AcceptP && !object->AcceptOld)
       object->SysAcceptDetected = 1;
-    if (object->OpAccept) {
+    if (object->OpAccept)
+    {
       object->OpAccept = 0;
       object->OpAcceptDetected = 1;
     }
-    if (object->OpAcceptDetected && object->SysAcceptDetected) {
+    if (object->OpAcceptDetected && object->SysAcceptDetected)
+    {
       object->AcceptDetected = 1;
       object->OpAcceptDetected = 0;
       object->SysAcceptDetected = 0;
     }
-  } else {
+  }
+  else
+  {
     if (*object->AcceptP && !object->AcceptOld)
       object->AcceptDetected = 1;
-    if (object->OpAccept) {
+    if (object->OpAccept)
+    {
       object->OpAccept = 0;
       object->AcceptDetected = 1;
     }
   }
-  if (*object->ResetP && !object->ResetOld) {
+  if (*object->ResetP && !object->ResetOld)
+  {
     object->ResetDetected = 1;
     object->OpAcceptDetected = 0;
     object->SysAcceptDetected = 0;
   }
-  if (object->OpReset) {
+  if (object->OpReset)
+  {
     object->ResetDetected = 1;
     object->OpReset = 0;
     object->OpAcceptDetected = 0;
     object->SysAcceptDetected = 0;
   }
 
-  if (object->DataRcvDetected) {
+  if (object->DataRcvDetected)
+  {
     object->DataReceived = 1;
     object->DataRcvDetected = 0;
   }
-  if (object->ErrorDetected) {
+  if (object->ErrorDetected)
+  {
     object->Error = 1;
     object->ErrorDetected = 0;
   }
@@ -172,11 +191,13 @@ void DataSend_exec(plc_sThread* tp, pwr_sClass_DataSend* object)
   if (*object->TriggP && !object->TriggOld)
     object->TriggDetected = 1;
 
-  if (object->ErrorDetected) {
+  if (object->ErrorDetected)
+  {
     object->Error = 1;
     object->ErrorDetected = 0;
   }
-  if (object->DataSentDetected) {
+  if (object->DataSentDetected)
+  {
     object->DataSent = 1;
     object->DataSentDetected = 0;
   }

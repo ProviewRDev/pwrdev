@@ -55,9 +55,8 @@
   Convert ai from rawvalue to actualvalue.
 \*----------------------------------------------------------------------------*/
 
-void ConvertAi(pwr_sClass_ChanAi* cop, pwr_tInt16 nobits, pwr_tUInt8 rawvalue8,
-               pwr_tUInt16 rawvalue16, pwr_tUInt32 rawvalue32,
-               pwr_tFloat32* actvalue_p, pwr_tEnum representation)
+void ConvertAi(pwr_sClass_ChanAi* cop, pwr_tInt16 nobits, pwr_tUInt8 rawvalue8, pwr_tUInt16 rawvalue16,
+               pwr_tUInt32 rawvalue32, pwr_tFloat32* actvalue_p, pwr_tEnum representation)
 
 {
   pwr_tFloat32 sigvalue;
@@ -130,10 +129,8 @@ void ConvertAi(pwr_sClass_ChanAi* cop, pwr_tInt16 nobits, pwr_tUInt8 rawvalue8,
   Convert ait from rawvalue to actualvalue.
 \*----------------------------------------------------------------------------*/
 
-void ConvertAit(pwr_sClass_ChanAit* cop, pwr_tInt16 nobits,
-                pwr_tUInt16 rawvalue8, pwr_tUInt16 rawvalue16,
-                pwr_tUInt32 rawvalue32, pwr_tFloat32* actvalue_p,
-                pwr_tEnum representation)
+void ConvertAit(pwr_sClass_ChanAit* cop, pwr_tInt16 nobits, pwr_tUInt16 rawvalue8, pwr_tUInt16 rawvalue16,
+                pwr_tUInt32 rawvalue32, pwr_tFloat32* actvalue_p, pwr_tEnum representation)
 {
   pwr_tFloat32 Slope;
   pwr_tFloat32 Intercept;
@@ -188,8 +185,7 @@ void ConvertAit(pwr_sClass_ChanAit* cop, pwr_tInt16 nobits,
 /*----------------------------------------------------------------------------*\
    Init method for the Pb module Ai
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                              io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   pwr_sClass_Pb_Ai* op;
@@ -229,8 +225,7 @@ static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 /*----------------------------------------------------------------------------*\
    Read method for the Pb Ai card
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                              io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   pwr_sClass_Pb_Ai* op;
@@ -277,20 +272,16 @@ static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
             data32 = (pwr_tInt32)udata32;
             sop->RawValue = 0;
             if (op->NumberRepresentation == PB_NUMREP_UNSIGNEDINT)
-              sop->SigValue =
-                  udata32 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
+              sop->SigValue = udata32 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
             else
-              sop->SigValue =
-                  data32 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
+              sop->SigValue = data32 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
             switch (chanp->ChanClass)
             {
             case pwr_cClass_ChanAi:
-              ConvertAi(cop, 32, 0, 0, udata32, &actvalue,
-                        op->NumberRepresentation);
+              ConvertAi(cop, 32, 0, 0, udata32, &actvalue, op->NumberRepresentation);
               break;
             case pwr_cClass_ChanAit:
-              ConvertAit((pwr_sClass_ChanAit*)cop, 32, 0, 0, udata32, &actvalue,
-                         op->NumberRepresentation);
+              ConvertAit((pwr_sClass_ChanAit*)cop, 32, 0, 0, udata32, &actvalue, op->NumberRepresentation);
               break;
             }
           }
@@ -306,20 +297,16 @@ static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
             data32 = (pwr_tInt32)udata32;
             sop->RawValue = 0;
             if (op->NumberRepresentation == PB_NUMREP_UNSIGNEDINT)
-              sop->SigValue =
-                  udata32 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
+              sop->SigValue = udata32 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
             else
-              sop->SigValue =
-                  data32 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
+              sop->SigValue = data32 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
             switch (chanp->ChanClass)
             {
             case pwr_cClass_ChanAi:
-              ConvertAi(cop, 32, 0, 0, udata32, &actvalue,
-                        op->NumberRepresentation);
+              ConvertAi(cop, 32, 0, 0, udata32, &actvalue, op->NumberRepresentation);
               break;
             case pwr_cClass_ChanAit:
-              ConvertAit((pwr_sClass_ChanAit*)cop, 32, 0, 0, udata32, &actvalue,
-                         op->NumberRepresentation);
+              ConvertAit((pwr_sClass_ChanAit*)cop, 32, 0, 0, udata32, &actvalue, op->NumberRepresentation);
               break;
             }
           }
@@ -331,20 +318,16 @@ static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
             data16 = (pwr_tInt16)udata16;
             sop->RawValue = udata16;
             if (op->NumberRepresentation == PB_NUMREP_UNSIGNEDINT)
-              sop->SigValue =
-                  udata16 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
+              sop->SigValue = udata16 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
             else
-              sop->SigValue =
-                  data16 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
+              sop->SigValue = data16 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
             switch (chanp->ChanClass)
             {
             case pwr_cClass_ChanAi:
-              ConvertAi(cop, 16, 0, udata16, 0, &actvalue,
-                        op->NumberRepresentation);
+              ConvertAi(cop, 16, 0, udata16, 0, &actvalue, op->NumberRepresentation);
               break;
             case pwr_cClass_ChanAit:
-              ConvertAit((pwr_sClass_ChanAit*)cop, 16, 0, udata16, 0, &actvalue,
-                         op->NumberRepresentation);
+              ConvertAit((pwr_sClass_ChanAit*)cop, 16, 0, udata16, 0, &actvalue, op->NumberRepresentation);
               break;
             }
           }
@@ -355,31 +338,25 @@ static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
             data8 = (pwr_tInt8)udata8;
             sop->RawValue = udata8;
             if (op->NumberRepresentation == PB_NUMREP_UNSIGNEDINT)
-              sop->SigValue =
-                  udata8 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
+              sop->SigValue = udata8 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
             else
-              sop->SigValue =
-                  data8 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
+              sop->SigValue = data8 * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
             switch (chanp->ChanClass)
             {
             case pwr_cClass_ChanAi:
-              ConvertAi(cop, 8, udata8, 0, 0, &actvalue,
-                        op->NumberRepresentation);
+              ConvertAi(cop, 8, udata8, 0, 0, &actvalue, op->NumberRepresentation);
               break;
             case pwr_cClass_ChanAit:
-              ConvertAit((pwr_sClass_ChanAit*)cop, 8, udata8, 0, 0, &actvalue,
-                         op->NumberRepresentation);
+              ConvertAit((pwr_sClass_ChanAit*)cop, 8, udata8, 0, 0, &actvalue, op->NumberRepresentation);
               break;
             }
           }
 
           // Filter
-          if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0 &&
-              sop->FilterAttribute[0] > ctx->ScanTime)
+          if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0 && sop->FilterAttribute[0] > ctx->ScanTime)
           {
             actvalue = *(pwr_tFloat32*)chanp->vbp +
-                       ctx->ScanTime / sop->FilterAttribute[0] *
-                           (actvalue - *(pwr_tFloat32*)chanp->vbp);
+                       ctx->ScanTime / sop->FilterAttribute[0] * (actvalue - *(pwr_tFloat32*)chanp->vbp);
           }
 
           *(pwr_tFloat32*)chanp->vbp = actvalue;
@@ -388,8 +365,8 @@ static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
         local->scancount[i]--;
 
       } // if ...ConversionOn
-    }   // for
-  }     // if ...op->Status
+    } // for
+  } // if ...op->Status
 
   return IO__SUCCESS;
 }
@@ -397,8 +374,7 @@ static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
 /*----------------------------------------------------------------------------*\
    Close method for the Pb Ai card
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
-                               io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   local = cp->Local;
@@ -412,6 +388,5 @@ static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp,
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Pb_Ai) = {
-    pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardRead),
-    pwr_BindIoMethod(IoCardClose), pwr_NullMethod};
+pwr_dExport pwr_BindIoMethods(Pb_Ai) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardRead),
+                                        pwr_BindIoMethod(IoCardClose), pwr_NullMethod};

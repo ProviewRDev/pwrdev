@@ -41,8 +41,7 @@
 #include "flow_pushbutton.h"
 #include "flow_draw.h"
 
-int BrowCtx::insert(FlowArrayElem* element, FlowArrayElem* destination,
-    flow_eDest destination_code)
+int BrowCtx::insert(FlowArrayElem* element, FlowArrayElem* destination, flow_eDest destination_code)
 {
   int sts;
   double y;
@@ -96,7 +95,8 @@ void BrowCtx::change_scrollbar()
 {
   flow_sScroll data;
 
-  if (!scroll_size) {
+  if (!scroll_size)
+  {
     // Get scroll size from the width of the first element
     double ll_x, ur_x, ll_y, ur_y;
 
@@ -111,10 +111,8 @@ void BrowCtx::change_scrollbar()
   data.total_height = int((y_high - y_low) / scroll_size) + 1;
   data.window_width = int(window_width / scroll_size / zoom_factor) + 1;
   data.window_height = int(window_height / scroll_size / zoom_factor) + 1;
-  data.offset_x
-      = int(offset_x / scroll_size / zoom_factor - x_left / scroll_size);
-  data.offset_y
-      = int(offset_y / scroll_size / zoom_factor - y_low / scroll_size);
+  data.offset_x = int(offset_x / scroll_size / zoom_factor - x_left / scroll_size);
+  data.offset_y = int(offset_y / scroll_size / zoom_factor - y_low / scroll_size);
 
   (scroll_callback)(&data);
 }
@@ -123,9 +121,12 @@ void BrowCtx::redraw(double y_redraw)
 {
   fdraw->get_window_size(this, &window_width, &window_height);
 
-  if (y_redraw) {
+  if (y_redraw)
+  {
     draw(0, int(y_redraw * zoom_factor - offset_y), window_width, window_height);
-  } else {
+  }
+  else
+  {
     draw(0, 0, window_width, window_height);
   }
   nav_zoom();
@@ -138,11 +139,9 @@ void BrowCtx::zoom(double factor)
 
   zoom_factor *= factor;
   if (offset_x != 0)
-    offset_x
-        = int((offset_x - window_width / 2.0 * (1.0 / factor - 1)) * factor);
+    offset_x = int((offset_x - window_width / 2.0 * (1.0 / factor - 1)) * factor);
   if (offset_y != 0)
-    offset_y
-        = int((offset_y - window_height / 2.0 * (1.0 / factor - 1)) * factor);
+    offset_y = int((offset_y - window_height / 2.0 * (1.0 / factor - 1)) * factor);
   offset_x = MAX(offset_x, 0);
   offset_y = MAX(offset_y, 0);
   if ((x_right - x_left) * zoom_factor <= window_width)
@@ -169,19 +168,22 @@ int BrowCtx::print(char* filename)
   ((FlowNode*)a[0])->measure(&ll_x, &ll_y, &ur_x, &ur_y);
   height = 60 * (ur_y - ll_y);
   width = 0.70 * height;
-  if (width < ur_x - ll_x) {
+  if (width < ur_x - ll_x)
+  {
     // Portrait
     height = 40 * (ur_y - ll_y);
     width = height / 0.70;
   }
 
   current_print = new FlowPscript(filename, this, 1, &sts);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     delete current_print;
     return 0;
   }
 
-  for (i = 0;; i++) {
+  for (i = 0;; i++)
+  {
     ll_y = i * height;
     ur_y = ll_y + height;
     ll_x = 0;
@@ -196,8 +198,8 @@ int BrowCtx::print(char* filename)
   return 1;
 }
 
-void BrowCtx::print_draw_page(void* context, const char* title, int page,
-    flow_eOrientation orientation, double scale)
+void BrowCtx::print_draw_page(void* context, const char* title, int page, flow_eOrientation orientation,
+                              double scale)
 {
   double ll_x, ll_y, ur_x, ur_y;
   double width, height;
@@ -209,13 +211,13 @@ void BrowCtx::print_draw_page(void* context, const char* title, int page,
   ((FlowNode*)a[0])->measure(&ll_x, &ll_y, &ur_x, &ur_y);
   height = 60 * (ur_y - ll_y) * scale;
   width = 0.70 * height;
-  if (orientation == flow_eOrientation_Landscape) {
+  if (orientation == flow_eOrientation_Landscape)
+  {
     height = 35 * (ur_y - ll_y) * scale;
     width = height / 0.70;
   }
 
-  current_print
-      = (FlowPrint*)fdraw->print_draw_new(context, title, page, this, 1, &sts);
+  current_print = (FlowPrint*)fdraw->print_draw_new(context, title, page, this, 1, &sts);
   if (EVEN(sts))
     return;
 
@@ -230,13 +232,13 @@ void BrowCtx::print_draw_page(void* context, const char* title, int page,
   delete current_print;
 }
 
-void BrowCtx::print_get_pages(
-    flow_eOrientation orientation, double scale, int* pages)
+void BrowCtx::print_get_pages(flow_eOrientation orientation, double scale, int* pages)
 {
   double ll_x, ll_y, ur_x, ur_y;
   double width, height;
 
-  if (a.size() == 0) {
+  if (a.size() == 0)
+  {
     *pages = 0;
     return;
   }
@@ -244,7 +246,8 @@ void BrowCtx::print_get_pages(
   ((FlowNode*)a[0])->measure(&ll_x, &ll_y, &ur_x, &ur_y);
   height = 60 * (ur_y - ll_y) * scale;
   width = 0.70 * height;
-  if (orientation == flow_eOrientation_Landscape) {
+  if (orientation == flow_eOrientation_Landscape)
+  {
     // Portrait
     height = 35 * (ur_y - ll_y) * scale;
     width = height / 0.70;
@@ -261,16 +264,16 @@ int BrowCtx::is_visible(FlowArrayElem* element, flow_eVisible type)
   ((FlowNode*)element)->measure(&ll_x, &ll_y, &ur_x, &ur_y);
   window_low = double(offset_y) / zoom_factor;
   window_high = double(offset_y + window_height) / zoom_factor;
-  switch (type) {
+  switch (type)
+  {
   case flow_eVisible_Full:
     if (ll_y >= window_low && ur_y <= window_high)
       return 1;
     else
       return 0;
   case flow_eVisible_Partial:
-    if ((ll_y >= window_low && ll_y <= window_high)
-        || (ur_y >= window_low && ur_y <= window_high)
-        || (ll_y <= window_low && ur_y >= window_high))
+    if ((ll_y >= window_low && ll_y <= window_high) || (ur_y >= window_low && ur_y <= window_high) ||
+        (ll_y <= window_low && ur_y >= window_high))
       return 1;
     else
       return 0;
@@ -314,9 +317,11 @@ int BrowCtx::get_first_visible(FlowArrayElem** element)
   window_low = double(offset_y) / zoom_factor;
   window_high = double(offset_y + window_height) / zoom_factor;
 
-  for (i = 0; i < a.size(); i++) {
+  for (i = 0; i < a.size(); i++)
+  {
     ((FlowNode*)a[i])->measure(&ll_x, &ll_y, &ur_x, &ur_y);
-    if (ll_y >= window_low || ur_y >= window_high) {
+    if (ll_y >= window_low || ur_y >= window_high)
+    {
       *element = a[i];
       return 1;
     }
@@ -333,9 +338,11 @@ int BrowCtx::get_last_visible(FlowArrayElem** element)
   window_low = double(offset_y) / zoom_factor;
   window_high = double(offset_y + window_height) / zoom_factor;
 
-  for (i = a.size() - 1; i >= 0; i--) {
+  for (i = a.size() - 1; i >= 0; i--)
+  {
     ((FlowNode*)a[i])->measure(&ll_x, &ll_y, &ur_x, &ur_y);
-    if (ur_y <= window_high || ll_y <= window_low) {
+    if (ur_y <= window_high || ll_y <= window_low)
+    {
       *element = a[i];
       return 1;
     }
@@ -350,14 +357,16 @@ int BrowCtx::page(double factor)
 
   new_offset_y = offset_y + int(factor * window_height);
 
-  if (factor < 0) {
+  if (factor < 0)
+  {
     if (offset_y <= 0)
       return 0;
 
     if (new_offset_y < 0)
       new_offset_y = 0;
   }
-  if (factor > 0) {
+  if (factor > 0)
+  {
     FlowArrayElem* e;
     int sts;
 
@@ -378,8 +387,8 @@ void brow_scroll_horizontal(BrowCtx* ctx, int value, int bottom)
 {
   int x_pix;
 
-  x_pix = int(-value * ctx->scroll_size * ctx->zoom_factor
-      + (ctx->offset_x - ctx->x_left * ctx->zoom_factor));
+  x_pix =
+      int(-value * ctx->scroll_size * ctx->zoom_factor + (ctx->offset_x - ctx->x_left * ctx->zoom_factor));
   ctx->scroll(x_pix, 0);
 }
 
@@ -387,15 +396,11 @@ void brow_scroll_vertical(BrowCtx* ctx, int value, int bottom)
 {
   int y_pix;
 
-  y_pix = int(-value * ctx->scroll_size * ctx->zoom_factor
-      + (ctx->offset_y - ctx->y_low * ctx->zoom_factor));
+  y_pix = int(-value * ctx->scroll_size * ctx->zoom_factor + (ctx->offset_y - ctx->y_low * ctx->zoom_factor));
   // Correction for the bottom position
-  if (bottom && (y_pix >= 0
-                    || ctx->window_height + y_pix
-                        < ctx->y_high * ctx->zoom_factor - ctx->offset_y))
+  if (bottom && (y_pix >= 0 || ctx->window_height + y_pix < ctx->y_high * ctx->zoom_factor - ctx->offset_y))
     //        window_height >= (y_high - y_low) * zoom_factor)
-    y_pix = int(
-        ctx->window_height + ctx->offset_y - ctx->y_high * ctx->zoom_factor);
+    y_pix = int(ctx->window_height + ctx->offset_y - ctx->y_high * ctx->zoom_factor);
   ctx->scroll(0, y_pix);
 }
 
@@ -415,4 +420,3 @@ void BrowCtx::update_color_theme(int ct)
   fdraw->update_color_theme(ct);
   redraw(0);
 }
-

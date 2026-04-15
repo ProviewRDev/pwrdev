@@ -44,16 +44,16 @@
 #include "glow_conpoint.h"
 #include "glow_draw.h"
 
-GrowConGlue::GrowConGlue(
-    GrowCtx* glow_ctx, const char* name, double x1, double y1, int nodraw)
-    : GrowNode(glow_ctx, name, 0, x1, y1, 1, 0), line_width_up(-1),
-      line_width_down(-1), line_width_left(-1), line_width_right(-1)
+GrowConGlue::GrowConGlue(GrowCtx* glow_ctx, const char* name, double x1, double y1, int nodraw)
+    : GrowNode(glow_ctx, name, 0, x1, y1, 1, 0), line_width_up(-1), line_width_down(-1), line_width_left(-1),
+      line_width_right(-1)
 {
   double x_grid, y_grid;
 
   // Get nodeclass
   nc = (GlowNodeClass*)ctx->get_nodeclass_from_name("pwr_conglue");
-  if (!nc) {
+  if (!nc)
+  {
     // Create the nodeclass
     GlowConPoint* cp;
     GrowRect* r;
@@ -70,8 +70,8 @@ GrowConGlue::GrowConGlue(
     nc->insert(cp);
     cp = new GlowConPoint(ctx, -0.5, 0, 3, glow_eDirection_Left);
     nc->insert(cp);
-    r = new GrowRect(ctx, "", -0.5, -0.5, 1, 1, glow_eDrawType_Line, 1, 0,
-        glow_mDisplayLevel_1, 0, 1, 0, glow_eDrawType_Line, 1);
+    r = new GrowRect(ctx, "", -0.5, -0.5, 1, 1, glow_eDrawType_Line, 1, 0, glow_mDisplayLevel_1, 0, 1, 0,
+                     glow_eDrawType_Line, 1);
     nc->insert(r);
     ctx->grid_on = grid_on;
 
@@ -79,7 +79,8 @@ GrowConGlue::GrowConGlue(
   }
   draw_type = glow_eDrawType_Line;
 
-  if (ctx->grid_on) {
+  if (ctx->grid_on)
+  {
     ctx->find_grid(x1, y1, &x_grid, &y_grid);
     trf.move(x_grid - x1, y_grid - y1);
   }
@@ -88,9 +89,7 @@ GrowConGlue::GrowConGlue(
     draw();
 }
 
-GrowConGlue::~GrowConGlue()
-{
-}
+GrowConGlue::~GrowConGlue() {}
 
 void GrowConGlue::configure(GlowCon* con)
 {
@@ -106,10 +105,13 @@ void GrowConGlue::configure(GlowCon* con)
   draw_type = glow_eDrawType_Line;
 
   // if con is created now, it is not inserted in the ctx list yet
-  if (con) {
-    if (con->source() == this) {
+  if (con)
+  {
+    if (con->source() == this)
+    {
       c = con;
-      switch (conpoint_to_direction(c->source_conpoint)) {
+      switch (conpoint_to_direction(c->source_conpoint))
+      {
       case glow_eDirection_Up:
         lw_up = c->cc->line_width;
         break;
@@ -129,9 +131,11 @@ void GrowConGlue::configure(GlowCon* con)
       shadow = c->shadow;
       border = c->border;
     }
-    if (con->destination() == this) {
+    if (con->destination() == this)
+    {
       c = con;
-      switch (conpoint_to_direction(c->dest_conpoint)) {
+      switch (conpoint_to_direction(c->dest_conpoint))
+      {
       case glow_eDirection_Up:
         if (lw_up < c->cc->line_width)
           lw_up = c->cc->line_width;
@@ -151,7 +155,8 @@ void GrowConGlue::configure(GlowCon* con)
       default:;
       }
       // Select properties from the widest connection
-      if (c->cc->line_width > max_width) {
+      if (c->cc->line_width > max_width)
+      {
         max_width = c->cc->line_width;
         draw_type = c->cc->draw_type;
         shadow = c->shadow;
@@ -160,11 +165,15 @@ void GrowConGlue::configure(GlowCon* con)
     }
   }
 
-  for (i = 0; i < ctx->a.size(); i++) {
-    if (ctx->a.a[i]->type() == glow_eObjectType_Con) {
-      if (((GlowCon*)ctx->a.a[i])->source() == this) {
+  for (i = 0; i < ctx->a.size(); i++)
+  {
+    if (ctx->a.a[i]->type() == glow_eObjectType_Con)
+    {
+      if (((GlowCon*)ctx->a.a[i])->source() == this)
+      {
         c = (GlowCon*)ctx->a.a[i];
-        switch (conpoint_to_direction(c->source_conpoint)) {
+        switch (conpoint_to_direction(c->source_conpoint))
+        {
         case glow_eDirection_Up:
           if (lw_up < c->cc->line_width)
             lw_up = c->cc->line_width;
@@ -184,16 +193,19 @@ void GrowConGlue::configure(GlowCon* con)
         default:;
         }
         // Select properties from the widest connection
-        if (c->cc->line_width > max_width) {
+        if (c->cc->line_width > max_width)
+        {
           max_width = c->cc->line_width;
           draw_type = c->cc->draw_type;
           shadow = c->shadow;
           border = c->border;
         }
       }
-      if (((GlowCon*)ctx->a.a[i])->destination() == this) {
+      if (((GlowCon*)ctx->a.a[i])->destination() == this)
+      {
         c = (GlowCon*)ctx->a.a[i];
-        switch (conpoint_to_direction(c->dest_conpoint)) {
+        switch (conpoint_to_direction(c->dest_conpoint))
+        {
         case glow_eDirection_Up:
           if (lw_up < c->cc->line_width)
             lw_up = c->cc->line_width;
@@ -213,7 +225,8 @@ void GrowConGlue::configure(GlowCon* con)
         default:;
         }
         // Select properties from the widest connection
-        if (c->cc->line_width > max_width) {
+        if (c->cc->line_width > max_width)
+        {
           max_width = c->cc->line_width;
           draw_type = c->cc->draw_type;
           shadow = c->shadow;
@@ -231,14 +244,10 @@ void GrowConGlue::configure(GlowCon* con)
 void GrowConGlue::save(std::ofstream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowConGlue) << '\n';
-  fp << int(glow_eSave_GrowConGlue_line_width_up) << FSPACE << line_width_up
-     << '\n';
-  fp << int(glow_eSave_GrowConGlue_line_width_down) << FSPACE << line_width_down
-     << '\n';
-  fp << int(glow_eSave_GrowConGlue_line_width_left) << FSPACE << line_width_left
-     << '\n';
-  fp << int(glow_eSave_GrowConGlue_line_width_right) << FSPACE
-     << line_width_right << '\n';
+  fp << int(glow_eSave_GrowConGlue_line_width_up) << FSPACE << line_width_up << '\n';
+  fp << int(glow_eSave_GrowConGlue_line_width_down) << FSPACE << line_width_down << '\n';
+  fp << int(glow_eSave_GrowConGlue_line_width_left) << FSPACE << line_width_left << '\n';
+  fp << int(glow_eSave_GrowConGlue_line_width_right) << FSPACE << line_width_right << '\n';
   fp << int(glow_eSave_GrowConGlue_border) << FSPACE << border << '\n';
   fp << int(glow_eSave_GrowConGlue_node_part) << '\n';
   GrowNode::save(fp, mode);
@@ -251,15 +260,18 @@ void GrowConGlue::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowConGlue: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowConGlue:
       break;
     case glow_eSave_GrowConGlue_line_width_up:
@@ -296,23 +308,24 @@ void GrowConGlue::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
 {
   int tmp;
 
-  if (ll_x > ur_x) {
+  if (ll_x > ur_x)
+  {
     /* Shift */
     tmp = ll_x;
     ll_x = ur_x;
     ur_x = tmp;
   }
-  if (ll_y > ur_y) {
+  if (ll_y > ur_y)
+  {
     /* Shift */
     tmp = ll_y;
     ll_y = ur_y;
     ur_y = tmp;
   }
 
-  if (x_right * w->zoom_factor_x - w->offset_x >= ll_x
-      && x_left * w->zoom_factor_x - w->offset_x <= ur_x
-      && y_high * w->zoom_factor_y - w->offset_y >= ll_y
-      && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
+  if (x_right * w->zoom_factor_x - w->offset_x >= ll_x && x_left * w->zoom_factor_x - w->offset_x <= ur_x &&
+      y_high * w->zoom_factor_y - w->offset_y >= ll_y && y_low * w->zoom_factor_y - w->offset_y <= ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
   }
 }
@@ -325,21 +338,23 @@ void GrowConGlue::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
   int obj_ur_y = int(y_high * w->zoom_factor_y) - w->offset_y;
   int obj_ll_y = int(y_low * w->zoom_factor_y) - w->offset_y;
 
-  if (*ll_x > *ur_x) {
+  if (*ll_x > *ur_x)
+  {
     /* Shift */
     tmp = *ll_x;
     *ll_x = *ur_x;
     *ur_x = tmp;
   }
-  if (*ll_y > *ur_y) {
+  if (*ll_y > *ur_y)
+  {
     /* Shift */
     tmp = *ll_y;
     *ll_y = *ur_y;
     *ur_y = tmp;
   }
 
-  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
-      && obj_ll_y <= *ur_y) {
+  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y && obj_ll_y <= *ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
 
     // Increase the redraw area
@@ -360,12 +375,13 @@ void GrowConGlue::set_highlight(int on)
   draw();
 }
 
-void GrowConGlue::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode, void *transpnode)
+void GrowConGlue::draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+                       void* transpnode)
 {
   if (ctx->nodraw)
     return;
-  if (w == &ctx->navw) {
+  if (w == &ctx->navw)
+  {
     if (ctx->no_nav)
       return;
     hot = 0;
@@ -379,12 +395,15 @@ void GrowConGlue::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   double x1, y1, x2, y2;
   int ll_x, ll_y, ur_x, ur_y, m_x, m_y;
 
-  if (!t) {
+  if (!t)
+  {
     x1 = x_left * w->zoom_factor_x - w->offset_x;
     y1 = y_low * w->zoom_factor_y - w->offset_y;
     x2 = x_right * w->zoom_factor_x - w->offset_x;
     y2 = y_high * w->zoom_factor_y - w->offset_y;
-  } else {
+  }
+  else
+  {
     x1 = t->x(x_left, y_low) * w->zoom_factor_x - w->offset_x;
     y1 = t->y(x_left, y_low) * w->zoom_factor_y - w->offset_y;
     x2 = t->x(x_right, y_high) * w->zoom_factor_x - w->offset_x;
@@ -398,8 +417,7 @@ void GrowConGlue::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   m_x = int((x1 + x2) / 2 + 0.5);
   m_y = int((y1 + y2) / 2 + 0.5);
 
-  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
-      highlight, (GrowNode*)colornode, 0);
+  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight, (GrowNode*)colornode, 0);
 
   int lw_up, lw_down, lw_left, lw_right;
 
@@ -428,781 +446,805 @@ void GrowConGlue::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   idx_right = MAX(0, idx_right);
   idx_right = MIN(idx_right, DRAW_TYPE_SIZE - 1);
 
-  if (lw_up != -1 && lw_down == -1 && lw_right == -1 && lw_left == -1) {
+  if (lw_up != -1 && lw_down == -1 && lw_right == -1 && lw_left == -1)
+  {
     // Up termination
-    ctx->gdraw->fill_rect(
-        w, m_x - idx_up + idx_up / 2, m_y, idx_up + 1, ur_y - m_y, drawtype);
-    if (shadow && idx_up > 2) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2, m_y, idx_up + 1, ur_y - m_y, drawtype);
+    if (shadow && idx_up > 2)
+    {
+      if (border)
+      {
         idx_up -= 2;
         m_y++;
       }
 
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y,
-          shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y, shift_drawtype, 0, 0);
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y,
-          m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y, m_x + idx_up / 2, m_y,
-          shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y, m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0,
+                       0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y, m_x + idx_up / 2, m_y, shift_drawtype, 0, 0);
 
-      if (border) {
+      if (border)
+      {
         idx_up += 2;
         m_y--;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y,
-          m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y, m_x + idx_up / 2, m_y,
-          glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y, m_x - idx_up + idx_up / 2, ur_y,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y, m_x + idx_up / 2, m_y, glow_eDrawType_Line, 0, 0);
     }
-  } else if (lw_up == -1 && lw_down != -1 && lw_right == -1 && lw_left == -1) {
+  }
+  else if (lw_up == -1 && lw_down != -1 && lw_right == -1 && lw_left == -1)
+  {
     // Down termination
-    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y - ll_y, drawtype);
-    if (shadow && idx_down > 2) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y - ll_y, drawtype);
+    if (shadow && idx_down > 2)
+    {
+      if (border)
+      {
         idx_down -= 2;
         m_y--;
       }
 
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y,
-          shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y,
-          m_x + idx_down / 2, m_y, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y, m_x + idx_down / 2, m_y, shift_drawtype, 0, 0);
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2, m_y,
+                       shift_drawtype, 0, 0);
 
-      if (border) {
+      if (border)
+      {
         idx_down += 2;
         m_y++;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y,
-          m_x + idx_down / 2, m_y, glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2, m_y,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y, m_x + idx_down / 2, m_y, glow_eDrawType_Line, 0,
+                       0);
     }
-  } else if (lw_up == -1 && lw_down == -1 && lw_right != -1 && lw_left == -1) {
+  }
+  else if (lw_up == -1 && lw_down == -1 && lw_right != -1 && lw_left == -1)
+  {
     // Right termination
-    ctx->gdraw->fill_rect(w, m_x, m_y - idx_right + idx_right / 2, ur_x - m_x,
-        idx_right + 1, drawtype);
-    if (shadow && idx_right > 2) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, m_x, m_y - idx_right + idx_right / 2, ur_x - m_x, idx_right + 1, drawtype);
+    if (shadow && idx_right > 2)
+    {
+      if (border)
+      {
         idx_right -= 2;
         m_x++;
       }
 
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, m_x, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
-          shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x, m_y + idx_right / 2, ur_x, m_y + idx_right / 2, shift_drawtype, 0, 0);
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, m_x,
-          m_y + idx_right / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, ur_x, m_y - idx_right + idx_right / 2,
+                       shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, m_x, m_y + idx_right / 2, shift_drawtype, 0,
+                       0);
 
-      if (border) {
+      if (border)
+      {
         idx_right += 2;
         m_x--;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, m_x,
-          m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, ur_x, m_y - idx_right + idx_right / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x, m_y + idx_right / 2, ur_x, m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, m_x, m_y + idx_right / 2, glow_eDrawType_Line,
+                       0, 0);
     }
-  } else if (lw_up == -1 && lw_down == -1 && lw_right == -1 && lw_left != -1) {
+  }
+  else if (lw_up == -1 && lw_down == -1 && lw_right == -1 && lw_left != -1)
+  {
     // Left termination
-    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x,
-        idx_left + 1, drawtype);
-    if (shadow && idx_left > 2) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x, idx_left + 1, drawtype);
+    if (shadow && idx_left > 2)
+    {
+      if (border)
+      {
         idx_left -= 2;
         m_x--;
       }
 
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2,
-          shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x, m_y - idx_left + idx_left / 2, m_x,
-          m_y + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x, m_y - idx_left + idx_left / 2, m_x, m_y + idx_left / 2, shift_drawtype, 0, 0);
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x,
-          m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x, m_y - idx_left + idx_left / 2,
+                       shift_drawtype, 0, 0);
 
-      if (border) {
+      if (border)
+      {
         idx_left += 2;
         m_x++;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x,
-          m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x, m_y - idx_left + idx_left / 2, m_x,
-          m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x, m_y - idx_left + idx_left / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x, m_y - idx_left + idx_left / 2, m_x, m_y + idx_left / 2, glow_eDrawType_Line, 0,
+                       0);
     }
-  } else if (lw_up != -1 && lw_down != -1 && lw_right == -1 && lw_left == -1) {
+  }
+  else if (lw_up != -1 && lw_down != -1 && lw_right == -1 && lw_left == -1)
+  {
     // Vertical glue
-    ctx->gdraw->fill_rect(
-        w, m_x - idx_up + idx_up / 2, m_y, idx_up + 1, ur_y - m_y, drawtype);
-    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y - ll_y, drawtype);
+    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2, m_y, idx_up + 1, ur_y - m_y, drawtype);
+    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y - ll_y, drawtype);
 
-    if (shadow && idx_down > 2) {
-      if (border) {
+    if (shadow && idx_down > 2)
+    {
+      if (border)
+      {
         idx_up -= 2;
         idx_down -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y,
-          m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2, m_y,
+                       shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y, m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0,
+                       0);
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y,
-          shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y,
-          shift_drawtype, 0, 0);
-      if (border) {
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y, shift_drawtype, 0, 0);
+      if (border)
+      {
         idx_up += 2;
         idx_down += 2;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y,
-          m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y,
-          glow_eDrawType_Line, 0, 0);
-      if (idx_down != idx_up) {
-        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y,
-            m_x - idx_down + idx_down / 2, m_y, glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y, m_x + idx_down / 2, m_y,
-            glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2, m_y,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y, m_x - idx_up + idx_up / 2, ur_y,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
+      if (idx_down != idx_up)
+      {
+        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y, m_x - idx_down + idx_down / 2, m_y,
+                         glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y, m_x + idx_down / 2, m_y, glow_eDrawType_Line, 0, 0);
       }
     }
-  } else if (lw_left != -1 && lw_right != -1 && lw_up == -1 && lw_down == -1) {
+  }
+  else if (lw_left != -1 && lw_right != -1 && lw_up == -1 && lw_down == -1)
+  {
     // Horizontal glue
-    ctx->gdraw->fill_rect(w, m_x, m_y - idx_right + idx_right / 2, ur_x - m_x,
-        idx_right + 1, drawtype);
-    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x,
-        idx_left + 1, drawtype);
-    if (shadow && (idx_left > 2 || idx_right > 2)) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, m_x, m_y - idx_right + idx_right / 2, ur_x - m_x, idx_right + 1, drawtype);
+    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x, idx_left + 1, drawtype);
+    if (shadow && (idx_left > 2 || idx_right > 2))
+    {
+      if (border)
+      {
         idx_left -= 2;
         idx_right -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x,
-          m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x, m_y - idx_left + idx_left / 2,
+                       shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, ur_x, m_y - idx_right + idx_right / 2,
+                       shift_drawtype, 0, 0);
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2,
-          shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
-          shift_drawtype, 0, 0);
-      if (border) {
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x, m_y + idx_right / 2, ur_x, m_y + idx_right / 2, shift_drawtype, 0, 0);
+      if (border)
+      {
         idx_left += 2;
         idx_right += 2;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x,
-          m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
-          glow_eDrawType_Line, 0, 0);
-      if (idx_left != idx_right) {
-        ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, m_x,
-            m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x, m_y + idx_right / 2, m_x, m_y + idx_left / 2,
-            glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x, m_y - idx_left + idx_left / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, ur_x, m_y - idx_right + idx_right / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x, m_y + idx_right / 2, ur_x, m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
+      if (idx_left != idx_right)
+      {
+        ctx->gdraw->line(w, m_x, m_y - idx_right + idx_right / 2, m_x, m_y - idx_left + idx_left / 2,
+                         glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x, m_y + idx_right / 2, m_x, m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
       }
     }
-  } else if (lw_left != -1 && lw_right == -1 && lw_up != -1 && lw_down == -1) {
+  }
+  else if (lw_left != -1 && lw_right == -1 && lw_up != -1 && lw_down == -1)
+  {
     // Left up corner
-    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-        idx_up + 1, ur_y - (m_y + idx_left / 2), drawtype);
-    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2,
-        m_x + idx_up / 2 - ll_x + 1, idx_left + 1, drawtype);
-    if (shadow && (idx_left > 2 || idx_up > 2)) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2, idx_up + 1,
+                          ur_y - (m_y + idx_left / 2), drawtype);
+    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2, m_x + idx_up / 2 - ll_x + 1, idx_left + 1,
+                          drawtype);
+    if (shadow && (idx_left > 2 || idx_up > 2))
+    {
+      if (border)
+      {
         idx_left -= 2;
         idx_up -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
       ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x + idx_up / 2,
-          m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, 0);
+                       m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                       shift_drawtype, 0, 0);
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2,
-          m_y + idx_left / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-          m_x + idx_up / 2, ur_y, shift_drawtype, 0, 0);
-      if (border) {
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                       shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_left + idx_left / 2, m_x + idx_up / 2, ur_y,
+                       shift_drawtype, 0, 0);
+      if (border)
+      {
         idx_left += 2;
         idx_up += 2;
       }
     }
-    if (border) {
+    if (border)
+    {
       ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x + idx_up / 2,
-          m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2,
-          m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-          m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
+                       m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_left + idx_left / 2, m_x + idx_up / 2, ur_y,
+                       glow_eDrawType_Line, 0, 0);
     }
-  } else if (lw_left == -1 && lw_right != -1 && lw_up != -1 && lw_down == -1) {
+  }
+  else if (lw_left == -1 && lw_right != -1 && lw_up != -1 && lw_down == -1)
+  {
     // Right up corner
-    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2,
-        m_y - idx_right + idx_right / 2, idx_up + 1,
-        ur_y - (m_y - idx_right + idx_right / 2), drawtype);
-    ctx->gdraw->fill_rect(w, m_x + idx_up / 2, m_y - idx_right + idx_right / 2,
-        ur_x - (m_x + idx_up / 2), idx_right + 1, drawtype);
-    if (shadow && (idx_right > 2 || idx_up > 2)) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2, idx_up + 1,
+                          ur_y - (m_y - idx_right + idx_right / 2), drawtype);
+    ctx->gdraw->fill_rect(w, m_x + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x - (m_x + idx_up / 2),
+                          idx_right + 1, drawtype);
+    if (shadow && (idx_right > 2 || idx_up > 2))
+    {
+      if (border)
+      {
         idx_right -= 2;
         idx_up -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2,
-          m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2,
-          m_y - idx_right + idx_right / 2, m_x - idx_up + idx_up / 2, ur_y,
-          shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x,
+                       m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                       m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, 0);
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, shift_drawtype, 0, 0);
-      if (border) {
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2, shift_drawtype, 0,
+                       0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y, shift_drawtype, 0,
+                       0);
+      if (border)
+      {
         idx_right += 2;
         idx_up += 2;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2,
-          m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2,
-          m_y - idx_right + idx_right / 2, m_x - idx_up + idx_up / 2, ur_y,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x,
+                       m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                       m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y, glow_eDrawType_Line,
+                       0, 0);
     }
-  } else if (lw_left == -1 && lw_right != -1 && lw_up == -1 && lw_down != -1) {
+  }
+  else if (lw_left == -1 && lw_right != -1 && lw_up == -1 && lw_down != -1)
+  {
     // Right down corner
     ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y - idx_right + idx_right / 2 - ll_y, drawtype);
-    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2,
-        m_y - idx_right + idx_right / 2, ur_x - (m_x - idx_down + idx_down / 2),
-        idx_right + 1, drawtype);
-    if (shadow && (idx_right > 2 || idx_down > 2)) {
-      if (border) {
+                          m_y - idx_right + idx_right / 2 - ll_y, drawtype);
+    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, m_y - idx_right + idx_right / 2,
+                          ur_x - (m_x - idx_down + idx_down / 2), idx_right + 1, drawtype);
+    if (shadow && (idx_right > 2 || idx_down > 2))
+    {
+      if (border)
+      {
         idx_right -= 2;
         idx_down -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
-          ur_x, m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y + idx_right / 2, shift_drawtype, 0,
-          0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                       m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                       m_y + idx_right / 2, shift_drawtype, 0, 0);
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y + idx_right / 2,
-          ur_x, m_y + idx_right / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
-      if (border) {
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                       shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                       shift_drawtype, 0, 0);
+      if (border)
+      {
         idx_right += 2;
         idx_down += 2;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y + idx_right / 2,
-          ur_x, m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
-          ur_x, m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y + idx_right / 2,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                       m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                       m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                       glow_eDrawType_Line, 0, 0);
     }
-  } else if (lw_left != -1 && lw_right == -1 && lw_up == -1 && lw_down != -1) {
+  }
+  else if (lw_left != -1 && lw_right == -1 && lw_up == -1 && lw_down != -1)
+  {
     // Left down corner
-    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y + idx_left / 2 - ll_y + 1, drawtype);
-    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2,
-        m_x - idx_down + idx_down / 2 - ll_x, idx_left + 1, drawtype);
-    if (shadow && (idx_left > 2 || idx_down > 2)) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y + idx_left / 2 - ll_y + 1,
+                          drawtype);
+    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2 - ll_x,
+                          idx_left + 1, drawtype);
+    if (shadow && (idx_left > 2 || idx_down > 2))
+    {
+      if (border)
+      {
         idx_left -= 2;
         idx_down -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x + idx_down / 2,
-          m_y + idx_left / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y + idx_left / 2, shift_drawtype, 0, 0);
-      if (border) {
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x + idx_down / 2, m_y + idx_left / 2, shift_drawtype, 0,
+                       0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y + idx_left / 2, shift_drawtype, 0,
+                       0);
+      if (border)
+      {
         idx_left += 2;
         idx_down += 2;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x + idx_down / 2,
-          m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x + idx_down / 2, m_y + idx_left / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y + idx_left / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
     }
-  } else if (lw_left != -1 && lw_right != -1 && lw_up == -1 && lw_down != -1) {
+  }
+  else if (lw_left != -1 && lw_right != -1 && lw_up == -1 && lw_down != -1)
+  {
     // Left right down threeway
-    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y - ll_y + 1, drawtype);
-    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2,
-        m_x + idx_down / 2 - ll_x, idx_left + 1, drawtype);
-    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2,
-        m_y - idx_right + idx_right / 2, ur_x - (m_x - idx_down + idx_down / 2),
-        idx_right + 1, drawtype);
-    if (shadow && (idx_left > 2 || idx_right > 2 || idx_down > 2)) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y - ll_y + 1, drawtype);
+    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2, m_x + idx_down / 2 - ll_x, idx_left + 1,
+                          drawtype);
+    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, m_y - idx_right + idx_right / 2,
+                          ur_x - (m_x - idx_down + idx_down / 2), idx_right + 1, drawtype);
+    if (shadow && (idx_left > 2 || idx_right > 2 || idx_down > 2))
+    {
+      if (border)
+      {
         idx_left -= 2;
         idx_right -= 2;
         idx_down -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
-          ur_x, m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                       m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                       shift_drawtype, 0, 0);
       if (idx_right == idx_left)
-        ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, ur_x, m_y + idx_left / 2,
-            shift_drawtype, 0, 0);
-      else if (idx_right > idx_left) {
-        ctx->gdraw->line(w, ll_x, m_y + idx_left / 2,
-            m_x - idx_down + idx_down / 2, m_y + idx_left / 2, shift_drawtype,
-            0, 0);
-        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y + idx_right / 2,
-            ur_x, m_y + idx_right / 2, shift_drawtype, 0, 0);
-      } else {
-        ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x + idx_down / 2,
-            m_y + idx_left / 2, shift_drawtype, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_down / 2, m_y + idx_right / 2, ur_x,
-            m_y + idx_right / 2, shift_drawtype, 0, 0);
+        ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, ur_x, m_y + idx_left / 2, shift_drawtype, 0, 0);
+      else if (idx_right > idx_left)
+      {
+        ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_down + idx_down / 2, m_y + idx_left / 2,
+                         shift_drawtype, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                         shift_drawtype, 0, 0);
       }
-      if (border) {
+      else
+      {
+        ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x + idx_down / 2, m_y + idx_left / 2, shift_drawtype,
+                         0, 0);
+        ctx->gdraw->line(w, m_x + idx_down / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                         shift_drawtype, 0, 0);
+      }
+      if (border)
+      {
         idx_left += 2;
         idx_right += 2;
         idx_down += 2;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
-          ur_x, m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                       m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                       glow_eDrawType_Line, 0, 0);
       if (idx_right == idx_left)
-        ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, ur_x, m_y + idx_left / 2,
-            glow_eDrawType_Line, 0, 0);
-      else if (idx_right > idx_left) {
-        ctx->gdraw->line(w, ll_x, m_y + idx_left / 2,
-            m_x - idx_down + idx_down / 2, m_y + idx_left / 2,
-            glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y + idx_right / 2,
-            ur_x, m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y + idx_right / 2,
-            m_x - idx_down + idx_down / 2, m_y + idx_left / 2,
-            glow_eDrawType_Line, 0, 0);
-      } else {
-        ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x + idx_down / 2,
-            m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_down / 2, m_y + idx_right / 2, ur_x,
-            m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_down / 2, m_y + idx_right / 2,
-            m_x + idx_down / 2, m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, ur_x, m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      else if (idx_right > idx_left)
+      {
+        ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_down + idx_down / 2, m_y + idx_left / 2,
+                         glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                         glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, m_y + idx_right / 2, m_x - idx_down + idx_down / 2,
+                         m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      }
+      else
+      {
+        ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x + idx_down / 2, m_y + idx_left / 2,
+                         glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_down / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                         glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_down / 2, m_y + idx_right / 2, m_x + idx_down / 2, m_y + idx_left / 2,
+                         glow_eDrawType_Line, 0, 0);
       }
     }
-  } else if (lw_left != -1 && lw_right != -1 && lw_up != -1 && lw_down == -1) {
+  }
+  else if (lw_left != -1 && lw_right != -1 && lw_up != -1 && lw_down == -1)
+  {
     // Left right up threeway
-    ctx->gdraw->fill_rect(
-        w, m_x - idx_up + idx_up / 2, m_y, idx_up + 1, ur_y - m_y, drawtype);
-    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2,
-        m_x + idx_up / 2 - ll_x, idx_left + 1, drawtype);
-    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2,
-        m_y - idx_right + idx_right / 2, ur_x - (m_x - idx_up + idx_up / 2),
-        idx_right + 1, drawtype);
-    if (shadow && (idx_left > 2 || idx_right > 2 || idx_up > 2)) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2, m_y, idx_up + 1, ur_y - m_y, drawtype);
+    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2, m_x + idx_up / 2 - ll_x, idx_left + 1,
+                          drawtype);
+    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                          ur_x - (m_x - idx_up + idx_up / 2), idx_right + 1, drawtype);
+    if (shadow && (idx_left > 2 || idx_right > 2 || idx_up > 2))
+    {
+      if (border)
+      {
         idx_left -= 2;
         idx_right -= 2;
         idx_up -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                       shift_drawtype, 0, 0);
       if (idx_right == idx_left)
-        ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, ur_x,
-            m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
-      else if (idx_right > idx_left) {
-        ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2,
-            m_x - idx_up + idx_up / 2, m_y - idx_left + idx_left / 2,
-            shift_drawtype, 0, 0);
-        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, ur_x,
-            m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
-        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x - idx_up + idx_up / 2,
-            m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
-      } else {
-        ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2,
-            m_x + idx_up / 2, m_y - idx_left + idx_left / 2, shift_drawtype, 0,
-            0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_right + idx_right / 2,
-            ur_x, m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_right + idx_right / 2,
-            m_x + idx_up / 2, m_y - idx_left + idx_left / 2, shift_drawtype, 0,
-            0);
+        ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, ur_x, m_y - idx_left + idx_left / 2,
+                         shift_drawtype, 0, 0);
+      else if (idx_right > idx_left)
+      {
+        ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x - idx_up + idx_up / 2,
+                         m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x,
+                         m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                         m_x - idx_up + idx_up / 2, m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+      }
+      else
+      {
+        ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x + idx_up / 2,
+                         m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x,
+                         m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_right + idx_right / 2, m_x + idx_up / 2,
+                         m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2,
-          m_y + idx_left / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, shift_drawtype, 0, 0);
-      if (border) {
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                       shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2, shift_drawtype, 0,
+                       0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y, shift_drawtype, 0,
+                       0);
+      if (border)
+      {
         idx_left += 2;
         idx_right += 2;
         idx_up += 2;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2,
-          m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y, glow_eDrawType_Line,
+                       0, 0);
       if (idx_right == idx_left)
-        ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, ur_x,
-            m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
-      else if (idx_right > idx_left) {
-        ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2,
-            m_x - idx_up + idx_up / 2, m_y - idx_left + idx_left / 2,
-            glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, ur_x,
-            m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x - idx_up + idx_up / 2,
-            m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
-      } else {
-        ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2,
-            m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-            glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_right + idx_right / 2,
-            ur_x, m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_right + idx_right / 2,
-            m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-            glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, ur_x, m_y - idx_left + idx_left / 2,
+                         glow_eDrawType_Line, 0, 0);
+      else if (idx_right > idx_left)
+      {
+        ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x - idx_up + idx_up / 2,
+                         m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x,
+                         m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                         m_x - idx_up + idx_up / 2, m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      }
+      else
+      {
+        ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x + idx_up / 2,
+                         m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x,
+                         m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_right + idx_right / 2, m_x + idx_up / 2,
+                         m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
       }
     }
-  } else if (lw_left != -1 && lw_right == -1 && lw_up != -1 && lw_down != -1) {
+  }
+  else if (lw_left != -1 && lw_right == -1 && lw_up != -1 && lw_down != -1)
+  {
     // Left up down threeway
-    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x,
-        idx_left + 1, drawtype);
-    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2,
-        m_y - idx_left + idx_left / 2, idx_up + 1,
-        ur_y - (m_y - idx_left + idx_left / 2), drawtype);
-    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y + idx_left / 2 - ll_y, drawtype);
-    if (shadow && (idx_left > 2 || idx_down > 2 || idx_up > 2)) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x, idx_left + 1, drawtype);
+    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2, m_y - idx_left + idx_left / 2, idx_up + 1,
+                          ur_y - (m_y - idx_left + idx_left / 2), drawtype);
+    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y + idx_left / 2 - ll_y,
+                          drawtype);
+    if (shadow && (idx_left > 2 || idx_down > 2 || idx_up > 2))
+    {
+      if (border)
+      {
         idx_left -= 2;
         idx_down -= 2;
         idx_up -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                       shift_drawtype, 0, 0);
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2,
-          m_y + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                       shift_drawtype, 0, 0);
 
       if (idx_up == idx_down)
-        ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, ur_y,
-            shift_drawtype, 0, 0);
-      else if (idx_down > idx_up) {
-        ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-            m_y + idx_left / 2, shift_drawtype, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_left / 2,
-            m_x + idx_up / 2, ur_y, shift_drawtype, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_left / 2,
-            m_x + idx_down / 2, m_y + idx_left / 2, shift_drawtype, 0, 0);
-      } else {
-        ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-            m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-            m_x + idx_up / 2, ur_y, shift_drawtype, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-            m_x + idx_down / 2, m_y - idx_left + idx_left / 2, shift_drawtype,
-            0, 0);
+        ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, ur_y, shift_drawtype, 0, 0);
+      else if (idx_down > idx_up)
+      {
+        ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y + idx_left / 2, shift_drawtype,
+                         0, 0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_left / 2, m_x + idx_up / 2, ur_y, shift_drawtype, 0,
+                         0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_left / 2, m_x + idx_down / 2, m_y + idx_left / 2,
+                         shift_drawtype, 0, 0);
       }
-      if (border) {
+      else
+      {
+        ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_left + idx_left / 2,
+                         shift_drawtype, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_left + idx_left / 2, m_x + idx_up / 2, ur_y,
+                         shift_drawtype, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_left + idx_left / 2, m_x + idx_down / 2,
+                         m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+      }
+      if (border)
+      {
         idx_left += 2;
         idx_down += 2;
         idx_up += 2;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2,
-          m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                       glow_eDrawType_Line, 0, 0);
 
       if (idx_up == idx_down)
-        ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, ur_y,
-            glow_eDrawType_Line, 0, 0);
-      else if (idx_down > idx_up) {
-        ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-            m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_left / 2,
-            m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_left / 2,
-            m_x + idx_down / 2, m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
-      } else {
-        ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-            m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-            m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-            m_x + idx_down / 2, m_y - idx_left + idx_left / 2,
-            glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, ur_y, glow_eDrawType_Line, 0, 0);
+      else if (idx_down > idx_up)
+      {
+        ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y + idx_left / 2,
+                         glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_left / 2, m_x + idx_up / 2, ur_y, glow_eDrawType_Line,
+                         0, 0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_left / 2, m_x + idx_down / 2, m_y + idx_left / 2,
+                         glow_eDrawType_Line, 0, 0);
+      }
+      else
+      {
+        ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_left + idx_left / 2,
+                         glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_left + idx_left / 2, m_x + idx_up / 2, ur_y,
+                         glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x + idx_up / 2, m_y - idx_left + idx_left / 2, m_x + idx_down / 2,
+                         m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
       }
     }
-  } else if (lw_left == -1 && lw_right != -1 && lw_up != -1 && lw_down != -1) {
+  }
+  else if (lw_left == -1 && lw_right != -1 && lw_up != -1 && lw_down != -1)
+  {
     // Right up down threeway
-    ctx->gdraw->fill_rect(w, m_x, m_y - idx_right + idx_right / 2, ur_x - m_x,
-        idx_right + 1, drawtype);
-    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2,
-        m_y - idx_right + idx_right / 2, idx_up + 1,
-        ur_y - (m_y - idx_right + idx_right / 2), drawtype);
-    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y + idx_right / 2 - ll_y, drawtype);
-    if (shadow && (idx_right > 2 || idx_down > 2 || idx_up > 2)) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, m_x, m_y - idx_right + idx_right / 2, ur_x - m_x, idx_right + 1, drawtype);
+    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2, idx_up + 1,
+                          ur_y - (m_y - idx_right + idx_right / 2), drawtype);
+    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y + idx_right / 2 - ll_y,
+                          drawtype);
+    if (shadow && (idx_right > 2 || idx_down > 2 || idx_up > 2))
+    {
+      if (border)
+      {
         idx_right -= 2;
         idx_down -= 2;
         idx_up -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
-          ur_x, m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                       m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
 
       if (idx_up == idx_down)
-        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-            m_x - idx_down + idx_down / 2, ur_y, shift_drawtype, 0, 0);
-      else if (idx_down > idx_up) {
-        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-            m_x - idx_down + idx_down / 2, m_y + idx_right / 2, shift_drawtype,
-            0, 0);
-        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_right / 2,
-            m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2, ur_y,
+                         shift_drawtype, 0, 0);
+      else if (idx_down > idx_up)
+      {
+        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                         m_y + idx_right / 2, shift_drawtype, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_right / 2, m_x - idx_up + idx_up / 2, ur_y,
+                         shift_drawtype, 0, 0);
         // ctx->gdraw->line( w, m_x - idx_up + idx_up/2, m_y + idx_right/2, m_x
         // - idx_down + idx_down/2, m_y + idx_right/2, shift_drawtype, 0, 0);
-      } else {
-        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-            m_x - idx_down + idx_down / 2, m_y - idx_right + idx_right / 2,
-            shift_drawtype, 0, 0);
-        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x - idx_up + idx_up / 2, ur_y,
-            shift_drawtype, 0, 0);
-        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x - idx_down + idx_down / 2,
-            m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
+      }
+      else
+      {
+        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                         m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                         m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                         m_x - idx_down + idx_down / 2, m_y - idx_right + idx_right / 2, shift_drawtype, 0,
+                         0);
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, shift_drawtype, 0, 0);
-      if (border) {
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                       shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2, shift_drawtype, 0,
+                       0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y, shift_drawtype, 0,
+                       0);
+      if (border)
+      {
         idx_right += 2;
         idx_down += 2;
         idx_up += 2;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
-          ur_x, m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                       m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y, glow_eDrawType_Line,
+                       0, 0);
 
       if (idx_up == idx_down)
-        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-            m_x - idx_down + idx_down / 2, ur_y, glow_eDrawType_Line, 0, 0);
-      else if (idx_down > idx_up) {
-        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-            m_x - idx_down + idx_down / 2, m_y + idx_right / 2,
-            glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_right / 2,
-            m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_right / 2,
-            m_x - idx_down + idx_down / 2, m_y + idx_right / 2,
-            glow_eDrawType_Line, 0, 0);
-      } else {
-        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-            m_x - idx_down + idx_down / 2, m_y - idx_right + idx_right / 2,
-            glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x - idx_up + idx_up / 2, ur_y,
-            glow_eDrawType_Line, 0, 0);
-        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x - idx_down + idx_down / 2,
-            m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2, ur_y,
+                         glow_eDrawType_Line, 0, 0);
+      else if (idx_down > idx_up)
+      {
+        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                         m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_right / 2, m_x - idx_up + idx_up / 2, ur_y,
+                         glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_right / 2, m_x - idx_down + idx_down / 2,
+                         m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
+      }
+      else
+      {
+        ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                         m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                         m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
+        ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                         m_x - idx_down + idx_down / 2, m_y - idx_right + idx_right / 2, glow_eDrawType_Line,
+                         0, 0);
       }
     }
-  } else if (lw_left != -1 && lw_right != -1 && lw_up != -1 && lw_down != -1) {
+  }
+  else if (lw_left != -1 && lw_right != -1 && lw_up != -1 && lw_down != -1)
+  {
     // Right left up down fourway
-    ctx->gdraw->fill_rect(w, m_x, m_y - idx_right + idx_right / 2, ur_x - m_x,
-        idx_right + 1, drawtype);
-    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x,
-        idx_left + 1, drawtype);
-    ctx->gdraw->fill_rect(
-        w, m_x - idx_up + idx_up / 2, m_y, idx_up + 1, ur_y - m_y, drawtype);
-    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y - ll_y, drawtype);
-    if (shadow
-        && (idx_left > 2 || idx_right > 2 || idx_down > 2 || idx_up > 2)) {
-      if (border) {
+    ctx->gdraw->fill_rect(w, m_x, m_y - idx_right + idx_right / 2, ur_x - m_x, idx_right + 1, drawtype);
+    ctx->gdraw->fill_rect(w, ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x, idx_left + 1, drawtype);
+    ctx->gdraw->fill_rect(w, m_x - idx_up + idx_up / 2, m_y, idx_up + 1, ur_y - m_y, drawtype);
+    ctx->gdraw->fill_rect(w, m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y - ll_y, drawtype);
+    if (shadow && (idx_left > 2 || idx_right > 2 || idx_down > 2 || idx_up > 2))
+    {
+      if (border)
+      {
         idx_right -= 2;
         idx_left -= 2;
         idx_down -= 2;
         idx_up -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
-          ur_x, m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                       m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                       shift_drawtype, 0, 0);
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2,
-          m_y + idx_left / 2, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, shift_drawtype, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, 0);
-      if (border) {
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2, shift_drawtype, 0,
+                       0);
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                       shift_drawtype, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y, shift_drawtype, 0,
+                       0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                       shift_drawtype, 0, 0);
+      if (border)
+      {
         idx_right += 2;
         idx_left += 2;
         idx_down += 2;
         idx_up += 2;
       }
     }
-    if (border) {
-      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
-          ur_x, m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2,
-          m_y + idx_left / 2, glow_eDrawType_Line, 0, 0);
-      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, 0);
+    if (border)
+    {
+      ctx->gdraw->line(w, m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                       m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y, glow_eDrawType_Line,
+                       0, 0);
+      ctx->gdraw->line(w, ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                       m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                       glow_eDrawType_Line, 0, 0);
+      ctx->gdraw->line(w, m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                       glow_eDrawType_Line, 0, 0);
     }
-  } else {
+  }
+  else
+  {
     ctx->gdraw->line(w, m_x, ll_y, m_x, m_y, drawtype, idx, 0);
     ctx->gdraw->line(w, m_x, m_y, m_x, ur_y, drawtype, idx, 0);
     ctx->gdraw->line(w, ll_x, m_y, m_x, m_y, drawtype, idx, 0);
@@ -1212,16 +1254,14 @@ void GrowConGlue::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
 void GrowConGlue::draw()
 {
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
 void GrowConGlue::align(double x, double y, glow_eAlignDirection direction)
@@ -1230,7 +1270,8 @@ void GrowConGlue::align(double x, double y, glow_eAlignDirection direction)
 
   ctx->set_defered_redraw();
   draw();
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eAlignDirection_CenterVert:
     dx = x - (x_right + x_left) / 2;
     dy = 0;
@@ -1270,25 +1311,26 @@ void GrowConGlue::align(double x, double y, glow_eAlignDirection direction)
   ctx->redraw_defered();
 }
 
-void GrowConGlue::export_javabean(GlowTransform* t, void* node,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, int in_nc,
-    std::ofstream& fp)
+void GrowConGlue::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
+                                  int node_cnt, int in_nc, std::ofstream& fp)
 {
   double x1, y1, x2, y2;
   double ll_x, ll_y, ur_x, ur_y, m_x, m_y;
   glow_eDrawType drawtype, shift_drawtype;
   int idx_up, idx_down, idx_left, idx_right;
 
-  int idx
-      = int(ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * line_width - 1);
+  int idx = int(ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * line_width - 1);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
 
-  if (!t) {
+  if (!t)
+  {
     x1 = x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y2 = y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
-  } else {
+  }
+  else
+  {
     x1 = t->x(x_left, y_low) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = t->y(x_left, y_low) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = t->x(x_right, y_high) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
@@ -1302,8 +1344,7 @@ void GrowConGlue::export_javabean(GlowTransform* t, void* node,
   m_x = int((x1 + x2) / 2 + 0.5);
   m_y = int((y1 + y2) / 2 + 0.5);
 
-  drawtype = ctx->get_drawtype(
-      draw_type, glow_eDrawType_LineHighlight, highlight, 0, 0);
+  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight, 0, 0);
 
   int lw_up, lw_down, lw_left, lw_right;
 
@@ -1314,14 +1355,11 @@ void GrowConGlue::export_javabean(GlowTransform* t, void* node,
 
   idx_up = int(ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * lw_up - 1);
   idx_up += hot;
-  idx_down
-      = int(ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * lw_down - 1);
+  idx_down = int(ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * lw_down - 1);
   idx_down += hot;
-  idx_left
-      = int(ctx->mw.zoom_factor_x / ctx->mw.base_zoom_factor * lw_left - 1);
+  idx_left = int(ctx->mw.zoom_factor_x / ctx->mw.base_zoom_factor * lw_left - 1);
   idx_left += hot;
-  idx_right
-      = int(ctx->mw.zoom_factor_x / ctx->mw.base_zoom_factor * lw_right - 1);
+  idx_right = int(ctx->mw.zoom_factor_x / ctx->mw.base_zoom_factor * lw_right - 1);
   idx_right += hot;
 
   idx = MAX(0, idx);
@@ -1335,1143 +1373,1132 @@ void GrowConGlue::export_javabean(GlowTransform* t, void* node,
   idx_right = MAX(0, idx_right);
   idx_right = MIN(idx_right, DRAW_TYPE_SIZE - 1);
 
-  if (lw_up != -1 && lw_down == -1 && lw_right == -1 && lw_left == -1) {
+  if (lw_up != -1 && lw_down == -1 && lw_right == -1 && lw_left == -1)
+  {
     // Up termination
-    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y, idx_up + 1,
-        ur_y - m_y, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y, idx_up + 1, ur_y - m_y, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_up -= 2;
         m_y++;
       }
 
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y, shift_drawtype, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y,
-          m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y, m_x - idx_up + idx_up / 2, ur_y, shift_drawtype,
+                              0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y, m_x + idx_up / 2,
-          m_y, shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y, m_x + idx_up / 2, m_y, shift_drawtype, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
 
-      if (border) {
+      if (border)
+      {
         idx_up += 2;
         m_y--;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y,
-          m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y, m_x - idx_up + idx_up / 2, ur_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y, m_x + idx_up / 2,
-          m_y, glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y, m_x + idx_up / 2, m_y, glow_eDrawType_Line, 0,
+                              pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
     }
-  } else if (lw_up == -1 && lw_down != -1 && lw_right == -1 && lw_left == -1) {
+  }
+  else if (lw_up == -1 && lw_down != -1 && lw_right == -1 && lw_left == -1)
+  {
     // Down termination
-    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y - ll_y, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y - ll_y, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_down -= 2;
         m_y--;
       }
 
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y, shift_drawtype, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, m_y,
-          m_x + idx_down / 2, m_y, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, m_y, m_x + idx_down / 2, m_y, shift_drawtype, 0,
+                              pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y, shift_drawtype, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2, m_y,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
 
-      if (border) {
+      if (border)
+      {
         idx_down += 2;
         m_y++;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2, m_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y, glow_eDrawType_Line, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, m_y,
-          m_x + idx_down / 2, m_y, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, m_y, m_x + idx_down / 2, m_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
     }
-  } else if (lw_up == -1 && lw_down == -1 && lw_right != -1 && lw_left == -1) {
+  }
+  else if (lw_up == -1 && lw_down == -1 && lw_right != -1 && lw_left == -1)
+  {
     // Right termination
-    ctx->export_jbean->rect(m_x, m_y - idx_right + idx_right / 2, ur_x - m_x,
-        idx_right + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(m_x, m_y - idx_right + idx_right / 2, ur_x - m_x, idx_right + 1, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_right -= 2;
         m_x++;
       }
 
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(m_x, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x, m_y + idx_right / 2, ur_x, m_y + idx_right / 2, shift_drawtype, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, ur_x, m_y - idx_right + idx_right / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, m_x,
-          m_y + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, m_x, m_y + idx_right / 2, shift_drawtype,
+                              0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
 
-      if (border) {
+      if (border)
+      {
         idx_right += 2;
         m_x--;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, ur_x, m_y - idx_right + idx_right / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x, m_y + idx_right / 2, ur_x, m_y + idx_right / 2, glow_eDrawType_Line, 0,
+                              pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, m_x,
-          m_y + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, m_x, m_y + idx_right / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
     }
-  } else if (lw_up == -1 && lw_down == -1 && lw_right == -1 && lw_left != -1) {
+  }
+  else if (lw_up == -1 && lw_down == -1 && lw_right == -1 && lw_left != -1)
+  {
     // Left termination
-    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x,
-        idx_left + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x, idx_left + 1, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_left -= 2;
         m_x--;
       }
 
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2, shift_drawtype, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x, m_y - idx_left + idx_left / 2, m_x,
-          m_y + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x, m_y - idx_left + idx_left / 2, m_x, m_y + idx_left / 2, shift_drawtype, 0,
+                              pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x,
-          m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x, m_y - idx_left + idx_left / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
 
-      if (border) {
+      if (border)
+      {
         idx_left += 2;
         m_x++;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x,
-          m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x, m_y - idx_left + idx_left / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2, glow_eDrawType_Line, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x, m_y - idx_left + idx_left / 2, m_x,
-          m_y + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x, m_y - idx_left + idx_left / 2, m_x, m_y + idx_left / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
     }
-  } else if (lw_up != -1 && lw_down != -1 && lw_right == -1 && lw_left == -1) {
+  }
+  else if (lw_up != -1 && lw_down != -1 && lw_right == -1 && lw_left == -1)
+  {
     // Vertical glue
-    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y, idx_up + 1,
-        ur_y - m_y, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y - ll_y, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
+    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y, idx_up + 1, ur_y - m_y, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y - ll_y, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
 
-    if (shadow) {
-      if (border) {
+    if (shadow)
+    {
+      if (border)
+      {
         idx_up -= 2;
         idx_down -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y, shift_drawtype, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2, m_y,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y,
-          m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y, m_x - idx_up + idx_up / 2, ur_y, shift_drawtype,
+                              0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y, shift_drawtype, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y, shift_drawtype, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (border) {
+      if (border)
+      {
         idx_up += 2;
         idx_down += 2;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2, m_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y, glow_eDrawType_Line, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y,
-          m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y, m_x - idx_up + idx_up / 2, ur_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y, m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (idx_down != idx_up) {
-        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y,
-            m_x - idx_down + idx_down / 2, m_y, glow_eDrawType_Line, 0, pass,
-            shape_cnt, node_cnt, fp);
+      if (idx_down != idx_up)
+      {
+        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y, m_x - idx_down + idx_down / 2, m_y,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2, m_y, m_x + idx_down / 2, m_y,
-            glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y, m_x + idx_down / 2, m_y, glow_eDrawType_Line, 0, pass,
+                                shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
       }
     }
-  } else if (lw_left != -1 && lw_right != -1 && lw_up == -1 && lw_down == -1) {
+  }
+  else if (lw_left != -1 && lw_right != -1 && lw_up == -1 && lw_down == -1)
+  {
     // Horizontal glue
-    ctx->export_jbean->rect(m_x, m_y - idx_right + idx_right / 2, ur_x - m_x,
-        idx_right + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x,
-        idx_left + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(m_x, m_y - idx_right + idx_right / 2, ur_x - m_x, idx_right + 1, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x, idx_left + 1, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_left -= 2;
         idx_right -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x,
-          m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x, m_y - idx_left + idx_left / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, ur_x, m_y - idx_right + idx_right / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2, shift_drawtype, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x, m_y + idx_right / 2, ur_x, m_y + idx_right / 2, shift_drawtype, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (border) {
+      if (border)
+      {
         idx_left += 2;
         idx_right += 2;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x,
-          m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x, m_y - idx_left + idx_left / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x, m_y + idx_left / 2, glow_eDrawType_Line, 0, pass,
+                              shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, ur_x, m_y - idx_right + idx_right / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x, m_y + idx_right / 2, ur_x, m_y + idx_right / 2, glow_eDrawType_Line, 0,
+                              pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (idx_left != idx_right) {
-        ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, m_x,
-            m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass,
-            shape_cnt, node_cnt, fp);
+      if (idx_left != idx_right)
+      {
+        ctx->export_jbean->line(m_x, m_y - idx_right + idx_right / 2, m_x, m_y - idx_left + idx_left / 2,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x, m_y + idx_right / 2, m_x,
-            m_y + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-            node_cnt, fp);
+        ctx->export_jbean->line(m_x, m_y + idx_right / 2, m_x, m_y + idx_left / 2, glow_eDrawType_Line, 0,
+                                pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
       }
     }
-  } else if (lw_left != -1 && lw_right == -1 && lw_up != -1 && lw_down == -1) {
+  }
+  else if (lw_left != -1 && lw_right == -1 && lw_up != -1 && lw_down == -1)
+  {
     // Left up corner
-    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-        idx_up + 1, ur_y - (m_y + idx_left / 2), 1, 0, drawtype,
-        glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
-        shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2,
-        m_x + idx_up / 2 - ll_x + 1, idx_left + 1, 1, 0, drawtype,
-        glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
-        shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y + idx_left / 2, idx_up + 1,
+                            ur_y - (m_y + idx_left / 2), 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
+                            glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
+    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2, m_x + idx_up / 2 - ll_x + 1, idx_left + 1, 1,
+                            0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
+                            shape_cnt, node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_left -= 2;
         idx_up -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-          m_x + idx_up / 2, m_y - idx_left + idx_left / 2, shift_drawtype, 0,
-          pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x + idx_up / 2,
+                              m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, m_y + idx_left / 2, shift_drawtype, 0,
-          pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-          m_x + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_left + idx_left / 2, m_x + idx_up / 2, ur_y,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (border) {
+      if (border)
+      {
         idx_left += 2;
         idx_up += 2;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-          m_x + idx_up / 2, m_y - idx_left + idx_left / 2, glow_eDrawType_Line,
-          0, pass, shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x + idx_up / 2,
+                              m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, m_y + idx_left / 2, glow_eDrawType_Line, 0,
-          pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-          m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_left + idx_left / 2, m_x + idx_up / 2, ur_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
     }
-  } else if (lw_left == -1 && lw_right != -1 && lw_up != -1 && lw_down == -1) {
+  }
+  else if (lw_left == -1 && lw_right != -1 && lw_up != -1 && lw_down == -1)
+  {
     // Right up corner
-    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2,
-        m_y - idx_right + idx_right / 2, idx_up + 1,
-        ur_y - (m_y - idx_right + idx_right / 2), 1, 0, drawtype,
-        glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
-        shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(m_x + idx_up / 2, m_y - idx_right + idx_right / 2,
-        ur_x - (m_x + idx_up / 2), idx_right + 1, 1, 0, drawtype,
-        glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
-        shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2, idx_up + 1,
+                            ur_y - (m_y - idx_right + idx_right / 2), 1, 0, drawtype, glow_eDrawType_No, 0, 0,
+                            0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
+    ctx->export_jbean->rect(m_x + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x - (m_x + idx_up / 2),
+                            idx_right + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
+                            glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_right -= 2;
         idx_up -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2,
-          m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x,
+                              m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2,
-          m_y - idx_right + idx_right / 2, m_x - idx_up + idx_up / 2, ur_y,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                              m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y, shift_drawtype,
+                              0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (border) {
+      if (border)
+      {
         idx_right += 2;
         idx_up += 2;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2,
-          m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x,
+                              m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2,
-          m_y - idx_right + idx_right / 2, m_x - idx_up + idx_up / 2, ur_y,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                              m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
     }
-  } else if (lw_left == -1 && lw_right != -1 && lw_up == -1 && lw_down != -1) {
+  }
+  else if (lw_left == -1 && lw_right != -1 && lw_up == -1 && lw_down != -1)
+  {
     // Right down corner
     ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y - idx_right + idx_right / 2 - ll_y, 1, 0, drawtype,
-        glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
-        shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2,
-        m_y - idx_right + idx_right / 2, ur_x - (m_x - idx_down + idx_down / 2),
-        idx_right + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+                            m_y - idx_right + idx_right / 2 - ll_y, 1, 0, drawtype, glow_eDrawType_No, 0, 0,
+                            0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
+    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, m_y - idx_right + idx_right / 2,
+                            ur_x - (m_x - idx_down + idx_down / 2), idx_right + 1, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_right -= 2;
         idx_down -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                              m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y + idx_right / 2, shift_drawtype, 0,
-          pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                              m_y + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2,
-          m_y + idx_right / 2, ur_x, m_y + idx_right / 2, shift_drawtype, 0,
-          pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (border) {
+      if (border)
+      {
         idx_right += 2;
         idx_down += 2;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2,
-          m_y + idx_right / 2, ur_x, m_y + idx_right / 2, glow_eDrawType_Line,
-          0, pass, shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                              m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y + idx_right / 2,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                              m_y + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
     }
-  } else if (lw_left != -1 && lw_right == -1 && lw_up == -1 && lw_down != -1) {
+  }
+  else if (lw_left != -1 && lw_right == -1 && lw_up == -1 && lw_down != -1)
+  {
     // Left down corner
-    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y + idx_left / 2 - ll_y + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0,
-        0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2,
-        m_x - idx_down + idx_down / 2 - ll_x, idx_left + 1, 1, 0, drawtype,
-        glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
-        shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y + idx_left / 2 - ll_y + 1,
+                            1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
+                            shape_cnt, node_cnt, fp);
+    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2 - ll_x,
+                            idx_left + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No,
+                            0, 0, pass, shape_cnt, node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_left -= 2;
         idx_down -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x + idx_down / 2,
-          m_y + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x + idx_down / 2, m_y + idx_left / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y + idx_left / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (border) {
+      if (border)
+      {
         idx_left += 2;
         idx_down += 2;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x + idx_down / 2,
-          m_y + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x + idx_down / 2, m_y + idx_left / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y + idx_left / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
     }
-  } else if (lw_left != -1 && lw_right != -1 && lw_up == -1 && lw_down != -1) {
+  }
+  else if (lw_left != -1 && lw_right != -1 && lw_up == -1 && lw_down != -1)
+  {
     // Left right down threeway
-    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y - ll_y + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2,
-        m_x + idx_down / 2 - ll_x, idx_left + 1, 1, 0, drawtype,
-        glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
-        shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2,
-        m_y - idx_right + idx_right / 2, ur_x - (m_x - idx_down + idx_down / 2),
-        idx_right + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y - ll_y + 1, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2, m_x + idx_down / 2 - ll_x, idx_left + 1, 1,
+                            0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
+                            shape_cnt, node_cnt, fp);
+    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, m_y - idx_right + idx_right / 2,
+                            ur_x - (m_x - idx_down + idx_down / 2), idx_right + 1, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_left -= 2;
         idx_right -= 2;
         idx_down -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                              m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (idx_right == idx_left) {
-        ctx->export_jbean->line(ll_x, m_y + idx_left / 2, ur_x,
-            m_y + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-            fp);
-        (*shape_cnt)++;
-      } else if (idx_right > idx_left) {
-        ctx->export_jbean->line(ll_x, m_y + idx_left / 2,
-            m_x - idx_down + idx_down / 2, m_y + idx_left / 2, shift_drawtype,
-            0, pass, shape_cnt, node_cnt, fp);
-        (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_down + idx_down / 2,
-            m_y + idx_right / 2, ur_x, m_y + idx_right / 2, shift_drawtype, 0,
-            pass, shape_cnt, node_cnt, fp);
-        (*shape_cnt)++;
-      } else {
-        ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x + idx_down / 2,
-            m_y + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-            fp);
-        (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_down / 2, m_y + idx_right / 2, ur_x,
-            m_y + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-            fp);
+      if (idx_right == idx_left)
+      {
+        ctx->export_jbean->line(ll_x, m_y + idx_left / 2, ur_x, m_y + idx_left / 2, shift_drawtype, 0, pass,
+                                shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
       }
-      if (border) {
+      else if (idx_right > idx_left)
+      {
+        ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x - idx_down + idx_down / 2, m_y + idx_left / 2,
+                                shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+        (*shape_cnt)++;
+        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                                shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+        (*shape_cnt)++;
+      }
+      else
+      {
+        ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x + idx_down / 2, m_y + idx_left / 2,
+                                shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+        (*shape_cnt)++;
+        ctx->export_jbean->line(m_x + idx_down / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                                shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+        (*shape_cnt)++;
+      }
+      if (border)
+      {
         idx_left += 2;
         idx_right += 2;
         idx_down += 2;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                              m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (idx_right == idx_left) {
-        ctx->export_jbean->line(ll_x, m_y + idx_left / 2, ur_x,
-            m_y + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-            node_cnt, fp);
+      if (idx_right == idx_left)
+      {
+        ctx->export_jbean->line(ll_x, m_y + idx_left / 2, ur_x, m_y + idx_left / 2, glow_eDrawType_Line, 0,
+                                pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-      } else if (idx_right > idx_left) {
-        ctx->export_jbean->line(ll_x, m_y + idx_left / 2,
-            m_x - idx_down + idx_down / 2, m_y + idx_left / 2,
-            glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      }
+      else if (idx_right > idx_left)
+      {
+        ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x - idx_down + idx_down / 2, m_y + idx_left / 2,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_down + idx_down / 2,
-            m_y + idx_right / 2, ur_x, m_y + idx_right / 2, glow_eDrawType_Line,
-            0, pass, shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_down + idx_down / 2,
-            m_y + idx_right / 2, m_x - idx_down + idx_down / 2,
-            m_y + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-            node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, m_y + idx_right / 2,
+                                m_x - idx_down + idx_down / 2, m_y + idx_left / 2, glow_eDrawType_Line, 0,
+                                pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-      } else {
-        ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x + idx_down / 2,
-            m_y + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-            node_cnt, fp);
+      }
+      else
+      {
+        ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x + idx_down / 2, m_y + idx_left / 2,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_down / 2, m_y + idx_right / 2, ur_x,
-            m_y + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-            node_cnt, fp);
+        ctx->export_jbean->line(m_x + idx_down / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_down / 2, m_y + idx_right / 2,
-            m_x + idx_down / 2, m_y + idx_left / 2, glow_eDrawType_Line, 0,
-            pass, shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x + idx_down / 2, m_y + idx_right / 2, m_x + idx_down / 2,
+                                m_y + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
       }
     }
-  } else if (lw_left != -1 && lw_right != -1 && lw_up != -1 && lw_down == -1) {
+  }
+  else if (lw_left != -1 && lw_right != -1 && lw_up != -1 && lw_down == -1)
+  {
     // Left right up threeway
-    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y, idx_up + 1,
-        ur_y - m_y, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2,
-        m_x + idx_up / 2 - ll_x, idx_left + 1, 1, 0, drawtype,
-        glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
-        shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2,
-        m_y - idx_right + idx_right / 2, ur_x - (m_x - idx_up + idx_up / 2),
-        idx_right + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y, idx_up + 1, ur_y - m_y, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2, m_x + idx_up / 2 - ll_x, idx_left + 1, 1, 0,
+                            drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
+                            shape_cnt, node_cnt, fp);
+    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                            ur_x - (m_x - idx_up + idx_up / 2), idx_right + 1, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_left -= 2;
         idx_right -= 2;
         idx_up -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (idx_right == idx_left) {
-        ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, ur_x,
-            m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt,
-            node_cnt, fp);
+      if (idx_right == idx_left)
+      {
+        ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, ur_x, m_y - idx_left + idx_left / 2,
+                                shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-      } else if (idx_right > idx_left) {
-        ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-            m_x - idx_up + idx_up / 2, m_y - idx_left + idx_left / 2,
-            shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      }
+      else if (idx_right > idx_left)
+      {
+        ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x - idx_up + idx_up / 2,
+                                m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                                fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, ur_x,
-            m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-            node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x,
+                                m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                                fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x - idx_up + idx_up / 2,
-            m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt,
-            node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                                m_x - idx_up + idx_up / 2, m_y - idx_left + idx_left / 2, shift_drawtype, 0,
+                                pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-      } else {
-        ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-            m_x + idx_up / 2, m_y - idx_left + idx_left / 2, shift_drawtype, 0,
-            pass, shape_cnt, node_cnt, fp);
+      }
+      else
+      {
+        ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x + idx_up / 2,
+                                m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                                fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2,
-            m_y - idx_right + idx_right / 2, ur_x,
-            m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-            node_cnt, fp);
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x,
+                                m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                                fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x + idx_up / 2,
-            m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt,
-            node_cnt, fp);
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_right + idx_right / 2, m_x + idx_up / 2,
+                                m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                                fp);
         (*shape_cnt)++;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, m_y + idx_left / 2, shift_drawtype, 0,
-          pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y, shift_drawtype,
+                              0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (border) {
+      if (border)
+      {
         idx_left += 2;
         idx_right += 2;
         idx_up += 2;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, m_y + idx_left / 2, glow_eDrawType_Line, 0,
-          pass, shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (idx_right == idx_left) {
-        ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, ur_x,
-            m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass,
-            shape_cnt, node_cnt, fp);
+      if (idx_right == idx_left)
+      {
+        ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, ur_x, m_y - idx_left + idx_left / 2,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-      } else if (idx_right > idx_left) {
-        ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-            m_x - idx_up + idx_up / 2, m_y - idx_left + idx_left / 2,
-            glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      }
+      else if (idx_right > idx_left)
+      {
+        ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x - idx_up + idx_up / 2,
+                                m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                                node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, ur_x,
-            m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-            shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x,
+                                m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                                node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x - idx_up + idx_up / 2,
-            m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass,
-            shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                                m_x - idx_up + idx_up / 2, m_y - idx_left + idx_left / 2, glow_eDrawType_Line,
+                                0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-      } else {
-        ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-            m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-            glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      }
+      else
+      {
+        ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x + idx_up / 2,
+                                m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                                node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2,
-            m_y - idx_right + idx_right / 2, ur_x,
-            m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-            shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_right + idx_right / 2, ur_x,
+                                m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                                node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x + idx_up / 2,
-            m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass,
-            shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_right + idx_right / 2, m_x + idx_up / 2,
+                                m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                                node_cnt, fp);
         (*shape_cnt)++;
       }
     }
-  } else if (lw_left != -1 && lw_right == -1 && lw_up != -1 && lw_down != -1) {
+  }
+  else if (lw_left != -1 && lw_right == -1 && lw_up != -1 && lw_down != -1)
+  {
     // Left up down threeway
-    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x,
-        idx_left + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2,
-        m_y - idx_left + idx_left / 2, idx_up + 1,
-        ur_y - (m_y - idx_left + idx_left / 2), 1, 0, drawtype,
-        glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
-        shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y + idx_left / 2 - ll_y, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0,
-        0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x, idx_left + 1, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y - idx_left + idx_left / 2, idx_up + 1,
+                            ur_y - (m_y - idx_left + idx_left / 2), 1, 0, drawtype, glow_eDrawType_No, 0, 0,
+                            0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
+    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y + idx_left / 2 - ll_y, 1,
+                            0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
+                            shape_cnt, node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_left -= 2;
         idx_down -= 2;
         idx_up -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, m_y + idx_left / 2, shift_drawtype, 0,
-          pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
 
-      if (idx_up == idx_down) {
-        ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-            ur_y, shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
-        (*shape_cnt)++;
-      } else if (idx_down > idx_up) {
-        ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-            m_y + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-            fp);
-        (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_left / 2,
-            m_x + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt,
-            node_cnt, fp);
-        (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_left / 2,
-            m_x + idx_down / 2, m_y + idx_left / 2, shift_drawtype, 0, pass,
-            shape_cnt, node_cnt, fp);
-        (*shape_cnt)++;
-      } else {
-        ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-            m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt,
-            node_cnt, fp);
-        (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-            m_x + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt,
-            node_cnt, fp);
-        (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-            m_x + idx_down / 2, m_y - idx_left + idx_left / 2, shift_drawtype,
-            0, pass, shape_cnt, node_cnt, fp);
+      if (idx_up == idx_down)
+      {
+        ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, ur_y, shift_drawtype, 0, pass,
+                                shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
       }
-      if (border) {
+      else if (idx_down > idx_up)
+      {
+        ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y + idx_left / 2,
+                                shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+        (*shape_cnt)++;
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_left / 2, m_x + idx_up / 2, ur_y, shift_drawtype,
+                                0, pass, shape_cnt, node_cnt, fp);
+        (*shape_cnt)++;
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_left / 2, m_x + idx_down / 2, m_y + idx_left / 2,
+                                shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+        (*shape_cnt)++;
+      }
+      else
+      {
+        ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_left + idx_left / 2,
+                                shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+        (*shape_cnt)++;
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_left + idx_left / 2, m_x + idx_up / 2, ur_y,
+                                shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+        (*shape_cnt)++;
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_left + idx_left / 2, m_x + idx_down / 2,
+                                m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                                fp);
+        (*shape_cnt)++;
+      }
+      if (border)
+      {
         idx_left += 2;
         idx_down += 2;
         idx_up += 2;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, m_y + idx_left / 2, glow_eDrawType_Line, 0,
-          pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
 
-      if (idx_up == idx_down) {
-        ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-            ur_y, glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      if (idx_up == idx_down)
+      {
+        ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, ur_y, glow_eDrawType_Line, 0,
+                                pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-      } else if (idx_down > idx_up) {
-        ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-            m_y + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-            node_cnt, fp);
+      }
+      else if (idx_down > idx_up)
+      {
+        ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y + idx_left / 2,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_left / 2,
-            m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass, shape_cnt,
-            node_cnt, fp);
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_left / 2, m_x + idx_up / 2, ur_y,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_left / 2,
-            m_x + idx_down / 2, m_y + idx_left / 2, glow_eDrawType_Line, 0,
-            pass, shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_left / 2, m_x + idx_down / 2, m_y + idx_left / 2,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-      } else {
-        ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-            m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass,
-            shape_cnt, node_cnt, fp);
+      }
+      else
+      {
+        ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_left + idx_left / 2,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-            m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass, shape_cnt,
-            node_cnt, fp);
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_left + idx_left / 2, m_x + idx_up / 2, ur_y,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_left + idx_left / 2,
-            m_x + idx_down / 2, m_y - idx_left + idx_left / 2,
-            glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x + idx_up / 2, m_y - idx_left + idx_left / 2, m_x + idx_down / 2,
+                                m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                                node_cnt, fp);
         (*shape_cnt)++;
       }
     }
-  } else if (lw_left == -1 && lw_right != -1 && lw_up != -1 && lw_down != -1) {
+  }
+  else if (lw_left == -1 && lw_right != -1 && lw_up != -1 && lw_down != -1)
+  {
     // Right up down threeway
-    ctx->export_jbean->rect(m_x, m_y - idx_right + idx_right / 2, ur_x - m_x,
-        idx_right + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2,
-        m_y - idx_right + idx_right / 2, idx_up + 1,
-        ur_y - (m_y - idx_right + idx_right / 2), 1, 0, drawtype,
-        glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
-        shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y + idx_right / 2 - ll_y, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0,
-        0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(m_x, m_y - idx_right + idx_right / 2, ur_x - m_x, idx_right + 1, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2, idx_up + 1,
+                            ur_y - (m_y - idx_right + idx_right / 2), 1, 0, drawtype, glow_eDrawType_No, 0, 0,
+                            0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
+    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y + idx_right / 2 - ll_y, 1,
+                            0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass,
+                            shape_cnt, node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_right -= 2;
         idx_down -= 2;
         idx_up -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                              m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
 
-      if (idx_up == idx_down) {
-        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-            m_x - idx_down + idx_down / 2, ur_y, shift_drawtype, 0, pass,
-            shape_cnt, node_cnt, fp);
+      if (idx_up == idx_down)
+      {
+        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2, ur_y,
+                                shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-      } else if (idx_down > idx_up) {
-        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-            m_x - idx_down + idx_down / 2, m_y + idx_right / 2, shift_drawtype,
-            0, pass, shape_cnt, node_cnt, fp);
+      }
+      else if (idx_down > idx_up)
+      {
+        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                                m_y + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_right / 2,
-            m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt,
-            node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_right / 2, m_x - idx_up + idx_up / 2,
+                                ur_y, shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
         // ctx->export_jbean->line(  m_x - idx_up + idx_up/2, m_y + idx_right/2,
         // m_x - idx_down + idx_down/2, m_y + idx_right/2, shift_drawtype, 0,
         // pass, shape_cnt, node_cnt, fp); (*shape_cnt)++;
-      } else {
-        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-            m_x - idx_down + idx_down / 2, m_y - idx_right + idx_right / 2,
-            shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      }
+      else
+      {
+        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                                m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                                fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x - idx_up + idx_up / 2, ur_y,
-            shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                                m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                                fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x - idx_down + idx_down / 2,
-            m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-            node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                                m_x - idx_down + idx_down / 2, m_y - idx_right + idx_right / 2,
+                                shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y, shift_drawtype,
+                              0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (border) {
+      if (border)
+      {
         idx_right += 2;
         idx_down += 2;
         idx_up += 2;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                              m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
 
-      if (idx_up == idx_down) {
-        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-            m_x - idx_down + idx_down / 2, ur_y, glow_eDrawType_Line, 0, pass,
-            shape_cnt, node_cnt, fp);
+      if (idx_up == idx_down)
+      {
+        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2, ur_y,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-      } else if (idx_down > idx_up) {
-        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-            m_x - idx_down + idx_down / 2, m_y + idx_right / 2,
-            glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      }
+      else if (idx_down > idx_up)
+      {
+        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                                m_y + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_right / 2,
-            m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass,
-            shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_right / 2, m_x - idx_up + idx_up / 2,
+                                ur_y, glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_right / 2,
-            m_x - idx_down + idx_down / 2, m_y + idx_right / 2,
-            glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_right / 2, m_x - idx_down + idx_down / 2,
+                                m_y + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
-      } else {
-        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-            m_x - idx_down + idx_down / 2, m_y - idx_right + idx_right / 2,
-            glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      }
+      else
+      {
+        ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                                m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                                node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x - idx_up + idx_up / 2, ur_y,
-            glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                                m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass, shape_cnt,
+                                node_cnt, fp);
         (*shape_cnt)++;
-        ctx->export_jbean->line(m_x - idx_up + idx_up / 2,
-            m_y - idx_right + idx_right / 2, m_x - idx_down + idx_down / 2,
-            m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-            shape_cnt, node_cnt, fp);
+        ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y - idx_right + idx_right / 2,
+                                m_x - idx_down + idx_down / 2, m_y - idx_right + idx_right / 2,
+                                glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
         (*shape_cnt)++;
       }
     }
-  } else if (lw_left != -1 && lw_right != -1 && lw_up != -1 && lw_down != -1) {
+  }
+  else if (lw_left != -1 && lw_right != -1 && lw_up != -1 && lw_down != -1)
+  {
     // Right left up down fourway
-    ctx->export_jbean->rect(m_x, m_y - idx_right + idx_right / 2, ur_x - m_x,
-        idx_right + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x,
-        idx_left + 1, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y, idx_up + 1,
-        ur_y - m_y, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1,
-        m_y - ll_y, 1, 0, drawtype, glow_eDrawType_No, 0, 0, 0, 0, 0,
-        glow_eGradient_No, 0, 0, pass, shape_cnt, node_cnt, fp);
-    if (shadow) {
-      if (border) {
+    ctx->export_jbean->rect(m_x, m_y - idx_right + idx_right / 2, ur_x - m_x, idx_right + 1, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    ctx->export_jbean->rect(ll_x, m_y - idx_left + idx_left / 2, m_x - ll_x, idx_left + 1, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    ctx->export_jbean->rect(m_x - idx_up + idx_up / 2, m_y, idx_up + 1, ur_y - m_y, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    ctx->export_jbean->rect(m_x - idx_down + idx_down / 2, ll_y, idx_down + 1, m_y - ll_y, 1, 0, drawtype,
+                            glow_eDrawType_No, 0, 0, 0, 0, 0, glow_eGradient_No, 0, 0, pass, shape_cnt,
+                            node_cnt, fp);
+    if (shadow)
+    {
+      if (border)
+      {
         idx_right -= 2;
         idx_left -= 2;
         idx_down -= 2;
         idx_up -= 2;
       }
       shift_drawtype = ctx->shift_drawtype(draw_type, -2, 0); // Light
-      ctx->export_jbean->line(m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                              m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
+                              fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
       shift_drawtype = ctx->shift_drawtype(draw_type, 2, 0); // Dark
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, m_y + idx_left / 2, shift_drawtype, 0,
-          pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, shift_drawtype, 0, pass, shape_cnt, node_cnt,
-          fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y, shift_drawtype,
+                              0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, shift_drawtype, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                              shift_drawtype, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      if (border) {
+      if (border)
+      {
         idx_right += 2;
         idx_left += 2;
         idx_down += 2;
         idx_up += 2;
       }
     }
-    if (border) {
-      ctx->export_jbean->line(m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, ur_x,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+    if (border)
+    {
+      ctx->export_jbean->line(m_x + idx_down / 2, m_y - idx_right + idx_right / 2, ur_x,
+                              m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2,
-          m_y - idx_right + idx_right / 2, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_down / 2, ll_y, m_x + idx_down / 2, m_y - idx_right + idx_right / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x,
-          m_y + idx_right / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, ur_x, m_y + idx_right / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2,
-          m_x + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass, shape_cnt,
-          node_cnt, fp);
+      ctx->export_jbean->line(m_x + idx_up / 2, m_y + idx_right / 2, m_x + idx_up / 2, ur_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y - idx_left + idx_left / 2, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y,
-          m_x - idx_down + idx_down / 2, m_y - idx_left + idx_left / 2,
-          glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_down + idx_down / 2, ll_y, m_x - idx_down + idx_down / 2,
+                              m_y - idx_left + idx_left / 2, glow_eDrawType_Line, 0, pass, shape_cnt,
+                              node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(ll_x, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, m_y + idx_left / 2, glow_eDrawType_Line, 0,
-          pass, shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(ll_x, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
-      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2,
-          m_x - idx_up + idx_up / 2, ur_y, glow_eDrawType_Line, 0, pass,
-          shape_cnt, node_cnt, fp);
+      ctx->export_jbean->line(m_x - idx_up + idx_up / 2, m_y + idx_left / 2, m_x - idx_up + idx_up / 2, ur_y,
+                              glow_eDrawType_Line, 0, pass, shape_cnt, node_cnt, fp);
       (*shape_cnt)++;
     }
-  } else {
-    ctx->export_jbean->line(
-        m_x, ll_y, m_x, m_y, drawtype, idx, pass, shape_cnt, node_cnt, fp);
+  }
+  else
+  {
+    ctx->export_jbean->line(m_x, ll_y, m_x, m_y, drawtype, idx, pass, shape_cnt, node_cnt, fp);
     (*shape_cnt)++;
-    ctx->export_jbean->line(
-        m_x, m_y, m_x, ur_y, drawtype, idx, pass, shape_cnt, node_cnt, fp);
+    ctx->export_jbean->line(m_x, m_y, m_x, ur_y, drawtype, idx, pass, shape_cnt, node_cnt, fp);
     (*shape_cnt)++;
-    ctx->export_jbean->line(
-        ll_x, m_y, m_x, m_y, drawtype, idx, pass, shape_cnt, node_cnt, fp);
+    ctx->export_jbean->line(ll_x, m_y, m_x, m_y, drawtype, idx, pass, shape_cnt, node_cnt, fp);
     (*shape_cnt)++;
-    ctx->export_jbean->line(
-        m_x, m_y, ur_x, m_y, drawtype, idx, pass, shape_cnt, node_cnt, fp);
+    ctx->export_jbean->line(m_x, m_y, ur_x, m_y, drawtype, idx, pass, shape_cnt, node_cnt, fp);
     (*shape_cnt)++;
   }
 }
@@ -2486,8 +2513,10 @@ glow_eDirection GrowConGlue::conpoint_to_direction(int point)
 {
   double rotation = (trf.rot() / 360 - floor(trf.rot() / 360)) * 360;
 
-  if (rotation < 45 || rotation > 315) {
-    switch (point) {
+  if (rotation < 45 || rotation > 315)
+  {
+    switch (point)
+    {
     case 0:
       return glow_eDirection_Down;
     case 1:
@@ -2498,8 +2527,11 @@ glow_eDirection GrowConGlue::conpoint_to_direction(int point)
       return glow_eDirection_Left;
     default:;
     }
-  } else if (rotation < 135) {
-    switch (point) {
+  }
+  else if (rotation < 135)
+  {
+    switch (point)
+    {
     default:;
     case 0:
       return glow_eDirection_Right;
@@ -2510,8 +2542,11 @@ glow_eDirection GrowConGlue::conpoint_to_direction(int point)
     case 3:
       return glow_eDirection_Down;
     }
-  } else if (rotation < 225) {
-    switch (point) {
+  }
+  else if (rotation < 225)
+  {
+    switch (point)
+    {
     case 0:
       return glow_eDirection_Up;
     case 1:
@@ -2522,8 +2557,11 @@ glow_eDirection GrowConGlue::conpoint_to_direction(int point)
       return glow_eDirection_Right;
     default:;
     }
-  } else {
-    switch (point) {
+  }
+  else
+  {
+    switch (point)
+    {
     case 0:
       return glow_eDirection_Left;
     case 1:

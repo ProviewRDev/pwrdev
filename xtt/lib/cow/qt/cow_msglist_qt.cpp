@@ -41,11 +41,9 @@
 
 #include "flow_browwidget_qt.h"
 
-MsgListQt::MsgListQt(void* ev_parent_ctx, QWidget** w)
-    : MsgList(ev_parent_ctx)
+MsgListQt::MsgListQt(void* ev_parent_ctx, QWidget** w) : MsgList(ev_parent_ctx)
 {
-  form_widget
-      = scrolledbrowwidgetqt_new(MsgList::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetqt_new(MsgList::init_brow_cb, this, &brow_widget);
 
   // Create the root item
   *w = form_widget;
@@ -57,7 +55,4 @@ MsgListQt::~MsgListQt()
   form_widget->close();
 }
 
-void MsgListQt::set_input_focus()
-{
-  brow_widget->setFocus();
-}
+void MsgListQt::set_input_focus() { brow_widget->setFocus(); }

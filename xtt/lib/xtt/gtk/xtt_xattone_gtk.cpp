@@ -59,10 +59,13 @@ void XAttOneGtk::message(char severity, const char* message)
 
 void XAttOneGtk::set_prompt(char* prompt)
 {
-  if (streq(prompt, "")) {
+  if (streq(prompt, ""))
+  {
     g_object_set(cmd_prompt, "visible", FALSE, NULL);
     g_object_set(msg_label, "visible", TRUE, NULL);
-  } else {
+  }
+  else
+  {
     g_object_set(msg_label, "visible", FALSE, NULL);
     g_object_set(cmd_prompt, "visible", TRUE, NULL);
   }
@@ -75,34 +78,40 @@ int XAttOneGtk::set_value()
   char buff[1024];
   char* textutf8;
 
-  if (input_open) {
-    if (input_multiline) {
+  if (input_open)
+  {
+    if (input_multiline)
+    {
       GtkTextIter start_iter, end_iter;
       gtk_text_buffer_get_start_iter(cmd_scrolled_buffer, &start_iter);
       gtk_text_buffer_get_end_iter(cmd_scrolled_buffer, &end_iter);
 
-      textutf8 = gtk_text_buffer_get_text(
-          cmd_scrolled_buffer, &start_iter, &end_iter, FALSE);
-    } else {
+      textutf8 = gtk_text_buffer_get_text(cmd_scrolled_buffer, &start_iter, &end_iter, FALSE);
+    }
+    else
+    {
       textutf8 = gtk_editable_get_chars(GTK_EDITABLE(cmd_input), 0, -1);
     }
 
     text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
     g_free(textutf8);
 
-    if (!text) {
+    if (!text)
+    {
       message('E', "Input error, invalid character");
       return 0;
     }
 
     sts = XNav::attr_string_to_value(atype, text, buff, sizeof(buff), asize);
     g_free(text);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', "Input syntax error");
       return sts;
     }
     sts = gdh_SetObjectInfoAttrref(&aref, buff, asize);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', "Unable to set value");
       return sts;
     }
@@ -125,7 +134,8 @@ int XAttOneGtk::change_value(int set_focus)
   if (EVEN(sts))
     return sts;
 
-  switch (atype) {
+  switch (atype)
+  {
   case pwr_eType_String:
   case pwr_eType_Text:
     input_size = asize;
@@ -140,16 +150,20 @@ int XAttOneGtk::change_value(int set_focus)
 
   if (atype == pwr_eType_Text)
     value = aval;
-  else {
-    XNav::attrvalue_to_string(
-        atype, atype, &aval, buf, sizeof(buf), &len, NULL, 0);
+  else
+  {
+    XNav::attrvalue_to_string(atype, atype, &aval, buf, sizeof(buf), &len, NULL, 0);
     value = buf;
   }
 
-  if (!access_rw) {
+  if (!access_rw)
+  {
     gtk_label_set_text(GTK_LABEL(cmd_label), buf);
-  } else {
-    if (atype == pwr_eType_Text) {
+  }
+  else
+  {
+    if (atype == pwr_eType_Text)
+    {
       text_w = cmd_scrolledinput;
       g_object_set(cmd_input, "visible", FALSE, NULL);
       g_object_set(cmd_scrolledinput, "visible", TRUE, NULL);
@@ -161,7 +175,8 @@ int XAttOneGtk::change_value(int set_focus)
         gtk_widget_grab_focus(cmd_scrolledtextview);
       input_multiline = 1;
 
-      if (value) {
+      if (value)
+      {
         GtkTextIter start_iter, end_iter;
         gtk_text_buffer_get_start_iter(cmd_scrolled_buffer, &start_iter);
         gtk_text_buffer_get_end_iter(cmd_scrolled_buffer, &end_iter);
@@ -169,13 +184,17 @@ int XAttOneGtk::change_value(int set_focus)
 
         gtk_text_buffer_get_start_iter(cmd_scrolled_buffer, &start_iter);
         gtk_text_buffer_insert(cmd_scrolled_buffer, &start_iter, value, -1);
-      } else {
+      }
+      else
+      {
         GtkTextIter start_iter, end_iter;
         gtk_text_buffer_get_start_iter(cmd_scrolled_buffer, &start_iter);
         gtk_text_buffer_get_end_iter(cmd_scrolled_buffer, &end_iter);
         gtk_text_buffer_delete(cmd_scrolled_buffer, &start_iter, &end_iter);
       }
-    } else {
+    }
+    else
+    {
       text_w = cmd_input;
       g_object_set(cmd_input, "visible", TRUE, NULL);
       g_object_set(cmd_scrolledinput, "visible", FALSE, NULL);
@@ -188,9 +207,9 @@ int XAttOneGtk::change_value(int set_focus)
       gint pos = 0;
       gtk_editable_delete_text(GTK_EDITABLE(cmd_input), 0, -1);
 
-      if (value) {
-        gtk_editable_insert_text(
-            GTK_EDITABLE(text_w), value, strlen(value), &pos);
+      if (value)
+      {
+        gtk_editable_insert_text(GTK_EDITABLE(text_w), value, strlen(value), &pos);
 
         // Select the text
         gtk_editable_set_position(GTK_EDITABLE(cmd_input), -1);
@@ -223,12 +242,12 @@ void XAttOneGtk::activate_help(GtkWidget* w, gpointer data)
   // Not yet implemented
 }
 
-gboolean XAttOneGtk::action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+gboolean XAttOneGtk::action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   XAttOneGtk* xattone = (XAttOneGtk*)data;
 
-  if (xattone->input_open) {
+  if (xattone->input_open)
+  {
     if (xattone->input_multiline)
       gtk_widget_grab_focus(xattone->cmd_scrolledtextview);
     else
@@ -237,15 +256,9 @@ gboolean XAttOneGtk::action_inputfocus(
   return FALSE;
 }
 
-void XAttOneGtk::change_value_close()
-{
-  set_value();
-}
+void XAttOneGtk::change_value_close() { set_value(); }
 
-void XAttOneGtk::activate_cmd_input(GtkWidget* w, gpointer data)
-{
-  activate_cmd_scrolled_ok(w, data);
-}
+void XAttOneGtk::activate_cmd_input(GtkWidget* w, gpointer data) { activate_cmd_scrolled_ok(w, data); }
 
 void XAttOneGtk::activate_cmd_scrolled_ok(GtkWidget* w, gpointer data)
 {
@@ -253,7 +266,8 @@ void XAttOneGtk::activate_cmd_scrolled_ok(GtkWidget* w, gpointer data)
   int sts;
 
   sts = xattone->set_value();
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     if (xattone->close_cb)
       (xattone->close_cb)(xattone->parent_ctx, xattone);
     else
@@ -278,10 +292,7 @@ void XAttOneGtk::activate_cmd_scrolled_ca(GtkWidget* w, gpointer data)
     delete xattone;
 }
 
-void XAttOneGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void XAttOneGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
 XAttOneGtk::~XAttOneGtk()
 {
@@ -295,14 +306,11 @@ static gboolean delete_event(GtkWidget* w, GdkEvent* event, gpointer data)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
-    pwr_sAttrRef* xa_aref, char* xa_title, unsigned int xa_priv, int* xa_sts)
-    : XAttOne(xa_parent_ctx, xa_aref, xa_title, xa_priv, xa_sts),
-      parent_wid(xa_parent_wid)
+XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx, pwr_sAttrRef* xa_aref, char* xa_title,
+                       unsigned int xa_priv, int* xa_sts)
+    : XAttOne(xa_parent_ctx, xa_aref, xa_title, xa_priv, xa_sts), parent_wid(xa_parent_wid)
 {
   pwr_tAName title;
 
@@ -310,30 +318,27 @@ XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   if (EVEN(*xa_sts))
     return;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 200,
-      "default-width", 500, "title", CoWowGtk::convert_utf8(title), NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 200, "default-width", 500, "title",
+                                      CoWowGtk::convert_utf8(title), NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
-  g_signal_connect(
-      toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(action_inputfocus), this);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
   // Menu
   // Accelerators
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File entry
-  GtkWidget* file_close
-      = gtk_menu_item_new_with_mnemonic("_Close");
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_exit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
@@ -343,11 +348,10 @@ XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // Help entry
-  GtkWidget* help_help
-      = gtk_menu_item_new_with_mnemonic("_Help");
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic("_Help");
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'h',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'h', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
@@ -363,7 +367,7 @@ XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   gtk_widget_set_size_request(cmd_prompt, -1, 25);
   cmd_label = gtk_label_new("");
   gtk_widget_set_size_request(cmd_label, -1, 25);
-  //gtk_misc_set_alignment(GTK_MISC(cmd_label), 0.0, 0.5);
+  // gtk_misc_set_alignment(GTK_MISC(cmd_label), 0.0, 0.5);
   cmd_entry = new CoWowEntryGtk(&value_recall);
   cmd_input = cmd_entry->widget();
   gtk_widget_set_size_request(cmd_input, -1, 25);
@@ -384,20 +388,15 @@ XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
   // Buttons
   cmd_scrolled_ok = gtk_button_new_with_label(CoWowGtk::translate_utf8("Ok"));
   gtk_widget_set_size_request(cmd_scrolled_ok, 70, 25);
-  g_signal_connect(
-      cmd_scrolled_ok, "clicked", G_CALLBACK(activate_cmd_scrolled_ok), this);
+  g_signal_connect(cmd_scrolled_ok, "clicked", G_CALLBACK(activate_cmd_scrolled_ok), this);
 
-  cmd_scrolled_ap
-      = gtk_button_new_with_label(CoWowGtk::translate_utf8("Apply"));
+  cmd_scrolled_ap = gtk_button_new_with_label(CoWowGtk::translate_utf8("Apply"));
   gtk_widget_set_size_request(cmd_scrolled_ap, 70, 25);
-  g_signal_connect(
-      cmd_scrolled_ap, "clicked", G_CALLBACK(activate_cmd_scrolled_ap), this);
+  g_signal_connect(cmd_scrolled_ap, "clicked", G_CALLBACK(activate_cmd_scrolled_ap), this);
 
-  cmd_scrolled_ca
-      = gtk_button_new_with_label(CoWowGtk::translate_utf8("Cancel"));
+  cmd_scrolled_ca = gtk_button_new_with_label(CoWowGtk::translate_utf8("Cancel"));
   gtk_widget_set_size_request(cmd_scrolled_ca, 70, 25);
-  g_signal_connect(
-      cmd_scrolled_ca, "clicked", G_CALLBACK(activate_cmd_scrolled_ca), this);
+  g_signal_connect(cmd_scrolled_ca, "clicked", G_CALLBACK(activate_cmd_scrolled_ca), this);
 
   GtkWidget* hboxbuttons = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
   gtk_box_pack_start(GTK_BOX(hboxbuttons), cmd_scrolled_ok, FALSE, FALSE, 0);
@@ -416,8 +415,8 @@ XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
 
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(menu_bar), FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(statusbar), TRUE, TRUE, 0);
-  gtk_box_pack_start(
-      GTK_BOX(vbox), GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_HORIZONTAL)), FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), GTK_WIDGET(gtk_separator_new(GTK_ORIENTATION_HORIZONTAL)), FALSE, FALSE,
+                     0);
   gtk_box_pack_end(GTK_BOX(vbox), hboxbuttons, FALSE, FALSE, 5);
 
   gtk_container_add(GTK_CONTAINER(toplevel), vbox);
@@ -431,7 +430,8 @@ XAttOneGtk::XAttOneGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx,
 
   if (access_rw)
     g_object_set(cmd_label, "visible", FALSE, NULL);
-  else {
+  else
+  {
     g_object_set(cmd_input, "visible", FALSE, NULL);
     g_object_set(cmd_scrolledinput, "visible", FALSE, NULL);
     g_object_set(cmd_scrolled_ok, "visible", FALSE, NULL);

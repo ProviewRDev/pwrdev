@@ -41,16 +41,13 @@
 
 #include "flow_browwidget_qt.h"
 
-void CoXHelpNavQt::pop()
-{
-}
+void CoXHelpNavQt::pop() {}
 
-CoXHelpNavQt::CoXHelpNavQt(void* xn_parent_ctx, char* xn_name,
-    xhelp_eUtility xn_utility, QWidget** w, pwr_tStatus* status)
+CoXHelpNavQt::CoXHelpNavQt(void* xn_parent_ctx, char* xn_name, xhelp_eUtility xn_utility, QWidget** w,
+                           pwr_tStatus* status)
     : CoXHelpNav(xn_parent_ctx, xn_name, xn_utility, status)
 {
-  form_widget = scrolledbrowwidgetqt_new(
-      CoXHelpNav::init_brow_base_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetqt_new(CoXHelpNav::init_brow_base_cb, this, &brow_widget);
 
   displayed = 1;
 
@@ -62,8 +59,10 @@ CoXHelpNavQt::~CoXHelpNavQt()
 {
   closing_down = 1;
 
-  for (int i = 0; i < brow_cnt; i++) {
-    if (i != 0) {
+  for (int i = 0; i < brow_cnt; i++)
+  {
+    if (i != 0)
+    {
       brow_DeleteSecondaryCtx(brow_stack[i]->ctx);
     }
     brow_stack[i]->free_pixmaps();
@@ -73,7 +72,4 @@ CoXHelpNavQt::~CoXHelpNavQt()
   form_widget->close();
 }
 
-void CoXHelpNavQt::set_inputfocus()
-{
-  brow_widget->setFocus();
-}
+void CoXHelpNavQt::set_inputfocus() { brow_widget->setFocus(); }

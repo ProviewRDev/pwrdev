@@ -36,6 +36,4 @@
 
 #include "wb_import.h"
 
-wb_import::~wb_import()
-{
-}
+wb_import::~wb_import() {}

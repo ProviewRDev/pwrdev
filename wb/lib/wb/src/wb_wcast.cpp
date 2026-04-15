@@ -47,8 +47,8 @@
 #include "wb_session.h"
 #include "wb_wcast.h"
 
-WCast::WCast(void* wc_parent_ctx, const char* wc_name,
-    ldh_tSesContext wc_ldhses, pwr_sAttrRef wc_aref, pwr_tStatus* status)
+WCast::WCast(void* wc_parent_ctx, const char* wc_name, ldh_tSesContext wc_ldhses, pwr_sAttrRef wc_aref,
+             pwr_tStatus* status)
     : parent_ctx(wc_parent_ctx), ldhses(wc_ldhses), aref(wc_aref)
 {
   strcpy(name, wc_name);
@@ -56,9 +56,7 @@ WCast::WCast(void* wc_parent_ctx, const char* wc_name,
   *status = 1;
 }
 
-WCast::~WCast()
-{
-}
+WCast::~WCast() {}
 
 pwr_tStatus WCast::open_castlist()
 {
@@ -82,10 +80,12 @@ pwr_tStatus WCast::open_castlist()
   class_vect = (char(*)[80])calloc(cidlist.size() + 1, 80);
 
   class_cnt = 0;
-  for (int i = 0; i < (int)cidlist.size(); i++) {
+  for (int i = 0; i < (int)cidlist.size(); i++)
+  {
     // Check size
     wb_cdef c = sp->cdef(cidlist[i]);
-    if (!c) {
+    if (!c)
+    {
       free(class_vect);
       return c.sts();
     }
@@ -93,9 +93,9 @@ pwr_tStatus WCast::open_castlist()
     if (c.size(pwr_eBix_rt) > a.size())
       continue;
 
-    sts = ldh_ClassIdToName(ldhses, cidlist[i], class_vect[class_cnt++],
-        sizeof(class_vect[0]), &size);
-    if (EVEN(sts)) {
+    sts = ldh_ClassIdToName(ldhses, cidlist[i], class_vect[class_cnt++], sizeof(class_vect[0]), &size);
+    if (EVEN(sts))
+    {
       free(class_vect);
       return sts;
     }
@@ -115,7 +115,8 @@ void WCast::get_subcid(pwr_tCid cid)
   pwr_tStatus sts;
 
   for (sts = ldh_GetSubClass(ldhses, cid, pwr_cNCid, &subcid); ODD(sts);
-       sts = ldh_GetSubClass(ldhses, cid, subcid, &subcid)) {
+       sts = ldh_GetSubClass(ldhses, cid, subcid, &subcid))
+  {
     cidlist.push_back(subcid);
     get_subcid(subcid);
   }
@@ -128,7 +129,8 @@ void WCast::selected_cb(void* ctx, char* text, int ok_pressed)
   pwr_tCid cid;
 
   sts = ldh_ClassNameToId(wcast->ldhses, &cid, text);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     char msg[256];
 
     msg_GetMsg(sts, msg, sizeof(msg));
@@ -136,7 +138,8 @@ void WCast::selected_cb(void* ctx, char* text, int ok_pressed)
   }
 
   sts = ldh_CastAttribute(wcast->ldhses, &wcast->aref, cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     char msg[256];
 
     msg_GetMsg(sts, msg, sizeof(msg));

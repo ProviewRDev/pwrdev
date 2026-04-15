@@ -53,9 +53,7 @@ wb_tdrep* wb_tdrep::ref()
   return this;
 }
 
-wb_tdrep::wb_tdrep() : m_nRef(0), m_orep(0), m_sts(LDH__NOCLASS)
-{
-}
+wb_tdrep::wb_tdrep() : m_nRef(0), m_orep(0), m_sts(LDH__NOCLASS) {}
 
 wb_tdrep::wb_tdrep(wb_mvrep* mvrep, pwr_tTid tid) : m_nRef(0)
 {
@@ -108,17 +106,16 @@ wb_tdrep::wb_tdrep(const wb_adrep& a) : m_nRef(0)
   delete tdrep;
 }
 
-pwr_tTid wb_tdrep::tid()
-{
-  return cdh_TypeObjidToId(m_orep->oid());
-}
+pwr_tTid wb_tdrep::tid() { return cdh_TypeObjidToId(m_orep->oid()); }
 
 void wb_tdrep::init()
 {
   pwr_tStatus sts;
 
-  switch (m_orep->cid()) {
-  case pwr_eClass_TypeDef: {
+  switch (m_orep->cid())
+  {
+  case pwr_eClass_TypeDef:
+  {
     pwr_sTypeDef body;
 
     m_orep->vrep()->readBody(&sts, m_orep, pwr_eBix_sys, (void*)&body);
@@ -129,18 +126,22 @@ void wb_tdrep::init()
     m_type = body.Type;
     m_elements = body.Elements;
     m_typeref = body.TypeRef;
-    if (streq(body.PgmName, "")) {
+    if (streq(body.PgmName, ""))
+    {
       strcpy(m_pgmname, name());
-      if (m_pgmname[0] == '$') {
+      if (m_pgmname[0] == '$')
+      {
         pwr_tObjName tmp;
         strcpy(tmp, &m_pgmname[1]);
         strcpy(m_pgmname, tmp);
       }
-    } else
+    }
+    else
       strcpy(m_pgmname, body.PgmName);
     break;
   }
-  case pwr_eClass_Type: {
+  case pwr_eClass_Type:
+  {
     pwr_sTypeDef body;
 
     m_orep->vrep()->readBody(&sts, m_orep, pwr_eBix_sys, (void*)&body);
@@ -152,7 +153,8 @@ void wb_tdrep::init()
     m_elements = 1;
     m_typeref = (pwr_tTid)body.Type;
     strcpy(m_pgmname, name());
-    if (m_pgmname[0] == '$') {
+    if (m_pgmname[0] == '$')
+    {
       pwr_tObjName tmp;
       strcpy(tmp, &m_pgmname[1]);
       strcpy(m_pgmname, tmp);
@@ -164,22 +166,13 @@ void wb_tdrep::init()
   }
 }
 
-const char* wb_tdrep::name() const
-{
-  return m_orep->name();
-}
+const char* wb_tdrep::name() const { return m_orep->name(); }
 
-wb_name wb_tdrep::longName()
-{
-  return m_orep->longName();
-}
+wb_name wb_tdrep::longName() { return m_orep->longName(); }
 
 bool wb_tdrep::renameType(pwr_tStatus* sts, wb_name& name)
 {
   return m_orep->vrep()->renameObject(sts, m_orep, name);
 }
 
-const char* wb_tdrep::pgmName()
-{
-  return m_pgmname;
-}
+const char* wb_tdrep::pgmName() { return m_pgmname; }

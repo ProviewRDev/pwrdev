@@ -35,22 +35,22 @@
  */
 
 /*************************************************************************
-*
-*                       3 9 6 4 R
-*                       ==========
-**************************************************************************
-*
-* Filename:             remote_3964r_vnet.c
-*
-*                       Date    Pgm.    Read.   Remark
-* Modified
-*
-*
-* Description:          Implements remote transport process 3964R.
-*                       For poll off io and commondata from PSS7000(VNET).
-*
-**************************************************************************
-**************************************************************************/
+ *
+ *                       3 9 6 4 R
+ *                       ==========
+ **************************************************************************
+ *
+ * Filename:             remote_3964r_vnet.c
+ *
+ *                       Date    Pgm.    Read.   Remark
+ * Modified
+ *
+ *
+ * Description:          Implements remote transport process 3964R.
+ *                       For poll off io and commondata from PSS7000(VNET).
+ *
+ **************************************************************************
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 
@@ -63,11 +63,11 @@
 
 #include "rt_gdh.h"
 
-#include "rs_remote_msg.h"
-#include "rs_remote.h"
-#include "rs_remtrans_utils.h"
 #include "rs_remio_utils.h"
+#include "rs_remote.h"
+#include "rs_remote_msg.h"
 #include "rs_remote_rad50.h"
+#include "rs_remtrans_utils.h"
 
 /*_Function prototypes___________________________________________________*/
 
@@ -75,9 +75,10 @@ static void exith(void);
 static void DeclareExitHandler(void);
 static unsigned int InitTimers(void);
 static unsigned int InitNet(void);
-static unsigned int remnode_send(remnode_item* remnode,
-    pwr_sClass_RemTrans* remtrans, char* buf, int buf_size);
-static unsigned int send_it(char* buf, int buf_size);
+static unsigned int remnode_send(remnode_item *remnode,
+                                 pwr_sClass_RemTrans *remtrans, char *buf,
+                                 int buf_size);
+static unsigned int send_it(char *buf, int buf_size);
 static unsigned int Receive();
 static unsigned int ReceiveHandler();
 
@@ -107,7 +108,7 @@ unsigned int ef_mask;
  * Variables common for VMS and ELN
  */
 remnode_item remnode_struct;
-remnode_item* remnode = &remnode_struct;
+remnode_item *remnode = &remnode_struct;
 
 /*************************************************************************
 **************************************************************************
@@ -123,10 +124,7 @@ remnode_item* remnode = &remnode_struct;
 **************************************************************************
 **************************************************************************/
 
-static void exith(void)
-{
-  return;
-}
+static void exith(void) { return; }
 
 /*************************************************************************
 **************************************************************************
@@ -143,10 +141,7 @@ static void exith(void)
 **************************************************************************
 **************************************************************************/
 
-static void DeclareExitHandler(void)
-{
-  atexit(exith);
-}
+static void DeclareExitHandler(void) { atexit(exith); }
 
 /************************************************************************
 **************************************************************************
@@ -162,27 +157,26 @@ static void DeclareExitHandler(void)
 **************************************************************************
 **************************************************************************/
 
-static unsigned int InitTimers(void)
-{
+static unsigned int InitTimers(void) {
   unsigned int sts;
   unsigned int time_function_code = LIB$K_DELTA_SECONDS_F;
   float max_acknowledge_delay = 2.0;
   float max_char_delay = 0.22;
 
   /* Konvertera cykeltiden till intern deltatid */
-  sts = lib$cvtf_to_internal_time(
-      &time_function_code, &remnode->objp->CycleTime, &timeout_cycle);
+  sts = lib$cvtf_to_internal_time(&time_function_code,
+                                  &remnode->objp->CycleTime, &timeout_cycle);
 
   if (ODD(sts)) {
     /* Set timeout for response character from receiver */
-    sts = lib$cvtf_to_internal_time(
-        &time_function_code, &max_acknowledge_delay, &timeout_ack);
+    sts = lib$cvtf_to_internal_time(&time_function_code, &max_acknowledge_delay,
+                                    &timeout_ack);
   }
 
   if (ODD(sts)) {
     /* Set timeout for max delay between receive of two characters */
-    sts = lib$cvtf_to_internal_time(
-        &time_function_code, &max_char_delay, &timeout_char);
+    sts = lib$cvtf_to_internal_time(&time_function_code, &max_char_delay,
+                                    &timeout_char);
   }
 
   return (sts);
@@ -202,8 +196,7 @@ static unsigned int InitTimers(void)
 **************************************************************************
 **************************************************************************/
 
-static unsigned int InitNet(void)
-{
+static unsigned int InitNet(void) {
   unsigned int i, sts;
   char ch = '\0';
   char namestring[80];
@@ -230,7 +223,7 @@ static unsigned int InitNet(void)
   if (ODD(sts))
     /* Connect the port object to the destination_port */
     ker$connect_circuit(&sts, &virtual_serial_line_port, &DDA_destination_port,
-        NULL, NULL, NULL, NULL);
+                        NULL, NULL, NULL, NULL);
 
   return (sts);
 }
@@ -249,10 +242,9 @@ static unsigned int InitNet(void)
 **************************************************************************
 **************************************************************************/
 
-void send_pollbuff(remnode_item* remnode, pssupd_buffer* buf)
-{
+void send_pollbuff(remnode_item *remnode, pssupd_buffer *buf) {
   unsigned int sts, buf_size;
-  pssupd_buffer_vnet* vnet_buf = buf;
+  pssupd_buffer_vnet *vnet_buf = buf;
 
   /* Fill in remaining data in poll telegram */
   AsciiToR50("PSSUPD", &vnet_buf->receive_task);
@@ -260,7 +252,7 @@ void send_pollbuff(remnode_item* remnode, pssupd_buffer* buf)
   vnet_buf->common_name[1] = remnode->objp->Address[1];
 
   buf_size = vnet_buf->length * 2; /*  Convert to bytes  */
-  sts = send_it((char*)vnet_buf, buf_size);
+  sts = send_it((char *)vnet_buf, buf_size);
 
   return;
 }
@@ -279,9 +271,9 @@ void send_pollbuff(remnode_item* remnode, pssupd_buffer* buf)
 **************************************************************************
 **************************************************************************/
 
-static unsigned int remnode_send(remnode_item* remnode,
-    pwr_sClass_RemTrans* remtrans, char* buf, int buffer_size)
-{
+static unsigned int remnode_send(remnode_item *remnode,
+                                 pwr_sClass_RemTrans *remtrans, char *buf,
+                                 int buffer_size) {
   unsigned int sts;
 
   sts = send_it(buf, buffer_size);
@@ -302,8 +294,7 @@ static unsigned int remnode_send(remnode_item* remnode,
 **************************************************************************
 **************************************************************************/
 
-static unsigned int send_it(char* buf, int buf_size)
-{
+static unsigned int send_it(char *buf, int buf_size) {
   unsigned int sts, i;
   unsigned int size_of_telegram;
   unsigned int number_of_DLE = 0;
@@ -312,11 +303,11 @@ static unsigned int send_it(char* buf, int buf_size)
   unsigned char ch;
   unsigned char BCC = DLE ^ ETX;
   unsigned char received_char = '\0';
-  unsigned char* restore_buf_ptr = buf;
+  unsigned char *restore_buf_ptr = buf;
   unsigned char telegram[MAX_SIZE_TELEGRAM];
-  static unsigned char sstx[2] = { STX, '\0' };
-  static unsigned char sdle[2] = { DLE, '\0' };
-  static unsigned char snak[2] = { NAK, '\0' };
+  static unsigned char sstx[2] = {STX, '\0'};
+  static unsigned char sdle[2] = {DLE, '\0'};
+  static unsigned char snak[2] = {NAK, '\0'};
 
   /*************************************************************************/
   /** Count DLE characters and calculate the size of the telegram.        **/
@@ -348,20 +339,22 @@ static unsigned int send_it(char* buf, int buf_size)
   /*************************************************************************/
   /* Send STX and wait for answer */
   eln$tty_write(&sts, &virtual_serial_line_port, 1, &sstx,
-      &nbr_of_bytes_written, NULL, NULL);
+                &nbr_of_bytes_written, NULL, NULL);
   if (ODD(sts)) {
     /* wait for character or timeout */
     eln$tty_read(&sts, &virtual_serial_line_port, 1, &received_char,
-        &nbr_of_bytes_read, 2, NULL, &timeout_ack, NULL, NULL, NULL, NULL);
+                 &nbr_of_bytes_read, 2, NULL, &timeout_ack, NULL, NULL, NULL,
+                 NULL);
   }
   if (EVEN(sts) || (received_char != DLE) || (sts == ELN$_TIMEOUT)) {
     /* Try one more time to establish contact */
     eln$tty_write(&sts, &virtual_serial_line_port, 1, &sstx,
-        &nbr_of_bytes_written, NULL, NULL);
+                  &nbr_of_bytes_written, NULL, NULL);
     if (ODD(sts)) {
       /* wait for character or timeout */
       eln$tty_read(&sts, &virtual_serial_line_port, 1, &received_char,
-          &nbr_of_bytes_read, 2, NULL, &timeout_ack, NULL, NULL, NULL, NULL);
+                   &nbr_of_bytes_read, 2, NULL, &timeout_ack, NULL, NULL, NULL,
+                   NULL);
     }
     if (EVEN(sts) || (received_char != DLE) || (sts == ELN$_TIMEOUT))
       sts = false;
@@ -370,11 +363,12 @@ static unsigned int send_it(char* buf, int buf_size)
   if (ODD(sts)) {
     /* Contact is established. Send telegram */
     eln$tty_write(&sts, &virtual_serial_line_port, size_of_telegram, &telegram,
-        &nbr_of_bytes_written, NULL, NULL);
+                  &nbr_of_bytes_written, NULL, NULL);
     if (ODD(sts)) {
       /* wait for character or timeout */
       eln$tty_read(&sts, &virtual_serial_line_port, 1, &received_char,
-          &nbr_of_bytes_read, 2, NULL, &timeout_ack, NULL, NULL, NULL, NULL);
+                   &nbr_of_bytes_read, 2, NULL, &timeout_ack, NULL, NULL, NULL,
+                   NULL);
     }
     if (EVEN(sts) || (received_char != DLE) || (sts == ELN$_TIMEOUT))
       sts = false;
@@ -386,7 +380,7 @@ static unsigned int send_it(char* buf, int buf_size)
   if (EVEN(sts)) {
     /* The send procedure has failed */
     eln$tty_write(NULL, &virtual_serial_line_port, 1, &snak,
-        &nbr_of_bytes_written, NULL, NULL);
+                  &nbr_of_bytes_written, NULL, NULL);
 
     errh_CErrLog(REM__SNDFAIL3964R);
   }
@@ -407,20 +401,20 @@ static unsigned int send_it(char* buf, int buf_size)
 **************************************************************************
 **************************************************************************/
 
-static unsigned int Receive()
-{
+static unsigned int Receive() {
   static int sts;
   static int nbr_of_bytes_read = 0;
   static int nbr_of_bytes_written = 0;
   unsigned char received_char = NUL;
-  static unsigned char snak[2] = { NAK, NUL };
+  static unsigned char snak[2] = {NAK, NUL};
   static int opt = 2;
-  static DDA$BREAK_MASK code = { 0, 0, 0, 0, 0, 0, 0, 0 };
+  static DDA$BREAK_MASK code = {0, 0, 0, 0, 0, 0, 0, 0};
   static DDA$_EXTENDED_STATUS_INFO stsblk;
   static int error_logged = 0;
 
   eln$tty_read(&sts, &virtual_serial_line_port, 1, &received_char,
-      &nbr_of_bytes_read, opt, NULL, &timeout_cycle, 1, stsblk, NULL, NULL);
+               &nbr_of_bytes_read, opt, NULL, &timeout_cycle, 1, stsblk, NULL,
+               NULL);
 
   if (sts == ELN$_SUCCESS) {
     if (error_logged) {
@@ -433,7 +427,7 @@ static unsigned int Receive()
       /* We don't understand, Send NAK unless NAK is received */
       if (received_char != NAK)
         eln$tty_write(NULL, &virtual_serial_line_port, 1, &snak,
-            &nbr_of_bytes_written, NULL, NULL);
+                      &nbr_of_bytes_written, NULL, NULL);
     }
   }
 
@@ -445,7 +439,7 @@ static unsigned int Receive()
     }
     remnode->objp->ErrTransCount++;
     eln$tty_write(NULL, &virtual_serial_line_port, 1, &snak,
-        &nbr_of_bytes_written, NULL, NULL);
+                  &nbr_of_bytes_written, NULL, NULL);
     ker$wait_any(NULL, NULL, &timeout_cycle);
   }
 
@@ -466,8 +460,7 @@ static unsigned int Receive()
 **************************************************************************
 **************************************************************************/
 
-static unsigned int ReceiveHandler()
-{
+static unsigned int ReceiveHandler() {
   unsigned int sts, i;
   unsigned int nbr_of_bytes_written = 0;
   unsigned int nbr_of_bytes_read = 0;
@@ -481,17 +474,17 @@ static unsigned int ReceiveHandler()
   unsigned char char_buffer, BCC_checksum;
   unsigned char received_char = '\0';
   unsigned char ReceiveBuffer[MAX_SIZE_TELEGRAM];
-  unsigned char* ReceiveBuffer_ptr;
-  unsigned char sstx[2] = { STX, '\0' };
-  unsigned char sdle[2] = { DLE, '\0' };
-  unsigned char snak[2] = { NAK, '\0' };
-  remtrans_item* remtrans;
+  unsigned char *ReceiveBuffer_ptr;
+  unsigned char sstx[2] = {STX, '\0'};
+  unsigned char sdle[2] = {DLE, '\0'};
+  unsigned char snak[2] = {NAK, '\0'};
+  remtrans_item *remtrans;
 
   /*************************************************************************/
   /** We have received STX earlier, send DLE to responde                  **/
   /*************************************************************************/
   eln$tty_write(&sts, &virtual_serial_line_port, 1, &sdle,
-      &nbr_of_bytes_written, NULL, NULL);
+                &nbr_of_bytes_written, NULL, NULL);
   if (EVEN(sts))
     return false;
 
@@ -499,7 +492,8 @@ static unsigned int ReceiveHandler()
   /**    Store the received telegram temporary                            **/
   /*************************************************************************/
   eln$tty_read(&sts, &virtual_serial_line_port, 1, &received_char,
-      &nbr_of_bytes_read, 2, NULL, &timeout_char, NULL, NULL, NULL, NULL);
+               &nbr_of_bytes_read, 2, NULL, &timeout_char, NULL, NULL, NULL,
+               NULL);
   if (EVEN(sts) || (sts == ELN$_TIMEOUT))
     return false;
 
@@ -508,7 +502,8 @@ static unsigned int ReceiveHandler()
 
   for (i = 1; (terminate == false) && (i < MAX_SIZE_TELEGRAM); i++) {
     eln$tty_read(&sts, &virtual_serial_line_port, 1, &received_char,
-        &nbr_of_bytes_read, 2, NULL, &timeout_char, NULL, NULL, NULL, NULL);
+                 &nbr_of_bytes_read, 2, NULL, &timeout_char, NULL, NULL, NULL,
+                 NULL);
     if (EVEN(sts) || (sts == ELN$_TIMEOUT))
       return false;
 
@@ -517,7 +512,8 @@ static unsigned int ReceiveHandler()
       ReceiveBuffer[i] = received_char;
       BCC ^= received_char;
       eln$tty_read(&sts, &virtual_serial_line_port, 1, &received_char,
-          &nbr_of_bytes_read, 2, NULL, &timeout_char, NULL, NULL, NULL, NULL);
+                   &nbr_of_bytes_read, 2, NULL, &timeout_char, NULL, NULL, NULL,
+                   NULL);
       if (EVEN(sts) || (sts == ELN$_TIMEOUT))
         return false;
 
@@ -526,8 +522,8 @@ static unsigned int ReceiveHandler()
     } else {
       /* Store one more received character in the buffer */
       BCC ^= received_char;
-      if ((received_char != DLE)
-          || ((received_char == DLE) && (char_buffer != DLE))) {
+      if ((received_char != DLE) ||
+          ((received_char == DLE) && (char_buffer != DLE))) {
         ReceiveBuffer[i] = char_buffer = received_char;
       } else {
         /* This is a duplicated DLE character. Throw away. */
@@ -542,7 +538,7 @@ static unsigned int ReceiveHandler()
   /*************************************************************************/
   if (BCC == BCC_checksum) {
     eln$tty_write(&sts, &virtual_serial_line_port, 1, &sdle,
-        &nbr_of_bytes_written, NULL, NULL);
+                  &nbr_of_bytes_written, NULL, NULL);
     if (EVEN(sts))
       return false;
   } else {
@@ -555,13 +551,13 @@ static unsigned int ReceiveHandler()
   /**  Treat the message and exit.                                        **/
   /*************************************************************************/
   {
-    io_buffer_vnet* io_buf = (io_buffer_vnet*)&ReceiveBuffer;
+    io_buffer_vnet *io_buf = (io_buffer_vnet *)&ReceiveBuffer;
 
-    if (io_buf->io_name[0] == remnode->objp->Address[0]
-        && io_buf->io_name[1] == remnode->objp->Address[1]) {
+    if (io_buf->io_name[0] == remnode->objp->Address[0] &&
+        io_buf->io_name[1] == remnode->objp->Address[1]) {
       data_size = io_buf->length * 2; /* Converted to bytes */
-      sts = RemIO_Receive_3964R(
-          remnode, &io_buf->data, data_size - NET_HEADER_SIZE_IO);
+      sts = RemIO_Receive_3964R(remnode, &io_buf->data,
+                                data_size - NET_HEADER_SIZE_IO);
       return (sts);
     }
   }
@@ -572,7 +568,7 @@ static unsigned int ReceiveHandler()
   /*************************************************************************/
   {
     char type_name[4];
-    common_buffer_vnet* c_buf = (common_buffer_vnet*)&ReceiveBuffer;
+    common_buffer_vnet *c_buf = (common_buffer_vnet *)&ReceiveBuffer;
 
     R50ToAscii(&c_buf->common_name, &name);
     for (i = 0; i < 4; i++) {
@@ -582,11 +578,11 @@ static unsigned int ReceiveHandler()
       search_remtrans = true;
       remtrans = remnode->remtrans;
       while (remtrans && search_remtrans) {
-        if (remtrans->objp->Address[0] == c_buf->common_name[0]
-            && remtrans->objp->Address[1] == c_buf->common_name[1])
+        if (remtrans->objp->Address[0] == c_buf->common_name[0] &&
+            remtrans->objp->Address[1] == c_buf->common_name[1])
           search_remtrans = false;
         if (search_remtrans)
-          remtrans = (remtrans_item*)remtrans->next;
+          remtrans = (remtrans_item *)remtrans->next;
       } /* endwhile */
 
       /*************************************************************************/
@@ -618,11 +614,11 @@ static unsigned int ReceiveHandler()
       search_remtrans = true;
       remtrans = remnode->remtrans;
       while (remtrans && search_remtrans) {
-        if (remtrans->objp->Address[0] == c_buf->common_name[0]
-            && remtrans->objp->Address[1] == c_buf->common_name[1])
+        if (remtrans->objp->Address[0] == c_buf->common_name[0] &&
+            remtrans->objp->Address[1] == c_buf->common_name[1])
           search_remtrans = false;
         if (search_remtrans)
-          remtrans = (remtrans_item*)remtrans->next;
+          remtrans = (remtrans_item *)remtrans->next;
       } /* endwhile */
 
       /*************************************************************************/
@@ -651,16 +647,15 @@ static unsigned int ReceiveHandler()
  * Main routine
  */
 
-main(int argc, char* argv[])
-{
-  unsigned int sts, i; /* Status from function calls etc. */
-  pwr_tObjid pwr_node; /* Own Pwr node */
-  pwr_sClass_PlcProcess* pwr_nodep; /* Ref to own Pwr node */
-  pwr_tTime OriginChgTime; /* LastChgTime at start */
-  pwr_tClassId remnode_class; /* Vår remnod's class */
-  char first; /* Send Hello first time */
-  pssupd_buffer_vnet buff; /* Buffer for 'Hello' */
-  pssupd_order_header* header; /* Header for Hello */
+main(int argc, char *argv[]) {
+  unsigned int sts, i;              /* Status from function calls etc. */
+  pwr_tObjid pwr_node;              /* Own Pwr node */
+  pwr_sClass_PlcProcess *pwr_nodep; /* Ref to own Pwr node */
+  pwr_tTime OriginChgTime;          /* LastChgTime at start */
+  pwr_tClassId remnode_class;       /* Vår remnod's class */
+  char first;                       /* Send Hello first time */
+  pssupd_buffer_vnet buff;          /* Buffer for 'Hello' */
+  pssupd_order_header *header;      /* Header for Hello */
 
   DeclareExitHandler();
 
@@ -684,7 +679,7 @@ main(int argc, char* argv[])
     exit(0);
 
   /* Hämta en pekare till remnoden */
-  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress*)&remnode->objp);
+  sts = gdh_ObjidToPointer(remnode->objid, (pwr_tAddress *)&remnode->objp);
   if (EVEN(sts))
     exit(sts);
 
@@ -694,7 +689,7 @@ main(int argc, char* argv[])
 
   /* Get pointer to $Node-object */
   sts = gdh_GetClassList(pwr_cClass_PlcProcess, &pwr_node);
-  sts = gdh_ObjidToPointer(pwr_node, (pwr_tAddress*)&pwr_nodep);
+  sts = gdh_ObjidToPointer(pwr_node, (pwr_tAddress *)&pwr_nodep);
 
   /* Initialize remtrans objects */
 
@@ -740,9 +735,9 @@ main(int argc, char* argv[])
       header->size = 0;
       header->signal = 0;
       buff.no_of_updates = 1;
-      buff.length = (sizeof(pssupd_buffer_vnet) - MAX_ORDER_BUFFERSIZE_VNET
-                        + sizeof(pssupd_order_header) + 1)
-          / 2;
+      buff.length = (sizeof(pssupd_buffer_vnet) - MAX_ORDER_BUFFERSIZE_VNET +
+                     sizeof(pssupd_order_header) + 1) /
+                    2;
       send_pollbuff(remnode, &buff);
     }
 
@@ -752,17 +747,17 @@ main(int argc, char* argv[])
 
     sts = RemTrans_Cyclic(remnode, &remnode_send);
 
-    if (((!remnode->objp->IOStallFlag || EVEN(remnode->objp->IOStallAction))
-            && (remnode->Time_since_poll >= remnode->objp->IOCycleTime))
-        || (remnode->objp->IOStallFlag && ODD(remnode->objp->IOStallAction)
-               && (remnode->Time_since_poll >= remnode->objp->ErrTime)
-               && (remnode->Time_since_poll >= remnode->objp->IOCycleTime))) {
+    if (((!remnode->objp->IOStallFlag || EVEN(remnode->objp->IOStallAction)) &&
+         (remnode->Time_since_poll >= remnode->objp->IOCycleTime)) ||
+        (remnode->objp->IOStallFlag && ODD(remnode->objp->IOStallAction) &&
+         (remnode->Time_since_poll >= remnode->objp->ErrTime) &&
+         (remnode->Time_since_poll >= remnode->objp->IOCycleTime))) {
       sts = RemIO_Cyclic_3964R(remnode, &send_pollbuff);
       remnode->Time_since_poll = 0.0;
     }
 
-    if ((remnode->Time_since_IO >= remnode->objp->IOStallTime)
-        && (remnode->objp->IOStallTime > 0))
+    if ((remnode->Time_since_IO >= remnode->objp->IOStallTime) &&
+        (remnode->objp->IOStallTime > 0))
       sts = RemIO_Stall(remnode);
 
     first = false;

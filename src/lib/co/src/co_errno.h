@@ -38,10 +38,11 @@
 #define co_errno_h
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* co_errno.h -- Translate UNIX errno error codes. */
+  /* co_errno.h -- Translate UNIX errno error codes. */
 
 #include "pwr.h"
 #include "pwr_msg.h"
@@ -50,15 +51,14 @@ extern "C" {
 
 #define ERRNO_BADBIT 16384
 #define EBADCODE 65534
-#define ERRNO_BADCODE(code)                                                    \
-  (pwr_tStatus)((MSG_CLEAR_CODE(ERRNO__BADCODE)) | ERRNO_BADBIT                \
-      | ((code) << MSG_S_CODE))
+#define ERRNO_BADCODE(code)                                                                                  \
+  (pwr_tStatus)((MSG_CLEAR_CODE(ERRNO__BADCODE)) | ERRNO_BADBIT | ((code) << MSG_S_CODE))
 
-int errno_ExitStatus(pwr_tStatus);
-int errno_ExitErrno(int);
-pwr_tStatus errno_Pstatus(int);
-pwr_tStatus errno_Status(int);
-pwr_tStatus errno_GetStatus();
+  int errno_ExitStatus(pwr_tStatus);
+  int errno_ExitErrno(int);
+  pwr_tStatus errno_Pstatus(int);
+  pwr_tStatus errno_Status(int);
+  pwr_tStatus errno_GetStatus();
 
 #ifdef __cplusplus
 }

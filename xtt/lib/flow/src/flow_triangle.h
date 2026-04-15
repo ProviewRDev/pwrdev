@@ -39,19 +39,16 @@
 
 #include "flow_rect.h"
 
-class FlowTriangle : public FlowRect {
+class FlowTriangle : public FlowRect
+{
 public:
-  FlowTriangle(FlowCtx* flow_ctx, double x = 0, double y = 0, double w = 0,
-      double h = 0, flow_eDrawType d_type = flow_eDrawType_Line, int line_w = 1,
-      int fix_line_w = 0, flow_mDisplayLevel display_lev = flow_mDisplayLevel_1,
-      int fill_triangle = 0)
-      : FlowRect(flow_ctx, x, y, w, h, d_type, line_w, fix_line_w, display_lev,
-            fill_triangle)
+  FlowTriangle(FlowCtx* flow_ctx, double x = 0, double y = 0, double w = 0, double h = 0,
+               flow_eDrawType d_type = flow_eDrawType_Line, int line_w = 1, int fix_line_w = 0,
+               flow_mDisplayLevel display_lev = flow_mDisplayLevel_1, int fill_triangle = 0)
+      : FlowRect(flow_ctx, x, y, w, h, d_type, line_w, fix_line_w, display_lev, fill_triangle)
   {
   }
-  virtual ~FlowTriangle()
-  {
-  }
+  virtual ~FlowTriangle() {}
   void save(std::ofstream& fp, flow_eSaveMode mode);
   void open(std::ifstream& fp);
   void draw(void* pos, int hightlight, int dimmed, int hot, void* node);

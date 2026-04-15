@@ -58,9 +58,10 @@ void log_close_cb(void* log)
   exit(0);
 }
 
-void set_severity(LogNav_hier *hier)
+void set_severity(LogNav_hier* hier)
 {
-  for (int i = 0; i < hier->child.size(); i++) {
+  for (int i = 0; i < hier->child.size(); i++)
+  {
     if (hier->child[i].type == lognav_eItemType_Hier)
       set_severity(&hier->child[i]);
     if (hier->child[i].severity > hier->severity)
@@ -68,26 +69,29 @@ void set_severity(LogNav_hier *hier)
   }
 }
 
-LogNav_hier *get_hier(LogNav_hier *parent, char *hier)
+LogNav_hier* get_hier(LogNav_hier* parent, char* hier)
 {
-  char *s;
+  char* s;
   char h1[100], h2[100];
   int last = 0;
 
   strncpy(h1, hier, sizeof(h1));
-  if ((s = strchr(h1, '-'))) {
+  if ((s = strchr(h1, '-')))
+  {
     *s = 0;
-    strncpy(h2, s+1, sizeof(h2));
-  }	
+    strncpy(h2, s + 1, sizeof(h2));
+  }
   else
     last = 1;
 
-  for (int i = 0; i < parent->child.size(); i++) {
-    if (str_NoCaseStrcmp(h1, parent->child[i].text) == 0) {
+  for (int i = 0; i < parent->child.size(); i++)
+  {
+    if (str_NoCaseStrcmp(h1, parent->child[i].text) == 0)
+    {
       if (last)
-	return &parent->child[i];
+        return &parent->child[i];
       else
-	return get_hier(&parent->child[i], h2);
+        return get_hier(&parent->child[i], h2);
     }
   }
 
@@ -98,13 +102,13 @@ LogNav_hier *get_hier(LogNav_hier *parent, char *hier)
   item.type = lognav_eItemType_Hier;
   parent->child.push_back(item);
   if (last)
-    return &parent->child[parent->child.size()-1];
-  return get_hier(&parent->child[parent->child.size()-1], h2);
+    return &parent->child[parent->child.size() - 1];
+  return get_hier(&parent->child[parent->child.size() - 1], h2);
 }
 
-void file_read(pwr_tStatus *sts, LogNav_hier *tree, char *filename)
+void file_read(pwr_tStatus* sts, LogNav_hier* tree, char* filename)
 {
-  FILE *fp;
+  FILE* fp;
   char line[200];
   lognav_eSeverity severity;
   char timstr[40];
@@ -112,50 +116,53 @@ void file_read(pwr_tStatus *sts, LogNav_hier *tree, char *filename)
   std::vector<LogNav_hier> store;
 
   fp = fopen(filename, "r");
-  if (!fp) {
+  if (!fp)
+  {
     *sts = 0;
     return;
   }
-  while (dcli_read_line(line, sizeof(line), fp)) {
-    switch (line[0]) {
+  while (dcli_read_line(line, sizeof(line), fp))
+  {
+    switch (line[0])
+    {
     case 'S':
       if (line[1] != ' ')
-	continue;
+        continue;
       severity = lognav_eSeverity_Success;
       break;
     case 'I':
       if (line[1] != ' ')
-	continue;
+        continue;
       severity = lognav_eSeverity_Info;
       break;
     case 'W':
       if (line[1] != ' ')
-	continue;
+        continue;
       severity = lognav_eSeverity_Warning;
       break;
     case 'E':
       if (line[1] != ' ')
-	continue;
+        continue;
       severity = lognav_eSeverity_Error;
       break;
     case 'F':
       if (line[1] != ' ')
-	continue;
+        continue;
       severity = lognav_eSeverity_Fatal;
       break;
     case 'D':
       if (line[1] != ' ')
-	continue;
+        continue;
       severity = lognav_eSeverity_Detail;
       break;
     case 'X':
       if (line[1] != ' ')
-	continue;
+        continue;
       severity = lognav_eSeverity_DetailError;
       break;
     case 'Z':
       if (line[1] != ' ')
-	continue;
+        continue;
       severity = lognav_eSeverity_DetailWarning;
       break;
     default:
@@ -165,34 +172,36 @@ void file_read(pwr_tStatus *sts, LogNav_hier *tree, char *filename)
     LogNav_hier item;
     item.severity = severity;
 
-    char *s = strchr(&line[26], ',');
+    char* s = strchr(&line[26], ',');
     if (!s)
       continue;
     *s = 0;
     strncpy(hier, &line[26], sizeof(hier));
-    strncpy(item.text, s+2, sizeof(item.text));    
-    item.text[sizeof(item.text)-1] = 0;
+    strncpy(item.text, s + 2, sizeof(item.text));
+    item.text[sizeof(item.text) - 1] = 0;
     item.type = lognav_eItemType_Entry;
 
     strncpy(timstr, &line[2], 23);
     timstr[23] = 0;
     time_AsciiToA(timstr, &item.time);
 
-    if (severity == lognav_eSeverity_Detail ||
-	severity == lognav_eSeverity_DetailError ||
-	severity == lognav_eSeverity_DetailWarning) {
+    if (severity == lognav_eSeverity_Detail || severity == lognav_eSeverity_DetailError ||
+        severity == lognav_eSeverity_DetailWarning)
+    {
       // Store and insert as child to next 'real' item
       store.push_back(item);
       continue;
     }
 
-    LogNav_hier *h = get_hier(tree, hier);
+    LogNav_hier* h = get_hier(tree, hier);
     if (severity > h->severity)
       h->severity = severity;
     h->child.push_back(item);
-    if (store.size() != 0) {
-      for (int i = 0; i < store.size(); i++) {
-	h->child[h->child.size()-1].child.push_back(store[i]);
+    if (store.size() != 0)
+    {
+      for (int i = 0; i < store.size(); i++)
+      {
+        h->child[h->child.size() - 1].child.push_back(store[i]);
       }
       store.clear();
     }
@@ -201,14 +210,15 @@ void file_read(pwr_tStatus *sts, LogNav_hier *tree, char *filename)
   set_severity(tree);
 }
 
-void log_read(pwr_tStatus *status, LogNav_hier *tree, char *filename) 
+void log_read(pwr_tStatus* status, LogNav_hier* tree, char* filename)
 {
   pwr_tFileName found_file;
   pwr_tStatus sts;
 
   sts = dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_INIT);
-  while (ODD(sts)) {
-    
+  while (ODD(sts))
+  {
+
     file_read(&sts, tree, found_file);
     sts = dcli_search_file(filename, found_file, DCLI_DIR_SEARCH_NEXT);
   }
@@ -219,11 +229,13 @@ int main(int argc, char* argv[])
 {
   pwr_tStatus sts;
   pwr_tFileName filename;
-  LogNav_hier *tree = 0;
+  LogNav_hier* tree = 0;
 
   // Get options
-  for (int i = 1; i < argc; i++) {
-    if (streq(argv[i], "-f") && i + 1 < argc) {
+  for (int i = 1; i < argc; i++)
+  {
+    if (streq(argv[i], "-f") && i + 1 < argc)
+    {
       strncpy(filename, argv[i + 1], sizeof(filename));
       i++;
     }

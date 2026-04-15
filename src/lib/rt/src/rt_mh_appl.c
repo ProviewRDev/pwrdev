@@ -49,7 +49,8 @@
 #include "rt_mh_util.h"
 
 //! Application context.
-typedef struct {
+typedef struct
+{
   mh_sHead head;
   qcom_sQid handler;
   mh_eApplState state;
@@ -72,11 +73,10 @@ static pwr_tStatus sendAndReceive(mh_eMsg, pwr_tUInt32, void*, mh_uApplReply*);
  *instead.
  * @return pwr_tStatus
  */
-pwr_tStatus mh_ApplCancel(
-    pwr_tUInt32 id, /**< The identity of the message to cancel.  */
-    pwr_tString80* cancelText /**< A string that will be associated with the
-                                 cancel event.*/
-    )
+pwr_tStatus mh_ApplCancel(pwr_tUInt32 id,           /**< The identity of the message to cancel.  */
+                          pwr_tString80* cancelText /**< A string that will be associated with the
+                                                       cancel event.*/
+)
 {
   pwr_tStatus sts;
   mh_sApplReturn cancel;
@@ -97,8 +97,8 @@ pwr_tStatus mh_ApplCancel(
 }
 
 /*
-*@example mh_examples.c
-*/
+ *@example mh_examples.c
+ */
 
 /**
  *@brief Connects this application to the local Handler.
@@ -109,52 +109,50 @@ pwr_tStatus mh_ApplCancel(
  *@return pwr_tStatus
  */
 
-pwr_tStatus mh_ApplConnect(
-    pwr_tObjid applObject, /**< Supplies the object id of the $appl-object for
-                                the application, or if no object exists, a value
-                              in
-                               the range [1000..2000]. This argument is used to
-                              identify
-                               the application and must be different for all
-                              application
-                               programs in the system, otherwise complete chaos
-                              can be the
-                               result. This identity may also be used to
-                              identify the origin
-                               of the messages. In this way a restarted
-                              application can find
-                               out if it has any active messages. */
-    mh_mApplFlags
-        flags, /**< see mh_mApplFlags N.B.! Ignored for this release  */
-    const pwr_tString80 abortEventName, /**< If the application terminates
-                                           abnormally, an alarm message
-                                             with this text as the event name
-                                           will be generated.<br>
-                                             N.B.! Ignored for this release  */
-    mh_eEvent abortEventType, /**< ZZZ */
-    mh_eEventPrio abortEventPrio, /**< If the application terminates abnormally,
-                                     an alarm message
-                                       with this priority will be generated.<br>
-                                       N.B.! Ignored for this release  */
-    mh_mEventFlags abortEventFlags, /**< If the application terminates
-                                       abnormally, an alarm message
-                                         with this priority will be
-                                       generated.<br>
-                                         N.B.! Ignored for this release  */
-    const pwr_tString80 abortEventText, /**< If the application terminates
-                                           abnormally, an alarm message
-                                             with this arbitrary text as the
-                                           event text will be
-                                             generated.<br>
-                                             N.B.! Ignored for this release  */
-    pwr_tUInt32* activeMessages /**< When restarting an application there might
-                                   exist active
-                                     messages originating from it, this
-                                   parameter returns the
-                                     number of such messages. Use
-                                   mh_ApplGetMsgInfo to acquire
-                                     more information about these. */
-    )
+pwr_tStatus mh_ApplConnect(pwr_tObjid applObject, /**< Supplies the object id of the $appl-object for
+                                                       the application, or if no object exists, a value
+                                                     in
+                                                      the range [1000..2000]. This argument is used to
+                                                     identify
+                                                      the application and must be different for all
+                                                     application
+                                                      programs in the system, otherwise complete chaos
+                                                     can be the
+                                                      result. This identity may also be used to
+                                                     identify the origin
+                                                      of the messages. In this way a restarted
+                                                     application can find
+                                                      out if it has any active messages. */
+                           mh_mApplFlags flags,   /**< see mh_mApplFlags N.B.! Ignored for this release  */
+                           const pwr_tString80 abortEventName, /**< If the application terminates
+                                                                  abnormally, an alarm message
+                                                                    with this text as the event name
+                                                                  will be generated.<br>
+                                                                    N.B.! Ignored for this release  */
+                           mh_eEvent abortEventType,           /**< ZZZ */
+                           mh_eEventPrio abortEventPrio,       /**< If the application terminates abnormally,
+                                                                  an alarm message
+                                                                    with this priority will be generated.<br>
+                                                                    N.B.! Ignored for this release  */
+                           mh_mEventFlags abortEventFlags,     /**< If the application terminates
+                                                                  abnormally, an alarm message
+                                                                    with this priority will be
+                                                                  generated.<br>
+                                                                    N.B.! Ignored for this release  */
+                           const pwr_tString80 abortEventText, /**< If the application terminates
+                                                                  abnormally, an alarm message
+                                                                    with this arbitrary text as the
+                                                                  event text will be
+                                                                    generated.<br>
+                                                                    N.B.! Ignored for this release  */
+                           pwr_tUInt32* activeMessages         /**< When restarting an application there might
+                                                                  exist active
+                                                                    messages originating from it, this
+                                                                  parameter returns the
+                                                                    number of such messages. Use
+                                                                  mh_ApplGetMsgInfo to acquire
+                                                                    more information about these. */
+)
 {
   pwr_tStatus sts;
   pwr_tClassId cid;
@@ -169,14 +167,16 @@ pwr_tStatus mh_ApplConnect(
 
   sprintf(name, "MhAppl_%X", applObject.oix);
 
-  if (!qcom_Init(&sts, NULL, name)) {
+  if (!qcom_Init(&sts, NULL, name))
+  {
     errh_Error("Failed connecting application to QCOM\n%m", sts);
     return MH__QCOMCONAPPL;
   }
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, &qid, &qAttr, name)) {
+  if (!qcom_CreateQ(&sts, &qid, &qAttr, name))
+  {
     errh_Error("Failed to create QCOM que\n%m", sts);
     return MH__QCOMCREQ;
   }
@@ -187,12 +187,13 @@ pwr_tStatus mh_ApplConnect(
 
   /* Check Application object */
 
-  if (applObject.vid
-      != pwr_cNVolumeId) { /* Application object should exist in Rtdb */
+  if (applObject.vid != pwr_cNVolumeId)
+  { /* Application object should exist in Rtdb */
     sts = gdh_GetObjectClass(applObject, &cid);
     if (EVEN(sts))
       return sts;
-    switch (cid) {
+    switch (cid)
+    {
     case pwr_eClass_Appl:
     case pwr_cClass_OpAppl:
     case pwr_cClass_Application:
@@ -214,13 +215,11 @@ pwr_tStatus mh_ApplConnect(
   connect.ApplObject = applObject;
   connect.Qid = qid;
   connect.Flags = flags;
-  strncpy(
-      connect.AbortEventName, abortEventName, sizeof(connect.AbortEventName));
+  strncpy(connect.AbortEventName, abortEventName, sizeof(connect.AbortEventName));
   connect.AbortEventType = abortEventType;
   connect.AbortEventPrio = abortEventPrio;
   connect.AbortEventFlags = abortEventFlags;
-  strncpy(
-      connect.AbortEventText, abortEventText, sizeof(connect.AbortEventText));
+  strncpy(connect.AbortEventText, abortEventText, sizeof(connect.AbortEventText));
 
   sts = sendAndReceive(mh_eMsg_ApplConnect, sizeof(connect), &connect, &reply);
   if (EVEN(sts))
@@ -260,16 +259,15 @@ pwr_tStatus mh_ApplDisconnect()
  * @return pwr_tStatus
  */
 
-pwr_tStatus mh_ApplMessage(
-    pwr_tUInt32* id, /**< The identity of the message created.
-                          The application must save this id to be able to send
-                          return and acknowledgement messages. */
-    mh_sApplMessage* message /**< A structure containing the properties of the
-                                message.
-                                  The application must fill this in before
-                                calling mh_ApplMessage,
-                                  See mhs_ApplMessage for the details. */
-    )
+pwr_tStatus mh_ApplMessage(pwr_tUInt32* id,         /**< The identity of the message created.
+                                                         The application must save this id to be able to send
+                                                         return and acknowledgement messages. */
+                           mh_sApplMessage* message /**< A structure containing the properties of the
+                                                       message.
+                                                         The application must fill this in before
+                                                       calling mh_ApplMessage,
+                                                         See mhs_ApplMessage for the details. */
+)
 {
   pwr_tStatus sts;
   mh_uApplReply reply;
@@ -296,12 +294,11 @@ pwr_tStatus mh_ApplMessage(
  * @return pwr_tStatus
  */
 
-pwr_tStatus mh_ApplReturn(
-    pwr_tUInt32 id, /**< The identity of the message, to which the return
-                       message applies. */
-    pwr_tString80* returnText /**< The text string appearing on the second row
-                                 in the alarm window. */
-    )
+pwr_tStatus mh_ApplReturn(pwr_tUInt32 id,           /**< The identity of the message, to which the return
+                                                       message applies. */
+                          pwr_tString80* returnText /**< The text string appearing on the second row
+                                                       in the alarm window. */
+)
 {
   pwr_tStatus sts;
   mh_sApplReturn applReturn;
@@ -316,8 +313,7 @@ pwr_tStatus mh_ApplReturn(
   applReturn.TargetIdx = id;
   applReturn.ReturnType = mh_eEvent_Return;
 
-  sts = sendAndReceive(
-      mh_eMsg_ApplReturn, sizeof(applReturn), &applReturn, NULL);
+  sts = sendAndReceive(mh_eMsg_ApplReturn, sizeof(applReturn), &applReturn, NULL);
 
   return sts;
 }
@@ -328,20 +324,17 @@ pwr_tStatus mh_ApplReturn(
  * see mh_examples.c
  * @return pwr_tStatus
  */
-pwr_tStatus mh_ApplGetMsgInfo(
-    pwr_tUInt32
-        id, /**< The identity of the message, about which you want information.
-                 If you supply an identity not known, data for the message with
-                 the closest (larger) identity will be returned. This means that
-                 if you supply 0, the data for the oldest still active message
-               will
-                 be returned. The identity of the message will be found in
-               Message.id.*/
-    mh_sApplMessage* message /**< The requested information will be returned
-                                here. See mhs_ApplMessage,
-                                  If no message is found, the contents of the
-                                structure will be undefined. */
-    )
+pwr_tStatus mh_ApplGetMsgInfo(pwr_tUInt32 id,          /**< The identity of the message, about which you want
+                                                          information.          If you supply an identity not known, data for
+                                                          the message with          the closest (larger) identity will be
+                                                          returned. This means that          if you supply 0, the data for the
+                                                          oldest still active message          will          be returned. The identity of
+                                                          the message will be found in          Message.id.*/
+                              mh_sApplMessage* message /**< The requested information will be returned
+                                                          here. See mhs_ApplMessage,
+                                                            If no message is found, the contents of the
+                                                          structure will be undefined. */
+)
 {
   pwr_tStatus sts;
   mh_uApplReply reply;
@@ -360,8 +353,7 @@ pwr_tStatus mh_ApplGetMsgInfo(
   return MH__SUCCESS;
 }
 
-static pwr_tStatus sendAndReceive(
-    mh_eMsg type, pwr_tUInt32 inSize, void* ip, mh_uApplReply* reply)
+static pwr_tStatus sendAndReceive(mh_eMsg type, pwr_tUInt32 inSize, void* ip, mh_uApplReply* reply)
 {
   pwr_tStatus sts;
   qcom_sPut put;
@@ -371,7 +363,8 @@ static pwr_tStatus sendAndReceive(
   void* rvoid;
   pwr_tUInt32 size = sizeof(lAppl.head) + inSize;
 
-  if ((put.data = qcom_Alloc(&sts, size)) == NULL) {
+  if ((put.data = qcom_Alloc(&sts, size)) == NULL)
+  {
     errh_Error("mh_Appl, sendAndReceive, qcom_AllocMsg failed\n%m", sts);
     return MH__QCOMALLOCMSG;
   }
@@ -395,9 +388,9 @@ static pwr_tStatus sendAndReceive(
    * occur under normal load, raise the timeout instead of going back to
    * extremely long blocking waits here.
    */
-  rvoid = qcom_Request(
-      &sts, &lAppl.handler, &put, &lAppl.head.qid, &get, mh_cSendRcvTmo, 0);
-  if (EVEN(sts)) {
+  rvoid = qcom_Request(&sts, &lAppl.handler, &put, &lAppl.head.qid, &get, mh_cSendRcvTmo, 0);
+  if (EVEN(sts))
+  {
     errh_Error("mhAppl, sendAndReceive, qcom_Request failed\n%m", sts);
     qcom_Free(NULL, put.data);
     if (sts == QCOM__TMO)

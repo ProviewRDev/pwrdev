@@ -41,7 +41,8 @@
 
 #include "flow_browapi.h"
 
-class XAttOne {
+class XAttOne
+{
 public:
   void* parent_ctx;
   pwr_sAttrRef aref;
@@ -61,30 +62,15 @@ public:
   unsigned int aoffs;
   unsigned int aelem;
 
-  XAttOne(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, char* xa_title,
-      unsigned int xa_priv, int* xa_sts);
+  XAttOne(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, char* xa_title, unsigned int xa_priv, int* xa_sts);
   virtual ~XAttOne();
 
-  virtual void message(char severity, const char* message)
-  {
-  }
-  virtual void set_prompt(char* prompt)
-  {
-  }
-  virtual int change_value(int set_focus)
-  {
-    return 0;
-  }
-  virtual void change_value_close()
-  {
-  }
-  virtual void pop()
-  {
-  }
-  virtual int set_value()
-  {
-    return 0;
-  }
+  virtual void message(char severity, const char* message) {}
+  virtual void set_prompt(char* prompt) {}
+  virtual int change_value(int set_focus) { return 0; }
+  virtual void change_value_close() {}
+  virtual void pop() {}
+  virtual int set_value() { return 0; }
 
   int open_changevalue(char* name);
 };

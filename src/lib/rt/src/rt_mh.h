@@ -40,11 +40,12 @@
 #include "pwr_class.h"
 #include "rt_mh_msg.h"
 
-typedef union {
+typedef union
+{
   pwr_tUInt32 All;
-  struct {
-    pwr_Endian_4(
-        pwr_Field(pwr_tUInt16, Status), pwr_Field(pwr_tUInt16, Prio), , )
+  struct
+  {
+    pwr_Endian_4(pwr_Field(pwr_tUInt16, Status), pwr_Field(pwr_tUInt16, Prio), , )
   } Event;
 } mh_uEventInfo;
 

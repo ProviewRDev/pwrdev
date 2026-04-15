@@ -43,7 +43,8 @@ typedef struct _FlowWidgetGtk FlowWidgetGtk;
 typedef struct _FlowWidgetGtkClass FlowWidgetGtkClass;
 typedef struct _FlowWidgetGtkPrivate FlowWidgetGtkPrivate;
 
-typedef struct {
+typedef struct
+{
   GtkWidget* flow;
   GtkWidget* form;
   GtkWidget* scroll_h;
@@ -52,13 +53,15 @@ typedef struct {
   int scroll_v_managed;
 } flowwidget_sScroll;
 
-struct _FlowWidgetGtk {
+struct _FlowWidgetGtk
+{
   GtkDrawingArea bin;
-  FlowWidgetGtkPrivate *priv;
+  FlowWidgetGtkPrivate* priv;
 };
-  
-struct _FlowWidgetGtkPrivate {
-  GdkWindow *window;
+
+struct _FlowWidgetGtkPrivate
+{
+  GdkWindow* window;
   void* flow_ctx;
   void* draw_ctx;
   int (*init_proc)(FlowCtx* ctx, void* clien_data);
@@ -86,7 +89,8 @@ struct _FlowWidgetGtkPrivate {
   guint vscroll_policy : 1;
 };
 
-enum {
+enum
+{
   PROP_0,
   PROP_HADJUSTMENT,
   PROP_VADJUSTMENT,
@@ -94,71 +98,80 @@ enum {
   PROP_VSCROLL_POLICY
 };
 
-struct _FlowWidgetGtkClass {
+struct _FlowWidgetGtkClass
+{
   GtkDrawingAreaClass parent_class;
 };
 
 G_DEFINE_TYPE_WITH_CODE(FlowWidgetGtk, flowwidgetgtk, GTK_TYPE_DRAWING_AREA,
-			G_ADD_PRIVATE(FlowWidgetGtk)
-			G_IMPLEMENT_INTERFACE(GTK_TYPE_SCROLLABLE, NULL));
+                        G_ADD_PRIVATE(FlowWidgetGtk) G_IMPLEMENT_INTERFACE(GTK_TYPE_SCROLLABLE, NULL));
 
 static gboolean scroll_callback_cb(void* d);
-static void flowwidgetgtk_get_property(GObject *object, guint prop_id, 
-				       GValue *value, GParamSpec *pspec);
-static void flowwidgetgtk_set_property(GObject *object, guint prop_id, 
-				       const GValue *value, GParamSpec *pspec);
-
+static void flowwidgetgtk_get_property(GObject* object, guint prop_id, GValue* value, GParamSpec* pspec);
+static void flowwidgetgtk_set_property(GObject* object, guint prop_id, const GValue* value,
+                                       GParamSpec* pspec);
 
 static void scroll_callback(flow_sScroll* data)
 {
   flowwidget_sScroll* scroll_data = (flowwidget_sScroll*)data->scroll_data;
-  FlowWidgetGtkPrivate *flow = (FlowWidgetGtkPrivate *)((FlowWidgetGtk*)scroll_data->flow)->priv;
+  FlowWidgetGtkPrivate* flow = (FlowWidgetGtkPrivate*)((FlowWidgetGtk*)scroll_data->flow)->priv;
 
   if (flow->scroll_timerid)
     g_source_remove(flow->scroll_timerid);
 
-  flow->scroll_timerid
-      = g_timeout_add(200, scroll_callback_cb, scroll_data->flow);
+  flow->scroll_timerid = g_timeout_add(200, scroll_callback_cb, scroll_data->flow);
   flow->scroll_data = *data;
 }
 
 static gboolean scroll_callback_cb(void* d)
 {
-  FlowWidgetGtkPrivate *flow = ((FlowWidgetGtk*)d)->priv;
+  FlowWidgetGtkPrivate* flow = ((FlowWidgetGtk*)d)->priv;
   flow_sScroll* data = &flow->scroll_data;
   flowwidget_sScroll* scroll_data = (flowwidget_sScroll*)data->scroll_data;
-  GtkAdjustment *adj;
+  GtkAdjustment* adj;
 
   flow->scroll_timerid = 0;
 
-  if (data->total_width <= data->window_width) {
+  if (data->total_width <= data->window_width)
+  {
     if (data->offset_x == 0)
       data->total_width = data->window_width;
-    if (scroll_data->scroll_h_managed) {
+    if (scroll_data->scroll_h_managed)
+    {
       // Remove horizontal scrollbar
     }
-  } else {
-    if (!scroll_data->scroll_h_managed) {
+  }
+  else
+  {
+    if (!scroll_data->scroll_h_managed)
+    {
       // Insert horizontal scrollbar
     }
   }
 
-  if (data->total_height <= data->window_height) {
+  if (data->total_height <= data->window_height)
+  {
     if (data->offset_y == 0)
       data->total_height = data->window_height;
-    if (scroll_data->scroll_v_managed) {
+    if (scroll_data->scroll_v_managed)
+    {
       // Remove vertical scrollbar
     }
-  } else {
-    if (!scroll_data->scroll_v_managed) {
+  }
+  else
+  {
+    if (!scroll_data->scroll_v_managed)
+    {
       // Insert vertical scrollbar
     }
   }
-  if (data->offset_x < 0) {
+  if (data->offset_x < 0)
+  {
     data->total_width += -data->offset_x;
     data->offset_x = 0;
   }
-  if (data->offset_y < 0) {
+  if (data->offset_y < 0)
+  {
     data->total_height += -data->offset_y;
     data->offset_y = 0;
   }
@@ -171,16 +184,19 @@ static gboolean scroll_callback_cb(void* d)
   if (data->window_height < 1)
     data->window_height = 1;
 
-  if (scroll_data->scroll_h_managed) {
+  if (scroll_data->scroll_h_managed)
+  {
     flow->scroll_h_ignore = 1;
-    if (data->window_width != flow->scroll_h_pagesize
-        || data->total_width != flow->scroll_h_upper
-        || flow->scroll_configure) {
+    if (data->window_width != flow->scroll_h_pagesize || data->total_width != flow->scroll_h_upper ||
+        flow->scroll_configure)
+    {
       adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_h));
       gtk_adjustment_set_value(adj, data->offset_x);
       gtk_adjustment_set_upper(adj, data->total_width);
       gtk_adjustment_set_page_size(adj, data->window_width);
-    } else {
+    }
+    else
+    {
       adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_h));
       gtk_adjustment_set_value(adj, data->offset_x);
     }
@@ -189,19 +205,20 @@ static gboolean scroll_callback_cb(void* d)
     flow->scroll_h_upper = data->total_width;
   }
 
-  if (scroll_data->scroll_v_managed) {
+  if (scroll_data->scroll_v_managed)
+  {
     flow->scroll_v_ignore = 1;
-    if (data->window_height != flow->scroll_v_pagesize
-        || data->total_height != flow->scroll_v_upper
-        || flow->scroll_configure) {
+    if (data->window_height != flow->scroll_v_pagesize || data->total_height != flow->scroll_v_upper ||
+        flow->scroll_configure)
+    {
       adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_v));
       gtk_adjustment_set_upper(adj, data->total_height);
       gtk_adjustment_set_page_size(adj, data->window_height);
-      gtk_range_set_value(
-          GTK_RANGE(scroll_data->scroll_v), (gdouble)data->offset_y);
-    } else {
-      gtk_range_set_value(
-          GTK_RANGE(scroll_data->scroll_v), (gdouble)data->offset_y);
+      gtk_range_set_value(GTK_RANGE(scroll_data->scroll_v), (gdouble)data->offset_y);
+    }
+    else
+    {
+      gtk_range_set_value(GTK_RANGE(scroll_data->scroll_v), (gdouble)data->offset_y);
     }
     flow->scroll_v_value = (gdouble)data->offset_y;
     flow->scroll_v_pagesize = data->window_height;
@@ -215,7 +232,8 @@ static void scroll_h_action(GtkWidget* w, gpointer data)
 {
   FlowWidgetGtkPrivate* floww = ((FlowWidgetGtk*)data)->priv;
 
-  if (floww->scroll_h_ignore) {
+  if (floww->scroll_h_ignore)
+  {
     floww->scroll_h_ignore = 0;
     return;
   }
@@ -224,7 +242,8 @@ static void scroll_h_action(GtkWidget* w, gpointer data)
   gdouble value;
   value = gtk_range_get_value(GTK_RANGE(floww->scroll_h));
 
-  if (feq(value, 0.0) && ABS(floww->scroll_h_value) > 2) {
+  if (feq(value, 0.0) && ABS(floww->scroll_h_value) > 2)
+  {
     // Probably a resize that seems to set value to zero, set old value
     ctx->change_scrollbar();
     return;
@@ -238,7 +257,8 @@ static void scroll_v_action(GtkWidget* w, gpointer data)
 {
   FlowWidgetGtkPrivate* floww = ((FlowWidgetGtk*)data)->priv;
 
-  if (floww->scroll_v_ignore) {
+  if (floww->scroll_v_ignore)
+  {
     floww->scroll_v_ignore = 0;
     return;
   }
@@ -247,7 +267,8 @@ static void scroll_v_action(GtkWidget* w, gpointer data)
   gdouble value;
   value = gtk_range_get_value(GTK_RANGE(floww->scroll_v));
 
-  if (feq(value, 0.0) && ABS(floww->scroll_v_value) > 2) {
+  if (feq(value, 0.0) && ABS(floww->scroll_v_value) > 2)
+  {
     // Probably a resize that seems to set value to zero, set old value
     ctx->change_scrollbar();
     return;
@@ -264,7 +285,8 @@ static int flow_init_proc(GtkWidget* w, FlowCtx* fctx, void* client_data)
 
   ctx = (FlowCtx*)((FlowWidgetGtk*)w)->priv->flow_ctx;
 
-  if (((FlowWidgetGtk*)w)->priv->scroll_h) {
+  if (((FlowWidgetGtk*)w)->priv->scroll_h)
+  {
     scroll_data = (flowwidget_sScroll*)malloc(sizeof(flowwidget_sScroll));
     scroll_data->flow = w;
     scroll_data->scroll_h = ((FlowWidgetGtk*)w)->priv->scroll_h;
@@ -281,8 +303,8 @@ static int flow_init_proc(GtkWidget* w, FlowCtx* fctx, void* client_data)
 static gboolean flowwidgetgtk_expose(GtkWidget* flow, cairo_t* cr)
 {
   ((FlowDrawGtk*)((FlowCtx*)((FlowWidgetGtk*)flow)->priv->flow_ctx)->fdraw)
-    ->expose((FlowCtx*)((FlowWidgetGtk*)flow)->priv->flow_ctx, cr, 
-    ((FlowWidgetGtk*)flow)->priv->is_navigator);
+      ->expose((FlowCtx*)((FlowWidgetGtk*)flow)->priv->flow_ctx, cr,
+               ((FlowWidgetGtk*)flow)->priv->is_navigator);
   return TRUE;
 }
 
@@ -291,17 +313,20 @@ static gboolean flowwidgetgtk_event(GtkWidget* flow, GdkEvent* event)
   if (((FlowWidgetGtk*)flow)->priv->destroyed)
     return TRUE;
 
-  if (event->type == GDK_MOTION_NOTIFY) {
-    gdk_display_flush(
-        ((FlowDrawGtk*)((FlowCtx*)((FlowWidgetGtk*)flow)->priv->flow_ctx)->fdraw)
-            ->display);
+  if (event->type == GDK_MOTION_NOTIFY)
+  {
+    gdk_display_flush(((FlowDrawGtk*)((FlowCtx*)((FlowWidgetGtk*)flow)->priv->flow_ctx)->fdraw)->display);
     GdkEvent* next = gdk_event_peek();
-    if (next && next->type == GDK_MOTION_NOTIFY) {
+    if (next && next->type == GDK_MOTION_NOTIFY)
+    {
       gdk_event_free(next);
       return TRUE;
-    } else if (next)
+    }
+    else if (next)
       gdk_event_free(next);
-  } else if (event->type == GDK_CONFIGURE) {
+  }
+  else if (event->type == GDK_CONFIGURE)
+  {
     ((FlowWidgetGtk*)flow)->priv->scroll_configure = 1;
   }
 
@@ -330,34 +355,38 @@ static void flowwidgetgtk_realize(GtkWidget* widget)
   attr.height = allocation.height;
   attr.wclass = GDK_INPUT_OUTPUT;
   attr.window_type = GDK_WINDOW_CHILD;
-  attr.event_mask = gtk_widget_get_events(widget) | GDK_EXPOSURE_MASK
-      | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK
-      | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK
-      | GDK_BUTTON_MOTION_MASK | GDK_ENTER_NOTIFY_MASK | GDK_SCROLL_MASK
-      | GDK_LEAVE_NOTIFY_MASK;
+  attr.event_mask = gtk_widget_get_events(widget) | GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK |
+                    GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_POINTER_MOTION_MASK |
+                    GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_MOTION_MASK | GDK_ENTER_NOTIFY_MASK |
+                    GDK_SCROLL_MASK | GDK_LEAVE_NOTIFY_MASK;
   attr.visual = gtk_widget_get_visual(widget);
 
   attr_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
   flow->priv->window = gdk_window_new(gtk_widget_get_parent_window(widget), &attr, attr_mask);
   gtk_widget_set_window(widget, flow->priv->window);
   gtk_widget_register_window(widget, flow->priv->window);
-  //widget->style = gtk_style_attach(widget->style, widget->window);
-  //gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
+  // widget->style = gtk_style_attach(widget->style, widget->window);
+  // gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
 
   gtk_widget_set_can_focus(widget, TRUE);
 
-  if (flow->priv->is_navigator) {
-    if (!flow->priv->flow_ctx) {
+  if (flow->priv->is_navigator)
+  {
+    if (!flow->priv->flow_ctx)
+    {
       FlowWidgetGtk* main_flow = (FlowWidgetGtk*)flow->priv->main_flow_widget;
 
       flow->priv->flow_ctx = main_flow->priv->flow_ctx;
       flow->priv->draw_ctx = main_flow->priv->draw_ctx;
       ((FlowDrawGtk*)flow->priv->draw_ctx)->init_nav(widget, flow->priv->flow_ctx);
     }
-  } else {
-    if (!flow->priv->flow_ctx) {
+  }
+  else
+  {
+    if (!flow->priv->flow_ctx)
+    {
       flow->priv->draw_ctx = new FlowDrawGtk(widget, &flow->priv->flow_ctx, flow_init_proc,
-          flow->priv->client_data, flow_eCtxType_Flow);
+                                             flow->priv->client_data, flow_eCtxType_Flow);
     }
   }
 }
@@ -366,7 +395,8 @@ static void flowwidgetgtk_destroy(GtkWidget* widget)
 {
   FlowWidgetGtk* flow = (FlowWidgetGtk*)widget;
 
-  if (!flow->priv->destroyed) {
+  if (!flow->priv->destroyed)
+  {
     flow->priv->destroyed = 1;
     if (flow->priv->scroll_timerid)
       g_source_remove(flow->priv->scroll_timerid);
@@ -403,11 +433,10 @@ static void flowwidgetgtk_class_init(FlowWidgetGtkClass* klass)
 
 static void flowwidgetgtk_init(FlowWidgetGtk* flow)
 {
-  flow->priv = (FlowWidgetGtkPrivate *)flowwidgetgtk_get_instance_private(flow);
+  flow->priv = (FlowWidgetGtkPrivate*)flowwidgetgtk_get_instance_private(flow);
 }
 
-GtkWidget* flowwidgetgtk_new(
-    int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data)
+GtkWidget* flowwidgetgtk_new(int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data)
 {
   FlowWidgetGtk* w;
   w = (FlowWidgetGtk*)g_object_new(FLOWWIDGETGTK_TYPE, NULL);
@@ -423,9 +452,8 @@ GtkWidget* flowwidgetgtk_new(
   return (GtkWidget*)w;
 }
 
-GtkWidget* scrolledflowwidgetgtk_new(
-    int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
-    GtkWidget** flowwidget)
+GtkWidget* scrolledflowwidgetgtk_new(int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
+                                     GtkWidget** flowwidget)
 {
   FlowWidgetGtk* w;
 
@@ -450,10 +478,10 @@ GtkWidget* scrolledflowwidgetgtk_new(
 
   *flowwidget = GTK_WIDGET(w);
 
-  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_h)),
-      "value-changed", G_CALLBACK(scroll_h_action), w);
-  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_v)),
-      "value-changed", G_CALLBACK(scroll_v_action), w);
+  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_h)), "value-changed",
+                   G_CALLBACK(scroll_h_action), w);
+  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_v)), "value-changed",
+                   G_CALLBACK(scroll_v_action), w);
 
   gtk_container_add(GTK_CONTAINER(form), GTK_WIDGET(w));
 
@@ -484,12 +512,12 @@ GtkWidget* flownavwidgetgtk_new(GtkWidget* main_flow)
   return (GtkWidget*)w;
 }
 
-static void flowwidgetgtk_set_property(GObject *object, guint prop_id, 
-				       const GValue *value, GParamSpec *pspec)
+static void flowwidgetgtk_set_property(GObject* object, guint prop_id, const GValue* value, GParamSpec* pspec)
 {
-  //FlowWidgetGtk *flow = (FlowWidgetGtk *)object;
+  // FlowWidgetGtk *flow = (FlowWidgetGtk *)object;
 
-  switch (prop_id) {
+  switch (prop_id)
+  {
   case PROP_HADJUSTMENT:
     break;
   case PROP_VADJUSTMENT:
@@ -501,12 +529,12 @@ static void flowwidgetgtk_set_property(GObject *object, guint prop_id,
   }
 }
 
-static void flowwidgetgtk_get_property(GObject *object, guint prop_id, 
-				       GValue *value, GParamSpec *pspec)
+static void flowwidgetgtk_get_property(GObject* object, guint prop_id, GValue* value, GParamSpec* pspec)
 {
-  FlowWidgetGtk *flow = (FlowWidgetGtk *)object;
+  FlowWidgetGtk* flow = (FlowWidgetGtk*)object;
 
-  switch (prop_id) {
+  switch (prop_id)
+  {
   case PROP_HADJUSTMENT:
     g_value_set_object(value, flow->priv->hadjustment);
     break;
@@ -522,7 +550,4 @@ static void flowwidgetgtk_get_property(GObject *object, guint prop_id,
   }
 }
 
-void flowwidgetgtk_modify_ctx(GtkWidget* w, void* ctx)
-{
-  ((FlowWidgetGtk*)w)->priv->flow_ctx = ctx;
-}
+void flowwidgetgtk_modify_ctx(GtkWidget* w, void* ctx) { ((FlowWidgetGtk*)w)->priv->flow_ctx = ctx; }

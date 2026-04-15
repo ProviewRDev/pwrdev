@@ -40,15 +40,9 @@
 #include "glow_growgroup.h"
 #include "glow_msg.h"
 
-GlowArrayElem::GlowArrayElem(GrowCtx* gctx) : ctx(gctx), parent(0)
-{
-  strcpy(n_name, "");
-}
+GlowArrayElem::GlowArrayElem(GrowCtx* gctx) : ctx(gctx), parent(0) { strcpy(n_name, ""); }
 
-GlowArrayElem::GlowArrayElem() : ctx(0), parent(0)
-{
-  strcpy(n_name, "");
-}
+GlowArrayElem::GlowArrayElem() : ctx(0), parent(0) { strcpy(n_name, ""); }
 
 GlowArrayElem::GlowArrayElem(const GlowArrayElem& x) : ctx(x.ctx), parent(x.parent)
 {
@@ -73,8 +67,7 @@ void GlowArrayElem::set_parent(GlowArrayElem* p)
 
 int GlowArrayElem::in_active_layer()
 {
-  if ((ctx->layer->is_background() && parent == 0 && ctx->layer->is_active()) ||
-      (ctx->layer == parent))
+  if ((ctx->layer->is_background() && parent == 0 && ctx->layer->is_active()) || (ctx->layer == parent))
     return 1;
   return 0;
 }
@@ -83,44 +76,54 @@ int GlowArrayElem::get_object_name(char* name, int size, glow_eName ntype)
 {
   int sts;
 
-  switch (ntype) {
+  switch (ntype)
+  {
   case glow_eName_Object:
     if ((int)strlen(n_name) + 1 > size)
       return GLOW__BUFF_SMALL;
     strcpy(name, n_name);
     break;
   case glow_eName_Path:
-    if (parent) {
+    if (parent)
+    {
       sts = parent->get_path(name, size);
       if (EVEN(sts))
         return sts;
 
-      if (strlen(name) == 0) {
-	if ((int)strlen(name) + (int)strlen(n_name) + 1 > size)
-	  return GLOW__BUFF_SMALL;
-	strcat(name, n_name);
-      } else {
-	if ((int)strlen(name) + (int)strlen(n_name) + 2 > size)
-	  return GLOW__BUFF_SMALL;
-	strcat(name, "-");
-	strcat(name, n_name);
+      if (strlen(name) == 0)
+      {
+        if ((int)strlen(name) + (int)strlen(n_name) + 1 > size)
+          return GLOW__BUFF_SMALL;
+        strcat(name, n_name);
       }
-    } else {
+      else
+      {
+        if ((int)strlen(name) + (int)strlen(n_name) + 2 > size)
+          return GLOW__BUFF_SMALL;
+        strcat(name, "-");
+        strcat(name, n_name);
+      }
+    }
+    else
+    {
       if ((int)strlen(n_name) + 1 > size)
         return GLOW__BUFF_SMALL;
       strcpy(name, n_name);
     }
     break;
-  case glow_eName_Layer: {
+  case glow_eName_Layer:
+  {
     GlowArrayElem *e, *p;
     e = this;
-    while ((p = e->parent)) 
+    while ((p = e->parent))
       e = p;
-    if (e->type() == glow_eObjectType_GrowLayer) {
+    if (e->type() == glow_eObjectType_GrowLayer)
+    {
       if ((int)strlen(e->n_name) + 1 > size)
         return GLOW__BUFF_SMALL;
       strcpy(name, e->n_name);
-    } else
+    }
+    else
       return GLOW__NOLAYER;
     break;
   }
@@ -128,20 +131,20 @@ int GlowArrayElem::get_object_name(char* name, int size, glow_eName ntype)
   return GLOW__SUCCESS;
 }
 
-void GlowArrayElem::set_object_name(char* name)
-{
-  strcpy(n_name, name);
-}
+void GlowArrayElem::set_object_name(char* name) { strcpy(n_name, name); }
 
 int GlowArrayElem::get_path(char* name, int size)
 {
-  if (parent) {
+  if (parent)
+  {
     parent->get_path(name, size);
     if ((int)strlen(name) + (int)strlen(n_name) + 2 > size)
       return GLOW__BUFF_SMALL;
     strcat(name, "-");
     strcat(name, n_name);
-  } else {
+  }
+  else
+  {
     if ((int)strlen(n_name) + 1 > size)
       return GLOW__BUFF_SMALL;
     strncpy(name, n_name, size);

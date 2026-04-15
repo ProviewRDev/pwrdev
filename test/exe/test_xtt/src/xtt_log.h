@@ -51,13 +51,14 @@ class XttSevHist;
 class CoLogin;
 class CoWow;
 
-class XttLog {
+class XttLog
+{
 public:
-  XttLog(void* xn_parent_ctx, LogNav_hier *xn_tree);
+  XttLog(void* xn_parent_ctx, LogNav_hier* xn_tree);
   void* parent_ctx;
   char name[80];
   LogNav* lognav;
-  LogNav_hier *tree;
+  LogNav_hier* tree;
   CoLogin* cologin;
   int command_open;
   void (*close_cb)(void*);
@@ -70,12 +71,8 @@ public:
   CoWow* wow;
   int quiet;
 
-  virtual void message(char severity, const char* message)
-  {
-  }
-  virtual void set_prompt(const char* prompt)
-  {
-  }
+  virtual void message(char severity, const char* message) {}
+  virtual void set_prompt(const char* prompt) {}
 
   int is_authorized(unsigned int access = pwr_mAccess_AllSev, int msg = 1);
   void open_login();
@@ -92,8 +89,7 @@ public:
   static int is_authorized(void* ctx, unsigned int access, int msg);
   static int command_cb(void* ctx, char* cmd);
   static void delete_item_yes(void* ctx, void* data);
-  static int sevhist_get_select_cb(
-      void* ctx, pwr_tOid* oid, char* aname, char* oname);
+  static int sevhist_get_select_cb(void* ctx, pwr_tOid* oid, char* aname, char* oname);
   static void sevhist_help_cb(void* ctx, const char* key);
   virtual ~XttLog();
 

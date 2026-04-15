@@ -69,5 +69,4 @@ static pwr_tStatus ShowConfiguration(xmenu_sMenuCall* ip)
   Every method to be exported to xtt should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindXttMethods(Pb_DP_Slave) = {
-    pwr_BindXttMethod(ShowConfiguration), pwr_NullMethod};
+pwr_dExport pwr_BindXttMethods(Pb_DP_Slave) = {pwr_BindXttMethod(ShowConfiguration), pwr_NullMethod};

@@ -28,7 +28,8 @@ static int plog = 1;
 #define cClientVid "_V0.254.254.203"
 #define cClientQix 3338
 
-typedef enum {
+typedef enum
+{
   eTest_Put = 1,
   eTest_PutResult = 2,
   eTest_Put10k = 3,
@@ -42,9 +43,11 @@ typedef enum {
 
 void ra_qmontest::evaluate(int action, int result)
 {
-  switch(action) {
+  switch (action)
+  {
   case eTest_PutResult:
-    if (result < m_qquota) {
+    if (result < m_qquota)
+    {
       m_log->vlog('E', "Put, messages less than queue quota, %d/%d", m_sent, result);
       m_errcnt++;
     }
@@ -53,7 +56,8 @@ void ra_qmontest::evaluate(int action, int result)
 
     break;
   case eTest_Put10kResult:
-    if (result < m_qquota) {
+    if (result < m_qquota)
+    {
       m_log->vlog('E', "Put10k, messages less than queue quota, %d/%d", m_sent, result);
       m_errcnt++;
     }
@@ -61,7 +65,8 @@ void ra_qmontest::evaluate(int action, int result)
       m_log->vlog('S', "Put10k, message sent/received, %d/%d", m_sent, result);
     break;
   case eTest_Put100kResult:
-    if (result < m_qquota) {
+    if (result < m_qquota)
+    {
       m_log->vlog('E', "Put100k, messages less than queue quota, %d/%d", m_sent, result);
       m_errcnt++;
     }
@@ -69,14 +74,15 @@ void ra_qmontest::evaluate(int action, int result)
       m_log->vlog('S', "Put100k, message sent/received, %d/%d", m_sent, result);
     break;
   case eTest_PutCyclicResult:
-    if (m_sent != result) {
+    if (m_sent != result)
+    {
       m_log->vlog('E', "PutCyclic, message lost, %d/%d", m_sent, result);
       m_errcnt++;
     }
     else
       m_log->vlog('S', "PutCyclic, message sent/received, %d/%d", m_sent, result);
     break;
-  default: ;
+  default:;
   }
 }
 
@@ -86,7 +92,8 @@ void ra_qmontest::SPut()
   int cnt = 1;
 
   m_sent = 0;
-  for (int i = 0; i < 1000; i++) {
+  for (int i = 0; i < 1000; i++)
+  {
     put.reply = m_clientq;
     put.type.b = (qcom_eBtype)0;
     put.type.s = (qcom_eStype)0;
@@ -115,22 +122,25 @@ void ra_qmontest::CPut()
   put.type.s = (qcom_eStype)0;
   put.size = sizeof(action);
   put.data = &action;
-  
+
   if (plog)
     m_log->vlog('D', "Send request Put %d", action);
   qcom_Put(&m_sts, &m_serverq, &put);
 
-  for (;;) {
+  for (;;)
+  {
     get.data = 0;
     qcom_Get(&m_sts, &m_clientq, &get, 1000);
-    if (m_sts == QCOM__TMO) {
+    if (m_sts == QCOM__TMO)
+    {
       break;
     }
-    if (EVEN(m_sts)) {
+    if (EVEN(m_sts))
+    {
       m_log->log('E', "clientq, qcom_Get", m_sts);
       exit(0);
     }
-    cnt = *(int *)get.data;
+    cnt = *(int*)get.data;
     qcom_Free(&m_sts, get.data);
   }
   m_log->vlog('D', "CPut received messages %d", cnt);
@@ -148,14 +158,15 @@ void ra_qmontest::SPut10k()
   qcom_sPut put;
   int cnt = 1;
   unsigned int size = 10000;
-  unsigned int *data;
+  unsigned int* data;
 
-  data = (unsigned int *)malloc(size);
-  for (unsigned int i = 0; i < size/sizeof(int); i++)
+  data = (unsigned int*)malloc(size);
+  for (unsigned int i = 0; i < size / sizeof(int); i++)
     data[i] = 0x55555555;
 
   m_sent = 0;
-  for (int i = 0; i < 1000; i++) {
+  for (int i = 0; i < 1000; i++)
+  {
     data[0] = cnt;
     put.reply = m_clientq;
     put.type.b = (qcom_eBtype)0;
@@ -187,36 +198,44 @@ void ra_qmontest::CPut10k()
   put.type.s = (qcom_eStype)0;
   put.size = sizeof(action);
   put.data = &action;
-  
+
   if (plog)
     m_log->vlog('D', "Send request Put10k %d", action);
   qcom_Put(&m_sts, &m_serverq, &put);
 
-  for (;;) {
+  for (;;)
+  {
     get.data = 0;
     qcom_Get(&m_sts, &m_clientq, &get, 1000);
-    if (m_sts == QCOM__TMO) {
+    if (m_sts == QCOM__TMO)
+    {
       break;
     }
-    if (EVEN(m_sts)) {
+    if (EVEN(m_sts))
+    {
       m_log->log('E', "clientq, qcom_Get", m_sts);
       exit(0);
     }
-    cnt = *(int *)get.data;
+    cnt = *(int*)get.data;
 
-    if (get.size != size) {
-      if (!error_logged) {
-	m_log->vlog('X', "put10k, size mismatch %d", get.size);
-	error_logged = 1;
+    if (get.size != size)
+    {
+      if (!error_logged)
+      {
+        m_log->vlog('X', "put10k, size mismatch %d", get.size);
+        error_logged = 1;
       }
       m_errcnt++;
     }
-    for (unsigned int i = 1; i < size/sizeof(int); i++) {
-      if (((int *)get.data)[i] != 0x55555555) {
-	if (!error_logged) {
-	  m_log->vlog('X', "put10k, content mismatch %d", i);
-	  error_logged = 1;
-	}
+    for (unsigned int i = 1; i < size / sizeof(int); i++)
+    {
+      if (((int*)get.data)[i] != 0x55555555)
+      {
+        if (!error_logged)
+        {
+          m_log->vlog('X', "put10k, content mismatch %d", i);
+          error_logged = 1;
+        }
       }
     }
 
@@ -236,14 +255,15 @@ void ra_qmontest::SPut100k()
   qcom_sPut put;
   int cnt = 1;
   unsigned int size = 10000;
-  unsigned int *data;
+  unsigned int* data;
 
-  data = (unsigned int *)malloc(size);
-  for (unsigned int i = 0; i < size/sizeof(int); i++)
+  data = (unsigned int*)malloc(size);
+  for (unsigned int i = 0; i < size / sizeof(int); i++)
     data[i] = 0x55555555;
 
   m_sent = 0;
-  for (int i = 0; i < 1000; i++) {
+  for (int i = 0; i < 1000; i++)
+  {
     data[0] = cnt;
     put.reply = m_clientq;
     put.type.b = (qcom_eBtype)0;
@@ -275,36 +295,44 @@ void ra_qmontest::CPut100k()
   put.type.s = (qcom_eStype)0;
   put.size = sizeof(action);
   put.data = &action;
-  
+
   if (plog)
     m_log->vlog('D', "Send request Put100k %d", action);
   qcom_Put(&m_sts, &m_serverq, &put);
 
-  for (;;) {
+  for (;;)
+  {
     get.data = 0;
     qcom_Get(&m_sts, &m_clientq, &get, 1000);
-    if (m_sts == QCOM__TMO) {
+    if (m_sts == QCOM__TMO)
+    {
       break;
     }
-    if (EVEN(m_sts)) {
+    if (EVEN(m_sts))
+    {
       m_log->log('E', "clientq, qcom_Get", m_sts);
       exit(0);
     }
-    cnt = *(int *)get.data;
+    cnt = *(int*)get.data;
 
-    if (get.size != size) {
-      if (!error_logged) {
-	m_log->vlog('X', "put100k, size mismatch %d", get.size);
-	error_logged = 1;
+    if (get.size != size)
+    {
+      if (!error_logged)
+      {
+        m_log->vlog('X', "put100k, size mismatch %d", get.size);
+        error_logged = 1;
       }
       m_errcnt++;
     }
-    for (unsigned int i = 1; i < size/sizeof(int); i++) {
-      if (((int *)get.data)[i] != 0x55555555) {
-	if (!error_logged) {
-	  m_log->vlog('X', "put100k, content mismatch %d", i);
-	  error_logged = 1;
-	}
+    for (unsigned int i = 1; i < size / sizeof(int); i++)
+    {
+      if (((int*)get.data)[i] != 0x55555555)
+      {
+        if (!error_logged)
+        {
+          m_log->vlog('X', "put100k, content mismatch %d", i);
+          error_logged = 1;
+        }
       }
     }
 
@@ -326,7 +354,8 @@ void ra_qmontest::SPutCyclic()
   float t = 0.01;
 
   m_sent = 0;
-  for (int i = 0; i < 1000; i++) {
+  for (int i = 0; i < 1000; i++)
+  {
     put.reply = m_clientq;
     put.type.b = (qcom_eBtype)0;
     put.type.s = (qcom_eStype)0;
@@ -356,22 +385,25 @@ void ra_qmontest::CPutCyclic()
   put.type.s = (qcom_eStype)0;
   put.size = sizeof(action);
   put.data = &action;
-  
+
   if (plog)
     m_log->vlog('D', "Send request PutCyclic %d", action);
   qcom_Put(&m_sts, &m_serverq, &put);
 
-  for (;;) {
+  for (;;)
+  {
     get.data = 0;
     qcom_Get(&m_sts, &m_clientq, &get, 1000);
-    if (m_sts == QCOM__TMO) {
+    if (m_sts == QCOM__TMO)
+    {
       break;
     }
-    if (EVEN(m_sts)) {
+    if (EVEN(m_sts))
+    {
       m_log->log('E', "clientq, qcom_Get", m_sts);
       exit(0);
     }
-    cnt = *(int *)get.data;
+    cnt = *(int*)get.data;
     qcom_Free(&m_sts, get.data);
   }
   put.reply = m_clientq;
@@ -403,7 +435,7 @@ void ra_qmontest::CEnd()
   put.type.s = (qcom_eStype)0;
   put.size = sizeof(action);
   put.data = &action;
-  
+
   if (plog)
     m_log->vlog('D', "Send request End %d", action);
   qcom_Put(&m_sts, &m_serverq, &put);
@@ -416,56 +448,62 @@ void ra_qmontest::CEnd()
 
 void ra_qmontest::exec()
 {
-  if (isServer()) {
+  if (isServer())
+  {
     // Server
     qcom_sGet get;
     int action;
     int end = 0;
 
-    for (;;) {
+    for (;;)
+    {
 
       get.data = 0;
       qcom_Get(&m_sts, &m_serverq, &get, qcom_cTmoEternal);
-      if (EVEN(m_sts)) {
-	m_log->log('E', "serverq, qcom_Get", m_sts);
-	exit(0);
+      if (EVEN(m_sts))
+      {
+        m_log->log('E', "serverq, qcom_Get", m_sts);
+        exit(0);
       }
       action = get.type.b;
 
       if (plog)
-	m_log->vlog('D', "Action request %d", action);
-      switch (action) {
+        m_log->vlog('D', "Action request %d", action);
+      switch (action)
+      {
       case eTest_Put:
-	SPut();
-	break;
+        SPut();
+        break;
       case eTest_Put10k:
-	SPut10k();
-	break;
+        SPut10k();
+        break;
       case eTest_Put100k:
-	SPut100k();
-	break;
+        SPut100k();
+        break;
       case eTest_PutCyclic:
-	SPutCyclic();
-	break;
+        SPutCyclic();
+        break;
       case eTest_PutResult:
       case eTest_Put10kResult:
       case eTest_Put100kResult:
-      case eTest_PutCyclicResult: {
-	int result = *(int *)get.data;
-	evaluate(action, result);
-	break;
+      case eTest_PutCyclicResult:
+      {
+        int result = *(int*)get.data;
+        evaluate(action, result);
+        break;
       }
       case eTest_End:
-	SEnd();
-	end = 1;
-	break;
+        SEnd();
+        end = 1;
+        break;
       }
       qcom_Free(&m_sts, get.data);
       if (end)
-	break;
+        break;
     }
   }
-  else {
+  else
+  {
     // Client
     CPut();
     sleep(1);
@@ -478,14 +516,11 @@ void ra_qmontest::exec()
   }
 }
 
-
-
 // Constructor
-ra_qmontest::ra_qmontest(eProc ptype) : m_ptype(ptype), m_qquota(500), m_errcnt(0), 
-   m_sent(0)
+ra_qmontest::ra_qmontest(eProc ptype) : m_ptype(ptype), m_qquota(500), m_errcnt(0), m_sent(0)
 {
   qcom_sQattr attr;
-  pwr_tVid vid;  
+  pwr_tVid vid;
 
   if (isServer())
     m_log = new tst_log(&m_sts, "rt-Qmon", "$pwrp_log/qmon.tlog");
@@ -495,8 +530,9 @@ ra_qmontest::ra_qmontest(eProc ptype) : m_ptype(ptype), m_qquota(500), m_errcnt(
     printf("** Unable to open log file");
 
   m_sts = gdh_Init("ra_qmontest");
-  if (EVEN(m_sts)) {
-    m_log->log('S', "qmon gdh_Init", m_sts);  
+  if (EVEN(m_sts))
+  {
+    m_log->log('S', "qmon gdh_Init", m_sts);
     exit(0);
   }
 
@@ -507,77 +543,84 @@ ra_qmontest::ra_qmontest(eProc ptype) : m_ptype(ptype), m_qquota(500), m_errcnt(
   m_clientq.qix = cClientQix;
   m_clientq.nid = vid;
 
-  if (isServer()) {
+  if (isServer())
+  {
     attr.type = qcom_eQtype_private;
     attr.quota = m_qquota;
-    qcom_CreateQ(&m_sts, &m_serverq, &attr, "queue3348");    
-    if (m_sts == QCOM__QALLREXIST) {
+    qcom_CreateQ(&m_sts, &m_serverq, &attr, "queue3348");
+    if (m_sts == QCOM__QALLREXIST)
+    {
       qcom_StealQ(&m_sts, &m_serverq);
-      //qcom_AttachQ(&m_sts, &m_serverq);
-      //if (m_sts == QCOM__ALLRATTACHED)
-      //m_sts = QCOM__SUCCESS;
-      //qcom_DeleteQ(&m_sts, &m_serverq);
-      //qcom_CreateQ(&m_sts, &m_serverq, &attr, "queue3348");
+      // qcom_AttachQ(&m_sts, &m_serverq);
+      // if (m_sts == QCOM__ALLRATTACHED)
+      // m_sts = QCOM__SUCCESS;
+      // qcom_DeleteQ(&m_sts, &m_serverq);
+      // qcom_CreateQ(&m_sts, &m_serverq, &attr, "queue3348");
     }
-    if (EVEN(m_sts)) {
+    if (EVEN(m_sts))
+    {
       m_log->log('E', "create serverq, qcom_CreateQ", m_sts);
       exit(0);
     }
 
-    for (;;) {
+    for (;;)
+    {
       qcom_AttachQ(&m_sts, &m_clientq);
       if (m_sts == QCOM__NOQ)
-	sleep(1);
+        sleep(1);
       else if (m_sts == QCOM__ALLRATTACHED)
-	break;
-      else if (EVEN(m_sts)) {
-	m_log->log('E', "attach clientq, qcom_AttachQ", m_sts);
-	exit(0);
+        break;
+      else if (EVEN(m_sts))
+      {
+        m_log->log('E', "attach clientq, qcom_AttachQ", m_sts);
+        exit(0);
       }
       else
-	break;
+        break;
     }
   }
-  else {
+  else
+  {
     // Client
     attr.type = qcom_eQtype_private;
     attr.quota = 10;
-    qcom_CreateQ(&m_sts, &m_clientq, &attr, "queue3348");    
-    if (m_sts == QCOM__QALLREXIST) {
+    qcom_CreateQ(&m_sts, &m_clientq, &attr, "queue3348");
+    if (m_sts == QCOM__QALLREXIST)
+    {
       qcom_StealQ(&m_sts, &m_clientq);
-      //if (m_sts == QCOM__ALLRATTACHED)
-      //m_sts = QCOM__SUCCESS;
-      //qcom_DeleteQ(&m_sts, &m_clientq);
-      //qcom_CreateQ(&m_sts, &m_clientq, &attr, "queue3348");
+      // if (m_sts == QCOM__ALLRATTACHED)
+      // m_sts = QCOM__SUCCESS;
+      // qcom_DeleteQ(&m_sts, &m_clientq);
+      // qcom_CreateQ(&m_sts, &m_clientq, &attr, "queue3348");
     }
-    if (EVEN(m_sts)) {
+    if (EVEN(m_sts))
+    {
       m_log->log('E', "create clientq, qcom_CreateQ", m_sts);
       exit(0);
     }
 
-    for (;;) {
+    for (;;)
+    {
       qcom_AttachQ(&m_sts, &m_serverq);
       if (m_sts == QCOM__NOQ)
-	sleep(1);
+        sleep(1);
       else if (m_sts == QCOM__ALLRATTACHED)
         break;
-      else if (EVEN(m_sts)) {
-	m_log->log('E', "attach serverq, qcom_AttachQ", m_sts);
-	exit(0);
+      else if (EVEN(m_sts))
+      {
+        m_log->log('E', "attach serverq, qcom_AttachQ", m_sts);
+        exit(0);
       }
       else
-	break;
+        break;
     }
   }
 }
 
 // Destructor
-ra_qmontest::~ra_qmontest()
-{
-  delete m_log;
-}
+ra_qmontest::~ra_qmontest() { delete m_log; }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   eProc ptype = eProc_Server;
   if (argc > 1 && strcmp(argv[1], "2") == 0)
@@ -585,5 +628,4 @@ int main(int argc, char *argv[])
 
   ra_qmontest qmon(ptype);
   qmon.exec();
-
 }

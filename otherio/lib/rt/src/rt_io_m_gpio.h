@@ -5,7 +5,8 @@
 
 #define GPIO_MAX_CHANNELS 32
 
-typedef struct {
+typedef struct
+{
   FILE* value_fp[GPIO_MAX_CHANNELS];
   unsigned int number[GPIO_MAX_CHANNELS];
   int interval_cnt;

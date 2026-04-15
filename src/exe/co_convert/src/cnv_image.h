@@ -47,8 +47,7 @@ void cnv_free_image(cnv_tImImage image, cnv_tPixmap pixmap);
 void cnv_print_image(cnv_tImImage image, char* filename);
 int cnv_image_width(cnv_tImImage image);
 int cnv_image_height(cnv_tImImage image);
-void cnv_image_pixel_iter(cnv_tImImage image,
-    void (*pixel_cb)(void*, std::ofstream&, unsigned char*), void* userdata,
-    std::ofstream& fp);
+void cnv_image_pixel_iter(cnv_tImImage image, void (*pixel_cb)(void*, std::ofstream&, unsigned char*),
+                          void* userdata, std::ofstream& fp);
 
 #endif

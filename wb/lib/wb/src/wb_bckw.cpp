@@ -46,11 +46,10 @@
 
 #include "wb_bckw.h"
 
-WbBckW::WbBckW(void* l_parent_ctx, ldh_tSesContext l_ldhses,
-    const char* bckw_name, wb_bck_list* l_list, int l_editmode,
-    pwr_tStatus* status)
-    : parent_ctx(l_parent_ctx), ldhses(l_ldhses), bckwnav(NULL), size(0),
-      max_size(500), list(l_list), editmode(l_editmode), wow(0)
+WbBckW::WbBckW(void* l_parent_ctx, ldh_tSesContext l_ldhses, const char* bckw_name, wb_bck_list* l_list,
+               int l_editmode, pwr_tStatus* status)
+    : parent_ctx(l_parent_ctx), ldhses(l_ldhses), bckwnav(NULL), size(0), max_size(500), list(l_list),
+      editmode(l_editmode), wow(0)
 {
   *status = 1;
   strcpy(name, bckw_name);
@@ -62,16 +61,12 @@ WbBckW::~WbBckW()
     delete list;
 }
 
-void WbBckW::show()
-{
-  bckwnav->show();
-}
+void WbBckW::show() { bckwnav->show(); }
 
 void WbBckW::activate_transfer_wb()
 {
-  wow->DisplayQuestion(this, "Transfer to database",
-      "Do you want to transfer the marked values to database", transfer_wb_ok,
-      0, 0);
+  wow->DisplayQuestion(this, "Transfer to database", "Do you want to transfer the marked values to database",
+                       transfer_wb_ok, 0, 0);
 }
 
 void WbBckW::transfer_wb_ok(void* ctx, void* data)
@@ -83,8 +78,7 @@ void WbBckW::transfer_wb_ok(void* ctx, void* data)
 
 void WbBckW::activate_filter()
 {
-  wow->CreateInputDialog(
-      this, "Filter", "Enter hierarchy", filter_cb, 0, 40, 0, 0);
+  wow->CreateInputDialog(this, "Filter", "Enter hierarchy", filter_cb, 0, 40, 0, 0);
 }
 
 void WbBckW::filter_cb(void* ctx, void* data, char* text)
@@ -99,12 +93,11 @@ void WbBckW::filter_cb(void* ctx, void* data, char* text)
 
 void WbBckW::activate_open()
 {
-  wow->CreateFileSelDia("Backup File Selection", (void*)this, file_selected_cb,
-      wow_eFileSelType_Backup, wow_eFileSelAction_Open);
+  wow->CreateFileSelDia("Backup File Selection", (void*)this, file_selected_cb, wow_eFileSelType_Backup,
+                        wow_eFileSelAction_Open);
 }
 
-void WbBckW::file_selected_cb(
-    void* ctx, char* filename, wow_eFileSelType file_type)
+void WbBckW::file_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type)
 {
   WbBckW* bckw = (WbBckW*)ctx;
   pwr_tStatus sts;
@@ -114,7 +107,8 @@ void WbBckW::file_selected_cb(
   wb_bck_list* slist = new wb_bck_list(bckw->ldhses, filename);
 
   sts = slist->read();
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     char msg[200];
 
     msg_GetMsg(sts, msg, sizeof(msg));
@@ -137,12 +131,11 @@ void WbBckW::activate_diff()
   if (!list)
     return;
 
-  wow->CreateFileSelDia("Backup File Selection", (void*)this,
-      diff_file_selected_cb, wow_eFileSelType_Backup, wow_eFileSelAction_Open);
+  wow->CreateFileSelDia("Backup File Selection", (void*)this, diff_file_selected_cb, wow_eFileSelType_Backup,
+                        wow_eFileSelAction_Open);
 }
 
-void WbBckW::diff_file_selected_cb(
-    void* ctx, char* filename, wow_eFileSelType file_type)
+void WbBckW::diff_file_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type)
 {
   WbBckW* bckw = (WbBckW*)ctx;
   pwr_tStatus sts;
@@ -155,13 +148,13 @@ void WbBckW::diff_file_selected_cb(
   wb_bck_list* dlist = new wb_bck_list(bckw->ldhses, filename);
 
   sts = dlist->read();
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     bckw->wow->DisplayError("Error Message", "Read error");
     return;
   }
 
-  wb_bck_list* outlist
-      = new wb_bck_list(bckw->ldhses, (char*)"Difference list");
+  wb_bck_list* outlist = new wb_bck_list(bckw->ldhses, (char*)"Difference list");
 
   sts = bckw->list->diff(dlist, outlist);
 
@@ -186,7 +179,8 @@ void WbBckW::activate_diff_wb()
   wb_bck_list* listdb = new wb_bck_list(ldhses, (char*)"Workbench");
 
   sts = listdb->read_db(list);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     wow->DisplayError("Error Message", "Read error");
     return;
   }

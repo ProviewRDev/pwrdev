@@ -56,8 +56,7 @@
 
 static int last_usblib_sts = 0;
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   ssize_t devnum;
   libusb_device** list;
@@ -66,23 +65,24 @@ static pwr_tStatus IoCardInit(
   int i;
   io_sLocalUSB_Agent* local_agent = (io_sLocalUSB_Agent*)ap->Local;
   io_sLocal_K8055* local;
-  pwr_sClass_Velleman_K8055_Board* op
-      = (pwr_sClass_Velleman_K8055_Board*)cp->op;
+  pwr_sClass_Velleman_K8055_Board* op = (pwr_sClass_Velleman_K8055_Board*)cp->op;
   int sts;
 
   if (!local_agent->libusb_ctx)
     return IO__INITFAIL;
 
   devnum = libusb_get_device_list(local_agent->libusb_ctx, &list);
-  if (devnum > 0) {
-    for (i = 0; i < devnum; i++) {
+  if (devnum > 0)
+  {
+    for (i = 0; i < devnum; i++)
+    {
       struct libusb_device_descriptor desc;
 
       if (libusb_get_device_descriptor(list[i], &desc) != 0)
         continue;
 
-      if (desc.idVendor == 0x10cf
-          && desc.idProduct == 0x5500 + op->Super.Address) {
+      if (desc.idVendor == 0x10cf && desc.idProduct == 0x5500 + op->Super.Address)
+      {
         device = list[i];
         found = 1;
         break;
@@ -90,7 +90,8 @@ static pwr_tStatus IoCardInit(
     }
   }
 
-  if (!found) {
+  if (!found)
+  {
     errh_Error("Init Velleman K8055, device not found '%s'", cp->Name);
     op->Status = IO__NODEVICE;
     ((pwr_sClass_Velleman_K8055*)rp->op)->Status = op->Status;
@@ -101,7 +102,8 @@ static pwr_tStatus IoCardInit(
   cp->Local = local;
 
   sts = libusb_open(device, &local->libusb_device);
-  if (sts != 0) {
+  if (sts != 0)
+  {
     if (sts == io_cLibDummy)
       op->Status = IO__DUMMYBUILD;
     else
@@ -115,18 +117,21 @@ static pwr_tStatus IoCardInit(
     libusb_detach_kernel_driver(local->libusb_device, 0);
 
   sts = libusb_claim_interface(local->libusb_device, 0);
-  if (sts < 0) {
+  if (sts < 0)
+  {
     errh_Error("K8055 Claim interface failed, sts %d, '%s'", sts, ap->Name);
     op->Status = IO__INITFAIL;
     ((pwr_sClass_Velleman_K8055*)rp->op)->Status = op->Status;
     return IO__INITFAIL;
   }
 
-  for (i = 0; i < 2; i++) {
+  for (i = 0; i < 2; i++)
+  {
     if (cp->chanlist[i].sop)
       io_AiRangeToCoef(&cp->chanlist[i]);
   }
-  for (i = 0; i < 2; i++) {
+  for (i = 0; i < 2; i++)
+  {
     if (cp->chanlist[i + 7].sop)
       io_AoRangeToCoef(&cp->chanlist[i + 7]);
   }
@@ -141,8 +146,7 @@ static pwr_tStatus IoCardInit(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalUSB_Agent* local_agent = (io_sLocalUSB_Agent*)ap->Local;
   io_sLocal_K8055* local = (io_sLocal_K8055*)cp->Local;
@@ -159,12 +163,10 @@ static pwr_tStatus IoCardClose(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal_K8055* local = (io_sLocal_K8055*)cp->Local;
-  pwr_sClass_Velleman_K8055_Board* op
-      = (pwr_sClass_Velleman_K8055_Board*)cp->op;
+  pwr_sClass_Velleman_K8055_Board* op = (pwr_sClass_Velleman_K8055_Board*)cp->op;
   unsigned char data[9];
   char endpoint = 0x81;
   int size = 8;
@@ -175,21 +177,25 @@ static pwr_tStatus IoCardRead(
   pwr_tUInt32 error_count = op->Super.ErrorCount;
 
   // You have to read twice to get the latest ?????
-  sts = libusb_interrupt_transfer(
-      local->libusb_device, endpoint, data, 8, &tsize, 100);
-  sts = libusb_interrupt_transfer(
-      local->libusb_device, endpoint, data, 8, &tsize, 100);
-  if (sts != 0 || tsize != size) {
+  sts = libusb_interrupt_transfer(local->libusb_device, endpoint, data, 8, &tsize, 100);
+  sts = libusb_interrupt_transfer(local->libusb_device, endpoint, data, 8, &tsize, 100);
+  if (sts != 0 || tsize != size)
+  {
     op->Super.ErrorCount++;
-    if (sts != 0 && sts != last_usblib_sts) {
+    if (sts != 0 && sts != last_usblib_sts)
+    {
       errh_Error("K8055 libusb transfer error %d", sts);
       last_usblib_sts = sts;
     }
     return IO__SUCCESS;
-  } else {
+  }
+  else
+  {
     // Handle Ai
-    for (i = 0; i < 2; i++) {
-      if (cp->chanlist[i].sop) {
+    for (i = 0; i < 2; i++)
+    {
+      if (cp->chanlist[i].sop)
+      {
         io_sChannel* chanp = &cp->chanlist[i];
         pwr_sClass_ChanAi* cop = (pwr_sClass_ChanAi*)chanp->cop;
         pwr_sClass_Ai* sop = (pwr_sClass_Ai*)chanp->sop;
@@ -203,11 +209,10 @@ static pwr_tStatus IoCardRead(
         io_ConvertAi(cop, ivalue, &actvalue);
 
         // Filter
-        if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0
-            && sop->FilterAttribute[0] > ctx->ScanTime) {
-          actvalue = *(pwr_tFloat32*)chanp->vbp
-              + ctx->ScanTime / sop->FilterAttribute[0]
-                  * (actvalue - *(pwr_tFloat32*)chanp->vbp);
+        if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0 && sop->FilterAttribute[0] > ctx->ScanTime)
+        {
+          actvalue = *(pwr_tFloat32*)chanp->vbp +
+                     ctx->ScanTime / sop->FilterAttribute[0] * (actvalue - *(pwr_tFloat32*)chanp->vbp);
         }
 
         *(pwr_tFloat32*)chanp->vbp = actvalue;
@@ -217,8 +222,10 @@ static pwr_tStatus IoCardRead(
     }
 
     // Handle Di
-    for (i = 0; i < 5; i++) {
-      switch (i) {
+    for (i = 0; i < 5; i++)
+    {
+      switch (i)
+      {
       case 0:
         m = 16;
         break;
@@ -240,13 +247,14 @@ static pwr_tStatus IoCardRead(
     }
   }
 
-  if (op->Super.ErrorCount >= op->Super.ErrorSoftLimit
-      && error_count < op->Super.ErrorSoftLimit) {
+  if (op->Super.ErrorCount >= op->Super.ErrorSoftLimit && error_count < op->Super.ErrorSoftLimit)
+  {
     errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
     ctx->IOHandler->CardErrorSoftLimit = 1;
     ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
   }
-  if (op->Super.ErrorCount >= op->Super.ErrorHardLimit) {
+  if (op->Super.ErrorCount >= op->Super.ErrorHardLimit)
+  {
     errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
     ctx->Node->EmergBreakTrue = 1;
     ctx->IOHandler->CardErrorHardLimit = 1;
@@ -257,12 +265,10 @@ static pwr_tStatus IoCardRead(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal_K8055* local = (io_sLocal_K8055*)cp->Local;
-  pwr_sClass_Velleman_K8055_Board* op
-      = (pwr_sClass_Velleman_K8055_Board*)cp->op;
+  pwr_sClass_Velleman_K8055_Board* op = (pwr_sClass_Velleman_K8055_Board*)cp->op;
   unsigned char data[9];
   char endpoint = 0x1;
   int size = 8;
@@ -278,8 +284,10 @@ static pwr_tStatus IoCardWrite(
   // Handle Do
   m = 1;
   unsigned char do_value = 0;
-  for (i = 0; i < 8; i++) {
-    if (cp->chanlist[i + 9].sop) {
+  for (i = 0; i < 8; i++)
+  {
+    if (cp->chanlist[i + 9].sop)
+    {
       if (*(pwr_tBoolean*)cp->chanlist[i + 9].vbp)
         do_value |= m;
     }
@@ -288,8 +296,10 @@ static pwr_tStatus IoCardWrite(
   data[1] = do_value;
 
   // Handle Ao
-  for (i = 0; i < 2; i++) {
-    if (cp->chanlist[i + 7].sop) {
+  for (i = 0; i < 2; i++)
+  {
+    if (cp->chanlist[i + 7].sop)
+    {
       io_sChannel* chanp = &cp->chanlist[i + 7];
       pwr_sClass_ChanAo* cop = (pwr_sClass_ChanAo*)chanp->cop;
 
@@ -297,8 +307,7 @@ static pwr_tStatus IoCardWrite(
         // Request to calculate new coefficients
         io_AoRangeToCoef(chanp);
 
-      float fvalue
-          = *(pwr_tFloat32*)chanp->vbp * cop->OutPolyCoef1 + cop->OutPolyCoef0;
+      float fvalue = *(pwr_tFloat32*)chanp->vbp * cop->OutPolyCoef1 + cop->OutPolyCoef0;
       int ivalue = (int)fvalue;
       if (ivalue < 0)
         ivalue = 0;
@@ -309,22 +318,24 @@ static pwr_tStatus IoCardWrite(
     }
   }
 
-  sts = libusb_interrupt_transfer(
-      local->libusb_device, endpoint, data, size, &tsize, 100);
-  if (sts != 0 || tsize != size) {
+  sts = libusb_interrupt_transfer(local->libusb_device, endpoint, data, size, &tsize, 100);
+  if (sts != 0 || tsize != size)
+  {
     op->Super.ErrorCount++;
-    if (sts != 0 && sts != last_usblib_sts) {
+    if (sts != 0 && sts != last_usblib_sts)
+    {
       errh_Error("K8055 libusb transfer error %d", sts);
       last_usblib_sts = sts;
     }
     return IO__SUCCESS;
   }
 
-  if (op->Super.ErrorCount >= op->Super.ErrorSoftLimit
-      && error_count < op->Super.ErrorSoftLimit) {
+  if (op->Super.ErrorCount >= op->Super.ErrorSoftLimit && error_count < op->Super.ErrorSoftLimit)
+  {
     errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
   }
-  if (op->Super.ErrorCount >= op->Super.ErrorHardLimit) {
+  if (op->Super.ErrorCount >= op->Super.ErrorHardLimit)
+  {
     errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
     ctx->Node->EmergBreakTrue = 1;
     return IO__ERRDEVICE;
@@ -334,23 +345,19 @@ static pwr_tStatus IoCardWrite(
 }
 
 #else
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   return IO__RELEASEBUILD;
 }
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   return IO__RELEASEBUILD;
 }
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   return IO__RELEASEBUILD;
 }
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   return IO__RELEASEBUILD;
 }
@@ -358,7 +365,6 @@ static pwr_tStatus IoCardWrite(
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(Velleman_K8055_Board)
-    = { pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
-        pwr_BindIoMethod(IoCardRead), pwr_BindIoMethod(IoCardWrite),
-        pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Velleman_K8055_Board) = {
+    pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead),
+    pwr_BindIoMethod(IoCardWrite), pwr_NullMethod};

@@ -96,19 +96,14 @@ int gobj_get_object_m36(WFoe* foe, vldh_t_node node, unsigned long index);
 int gobj_get_object_m37(WFoe* foe, vldh_t_node node, unsigned long index);
 
 gobj_tMethod gobj_get_object_m[40] = {
-  gobj_get_object_m0, gobj_get_object_m1, gobj_get_object_m2,
-  gobj_get_object_m3, gobj_get_object_m4, gobj_get_object_m5,
-  gobj_get_object_m6, gobj_get_object_m7, gobj_get_object_m8,
-  gobj_get_object_m9, gobj_get_object_m10, gobj_get_object_m11,
-  gobj_get_object_m12, gobj_get_object_m13, gobj_get_object_m14,
-  gobj_get_object_m15, gobj_get_object_m16, gobj_get_object_m17,
-  gobj_get_object_m18, gobj_get_object_m19, gobj_get_object_m20,
-  gobj_get_object_m21, gobj_get_object_m22, gobj_get_object_m23,
-  gobj_get_object_m24, gobj_get_object_m25, gobj_get_object_m26,
-  gobj_get_object_m27, gobj_get_object_m28, gobj_get_object_m29,
-  gobj_get_object_m30, gobj_get_object_m31, gobj_get_object_m32,
-  gobj_get_object_m33, gobj_get_object_m34, gobj_get_object_m35,
-  gobj_get_object_m36, gobj_get_object_m37,
+    gobj_get_object_m0,  gobj_get_object_m1,  gobj_get_object_m2,  gobj_get_object_m3,  gobj_get_object_m4,
+    gobj_get_object_m5,  gobj_get_object_m6,  gobj_get_object_m7,  gobj_get_object_m8,  gobj_get_object_m9,
+    gobj_get_object_m10, gobj_get_object_m11, gobj_get_object_m12, gobj_get_object_m13, gobj_get_object_m14,
+    gobj_get_object_m15, gobj_get_object_m16, gobj_get_object_m17, gobj_get_object_m18, gobj_get_object_m19,
+    gobj_get_object_m20, gobj_get_object_m21, gobj_get_object_m22, gobj_get_object_m23, gobj_get_object_m24,
+    gobj_get_object_m25, gobj_get_object_m26, gobj_get_object_m27, gobj_get_object_m28, gobj_get_object_m29,
+    gobj_get_object_m30, gobj_get_object_m31, gobj_get_object_m32, gobj_get_object_m33, gobj_get_object_m34,
+    gobj_get_object_m35, gobj_get_object_m36, gobj_get_object_m37,
 };
 
 static pwr_tAttrRef gobj_selected_aref;
@@ -134,8 +129,7 @@ void gobj_set_select(pwr_tAttrRef* aref)
 //	with the vid of a reference volume. The reference is transfered
 //	at compilation to the PlcFo or PlcMain object.
 //
-static pwr_tStatus gobj_ref_replace(
-    ldh_tSesContext ldhses, vldh_t_node node, pwr_sAttrRef* attrref)
+static pwr_tStatus gobj_ref_replace(ldh_tSesContext ldhses, vldh_t_node node, pwr_sAttrRef* attrref)
 {
   pwr_tCid cid;
   int size;
@@ -146,9 +140,9 @@ static pwr_tStatus gobj_ref_replace(
 
   plc = (node->hn.wind)->hw.plc;
 
-  sts = ldh_ObjidToName(
-      ldhses, attrref->Objid, ldh_eName_Object, name, sizeof(name), &size);
-  if (ODD(sts) && streq(name, "Template")) {
+  sts = ldh_ObjidToName(ldhses, attrref->Objid, ldh_eName_Object, name, sizeof(name), &size);
+  if (ODD(sts) && streq(name, "Template"))
+  {
     sts = ldh_GetObjectClass(ldhses, attrref->Objid, &cid);
     if (EVEN(sts))
       return sts;
@@ -161,12 +155,15 @@ static pwr_tStatus gobj_ref_replace(
     if (EVEN(sts))
       return sts;
 
-    if (cdh_ObjidIsEqual(parent, plcparent)) {
+    if (cdh_ObjidIsEqual(parent, plcparent))
+    {
       // Own template object, use $PlcFo reference
       attrref->Objid.vid = ldh_cPlcFoVolume;
       attrref->Objid.oix = cid;
       return FOE__REPLACED;
-    } else {
+    }
+    else
+    {
       // Other template object, use $PlcMain reference
       attrref->Objid.vid = ldh_cPlcMainVolume;
       attrref->Objid.oix = cid;
@@ -182,7 +179,8 @@ static int gobj_get_select(WFoe* foe, pwr_sAttrRef* attrref, int* is_attr)
   pwr_tAName str;
   vldh_t_plc plc = foe->gre->wind->hw.plc;
 
-  if (gobj_selected_set) {
+  if (gobj_selected_set)
+  {
     // Preset select
     char* np;
     int size;
@@ -190,9 +188,9 @@ static int gobj_get_select(WFoe* foe, pwr_sAttrRef* attrref, int* is_attr)
     *attrref = gobj_selected_aref;
     gobj_selected_set = 0;
 
-    sts = ldh_AttrRefToName(
-        foe->gre->wind->hw.ldhses, attrref, ldh_eName_Hierarchy, &np, &size);
-    if (ODD(sts)) {
+    sts = ldh_AttrRefToName(foe->gre->wind->hw.ldhses, attrref, ldh_eName_Hierarchy, &np, &size);
+    if (ODD(sts))
+    {
       if (strchr(np, '.') != 0)
         *is_attr = 1;
       else
@@ -201,7 +199,8 @@ static int gobj_get_select(WFoe* foe, pwr_sAttrRef* attrref, int* is_attr)
     return FOE__SUCCESS;
   }
 
-  if (foe->nav_palette_managed) {
+  if (foe->nav_palette_managed)
+  {
     sts = foe->navctx->get_select(attrref, is_attr);
     if (ODD(sts))
       return sts;
@@ -213,9 +212,11 @@ static int gobj_get_select(WFoe* foe, pwr_sAttrRef* attrref, int* is_attr)
     return sts;
 
   sts = foe->get_selection(str, sizeof(str));
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_NameToAttrRef(foe->gre->wind->hw.ldhses, str, attrref);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       if (strchr(str, '.') != 0)
         *is_attr = 1;
       else
@@ -241,13 +242,14 @@ int gobj_get_object(WFoe* foe, vldh_t_node node, unsigned long index)
 
   /* Fix to avoid crash if foe is started form hied */
   plc = (node->hn.wind)->hw.plc;
-  if (plc->hp.hinactx == 0 && !gobj_selected_set) {
+  if (plc->hp.hinactx == 0 && !gobj_selected_set)
+  {
     foe->message("Foe must be started from the navigator to connect");
     return FOE__SUCCESS;
   }
 
-  sts = ldh_GetClassBody((node->hn.wind)->hw.ldhses, node->ln.cid,
-      "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody((node->hn.wind)->hw.ldhses, node->ln.cid, "GraphPlcNode", &bodyclass,
+                         (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
@@ -288,7 +290,8 @@ int gobj_get_object_m1(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select a Di object in the navigator");
     BEEP;
     return sts;
@@ -298,21 +301,22 @@ int gobj_get_object_m1(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_Di) {
+  if (cid != pwr_cClass_Di)
+  {
     foe->message("Selected object is not a di object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DiObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DiObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -340,7 +344,8 @@ int gobj_get_object_m2(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select a Do object in the navigator");
     BEEP;
     return sts;
@@ -351,21 +356,22 @@ int gobj_get_object_m2(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!(cid == pwr_cClass_Do || cid == pwr_cClass_Po)) {
+  if (!(cid == pwr_cClass_Do || cid == pwr_cClass_Po))
+  {
     foe->message("Selected object is not a do object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DoObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DoObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -392,7 +398,8 @@ int gobj_get_object_m3(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select a Dv object in the navigator");
     BEEP;
     return sts;
@@ -403,21 +410,22 @@ int gobj_get_object_m3(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_Dv) {
+  if (cid != pwr_cClass_Dv)
+  {
     foe->message("Selected object is not a dv object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DvObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DvObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -444,7 +452,8 @@ int gobj_get_object_m4(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an Ai object in the navigator");
     BEEP;
     return sts;
@@ -455,21 +464,22 @@ int gobj_get_object_m4(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_Ai) {
+  if (cid != pwr_cClass_Ai)
+  {
     foe->message("Selected object is not an ai object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "AiObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "AiObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -496,7 +506,8 @@ int gobj_get_object_m5(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an Ao object in the navigator");
     BEEP;
     return sts;
@@ -507,21 +518,22 @@ int gobj_get_object_m5(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_Ao) {
+  if (cid != pwr_cClass_Ao)
+  {
     foe->message("Selected object is not an ao object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "AoObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "AoObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -548,7 +560,8 @@ int gobj_get_object_m6(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an Av object in the navigator");
     BEEP;
     return sts;
@@ -559,21 +572,22 @@ int gobj_get_object_m6(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!(cid == pwr_cClass_Av || cid == pwr_cClass_ConstAv)) {
+  if (!(cid == pwr_cClass_Av || cid == pwr_cClass_ConstAv))
+  {
     foe->message("Selected object is not an Av object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "AvObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "AvObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -604,7 +618,8 @@ int gobj_get_object_m7(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an attribute in the navigator");
     BEEP;
     return sts;
@@ -614,26 +629,29 @@ int gobj_get_object_m7(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
   }
 
-  if (cdh_tidIsCid(tid)) {
+  if (cdh_tidIsCid(tid))
+  {
     foe->message("Select an attribute in the navigator");
     BEEP;
     return sts;
   }
 
   /* Get first attribute in devbody of type pwr_eType_AttrRef */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
-  for (i = 0; i < rows; i++) {
-    switch (bodydef[i].ParClass) {
+  for (i = 0; i < rows; i++)
+  {
+    switch (bodydef[i].ParClass)
+    {
     case pwr_eClass_Input:
       type = bodydef[i].Par->Input.Info.Type;
       break;
@@ -645,16 +663,18 @@ int gobj_get_object_m7(WFoe* foe, vldh_t_node node, unsigned long index)
       break;
     default:;
     }
-    if (type == pwr_eType_AttrRef) {
-      if (cdh_IsClassVolume(node->ln.oid.vid)) {
+    if (type == pwr_eType_AttrRef)
+    {
+      if (cdh_IsClassVolume(node->ln.oid.vid))
+      {
         sts = gobj_ref_replace(ldhses, node, &attrref);
         if (EVEN(sts))
           return sts;
       }
 
       /* Set the parameter value */
-      sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody",
-          bodydef[i].ParName, (char*)&attrref, sizeof(attrref));
+      sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[i].ParName, (char*)&attrref,
+                             sizeof(attrref));
       if (EVEN(sts))
         return sts;
 
@@ -683,7 +703,8 @@ int gobj_get_object_m8(WFoe* foe, vldh_t_node node, unsigned long index)
   plc = (node->hn.wind)->hw.plc;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select a Di, Do or Dv object in the navigator");
     BEEP;
     return sts;
@@ -697,22 +718,22 @@ int gobj_get_object_m8(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if ((cid != pwr_cClass_Di) && (cid != pwr_cClass_Do) && (cid != pwr_cClass_Po)
-      && (cid != pwr_cClass_Dv)) {
+  if ((cid != pwr_cClass_Di) && (cid != pwr_cClass_Do) && (cid != pwr_cClass_Po) && (cid != pwr_cClass_Dv))
+  {
     foe->message("Reset object has to be a di, do or dv.");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, plc->lp.oid, "DevBody", "ResetObject",
-      (char*)&objdid, sizeof(objdid));
+  sts = ldh_SetObjectPar(ldhses, plc->lp.oid, "DevBody", "ResetObject", (char*)&objdid, sizeof(objdid));
   if (EVEN(sts))
     return sts;
 
@@ -740,7 +761,8 @@ int gobj_get_object_m9(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select a Co object in the navigator");
     BEEP;
     return sts;
@@ -751,21 +773,22 @@ int gobj_get_object_m9(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_Co) {
+  if (cid != pwr_cClass_Co)
+  {
     foe->message("Selected object is not a co object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "CoObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "CoObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -796,16 +819,17 @@ int gobj_get_object_m10(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts) || is_attr == 1) {
+  if (EVEN(sts) || is_attr == 1)
+  {
     foe->message("Select an object in the navigator");
     BEEP;
     return sts;
   }
 
   /* Set the PlcConnect attribute in the current object */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", "PlcConnect",
-      (char*)&attrref, sizeof(attrref));
-  if (EVEN(sts)) {
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", "PlcConnect", (char*)&attrref, sizeof(attrref));
+  if (EVEN(sts))
+  {
     foe->message("No PlcConnect attribute in object");
     BEEP;
     return sts;
@@ -813,19 +837,20 @@ int gobj_get_object_m10(WFoe* foe, vldh_t_node node, unsigned long index)
 
   /* Set the PlcConnect attribute in the connected object */
   nattrref = cdh_ObjidToAref(node->ln.oid);
-  sts = ldh_SetObjectPar(ldhses, attrref.Objid, "RtBody", "PlcConnect",
-      (char*)&nattrref, sizeof(nattrref));
+  sts = ldh_SetObjectPar(ldhses, attrref.Objid, "RtBody", "PlcConnect", (char*)&nattrref, sizeof(nattrref));
 
   foe->gre->node_update(node);
 
   /* Remove the subwindow which might hold old references */
   sts = ldh_GetChild(ldhses, node->ln.oid, &woid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_GetObjectClass(ldhses, woid, &cid);
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_windowplc) {
+    if (cid == pwr_cClass_windowplc)
+    {
       sts = ldh_DeleteObjectTree(ldhses, woid, 0);
       if (EVEN(sts))
         return sts;
@@ -868,43 +893,55 @@ int gobj_get_object_m11(WFoe* foe, vldh_t_node node, unsigned long index)
 
   foe->gre->get_selnodes(&node_count, &nodelist);
 
-  if (((node_count == 1) && (*nodelist == node)) || (node_count == 0)) {
+  if (((node_count == 1) && (*nodelist == node)) || (node_count == 0))
+  {
     /* Take the orderobject from the navigator */
     sts = gobj_get_select(foe, &attrref, &is_attr);
-    if (EVEN(sts)) {
-      foe->message(
-          "Select an order object in the navigator or in the current window");
+    if (EVEN(sts))
+    {
+      foe->message("Select an order object in the navigator or in the current window");
       BEEP;
       return sts;
     }
     objdid = attrref.Objid;
-  } else if ((node_count == 2)
-      && ((*nodelist == node) || (*(nodelist + 1) == node))) {
+  }
+  else if ((node_count == 2) && ((*nodelist == node) || (*(nodelist + 1) == node)))
+  {
     /* Check if the other node is a orderobject */
     if (*nodelist == node)
       object = *(nodelist + 1);
     else
       object = *nodelist;
-    if (object->ln.cid == pwr_cClass_order) {
+    if (object->ln.cid == pwr_cClass_order)
+    {
       objdid = object->ln.oid;
-    } else {
+    }
+    else
+    {
       foe->message("Select an order object in the navigator or in the current "
                    "window first");
       BEEP;
       return 0;
     }
-  } else if (node_count == 1) {
+  }
+  else if (node_count == 1)
+  {
     /* Check if the other node is a orderobject */
     object = *nodelist;
-    if (object->ln.cid == pwr_cClass_order) {
+    if (object->ln.cid == pwr_cClass_order)
+    {
       objdid = object->ln.oid;
-    } else {
+    }
+    else
+    {
       foe->message("Select an order object in the navigator or in the current "
                    "window first");
       BEEP;
       return 0;
     }
-  } else {
+  }
+  else
+  {
     foe->message("Select an order object in the navigator or in the current "
                  "window first");
     BEEP;
@@ -918,15 +955,15 @@ int gobj_get_object_m11(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_order) {
+  if (cid != pwr_cClass_order)
+  {
     foe->message("Selected object is not an order object");
     BEEP;
     return 0;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "OrderObject",
-      (char*)&objdid, sizeof(objdid));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "OrderObject", (char*)&objdid, sizeof(objdid));
   if (EVEN(sts))
     return sts;
 
@@ -963,43 +1000,56 @@ int gobj_get_object_m12(WFoe* foe, vldh_t_node node, unsigned long index)
 
   foe->gre->get_selnodes(&node_count, &nodelist);
 
-  if (((node_count == 1) && (*nodelist == node)) || (node_count == 0)) {
+  if (((node_count == 1) && (*nodelist == node)) || (node_count == 0))
+  {
     /* Take the document from the navigator */
     sts = gobj_get_select(foe, &attrref, &is_attr);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       foe->message("Select a document object in the navigator or in the "
                    "current window first");
       BEEP;
       return sts;
     }
     objdid = attrref.Objid;
-  } else if ((node_count == 2)
-      && ((*nodelist == node) || (*(nodelist + 1) == node))) {
+  }
+  else if ((node_count == 2) && ((*nodelist == node) || (*(nodelist + 1) == node)))
+  {
     /* Check if the other node is a documentobject */
     if (*nodelist == node)
       object = *(nodelist + 1);
     else
       object = *nodelist;
-    if (vldh_check_document(ldhses, object->ln.oid)) {
+    if (vldh_check_document(ldhses, object->ln.oid))
+    {
       objdid = object->ln.oid;
-    } else {
+    }
+    else
+    {
       foe->message("Select a document object in the navigator or in the "
                    "current window first");
       BEEP;
       return 0;
     }
-  } else if (node_count == 1) {
+  }
+  else if (node_count == 1)
+  {
     /* Check if the other node is a orderobject */
     object = *nodelist;
-    if (vldh_check_document(ldhses, object->ln.oid)) {
+    if (vldh_check_document(ldhses, object->ln.oid))
+    {
       objdid = object->ln.oid;
-    } else {
+    }
+    else
+    {
       foe->message("Select a document object in the navigator or in the "
                    "current window first");
       BEEP;
       return 0;
     }
-  } else {
+  }
+  else
+  {
     foe->message("Select a document object in the navigator or in the current "
                  "window first");
     BEEP;
@@ -1009,14 +1059,14 @@ int gobj_get_object_m12(WFoe* foe, vldh_t_node node, unsigned long index)
     free((char*)nodelist);
 
   /* Check that the objdid is a do object */
-  if (!vldh_check_document(ldhses, objdid)) {
+  if (!vldh_check_document(ldhses, objdid))
+  {
     foe->message("Selected object is not a document object");
     BEEP;
     return 0;
   }
 
-  sts = ldh_ObjidToName(
-      ldhses, objdid, ldh_eName_ArefVol, name, sizeof(name), &size);
+  sts = ldh_ObjidToName(ldhses, objdid, ldh_eName_ArefVol, name, sizeof(name), &size);
   if (EVEN(sts))
     return sts;
 
@@ -1026,8 +1076,7 @@ int gobj_get_object_m12(WFoe* foe, vldh_t_node node, unsigned long index)
     return sts;
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "PageAttr",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "PageAttr", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -1055,21 +1104,22 @@ int gobj_get_object_m13(WFoe* foe, vldh_t_node node, unsigned long index)
 
   /* Take the object from the navigator */
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an object in the navigator");
     BEEP;
     return sts;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DataObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DataObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -1105,7 +1155,8 @@ int gobj_get_object_m14(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an analog signal or attribute in the navigator");
     BEEP;
     return sts;
@@ -1115,7 +1166,8 @@ int gobj_get_object_m14(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
@@ -1125,7 +1177,8 @@ int gobj_get_object_m14(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  switch (tid) {
+  switch (tid)
+  {
   case pwr_eType_Float32:
     /* Create a StoAp */
     create_classid = pwr_cClass_GetAp;
@@ -1163,27 +1216,30 @@ int gobj_get_object_m14(WFoe* foe, vldh_t_node node, unsigned long index)
     return 0;
   }
 
-  sts = foe->gre->create_node(
-      create_classid, node->ln.x, node->ln.y, &new_node);
+  sts = foe->gre->create_node(create_classid, node->ln.x, node->ln.y, &new_node);
   if (EVEN(sts))
     return sts;
 
   /* Create new connections */
   con_ptr = con_list;
-  for (j = 0; j < (int)con_count; j++) {
-    if ((*con_ptr)->hc.source_node == node) {
+  for (j = 0; j < (int)con_count; j++)
+  {
+    if ((*con_ptr)->hc.source_node == node)
+    {
       source = new_node;
       source_point = 0;
       dest = (*con_ptr)->hc.dest_node;
       dest_point = (*con_ptr)->lc.dest_point;
-    } else {
+    }
+    else
+    {
       dest = new_node;
       dest_point = 0;
       source = (*con_ptr)->hc.source_node;
       source_point = (*con_ptr)->lc.source_point;
     }
-    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest,
-        dest_point, (*con_ptr)->lc.drawtype);
+    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest, dest_point,
+                               (*con_ptr)->lc.drawtype);
     if (EVEN(sts))
       return sts;
     con_ptr++;
@@ -1193,15 +1249,15 @@ int gobj_get_object_m14(WFoe* foe, vldh_t_node node, unsigned long index)
   foe->gre->delete_node(node);
   foe->popupmenu_node = 0;
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname,
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname, (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -1239,7 +1295,8 @@ int gobj_get_object_m15(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select a digital signal or attribute in the navigator");
     BEEP;
     return sts;
@@ -1249,7 +1306,8 @@ int gobj_get_object_m15(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
@@ -1259,7 +1317,8 @@ int gobj_get_object_m15(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  switch (tid) {
+  switch (tid)
+  {
   case pwr_eType_Boolean:
     /* Create a GetDp */
     create_classid = pwr_cClass_GetDp;
@@ -1282,27 +1341,30 @@ int gobj_get_object_m15(WFoe* foe, vldh_t_node node, unsigned long index)
     BEEP;
     return 0;
   }
-  sts = foe->gre->create_node(
-      create_classid, node->ln.x, node->ln.y, &new_node);
+  sts = foe->gre->create_node(create_classid, node->ln.x, node->ln.y, &new_node);
   if (EVEN(sts))
     return sts;
 
   /* Create new connections */
   con_ptr = con_list;
-  for (j = 0; j < (int)con_count; j++) {
-    if ((*con_ptr)->hc.source_node == node) {
+  for (j = 0; j < (int)con_count; j++)
+  {
+    if ((*con_ptr)->hc.source_node == node)
+    {
       source = new_node;
       source_point = 0;
       dest = (*con_ptr)->hc.dest_node;
       dest_point = (*con_ptr)->lc.dest_point;
-    } else {
+    }
+    else
+    {
       dest = new_node;
       dest_point = 0;
       source = (*con_ptr)->hc.source_node;
       source_point = (*con_ptr)->lc.source_point;
     }
-    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest,
-        dest_point, (*con_ptr)->lc.drawtype);
+    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest, dest_point,
+                               (*con_ptr)->lc.drawtype);
     if (EVEN(sts))
       return sts;
     con_ptr++;
@@ -1312,15 +1374,15 @@ int gobj_get_object_m15(WFoe* foe, vldh_t_node node, unsigned long index)
   foe->gre->delete_node(node);
   foe->popupmenu_node = 0;
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname,
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname, (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -1358,7 +1420,8 @@ int gobj_get_object_m16(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an analog signal or attribute in the navigator");
     BEEP;
     return sts;
@@ -1368,7 +1431,8 @@ int gobj_get_object_m16(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
@@ -1378,7 +1442,8 @@ int gobj_get_object_m16(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  switch (tid) {
+  switch (tid)
+  {
   case pwr_eType_Float32:
     /* Create a StoAp */
     strcpy(parname, "Object");
@@ -1412,27 +1477,30 @@ int gobj_get_object_m16(WFoe* foe, vldh_t_node node, unsigned long index)
     return 0;
   }
 
-  sts = foe->gre->create_node(
-      create_classid, node->ln.x, node->ln.y, &new_node);
+  sts = foe->gre->create_node(create_classid, node->ln.x, node->ln.y, &new_node);
   if (EVEN(sts))
     return sts;
 
   /* Create new connections */
   con_ptr = con_list;
-  for (j = 0; j < (int)con_count; j++) {
-    if ((*con_ptr)->hc.source_node == node) {
+  for (j = 0; j < (int)con_count; j++)
+  {
+    if ((*con_ptr)->hc.source_node == node)
+    {
       source = new_node;
       source_point = 0;
       dest = (*con_ptr)->hc.dest_node;
       dest_point = (*con_ptr)->lc.dest_point;
-    } else {
+    }
+    else
+    {
       dest = new_node;
       dest_point = 0;
       source = (*con_ptr)->hc.source_node;
       source_point = (*con_ptr)->lc.source_point;
     }
-    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest,
-        dest_point, (*con_ptr)->lc.drawtype);
+    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest, dest_point,
+                               (*con_ptr)->lc.drawtype);
     if (EVEN(sts))
       return sts;
     con_ptr++;
@@ -1442,15 +1510,15 @@ int gobj_get_object_m16(WFoe* foe, vldh_t_node node, unsigned long index)
   foe->gre->delete_node(node);
   foe->popupmenu_node = 0;
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname,
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname, (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -1488,7 +1556,8 @@ int gobj_get_object_m17(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select a digital signal in the navigator");
     BEEP;
     return sts;
@@ -1498,7 +1567,8 @@ int gobj_get_object_m17(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
@@ -1508,7 +1578,8 @@ int gobj_get_object_m17(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  switch (tid) {
+  switch (tid)
+  {
   case pwr_eType_Boolean:
     /* Create a StoDp */
     strcpy(parname, "Object");
@@ -1532,27 +1603,30 @@ int gobj_get_object_m17(WFoe* foe, vldh_t_node node, unsigned long index)
     return 0;
   }
 
-  sts = foe->gre->create_node(
-      create_classid, node->ln.x, node->ln.y, &new_node);
+  sts = foe->gre->create_node(create_classid, node->ln.x, node->ln.y, &new_node);
   if (EVEN(sts))
     return sts;
 
   /* Create new connections */
   con_ptr = con_list;
-  for (j = 0; j < (int)con_count; j++) {
-    if ((*con_ptr)->hc.source_node == node) {
+  for (j = 0; j < (int)con_count; j++)
+  {
+    if ((*con_ptr)->hc.source_node == node)
+    {
       source = new_node;
       source_point = 0;
       dest = (*con_ptr)->hc.dest_node;
       dest_point = (*con_ptr)->lc.dest_point;
-    } else {
+    }
+    else
+    {
       dest = new_node;
       dest_point = 0;
       source = (*con_ptr)->hc.source_node;
       source_point = (*con_ptr)->lc.source_point;
     }
-    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest,
-        dest_point, (*con_ptr)->lc.drawtype);
+    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest, dest_point,
+                               (*con_ptr)->lc.drawtype);
     if (EVEN(sts))
       return sts;
     con_ptr++;
@@ -1562,15 +1636,15 @@ int gobj_get_object_m17(WFoe* foe, vldh_t_node node, unsigned long index)
   foe->gre->delete_node(node);
   foe->popupmenu_node = 0;
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname,
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname, (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -1601,7 +1675,8 @@ int gobj_get_object_m18(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select Sv object in the navigator");
     BEEP;
     return sts;
@@ -1612,21 +1687,22 @@ int gobj_get_object_m18(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_Sv) {
+  if (cid != pwr_cClass_Sv)
+  {
     foe->message("Selected object is not a Sv object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "SvObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "SvObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -1661,7 +1737,8 @@ int gobj_get_object_m19(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select string value or attribute in the navigator");
     BEEP;
     return sts;
@@ -1671,7 +1748,8 @@ int gobj_get_object_m19(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
@@ -1681,7 +1759,8 @@ int gobj_get_object_m19(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  switch (tid) {
+  switch (tid)
+  {
   case pwr_eType_String:
     /* Create a GetSp */
     create_classid = pwr_cClass_GetSp;
@@ -1696,27 +1775,30 @@ int gobj_get_object_m19(WFoe* foe, vldh_t_node node, unsigned long index)
     BEEP;
     return 0;
   }
-  sts = foe->gre->create_node(
-      create_classid, node->ln.x, node->ln.y, &new_node);
+  sts = foe->gre->create_node(create_classid, node->ln.x, node->ln.y, &new_node);
   if (EVEN(sts))
     return sts;
 
   /* Create new connections */
   con_ptr = con_list;
-  for (j = 0; j < (int)con_count; j++) {
-    if ((*con_ptr)->hc.source_node == node) {
+  for (j = 0; j < (int)con_count; j++)
+  {
+    if ((*con_ptr)->hc.source_node == node)
+    {
       source = new_node;
       source_point = 0;
       dest = (*con_ptr)->hc.dest_node;
       dest_point = (*con_ptr)->lc.dest_point;
-    } else {
+    }
+    else
+    {
       dest = new_node;
       dest_point = 0;
       source = (*con_ptr)->hc.source_node;
       source_point = (*con_ptr)->lc.source_point;
     }
-    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest,
-        dest_point, (*con_ptr)->lc.drawtype);
+    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest, dest_point,
+                               (*con_ptr)->lc.drawtype);
     if (EVEN(sts))
       return sts;
     con_ptr++;
@@ -1726,15 +1808,15 @@ int gobj_get_object_m19(WFoe* foe, vldh_t_node node, unsigned long index)
   foe->gre->delete_node(node);
   foe->popupmenu_node = 0;
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname,
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname, (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -1773,7 +1855,8 @@ int gobj_get_object_m20(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select a string value or attribute in the navigator");
     BEEP;
     return sts;
@@ -1783,7 +1866,8 @@ int gobj_get_object_m20(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
@@ -1793,7 +1877,8 @@ int gobj_get_object_m20(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  switch (tid) {
+  switch (tid)
+  {
   case pwr_eType_String:
     /* Create a StoSp */
     strcpy(parname, "Object");
@@ -1809,27 +1894,30 @@ int gobj_get_object_m20(WFoe* foe, vldh_t_node node, unsigned long index)
     return 0;
   }
 
-  sts = foe->gre->create_node(
-      create_classid, node->ln.x, node->ln.y, &new_node);
+  sts = foe->gre->create_node(create_classid, node->ln.x, node->ln.y, &new_node);
   if (EVEN(sts))
     return sts;
 
   /* Create new connections */
   con_ptr = con_list;
-  for (j = 0; j < (int)con_count; j++) {
-    if ((*con_ptr)->hc.source_node == node) {
+  for (j = 0; j < (int)con_count; j++)
+  {
+    if ((*con_ptr)->hc.source_node == node)
+    {
       source = new_node;
       source_point = 0;
       dest = (*con_ptr)->hc.dest_node;
       dest_point = (*con_ptr)->lc.dest_point;
-    } else {
+    }
+    else
+    {
       dest = new_node;
       dest_point = 0;
       source = (*con_ptr)->hc.source_node;
       source_point = (*con_ptr)->lc.source_point;
     }
-    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest,
-        dest_point, (*con_ptr)->lc.drawtype);
+    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest, dest_point,
+                               (*con_ptr)->lc.drawtype);
     if (EVEN(sts))
       return sts;
     con_ptr++;
@@ -1839,15 +1927,15 @@ int gobj_get_object_m20(WFoe* foe, vldh_t_node node, unsigned long index)
   foe->gre->delete_node(node);
   foe->popupmenu_node = 0;
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname,
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname, (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -1878,7 +1966,8 @@ int gobj_get_object_m21(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an Iv object in the navigator");
     BEEP;
     return sts;
@@ -1889,21 +1978,22 @@ int gobj_get_object_m21(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!(cid == pwr_cClass_Iv || cid == pwr_cClass_ConstIv)) {
+  if (!(cid == pwr_cClass_Iv || cid == pwr_cClass_ConstIv))
+  {
     foe->message("Selected object is not a Iv object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "IvObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "IvObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -1930,7 +2020,8 @@ int gobj_get_object_m22(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an Ii object in the navigator");
     BEEP;
     return sts;
@@ -1941,21 +2032,22 @@ int gobj_get_object_m22(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_Ii) {
+  if (cid != pwr_cClass_Ii)
+  {
     foe->message("Selected object is not a Ii object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "IiObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "IiObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -1982,7 +2074,8 @@ int gobj_get_object_m23(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an Io object in the navigator");
     BEEP;
     return sts;
@@ -1993,21 +2086,22 @@ int gobj_get_object_m23(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_Io) {
+  if (cid != pwr_cClass_Io)
+  {
     foe->message("Selected object is not a Io object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "IoObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "IoObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -2042,7 +2136,8 @@ int gobj_get_object_m24(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an integer signal or attribute in the navigator");
     BEEP;
     return sts;
@@ -2052,7 +2147,8 @@ int gobj_get_object_m24(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
@@ -2062,7 +2158,8 @@ int gobj_get_object_m24(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  switch (tid) {
+  switch (tid)
+  {
   case pwr_eType_Int32:
   case pwr_eType_UInt32:
   case pwr_eType_Int16:
@@ -2097,27 +2194,30 @@ int gobj_get_object_m24(WFoe* foe, vldh_t_node node, unsigned long index)
     return 0;
   }
 
-  sts = foe->gre->create_node(
-      create_classid, node->ln.x, node->ln.y, &new_node);
+  sts = foe->gre->create_node(create_classid, node->ln.x, node->ln.y, &new_node);
   if (EVEN(sts))
     return sts;
 
   /* Create new connections */
   con_ptr = con_list;
-  for (j = 0; j < (int)con_count; j++) {
-    if ((*con_ptr)->hc.source_node == node) {
+  for (j = 0; j < (int)con_count; j++)
+  {
+    if ((*con_ptr)->hc.source_node == node)
+    {
       source = new_node;
       source_point = 0;
       dest = (*con_ptr)->hc.dest_node;
       dest_point = (*con_ptr)->lc.dest_point;
-    } else {
+    }
+    else
+    {
       dest = new_node;
       dest_point = 0;
       source = (*con_ptr)->hc.source_node;
       source_point = (*con_ptr)->lc.source_point;
     }
-    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest,
-        dest_point, (*con_ptr)->lc.drawtype);
+    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest, dest_point,
+                               (*con_ptr)->lc.drawtype);
     if (EVEN(sts))
       return sts;
     con_ptr++;
@@ -2127,15 +2227,15 @@ int gobj_get_object_m24(WFoe* foe, vldh_t_node node, unsigned long index)
   foe->gre->delete_node(node);
   foe->popupmenu_node = 0;
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname,
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname, (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -2174,7 +2274,8 @@ int gobj_get_object_m25(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an integer signal in the navigator");
     BEEP;
     return sts;
@@ -2184,7 +2285,8 @@ int gobj_get_object_m25(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
@@ -2194,7 +2296,8 @@ int gobj_get_object_m25(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  switch (tid) {
+  switch (tid)
+  {
   case pwr_eType_Int32:
   case pwr_eType_UInt32:
   case pwr_eType_Int16:
@@ -2225,27 +2328,30 @@ int gobj_get_object_m25(WFoe* foe, vldh_t_node node, unsigned long index)
     return 0;
   }
 
-  sts = foe->gre->create_node(
-      create_classid, node->ln.x, node->ln.y, &new_node);
+  sts = foe->gre->create_node(create_classid, node->ln.x, node->ln.y, &new_node);
   if (EVEN(sts))
     return sts;
 
   /* Create new connections */
   con_ptr = con_list;
-  for (j = 0; j < (int)con_count; j++) {
-    if ((*con_ptr)->hc.source_node == node) {
+  for (j = 0; j < (int)con_count; j++)
+  {
+    if ((*con_ptr)->hc.source_node == node)
+    {
       source = new_node;
       source_point = 0;
       dest = (*con_ptr)->hc.dest_node;
       dest_point = (*con_ptr)->lc.dest_point;
-    } else {
+    }
+    else
+    {
       dest = new_node;
       dest_point = 0;
       source = (*con_ptr)->hc.source_node;
       source_point = (*con_ptr)->lc.source_point;
     }
-    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest,
-        dest_point, (*con_ptr)->lc.drawtype);
+    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest, dest_point,
+                               (*con_ptr)->lc.drawtype);
     if (EVEN(sts))
       return sts;
     con_ptr++;
@@ -2255,15 +2361,15 @@ int gobj_get_object_m25(WFoe* foe, vldh_t_node node, unsigned long index)
   foe->gre->delete_node(node);
   foe->popupmenu_node = 0;
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname,
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname, (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -2298,33 +2404,35 @@ int gobj_get_object_m26(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts) || is_attr == 1) {
+  if (EVEN(sts) || is_attr == 1)
+  {
     foe->message("Select an object in the navigator");
     BEEP;
     return sts;
   }
 
   /* Set the PlcConnect attribute in the current object */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", "PlcConnect",
-      (char*)&attrref, sizeof(attrref));
-  if (EVEN(sts)) {
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", "PlcConnect", (char*)&attrref, sizeof(attrref));
+  if (EVEN(sts))
+  {
     foe->message("No PlcConnect attribute in object");
     BEEP;
     return sts;
   }
   /* Set the SimConnect attribute in the connected object */
   nattrref = cdh_ObjidToAref(node->ln.oid);
-  sts = ldh_SetObjectPar(ldhses, attrref.Objid, "RtBody", "SimConnect",
-      (char*)&nattrref, sizeof(nattrref));
+  sts = ldh_SetObjectPar(ldhses, attrref.Objid, "RtBody", "SimConnect", (char*)&nattrref, sizeof(nattrref));
 
   /* Remove the subwindow which might hold old references */
   sts = ldh_GetChild(ldhses, node->ln.oid, &woid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = ldh_GetObjectClass(ldhses, woid, &cid);
     if (EVEN(sts))
       return sts;
 
-    if (cid == pwr_cClass_windowplc) {
+    if (cid == pwr_cClass_windowplc)
+    {
       sts = ldh_DeleteObjectTree(ldhses, woid, 0);
       if (EVEN(sts))
         return sts;
@@ -2362,13 +2470,15 @@ int gobj_get_object_m27(WFoe* foe, vldh_t_node node, unsigned long index)
 
   /* Take the object from the navigator */
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an object in the navigator");
     BEEP;
     return sts;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
@@ -2379,15 +2489,15 @@ int gobj_get_object_m27(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!(info.flags & PWR_MASK_DISABLEATTR)) {
+  if (!(info.flags & PWR_MASK_DISABLEATTR))
+  {
     foe->message("Attribute can't be disabled");
     BEEP;
     return 0;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "Object",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "Object", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -2423,7 +2533,8 @@ int gobj_get_object_m28(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select string value or attribute in the navigator");
     BEEP;
     return sts;
@@ -2433,7 +2544,8 @@ int gobj_get_object_m28(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
@@ -2443,9 +2555,11 @@ int gobj_get_object_m28(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_GetATgeneric:
-    switch (tid) {
+    switch (tid)
+    {
     case pwr_eType_Time:
       /* Create a GetATp */
       create_classid = pwr_cClass_GetATp;
@@ -2462,7 +2576,8 @@ int gobj_get_object_m28(WFoe* foe, vldh_t_node node, unsigned long index)
     }
     break;
   case pwr_cClass_GetDTgeneric:
-    switch (tid) {
+    switch (tid)
+    {
     case pwr_eType_DeltaTime:
       /* Create a GetDTp */
       create_classid = pwr_cClass_GetDTp;
@@ -2479,27 +2594,30 @@ int gobj_get_object_m28(WFoe* foe, vldh_t_node node, unsigned long index)
     }
     break;
   }
-  sts = foe->gre->create_node(
-      create_classid, node->ln.x, node->ln.y, &new_node);
+  sts = foe->gre->create_node(create_classid, node->ln.x, node->ln.y, &new_node);
   if (EVEN(sts))
     return sts;
 
   /* Create new connections */
   con_ptr = con_list;
-  for (j = 0; j < (int)con_count; j++) {
-    if ((*con_ptr)->hc.source_node == node) {
+  for (j = 0; j < (int)con_count; j++)
+  {
+    if ((*con_ptr)->hc.source_node == node)
+    {
       source = new_node;
       source_point = 0;
       dest = (*con_ptr)->hc.dest_node;
       dest_point = (*con_ptr)->lc.dest_point;
-    } else {
+    }
+    else
+    {
       dest = new_node;
       dest_point = 0;
       source = (*con_ptr)->hc.source_node;
       source_point = (*con_ptr)->lc.source_point;
     }
-    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest,
-        dest_point, (*con_ptr)->lc.drawtype);
+    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest, dest_point,
+                               (*con_ptr)->lc.drawtype);
     if (EVEN(sts))
       return sts;
     con_ptr++;
@@ -2509,15 +2627,15 @@ int gobj_get_object_m28(WFoe* foe, vldh_t_node node, unsigned long index)
   foe->gre->delete_node(node);
   foe->popupmenu_node = 0;
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname,
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname, (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -2556,7 +2674,8 @@ int gobj_get_object_m29(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select a string value or attribute in the navigator");
     BEEP;
     return sts;
@@ -2566,7 +2685,8 @@ int gobj_get_object_m29(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
@@ -2576,9 +2696,11 @@ int gobj_get_object_m29(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_StoATgeneric:
-    switch (tid) {
+    switch (tid)
+    {
     case pwr_eType_Time:
       /* Create a StoATp */
       strcpy(parname, "Object");
@@ -2595,7 +2717,8 @@ int gobj_get_object_m29(WFoe* foe, vldh_t_node node, unsigned long index)
     }
     break;
   case pwr_cClass_StoDTgeneric:
-    switch (tid) {
+    switch (tid)
+    {
     case pwr_eType_DeltaTime:
       /* Create a StoDTp */
       strcpy(parname, "Object");
@@ -2614,27 +2737,30 @@ int gobj_get_object_m29(WFoe* foe, vldh_t_node node, unsigned long index)
   default:
     return 0;
   }
-  sts = foe->gre->create_node(
-      create_classid, node->ln.x, node->ln.y, &new_node);
+  sts = foe->gre->create_node(create_classid, node->ln.x, node->ln.y, &new_node);
   if (EVEN(sts))
     return sts;
 
   /* Create new connections */
   con_ptr = con_list;
-  for (j = 0; j < (int)con_count; j++) {
-    if ((*con_ptr)->hc.source_node == node) {
+  for (j = 0; j < (int)con_count; j++)
+  {
+    if ((*con_ptr)->hc.source_node == node)
+    {
       source = new_node;
       source_point = 0;
       dest = (*con_ptr)->hc.dest_node;
       dest_point = (*con_ptr)->lc.dest_point;
-    } else {
+    }
+    else
+    {
       dest = new_node;
       dest_point = 0;
       source = (*con_ptr)->hc.source_node;
       source_point = (*con_ptr)->lc.source_point;
     }
-    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest,
-        dest_point, (*con_ptr)->lc.drawtype);
+    sts = foe->gre->create_con((*con_ptr)->lc.cid, source, source_point, dest, dest_point,
+                               (*con_ptr)->lc.drawtype);
     if (EVEN(sts))
       return sts;
     con_ptr++;
@@ -2644,15 +2770,15 @@ int gobj_get_object_m29(WFoe* foe, vldh_t_node node, unsigned long index)
   foe->gre->delete_node(node);
   foe->popupmenu_node = 0;
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname,
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, new_node->ln.oid, "DevBody", parname, (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -2684,7 +2810,8 @@ int gobj_get_object_m30(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select ATv object in the navigator");
     BEEP;
     return sts;
@@ -2695,21 +2822,22 @@ int gobj_get_object_m30(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_ATv) {
+  if (cid != pwr_cClass_ATv)
+  {
     foe->message("Selected object is not a ATv object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "ATvObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "ATvObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -2737,7 +2865,8 @@ int gobj_get_object_m31(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select DTv object in the navigator");
     BEEP;
     return sts;
@@ -2748,21 +2877,22 @@ int gobj_get_object_m31(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_DTv) {
+  if (cid != pwr_cClass_DTv)
+  {
     foe->message("Selected object is not a DTv object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DTvObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DTvObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -2800,7 +2930,8 @@ int gobj_get_object_m32(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an attribute in the navigator");
     BEEP;
     return sts;
@@ -2810,13 +2941,15 @@ int gobj_get_object_m32(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
   }
 
-  if (cdh_tidIsCid(tid)) {
+  if (cdh_tidIsCid(tid))
+  {
     foe->message("Select an attribute in the navigator");
     BEEP;
     return 0;
@@ -2841,21 +2974,25 @@ int gobj_get_object_m32(WFoe* foe, vldh_t_node node, unsigned long index)
     return sts;
 
   ok = 0;
-  if (cdh_tidIsCid(cid)) {
+  if (cdh_tidIsCid(cid))
+  {
     sts = ldh_GetSuperClass(ldhses, cid, &scid);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       if (scid == pwr_cClass_Bi)
         ok = 1;
     }
   }
-  if (!ok) {
+  if (!ok)
+  {
     foe->message("Select ActualValue of a Buffer Input object");
     BEEP;
     return 0;
   }
 
   ok = 0;
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_GetBiInt32:
     if (tid == pwr_eType_Int32 || tid == pwr_eType_UInt32)
       ok = 1;
@@ -2873,7 +3010,8 @@ int gobj_get_object_m32(WFoe* foe, vldh_t_node node, unsigned long index)
     ok = 1;
   }
 
-  if (!ok) {
+  if (!ok)
+  {
     foe->message("Error on Bi object data type");
     BEEP;
     return 0;
@@ -2884,30 +3022,35 @@ int gobj_get_object_m32(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (streq(bodydef[rows - 2].ParName, "ActualValue")) {
-    if (bodydef[rows - 2].Par->Param.Info.Flags & PWR_MASK_ARRAY) {
-      if (attrref.Flags.b.Array) {
+  if (streq(bodydef[rows - 2].ParName, "ActualValue"))
+  {
+    if (bodydef[rows - 2].Par->Param.Info.Flags & PWR_MASK_ARRAY)
+    {
+      if (attrref.Flags.b.Array)
+      {
         foe->message("Select and array element");
         BEEP;
         return 0;
       }
     }
-  } else {
+  }
+  else
+  {
     foe->message("Bi object ActualValue attribute not found");
     BEEP;
     return 0;
   }
   free((char*)bodydef);
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "BiObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "BiObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -2945,7 +3088,8 @@ int gobj_get_object_m33(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an attribute in the navigator");
     BEEP;
     return sts;
@@ -2955,13 +3099,15 @@ int gobj_get_object_m33(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (!cdh_tidIsCid(tid)) {
+  if (!cdh_tidIsCid(tid))
+  {
     sts = ldh_GetAttrRefType(ldhses, &attrref, (pwr_eType*)&tid);
     if (EVEN(sts))
       return sts;
   }
 
-  if (cdh_tidIsCid(tid)) {
+  if (cdh_tidIsCid(tid))
+  {
     foe->message("Select an attribute in the navigator");
     BEEP;
     return sts;
@@ -2986,21 +3132,25 @@ int gobj_get_object_m33(WFoe* foe, vldh_t_node node, unsigned long index)
     return sts;
 
   ok = 0;
-  if (cdh_tidIsCid(cid)) {
+  if (cdh_tidIsCid(cid))
+  {
     sts = ldh_GetSuperClass(ldhses, cid, &scid);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       if (scid == pwr_cClass_Bo)
         ok = 1;
     }
   }
-  if (!ok) {
+  if (!ok)
+  {
     foe->message("Select ActualValue of a Buffer Output object");
     BEEP;
     return sts;
   }
 
   ok = 0;
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_GetBoInt32:
     if (tid == pwr_eType_Int32 || tid == pwr_eType_UInt32)
       ok = 1;
@@ -3023,30 +3173,35 @@ int gobj_get_object_m33(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (streq(bodydef[rows - 2].ParName, "ActualValue")) {
-    if (bodydef[rows - 2].Par->Param.Info.Flags & PWR_MASK_ARRAY) {
-      if (attrref.Flags.b.Array) {
+  if (streq(bodydef[rows - 2].ParName, "ActualValue"))
+  {
+    if (bodydef[rows - 2].Par->Param.Info.Flags & PWR_MASK_ARRAY)
+    {
+      if (attrref.Flags.b.Array)
+      {
         foe->message("Select and array element");
         BEEP;
         return 0;
       }
     }
-  } else {
+  }
+  else
+  {
     foe->message("Bi object ActualValue attribute not found");
     BEEP;
     return 0;
   }
   free((char*)bodydef);
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "BoObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "BoObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -3074,7 +3229,8 @@ int gobj_get_object_m34(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select Sv object in the navigator");
     BEEP;
     return sts;
@@ -3085,21 +3241,22 @@ int gobj_get_object_m34(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (cid != pwr_cClass_DataRefv) {
+  if (cid != pwr_cClass_DataRefv)
+  {
     foe->message("Selected object is not a DataRefv object");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DataRefvObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DataRefvObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -3125,7 +3282,8 @@ int gobj_get_object_m35(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     foe->message("Select an attribute of the AttrRef in the navigator");
     BEEP;
     return sts;
@@ -3135,21 +3293,22 @@ int gobj_get_object_m35(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  if (info.type != pwr_eType_AttrRef) {
+  if (info.type != pwr_eType_AttrRef)
+  {
     foe->message("Selected attribute is not of type AttrRef");
     BEEP;
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "RefAttribute",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "RefAttribute", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -3180,26 +3339,33 @@ int gobj_get_object_m36(WFoe* foe, vldh_t_node node, unsigned long index)
   /* Get the selected object in current plc window or the navigator */
   foe->gre->get_selnodes(&node_count, &nodelist);
 
-  if (((node_count == 1) && (*nodelist == node)) || (node_count == 0)) {
+  if (((node_count == 1) && (*nodelist == node)) || (node_count == 0))
+  {
     /* Take the orderobject from the navigator */
     sts = gobj_get_select(foe, &attrref, &is_attr);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       foe->message("Select a supervision object in the navigator or in the "
                    "current window");
       BEEP;
       return sts;
     }
-  } else if ((node_count == 2)
-      && ((*nodelist == node) || (*(nodelist + 1) == node))) {
+  }
+  else if ((node_count == 2) && ((*nodelist == node) || (*(nodelist + 1) == node)))
+  {
     if (*nodelist == node)
       object = *(nodelist + 1);
     else
       object = *nodelist;
     attrref = cdh_ObjidToAref(object->ln.oid);
-  } else if (node_count == 1) {
+  }
+  else if (node_count == 1)
+  {
     object = *nodelist;
     attrref = cdh_ObjidToAref(object->ln.oid);
-  } else {
+  }
+  else
+  {
     foe->message("Select a supervision object in the navigator or in the "
                  "current window first");
     BEEP;
@@ -3212,7 +3378,8 @@ int gobj_get_object_m36(WFoe* foe, vldh_t_node node, unsigned long index)
   if (EVEN(sts))
     return sts;
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_DSup:
   case pwr_cClass_ASup:
   case pwr_cClass_DSupComp:
@@ -3224,15 +3391,15 @@ int gobj_get_object_m36(WFoe* foe, vldh_t_node node, unsigned long index)
     return 0;
   }
 
-  if (cdh_IsClassVolume(node->ln.oid.vid)) {
+  if (cdh_IsClassVolume(node->ln.oid.vid))
+  {
     sts = gobj_ref_replace(ldhses, node, &attrref);
     if (EVEN(sts))
       return sts;
   }
 
   /* Set the parameter value */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "SupObject",
-      (char*)&attrref, sizeof(attrref));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "SupObject", (char*)&attrref, sizeof(attrref));
   if (EVEN(sts))
     return sts;
 
@@ -3261,16 +3428,17 @@ int gobj_get_object_m37(WFoe* foe, vldh_t_node node, unsigned long index)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   sts = gobj_get_select(foe, &attrref, &is_attr);
-  if (EVEN(sts) || is_attr == 1) {
+  if (EVEN(sts) || is_attr == 1)
+  {
     foe->message("Select an object in the navigator");
     BEEP;
     return sts;
   }
 
   /* Set the PlcConnect attribute in the current object */
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", "PlcConnect",
-      (char*)&attrref, sizeof(attrref));
-  if (EVEN(sts)) {
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "RtBody", "PlcConnect", (char*)&attrref, sizeof(attrref));
+  if (EVEN(sts))
+  {
     foe->message("No PlcConnect attribute in object");
     BEEP;
     return sts;
@@ -3278,8 +3446,7 @@ int gobj_get_object_m37(WFoe* foe, vldh_t_node node, unsigned long index)
 
   /* Set the PlcConnect attribute in the connected object */
   nattrref = cdh_ObjidToAref(node->ln.oid);
-  sts = ldh_SetObjectPar(ldhses, attrref.Objid, "RtBody", "PlcConnect",
-      (char*)&nattrref, sizeof(nattrref));
+  sts = ldh_SetObjectPar(ldhses, attrref.Objid, "RtBody", "PlcConnect", (char*)&nattrref, sizeof(nattrref));
 
   foe->gre->node_update(node);
 
@@ -3300,7 +3467,8 @@ int gobj_expand(WFoe* foe, vldh_t_node node, int compress)
 {
   int sts;
 
-  switch (node->ln.cid) {
+  switch (node->ln.cid)
+  {
   case pwr_cClass_GetDv:
   case pwr_cClass_GetDi:
   case pwr_cClass_GetDo:
@@ -3413,16 +3581,14 @@ static int gobj_expand_m1(WFoe* foe, vldh_t_node node, int compress)
   ldhses = (node->hn.wind)->hw.ldhses;
 
   /* Get the devbody parameters for this class */
-  sts = ldh_GetObjectBodyDef(
-      ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
+  sts = ldh_GetObjectBodyDef(ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
   if (EVEN(sts))
     return sts;
 
   strcpy(attrname, bodydef[0].ParName);
   strcat(attrname, "Segments");
 
-  sts = ldh_GetObjectPar(
-      ldhses, node->ln.oid, "DevBody", attrname, (char**)&segments_p, &size);
+  sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", attrname, (char**)&segments_p, &size);
   if (EVEN(sts))
     return sts;
 
@@ -3431,13 +3597,13 @@ static int gobj_expand_m1(WFoe* foe, vldh_t_node node, int compress)
   free((char*)segments_p);
   if (!compress)
     segments++;
-  else {
+  else
+  {
     segments--;
     if (segments < 1)
       segments = 1;
   }
-  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", attrname,
-      (char*)&segments, sizeof(segments));
+  sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", attrname, (char*)&segments, sizeof(segments));
   if (EVEN(sts))
     return sts;
 
@@ -3461,33 +3627,37 @@ static int gobj_expand_m2(WFoe* foe, vldh_t_node node, int compress)
 
   ldhses = (node->hn.wind)->hw.ldhses;
 
-  sts = ldh_GetObjectBuffer(ldhses, node->ln.oid, "DevBody", "PlcNode", &cid,
-      (char**)&nodebuffer, &size);
+  sts = ldh_GetObjectBuffer(ldhses, node->ln.oid, "DevBody", "PlcNode", &cid, (char**)&nodebuffer, &size);
   if (EVEN(sts))
     return sts;
 
   i_max = 0;
-  for (i = 0; i < max_input; i++) {
+  for (i = 0; i < max_input; i++)
+  {
     m = 1 << i;
     if (nodebuffer->mask[0] & m)
       i_max = i;
   }
-  if (!compress) {
-    if (i_max == max_input - 1) {
+  if (!compress)
+  {
+    if (i_max == max_input - 1)
+    {
       free((char*)nodebuffer);
       return FOE__SUCCESS;
     }
     nodebuffer->mask[0] |= 1 << (i_max + 1);
-  } else {
-    if (i_max == 0) {
+  }
+  else
+  {
+    if (i_max == 0)
+    {
       free((char*)nodebuffer);
       return FOE__SUCCESS;
     }
     nodebuffer->mask[0] &= ~(1 << (i_max));
   }
 
-  sts = ldh_SetObjectBuffer(
-      ldhses, node->ln.oid, "DevBody", "PlcNode", (char*)nodebuffer);
+  sts = ldh_SetObjectBuffer(ldhses, node->ln.oid, "DevBody", "PlcNode", (char*)nodebuffer);
   if (EVEN(sts))
     return sts;
 

@@ -39,7 +39,8 @@
 
 /* wb_utility.h -- Baseclass for a workbench utility */
 
-typedef enum {
+typedef enum
+{
   wb_eUtility_Wtt = 999,
   wb_eUtility_PlcEditor = 1000,
   wb_eUtility_AttributeEditor = 1001,
@@ -51,7 +52,8 @@ typedef enum {
   wb_eUtility_Ge = 1007
 } wb_eUtility;
 
-class WUtility {
+class WUtility
+{
 public:
   WUtility(wb_eUtility type);
   virtual ~WUtility();

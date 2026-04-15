@@ -41,13 +41,15 @@
 #include "wb_wnav.h"
 #include "pwr_baseclasses.h"
 
-typedef struct {
+typedef struct
+{
   char name[80];
   bool in_master;
   bool in_end_of_branch;
 } wb_rev_info;
 
-class wb_rev_item {
+class wb_rev_item
+{
 public:
   char name[80];
   int level;
@@ -64,7 +66,8 @@ public:
   wb_rev_item(const wb_rev_item& x);
 };
 
-class wb_version_manager {
+class wb_version_manager
+{
 protected:
   pwr_tStatus m_sts;
 
@@ -74,41 +77,36 @@ public:
   virtual ~wb_version_manager();
   virtual void init();
   virtual int store_revision(char* name, char* descr, bool new_branch);
-  virtual int restore_revision(
-      char* name, char* branch, int checkout_master, int checkout_branch);
+  virtual int restore_revision(char* name, char* branch, int checkout_master, int checkout_branch);
   virtual int get_current(char* name);
   virtual int check(std::vector<wb_rev_item>& v);
   virtual int check_add(char* filename);
   virtual bool modified();
 };
 
-class wb_version_manager_git : public wb_version_manager {
+class wb_version_manager_git : public wb_version_manager
+{
   static bool m_found;
   static bool m_found_tested;
 
   bool git_found();
 
 public:
-  wb_version_manager_git() : wb_version_manager()
-  {
-    init();
-  }
-  ~wb_version_manager_git()
-  {
-  }
+  wb_version_manager_git() : wb_version_manager() { init(); }
+  ~wb_version_manager_git() {}
   pwr_tFileName m_git_dir;
   pwr_tFileName m_work_tree;
   void init();
   int store_revision(char* name, char* descr, bool new_branch);
-  int restore_revision(
-      char* name, char* branch, int checkout_master, int checkout_branch);
+  int restore_revision(char* name, char* branch, int checkout_master, int checkout_branch);
   int get_current(char* name);
   int check(std::vector<wb_rev_item>& v);
   int check_add(char* filename);
   bool modified();
 };
 
-class wb_revision : public wb_status {
+class wb_revision : public wb_status
+{
 private:
   void* m_parent_ctx;
   wb_session* m_session;
@@ -136,8 +134,7 @@ public:
   void read_file();
   void read_file_meta();
   void write_file();
-  int add(char* name, char* description, char* version, pwr_tTime* date,
-      bool in_main, int sub_idx);
+  int add(char* name, char* description, char* version, pwr_tTime* date, bool in_main, int sub_idx);
   void list();
   void* parent_ctx();
   void command_cb(int (*cmd_cb)(void*, char*));

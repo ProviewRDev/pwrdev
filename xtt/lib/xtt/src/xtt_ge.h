@@ -47,7 +47,8 @@
 class Graph;
 class CoWow;
 
-typedef enum {
+typedef enum
+{
   ge_mOptions_FullScreen = 1 << 0,
   ge_mOptions_Maximize = 1 << 1,
   ge_mOptions_FullMaximize = 1 << 2,
@@ -61,7 +62,8 @@ typedef enum {
   ge_mOptions_ResizeFree = 1 << 10
 } ge_mOptions;
 
-class XttGe : XttUtility {
+class XttGe : XttUtility
+{
 public:
   void* parent_ctx;
   pwr_tAName name;
@@ -79,10 +81,8 @@ public:
   void (*help_cb)(void*, const char* key);
   void (*display_in_xnav_cb)(void*, pwr_sAttrRef*);
   int (*is_authorized_cb)(void*, unsigned int);
-  void (*popup_menu_cb)(
-      void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
-  int (*call_method_cb)(void*, const char*, const char*, pwr_sAttrRef,
-      unsigned long, unsigned long, char*);
+  void (*popup_menu_cb)(void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  int (*call_method_cb)(void*, const char*, const char*, pwr_sAttrRef, unsigned long, unsigned long, char*);
   int (*get_current_objects_cb)(void*, pwr_sAttrRef**, int**);
   int (*sound_cb)(void*, pwr_tAttrRef*);
   void (*eventlog_cb)(void*, void*, int, void*, unsigned int);
@@ -99,52 +99,30 @@ public:
   int resize_restrictions_set;
   double window_resize_delta;
   CoWow* wow;
-  void *contextmenudata;
+  void* contextmenudata;
 
-  XttGe(void* parent_ctx, const char* name, const char* filename, int scrollbar,
-      int menu, int navigator, int width, int height, int x, int y,
-      double scan_time, const char* object_name, int use_default_access,
-      unsigned int access, unsigned int options, int color_theme,
-      int (*xg_command_cb)(void*, char*, char*, char *, void*),
-      int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-      int (*xg_is_authorized_cb)(void*, unsigned int),
-      void (*xg_keyboard_cb)(void*, void*, int, int));
+  XttGe(void* parent_ctx, const char* name, const char* filename, int scrollbar, int menu, int navigator,
+        int width, int height, int x, int y, double scan_time, const char* object_name,
+        int use_default_access, unsigned int access, unsigned int options, int color_theme,
+        int (*xg_command_cb)(void*, char*, char*, char*, void*),
+        int (*xg_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+        int (*xg_is_authorized_cb)(void*, unsigned int), void (*xg_keyboard_cb)(void*, void*, int, int));
   virtual ~XttGe();
 
-  virtual void pop()
-  {
-  }
-  virtual void iconify()
-  {
-  }
-  virtual void set_title(char *t)
-  {
-  }
-  virtual void set_size(int width, int height)
-  {
-  }
-  virtual void confirm_reply(int ok)
-  {
-  }
-  virtual void* get_widget()
-  {
-    return 0;
-  }
-  virtual void iconify(int val)
-  {
-  }
-  virtual void set_below(int val)
-  {
-  }
-  virtual void get_context_menu(void* mdata,
-      xmenu_mUtility caller, unsigned int priv, char* arg, int x, int y)
+  virtual void pop() {}
+  virtual void iconify() {}
+  virtual void set_title(char* t) {}
+  virtual void set_size(int width, int height) {}
+  virtual void confirm_reply(int ok) {}
+  virtual void* get_widget() { return 0; }
+  virtual void iconify(int val) {}
+  virtual void set_below(int val) {}
+  virtual void get_context_menu(void* mdata, xmenu_mUtility caller, unsigned int priv, char* arg, int x,
+                                int y)
   {
   }
 
-  xtt_eUtility get_type()
-  {
-    return xtt_eUtility_Graph;
-  }
+  xtt_eUtility get_type() { return xtt_eUtility_Graph; }
   void message(char severity, const char* msg);
   void print();
   void export_image(char* filename);
@@ -159,7 +137,7 @@ public:
   int key_pressed(int key);
   void close_input_all();
   int get_object_name(unsigned int idx, int size, char* name);
-  int dash_insert(char *name, pwr_tTypeId type);
+  int dash_insert(char* name, pwr_tTypeId type);
   int in_edit_mode();
   void signal_send(char* signalname);
   void activate_edit(int edit);
@@ -184,18 +162,15 @@ public:
   static int ge_command_cb(void* ge_ctx, char* command, char* script, char* scriptargs);
   static int ge_sound_cb(void* ge_ctx, pwr_tAttrRef* aref);
   static void ge_display_in_xnav_cb(void* ge_ctx, pwr_sAttrRef* arp);
-  static void ge_popup_menu_cb(void* ge_ctx, pwr_sAttrRef attrref,
-      unsigned long item_type, unsigned long utility, char* arg, int x, int y);
-  static void ge_context_menu_cb(void* ge_ctx, void *menudata,
-      unsigned long utility, char* arg, int x, int y);
-  static int ge_call_method_cb(void* ge_ctx, char* method, char* filter,
-      pwr_sAttrRef attrref, unsigned long item_type, unsigned long utility,
-      char* arg);
+  static void ge_popup_menu_cb(void* ge_ctx, pwr_sAttrRef attrref, unsigned long item_type,
+                               unsigned long utility, char* arg, int x, int y);
+  static void ge_context_menu_cb(void* ge_ctx, void* menudata, unsigned long utility, char* arg, int x,
+                                 int y);
+  static int ge_call_method_cb(void* ge_ctx, char* method, char* filter, pwr_sAttrRef attrref,
+                               unsigned long item_type, unsigned long utility, char* arg);
   static int ge_is_authorized_cb(void* ge_ctx, unsigned int access);
-  static int ge_get_current_objects_cb(
-      void* ge_ctx, pwr_sAttrRef** alist, int** is_alist);
-  static int ge_get_rtplant_select_cb(
-      void* ge_ctx, char* attr_name, int size, pwr_tTypeId *type);
+  static int ge_get_current_objects_cb(void* ge_ctx, pwr_sAttrRef** alist, int** is_alist);
+  static int ge_get_rtplant_select_cb(void* ge_ctx, char* attr_name, int size, pwr_tTypeId* type);
   static void ge_eventlog_cb(void* ge_ctx, void* value, unsigned int size);
   static void ge_keyboard_cb(void* ge_ctx, int action, int type);
   static void message_cb(void* ctx, char severity, const char* msg);
@@ -203,10 +178,10 @@ public:
   static void eventlog_enable(int enable);
   static void file_selected_cb(void* ctx, void* data, char* text);
   static void ge_colortheme_selector_ok_cb(void* ctx, char* text, int ok_pressed);
-  static void get_current_colors_cb(void* ctx, glow_eDrawType* fill_color,
-      glow_eDrawType* border_color, glow_eDrawType* text_color);
-  static void set_current_colors_cb(void* ctx, glow_eDrawType fill_color,
-      glow_eDrawType border_color, glow_eDrawType text_color);
+  static void get_current_colors_cb(void* ctx, glow_eDrawType* fill_color, glow_eDrawType* border_color,
+                                    glow_eDrawType* text_color);
+  static void set_current_colors_cb(void* ctx, glow_eDrawType fill_color, glow_eDrawType border_color,
+                                    glow_eDrawType text_color);
 };
 
 #endif

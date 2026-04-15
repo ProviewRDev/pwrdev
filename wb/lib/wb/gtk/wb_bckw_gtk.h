@@ -43,11 +43,11 @@
 
 #include "wb_bckw.h"
 
-class WbBckWGtk : public WbBckW {
+class WbBckWGtk : public WbBckW
+{
 public:
-  WbBckWGtk(void* l_parent_ctx, GtkWidget* l_parent_wid, ldh_tSession l_ldhses,
-      const char* l_name, wb_bck_list* l_list, int l_editmode,
-      pwr_tStatus* status);
+  WbBckWGtk(void* l_parent_ctx, GtkWidget* l_parent_wid, ldh_tSession l_ldhses, const char* l_name,
+            wb_bck_list* l_list, int l_editmode, pwr_tStatus* status);
   ~WbBckWGtk();
 
   GtkWidget* parent_wid;
@@ -63,8 +63,7 @@ public:
   void print();
   void set_title(char* title);
 
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_print(GtkWidget* w, gpointer data);
   static void activate_open(GtkWidget* w, gpointer data);

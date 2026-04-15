@@ -59,15 +59,15 @@ class GrowWindow;
 class GrowToolbar;
 class GrowScriptModule;
 
-class GlowExportScript {
+class GlowExportScript
+{
 public:
   GlowExportScript(GrowCtx* glow_ctx) : ctx(glow_ctx)
   {
-    strcpy(ind,"");
+    strcpy(ind, "");
     strcpy(cind, "# ");
   }
-  int export_script(char* filename,
-		    int (*userdata_cb)(void*, void*, std::ofstream&, char*));
+  int export_script(char* filename, int (*userdata_cb)(void*, void*, std::ofstream&, char*));
   int array(GlowArray* o, void* e, void* m);
   int rect(GrowRect* o, void* e, void* m);
   int rectrounded(GrowRectRounded* o, void* e, void* m);
@@ -89,14 +89,16 @@ public:
   int toolbar(GrowToolbar* o, void* e, void* m);
   int window(GrowWindow* o, void* e, void* m);
   int scriptmodule(GrowScriptModule* o, void* e, void* m);
-  GrowScriptModule* get_scriptmodule(GlowArrayElem *o, double *x, double *y);
+  GrowScriptModule* get_scriptmodule(GlowArrayElem* o, double* x, double* y);
   int scriptmodule_count();
-  void ind_incr() {
+  void ind_incr()
+  {
     if (strlen(ind) > 1)
       strcat(cind, "  ");
     strcat(ind, "  ");
   }
-  void ind_decr() {
+  void ind_decr()
+  {
     if (strlen(ind) >= 4)
       cind[strlen(ind) - 2] = 0;
     if (strlen(ind) >= 2)

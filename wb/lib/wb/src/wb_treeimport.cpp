@@ -40,15 +40,12 @@
 #include "wb_merep.h"
 #include "wb_volume.h"
 
-wb_treeimport::~wb_treeimport()
-{
-}
+wb_treeimport::~wb_treeimport() {}
 
 bool wb_treeimport::importTranslationTableInsert(pwr_tOix from, pwr_tOix to)
 {
   std::pair<pwr_tOix, pwr_tOix> p(from, to);
-  std::pair<std::map<pwr_tOix, pwr_tOix>::iterator, bool> result
-      = m_translation_table.insert(p);
+  std::pair<std::map<pwr_tOix, pwr_tOix>::iterator, bool> result = m_translation_table.insert(p);
 
   return result.second;
 }
@@ -56,8 +53,7 @@ bool wb_treeimport::importTranslationTableInsert(pwr_tOix from, pwr_tOix to)
 bool wb_treeimport::importTranslationTableCidInsert(pwr_tCid from, pwr_tCid to)
 {
   std::pair<pwr_tCid, pwr_tCid> p(from, to);
-  std::pair<std::map<pwr_tCid, pwr_tCid>::iterator, bool> result
-      = m_translation_table_cid.insert(p);
+  std::pair<std::map<pwr_tCid, pwr_tCid>::iterator, bool> result = m_translation_table_cid.insert(p);
 
   return result.second;
 }
@@ -86,10 +82,7 @@ pwr_tCid wb_treeimport::importTranslateCid(pwr_tCid cid)
   return it->second;
 }
 
-void wb_treeimport::importSetSourceVid(pwr_tVid vid)
-{
-  m_import_source_vid = vid;
-}
+void wb_treeimport::importSetSourceVid(pwr_tVid vid) { m_import_source_vid = vid; }
 
 bool wb_treeimport::importUpdateTree(wb_vrep* vrep)
 {
@@ -97,8 +90,8 @@ bool wb_treeimport::importUpdateTree(wb_vrep* vrep)
   pwr_tStatus sts;
 
   // Update all imported objects, get objects from the translationtable
-  for (it = m_translation_table.begin(); it != m_translation_table.end();
-       it++) {
+  for (it = m_translation_table.begin(); it != m_translation_table.end(); it++)
+  {
     pwr_tOid oid;
     oid.oix = it->second;
     oid.vid = vrep->vid();
@@ -108,25 +101,25 @@ bool wb_treeimport::importUpdateTree(wb_vrep* vrep)
 
     o->ref();
     importUpdateObject(o, vrep);
-    if (m_object_import_cb) {
+    if (m_object_import_cb)
+    {
       oid.oix = it->first;
       oid.vid = vrep->vid();
       wb_orep* os = vrep->object(&sts, oid);
       if (ODD(sts))
-	os->ref();
+        os->ref();
       else
-	os = 0;
+        os = 0;
       (m_object_import_cb)(o, os, m_object_import_cb_data);
       if (os)
-	os->unref();
+        os->unref();
     }
     o->unref();
   }
   return true;
 }
 
-bool wb_treeimport::importUpdateSubClass(
-    wb_adrep* subattr, char* body, wb_vrep* vrep, bool* modified)
+bool wb_treeimport::importUpdateSubClass(wb_adrep* subattr, char* body, wb_vrep* vrep, bool* modified)
 {
   pwr_tStatus sts;
   pwr_tOix oix;
@@ -140,27 +133,34 @@ bool wb_treeimport::importUpdateSubClass(
 
   int subattr_elements = subattr->isArray() ? subattr->nElement() : 1;
 
-  for (int i = 0; i < subattr_elements; i++) {
+  for (int i = 0; i < subattr_elements; i++)
+  {
     wb_adrep* adrep = bdrep->adrep(&sts);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       int elements = adrep->isArray() ? adrep->nElement() : 1;
-      if (adrep->isClass()) {
-        importUpdateSubClass(adrep,
-            body + i * subattr->size() / subattr_elements + adrep->offset(),
-            vrep, modified);
-      } else {
-        switch (adrep->type()) {
-        case pwr_eType_Objid: {
-          pwr_tOid* oidp = (pwr_tOid*)(body
-              + i * subattr->size() / subattr_elements + adrep->offset());
-          for (int j = 0; j < elements; j++) {
-            if (oidp->vid == m_import_source_vid
-                && (oix = importTranslate(oidp->oix))) {
+      if (adrep->isClass())
+      {
+        importUpdateSubClass(adrep, body + i * subattr->size() / subattr_elements + adrep->offset(), vrep,
+                             modified);
+      }
+      else
+      {
+        switch (adrep->type())
+        {
+        case pwr_eType_Objid:
+        {
+          pwr_tOid* oidp = (pwr_tOid*)(body + i * subattr->size() / subattr_elements + adrep->offset());
+          for (int j = 0; j < elements; j++)
+          {
+            if (oidp->vid == m_import_source_vid && (oix = importTranslate(oidp->oix)))
+            {
               oidp->vid = vrep->vid();
               oidp->oix = oix;
               *modified = true;
-            } else if (ldh_isSymbolicVid(oidp->vid)
-                && (oix = importTranslateCid(oidp->oix))) {
+            }
+            else if (ldh_isSymbolicVid(oidp->vid) && (oix = importTranslateCid(oidp->oix)))
+            {
               oidp->oix = oix;
               *modified = true;
             }
@@ -168,17 +168,20 @@ bool wb_treeimport::importUpdateSubClass(
           }
           break;
         }
-        case pwr_eType_AttrRef: {
-          pwr_sAttrRef* arp = (pwr_sAttrRef*)(body
-              + i * subattr->size() / subattr_elements + adrep->offset());
-          for (int j = 0; j < elements; j++) {
-            if (arp->Objid.vid == m_import_source_vid
-                && (oix = importTranslate(arp->Objid.oix))) {
+        case pwr_eType_AttrRef:
+        {
+          pwr_sAttrRef* arp =
+              (pwr_sAttrRef*)(body + i * subattr->size() / subattr_elements + adrep->offset());
+          for (int j = 0; j < elements; j++)
+          {
+            if (arp->Objid.vid == m_import_source_vid && (oix = importTranslate(arp->Objid.oix)))
+            {
               arp->Objid.vid = vrep->vid();
               arp->Objid.oix = oix;
               *modified = true;
-            } else if (ldh_isSymbolicVid(arp->Objid.vid)
-                && (oix = importTranslateCid(arp->Objid.oix))) {
+            }
+            else if (ldh_isSymbolicVid(arp->Objid.vid) && (oix = importTranslateCid(arp->Objid.oix)))
+            {
               arp->Objid.oix = oix;
               *modified = true;
             }
@@ -186,12 +189,14 @@ bool wb_treeimport::importUpdateSubClass(
           }
           break;
         }
-        case pwr_eType_DataRef: {
-          pwr_tDataRef* drp = (pwr_tDataRef*)(body
-              + i * subattr->size() / subattr_elements + adrep->offset());
-          for (int j = 0; j < elements; j++) {
-            if (drp->Aref.Objid.vid == m_import_source_vid
-                && (oix = importTranslate(drp->Aref.Objid.oix))) {
+        case pwr_eType_DataRef:
+        {
+          pwr_tDataRef* drp =
+              (pwr_tDataRef*)(body + i * subattr->size() / subattr_elements + adrep->offset());
+          for (int j = 0; j < elements; j++)
+          {
+            if (drp->Aref.Objid.vid == m_import_source_vid && (oix = importTranslate(drp->Aref.Objid.oix)))
+            {
               drp->Aref.Objid.vid = vrep->vid();
               drp->Aref.Objid.oix = oix;
               *modified = true;
@@ -222,7 +227,8 @@ bool wb_treeimport::importUpdateObject(wb_orep* o, wb_vrep* vrep)
   if (EVEN(sts))
     throw wb_error(sts);
 
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 2; i++)
+  {
     pwr_eBix bix = i ? pwr_eBix_rt : pwr_eBix_dev;
 
     wb_bdrep* bdrep = cdrep->bdrep(&sts, bix);
@@ -239,27 +245,34 @@ bool wb_treeimport::importUpdateObject(wb_orep* o, wb_vrep* vrep)
     bool modified = false;
 
     wb_adrep* adrep = bdrep->adrep(&sts);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       int elements = adrep->isArray() ? adrep->nElement() : 1;
-      if (adrep->offset() < 0
-          || ((int)(adrep->offset() + adrep->size()) > size))
+      if (adrep->offset() < 0 || ((int)(adrep->offset() + adrep->size()) > size))
         printf("(adrep->offset() < 0 || (adrep->offset() + adrep->size() > "
                "size))\n");
 
-      if (adrep->isClass()) {
+      if (adrep->isClass())
+      {
         importUpdateSubClass(adrep, body + adrep->offset(), vrep, &modified);
-      } else {
-        switch (adrep->type()) {
-        case pwr_eType_Objid: {
+      }
+      else
+      {
+        switch (adrep->type())
+        {
+        case pwr_eType_Objid:
+        {
           pwr_tOid* oidp = (pwr_tOid*)(body + adrep->offset());
-          for (int j = 0; j < elements; j++) {
-            if (oidp->vid == m_import_source_vid
-                && (oix = importTranslate(oidp->oix))) {
+          for (int j = 0; j < elements; j++)
+          {
+            if (oidp->vid == m_import_source_vid && (oix = importTranslate(oidp->oix)))
+            {
               oidp->vid = vrep->vid();
               oidp->oix = oix;
               modified = true;
-            } else if (ldh_isSymbolicVid(oidp->vid)
-                && (oix = importTranslateCid(oidp->oix))) {
+            }
+            else if (ldh_isSymbolicVid(oidp->vid) && (oix = importTranslateCid(oidp->oix)))
+            {
               oidp->oix = oix;
               modified = true;
             }
@@ -267,16 +280,19 @@ bool wb_treeimport::importUpdateObject(wb_orep* o, wb_vrep* vrep)
           }
           break;
         }
-        case pwr_eType_AttrRef: {
+        case pwr_eType_AttrRef:
+        {
           pwr_sAttrRef* arp = (pwr_sAttrRef*)(body + adrep->offset());
-          for (int j = 0; j < elements; j++) {
-            if (arp->Objid.vid == m_import_source_vid
-                && (oix = importTranslate(arp->Objid.oix))) {
+          for (int j = 0; j < elements; j++)
+          {
+            if (arp->Objid.vid == m_import_source_vid && (oix = importTranslate(arp->Objid.oix)))
+            {
               arp->Objid.vid = vrep->vid();
               arp->Objid.oix = oix;
               modified = true;
-            } else if (ldh_isSymbolicVid(arp->Objid.vid)
-                && (oix = importTranslateCid(arp->Objid.oix))) {
+            }
+            else if (ldh_isSymbolicVid(arp->Objid.vid) && (oix = importTranslateCid(arp->Objid.oix)))
+            {
               arp->Objid.oix = oix;
               modified = true;
             }
@@ -284,11 +300,13 @@ bool wb_treeimport::importUpdateObject(wb_orep* o, wb_vrep* vrep)
           }
           break;
         }
-        case pwr_eType_DataRef: {
+        case pwr_eType_DataRef:
+        {
           pwr_tDataRef* drp = (pwr_tDataRef*)(body + adrep->offset());
-          for (int j = 0; j < elements; j++) {
-            if (drp->Aref.Objid.vid == m_import_source_vid
-                && (oix = importTranslate(drp->Aref.Objid.oix))) {
+          for (int j = 0; j < elements; j++)
+          {
+            if (drp->Aref.Objid.vid == m_import_source_vid && (oix = importTranslate(drp->Aref.Objid.oix)))
+            {
               drp->Aref.Objid.vid = vrep->vid();
               drp->Aref.Objid.oix = oix;
               modified = true;
@@ -304,7 +322,8 @@ bool wb_treeimport::importUpdateObject(wb_orep* o, wb_vrep* vrep)
       adrep = adrep->next(&sts);
       delete prev;
     }
-    if (modified) {
+    if (modified)
+    {
       vrep->writeBody(&sts, o, bix, body);
       if (EVEN(sts))
         throw wb_error(sts);

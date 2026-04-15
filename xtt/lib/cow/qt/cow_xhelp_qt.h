@@ -43,7 +43,8 @@
 
 class CoXHelpQtWidget;
 
-class CoXHelpQt : public CoXHelp {
+class CoXHelpQt : public CoXHelp
+{
 public:
   CoXHelpQt(void* xa_parent_ctx, xhelp_eUtility utility, int* xa_sts);
   ~CoXHelpQt();
@@ -56,13 +57,14 @@ public:
   void set_dimension(int width, int height);
   void pop();
   void print();
-  void open_input_dialog(const char* text, const char* title,
-      const char* init_text, void (*ok_cb)(CoXHelp*, char*));
+  void open_input_dialog(const char* text, const char* title, const char* init_text,
+                         void (*ok_cb)(CoXHelp*, char*));
 
   static QWidget* get_widget();
 };
 
-class CoXHelpQtWidget : public QWidget {
+class CoXHelpQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

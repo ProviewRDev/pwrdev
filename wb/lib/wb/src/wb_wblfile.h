@@ -44,7 +44,8 @@
 class wb_wbl_parser;
 class wb_wblnode;
 
-class wb_wblfile {
+class wb_wblfile
+{
 public:
   wb_wbl_parser* parser;
   wb_wblnode* rootAST;

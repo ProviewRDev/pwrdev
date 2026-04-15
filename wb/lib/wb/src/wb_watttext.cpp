@@ -49,9 +49,9 @@ void WAttText::message_cb(void* watttext, char severity, const char* message)
 void WAttText::activate_exit()
 {
   if (modified)
-    wow->DisplayQuestion(this, "Close text editor",
-        "Do you want to insert text", exit_ok, exit_cancel, this);
-  else {
+    wow->DisplayQuestion(this, "Close text editor", "Do you want to insert text", exit_ok, exit_cancel, this);
+  else
+  {
     if (close_cb)
       (close_cb)(this);
     else
@@ -81,18 +81,14 @@ void WAttText::exit_cancel(void* ctx, void* data)
     delete watttext;
 }
 
-void WAttText::activate_print()
-{
-}
+void WAttText::activate_print() {}
 
-WAttText::~WAttText()
-{
-}
+WAttText::~WAttText() {}
 
-WAttText::WAttText(void* wa_parent_ctx, ldh_tSesContext wa_ldhses,
-    pwr_sAttrRef wa_aref, int wa_editmode, pwr_tStatus* status)
-    : parent_ctx(wa_parent_ctx), ldhses(wa_ldhses), aref(wa_aref),
-      editmode(wa_editmode), modified(0), close_cb(0), wow(0)
+WAttText::WAttText(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref, int wa_editmode,
+                   pwr_tStatus* status)
+    : parent_ctx(wa_parent_ctx), ldhses(wa_ldhses), aref(wa_aref), editmode(wa_editmode), modified(0),
+      close_cb(0), wow(0)
 {
   pwr_tStatus sts;
 
@@ -101,12 +97,14 @@ WAttText::WAttText(void* wa_parent_ctx, ldh_tSesContext wa_ldhses,
   ldh_sAttrRefInfo ainfo;
 
   sts = ldh_GetAttrRefInfo(ldhses, &aref, &ainfo);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *status = sts;
     return;
   }
 
-  switch (ainfo.type) {
+  switch (ainfo.type)
+  {
   case pwr_eType_Text:
     break;
   default:

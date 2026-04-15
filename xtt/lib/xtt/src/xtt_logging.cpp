@@ -64,17 +64,15 @@ static int log_errormessage_func(char* msg, int severity, void* data)
   return 1;
 }
 
-static int logccm_geta_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int logccm_geta_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                            ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
 
   if (arg_count != 1 || arg_list->value_decl != CCM_DECL_STRING)
     return CCM__ARGMISM;
 
-  sts = gdh_GetObjectInfo(
-      arg_list->value_string, return_float, sizeof(*return_float));
+  sts = gdh_GetObjectInfo(arg_list->value_string, return_float, sizeof(*return_float));
   if (EVEN(sts))
     return sts;
 
@@ -82,17 +80,15 @@ static int logccm_geta_func(void* filectx, ccm_sArg* arg_list, int arg_count,
   return 1;
 }
 
-static int logccm_getd_func(void* filectx, ccm_sArg* arg_list, int arg_count,
-    int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
-    char* return_string)
+static int logccm_getd_func(void* filectx, ccm_sArg* arg_list, int arg_count, int* return_decl,
+                            ccm_tFloat* return_float, ccm_tInt* return_int, char* return_string)
 {
   int sts;
 
   if (arg_count != 1 || arg_list->value_decl != CCM_DECL_STRING)
     return CCM__ARGMISM;
 
-  sts = gdh_GetObjectInfo(
-      arg_list->value_string, return_int, sizeof(*return_int));
+  sts = gdh_GetObjectInfo(arg_list->value_string, return_int, sizeof(*return_int));
   if (EVEN(sts))
     return sts;
 
@@ -101,13 +97,13 @@ static int logccm_getd_func(void* filectx, ccm_sArg* arg_list, int arg_count,
 }
 
 XttLogging::XttLogging()
-    : xnav(0), index(0), active(0), intern(0), stop_logg(0),
-      logg_type(xtt_eLoggType_Cont), logg_priority(0), logg_format(xtt_eLoggFormat_Std), 
-      condition_ptr(0), logg_time(200), logg_file(0), line_size(10000), parameter_count(0),
-      print_shortname(0), buffer_size(100), wanted_buffer_size(100),
-      buffer_count(0), buffer_ptr(0), cond_ccm_ctx(0)
+    : xnav(0), index(0), active(0), intern(0), stop_logg(0), logg_type(xtt_eLoggType_Cont), logg_priority(0),
+      logg_format(xtt_eLoggFormat_Std), condition_ptr(0), logg_time(200), logg_file(0), line_size(10000),
+      parameter_count(0), print_shortname(0), buffer_size(100), wanted_buffer_size(100), buffer_count(0),
+      buffer_ptr(0), cond_ccm_ctx(0)
 {
-  for (int i = 0; i < RTT_LOGG_MAXPAR; i++) {
+  for (int i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
     parameterstr[i][0] = 0;
     shortname[i][0] = 0;
   }
@@ -131,21 +127,21 @@ XttLogging::~XttLogging()
 }
 
 /*************************************************************************
-*
-* Name:		logging_set()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Modify parameter in the logging table.
-*
-**************************************************************************/
+ *
+ * Name:		logging_set()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Modify parameter in the logging table.
+ *
+ **************************************************************************/
 
-int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
-    char* condition, int a_logg_type, int a_logg_format, int insert, int a_buffer_size, int stop,
-    int priority, int create, int a_line_size, int shortname)
+int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter, char* condition,
+                            int a_logg_type, int a_logg_format, int insert, int a_buffer_size, int stop,
+                            int priority, int create, int a_line_size, int shortname)
 {
   int i, sts;
   int found, par_index = 0;
@@ -155,13 +151,16 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
   pwr_tTypeId atype;
   unsigned int asize, aoffset, aelem;
 
-  if (active) {
+  if (active)
+  {
     message('E', "Unable to modify entry, entry is started");
     return XNAV__HOLDCOMMAND;
   }
 
-  if (a_buffer_size != 0 || buffer_ptr == 0) {
-    if (a_buffer_size != 0) {
+  if (a_buffer_size != 0 || buffer_ptr == 0)
+  {
+    if (a_buffer_size != 0)
+    {
       buffer_size = a_buffer_size;
       wanted_buffer_size = a_buffer_size;
     }
@@ -169,7 +168,8 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
     if (buffer_ptr != 0)
       free(buffer_ptr);
     buffer_ptr = (char*)calloc(1, buffer_size * 512);
-    if (buffer_ptr == 0) {
+    if (buffer_ptr == 0)
+    {
       message('E', "Buffer is to large");
       /* set default buffer */
       buffer_size = RTT_BUFFER_DEFSIZE;
@@ -183,34 +183,40 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
   }
 
   /* Insert in the entry */
-  if (filename != NULL) {
+  if (filename != NULL)
+  {
     dcli_get_defaultfilename(filename, logg_filename, ".rtt_log");
   }
-  if (parameter != NULL) {
+  if (parameter != NULL)
+  {
     /* Get a free parameter index */
     found = 0;
-    for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-      if (parameterstr[i][0] == 0) {
+    for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+    {
+      if (parameterstr[i][0] == 0)
+      {
         found = 1;
         par_index = i;
         break;
       }
     }
-    if (!found) {
+    if (!found)
+    {
       message('E', "Max number of parameters exceeded");
       return XNAV__HOLDCOMMAND;
     }
 
     /* Check that parameter exists */
     sts = gdh_GetObjectInfo(parameter, &buffer, sizeof(buffer));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', "Parameter doesn't exist");
       return XNAV__HOLDCOMMAND;
     }
 
-    sts = gdh_GetAttributeCharacteristics(
-        parameter, &atype, &asize, &aoffset, &aelem);
-    if (EVEN(sts)) {
+    sts = gdh_GetAttributeCharacteristics(parameter, &atype, &asize, &aoffset, &aelem);
+    if (EVEN(sts))
+    {
       message('E', "Parameter doesn't exist");
       return XNAV__HOLDCOMMAND;
     }
@@ -219,13 +225,16 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
     parameter_size[par_index] = asize / aelem;
   }
 
-  if (condition != NULL) {
+  if (condition != NULL)
+  {
     if (str_NoCaseStrncmp(condition, "EXPR(", 5) == 0)
       strcpy(conditionstr, condition);
-    else {
+    else
+    {
       /* Attribute, Check that parameter exists */
       sts = gdh_GetObjectInfo(condition, &buffer, sizeof(buffer));
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         message('E', "Condition doesn't exist");
         return XNAV__HOLDCOMMAND;
       }
@@ -241,10 +250,12 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
   if (a_logg_format >= 0)
     logg_format = (xtt_eLoggFormat)a_logg_format;
 
-  if (priority < -1 || priority > 32) {
+  if (priority < -1 || priority > 32)
+  {
     message('E', "Priority out of range");
     return XNAV__HOLDCOMMAND;
-  } else if (priority != -1)
+  }
+  else if (priority != -1)
     logg_priority = priority;
 
   if (a_line_size != 0)
@@ -256,7 +267,8 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
   if (stop != -1)
     intern = stop;
 
-  if (insert) {
+  if (insert)
+  {
     pwr_sAttrRef *alist, *ap;
     int *is_attrp, *is_attr;
     pwr_tTypeId attr_type;
@@ -265,7 +277,8 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
 
     /* Insert from collection picture */
     sts = ((XNav*)xnav)->get_all_collect_objects(&alist, &is_attr);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       message('E', "Nothing to insert");
       return XNAV__HOLDCOMMAND;
     }
@@ -278,9 +291,12 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
 
     ap = alist;
     is_attrp = is_attr;
-    while (cdh_ObjidIsNotNull(ap->Objid)) {
-      if (*is_attrp) {
-        if (i >= RTT_LOGG_MAXPAR) {
+    while (cdh_ObjidIsNotNull(ap->Objid))
+    {
+      if (*is_attrp)
+      {
+        if (i >= RTT_LOGG_MAXPAR)
+        {
           message('E', "Max number of parameters exceeded");
           break;
         }
@@ -289,16 +305,14 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
         if (EVEN(sts))
           return sts;
 
-        sts = gdh_GetAttributeCharacteristics(
-            name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
-        if (EVEN(sts)) {
-          sts = gdh_AttrrefToName(
-              ap, name, sizeof(name), cdh_mName_volumeStrict);
+        sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+        if (EVEN(sts))
+        {
+          sts = gdh_AttrrefToName(ap, name, sizeof(name), cdh_mName_volumeStrict);
           if (EVEN(sts))
             return sts;
 
-          sts = gdh_GetAttributeCharacteristics(
-              name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
+          sts = gdh_GetAttributeCharacteristics(name, &attr_type, &attr_size, &attr_offset, &attr_dimension);
           if (EVEN(sts))
             return sts;
         }
@@ -306,7 +320,8 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
         strcpy(parameterstr[i], name);
         parameter_type[i] = attr_type;
         parameter_size[i] = attr_size / attr_dimension;
-        switch (parameter_type[i]) {
+        switch (parameter_type[i])
+        {
         case pwr_eType_Float32:
         case pwr_eType_Float64:
         case pwr_eType_UInt8:
@@ -325,8 +340,7 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
         case pwr_eType_Time:
           break;
         default:
-          sprintf(
-              msg, "Error in parameter nr %d: type is not supported", i + 1);
+          sprintf(msg, "Error in parameter nr %d: type is not supported", i + 1);
           message('E', msg);
           type_error = 1;
         }
@@ -344,7 +358,8 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
 
   /* Count the parameters */
   parameter_count = 0;
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
     if (parameterstr[i][0] != 0)
       parameter_count++;
   }
@@ -353,17 +368,17 @@ int XttLogging::logging_set(float a_logg_time, char* filename, char* parameter,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_show()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Show the entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_show()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Show the entry.
+ *
+ **************************************************************************/
 
 int XttLogging::show()
 {
@@ -398,23 +413,21 @@ int XttLogging::show_entry(char* buff, int* buff_cnt)
   else if (logg_type == xtt_eLoggType_Cont)
     (*buff_cnt) += sprintf(buff + *buff_cnt, "   Type:      Cont\n");
 
-  (*buff_cnt)
-      += sprintf(buff + *buff_cnt, "   Time:      %5.1f ms\n", logg_time);
-  (*buff_cnt)
-      += sprintf(buff + *buff_cnt, "   Buffer:    %d pages\n", buffer_size);
+  (*buff_cnt) += sprintf(buff + *buff_cnt, "   Time:      %5.1f ms\n", logg_time);
+  (*buff_cnt) += sprintf(buff + *buff_cnt, "   Buffer:    %d pages\n", buffer_size);
   (*buff_cnt) += sprintf(buff + *buff_cnt, "   Priority:  %d\n", logg_priority);
   (*buff_cnt) += sprintf(buff + *buff_cnt, "   Line size: %d\n", line_size);
   if (intern)
     (*buff_cnt) += sprintf(buff + *buff_cnt, "   Stop when buffer is full\n");
   (*buff_cnt) += sprintf(buff + *buff_cnt, "   Filename:  %s\n", logg_filename);
-  (*buff_cnt) += sprintf(
-      buff + *buff_cnt, "   Number of parameters: %d\n", parameter_count);
+  (*buff_cnt) += sprintf(buff + *buff_cnt, "   Number of parameters: %d\n", parameter_count);
   par_cnt = 0;
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-    if (parameterstr[i][0] != 0) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
+    if (parameterstr[i][0] != 0)
+    {
       par_cnt++;
-      (*buff_cnt) += sprintf(buff + *buff_cnt, "Parameter%d :	%s\n", par_cnt,
-          parameterstr[i]);
+      (*buff_cnt) += sprintf(buff + *buff_cnt, "Parameter%d :	%s\n", par_cnt, parameterstr[i]);
     }
   }
   (*buff_cnt) += sprintf(buff + *buff_cnt, "Condition:	%s\n", conditionstr);
@@ -424,59 +437,62 @@ int XttLogging::show_entry(char* buff, int* buff_cnt)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_analyse()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Analyse an entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_analyse()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Analyse an entry.
+ *
+ **************************************************************************/
 
 int XttLogging::analyse()
 {
   pwr_tCmd cmd;
 
-  if (logg_format != xtt_eLoggFormat_Py) {
+  if (logg_format != xtt_eLoggFormat_Py)
+  {
     message('E', "File format has to be \"Py\"");
     return XNAV__HOLDCOMMAND;
   }
 
-  sprintf( cmd, "sev_analyse.py -f %s &", logg_filename);
+  sprintf(cmd, "sev_analyse.py -f %s &", logg_filename);
   system(cmd);
   return 1;
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_store_entry()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Store one entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_store_entry()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Store one entry.
+ *
+ **************************************************************************/
 
 int XttLogging::store(char* filename)
 {
   int i;
   pwr_tFileName filename_str;
   FILE* outfile;
-  char msg[pwr_cSizFileName+15];
+  char msg[pwr_cSizFileName + 15];
   int found_parameter;
 
   found_parameter = 0;
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
     if (parameterstr[i][0] != 0)
       found_parameter++;
   }
-  if (!found_parameter) {
+  if (!found_parameter)
+  {
     message('E', "No parameters found in Logging entry");
     return XNAV__SUCCESS;
   }
@@ -484,15 +500,15 @@ int XttLogging::store(char* filename)
   dcli_get_defaultfilename(filename, filename_str, ".rtt_com");
 
   outfile = fopen(filename_str, "w");
-  if (outfile == 0) {
+  if (outfile == 0)
+  {
     char tmp[280];
     snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", filename_str);
     message('E', tmp);
     return XNAV__HOLDCOMMAND;
   }
 
-  fprintf(
-      outfile, "logging set/create/entry=current/file=\"%s\"\n", logg_filename);
+  fprintf(outfile, "logging set/create/entry=current/file=\"%s\"\n", logg_filename);
   fprintf(outfile, "logging delete/entry=current/all\n");
   if (!feqf(logg_time, 0.0f))
     fprintf(outfile, "logging set/entry=current/time=%f\n", logg_time);
@@ -514,18 +530,21 @@ int XttLogging::store(char* filename)
   else if (logg_format == xtt_eLoggFormat_Py)
     fprintf(outfile, "logging set/entry=current/format=py\n");
 
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
     if (parameterstr[i][0] != 0)
-      fprintf(outfile, "logging set/entry=current/parameter=\"%s\"\n",
-          parameterstr[i]);
+      fprintf(outfile, "logging set/entry=current/parameter=\"%s\"\n", parameterstr[i]);
   }
-  if (conditionstr[0] != 0) {
+  if (conditionstr[0] != 0)
+  {
     pwr_tCmd cond;
     char *s, *t;
 
     // Replace " with \"
-    for (s = conditionstr, t = cond; *s; s++) {
-      if (*s == '"') {
+    for (s = conditionstr, t = cond; *s; s++)
+    {
+      if (*s == '"')
+      {
         *t = '\\';
         t++;
       }
@@ -550,17 +569,17 @@ int XttLogging::store(char* filename)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_start()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Start the entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_start()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Start the entry.
+ *
+ **************************************************************************/
 
 int XttLogging::start()
 {
@@ -568,12 +587,14 @@ int XttLogging::start()
   int i, found;
   char msg[256];
 
-  if (active) {
+  if (active)
+  {
     message('E', "Entry is already started");
     return XNAV__HOLDCOMMAND;
   }
 
-  if (wanted_buffer_size != buffer_size || buffer_ptr == 0) {
+  if (wanted_buffer_size != buffer_size || buffer_ptr == 0)
+  {
     // Reallocate
     if (buffer_ptr != 0)
       free(buffer_ptr);
@@ -586,37 +607,45 @@ int XttLogging::start()
 
   /* Get the parameters */
   found = 0;
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-    if (parameterstr[i][0] != 0) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
+    if (parameterstr[i][0] != 0)
+    {
       found = 1;
 
-      sts = gdh_RefObjectInfo(parameterstr[i], (pwr_tAddress*)&parameter_ptr[i],
-          &(parameter_subid[i]), parameter_size[i]);
-      if (EVEN(sts)) {
+      sts = gdh_RefObjectInfo(parameterstr[i], (pwr_tAddress*)&parameter_ptr[i], &(parameter_subid[i]),
+                              parameter_size[i]);
+      if (EVEN(sts))
+      {
         message('E', "Parameter not found");
         return XNAV__HOLDCOMMAND;
       }
     }
   }
-  if (!found) {
+  if (!found)
+  {
     message('E', "Parameter is missing");
     return XNAV__HOLDCOMMAND;
   }
 
   /* Get the condition */
-  if (conditionstr[0] != 0) {
-    if (str_NoCaseStrncmp(conditionstr, "EXPR(", 5) == 0) {
+  if (conditionstr[0] != 0)
+  {
+    if (str_NoCaseStrncmp(conditionstr, "EXPR(", 5) == 0)
+    {
       pwr_tCmd expr;
 
       strncpy(expr, &conditionstr[5], sizeof(expr));
       char* s = strrchr(expr, ')');
-      if (!s) {
+      if (!s)
+      {
         message('E', "Condition expression syntax error");
         return XNAV__HOLDCOMMAND;
       }
       *s = 0;
 
-      if (!log_ccm_registred) {
+      if (!log_ccm_registred)
+      {
         sts = ccm_register_function("Logging", "GetA", logccm_geta_func);
         if (EVEN(sts))
           return sts;
@@ -629,42 +658,51 @@ int XttLogging::start()
         log_ccm_registred = 1;
       }
 
-      sts = ccm_singleline_init(
-          &cond_ccm_ctx, expr, log_errormessage_func, this);
-      if (EVEN(sts)) {
+      sts = ccm_singleline_init(&cond_ccm_ctx, expr, log_errormessage_func, this);
+      if (EVEN(sts))
+      {
         message('E', "Condition expression syntax error");
         return XNAV__HOLDCOMMAND;
       }
       condition_ptr = 0;
-    } else {
-      sts = gdh_RefObjectInfo(
-          conditionstr, (pwr_tAddress*)&condition_ptr, &(condition_subid), 1);
-      if (EVEN(sts)) {
+    }
+    else
+    {
+      sts = gdh_RefObjectInfo(conditionstr, (pwr_tAddress*)&condition_ptr, &(condition_subid), 1);
+      if (EVEN(sts))
+      {
         condition_ptr = 0;
         message('E', "Condition parameter not found");
         return XNAV__HOLDCOMMAND;
       }
       cond_ccm_ctx = 0;
     }
-  } else {
+  }
+  else
+  {
     condition_ptr = 0;
     cond_ccm_ctx = 0;
   }
 
   /* Open the file */
-  if (logg_filename[0] != 0) {
+  if (logg_filename[0] != 0)
+  {
     logg_file = fopen(logg_filename, "w");
-    if (logg_file == 0) {
+    if (logg_file == 0)
+    {
       message('E', "Unable to open file");
       return XNAV__HOLDCOMMAND;
     }
-  } else {
+  }
+  else
+  {
     message('E', "File is missing");
     return XNAV__HOLDCOMMAND;
   }
 
   /* Check time */
-  if (feqf(logg_time, 0.0f)) {
+  if (feqf(logg_time, 0.0f))
+  {
     message('E', "Time is missing");
     return XNAV__HOLDCOMMAND;
   }
@@ -676,10 +714,10 @@ int XttLogging::start()
   active = 1;
   stop_logg = 0;
 
-/* Create a subprocess */
+  /* Create a subprocess */
   sts = pthread_create(&thread, NULL, /* attr */
-      xtt_logproc, /* start_routine */
-      (void*)this); /* arg */
+                       xtt_logproc,   /* start_routine */
+                       (void*)this);  /* arg */
   if (sts != 0)
     return sts;
 
@@ -689,21 +727,22 @@ int XttLogging::start()
   return XNAV__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		rtt_logging_stop()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Stop the entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_stop()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Stop the entry.
+ *
+ **************************************************************************/
 
 int XttLogging::stop()
 {
-  if (!active) {
+  if (!active)
+  {
     message('E', "Entry is already stopped");
     return XNAV__HOLDCOMMAND;
   }
@@ -715,17 +754,17 @@ int XttLogging::stop()
 }
 
 /*************************************************************************
-*
-* Name:		entry_stop()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Stop the entry.
-*
-**************************************************************************/
+ *
+ * Name:		entry_stop()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Stop the entry.
+ *
+ **************************************************************************/
 
 int XttLogging::entry_stop()
 {
@@ -737,16 +776,20 @@ int XttLogging::entry_stop()
   stop_logg = 1;
 
   /* Unref from gdh */
-  for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-    if (parameterstr[i][0] != 0) {
+  for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+  {
+    if (parameterstr[i][0] != 0)
+    {
       sts = gdh_UnrefObjectInfo(parameter_subid[i]);
     }
   }
-  if (condition_ptr != 0) {
+  if (condition_ptr != 0)
+  {
     sts = gdh_UnrefObjectInfo(condition_subid);
     condition_ptr = 0;
   }
-  if (cond_ccm_ctx != 0) {
+  if (cond_ccm_ctx != 0)
+  {
     ccm_singleline_free(cond_ccm_ctx);
     cond_ccm_ctx = 0;
   }
@@ -755,28 +798,31 @@ int XttLogging::entry_stop()
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_delete()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Delete the entry.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_delete()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Delete the entry.
+ *
+ **************************************************************************/
 
 int XttLogging::remove(char* parameter)
 {
   int i;
   int found = 0;
 
-  if (parameter) {
+  if (parameter)
+  {
     /* Remove this parameter */
     found = 0;
-    for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-      if (str_NoCaseStrcmp(parameterstr[i], parameter) == 0) {
+    for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+    {
+      if (str_NoCaseStrcmp(parameterstr[i], parameter) == 0)
+      {
         /* Parmeter is found, remove it */
         parameterstr[i][0] = 0;
         message('I', "Parameter removed");
@@ -785,10 +831,13 @@ int XttLogging::remove(char* parameter)
       }
     }
   }
-  if (!found) {
+  if (!found)
+  {
     message('E', "Parameter not found");
     return XNAV__HOLDCOMMAND;
-  } else {
+  }
+  else
+  {
     /* Clear all parameters */
     for (i = 0; i < RTT_LOGG_MAXPAR; i++)
       parameterstr[i][0] = 0;
@@ -798,17 +847,17 @@ int XttLogging::remove(char* parameter)
 }
 
 /*************************************************************************
-*
-* Name:		xtt_logproc()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Logging subprocess.
-*
-**************************************************************************/
+ *
+ * Name:		xtt_logproc()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Logging subprocess.
+ *
+ **************************************************************************/
 
 static void* xtt_logproc(void* arg)
 {
@@ -843,44 +892,54 @@ static void* xtt_logproc(void* arg)
   logg->starttime = nextime;
 
   /* Print starttime and logged parameters on the file */
-  time_AtoAscii(
-      &logg->starttime, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+  time_AtoAscii(&logg->starttime, time_eFormat_DateAndTime, time_str, sizeof(time_str));
 
-  switch (logg->logg_type) {
+  switch (logg->logg_type)
+  {
   case xtt_eLoggType_Cont:
-    switch (logg->logg_format) {
+    switch (logg->logg_format)
+    {
     case xtt_eLoggFormat_Py:
       if (logg->logg_file)
-	char_cnt += fprintf(logg->logg_file, "Time");
+        char_cnt += fprintf(logg->logg_file, "Time");
       break;
     default:
       if (logg->logg_file)
-	char_cnt += fprintf(logg->logg_file, "\"%s\"", time_str);
-    }    
+        char_cnt += fprintf(logg->logg_file, "\"%s\"", time_str);
+    }
     /* Find a unique shortname for each parameter */
-    for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-      if (logg->print_shortname) {
-        if (logg->parameterstr[i][0] != 0) {
+    for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+    {
+      if (logg->print_shortname)
+      {
+        if (logg->parameterstr[i][0] != 0)
+        {
           /* Print only last segment and not ActualValue */
           xnav_cut_segments(logg->shortname[i], logg->parameterstr[i], 1);
-          if ((s = strchr(logg->shortname[i], '.')) != 0) {
+          if ((s = strchr(logg->shortname[i], '.')) != 0)
+          {
             str_ToUpper(parname, s + 1);
             if (streq(parname, "ACTUALVALUE"))
               *s = 0;
           }
           /* Check that this name is unique */
-          for (j = 0; j < RTT_LOGG_MAXPAR; j++) {
-            if (j != i && !strcmp(logg->shortname[i], logg->shortname[j])) {
-              for (k = 2; k < 7; k++) {
+          for (j = 0; j < RTT_LOGG_MAXPAR; j++)
+          {
+            if (j != i && !strcmp(logg->shortname[i], logg->shortname[j]))
+            {
+              for (k = 2; k < 7; k++)
+              {
                 /* Increase number of segments */
                 xnav_cut_segments(logg->shortname[i], logg->parameterstr[i], k);
-                if ((s = strchr(logg->shortname[i], '.')) != 0) {
+                if ((s = strchr(logg->shortname[i], '.')) != 0)
+                {
                   str_ToUpper(parname, s + 1);
                   if (streq(parname, "ACTUALVALUE"))
                     *s = 0;
                 }
                 xnav_cut_segments(logg->shortname[j], logg->parameterstr[j], k);
-                if ((s = strchr(logg->shortname[j], '.')) != 0) {
+                if ((s = strchr(logg->shortname[j], '.')) != 0)
+                {
                   str_ToUpper(parname, s + 1);
                   if (streq(parname, "ACTUALVALUE"))
                     *s = 0;
@@ -891,27 +950,34 @@ static void* xtt_logproc(void* arg)
             }
           }
         }
-      } else
+      }
+      else
         strcpy(logg->shortname[i], logg->parameterstr[i]);
     }
-    for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-      if (logg->parameterstr[i][0] != 0) {
-        if (logg->logg_file) {
-	  switch (logg->logg_format) {
-	  case xtt_eLoggFormat_Py:
-	    char_cnt += fprintf(logg->logg_file, ",%s", logg->shortname[i]);
-	    break;
-	  default:
-	    char_cnt += fprintf(logg->logg_file, "	%s", logg->shortname[i]);
-	    if (char_cnt + 120 > logg->line_size) {
-	      fprintf(logg->logg_file, "\n");
-	      char_cnt = 0;	      
-	    }
-	  }
+    for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+    {
+      if (logg->parameterstr[i][0] != 0)
+      {
+        if (logg->logg_file)
+        {
+          switch (logg->logg_format)
+          {
+          case xtt_eLoggFormat_Py:
+            char_cnt += fprintf(logg->logg_file, ",%s", logg->shortname[i]);
+            break;
+          default:
+            char_cnt += fprintf(logg->logg_file, "	%s", logg->shortname[i]);
+            if (char_cnt + 120 > logg->line_size)
+            {
+              fprintf(logg->logg_file, "\n");
+              char_cnt = 0;
+            }
+          }
         }
       }
     }
-    if (logg->logg_file) {
+    if (logg->logg_file)
+    {
       fprintf(logg->logg_file, "\n");
       char_cnt = 0;
     }
@@ -920,8 +986,10 @@ static void* xtt_logproc(void* arg)
   case xtt_eLoggType_Mod:
     if (logg->logg_file)
       fprintf(logg->logg_file, "RTT LOGGING STARTED AT %s\n", time_str);
-    for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-      if (logg->parameterstr[i][0] != 0) {
+    for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+    {
+      if (logg->parameterstr[i][0] != 0)
+      {
         if (logg->logg_file)
           fprintf(logg->logg_file, "Parameter: %s\n", logg->parameterstr[i]);
       }
@@ -934,25 +1002,31 @@ static void* xtt_logproc(void* arg)
   if (logg->logg_priority != 0)
     sts = logg->set_prio(logg->logg_priority);
 
-  for (;;) {
+  for (;;)
+  {
     /* Calculation of starttime for next loop */
     time_Aadd(&restime, &nextime, &deltatime);
     nextime = restime;
 
-    if (logg->condition_ptr || logg->cond_ccm_ctx) {
-      if (logg->active && !logg->stop_logg) {
+    if (logg->condition_ptr || logg->cond_ccm_ctx)
+    {
+      if (logg->active && !logg->stop_logg)
+      {
         if (logg->condition_ptr)
           cond = *logg->condition_ptr;
-        else {
+        else
+        {
           sts = ccm_singleline_exec_int(logg->cond_ccm_ctx, &cond);
-          if (EVEN(sts)) {
+          if (EVEN(sts))
+          {
             logg->message(' ', XNav::get_message(sts));
             cond = 0;
           }
         }
 
-        if (!cond) {
-/*  Don't log, wait until next scan */
+        if (!cond)
+        {
+          /*  Don't log, wait until next scan */
           time_GetTime(&time);
           time_Adiff(&wait_time, &nextime, &time);
 
@@ -966,7 +1040,8 @@ static void* xtt_logproc(void* arg)
     }
 
     time_GetTime(&time);
-    switch (logg->logg_type) {
+    switch (logg->logg_type)
+    {
     case xtt_eLoggType_Cont:
       /* Convert time to seconds since start */
       time_Adiff(&timediff, &time, &logg->starttime);
@@ -976,212 +1051,231 @@ static void* xtt_logproc(void* arg)
       if (first_scan)
         time_float = 0.;
       /* Print time and the value of the parameter on the file */
-      switch (logg->logg_format) {
+      switch (logg->logg_format)
+      {
       case xtt_eLoggFormat_Py:
-	time_AtoAscii(&time, time_eFormat_NumDateAndTime, time_str, sizeof(time_str));	
-	char_cnt += logg->log_print("%s", time_str);
-	break;
+        time_AtoAscii(&time, time_eFormat_NumDateAndTime, time_str, sizeof(time_str));
+        char_cnt += logg->log_print("%s", time_str);
+        break;
       default:
-	char_cnt += logg->log_print("%12.4f", time_float);
+        char_cnt += logg->log_print("%12.4f", time_float);
       }
-      for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-        if (logg->parameterstr[i][0] != 0) {
+      for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+      {
+        if (logg->parameterstr[i][0] != 0)
+        {
           value_ptr = logg->parameter_ptr[i];
-          switch (logg->parameter_type[i]) {
+          switch (logg->parameter_type[i])
+          {
           case pwr_eType_Float32:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%f", *(pwr_tFloat32*)value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%f", *(pwr_tFloat32*)value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%f", *(pwr_tFloat32*)value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%f", *(pwr_tFloat32*)value_ptr);
+            }
             break;
 
           case pwr_eType_Float64:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%f", *(pwr_tFloat64*)value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%f", *(pwr_tFloat64*)value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%f", *(pwr_tFloat64*)value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%f", *(pwr_tFloat64*)value_ptr);
+            }
             break;
 
           case pwr_eType_UInt8:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%d", *(pwr_tUInt8*)value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%d", *(pwr_tUInt8*)value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%d", *(pwr_tUInt8*)value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%d", *(pwr_tUInt8*)value_ptr);
+            }
             break;
           case pwr_eType_Boolean:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%d", *(pwr_tBoolean*)value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%d", *(pwr_tBoolean*)value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%d", *(pwr_tBoolean*)value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%d", *(pwr_tBoolean*)value_ptr);
+            }
             break;
           case pwr_eType_Char:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%c", *(pwr_tChar*)value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%c", *(pwr_tChar*)value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%c", *(pwr_tChar*)value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%c", *(pwr_tChar*)value_ptr);
+            }
             break;
           case pwr_eType_Int8:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%d", *(pwr_tInt8*)value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%d", *(pwr_tInt8*)value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%d", *(pwr_tInt8*)value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%d", *(pwr_tInt8*)value_ptr);
+            }
             break;
           case pwr_eType_Int16:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%d", *(pwr_tInt16*)value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%d", *(pwr_tInt16*)value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%d", *(pwr_tInt16*)value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%d", *(pwr_tInt16*)value_ptr);
+            }
             break;
           case pwr_eType_UInt16:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%d", *(pwr_tUInt16*)value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%d", *(pwr_tUInt16*)value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%d", *(pwr_tUInt16*)value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%d", *(pwr_tUInt16*)value_ptr);
+            }
             break;
           case pwr_eType_Int32:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%d", *(pwr_tInt32*)value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%d", *(pwr_tInt32*)value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%d", *(pwr_tInt32*)value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%d", *(pwr_tInt32*)value_ptr);
+            }
             break;
           case pwr_eType_UInt32:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%d", *(pwr_tUInt32*)value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%d", *(pwr_tUInt32*)value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%d", *(pwr_tUInt32*)value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%d", *(pwr_tUInt32*)value_ptr);
+            }
             break;
           case pwr_eType_Int64:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%lld", *(pwr_tInt64*)value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%lld", *(pwr_tInt64*)value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%lld", *(pwr_tInt64*)value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%lld", *(pwr_tInt64*)value_ptr);
+            }
             break;
           case pwr_eType_UInt64:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%llu", *(pwr_tUInt64*)value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%llu", *(pwr_tUInt64*)value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%llu", *(pwr_tUInt64*)value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%llu", *(pwr_tUInt64*)value_ptr);
+            }
             break;
           case pwr_eType_String:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%s", value_ptr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%s", value_ptr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%s", value_ptr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%s", value_ptr);
+            }
             break;
           case pwr_eType_Objid:
             objid = *(pwr_tObjid*)value_ptr;
             if (!objid.oix)
-              sts = gdh_ObjidToName(
-                  objid, hiername, sizeof(hiername), cdh_mName_volumeStrict);
+              sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mName_volumeStrict);
             else
-              sts = gdh_ObjidToName(
-                  objid, hiername, sizeof(hiername), cdh_mNName);
+              sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
             if (EVEN(sts))
               strcpy(hiername, "** Unknown objid");
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%s", hiername);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%s", hiername);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%s", hiername);
+              break;
+            default:
+              char_cnt += logg->log_print("	%s", hiername);
+            }
             break;
           case pwr_eType_AttrRef:
             attrref = (pwr_sAttrRef*)value_ptr;
-            sts = gdh_AttrrefToName(
-                attrref, hiername, sizeof(hiername), cdh_mNName);
+            sts = gdh_AttrrefToName(attrref, hiername, sizeof(hiername), cdh_mNName);
             if (EVEN(sts))
               strcpy(hiername, "** Unknown attrref");
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%s", hiername);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%s", hiername);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%s", hiername);
+              break;
+            default:
+              char_cnt += logg->log_print("	%s", hiername);
+            }
             break;
           case pwr_eType_Time:
-            sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime,
-                timstr, sizeof(timstr));
+            sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime, timstr, sizeof(timstr));
             if (EVEN(sts))
               strcpy(timstr, "Undefined time");
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%s", timstr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%s", timstr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%s", timstr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%s", timstr);
+            }
             break;
           case pwr_eType_DeltaTime:
-            sts = time_DtoAscii(
-                (pwr_tDeltaTime*)value_ptr, 1, timstr, sizeof(timstr));
+            sts = time_DtoAscii((pwr_tDeltaTime*)value_ptr, 1, timstr, sizeof(timstr));
             if (EVEN(sts))
               strcpy(timstr, "Undefined time");
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%s", timstr);
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%s", timstr);
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%s", timstr);
+              break;
+            default:
+              char_cnt += logg->log_print("	%s", timstr);
+            }
             break;
           default:
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      char_cnt += logg->log_print(",%s", "Type error");
-	      break;
-	    default:
-	      char_cnt += logg->log_print("	%s", "Type error");
-	    }
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              char_cnt += logg->log_print(",%s", "Type error");
+              break;
+            default:
+              char_cnt += logg->log_print("	%s", "Type error");
+            }
           }
-          if (char_cnt + 10 > logg->line_size) {
-	    switch (logg->logg_format) {
-	    case xtt_eLoggFormat_Py:
-	      break;
-	    default:
-	      logg->log_print("\n");
-	      char_cnt = 0;
-	    }
+          if (char_cnt + 10 > logg->line_size)
+          {
+            switch (logg->logg_format)
+            {
+            case xtt_eLoggFormat_Py:
+              break;
+            default:
+              logg->log_print("\n");
+              char_cnt = 0;
+            }
           }
         }
       }
@@ -1192,17 +1286,19 @@ static void* xtt_logproc(void* arg)
 
     case xtt_eLoggType_Mod:
       /* Write only if value is changed */
-      for (i = 0; i < RTT_LOGG_MAXPAR; i++) {
-        if (logg->parameterstr[i][0] != 0) {
+      for (i = 0; i < RTT_LOGG_MAXPAR; i++)
+      {
+        if (logg->parameterstr[i][0] != 0)
+        {
           value_ptr = logg->parameter_ptr[i];
           old_value_ptr = (char*)&logg->old_value[i];
-          switch (logg->parameter_type[i]) {
+          switch (logg->parameter_type[i])
+          {
           case pwr_eType_Float32:
-            if ((!feqf(*(pwr_tFloat32*)value_ptr, *(pwr_tFloat32*)old_value_ptr))
-                || first_scan) {
+            if ((!feqf(*(pwr_tFloat32*)value_ptr, *(pwr_tFloat32*)old_value_ptr)) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%f\n", *(pwr_tFloat32*)value_ptr);
@@ -1211,8 +1307,8 @@ static void* xtt_logproc(void* arg)
             break;
 
           case pwr_eType_Float64:
-            if ((!feq(*(pwr_tFloat64*)value_ptr, *(pwr_tFloat64*)old_value_ptr))
-                || first_scan) {
+            if ((!feq(*(pwr_tFloat64*)value_ptr, *(pwr_tFloat64*)old_value_ptr)) || first_scan)
+            {
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%f\n", *(pwr_tFloat64*)value_ptr);
               *(pwr_tFloat64*)old_value_ptr = *(pwr_tFloat64*)value_ptr;
@@ -1220,11 +1316,10 @@ static void* xtt_logproc(void* arg)
             break;
 
           case pwr_eType_Boolean:
-            if ((*(pwr_tBoolean*)value_ptr != *(pwr_tBoolean*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tBoolean*)value_ptr != *(pwr_tBoolean*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%d\n", *(pwr_tBoolean*)value_ptr);
@@ -1232,11 +1327,10 @@ static void* xtt_logproc(void* arg)
             }
             break;
           case pwr_eType_Char:
-            if ((*(pwr_tChar*)value_ptr != *(pwr_tChar*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tChar*)value_ptr != *(pwr_tChar*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%c\n", *(pwr_tChar*)value_ptr);
@@ -1244,11 +1338,10 @@ static void* xtt_logproc(void* arg)
             }
             break;
           case pwr_eType_UInt8:
-            if ((*(pwr_tUInt8*)value_ptr != *(pwr_tUInt8*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tUInt8*)value_ptr != *(pwr_tUInt8*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%d\n", *(pwr_tUInt8*)value_ptr);
@@ -1256,11 +1349,10 @@ static void* xtt_logproc(void* arg)
             }
             break;
           case pwr_eType_Int8:
-            if ((*(pwr_tInt8*)value_ptr != *(pwr_tInt8*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tInt8*)value_ptr != *(pwr_tInt8*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%d\n", *value_ptr);
@@ -1268,11 +1360,10 @@ static void* xtt_logproc(void* arg)
             }
             break;
           case pwr_eType_UInt16:
-            if ((*(pwr_tUInt16*)value_ptr != *(pwr_tUInt16*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tUInt16*)value_ptr != *(pwr_tUInt16*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%d\n", *(pwr_tUInt16*)value_ptr);
@@ -1280,11 +1371,10 @@ static void* xtt_logproc(void* arg)
             }
             break;
           case pwr_eType_Int16:
-            if ((*(pwr_tInt16*)value_ptr != *(pwr_tInt16*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tInt16*)value_ptr != *(pwr_tInt16*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%d\n", *(pwr_tInt16*)value_ptr);
@@ -1292,11 +1382,10 @@ static void* xtt_logproc(void* arg)
             }
             break;
           case pwr_eType_UInt32:
-            if ((*(pwr_tUInt32*)value_ptr != *(pwr_tUInt32*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tUInt32*)value_ptr != *(pwr_tUInt32*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%d\n", *(pwr_tUInt32*)value_ptr);
@@ -1304,11 +1393,10 @@ static void* xtt_logproc(void* arg)
             }
             break;
           case pwr_eType_Int32:
-            if ((*(pwr_tInt32*)value_ptr != *(pwr_tInt32*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tInt32*)value_ptr != *(pwr_tInt32*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%d\n", *(pwr_tInt32*)value_ptr);
@@ -1316,11 +1404,10 @@ static void* xtt_logproc(void* arg)
             }
             break;
           case pwr_eType_UInt64:
-            if ((*(pwr_tUInt64*)value_ptr != *(pwr_tUInt64*)old_value_ptr)
-                || first_scan) {
+            if ((*(pwr_tUInt64*)value_ptr != *(pwr_tUInt64*)old_value_ptr) || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%llu\n", *(pwr_tUInt64*)value_ptr);
@@ -1328,12 +1415,10 @@ static void* xtt_logproc(void* arg)
             }
             break;
           case pwr_eType_String:
-            if (strncmp(value_ptr, old_value_ptr, sizeof(logg->old_value[0]))
-                    != 0
-                || first_scan) {
+            if (strncmp(value_ptr, old_value_ptr, sizeof(logg->old_value[0])) != 0 || first_scan)
+            {
               /* Value is changed, print */
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%s\n", value_ptr);
@@ -1341,20 +1426,17 @@ static void* xtt_logproc(void* arg)
             }
             break;
           case pwr_eType_Objid:
-            if (memcmp(value_ptr, old_value_ptr, sizeof(pwr_tObjid)) != 0
-                || first_scan) {
+            if (memcmp(value_ptr, old_value_ptr, sizeof(pwr_tObjid)) != 0 || first_scan)
+            {
               /* Value is changed, print */
               objid = *(pwr_tObjid*)value_ptr;
               if (!objid.oix)
-                sts = gdh_ObjidToName(
-                    objid, hiername, sizeof(hiername), cdh_mName_volumeStrict);
+                sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mName_volumeStrict);
               else
-                sts = gdh_ObjidToName(
-                    objid, hiername, sizeof(hiername), cdh_mNName);
+                sts = gdh_ObjidToName(objid, hiername, sizeof(hiername), cdh_mNName);
               if (EVEN(sts))
                 strcpy(hiername, "** Unknown objid");
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%s\n", hiername);
@@ -1365,17 +1447,13 @@ static void* xtt_logproc(void* arg)
             attrref = (pwr_sAttrRef*)value_ptr;
             /* There is only space for the objid of the attrref in oldvalue ..
              */
-            if (memcmp(
-                    (char*)&attrref->Objid, old_value_ptr, sizeof(pwr_tObjid))
-                    != 0
-                || first_scan) {
+            if (memcmp((char*)&attrref->Objid, old_value_ptr, sizeof(pwr_tObjid)) != 0 || first_scan)
+            {
               /* At least the objid is changed */
-              sts = gdh_AttrrefToName(
-                  attrref, hiername, sizeof(hiername), cdh_mNName);
+              sts = gdh_AttrrefToName(attrref, hiername, sizeof(hiername), cdh_mNName);
               if (EVEN(sts))
                 strcpy(hiername, "** Unknown attrref");
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%s\n", hiername);
@@ -1383,16 +1461,14 @@ static void* xtt_logproc(void* arg)
             }
             break;
           case pwr_eType_Time:
-            if (memcmp(value_ptr, old_value_ptr, sizeof(pwr_tTime)) != 0
-                || first_scan) {
+            if (memcmp(value_ptr, old_value_ptr, sizeof(pwr_tTime)) != 0 || first_scan)
+            {
               /* Value is changed, print */
-              sts = time_AtoAscii((pwr_tTime*)value_ptr,
-                  time_eFormat_DateAndTime, timstr, sizeof(timstr));
+              sts = time_AtoAscii((pwr_tTime*)value_ptr, time_eFormat_DateAndTime, timstr, sizeof(timstr));
               if (EVEN(sts))
                 strcpy(timstr, "Undefined time");
 
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%s\n", timstr);
@@ -1400,16 +1476,14 @@ static void* xtt_logproc(void* arg)
             }
             break;
           case pwr_eType_DeltaTime:
-            if (memcmp(value_ptr, old_value_ptr, sizeof(pwr_tTime)) != 0
-                || first_scan) {
+            if (memcmp(value_ptr, old_value_ptr, sizeof(pwr_tTime)) != 0 || first_scan)
+            {
               /* Value is changed, print */
-              sts = time_DtoAscii(
-                  (pwr_tDeltaTime*)value_ptr, 1, timstr, sizeof(timstr));
+              sts = time_DtoAscii((pwr_tDeltaTime*)value_ptr, 1, timstr, sizeof(timstr));
               if (EVEN(sts))
                 strcpy(timstr, "Undefined time");
 
-              time_AtoAscii(
-                  &time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+              time_AtoAscii(&time, time_eFormat_DateAndTime, time_str, sizeof(time_str));
               logg->log_print("%s", &time_str);
               logg->log_print("	%s", &(logg->parameterstr[i]));
               logg->log_print("	%s\n", timstr);
@@ -1426,7 +1500,8 @@ static void* xtt_logproc(void* arg)
 
     /*  Wait "cytime" ms */
 
-    if (!logg->active || logg->stop_logg) {
+    if (!logg->active || logg->stop_logg)
+    {
       logg->active = 0;
       logg->entry_stop();
       logg->print_buffer();
@@ -1440,7 +1515,8 @@ static void* xtt_logproc(void* arg)
       pthread_exit((void*)1);
     }
     time_GetTime(&time);
-    while (time_Acomp(&time, &nextime) > 0) {
+    while (time_Acomp(&time, &nextime) > 0)
+    {
       /* To late for next lap, skip it */
       time_Aadd(&restime, &nextime, &deltatime);
       nextime = restime;
@@ -1458,20 +1534,20 @@ static void* xtt_logproc(void* arg)
 }
 
 /*************************************************************************
-*
-* Name:		log_print()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Print. Equivalent to fprintf but the character string is put
-*	in a buffer and printed when the buffer size is exceeded or
-*	when r_print_buffer is called.
-*	The max size of the character string is 500.
-*
-**************************************************************************/
+ *
+ * Name:		log_print()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Print. Equivalent to fprintf but the character string is put
+ *	in a buffer and printed when the buffer size is exceeded or
+ *	when r_print_buffer is called.
+ *	The max size of the character string is 500.
+ *
+ **************************************************************************/
 
 int XttLogging::log_print(const char* format, ...)
 {
@@ -1488,8 +1564,10 @@ int XttLogging::log_print(const char* format, ...)
   strcpy(s, buff);
   buffer_count += strlen(buff);
 
-  if (buffer_count > (buffer_size * 512 - (int)sizeof(buff))) {
-    if (intern) {
+  if (buffer_count > (buffer_size * 512 - (int)sizeof(buff)))
+  {
+    if (intern)
+    {
       stop_logg = 1;
       return 1;
     }
@@ -1499,16 +1577,16 @@ int XttLogging::log_print(const char* format, ...)
 }
 
 /*************************************************************************
-*
-* Name:		print_buffer()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		print_buffer()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 int XttLogging::print_buffer()
 {
@@ -1528,22 +1606,24 @@ int XttLogging::print_buffer()
 }
 
 /*************************************************************************
-*
-* Name:		rtt_logging_close_files()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Close all open files.
-*	This file is called at execute termintation to close the files.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_logging_close_files()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Close all open files.
+ *	This file is called at execute termintation to close the files.
+ *
+ **************************************************************************/
 int XttLogging::close_files()
 {
-  if (active) {
-    if (logg_file) {
+  if (active)
+  {
+    if (logg_file)
+    {
       print_buffer();
       fclose(logg_file);
     }
@@ -1551,7 +1631,4 @@ int XttLogging::close_files()
   return XNAV__SUCCESS;
 }
 
-void XttLogging::message(char severity, const char* msg)
-{
-  ((XNav*)xnav)->message(severity, msg);
-}
+void XttLogging::message(char severity, const char* msg) { ((XNav*)xnav)->message(severity, msg); }

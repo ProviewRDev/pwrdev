@@ -46,7 +46,8 @@
 #ifndef pdr_parse_h
 #define pdr_parse_h
 
-enum defkind {
+enum defkind
+{
   DEF_CONST,
   DEF_STRUCT,
   DEF_UNION,
@@ -58,15 +59,17 @@ typedef enum defkind defkind;
 
 typedef char* const_def;
 
-enum relation {
-  REL_VECTOR, /* fixed length array */
-  REL_ARRAY, /* variable length array */
+enum relation
+{
+  REL_VECTOR,  /* fixed length array */
+  REL_ARRAY,   /* variable length array */
   REL_POINTER, /* pointer */
-  REL_ALIAS /* simple */
+  REL_ALIAS    /* simple */
 };
 typedef enum relation relation;
 
-struct typedef_def {
+struct typedef_def
+{
   char* old_prefix;
   char* old_type;
   relation rel;
@@ -74,19 +77,22 @@ struct typedef_def {
 };
 typedef struct typedef_def typedef_def;
 
-struct enumval_list {
+struct enumval_list
+{
   char* name;
   char* assignment;
   struct enumval_list* next;
 };
 typedef struct enumval_list enumval_list;
 
-struct enum_def {
+struct enum_def
+{
   enumval_list* vals;
 };
 typedef struct enum_def enum_def;
 
-struct declaration {
+struct declaration
+{
   char* prefix;
   char* type;
   char* name;
@@ -95,32 +101,37 @@ struct declaration {
 };
 typedef struct declaration declaration;
 
-struct decl_list {
+struct decl_list
+{
   declaration decl;
   struct decl_list* next;
 };
 typedef struct decl_list decl_list;
 
-struct struct_def {
+struct struct_def
+{
   decl_list* decls;
 };
 typedef struct struct_def struct_def;
 
-struct case_list {
+struct case_list
+{
   char* case_name;
   declaration case_decl;
   struct case_list* next;
 };
 typedef struct case_list case_list;
 
-struct union_def {
+struct union_def
+{
   declaration enum_decl;
   case_list* cases;
   declaration* default_decl;
 };
 typedef struct union_def union_def;
 
-struct proc_list {
+struct proc_list
+{
   char* proc_name;
   char* proc_num;
   char* arg_type;
@@ -131,7 +142,8 @@ struct proc_list {
 };
 typedef struct proc_list proc_list;
 
-struct version_list {
+struct version_list
+{
   char* vers_name;
   char* vers_num;
   proc_list* procs;
@@ -139,16 +151,19 @@ struct version_list {
 };
 typedef struct version_list version_list;
 
-struct program_def {
+struct program_def
+{
   char* prog_num;
   version_list* versions;
 };
 typedef struct program_def program_def;
 
-struct definition {
+struct definition
+{
   char* def_name;
   defkind def_kind;
-  union {
+  union
+  {
     const_def co;
     struct_def st;
     union_def un;

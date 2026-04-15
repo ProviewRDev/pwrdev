@@ -45,12 +45,13 @@
 
 #include <gst/gst.h>
 
-class XttStreamGtk : public XttStream {
+class XttStreamGtk : public XttStream
+{
 public:
-  GstElement* playbin2; /* Our one and only pipeline */
+  GstElement* playbin2;           /* Our one and only pipeline */
   gulong slider_update_signal_id; /* Signal ID for the slider update signal */
-  GstState state; /* Current state of the pipeline */
-  gint64 duration; /* Duration of the clip, in nanoseconds */
+  GstState state;                 /* Current state of the pipeline */
+  gint64 duration;                /* Duration of the clip, in nanoseconds */
   pwr_tTime mb_press_time;
   int mb_press_x;
   int mb_press_y;
@@ -81,18 +82,15 @@ public:
 
   static int gst_initialized;
 
-  XttStreamGtk(GtkWidget* parent_wid, void* parent_ctx, const char* name,
-      const char* uri, int width, int height, int x, int y, double scan_time,
-      unsigned int options, int embedded, pwr_tAttrRef* arp, pwr_tStatus* sts);
+  XttStreamGtk(GtkWidget* parent_wid, void* parent_ctx, const char* name, const char* uri, int width,
+               int height, int x, int y, double scan_time, unsigned int options, int embedded,
+               pwr_tAttrRef* arp, pwr_tStatus* sts);
   ~XttStreamGtk();
 
   void pop();
   void set_size(int width, int height);
   void setup();
-  void* get_widget()
-  {
-    return main_box;
-  }
+  void* get_widget() { return main_box; }
   void create_popup_menu(int x, int y);
   void erase_window();
 
@@ -107,8 +105,7 @@ public:
   static void pause_cb(GtkButton* button, void* data);
   static void stop_cb(GtkButton* button, void* data);
   static void delete_event_cb(GtkWidget* widget, GdkEvent* event, void* data);
-  static gboolean expose_cb(
-      GtkWidget* widget, GdkEventExpose* event, void* data);
+  static gboolean expose_cb(GtkWidget* widget, GdkEventExpose* event, void* data);
   static void slider_cb(GtkRange* range, void* data);
   static void tags_cb(GstElement* playbin2, gint stream, void* data);
   static void error_cb(GstBus* bus, GstMessage* msg, void* data);
@@ -116,13 +113,10 @@ public:
   static void state_changed_cb(GstBus* bus, GstMessage* msg, void* data);
   static void application_cb(GstBus* bus, GstMessage* msg, void* data);
   static void resize_cb(GtkWidget* w, GtkAllocation* allocation, gpointer data);
-  static void source_setup_cb(
-      GstElement* playbin2, GstElement* src, gpointer data);
-  static gboolean mousebutton_cb(
-      GtkWidget* widget, GdkEvent* event, void* data);
+  static void source_setup_cb(GstElement* playbin2, GstElement* src, gpointer data);
+  static gboolean mousebutton_cb(GtkWidget* widget, GdkEvent* event, void* data);
   static void reconnect(void* data);
-  static void menu_position_func(
-      GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data);
+  static void menu_position_func(GtkMenu* menu, gint* x, gint* y, gboolean* push_in, gpointer data);
   static void activate_zoomreset(GtkWidget* w, gpointer data);
   static void activate_zoomin(GtkWidget* w, gpointer data);
   static void activate_zoomout(GtkWidget* w, gpointer data);
@@ -158,23 +152,17 @@ public:
 };
 
 #else
-class XttStreamGtk : public XttStream {
+class XttStreamGtk : public XttStream
+{
 public:
-  XttStreamGtk(GtkWidget* parent_wid, void* parent_ctx, const char* name,
-      const char* uri, int width, int height, int x, int y, double scan_time,
-      unsigned int options, int embedded, pwr_tAttrRef* arp, pwr_tStatus* sts);
+  XttStreamGtk(GtkWidget* parent_wid, void* parent_ctx, const char* name, const char* uri, int width,
+               int height, int x, int y, double scan_time, unsigned int options, int embedded,
+               pwr_tAttrRef* arp, pwr_tStatus* sts);
   ~XttStreamGtk();
 
-  void pop()
-  {
-  }
-  void set_size(int width, int height)
-  {
-  }
-  void* get_widget()
-  {
-    return 0;
-  }
+  void pop() {}
+  void set_size(int width, int height) {}
+  void* get_widget() { return 0; }
 };
 #endif
 

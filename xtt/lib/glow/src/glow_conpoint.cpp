@@ -42,28 +42,18 @@
 #include "glow_conpoint.h"
 #include "glow_draw.h"
 
-GlowConPoint::GlowConPoint(
-    GrowCtx* glow_ctx, double x, double y, int cp_num, glow_eDirection d)
-  : GlowArrayElem(glow_ctx), number(cp_num), p(glow_ctx, x, y), direction(d),
+GlowConPoint::GlowConPoint(GrowCtx* glow_ctx, double x, double y, int cp_num, glow_eDirection d)
+    : GlowArrayElem(glow_ctx), number(cp_num), p(glow_ctx, x, y), direction(d),
       trace_attr_type(glow_eTraceType_Boolean)
 {
   strcpy(trace_attribute, "");
 }
 
-void GlowConPoint::zoom()
-{
-  p.zoom();
-}
+void GlowConPoint::zoom() { p.zoom(); }
 
-void GlowConPoint::nav_zoom()
-{
-  p.nav_zoom();
-}
+void GlowConPoint::nav_zoom() { p.nav_zoom(); }
 
-void GlowConPoint::print_zoom()
-{
-  p.print_zoom();
-}
+void GlowConPoint::print_zoom() { p.print_zoom(); }
 
 void GlowConPoint::save(std::ofstream& fp, glow_eSaveMode mode)
 {
@@ -72,10 +62,8 @@ void GlowConPoint::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_ConPoint_direction) << FSPACE << int(direction) << '\n';
   fp << int(glow_eSave_ConPoint_p) << '\n';
   p.save(fp, mode);
-  fp << int(glow_eSave_ConPoint_trace_attribute) << FSPACE << trace_attribute
-     << '\n';
-  fp << int(glow_eSave_ConPoint_trace_attr_type) << FSPACE
-     << int(trace_attr_type) << '\n';
+  fp << int(glow_eSave_ConPoint_trace_attribute) << FSPACE << trace_attribute << '\n';
+  fp << int(glow_eSave_ConPoint_trace_attr_type) << FSPACE << int(trace_attr_type) << '\n';
   fp << int(glow_eSave_ConPoint_trf) << '\n';
   trf.save(fp, mode);
   fp << int(glow_eSave_End) << '\n';
@@ -88,15 +76,18 @@ void GlowConPoint::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GlowConPoint: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_ConPoint:
       break;
     case glow_eSave_ConPoint_number:
@@ -132,19 +123,11 @@ void GlowConPoint::open(std::ifstream& fp)
   }
 }
 
-void GlowConPoint::traverse(int x, int y)
-{
-  p.traverse(x, y);
-}
+void GlowConPoint::traverse(int x, int y) { p.traverse(x, y); }
 
-int GlowConPoint::event_handler(
-    void* pos, glow_eEvent event, int x, int y, void* node)
-{
-  return 0;
-}
+int GlowConPoint::event_handler(void* pos, glow_eEvent event, int x, int y, void* node) { return 0; }
 
-void GlowConPoint::conpoint_select(
-    void* pos, int x, int y, double* distance, void** cp)
+void GlowConPoint::conpoint_select(void* pos, int x, int y, double* distance, void** cp)
 {
   int px, py;
   double dist;
@@ -153,14 +136,15 @@ void GlowConPoint::conpoint_select(
   py = ((GlowPoint*)pos)->z_y - ctx->mw.offset_y + p.z_y;
 
   dist = sqrt(1.0 * (x - px) * (x - px) + 1.0 * (y - py) * (y - py));
-  if (dist < *distance) {
+  if (dist < *distance)
+  {
     *distance = dist;
     *cp = (void*)this;
   }
 }
 
-void GlowConPoint::conpoint_select(GlowTransform* t, int x, int y,
-    double* distance, void** cp, int* pix_x, int* pix_y)
+void GlowConPoint::conpoint_select(GlowTransform* t, int x, int y, double* distance, void** cp, int* pix_x,
+                                   int* pix_y)
 {
   int px, py;
   double dist;
@@ -172,7 +156,8 @@ void GlowConPoint::conpoint_select(GlowTransform* t, int x, int y,
   py = int(y1 * ctx->mw.zoom_factor_y - ctx->mw.offset_y);
 
   dist = sqrt(1.0 * (x - px) * (x - px) + 1.0 * (y - py) * (y - py));
-  if (dist < *distance) {
+  if (dist < *distance)
+  {
     *distance = dist;
     *cp = (void*)this;
     *pix_x = px;
@@ -180,10 +165,10 @@ void GlowConPoint::conpoint_select(GlowTransform* t, int x, int y,
   }
 }
 
-int GlowConPoint::get_conpoint(
-    int num, double* x, double* y, glow_eDirection* dir)
+int GlowConPoint::get_conpoint(int num, double* x, double* y, glow_eDirection* dir)
 {
-  if (number == num) {
+  if (number == num)
+  {
     *x = p.x;
     *y = p.y;
     *dir = direction;
@@ -192,56 +177,67 @@ int GlowConPoint::get_conpoint(
   return 0;
 }
 
-int GlowConPoint::get_conpoint(GlowTransform* t, int num, bool flip_horizontal,
-    bool flip_vertical, double* x, double* y, glow_eDirection* dir)
+int GlowConPoint::get_conpoint(GlowTransform* t, int num, bool flip_horizontal, bool flip_vertical, double* x,
+                               double* y, glow_eDirection* dir)
 {
   double rotation;
 
-  if (number == num) {
+  if (number == num)
+  {
     *x = trf.x(t, p.x, p.y);
     *y = trf.y(t, p.x, p.y);
-    if (direction == glow_eDirection_Center) {
+    if (direction == glow_eDirection_Center)
+    {
       *dir = direction;
       return 1;
     }
     rotation = (trf.rot(t) / 360 - floor(trf.rot(t) / 360)) * 360;
-    if (45 >= rotation || rotation > 315) {
-      *dir = direction;
-    } else if (45 < rotation && rotation <= 135) {
-      switch (direction) {
-      case glow_eDirection_Right:
-        *dir = glow_eDirection_Up;
-        break;
-      case glow_eDirection_Up:
-        *dir = glow_eDirection_Left;
-        break;
-      case glow_eDirection_Left:
-        *dir = glow_eDirection_Down;
-        break;
-      case glow_eDirection_Down:
-        *dir = glow_eDirection_Right;
-        break;
-      default:;
-      }
-    } else if (135 < rotation && rotation <= 225) {
-      switch (direction) {
-      case glow_eDirection_Right:
-        *dir = glow_eDirection_Left;
-        break;
-      case glow_eDirection_Up:
-        *dir = glow_eDirection_Down;
-        break;
-      case glow_eDirection_Left:
-        *dir = glow_eDirection_Right;
-        break;
-      case glow_eDirection_Down:
-        *dir = glow_eDirection_Up;
-        break;
-      default:;
-      }
-    } else // if ( 225 < rotation && rotation <= 315)
+    if (45 >= rotation || rotation > 315)
     {
-      switch (direction) {
+      *dir = direction;
+    }
+    else if (45 < rotation && rotation <= 135)
+    {
+      switch (direction)
+      {
+      case glow_eDirection_Right:
+        *dir = glow_eDirection_Up;
+        break;
+      case glow_eDirection_Up:
+        *dir = glow_eDirection_Left;
+        break;
+      case glow_eDirection_Left:
+        *dir = glow_eDirection_Down;
+        break;
+      case glow_eDirection_Down:
+        *dir = glow_eDirection_Right;
+        break;
+      default:;
+      }
+    }
+    else if (135 < rotation && rotation <= 225)
+    {
+      switch (direction)
+      {
+      case glow_eDirection_Right:
+        *dir = glow_eDirection_Left;
+        break;
+      case glow_eDirection_Up:
+        *dir = glow_eDirection_Down;
+        break;
+      case glow_eDirection_Left:
+        *dir = glow_eDirection_Right;
+        break;
+      case glow_eDirection_Down:
+        *dir = glow_eDirection_Up;
+        break;
+      default:;
+      }
+    }
+    else // if ( 225 < rotation && rotation <= 315)
+    {
+      switch (direction)
+      {
       case glow_eDirection_Right:
         *dir = glow_eDirection_Down;
         break;
@@ -258,8 +254,10 @@ int GlowConPoint::get_conpoint(GlowTransform* t, int num, bool flip_horizontal,
       }
     }
 
-    if (flip_horizontal) {
-      switch (*dir) {
+    if (flip_horizontal)
+    {
+      switch (*dir)
+      {
       case glow_eDirection_Up:
         *dir = glow_eDirection_Down;
         break;
@@ -269,8 +267,10 @@ int GlowConPoint::get_conpoint(GlowTransform* t, int num, bool flip_horizontal,
       default:;
       }
     }
-    if (flip_vertical) {
-      switch (*dir) {
+    if (flip_vertical)
+    {
+      switch (*dir)
+      {
       case glow_eDirection_Right:
         *dir = glow_eDirection_Left;
         break;

@@ -41,7 +41,8 @@
 
 #include "wb_object.h"
 
-class wb_recix {
+class wb_recix
+{
   typedef std::map<std::string, pwr_tOix>::iterator ix_iterator;
 
 private:

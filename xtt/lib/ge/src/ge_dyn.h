@@ -57,59 +57,70 @@
 #define FLT_INI -9999
 
 //! Types of animation sequences.
-typedef enum {
-  ge_eAnimSequence_Inherit, //!< Inherit from nodeclass.
-  ge_eAnimSequence_Cycle, //!< Cyclic animation. First page is low value page.
-  ge_eAnimSequence_Dig, //!< Animation between two resct positions.
+typedef enum
+{
+  ge_eAnimSequence_Inherit,  //!< Inherit from nodeclass.
+  ge_eAnimSequence_Cycle,    //!< Cyclic animation. First page is low value page.
+  ge_eAnimSequence_Dig,      //!< Animation between two resct positions.
   ge_eAnimSequence_ForwBack, //!< Animation first in forward directon and then in
   //! backward, and so on.
   ge_eAnimSequence_CycleLast //!< Cyclic animation. Last page is low value page.
 } ge_eAnimSequence;
 
 //! Values for a limit type.
-typedef enum {
+typedef enum
+{
   ge_eLimitType_Gt, //!< Greater then.
   ge_eLimitType_Lt, //!< Less then.
   ge_eLimitType_Ge, //!< Greater then or equal.
   ge_eLimitType_Le, //!< Less then or equal.
-  ge_eLimitType_Eq //!< Equal.
+  ge_eLimitType_Eq  //!< Equal.
 } ge_eLimitType;
 
 //! Mask for initial and first input focus.
-typedef enum {
-  ge_mInputFocus_InitialFocus = 1 << 0, //!< Initial input focus.
+typedef enum
+{
+  ge_mInputFocus_InitialFocus = 1 << 0,    //!< Initial input focus.
   ge_mInputFocus_FirstHorizontal = 1 << 1, //!< First horizontal input focus.
-  ge_mInputFocus_FirstVertical = 1 << 2, //!< First vertical input focus.
-  ge_mInputFocus_FirstTab = 1 << 3, //!< First tab input focus.
-  ge_mInputFocus_LastHorizontal = 1 << 4, //!< Last horizontal input focus.
-  ge_mInputFocus_LastVertical = 1 << 5 //!< Last vertical input focus.
+  ge_mInputFocus_FirstVertical = 1 << 2,   //!< First vertical input focus.
+  ge_mInputFocus_FirstTab = 1 << 3,        //!< First tab input focus.
+  ge_mInputFocus_LastHorizontal = 1 << 4,  //!< Last horizontal input focus.
+  ge_mInputFocus_LastVertical = 1 << 5     //!< Last vertical input focus.
 } ge_mInputFocus;
 
 //! Types of animation sequences.
-typedef enum {
-  ge_eCurveDataType_XYArrays, //!< One x array and one y array.
+typedef enum
+{
+  ge_eCurveDataType_XYArrays,   //!< One x array and one y array.
   ge_eCurveDataType_PointArray, //!< One point array.
   ge_eCurveDataType_TableObject //!< Table object syntax.
 } ge_eCurveDataType;
 
 //! Types of animation sequences.
-typedef enum {
+typedef enum
+{
   ge_eOptionMenuType_Static, //!< Static optionmenu.
   ge_eOptionMenuType_Dynamic //!< Dynamic optionmenu.
 } ge_eOptionMenuType;
 
 //! Types of script trigger event.
-typedef enum {
+typedef enum
+{
   ge_eScriptTriggerEvent_ClickMB1, //!< On ClickMB1.
-  ge_eScriptTriggerEvent_Open, //!< When graph is opened.
-  ge_eScriptTriggerEvent_Close //!< When graph is closed.
+  ge_eScriptTriggerEvent_Open,     //!< When graph is opened.
+  ge_eScriptTriggerEvent_Close     //!< When graph is closed.
 } ge_eScriptTriggerEvent;
 
 //! Dyn attributes displayed in attribute editor
-typedef enum { ge_eDynAttr_All, ge_eDynAttr_Menu } ge_eDynAttr;
+typedef enum
+{
+  ge_eDynAttr_All,
+  ge_eDynAttr_Menu
+} ge_eDynAttr;
 
 //! Status value handled by GeStatus
-typedef enum {
+typedef enum
+{
   ge_ePwrStatus_No,
   ge_ePwrStatus_Success,
   ge_ePwrStatus_Warning,
@@ -118,21 +129,24 @@ typedef enum {
 } ge_ePwrStatus;
 
 //! MethodsPulldownMenu types
-typedef enum {
+typedef enum
+{
   ge_eMethodsMenuType_Object,
   ge_eMethodsMenuType_Help,
   ge_eMethodsMenuType_Simulate
 } ge_eMethodsMenuType;
 
 //! MethodToolbar types
-typedef enum {
+typedef enum
+{
   ge_eMethodToolbarType_Object,
   ge_eMethodToolbarType_Simulate
 } ge_eMethodToolbarType;
 
 //! Priority order for dyntypes and actiontypes. Lower value gives higher
 //! priority.
-typedef enum {
+typedef enum
+{
   ge_eDynPrio_RefUpdate,
   ge_eDynPrio_DigSound,
   ge_eDynPrio_HostObject,
@@ -212,7 +226,8 @@ typedef enum {
 } ge_eDynPrio;
 
 //! Dynamic types
-typedef enum {
+typedef enum
+{
   ge_mDynType1_No = 0,
   ge_mDynType1_Inherit = 1 << 0,
   ge_mDynType1_Tone = 1 << 1,
@@ -248,7 +263,8 @@ typedef enum {
   ge_mDynType1_BarChart = 1 << 31
 } ge_mDynType1;
 
-typedef enum {
+typedef enum
+{
   ge_mDynType2_No = 0,
   ge_mDynType2_Axis = 1 << 0,
   ge_mDynType2_DigTextColor = 1 << 1,
@@ -270,7 +286,8 @@ typedef enum {
 } ge_mDynType2;
 
 //! Action types.
-typedef enum {
+typedef enum
+{
   ge_mActionType1_No = 0,
   ge_mActionType1_Inherit = 1 << 0,
   ge_mActionType1_PopupMenu = 1 << 1,
@@ -302,10 +319,14 @@ typedef enum {
   ge_mActionType1_ContextMenu = 1 << 27
 } ge_mActionType1;
 
-typedef enum { ge_mActionType2_No = 0 } ge_mActionType2;
+typedef enum
+{
+  ge_mActionType2_No = 0
+} ge_mActionType2;
 
 //! Instances. A bitmask where each bit represents an instance.
-typedef enum {
+typedef enum
+{
   ge_mInstance_1 = 1 << 0,
   ge_mInstance_2 = 1 << 1,
   ge_mInstance_3 = 1 << 2,
@@ -344,7 +365,8 @@ typedef enum {
 /*! Every data written is preceeded by a tag to identify the data.
   All tags for all dynamic classes are defined here.
 */
-typedef enum {
+typedef enum
+{
   ge_eSave_Dyn = 1,
   ge_eSave_DigLowColor = 2,
   ge_eSave_DigColor = 3,
@@ -926,12 +948,12 @@ class GeUnitConvert;
   this list is traversed and scan and action functions for all the elements are
   called.
 */
-class GeDyn {
+class GeDyn
+{
 public:
-  GeDynElem*
-      elements; //!< List of dynamic object specified in dyntype and actiontype.
-  Graph* graph; //!< Graph.
-  bool ignore_color; //!< All remaining elements with lower prio should ignore
+  GeDynElem* elements; //!< List of dynamic object specified in dyntype and actiontype.
+  Graph* graph;        //!< Graph.
+  bool ignore_color;   //!< All remaining elements with lower prio should ignore
   //! color dynamics.
   bool reset_color; //!< An element of higher prio is passing color dynamics to
   //! elements of lower prio.
@@ -947,25 +969,24 @@ public:
   //! a1 text dynamics.
   bool reset_text_a1; //!< An element of higher prio is passing a1 text dynamics
   //! to elements of lower prio.
-  ge_mDynType1 dyn_type1; //!< Dynamic type.
-  ge_mDynType2 dyn_type2; //!< Dynamic type.
+  ge_mDynType1 dyn_type1;       //!< Dynamic type.
+  ge_mDynType2 dyn_type2;       //!< Dynamic type.
   ge_mDynType1 total_dyn_type1; //!< Total dynamic type, including the dyntype
   //! of the nodeclass if Inherit is set.
   ge_mDynType2 total_dyn_type2; //!< Total dynamic type, including the dyntype
   //! of the nodeclass if Inherit is set.
-  ge_mActionType1 action_type1; //!< Action type.
-  ge_mActionType2 action_type2; //!< Action type.
+  ge_mActionType1 action_type1;       //!< Action type.
+  ge_mActionType2 action_type2;       //!< Action type.
   ge_mActionType1 total_action_type1; //!< Total action type, including the
   //! actiontype of the nodeclass if Inherit
   //! is set.
   ge_mActionType2 total_action_type2; //!< Total action type, including the
   //! actiontype of the nodeclass if Inherit
   //! is set.
-  glow_mAccess access; //!< Access of the object.
-  glow_eCycle cycle; //!< Cycle in which the scan is executed.
-  bool display_access; //!< Display acess in attrbute editor.
-  ge_eDynAttr
-      attr_editor; //!< Controls attributes displayed in attribute editor.
+  glow_mAccess access;             //!< Access of the object.
+  glow_eCycle cycle;               //!< Cycle in which the scan is executed.
+  bool display_access;             //!< Display acess in attrbute editor.
+  ge_eDynAttr attr_editor;         //!< Controls attributes displayed in attribute editor.
   pwr_tAName recursive_hostobject; //!< Hostobject from parent dynamics.
 
   //! Constructor.
@@ -1033,8 +1054,7 @@ public:
   void set_color(grow_tObject object, glow_eDrawType color);
   int get_attr_typeid();
   void set_access(glow_mAccess acc);
-  void set_dyn(ge_mDynType1 type1, ge_mDynType2 type2, ge_mActionType1 action1,
-      ge_mActionType2 action2);
+  void set_dyn(ge_mDynType1 type1, ge_mDynType2 type2, ge_mActionType1 action1, ge_mActionType2 action2);
   void unset_inherit(grow_tObject object);
   void set_command(const char* cmd);
   void set_hostobject(char* hostobject);
@@ -1047,44 +1067,40 @@ public:
   void* get_p();
   void set_p(grow_tObject object, void* p);
   void update();
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
   void export_java(grow_tObject object, std::ofstream& fp, char* var_name);
-  void export_java_object(
-      grow_tObject object, std::ofstream& fp, char* var_name);
+  void export_java_object(grow_tObject object, std::ofstream& fp, char* var_name);
   GeDynElem* create_dyn1_element(int mask, int instance);
   GeDynElem* create_dyn2_element(int mask, int instance);
   GeDynElem* create_action1_element(int mask, int instance);
   GeDynElem* create_action2_element(int mask, int instance);
   GeDynElem* copy_element(GeDynElem& x);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  graph_eDatabase parse_attr_name(char* name, char* parsed_name, int* inverted,
-      int* type, int* size, int* elem = 0,
-      graph_mParseOpt options = graph_mParseOpt_None);
+  graph_eDatabase parse_attr_name(char* name, char* parsed_name, int* inverted, int* type, int* size,
+                                  int* elem = 0, graph_mParseOpt options = graph_mParseOpt_None);
   void merge(GeDyn& x);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
-  void syntax_check_attribute(grow_tObject object, const char* text,
-      char* attribute, int optional, int* types, graph_eDatabase* databases,
-      int* error_cnt, int* warning_cnt);
+  void syntax_check_attribute(grow_tObject object, const char* text, char* attribute, int optional,
+                              int* types, graph_eDatabase* databases, int* error_cnt, int* warning_cnt);
   static char* cmd_cnv(char* instr);
   static int instance_to_number(int instance);
-  static void replace_attribute(char* attribute, int attr_size, char* from,
-      char* to, int* cnt, int strict);
+  static void replace_attribute(char* attribute, int attr_size, char* from, char* to, int* cnt, int strict);
   static char* printstr(char* str);
 };
 
 //! Virtual baseclass for dynamic elements.
-class GeDynElem {
+class GeDynElem
+{
 public:
-  GeDyn* dyn; //!< Parent GeDyn object.
-  ge_mDynType1 dyn_type1; //!< Dyntype of the element.
-  ge_mDynType2 dyn_type2; //!< Dyntype of the element.
+  GeDyn* dyn;                   //!< Parent GeDyn object.
+  ge_mDynType1 dyn_type1;       //!< Dyntype of the element.
+  ge_mDynType2 dyn_type2;       //!< Dyntype of the element.
   ge_mActionType1 action_type1; //!< Actiontype of the element.
   ge_mActionType2 action_type2; //!< Actiontype of the element.
-  ge_eDynPrio prio; //!< Priority of the element.
-  unsigned int
-      instance_mask; //!< Instance mask. Only valid in the first instance.
-  ge_mInstance instance; //!< Instance of the element
-  GeDynElem* next; //!< Pointer to next element in list.
+  ge_eDynPrio prio;             //!< Priority of the element.
+  unsigned int instance_mask;   //!< Instance mask. Only valid in the first instance.
+  ge_mInstance instance;        //!< Instance of the element
+  GeDynElem* next;              //!< Pointer to next element in list.
 
   //! Constructor.
   /*!
@@ -1095,12 +1111,10 @@ public:
     \param e_action_type2 Actiontype of the element.
     \param e_prio	Priority of the element.
   */
-  GeDynElem(GeDyn* e_dyn, ge_mDynType1 e_dyn_type1, ge_mDynType2 e_dyn_type2,
-      ge_mActionType1 e_action_type1, ge_mActionType2 e_action_type2,
-      ge_eDynPrio e_prio)
-      : dyn(e_dyn), dyn_type1(e_dyn_type1), dyn_type2(e_dyn_type2),
-        action_type1(e_action_type1), action_type2(e_action_type2),
-        prio(e_prio), instance_mask(ge_mInstance_1), instance(ge_mInstance_1),
+  GeDynElem(GeDyn* e_dyn, ge_mDynType1 e_dyn_type1, ge_mDynType2 e_dyn_type2, ge_mActionType1 e_action_type1,
+            ge_mActionType2 e_action_type2, ge_eDynPrio e_prio)
+      : dyn(e_dyn), dyn_type1(e_dyn_type1), dyn_type2(e_dyn_type2), action_type1(e_action_type1),
+        action_type2(e_action_type2), prio(e_prio), instance_mask(ge_mInstance_1), instance(ge_mInstance_1),
         next(0)
   {
   }
@@ -1108,9 +1122,8 @@ public:
   //! Copy constructor
   /*! \param x	Element to copy. */
   GeDynElem(const GeDynElem& x)
-      : dyn(x.dyn), dyn_type1(x.dyn_type1), dyn_type2(x.dyn_type2),
-        action_type1(x.action_type1), action_type2(x.action_type2),
-        prio(x.prio), next(0)
+      : dyn(x.dyn), dyn_type1(x.dyn_type1), dyn_type2(x.dyn_type2), action_type1(x.action_type1),
+        action_type2(x.action_type2), prio(x.prio), next(0)
   {
   }
 
@@ -1123,33 +1136,22 @@ public:
     \param object 	Owner object.
     \param trace_data	Trace info stored in grow for the object.
   */
-  virtual int connect(
-      grow_tObject object, glow_sTraceData* trace_data, bool now)
-  {
-    return 1;
-  }
+  virtual int connect(grow_tObject object, glow_sTraceData* trace_data, bool now) { return 1; }
 
   //! Scan the element.
   /*! \param object 	Owner object. */
-  virtual int scan(grow_tObject object)
-  {
-    return 1;
-  }
+  virtual int scan(grow_tObject object) { return 1; }
 
   //! Reset the element.
   /*! \param object 	Owner object. */
-  virtual void reset(grow_tObject object)
-  {
-  }
+  virtual void reset(grow_tObject object) {}
 
   //! Get list of attributes.
   /*!
     \param attrinfo    	List of attribute items.
     \param item_count	Number of items in list.
   */
-  virtual void get_attributes(attr_sItem* attrinfo, int* item_count)
-  {
-  }
+  virtual void get_attributes(attr_sItem* attrinfo, int* item_count) {}
 
   //! Get translation table. Rename or hide the attributes from grow.
   /*!
@@ -1160,35 +1162,25 @@ public:
 
   //! Save dynamic data to file.
   /*! \param fp		Output file. */
-  virtual void save(std::ofstream& fp)
-  {
-  }
+  virtual void save(std::ofstream& fp) {}
 
   //! Open dynamic data from file.
   /*! \param fp		Input file. */
-  virtual void open(std::ifstream& fp)
-  {
-  }
+  virtual void open(std::ifstream& fp) {}
 
   //! Execute action for an event.
   /*!
     \param object	Owner object of the dynamics.
     \param event	Event.
   */
-  virtual int action(grow_tObject object, glow_tEvent event)
-  {
-    return 1;
-  }
+  virtual int action(grow_tObject object, glow_tEvent event) { return 1; }
 
   //! Change value for ValueInput element.
   /*!
     \param object 	Owner object.
     \param text		Text from value input field.
   */
-  virtual int change_value(grow_tObject object, char* text)
-  {
-    return 1;
-  }
+  virtual int change_value(grow_tObject object, char* text) { return 1; }
 
   //! Set an 'Attribute' attribute, i.e. a reference to the database attribute.
   /*!
@@ -1197,30 +1189,18 @@ public:
     \param cnt		Counter to decide if first or second attribute is to be
     set.
   */
-  virtual void set_attribute(
-      grow_tObject object, const char* attr_name, int* cnt)
-  {
-  }
+  virtual void set_attribute(grow_tObject object, const char* attr_name, int* cnt) {}
 
   //! Set color or color tone.
   /*!
     \param object	Owner object.
     \param color	Color to set.
   */
-  virtual int set_color(grow_tObject object, glow_eDrawType color)
-  {
-    return 0;
-  }
+  virtual int set_color(grow_tObject object, glow_eDrawType color) { return 0; }
 
-  virtual void update()
-  {
-  }
+  virtual void update() {}
 
-  virtual int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix)
-  {
-    return 1;
-  }
-
+  virtual int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix) { return 1; }
 
   //! Export java code for the dynamic element.
   /*!
@@ -1229,11 +1209,7 @@ public:
     \param first	First element in element list.
     \param var_name	Name of objects java variable name.
   */
-  virtual int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name)
-  {
-    return 0;
-  }
+  virtual int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 0; }
 
   //! Replace an attribute string
   /*!
@@ -1242,23 +1218,18 @@ public:
     \param cnt		Counter of replaced attributes.
     \param strict	If 1 the comparation is case sensitive.
   */
-  virtual void replace_attribute(char* from, char* to, int* cnt, int strict)
-  {
-  }
+  virtual void replace_attribute(char* from, char* to, int* cnt, int strict) {}
 
   //! Check syntax
-  virtual int syntax_check(
-      grow_tObject object, int* error_cnt, int* warning_cnt)
-  {
-    return 1;
-  }
+  virtual int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt) { return 1; }
 
   //! Destructor
-  virtual ~GeDynElem(){}
+  virtual ~GeDynElem() {}
 };
 
 //! Set the supplied fill color when the signal is low.
-class GeDigLowColor : public GeDynElem {
+class GeDigLowColor : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database reference for digital attribute.
   glow_eDrawType color; //!< Color to set when value is low.
@@ -1285,14 +1256,14 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Set the supplied fillcolor when the value is high.
-class GeDigColor : public GeDynElem {
+class GeDigColor : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database reference for digital attribute.
   glow_eDrawType color; //!< Color to set when value is high.
@@ -1319,14 +1290,14 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Set the supplied backgroundcolor when the value is high.
-class GeDigBackgroundColor : public GeDynElem {
+class GeDigBackgroundColor : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database reference for digital attribute.
   glow_eDrawType color; //!< Color to set when value is high.
@@ -1352,14 +1323,14 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Set yellow fill color when the signal is low.
-class GeDigWarning : public GeDynElem {
+class GeDigWarning : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database reference for digital attribute.
   int use_colortheme;
@@ -1384,14 +1355,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Set red fill color when the signal is high.
-class GeDigError : public GeDynElem {
+class GeDigError : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database refrence for digital attribute.
   int use_colortheme;
@@ -1416,17 +1387,17 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Flash with the supplied color when the signal is high.
-class GeDigFlash : public GeDynElem {
+class GeDigFlash : public GeDynElem
+{
 public:
-  pwr_tAName attribute; //!< Database reference to digital attribute.
-  glow_eDrawType color; //!< First flash color when the signal is high.
+  pwr_tAName attribute;  //!< Database reference to digital attribute.
+  glow_eDrawType color;  //!< First flash color when the signal is high.
   glow_eDrawType color2; //!< Second flash color when the signal is high.
 
   pwr_tBoolean* p;
@@ -1451,18 +1422,18 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Make the object invisible when the signal is high.
-class GeInvisible : public GeDynElem {
+class GeInvisible : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database reference for digital attribute.
-  int dimmed; //!< Object is dimmed (not invisible)
-  double dim_level; //!< Transparency  for dimmed object
+  int dimmed;           //!< Object is dimmed (not invisible)
+  double dim_level;     //!< Transparency  for dimmed object
 
   pwr_tBoolean* p;
   pwr_tSubid subid;
@@ -1484,14 +1455,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Set the supplied border color when the signal is high.
-class GeDigBorder : public GeDynElem {
+class GeDigBorder : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database reference to digital attribute.
   glow_eDrawType color; //!< Bordercolor to set when the signal is high.
@@ -1516,14 +1487,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Set the supplied border color when the signal is high.
-class GeDigTextColor : public GeDynElem {
+class GeDigTextColor : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database reference to digital attribute.
   glow_eDrawType color; //!< Text color to set when the signal is high.
@@ -1548,17 +1519,17 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Set supplied text when the signal is low.
-class GeDigText : public GeDynElem {
+class GeDigText : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database reference for digital attribute.
-  char low_text[80]; //!< Text to set when the signal is low.
+  char low_text[80];    //!< Text to set when the signal is low.
 
   pwr_tBoolean* p;
   pwr_tSubid subid;
@@ -1582,19 +1553,18 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Display the value of a signal.
-class GeValue : public GeDynElem {
+class GeValue : public GeDynElem
+{
 public:
-  pwr_tAName
-      attribute; //!< Database reference of an attribute with arbitrary type.
-  char format[80]; //!< Format of conversion from value to string.
-  int zero_blank; //!< Blank field when value i zero (integer or float).
+  pwr_tAName attribute;     //!< Database reference of an attribute with arbitrary type.
+  char format[80];          //!< Format of conversion from value to string.
+  int zero_blank;           //!< Blank field when value i zero (integer or float).
   pwr_tAName decimals_attr; //!< Database reference to number of decimals for
   //! float format.
   int decimals_decr;
@@ -1609,7 +1579,7 @@ public:
   int annot_size;
   pwr_tTid tid;
   int update_open;
-  GeUnitConvert *convert_element;
+  GeUnitConvert* convert_element;
 
   GeValue(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeValue(const GeValue& x);
@@ -1623,20 +1593,20 @@ public:
   void reset(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Add input function to Value dynamics.
-class GeValueInput : public GeDynElem {
+class GeValueInput : public GeDynElem
+{
 public:
   double min_value; //!< Minimum value for input.
   double max_value; //!< Maximum value for input.
-  int clear; //!< Clear input field it is when opened.
-  int popup; //!< Input in popup dialog.
-  int unselect; //!< Text not selected in input field when opened.
+  int clear;        //!< Clear input field it is when opened.
+  int popup;        //!< Input in popup dialog.
+  int unselect;     //!< Text not selected in input field when opened.
   int escape_store; //!< Store value when focus is lost.
   pwr_tAName minvalue_attr;
   pwr_tAName maxvalue_attr;
@@ -1656,21 +1626,21 @@ public:
   int disconnect(grow_tObject object);
   int action(grow_tObject object, glow_tEvent event);
   int change_value(grow_tObject object, char* text);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Set the supplied fill color when the signal exceeds or is below a specified
 //! limit value.
-class GeAnalogColor : public GeDynElem {
+class GeAnalogColor : public GeDynElem
+{
 public:
-  pwr_tAName attribute; //!< Database reference of analog attribute.
-  double limit; //!< Limit value.
+  pwr_tAName attribute;     //!< Database reference of analog attribute.
+  double limit;             //!< Limit value.
   ge_eLimitType limit_type; //!< Type of limit.
-  glow_eDrawType color; //!< Color to set when limit value is exceeded.
+  glow_eDrawType color;     //!< Color to set when limit value is exceeded.
   int border;
   int common_attr;
 
@@ -1695,22 +1665,22 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Rotate the component.
-class GeRotate : public GeDynElem {
+class GeRotate : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database reference of analog attribute.
-  double x0; //!< x coordinate for rotation point.
-  double y0; //!< y coordinate for rotation point.
-  double factor; //!< Conversion factor from value to rotation angle in degrees.
-  double offset; //!< Offset angle.
-  double min_angle; //!< Minimum angle.
-  double max_angle; //!< Maximum angle.
+  double x0;            //!< x coordinate for rotation point.
+  double y0;            //!< y coordinate for rotation point.
+  double factor;        //!< Conversion factor from value to rotation angle in degrees.
+  double offset;        //!< Offset angle.
+  double min_angle;     //!< Minimum angle.
+  double max_angle;     //!< Maximum angle.
 
   pwr_tFloat32* p;
   pwr_tSubid subid;
@@ -1730,14 +1700,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Move an scale the component.
-class GeMove : public GeDynElem {
+class GeMove : public GeDynElem
+{
 public:
   pwr_tAName move_x_attribute;
   pwr_tAName move_y_attribute;
@@ -1791,15 +1761,15 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Shift between different pages in the subgraph. The value of the signal
 //! determine the page number.
-class GeAnalogShift : public GeDynElem {
+class GeAnalogShift : public GeDynElem
+{
 public:
   pwr_tAName attribute;
 
@@ -1821,14 +1791,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Shift between two pages in the subgraph (first and last).
-class GeDigShift : public GeDynElem {
+class GeDigShift : public GeDynElem
+{
 public:
   pwr_tAName attribute;
 
@@ -1852,14 +1822,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Shift between two pages in the subgraph (first and last).
-class GeDigLowShift : public GeDynElem {
+class GeDigLowShift : public GeDynElem
+{
 public:
   pwr_tAName attribute;
 
@@ -1883,12 +1853,13 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Shift between four pages in the subgraph (first, second, third and last).
-class GeDigFourShift : public GeDynElem {
+class GeDigFourShift : public GeDynElem
+{
 public:
   pwr_tAName attribute1;
   pwr_tAName attribute2;
@@ -1930,14 +1901,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Horizontally scrolling text.
-class GeScrollingText : public GeDynElem {
+class GeScrollingText : public GeDynElem
+{
 public:
   pwr_tAName attribute;
   glow_eDirection direction;
@@ -1965,14 +1936,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Different types of animations.
-class GeAnimation : public GeDynElem {
+class GeAnimation : public GeDynElem
+{
 public:
   pwr_tAName attribute;
   ge_eAnimSequence sequence;
@@ -1999,23 +1970,22 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Continuous update of an image file.
-class GeVideo : public GeDynElem {
+class GeVideo : public GeDynElem
+{
 public:
   GeVideo(GeDyn* e_dyn)
-      : GeDynElem(e_dyn, ge_mDynType1_Video, ge_mDynType2_No,
-            ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_Video)
+      : GeDynElem(e_dyn, ge_mDynType1_Video, ge_mDynType2_No, ge_mActionType1_No, ge_mActionType2_No,
+                  ge_eDynPrio_Video)
   {
   }
   GeVideo(const GeVideo& x)
-      : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1,
-            x.action_type2, x.prio)
+      : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
   {
   }
   void save(std::ofstream& fp);
@@ -2027,7 +1997,8 @@ public:
 };
 
 //! Color of status attribute.
-class GeStatusColor : public GeDynElem {
+class GeStatusColor : public GeDynElem
+{
 public:
   pwr_tAName attribute;
   glow_eDrawType nostatus_color;
@@ -2054,14 +2025,14 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Changes the fill color up to a certain level of the component.
-class GeFillLevel : public GeDynElem {
+class GeFillLevel : public GeDynElem
+{
 public:
   pwr_tAName attribute;
   glow_eDrawType color;
@@ -2095,14 +2066,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! HostObject connected to several attributes specified in the subgraph.
-class GeHostObject : public GeDynElem {
+class GeHostObject : public GeDynElem
+{
 public:
   pwr_tAName hostobject;
 
@@ -2114,14 +2085,14 @@ public:
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Play sound specified by a Sound or SoundSequence object.
-class GeDigSound : public GeDynElem {
+class GeDigSound : public GeDynElem
+{
 public:
   pwr_tAName attribute;
   pwr_tAName soundobject;
@@ -2154,17 +2125,16 @@ public:
 };
 
 //! Lighntess is dependent on color theme.
-class GeColorThemeLightness : public GeDynElem {
+class GeColorThemeLightness : public GeDynElem
+{
 public:
   GeColorThemeLightness(GeDyn* e_dyn)
-      : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_ColorThemeLightness,
-            ge_mActionType1_No, ge_mActionType2_No,
-            ge_eDynPrio_ColorThemeLightness)
+      : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_ColorThemeLightness, ge_mActionType1_No,
+                  ge_mActionType2_No, ge_eDynPrio_ColorThemeLightness)
   {
   }
   GeColorThemeLightness(const GeColorThemeLightness& x)
-      : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1,
-            x.action_type2, x.prio)
+      : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
   {
   }
   void get_attributes(attr_sItem* attrinfo, int* item_count);
@@ -2175,12 +2145,12 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
 };
 
 //! Set the supplied backgroundcolor when the value is high.
-class GeDigSwap : public GeDynElem {
+class GeDigSwap : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database reference for digital attribute.
   pwr_tBoolean reset_value;
@@ -2206,14 +2176,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Display the methods popup menu.
-class GePopupMenu : public GeDynElem {
+class GePopupMenu : public GeDynElem
+{
 public:
   pwr_tAName ref_object;
 
@@ -2225,14 +2195,14 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Display the context menu.
-class GeContextMenu : public GeDynElem {
+class GeContextMenu : public GeDynElem
+{
 public:
   ge_sContextMenuData mdata;
 
@@ -2244,12 +2214,13 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Set a digital signal
-class GeSetDig : public GeDynElem {
+class GeSetDig : public GeDynElem
+{
 public:
   pwr_tAName attribute;
 
@@ -2262,14 +2233,14 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Reset a digital signal
-class GeResetDig : public GeDynElem {
+class GeResetDig : public GeDynElem
+{
 public:
   pwr_tAName attribute;
 
@@ -2282,14 +2253,14 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Toggle a digital signal
-class GeToggleDig : public GeDynElem {
+class GeToggleDig : public GeDynElem
+{
 public:
   pwr_tAName attribute;
 
@@ -2302,14 +2273,14 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Sto a digital signal,
-class GeStoDig : public GeDynElem {
+class GeStoDig : public GeDynElem
+{
 public:
   pwr_tAName attribute;
 
@@ -2322,14 +2293,14 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Execute a command.
-class GeCommand : public GeDynElem {
+class GeCommand : public GeDynElem
+{
 public:
   char command[400];
 
@@ -2341,14 +2312,14 @@ public:
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Execute a command on double click.
-class GeCommandDoubleClick : public GeDynElem {
+class GeCommandDoubleClick : public GeDynElem
+{
 public:
   char command[400];
 
@@ -2360,12 +2331,13 @@ public:
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Execute a script.
-class GeScript : public GeDynElem {
+class GeScript : public GeDynElem
+{
 public:
   char script[2048];
   int script_len;
@@ -2380,12 +2352,13 @@ public:
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Display confirm dialog before execution of action.
-class GeConfirm : public GeDynElem {
+class GeConfirm : public GeDynElem
+{
 public:
   char text[120];
   pwr_tBoolean on_set;
@@ -2397,14 +2370,14 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Increase an analog signal.
-class GeIncrAnalog : public GeDynElem {
+class GeIncrAnalog : public GeDynElem
+{
 public:
   pwr_tAName attribute;
   double increment;
@@ -2419,14 +2392,14 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Dynamics for a radiobutton.
-class GeRadioButton : public GeDynElem {
+class GeRadioButton : public GeDynElem
+{
 public:
   pwr_tAName attribute;
 
@@ -2449,14 +2422,14 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Display tooltip text.
-class GeTipText : public GeDynElem {
+class GeTipText : public GeDynElem
+{
 public:
   char text[200];
 
@@ -2466,14 +2439,14 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Open help window.
-class GeHelp : public GeDynElem {
+class GeHelp : public GeDynElem
+{
 public:
   char topic[80];
   char bookmark[80];
@@ -2485,14 +2458,14 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Open another graph.
-class GeOpenGraph : public GeDynElem {
+class GeOpenGraph : public GeDynElem
+{
 public:
   char graph_object[80];
 
@@ -2505,14 +2478,14 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Open an URL.
-class GeOpenURL : public GeDynElem {
+class GeOpenURL : public GeDynElem
+{
 public:
   char url[200];
 
@@ -2523,14 +2496,14 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Handle input focus.
-class GeInputFocus : public GeDynElem {
+class GeInputFocus : public GeDynElem
+{
 public:
   int initial_focus;
   char next_horizontal[40];
@@ -2544,34 +2517,33 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Close current graph.
-class GeCloseGraph : public GeDynElem {
+class GeCloseGraph : public GeDynElem
+{
 public:
   GeCloseGraph(GeDyn* e_dyn)
-      : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No,
-            ge_mActionType1_CloseGraph, ge_mActionType2_No,
-            ge_eDynPrio_CloseGraph)
+      : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_No, ge_mActionType1_CloseGraph, ge_mActionType2_No,
+                  ge_eDynPrio_CloseGraph)
   {
   }
   GeCloseGraph(const GeCloseGraph& x)
-      : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1,
-            x.action_type2, x.prio)
+      : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
   {
   }
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
 };
 
 //! Dynamics for a slider object.
-class GeSlider : public GeDynElem {
+class GeSlider : public GeDynElem
+{
 public:
   pwr_tAName attribute;
   pwr_tAName minvalue_attr;
@@ -2611,20 +2583,17 @@ public:
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   int action(grow_tObject object, glow_tEvent event);
-  void update()
-  {
-    first_scan = true;
-  }
+  void update() { first_scan = true; }
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Dynamics for a bar object.
-class GeBar : public GeDynElem {
+class GeBar : public GeDynElem
+{
 public:
   pwr_tAName attribute;
   pwr_tAName minvalue_attr;
@@ -2657,12 +2626,13 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   void configure(grow_tObject object);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Dynamics for a trend object.
-class GeTrend : public GeDynElem {
+class GeTrend : public GeDynElem
+{
 public:
   pwr_tAName attribute1;
   pwr_tAName attribute2;
@@ -2733,12 +2703,13 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Dynamics for a xy curve object.
-class GeXY_Curve : public GeDynElem {
+class GeXY_Curve : public GeDynElem
+{
 public:
   pwr_tAName x_attr;
   pwr_tAName y_attr;
@@ -2812,14 +2783,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Dynamics for a DsTrend object.
-class GeDsTrend : public GeDynElem {
+class GeDsTrend : public GeDynElem
+{
 public:
   pwr_tOName dstrend_object1;
   pwr_tOName dstrend_object2;
@@ -2831,7 +2802,7 @@ public:
   pwr_tAName mark1_attr;
   pwr_tAName mark2_attr;
 
-  int max_points; //!< Max number of points in curves.
+  int max_points;  //!< Max number of points in curves.
   bool first_scan; //!< Indicates that this is the first scan.
   int dstrend_cnt;
   pwr_tAttrRef dstrend_aref[2];
@@ -2882,7 +2853,8 @@ public:
 };
 
 //! Dynamics for a DsTrendCurve object.
-class GeDsTrendCurve : public GeDynElem {
+class GeDsTrendCurve : public GeDynElem
+{
 public:
   pwr_tOName dstrend_object;
   pwr_tAName minvalue_attr1;
@@ -2893,7 +2865,7 @@ public:
   pwr_tAName mark1_attr;
   pwr_tAName mark2_attr;
 
-  int max_points; //!< Max number of points in curves.
+  int max_points;  //!< Max number of points in curves.
   bool first_scan; //!< Indicates that this is the first scan.
   int dstrend_cnt;
   cbuf_sCircBuffInfo cb_info[2];
@@ -2948,7 +2920,8 @@ public:
 };
 
 //! Dynamics for a SevHist object.
-class GeSevHist : public GeDynElem {
+class GeSevHist : public GeDynElem
+{
 public:
   pwr_tAName sevhist_object1;
   pwr_tAName sevhist_object2;
@@ -2967,7 +2940,7 @@ public:
   pwr_tAName mark1_attr;
   pwr_tAName mark2_attr;
 
-  int max_points; //!< Max number of points in curves.
+  int max_points;  //!< Max number of points in curves.
   bool first_scan; //!< Indicates that this is the first scan.
   int sevhist_cnt;
   pwr_tFloat32* min_value1_p;
@@ -3024,7 +2997,8 @@ public:
 };
 
 //! Changes the fill color up to a certain level of the component.
-class GeDigTransparency : public GeDynElem {
+class GeDigTransparency : public GeDynElem
+{
 public:
   pwr_tAName attribute;
   double low_value;
@@ -3052,12 +3026,13 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Changes the fill color up to a certain level of the component.
-class GeAnalogTransparency : public GeDynElem {
+class GeAnalogTransparency : public GeDynElem
+{
 public:
   pwr_tAName attribute;
   double min_value;
@@ -3080,12 +3055,13 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! UnitConvert.
-class GeUnitConvert : public GeDynElem {
+class GeUnitConvert : public GeDynElem
+{
 public:
   int entity;
   int db_unit;
@@ -3097,15 +3073,16 @@ public:
   int get_transtab(char** tt);
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Execute the supplied command when the value gets high.
-class GeDigCommand : public GeDynElem {
+class GeDigCommand : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database reference for digital attribute.
-  char command[400]; //!< Command to execute.
+  char command[400];    //!< Command to execute.
   int level;
 
   pwr_tBoolean* p;
@@ -3128,14 +3105,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Execute the supplied command when the value gets high.
-class GeDigScript : public GeDynElem {
+class GeDigScript : public GeDynElem
+{
 public:
   pwr_tAName attribute; //!< Database reference for digital attribute.
   char script[2048];
@@ -3164,16 +3141,17 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Execute the supplied command when the value gets high.
-class GeRefUpdate : public GeDynElem {
+class GeRefUpdate : public GeDynElem
+{
 public:
-  union value_u {
+  union value_u
+  {
     pwr_tAttrRef aref;
     pwr_tDataRef dref;
     pwr_tObjid oid;
@@ -3181,7 +3159,7 @@ public:
   };
 
   pwr_tAName attribute; //!< Database reference for reference attribute.
-  int whole_graph; //!< Reconnect whole graph.
+  int whole_graph;      //!< Reconnect whole graph.
 
   void* p[2];
   pwr_tSubid subid[2];
@@ -3208,9 +3186,8 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 
   int connect(grow_tObject object, int level);
@@ -3218,28 +3195,28 @@ public:
 };
 
 //! Dynamics for a trend object.
-class GeFastCurve : public GeDynElem {
+class GeFastCurve : public GeDynElem
+{
 public:
   pwr_tAName fast_object;
   int curve_index1;
   int curve_index2;
 
-  pwr_tBoolean*
-      new_p; //!< Pointer to New attribute, which indicates new curve data.
-  pwr_tRefId subid; //!< Subid of New attribute in DsFastCurve.
-  pwr_sAttrRef time_buff; //!< Attrref to data array for time axis.
+  pwr_tBoolean* new_p;            //!< Pointer to New attribute, which indicates new curve data.
+  pwr_tRefId subid;               //!< Subid of New attribute in DsFastCurve.
+  pwr_sAttrRef time_buff;         //!< Attrref to data array for time axis.
   pwr_sAttrRef buff[FAST_CURVES]; //!< Attrefs to data arrays for curves.
-  pwr_eType type[FAST_CURVES]; //!< Types of curves.
-  int fast_idx[FAST_CURVES]; //!< Conversion from DsFastCurve index to
+  pwr_eType type[FAST_CURVES];    //!< Types of curves.
+  int fast_idx[FAST_CURVES];      //!< Conversion from DsFastCurve index to
   //! GeCurveData index.
   int curve_idx[DYN_FAST_MAX]; //!< Conversion from GeCurveData index to
   //! DsFastCurve index.
   int element_size[DYN_FAST_MAX]; //!< Size of data element in curves.
-  int max_points; //!< Max number of points in curves.
-  pwr_tBoolean old_new; //!< Old value of new. Used to detect edge of New.
-  pwr_tMask fast_function; //!< Function configured in DsFastCurve object.
-  bool first_scan; //!< Indicates that this is the first scan.
-  pwr_sAttrRef trigg_index_attr; //!< Attrref to TriggIndex attribute in
+  int max_points;                 //!< Max number of points in curves.
+  pwr_tBoolean old_new;           //!< Old value of new. Used to detect edge of New.
+  pwr_tMask fast_function;        //!< Function configured in DsFastCurve object.
+  bool first_scan;                //!< Indicates that this is the first scan.
+  pwr_sAttrRef trigg_index_attr;  //!< Attrref to TriggIndex attribute in
   //! DsFastCurve object.
   pwr_sAttrRef first_index_attr; //!< Attrref to FirstIndex attribute in
   //! DsFastCurve object.
@@ -3261,7 +3238,8 @@ public:
 };
 
 //! Dynamics for a table object.
-class GeTable : public GeDynElem {
+class GeTable : public GeDynElem
+{
 public:
   pwr_tAName attribute[TABLE_MAX_COL];
   char format[TABLE_MAX_COL][80];
@@ -3298,16 +3276,16 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Dynamics for a pie object.
 #define PIE_MAX_SECTORS 12
 
-class GePie : public GeDynElem {
+class GePie : public GeDynElem
+{
 public:
   int sectors;
   double min_value;
@@ -3332,16 +3310,16 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Dynamics for a barchart object.
 #define BARCHART_MAX_BARSEGMENTS 12
 
-class GeBarChart : public GeDynElem {
+class GeBarChart : public GeDynElem
+{
 public:
   int bars;
   int barsegments;
@@ -3368,14 +3346,14 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Pulldown menu.
-class GePulldownMenu : public GeDynElem {
+class GePulldownMenu : public GeDynElem
+{
 public:
   GeDyn* items_dyn[32];
   char items_text[80][32];
@@ -3391,19 +3369,18 @@ public:
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
   int get_transtab(char** tt);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
 };
 
 //! Options menu.
-class GeOptionMenu : public GeDynElem {
+class GeOptionMenu : public GeDynElem
+{
 public:
-  pwr_tAName attribute; //!< Database reference for analog attribute.
-  pwr_tAName text_attribute; //!< Database reference for text array attribute.
-  pwr_tAName size_attribute; //!< Database reference for menu size attribute.
-  pwr_tAName
-      update_attribute; //!< Database reference for update text attribute.
+  pwr_tAName attribute;        //!< Database reference for analog attribute.
+  pwr_tAName text_attribute;   //!< Database reference for text array attribute.
+  pwr_tAName size_attribute;   //!< Database reference for menu size attribute.
+  pwr_tAName update_attribute; //!< Database reference for update text attribute.
   unsigned int items_enum[32];
   char items_text[32][80];
   unsigned int button_mask;
@@ -3435,15 +3412,14 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int get_transtab(char** tt);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
-  virtual int syntax_check(
-      grow_tObject object, int* error_cnt, int* warning_cnt);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  virtual int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Analog text.
-class GeAnalogText : public GeOptionMenu {
+class GeAnalogText : public GeOptionMenu
+{
 public:
   GeAnalogText(GeDyn* e_dyn) : GeOptionMenu(e_dyn)
   {
@@ -3452,25 +3428,20 @@ public:
     prio = ge_eDynPrio_AnalogText;
   }
 
-  GeAnalogText(const GeAnalogText& x) : GeOptionMenu(x)
-  {
-  }
+  GeAnalogText(const GeAnalogText& x) : GeOptionMenu(x) {}
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
-  int action(grow_tObject object, glow_tEvent event)
-  {
-    return 1;
-  }
+  int action(grow_tObject object, glow_tEvent event) { return 1; }
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
 };
 
 //! Set a value
-class GeSetValue : public GeDynElem {
+class GeSetValue : public GeDynElem
+{
 public:
   pwr_tAName attribute;
   pwr_tString80 value;
@@ -3483,14 +3454,14 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Toolbar for object methods
-class GeMethodToolbar : public GeDynElem {
+class GeMethodToolbar : public GeDynElem
+{
 public:
   pwr_tAName method_object;
   ge_eMethodToolbarType toolbar_type;
@@ -3507,14 +3478,14 @@ public:
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Method pulldown menu.
-class GeMethodPulldownMenu : public GeDynElem {
+class GeMethodPulldownMenu : public GeDynElem
+{
 public:
   pwr_tAName method_object;
   ge_eMethodsMenuType menu_type;
@@ -3529,14 +3500,14 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Changes the fill color up to a certain level of the component.
-class GeAxis : public GeDynElem {
+class GeAxis : public GeDynElem
+{
 public:
   bool first_scan;
 
@@ -3568,16 +3539,16 @@ public:
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Set the supplied border color when the signal is high.
-class GeTimeoutColor : public GeDynElem {
+class GeTimeoutColor : public GeDynElem
+{
 public:
-  double time; //!< Timeout time
+  double time;          //!< Timeout time
   glow_eDrawType color; //!< Fill color to set when the subscription is old.
 
   pwr_tBoolean* p;
@@ -3590,15 +3561,14 @@ public:
   int interval_cnt;
 
   GeTimeoutColor(GeDyn* e_dyn)
-      : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_TimeoutColor,
-            ge_mActionType1_No, ge_mActionType2_No, ge_eDynPrio_TimeoutColor),
+      : GeDynElem(e_dyn, ge_mDynType1_No, ge_mDynType2_TimeoutColor, ge_mActionType1_No, ge_mActionType2_No,
+                  ge_eDynPrio_TimeoutColor),
         time(5), color(glow_eDrawType_Inherit)
   {
   }
   GeTimeoutColor(const GeTimeoutColor& x)
-      : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1,
-            x.action_type2, x.prio),
-        time(x.time), color(x.color)
+      : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio), time(x.time),
+        color(x.color)
   {
   }
   void get_attributes(attr_sItem* attrinfo, int* item_count);
@@ -3607,12 +3577,13 @@ public:
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Catch signal.
-class GeCatchSignal : public GeDynElem {
+class GeCatchSignal : public GeDynElem
+{
 public:
   pwr_tString80 signal_name;
 
@@ -3622,14 +3593,14 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
 //! Emit signal.
-class GeEmitSignal : public GeDynElem {
+class GeEmitSignal : public GeDynElem
+{
 public:
   pwr_tString80 signal_name;
   int global;
@@ -3640,9 +3611,8 @@ public:
   void save(std::ofstream& fp);
   void open(std::ifstream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char *indentation, char *prefix);
-  int export_java(
-      grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 

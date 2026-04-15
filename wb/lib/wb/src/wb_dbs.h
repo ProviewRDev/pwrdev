@@ -45,10 +45,13 @@
 class wb_vrep;
 class CoDepend;
 
-class wb_dbs : public wb_status, public wb_import {
+class wb_dbs : public wb_status, public wb_import
+{
 public:
-  typedef union {
-    struct {
+  typedef union
+  {
+    struct
+    {
       pwr_tBit devOnly : 1;
       pwr_tBit exist : 1;
     } b;
@@ -64,7 +67,8 @@ public:
   struct sCentry;
   struct sVentry;
 
-  struct sOentry {
+  struct sOentry
+  {
     tree_sNode node;
     dbs_sObject o;
     dbs_sBody rbody;
@@ -84,14 +88,16 @@ public:
 
   /* Name entry, used in name table.  */
 
-  struct sNentry {
+  struct sNentry
+  {
     tree_sNode node;
     dbs_sName n;
     dbs_tRef ref;
     sOentry* oep;
   };
 
-  struct sCentry {
+  struct sCentry
+  {
     tree_sNode node;
     dbs_sClass c;
     dbs_tRef ref;
@@ -99,13 +105,14 @@ public:
     sOentry* o_lt; // Tail of object list
   };
 
-  struct sVentry {
+  struct sVentry
+  {
     tree_sNode node;
     dbs_sVolRef v;
     dbs_sEnv env;
   };
 
-  FILE* m_fp; /**< file pointer */
+  FILE* m_fp;           /**< file pointer */
   char m_fileName[512]; /**< name of load file */
   //    wb_object    *m_o;		/* Volume object header.  */
   wb_vrep* m_v;
@@ -147,10 +154,7 @@ public:
   void setFileName(const char* name);
   void getFileName(char* name);
   void setTime(const pwr_tTime t);
-  void setRtonly(const int rtonly)
-  {
-    m_rtonly = rtonly;
-  }
+  void setRtonly(const int rtonly) { m_rtonly = rtonly; }
 
   void getAliasServer(sOentry* oep, void* p);
   char* pathName(sOentry* oep);
@@ -167,8 +171,7 @@ public:
   // pwr_tStatus    getMountServer(sLCB *lcbp, ldhi_sObjHead *o, pwr_tOid
   // *soid);
 
-  void cidInsert(
-      pwr_tStatus* sts, pwr_tCid cid, pwr_sAttrRef* arp, sCentry** cep);
+  void cidInsert(pwr_tStatus* sts, pwr_tCid cid, pwr_sAttrRef* arp, sCentry** cep);
   void classInsert(sOentry* oep);
   pwr_tStatus openFile();
   pwr_tStatus writeSectFile(size_t size);
@@ -184,27 +187,20 @@ public:
   pwr_tStatus writeSectDbody();
   pwr_tStatus writeReferencedVolumes();
   pwr_tUInt32 getDvVersion(wb_vrep* v);
-  void setDepend(CoDepend* depend)
-  {
-    m_depend = depend;
-  }
+  void setDepend(CoDepend* depend) { m_depend = depend; }
 
   virtual bool importVolume(wb_export& e);
 
-  virtual bool importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid,
-      pwr_tOid boid, pwr_tOid aoid, pwr_tOid foid, pwr_tOid loid,
-      const char* name, const char* normname, pwr_mClassDef flags,
-      pwr_tTime ohTime, pwr_tTime rbTime, pwr_tTime dbTime, size_t rbSize,
-      size_t dbSize);
+  virtual bool importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid, pwr_tOid aoid,
+                          pwr_tOid foid, pwr_tOid loid, const char* name, const char* normname,
+                          pwr_mClassDef flags, pwr_tTime ohTime, pwr_tTime rbTime, pwr_tTime dbTime,
+                          size_t rbSize, size_t dbSize);
 
   virtual bool importRbody(pwr_tOid oid, size_t size, void* body);
 
   virtual bool importDbody(pwr_tOid oid, size_t size, void* body);
 
-  virtual bool importDocBlock(pwr_tOid oid, size_t size, char* block)
-  {
-    return true;
-  }
+  virtual bool importDocBlock(pwr_tOid oid, size_t size, char* block) { return true; }
 
   virtual bool importMeta(dbs_sMenv* mep);
 

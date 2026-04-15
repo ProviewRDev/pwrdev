@@ -41,32 +41,36 @@
 
   @aref remtranssend RemTransSend
 */
-#define RemTransSend_exec(object, subwindow)                                   \
-  if (((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid > 0)             \
-    object->Occupied = 1;                                                      \
-  else                                                                         \
-    object->Occupied = 0;                                                      \
-  if (*object->SendP && !object->Send) {                                       \
-    if (((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid > 0)           \
-      object->Error = 1;                                                       \
-    else {                                                                     \
-      subwindow;                                                               \
-      ((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid = 1;             \
-      object->Occupied = 1;						       \
-      object->Error = 0;                                                       \
-    }                                                                          \
-  } else                                                                       \
-    object->Error                                                              \
-        = EVEN(((pwr_sClass_RemTrans*)(*object->RemTransP))->LastSts);         \
-                                                                               \
-  object->Send = *object->SendP;                                               \
-                                                                               \
-  if (((pwr_sClass_RemTrans*)(*object->RemTransP))->Buffers > 0) {             \
-    object->Buffer = 1;                                                        \
-    if (((pwr_sClass_RemTrans*)(*object->RemTransP))->Buffers                  \
-        >= ((pwr_sClass_RemTrans*)(*object->RemTransP))->MaxBuffers)           \
-      object->Occupied = 1;                                                    \
-  } else                                                                       \
+#define RemTransSend_exec(object, subwindow)                                                                 \
+  if (((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid > 0)                                           \
+    object->Occupied = 1;                                                                                    \
+  else                                                                                                       \
+    object->Occupied = 0;                                                                                    \
+  if (*object->SendP && !object->Send)                                                                       \
+  {                                                                                                          \
+    if (((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid > 0)                                         \
+      object->Error = 1;                                                                                     \
+    else                                                                                                     \
+    {                                                                                                        \
+      subwindow;                                                                                             \
+      ((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid = 1;                                           \
+      object->Occupied = 1;                                                                                  \
+      object->Error = 0;                                                                                     \
+    }                                                                                                        \
+  }                                                                                                          \
+  else                                                                                                       \
+    object->Error = EVEN(((pwr_sClass_RemTrans*)(*object->RemTransP))->LastSts);                             \
+                                                                                                             \
+  object->Send = *object->SendP;                                                                             \
+                                                                                                             \
+  if (((pwr_sClass_RemTrans*)(*object->RemTransP))->Buffers > 0)                                             \
+  {                                                                                                          \
+    object->Buffer = 1;                                                                                      \
+    if (((pwr_sClass_RemTrans*)(*object->RemTransP))->Buffers >=                                             \
+        ((pwr_sClass_RemTrans*)(*object->RemTransP))->MaxBuffers)                                            \
+      object->Occupied = 1;                                                                                  \
+  }                                                                                                          \
+  else                                                                                                       \
     object->Buffer = 0;
 
 /*_*
@@ -74,10 +78,12 @@
 
   @aref remtransrcv RemTransRcv
 */
-#define RemTransRcv_exec(object, subwindow)                                    \
-  if (((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid > 0) {           \
-    subwindow;                                                                 \
-    ((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid = 0;               \
-    object->Received = 1;                                                      \
-  } else                                                                       \
+#define RemTransRcv_exec(object, subwindow)                                                                  \
+  if (((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid > 0)                                           \
+  {                                                                                                          \
+    subwindow;                                                                                               \
+    ((pwr_sClass_RemTrans*)(*object->RemTransP))->DataValid = 0;                                             \
+    object->Received = 1;                                                                                    \
+  }                                                                                                          \
+  else                                                                                                       \
     object->Received = 0;

@@ -42,7 +42,7 @@
 
 #include "co_log.h"
 
-//#include "cow_style_qt.h"
+// #include "cow_style_qt.h"
 
 #include "wb_log_qt.h"
 #include "wb_wnav_qt.h"
@@ -59,14 +59,14 @@ CmdQt::CmdQt(int argc, char* argv[])
   // Attach to history log
   new wb_log_qt(0);
 
-  for (int i = 0; i < argc; i++) {
+  for (int i = 0; i < argc; i++)
+  {
     printf(argv[i]);
     printf(" ");
   }
   printf("\n");
 
-  wnav = new WNavQt((void*)this, NULL, "", "", &w, ldhses, (wnav_sStartMenu*)0,
-      wnav_eWindowType_No, &sts);
+  wnav = new WNavQt((void*)this, NULL, "", "", &w, ldhses, (wnav_sStartMenu*)0, wnav_eWindowType_No, &sts);
   wnav->attach_volume_cb = attach_volume_cb;
   wnav->detach_volume_cb = detach_volume_cb;
   wnav->get_wbctx_cb = get_wbctx;

@@ -38,18 +38,17 @@
 #define co_api_user_h
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-int user_CheckUser(const char* systemgroup, const char* user,
-    const char* password, unsigned int* priv);
-int user_CheckSystemGroup(const char* systemgroup);
-int user_GetUserPriv(
-    const char* systemgroup, const char* user, unsigned int* priv);
-void user_PrivToString(unsigned int priv, char* str, int size);
-void user_RtPrivToString(unsigned int priv, char* str, int size);
-void user_DevPrivToString(unsigned int priv, char* str, int size);
-char* user_PwCrypt(char* password);
+  int user_CheckUser(const char* systemgroup, const char* user, const char* password, unsigned int* priv);
+  int user_CheckSystemGroup(const char* systemgroup);
+  int user_GetUserPriv(const char* systemgroup, const char* user, unsigned int* priv);
+  void user_PrivToString(unsigned int priv, char* str, int size);
+  void user_RtPrivToString(unsigned int priv, char* str, int size);
+  void user_DevPrivToString(unsigned int priv, char* str, int size);
+  char* user_PwCrypt(char* password);
 
 #if defined __cplusplus
 }

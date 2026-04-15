@@ -35,41 +35,41 @@
  */
 
 /*************************************************************************
-*
-* Filename:             remote_pams.c
-*
-*                       Date    Pgm.    Read.   Remark
-* Modified              950307  CJu
-*
-* Description:		Implements remote transport process PAMS
-*
-**************************************************************************/
+ *
+ * Filename:             remote_pams.c
+ *
+ *                       Date    Pgm.    Read.   Remark
+ * Modified              950307  CJu
+ *
+ * Description:		Implements remote transport process PAMS
+ *
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 
-#include "pwrs_c_node.h"
-#include "rs_remote_mq.h"
-#include "rt_gdh.h"
 #include "pwr_baseclasses.h"
 #include "pwr_ssabclasses.h"
-#include "rs_remote_msg.h"
+#include "pwrs_c_node.h"
 #include "rs_remote.h"
+#include "rs_remote_mq.h"
+#include "rs_remote_msg.h"
 #include "rs_remtrans_utils.h"
+#include "rt_gdh.h"
 
 #define CLASS_APL_RESP 101
 #define CLASS_RESP 102
 
 mq_uAddress my_pams_process; /* Pams processnumber for this job */
-char receive_buffer[32767]; /* Pointer to received message */
-int receive_prio = 0; /* Prio for messages */
-mq_uAddress receive_src; /* group, process  received message */
-short int receive_class; /* Class of received message */
-short int receive_type; /* Type of received message */
-int receive_size; /* Size of received message */
+char receive_buffer[32767];  /* Pointer to received message */
+int receive_prio = 0;        /* Prio for messages */
+mq_uAddress receive_src;     /* group, process  received message */
+short int receive_class;     /* Class of received message */
+short int receive_type;      /* Type of received message */
+int receive_size;            /* Size of received message */
 
-remnode_item* remnode_list = NULL; /* List of remnodes (internal structure) */
-float cycle_time = 1.0; /* Cycle time in seconds */
-float min_cycle_time = 0.01; /* Shortest scan time */
+remnode_item *remnode_list = NULL; /* List of remnodes (internal structure) */
+float cycle_time = 1.0;            /* Cycle time in seconds */
+float min_cycle_time = 0.01;       /* Shortest scan time */
 
 unsigned int timer_id = 1;
 
@@ -87,8 +87,7 @@ unsigned int timer_id = 1;
 **************************************************************************
 **************************************************************************/
 
-void exith(void)
-{
+void exith(void) {
   unsigned int sts;
 
   sts = pams_cancel_timer(&timer_id);
@@ -111,10 +110,7 @@ void exith(void)
 **************************************************************************
 **************************************************************************/
 
-void DeclareExitHandler(void)
-{
-  atexit(exith);
-}
+void DeclareExitHandler(void) { atexit(exith); }
 
 /*************************************************************************
 **************************************************************************
@@ -130,8 +126,7 @@ void DeclareExitHandler(void)
 **************************************************************************
 **************************************************************************/
 
-unsigned int InitCycleTimer()
-{
+unsigned int InitCycleTimer() {
   unsigned int sts;
   unsigned int sts2;
   unsigned int time_function_code = LIB$K_DELTA_SECONDS_F;
@@ -139,8 +134,8 @@ unsigned int InitCycleTimer()
   unsigned short delta_time[4];
 
   /* Konvertera cykeltiden till intern deltatid */
-  sts = lib$cvtf_to_internal_time(
-      &time_function_code, &cycle_time, &delta_time);
+  sts =
+      lib$cvtf_to_internal_time(&time_function_code, &cycle_time, &delta_time);
   if (EVEN(sts))
     exit(sts);
 
@@ -163,8 +158,7 @@ unsigned int InitCycleTimer()
 **************************************************************************
 **************************************************************************/
 
-unsigned int WaitEvent(void)
-{
+unsigned int WaitEvent(void) {
   unsigned int sts;
   unsigned int receive_timeout = 0;
   short buffer_size;
@@ -172,8 +166,8 @@ unsigned int WaitEvent(void)
   buffer_size = sizeof(receive_buffer);
 
   sts = pams_get_msgw(&receive_buffer, &receive_prio, &receive_src,
-      &receive_class, &receive_type, &buffer_size, &receive_size,
-      &receive_timeout);
+                      &receive_class, &receive_type, &buffer_size,
+                      &receive_size, &receive_timeout);
 
   if (sts == SS$_NORMAL) {
     if (receive_type == MSG_TYPE_TIMER_EXPIRED)
@@ -198,10 +192,7 @@ unsigned int WaitEvent(void)
 **************************************************************************
 **************************************************************************/
 
-void send_pollbuff(remnode_item* remnode, pssupd_buffer* buf)
-{
-  return;
-}
+void send_pollbuff(remnode_item *remnode, pssupd_buffer *buf) { return; }
 
 /*************************************************************************
 **************************************************************************
@@ -217,15 +208,15 @@ void send_pollbuff(remnode_item* remnode, pssupd_buffer* buf)
 **************************************************************************
 **************************************************************************/
 
-unsigned int remnode_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
-    char* buf, int buf_size)
+unsigned int remnode_send(remnode_item *remnode, pwr_sClass_RemTrans *remtrans,
+                          char *buf, int buf_size)
 
 {
   unsigned int sts;
 
-  char* send_buffer; /* Pointer to message */
+  char *send_buffer; /* Pointer to message */
   int send_prio = 0; /* Prio for messages */
-  mq_uAddress dest; /* group, process for message */
+  mq_uAddress dest;  /* group, process for message */
 
   sts = pams_alloc_msg(&buf_size, &send_buffer);
   if (EVEN(sts))
@@ -236,7 +227,7 @@ unsigned int remnode_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
   dest.au.Queue = remtrans->Address[2];
 
   sts = pams_send_msg(&send_buffer, &send_prio, &dest, &remtrans->Address[0],
-      &remtrans->Address[1], &0);
+                      &remtrans->Address[1], &0);
 
   if (ODD(sts) && (remtrans->Address[0] == CLASS_APL_RESP))
     return (STATUS_BUFACK);
@@ -258,20 +249,19 @@ unsigned int remnode_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
 **************************************************************************
 **************************************************************************/
 
-unsigned int ReceiveComplete()
-{
+unsigned int ReceiveComplete() {
   unsigned int sts;
 
   char search_remnode = true;
   char search_remtrans = true;
   char send_response = false;
-  remnode_item* remnode;
-  remtrans_item* remtrans;
+  remnode_item *remnode;
+  remtrans_item *remtrans;
 
-  char* response_buffer; /* Pointer to response message */
-  int response_prio = 0; /* Prio for response */
+  char *response_buffer;                 /* Pointer to response message */
+  int response_prio = 0;                 /* Prio for response */
   short int response_class = CLASS_RESP; /* Class of response */
-  int response_size = 4; /* Size of response  = 4 bytes */
+  int response_size = 4;                 /* Size of response  = 4 bytes */
 
   search_remnode = true;
 
@@ -280,7 +270,7 @@ unsigned int ReceiveComplete()
     if (receive_src.au.Group == remnode->objp->Address[0])
       search_remnode = false;
     else
-      remnode = (remnode_item*)remnode->next;
+      remnode = (remnode_item *)remnode->next;
   }
 
   if (search_remnode)
@@ -290,14 +280,15 @@ unsigned int ReceiveComplete()
   else {
     if (receive_class == CLASS_RESP) /* Response message */
     {
-      rem_t_transbuff* transbuff;
+      rem_t_transbuff *transbuff;
 
       transbuff = remnode->transbuff;
 
-      if (transbuff && transbuff->remtrans->objp->Address[0] == CLASS_APL_RESP
-          && transbuff->remtrans->objp->Address[1] == receive_type
-          && (memcmp(&transbuff->data, receive_buffer, response_size) == 0)) {
-        remnode->transbuff = (rem_t_transbuff*)transbuff->next;
+      if (transbuff &&
+          transbuff->remtrans->objp->Address[0] == CLASS_APL_RESP &&
+          transbuff->remtrans->objp->Address[1] == receive_type &&
+          (memcmp(&transbuff->data, receive_buffer, response_size) == 0)) {
+        remnode->transbuff = (rem_t_transbuff *)transbuff->next;
         transbuff->remtrans->objp->Buffers--;
         remnode->Time_since_send = remnode->objp->ErrTime;
         free(transbuff);
@@ -305,9 +296,9 @@ unsigned int ReceiveComplete()
         transbuff = remnode->transbuff;
         if (transbuff) {
           sts = remnode_send(remnode, transbuff->remtrans->objp,
-              &transbuff->data, transbuff->size);
+                             &transbuff->data, transbuff->size);
           if (ODD(sts)) {
-            remnode->transbuff = (rem_t_transbuff*)transbuff->next;
+            remnode->transbuff = (rem_t_transbuff *)transbuff->next;
             transbuff->remtrans->objp->Buffers--;
             free(transbuff);
           }
@@ -320,16 +311,16 @@ unsigned int ReceiveComplete()
 
       remtrans = remnode->remtrans;
       while (remtrans && search_remtrans) {
-        if (remtrans->objp->Address[0] == receive_class
-            && remtrans->objp->Address[1] == receive_type
-            && remtrans->objp->Direction == REMTRANS_IN) {
+        if (remtrans->objp->Address[0] == receive_class &&
+            remtrans->objp->Address[1] == receive_type &&
+            remtrans->objp->Direction == REMTRANS_IN) {
           search_remtrans = false;
           sts = RemTrans_Receive(remtrans, receive_buffer, receive_size);
           if (ODD(sts) && receive_class == CLASS_APL_RESP)
             send_response = true;
           break;
         }
-        remtrans = (remtrans_item*)remtrans->next;
+        remtrans = (remtrans_item *)remtrans->next;
       }
       if (search_remtrans)
         remnode->objp->ErrTransCount++;
@@ -345,7 +336,7 @@ unsigned int ReceiveComplete()
       memcpy(response_buffer, receive_buffer, response_size);
 
       sts = pams_send_msg(&response_buffer, &response_prio, &receive_src,
-          &response_class, &receive_type, &0);
+                          &response_class, &receive_type, &0);
       if (EVEN(sts))
         exit(sts);
     }
@@ -358,17 +349,16 @@ unsigned int ReceiveComplete()
  * Main routine
  */
 
-main(int argc, char* argv[])
-{
-  remnode_item* remnode = NULL; /* Temporary remnode */
-  unsigned int sts; /* Status from function calls etc. */
-  unsigned int sts2; /* Status from function calls etc. */
-  pwr_tObjid node; /* Loop node */
-  pwr_sClass_RemNode* nodep;
-  pwr_tObjid pwr_node; /* Own Pwr node */
-  pwr_sClass_PlcProcess* pwr_nodep; /* Ref to own Pwr plcprocess */
-  pwr_tTime OriginDnoChgTime; /* LastDnoChgTime at start */
-  int mygroup; /* PAMS group no */
+main(int argc, char *argv[]) {
+  remnode_item *remnode = NULL; /* Temporary remnode */
+  unsigned int sts;             /* Status from function calls etc. */
+  unsigned int sts2;            /* Status from function calls etc. */
+  pwr_tObjid node;              /* Loop node */
+  pwr_sClass_RemNode *nodep;
+  pwr_tObjid pwr_node;              /* Own Pwr node */
+  pwr_sClass_PlcProcess *pwr_nodep; /* Ref to own Pwr plcprocess */
+  pwr_tTime OriginDnoChgTime;       /* LastDnoChgTime at start */
+  int mygroup;                      /* PAMS group no */
 
   mq_uAddress gdhpams_process;
 
@@ -393,7 +383,7 @@ main(int argc, char* argv[])
   /* Get pointer to $Node-object */
 
   sts = gdh_GetClassList(pwr_cClass_PlcProcess, &pwr_node);
-  sts = gdh_ObjidToPointer(pwr_node, (pwr_tAddress*)&pwr_nodep);
+  sts = gdh_ObjidToPointer(pwr_node, (pwr_tAddress *)&pwr_nodep);
   memcpy(&OriginDnoChgTime, &pwr_nodep->LastChgTime, sizeof(pwr_tTime));
 
   /* Get first remnode object, only on local node */
@@ -404,13 +394,13 @@ main(int argc, char* argv[])
     exit(sts);
 
   while (ODD(sts)) {
-    sts = gdh_ObjidToPointer(node, (pwr_tAddress*)&nodep);
+    sts = gdh_ObjidToPointer(node, (pwr_tAddress *)&nodep);
 
     /* Check if transport type is PAMS and if remnode's process number matches
      * ours */
 
-    if (nodep->TransportType == REMNODE_TRANSPORT_PAMS
-        && nodep->Address[1] == my_pams_process.All) {
+    if (nodep->TransportType == REMNODE_TRANSPORT_PAMS &&
+        nodep->Address[1] == my_pams_process.All) {
       /* Allocate a new item and link it */
       remnode = malloc(sizeof(remnode_item));
       if (!remnode)
@@ -419,7 +409,7 @@ main(int argc, char* argv[])
       remnode->objp = nodep;
       remnode->objid = node;
 
-      remnode->next = (struct remnode_item*)remnode_list;
+      remnode->next = (struct remnode_item *)remnode_list;
       remnode_list = remnode;
 
       remnode->Time_since_scan = 0;
@@ -436,8 +426,8 @@ main(int argc, char* argv[])
 
       /* Check if any cycle time is the shortest so far */
 
-      if (remnode->objp->CycleTime < cycle_time
-          && remnode->objp->CycleTime >= min_cycle_time)
+      if (remnode->objp->CycleTime < cycle_time &&
+          remnode->objp->CycleTime >= min_cycle_time)
         cycle_time = remnode->objp->CycleTime;
 
     } /* if transport_type... */
@@ -461,8 +451,8 @@ main(int argc, char* argv[])
 
     /* Om LastDnoChgTime är ändrad (PLC-programbyte), avsluta */
 
-    if (memcmp(&OriginDnoChgTime, &pwr_nodep->LastChgTime, sizeof(pwr_tTime))
-        != 0)
+    if (memcmp(&OriginDnoChgTime, &pwr_nodep->LastChgTime, sizeof(pwr_tTime)) !=
+        0)
       exit(0);
 
     if (sts == RT_RECEIVE) {
@@ -480,7 +470,7 @@ main(int argc, char* argv[])
           sts = RemTrans_Cyclic(remnode, &remnode_send);
           remnode->Time_since_scan = 0.0;
         }
-        remnode = (remnode_item*)remnode->next;
+        remnode = (remnode_item *)remnode->next;
       }
 
       /*

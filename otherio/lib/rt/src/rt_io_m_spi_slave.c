@@ -62,7 +62,8 @@
 #include "rt_io_msg.h"
 #include "rt_iom_msg.h"
 
-typedef struct {
+typedef struct
+{
   int fd;
   int byte_ordering;
   int float_representation;
@@ -76,8 +77,7 @@ typedef struct {
   __u8 mode;
 } io_sLocalSPI_Slave;
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalSPI_Slave* local;
   pwr_sClass_SPI_Slave* op = (pwr_sClass_SPI_Slave*)cp->op;
@@ -97,15 +97,16 @@ static pwr_tStatus IoCardInit(
   op->Status = IOM__UDP_INIT;
 
   local->fd = open(op->Device, O_RDWR);
-  if (local->fd < 0) {
-    errh_Error(
-        "SPI Slave, unable to open device %s, '%s'", op->Device, cp->Name);
+  if (local->fd < 0)
+  {
+    errh_Error("SPI Slave, unable to open device %s, '%s'", op->Device, cp->Name);
     op->Status = IOM__SPI_DEVICE;
     return IO__INITFAIL;
   }
 
   /* Set mode */
-  switch (op->Mode) {
+  switch (op->Mode)
+  {
   case pwr_eSPI_ModeEnum_Mode0:
     mode = SPI_MODE_0;
     break;
@@ -125,9 +126,9 @@ static pwr_tStatus IoCardInit(
   }
 
   sts = ioctl(local->fd, SPI_IOC_WR_MODE, &mode);
-  if (sts < 0) {
-    errh_Error("SPI Slave, unable to set mode, init error errno %d, '%s'",
-        errno, cp->Name);
+  if (sts < 0)
+  {
+    errh_Error("SPI Slave, unable to set mode, init error errno %d, '%s'", errno, cp->Name);
     op->Status = IOM__SPI_INIT;
     return IO__INITFAIL;
   }
@@ -138,9 +139,9 @@ static pwr_tStatus IoCardInit(
   else
     lsb = 0;
   sts = ioctl(local->fd, SPI_IOC_WR_LSB_FIRST, &lsb);
-  if (sts < 0) {
-    errh_Error("SPI Slave, unable to set LSB first, init error errno %d, '%s'",
-        errno, cp->Name);
+  if (sts < 0)
+  {
+    errh_Error("SPI Slave, unable to set LSB first, init error errno %d, '%s'", errno, cp->Name);
     op->Status = IOM__SPI_INIT;
     return IO__INITFAIL;
   }
@@ -148,31 +149,29 @@ static pwr_tStatus IoCardInit(
   /* Set bits per word */
   bits = op->BitsPerWord;
   sts = ioctl(local->fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
-  if (sts < 0) {
-    errh_Error(
-        "SPI Slave, unable to set Bits per word, init error errno %d, '%s'",
-        errno, cp->Name);
+  if (sts < 0)
+  {
+    errh_Error("SPI Slave, unable to set Bits per word, init error errno %d, '%s'", errno, cp->Name);
     op->Status = IOM__SPI_INIT;
     return IO__INITFAIL;
   }
 
   /* Set Max speed */
   speed = op->MaxSpeed;
-  if (speed != 0) {
+  if (speed != 0)
+  {
     sts = ioctl(local->fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
-    if (sts < 0) {
-      errh_Error(
-          "SPI Slave, unable to set Max speed, init error errno %d, '%s'",
-          errno, cp->Name);
+    if (sts < 0)
+    {
+      errh_Error("SPI Slave, unable to set Max speed, init error errno %d, '%s'", errno, cp->Name);
       op->Status = IOM__SPI_INIT;
       return IO__INITFAIL;
     }
   }
   local->byte_ordering = op->ByteOrdering;
 
-  io_bus_card_init(ctx, cp, &input_area_offset, &input_area_chansize,
-      &output_area_offset, &output_area_chansize, local->byte_ordering,
-      io_eAlignment_Packed);
+  io_bus_card_init(ctx, cp, &input_area_offset, &input_area_chansize, &output_area_offset,
+                   &output_area_chansize, local->byte_ordering, io_eAlignment_Packed);
 
   local->input_area_size = input_area_offset + input_area_chansize;
   local->output_area_size = output_area_offset + output_area_chansize;
@@ -191,8 +190,7 @@ static pwr_tStatus IoCardInit(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalSPI_Slave* local = (io_sLocalSPI_Slave*)cp->Local;
 
@@ -208,8 +206,7 @@ static pwr_tStatus IoCardClose(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalSPI_Slave* local = (io_sLocalSPI_Slave*)cp->Local;
   pwr_sClass_SPI_Slave* op = (pwr_sClass_SPI_Slave*)cp->op;
@@ -217,43 +214,49 @@ static pwr_tStatus IoCardRead(
   int i;
 
   // sts = read( local->fd, local->input_area, local->input_area_size);
-  for (i = 0; i < local->input_area_size; i++) {
+  for (i = 0; i < local->input_area_size; i++)
+  {
     sts = read(local->fd, &local->input_area[i], 1);
     if (sts != 1)
       break;
   }
-  if (sts < 0) {
+  if (sts < 0)
+  {
     op->ErrorCount++;
-    if (!local->readerror_logged) {
+    if (!local->readerror_logged)
+    {
       errh_Error("SPI read error errno %d, '%s'", errno, cp->Name);
       local->readerror_logged = 1;
     }
     op->Status = IOM__SPI_READERROR;
   }
   // else if ( sts != local->input_area_size) {
-  else if (sts == 0) {
+  else if (sts == 0)
+  {
     op->ErrorCount++;
-    if (!local->readerror_logged) {
-      errh_Error(
-          "SPI read buffer smaller than expected: %d, '%s'", sts, cp->Name);
+    if (!local->readerror_logged)
+    {
+      errh_Error("SPI read buffer smaller than expected: %d, '%s'", sts, cp->Name);
       local->readerror_logged = 1;
     }
     op->Status = IOM__SPI_READERROR;
-  } else {
+  }
+  else
+  {
     local->readerror_logged = 0;
     op->Status = IOM__SPI_NORMAL;
-    io_bus_card_read(ctx, rp, cp, local->input_area, 0, local->byte_ordering,
-        pwr_eFloatRepEnum_FloatIEEE);
+    io_bus_card_read(ctx, rp, cp, local->input_area, 0, local->byte_ordering, pwr_eFloatRepEnum_FloatIEEE);
   }
 
-  if (op->ErrorSoftLimit && op->ErrorCount == op->ErrorSoftLimit
-      && !local->softlimit_logged) {
+  if (op->ErrorSoftLimit && op->ErrorCount == op->ErrorSoftLimit && !local->softlimit_logged)
+  {
     errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
     ctx->IOHandler->CardErrorSoftLimit = 1;
     ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
     local->softlimit_logged = 1;
   }
-  if (op->ErrorHardLimit && op->ErrorCount >= op->ErrorHardLimit) {
+  if (op->ErrorHardLimit && op->ErrorCount >= op->ErrorHardLimit)
+  {
     errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
     ctx->Node->EmergBreakTrue = 1;
     ctx->IOHandler->CardErrorHardLimit = 1;
@@ -264,50 +267,56 @@ static pwr_tStatus IoCardRead(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalSPI_Slave* local = (io_sLocalSPI_Slave*)cp->Local;
   pwr_sClass_SPI_Slave* op = (pwr_sClass_SPI_Slave*)cp->op;
   int sts = 0;
   int i;
 
-  io_bus_card_write(ctx, cp, local->output_area, local->byte_ordering,
-      pwr_eFloatRepEnum_FloatIEEE);
+  io_bus_card_write(ctx, cp, local->output_area, local->byte_ordering, pwr_eFloatRepEnum_FloatIEEE);
 
   // sts = write( local->fd, local->output_area, local->output_area_size);
-  for (i = 0; i < local->output_area_size; i++) {
+  for (i = 0; i < local->output_area_size; i++)
+  {
     sts = write(local->fd, &local->output_area[i], 1);
     if (sts != 1)
       break;
   }
-  if (sts < 0) {
+  if (sts < 0)
+  {
     op->ErrorCount++;
-    if (!local->writeerror_logged) {
+    if (!local->writeerror_logged)
+    {
       errh_Error("SPI write error errno %d, '%s'", errno, cp->Name);
       local->writeerror_logged = 1;
     }
     op->Status = IOM__SPI_WRITEERROR;
   }
   // else if ( sts != local->output_area_size) {
-  else if (sts == 0) {
+  else if (sts == 0)
+  {
     op->ErrorCount++;
-    if (!local->writeerror_logged) {
+    if (!local->writeerror_logged)
+    {
       errh_Error("SPI write buffer unexpected size %d, '%s'", sts, cp->Name);
       local->writeerror_logged = 1;
     }
     op->Status = IOM__SPI_WRITEERROR;
-  } else {
+  }
+  else
+  {
     local->writeerror_logged = 0;
     op->Status = IOM__SPI_NORMAL;
   }
 
-  if (op->ErrorSoftLimit && op->ErrorCount == op->ErrorSoftLimit
-      && !local->softlimit_logged) {
+  if (op->ErrorSoftLimit && op->ErrorCount == op->ErrorSoftLimit && !local->softlimit_logged)
+  {
     errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
     local->softlimit_logged = 1;
   }
-  if (op->ErrorHardLimit && op->ErrorCount >= op->ErrorHardLimit) {
+  if (op->ErrorHardLimit && op->ErrorCount >= op->ErrorHardLimit)
+  {
     errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
     ctx->Node->EmergBreakTrue = 1;
     return IO__ERRDEVICE;
@@ -318,6 +327,6 @@ static pwr_tStatus IoCardWrite(
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(SPI_Slave) = { pwr_BindIoMethod(IoCardInit),
-  pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead),
-  pwr_BindIoMethod(IoCardWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(SPI_Slave) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                            pwr_BindIoMethod(IoCardRead), pwr_BindIoMethod(IoCardWrite),
+                                            pwr_NullMethod};

@@ -46,8 +46,8 @@
 
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father,
+                              pwr_tClassId Class)
 {
   pwr_tStatus sts;
   pwr_tOid oid;
@@ -56,15 +56,16 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
 
   // Insert a thread object
   sts = ldh_GetClassList(Session, pwr_cClass_SevHistThread, &oid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     cnt++;
     toid = oid;
     sts = ldh_GetNextObject(Session, oid, &oid);
   }
 
-  if (cnt > 0) {
-    sts = ldh_SetObjectPar(
-        Session, Object, "RtBody", "ThreadObject", (char*)&toid, sizeof(toid));
+  if (cnt > 0)
+  {
+    sts = ldh_SetObjectPar(Session, Object, "RtBody", "ThreadObject", (char*)&toid, sizeof(toid));
     if (EVEN(sts))
       return sts;
   }
@@ -74,11 +75,10 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
 //
 //  Syntax check.
 //
-static pwr_tStatus SyntaxCheck(
-    ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
-    int* ErrorCount, /* accumulated error count */
-    int* WarningCount /* accumulated waring count */
-    )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated waring count */
+)
 {
   pwr_tOid thread_oid;
   wb_session* sp = (wb_session*)Session;
@@ -100,11 +100,9 @@ static pwr_tStatus SyntaxCheck(
 
   wb_object othread = sp->object(thread_oid);
   if (!othread)
-    wsx_error_msg_str(
-        Session, "Bad thread object", Object, 'E', ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Bad thread object", Object, 'E', ErrorCount, WarningCount);
   else if (othread.cid() != pwr_cClass_SevHistThread)
-    wsx_error_msg_str(Session, "Bad thread object class", Object, 'E',
-        ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Bad thread object class", Object, 'E', ErrorCount, WarningCount);
 
   // Check StorageTime
   wb_attribute storagetime_a(a, 0, "StorageTime");
@@ -116,8 +114,7 @@ static pwr_tStatus SyntaxCheck(
     return storagetime_a.sts();
 
   if (storagetime.tv_sec == 0 && storagetime.tv_nsec == 0)
-    wsx_error_msg_str(
-        Session, "Bad StorageTime", Object, 'E', ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Bad StorageTime", Object, 'E', ErrorCount, WarningCount);
 
   // Check Attribute
   wb_attribute dataname_a(a, 0, "Attribute");
@@ -129,9 +126,9 @@ static pwr_tStatus SyntaxCheck(
     return dataname_a.sts();
 
   wb_attribute data_a = sp->attribute(&dataname_aref);
-  if (!data_a) {
-    wsx_error_msg_str(Session, "Bad Attribute reference", Object, 'E',
-        ErrorCount, WarningCount);
+  if (!data_a)
+  {
+    wsx_error_msg_str(Session, "Bad Attribute reference", Object, 'E', ErrorCount, WarningCount);
     return PWRB__SUCCESS;
   }
   return PWRB__SUCCESS;
@@ -139,5 +136,5 @@ static pwr_tStatus SyntaxCheck(
 
 //  Every method to be exported to the workbench should be registred here.
 
-pwr_dExport pwr_BindMethods(SevHistObject) = { pwr_BindMethod(PostCreate),
-  pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(SevHistObject) = {pwr_BindMethod(PostCreate), pwr_BindMethod(SyntaxCheck),
+                                              pwr_NullMethod};

@@ -41,14 +41,13 @@
 
 /* xtt_fileview_gtk.h -- view and select files */
 
-class XttFileviewGtk : public XttFileview {
+class XttFileviewGtk : public XttFileview
+{
 public:
-  XttFileviewGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, pwr_tOid xn_oid,
-      char* xn_title, char* xn_dir, char* xn_pattern, int xn_type,
-      char* xn_target_attr, char* xn_trigger_attr, char* xn_filetype);
-  ~XttFileviewGtk()
-  {
-  }
+  XttFileviewGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, pwr_tOid xn_oid, char* xn_title, char* xn_dir,
+                 char* xn_pattern, int xn_type, char* xn_target_attr, char* xn_trigger_attr,
+                 char* xn_filetype);
+  ~XttFileviewGtk() {}
 
   GtkWidget* toplevel;
   GtkWidget* list;
@@ -68,8 +67,8 @@ public:
   void execute(char* file);
 
   static void list_cursor_changed_cb(GtkTreeView* tree_view, gpointer data);
-  static void list_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path,
-      GtkTreeViewColumn* column, gpointer data);
+  static void list_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path, GtkTreeViewColumn* column,
+                                    gpointer data);
   static void list_ok_cb(GtkWidget* w, gpointer data);
   static void list_input_cb(GtkWidget* w, gpointer data);
   static void list_cancel_cb(GtkWidget* w, gpointer data);

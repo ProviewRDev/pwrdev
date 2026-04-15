@@ -41,7 +41,8 @@
 
 class XNav;
 
-class XttMethodToolbar {
+class XttMethodToolbar
+{
 public:
   static int m_disabled;
   XNav* m_xnav;
@@ -51,8 +52,8 @@ public:
   char m_tooltip_suffix[80];
   int (*get_select_cb)(void*, pwr_tAttrRef*, int*);
 
-  XttMethodToolbar(void* parent_ctx, void* xnav, unsigned int op_method_mask,
-      unsigned int mnt_method_mask, const char* tooltip_suffix);
+  XttMethodToolbar(void* parent_ctx, void* xnav, unsigned int op_method_mask, unsigned int mnt_method_mask,
+                   const char* tooltip_suffix);
   virtual ~XttMethodToolbar();
   virtual void set_sensitive();
 

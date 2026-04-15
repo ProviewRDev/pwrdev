@@ -39,8 +39,7 @@
 
 /* Function prototypes. */
 
-pwr_tStatus utl_BatchEnterJob(
-    int* Entry, char* Queue, char* File, char* Logfile, char* Par[]);
+pwr_tStatus utl_BatchEnterJob(int* Entry, char* Queue, char* File, char* Logfile, char* Par[]);
 
 pwr_tStatus utl_BatchFindQueue(char* Queue);
 

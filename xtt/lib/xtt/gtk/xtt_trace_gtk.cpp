@@ -69,8 +69,8 @@ void RtTraceGtk::activate_print(GtkWidget* w, gpointer data)
   RtTraceGtk* tractx = (RtTraceGtk*)data;
   pwr_tStatus sts;
 
-  CoWowGtk::CreateFlowPrintDialogGtk("Trace", tractx->flow_ctx,
-      flow_eOrientation_Landscape, 1.0, tractx->toplevel, &sts);
+  CoWowGtk::CreateFlowPrintDialogGtk("Trace", tractx->flow_ctx, flow_eOrientation_Landscape, 1.0,
+                                     tractx->toplevel, &sts);
 }
 
 void RtTraceGtk::activate_printselect(GtkWidget* w, gpointer data)
@@ -255,7 +255,8 @@ RtTraceGtk::~RtTraceGtk()
   trace_stop();
 
   /* Delete all trace children windows */
-  for (node = trace_list; node;) {
+  for (node = trace_list; node;)
+  {
     delete node->tractx;
     fnode = node->Next;
     free((char*)node);
@@ -274,10 +275,7 @@ RtTraceGtk::~RtTraceGtk()
     delete trace_timerid;
 }
 
-void RtTraceGtk::pop()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void RtTraceGtk::pop() { gtk_window_present(GTK_WINDOW(toplevel)); }
 
 void RtTraceGtk::popup_menu_position(int event_x, int event_y, int* x, int* y)
 {
@@ -296,14 +294,11 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer tra)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
-RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
-    pwr_tObjid tr_objid, pwr_tStatus* status)
-    : RtTrace(tr_parent_ctx, tr_objid, status), parent_wid(tr_parent_wid),
-      toplevel(0), nav_shell(0)
+RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid, pwr_tObjid tr_objid,
+                       pwr_tStatus* status)
+    : RtTrace(tr_parent_ctx, tr_objid, status), parent_wid(tr_parent_wid), toplevel(0), nav_shell(0)
 {
   const int window_width = 900;
   const int window_height = 800;
@@ -318,7 +313,8 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
   pwr_tCid parent_cid;
 
   sts = gdh_ObjidToName(tr_objid, name, sizeof(name), cdh_mNName);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *status = sts;
     return;
   }
@@ -327,54 +323,59 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
 
   /* Find plcwindow */
   sts = gdh_GetObjectClass(tr_objid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *status = sts;
     return;
   }
 
-  if (!(cid == pwr_cClass_windowplc || cid == pwr_cClass_windowcond
-          || cid == pwr_cClass_windoworderact
-          || cid == pwr_cClass_windowsubstep)) {
+  if (!(cid == pwr_cClass_windowplc || cid == pwr_cClass_windowcond || cid == pwr_cClass_windoworderact ||
+        cid == pwr_cClass_windowsubstep))
+  {
     sts = gdh_GetChild(tr_objid, &window_objid);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       *status = sts;
       return;
     }
-  } else
+  }
+  else
     window_objid = tr_objid;
 
   sts = gdh_GetObjectClass(window_objid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *status = sts;
     return;
   }
 
-  if (!(cid == pwr_cClass_windowplc || cid == pwr_cClass_windowcond
-          || cid == pwr_cClass_windoworderact
-          || cid == pwr_cClass_windowsubstep)) {
+  if (!(cid == pwr_cClass_windowplc || cid == pwr_cClass_windowcond || cid == pwr_cClass_windoworderact ||
+        cid == pwr_cClass_windowsubstep))
+  {
     *status = 0;
     return;
   }
 
   sts = get_filename(window_objid, filename, &m_has_host, hostname, plcconnect);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     *status = sts;
     return;
   }
 
   /* Create object context */
   objid = window_objid;
-  if (m_has_host) {
+  if (m_has_host)
+  {
     strcpy(m_hostname, hostname);
     strcpy(m_plcconnect, plcconnect);
   }
 
-  char* titleutf8
-      = g_convert(title, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  char* titleutf8 = g_convert(title, -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
 
   // Gtk
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      window_height, "default-width", window_width, "title", titleutf8, NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height, "default-width",
+                                      window_width, "title", titleutf8, NULL);
   g_free(titleutf8);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
@@ -384,43 +385,33 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
 
   CoWowGtk::SetWindowIcon(toplevel);
 
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File Entry
   // Submenu Print
-  GtkWidget* file_print
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Print"));
+  GtkWidget* file_print = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Print"));
   g_signal_connect(file_print, "activate", G_CALLBACK(activate_print), this);
 
-  GtkWidget* file_print_select = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Print _Selected Documents"));
-  g_signal_connect(
-      file_print_select, "activate", G_CALLBACK(activate_printselect), this);
+  GtkWidget* file_print_select =
+      gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Print _Selected Documents"));
+  g_signal_connect(file_print_select, "activate", G_CALLBACK(activate_printselect), this);
 
-  GtkWidget* file_savetrace = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Save _Trace"));
-  g_signal_connect(
-      file_savetrace, "activate", G_CALLBACK(activate_savetrace), this);
+  GtkWidget* file_savetrace = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Save _Trace"));
+  g_signal_connect(file_savetrace, "activate", G_CALLBACK(activate_savetrace), this);
 
-  GtkWidget* file_restoretrace = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Restore Trace"));
-  g_signal_connect(
-      file_restoretrace, "activate", G_CALLBACK(activate_restoretrace), this);
+  GtkWidget* file_restoretrace = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Restore Trace"));
+  g_signal_connect(file_restoretrace, "activate", G_CALLBACK(activate_restoretrace), this);
 
-  GtkWidget* file_cleartrace = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("C_lear Trace"));
-  g_signal_connect(
-      file_cleartrace, "activate", G_CALLBACK(activate_cleartrace), this);
+  GtkWidget* file_cleartrace = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("C_lear Trace"));
+  g_signal_connect(file_cleartrace, "activate", G_CALLBACK(activate_cleartrace), this);
 
-  GtkWidget* file_close
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Close"));
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Close"));
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_close), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_print);
@@ -430,132 +421,95 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_cleartrace);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
 
-  GtkWidget* file
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
+  GtkWidget* file = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_File"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), file);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // Functions Entry
-  GtkWidget* functions_open_object = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Open Object"));
-  g_signal_connect(functions_open_object, "activate",
-      G_CALLBACK(activate_open_object), this);
+  GtkWidget* functions_open_object =
+      gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Open Object"));
+  g_signal_connect(functions_open_object, "activate", G_CALLBACK(activate_open_object), this);
   gtk_widget_add_accelerator(functions_open_object, "activate", accel_g, 'a',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_open_subwindow = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("Open S_ubwindow"));
-  g_signal_connect(functions_open_subwindow, "activate",
-      G_CALLBACK(activate_open_subwindow), this);
+  GtkWidget* functions_open_subwindow =
+      gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Open S_ubwindow"));
+  g_signal_connect(functions_open_subwindow, "activate", G_CALLBACK(activate_open_subwindow), this);
   gtk_widget_add_accelerator(functions_open_subwindow, "activate", accel_g, 'l',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_display_object = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Display object in Navigator"));
-  g_signal_connect(functions_display_object, "activate",
-      G_CALLBACK(activate_display_object), this);
+  GtkWidget* functions_display_object =
+      gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Display object in Navigator"));
+  g_signal_connect(functions_display_object, "activate", G_CALLBACK(activate_display_object), this);
   gtk_widget_add_accelerator(functions_display_object, "activate", accel_g, 'd',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_show_cross = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Show Crossreferences"));
-  g_signal_connect(
-      functions_show_cross, "activate", G_CALLBACK(activate_show_cross), this);
+  GtkWidget* functions_show_cross =
+      gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Show Crossreferences"));
+  g_signal_connect(functions_show_cross, "activate", G_CALLBACK(activate_show_cross), this);
   gtk_widget_add_accelerator(functions_show_cross, "activate", accel_g, 'r',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_open_classgraph = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Open ObjectGraph"));
-  g_signal_connect(functions_open_classgraph, "activate",
-      G_CALLBACK(activate_open_classgraph), this);
-  gtk_widget_add_accelerator(functions_open_classgraph, "activate", accel_g,
-      'g', GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  GtkWidget* functions_open_classgraph =
+      gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Open ObjectGraph"));
+  g_signal_connect(functions_open_classgraph, "activate", G_CALLBACK(activate_open_classgraph), this);
+  gtk_widget_add_accelerator(functions_open_classgraph, "activate", accel_g, 'g',
+                             GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
-  GtkWidget* functions_collect_insert = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("_Collect Insert"));
-  g_signal_connect(functions_collect_insert, "activate",
-      G_CALLBACK(activate_collect_insert), this);
+  GtkWidget* functions_collect_insert =
+      gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Collect Insert"));
+  g_signal_connect(functions_collect_insert, "activate", G_CALLBACK(activate_collect_insert), this);
   gtk_widget_add_accelerator(functions_collect_insert, "activate", accel_g, 'v',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+                             GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
 
   GtkMenu* functions_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_open_object);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(functions_menu), functions_open_subwindow);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(functions_menu), functions_display_object);
+  gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_open_subwindow);
+  gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_display_object);
   gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_show_cross);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(functions_menu), functions_open_classgraph);
-  gtk_menu_shell_append(
-      GTK_MENU_SHELL(functions_menu), functions_collect_insert);
+  gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_open_classgraph);
+  gtk_menu_shell_append(GTK_MENU_SHELL(functions_menu), functions_collect_insert);
 
-  GtkWidget* functions
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Functions"));
+  GtkWidget* functions = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Functions"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), functions);
-  gtk_menu_item_set_submenu(
-      GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
+  gtk_menu_item_set_submenu(GTK_MENU_ITEM(functions), GTK_WIDGET(functions_menu));
 
   // View Entry
 
-  GtkWidget* view_zoom_in
-    = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _in"));
-  g_signal_connect(
-      view_zoom_in, "activate", G_CALLBACK(activate_zoomin), this);
-  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* view_zoom_in = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _in"));
+  g_signal_connect(view_zoom_in, "activate", G_CALLBACK(activate_zoomin), this);
+  gtk_widget_add_accelerator(view_zoom_in, "activate", accel_g, 'i', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_out
-    = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _out"));
-  g_signal_connect(
-      view_zoom_out, "activate", G_CALLBACK(activate_zoomout), this);
-  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* view_zoom_out = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _out"));
+  g_signal_connect(view_zoom_out, "activate", G_CALLBACK(activate_zoomout), this);
+  gtk_widget_add_accelerator(view_zoom_out, "activate", accel_g, 'o', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* view_zoom_reset
-    = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _reset"));
-  g_signal_connect(
-      view_zoom_reset, "activate", G_CALLBACK(activate_zoomreset), this);
-  gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  GtkWidget* view_zoom_reset = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("Zoom _reset"));
+  g_signal_connect(view_zoom_reset, "activate", G_CALLBACK(activate_zoomreset), this);
+  gtk_widget_add_accelerator(view_zoom_reset, "activate", accel_g, 'b', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   // Submenu ScanTime
   GSList* view_sc_group = NULL;
-  GtkWidget* view_scantime1
-      = gtk_radio_menu_item_new_with_mnemonic(view_sc_group, "0.50 s");
-  view_sc_group
-      = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_scantime1));
-  g_signal_connect(
-      view_scantime1, "activate", G_CALLBACK(activate_scantime1), this);
+  GtkWidget* view_scantime1 = gtk_radio_menu_item_new_with_mnemonic(view_sc_group, "0.50 s");
+  view_sc_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_scantime1));
+  g_signal_connect(view_scantime1, "activate", G_CALLBACK(activate_scantime1), this);
 
-  GtkWidget* view_scantime2
-      = gtk_radio_menu_item_new_with_mnemonic(view_sc_group, "0.20 s");
-  view_sc_group
-      = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_scantime1));
-  g_signal_connect(
-      view_scantime2, "activate", G_CALLBACK(activate_scantime2), this);
+  GtkWidget* view_scantime2 = gtk_radio_menu_item_new_with_mnemonic(view_sc_group, "0.20 s");
+  view_sc_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_scantime1));
+  g_signal_connect(view_scantime2, "activate", G_CALLBACK(activate_scantime2), this);
 
-  GtkWidget* view_scantime3
-      = gtk_radio_menu_item_new_with_mnemonic(view_sc_group, "0.10 s");
-  view_sc_group
-      = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_scantime1));
-  g_signal_connect(
-      view_scantime3, "activate", G_CALLBACK(activate_scantime3), this);
+  GtkWidget* view_scantime3 = gtk_radio_menu_item_new_with_mnemonic(view_sc_group, "0.10 s");
+  view_sc_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_scantime1));
+  g_signal_connect(view_scantime3, "activate", G_CALLBACK(activate_scantime3), this);
 
-  GtkWidget* view_scantime4
-      = gtk_radio_menu_item_new_with_mnemonic(view_sc_group, "0.05 s");
-  view_sc_group
-      = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_scantime1));
-  g_signal_connect(
-      view_scantime4, "activate", G_CALLBACK(activate_scantime4), this);
+  GtkWidget* view_scantime4 = gtk_radio_menu_item_new_with_mnemonic(view_sc_group, "0.05 s");
+  view_sc_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(view_scantime1));
+  g_signal_connect(view_scantime4, "activate", G_CALLBACK(activate_scantime4), this);
 
-  GtkWidget* view_scantime5
-      = gtk_radio_menu_item_new_with_mnemonic(view_sc_group, "0.02 s");
-  g_signal_connect(
-      view_scantime5, "activate", G_CALLBACK(activate_scantime5), this);
+  GtkWidget* view_scantime5 = gtk_radio_menu_item_new_with_mnemonic(view_sc_group, "0.02 s");
+  g_signal_connect(view_scantime5, "activate", G_CALLBACK(activate_scantime5), this);
 
-  GtkWidget* view_sc
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_ScanTime"));
+  GtkWidget* view_sc = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_ScanTime"));
   GtkMenu* view_sc_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_sc_menu), view_scantime1);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_sc_menu), view_scantime2);
@@ -571,67 +525,57 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_zoom_reset);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_sc);
 
-  GtkWidget* view
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
+  GtkWidget* view = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_View"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), view);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(view), GTK_WIDGET(view_menu));
 
   // Mode entry
   GSList* mode_group = NULL;
-  GtkWidget* mode_view = gtk_radio_menu_item_new_with_mnemonic(
-      mode_group, CoWowGtk::translate_utf8("V_iew"));
+  GtkWidget* mode_view = gtk_radio_menu_item_new_with_mnemonic(mode_group, CoWowGtk::translate_utf8("V_iew"));
   mode_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(mode_view));
-  gtk_widget_add_accelerator(mode_view, "activate", accel_g, 'y',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(mode_view, "activate", accel_g, 'y', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
   g_signal_connect(mode_view, "activate", G_CALLBACK(activate_view), this);
 
-  GtkWidget* mode_trace = gtk_radio_menu_item_new_with_mnemonic(
-      mode_group, CoWowGtk::translate_utf8("_Trace"));
+  GtkWidget* mode_trace =
+      gtk_radio_menu_item_new_with_mnemonic(mode_group, CoWowGtk::translate_utf8("_Trace"));
   mode_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(mode_trace));
-  gtk_widget_add_accelerator(mode_trace, "activate", accel_g, 't',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(mode_trace, "activate", accel_g, 't', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
   g_signal_connect(mode_trace, "activate", G_CALLBACK(activate_trace), this);
 
-  GtkWidget* mode_simulate = gtk_radio_menu_item_new_with_mnemonic(
-      mode_group, CoWowGtk::translate_utf8("_Simulate"));
+  GtkWidget* mode_simulate =
+      gtk_radio_menu_item_new_with_mnemonic(mode_group, CoWowGtk::translate_utf8("_Simulate"));
   gtk_widget_add_accelerator(mode_simulate, "activate", accel_g, 's',
-      GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
-  g_signal_connect(
-      mode_simulate, "activate", G_CALLBACK(activate_simulate), this);
+                             GdkModifierType(GDK_CONTROL_MASK | GDK_SHIFT_MASK), GTK_ACCEL_VISIBLE);
+  g_signal_connect(mode_simulate, "activate", G_CALLBACK(activate_simulate), this);
 
   GtkMenu* mode_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(mode_menu), mode_view);
   gtk_menu_shell_append(GTK_MENU_SHELL(mode_menu), mode_trace);
   gtk_menu_shell_append(GTK_MENU_SHELL(mode_menu), mode_simulate);
 
-  GtkWidget* mode
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Mode"));
+  GtkWidget* mode = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Mode"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), mode);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(mode), GTK_WIDGET(mode_menu));
 
   // Menu Help
-  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("On _Trace"));
+  GtkWidget* help_help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("On _Trace"));
   g_signal_connect(help_help, "activate", G_CALLBACK(activate_help), this);
-  gtk_widget_add_accelerator(
-      help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(help_help, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
-  GtkWidget* help_plcpgm
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("On _PlcPgm"));
+  GtkWidget* help_plcpgm = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("On _PlcPgm"));
   g_signal_connect(help_plcpgm, "activate", G_CALLBACK(activate_helpplc), this);
 
-  GtkWidget* help_plclist = gtk_menu_item_new_with_mnemonic(
-      CoWowGtk::translate_utf8("P_lcPgm Overview"));
-  g_signal_connect(
-      help_plclist, "activate", G_CALLBACK(activate_helpplclist), this);
+  GtkWidget* help_plclist = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("P_lcPgm Overview"));
+  g_signal_connect(help_plclist, "activate", G_CALLBACK(activate_helpplclist), this);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_help);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_plcpgm);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_plclist);
 
-  GtkWidget* help
-      = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
+  GtkWidget* help = gtk_menu_item_new_with_mnemonic(CoWowGtk::translate_utf8("_Help"));
   gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), help);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(help), GTK_WIDGET(help_menu));
 
@@ -640,32 +584,33 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
 
   // Open parent window for subwindows
   sts = gdh_GetParent(objid, &parent);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = gdh_GetObjectClass(parent, &parent_cid);
-    if (ODD(sts) && parent_cid != pwr_cClass_plc) {
-      wutl_tools_item(tools, "$pwr_exe/xtt_up.png", G_CALLBACK(activate_parent_window), 
-      "Open parent window", this, 0, 1);
+    if (ODD(sts) && parent_cid != pwr_cClass_plc)
+    {
+      wutl_tools_item(tools, "$pwr_exe/xtt_up.png", G_CALLBACK(activate_parent_window), "Open parent window",
+                      this, 0, 1);
     }
   }
 
-  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_navigator_d_30.png" : "$pwr_exe/ico_navigator_l_30.png", G_CALLBACK(activate_display_object), 
-      "Display object in Navigator", this, 0, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_navigator_d_30.png" : "$pwr_exe/ico_navigator_l_30.png",
+                  G_CALLBACK(activate_display_object), "Display object in Navigator", this, 0, 1);
 
-  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_crossref_d_30.png" : "$pwr_exe/ico_crossref_l_30.png", G_CALLBACK(activate_show_cross), 
-      "Show Crossreferences", this, 0, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_crossref_d_30.png" : "$pwr_exe/ico_crossref_l_30.png",
+                  G_CALLBACK(activate_show_cross), "Show Crossreferences", this, 0, 1);
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png", G_CALLBACK(activate_zoomin), 
-      "Zoom in", this, 0, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomin_d_30.png" : "$pwr_exe/ico_zoomin_l_30.png",
+                  G_CALLBACK(activate_zoomin), "Zoom in", this, 0, 1);
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png", G_CALLBACK(activate_zoomout), 
-      "Zoom out", this, 0, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomout_d_30.png" : "$pwr_exe/ico_zoomout_l_30.png",
+                  G_CALLBACK(activate_zoomout), "Zoom out", this, 0, 1);
 
-    wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png", G_CALLBACK(activate_zoomreset), 
-      "Zoom reset", this, 0, 1);
+  wutl_tools_item(tools, dark_theme ? "$pwr_exe/ico_zoomreset_d_30.png" : "$pwr_exe/ico_zoomreset_l_30.png",
+                  G_CALLBACK(activate_zoomreset), "Zoom reset", this, 0, 1);
 
   // Flow widget
-  GtkWidget* flow_scrolled
-      = scrolledflowwidgetgtk_new(init_flow, this, &flow_widget);
+  GtkWidget* flow_scrolled = scrolledflowwidgetgtk_new(init_flow, this, &flow_widget);
   gtk_widget_set_name(flow_widget, "plctrace");
   gtk_widget_show_all(flow_widget);
 
@@ -705,8 +650,8 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
   gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(mode_trace), TRUE);
   gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(view_scantime1), TRUE);
 
-// trasetup();
-// trace_start();
+  // trasetup();
+  // trace_start();
 
 #if defined OS_LINUX
   {
@@ -731,7 +676,8 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
   if (EVEN(sts))
     return;
 
-  if (flow_version != window_version) {
+  if (flow_version != window_version)
+  {
     char msg[200];
     char flow_version_str[30];
     char window_version_str[30];
@@ -739,19 +685,17 @@ RtTraceGtk::RtTraceGtk(void* tr_parent_ctx, GtkWidget* tr_parent_wid,
 
     t.tv_sec = flow_version;
     t.tv_nsec = 0;
-    time_AtoAscii(&t, time_eFormat_DateAndTime, flow_version_str,
-        sizeof(flow_version_str));
+    time_AtoAscii(&t, time_eFormat_DateAndTime, flow_version_str, sizeof(flow_version_str));
     t.tv_sec = window_version;
     t.tv_nsec = 0;
-    time_AtoAscii(&t, time_eFormat_DateAndTime, window_version_str,
-        sizeof(window_version_str));
+    time_AtoAscii(&t, time_eFormat_DateAndTime, window_version_str, sizeof(window_version_str));
 
     if (flow_version > window_version)
-      sprintf(msg, "Trace file is newer than database version\n(%s > %s)",
-          flow_version_str, window_version_str);
+      sprintf(msg, "Trace file is newer than database version\n(%s > %s)", flow_version_str,
+              window_version_str);
     else if (flow_version < window_version)
-      sprintf(msg, "Trace file is older than database version\n(%s < %s)",
-          flow_version_str, window_version_str);
+      sprintf(msg, "Trace file is older than database version\n(%s < %s)", flow_version_str,
+              window_version_str);
     wow->DisplayError("Version mismatch", msg);
   }
 }

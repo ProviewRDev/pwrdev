@@ -46,68 +46,82 @@
 #include "co_math.h"
 #include "rt_conv.h"
 
-#define CONV_ARGS                                                              \
-  int tcount, int tasize, char *tp, int *tsize, int scount, int sasize,        \
-      const char *sp, pwr_mAdef sadef
+#define CONV_ARGS                                                                                            \
+  int tcount, int tasize, char *tp, int *tsize, int scount, int sasize, const char *sp, pwr_mAdef sadef
 
-#define BOOL_TO_OTHER(TTYPE)                                                   \
-  for (; tcount > 0 && *tsize >= sizeof(TTYPE); tcount--, scount--) {          \
-    if (scount > 0) {                                                          \
-      *(TTYPE*)tp = (*(pwr_tBoolean*)sp) ? 1 : 0;                              \
-      sp += sizeof(pwr_tBoolean);                                              \
-    } else                                                                     \
-      *(TTYPE*)tp = 0;                                                         \
-                                                                               \
-    tp += sizeof(TTYPE);                                                       \
-    *tsize -= sizeof(TTYPE);                                                   \
+#define BOOL_TO_OTHER(TTYPE)                                                                                 \
+  for (; tcount > 0 && *tsize >= sizeof(TTYPE); tcount--, scount--)                                          \
+  {                                                                                                          \
+    if (scount > 0)                                                                                          \
+    {                                                                                                        \
+      *(TTYPE*)tp = (*(pwr_tBoolean*)sp) ? 1 : 0;                                                            \
+      sp += sizeof(pwr_tBoolean);                                                                            \
+    }                                                                                                        \
+    else                                                                                                     \
+      *(TTYPE*)tp = 0;                                                                                       \
+                                                                                                             \
+    tp += sizeof(TTYPE);                                                                                     \
+    *tsize -= sizeof(TTYPE);                                                                                 \
   }
 
-#define FLOAT_TO_BOOL(STYPE, EPS)                                                   \
-  for (; tcount > 0 && *tsize >= sizeof(pwr_tBoolean); tcount--, scount--) {   \
-    if (scount > 0 && !sadef.b.privatepointer) {                               \
-      *(pwr_tBoolean*)tp = !(ABS(*(STYPE*)sp) < EPS);                  \
-      sp += sizeof(STYPE);                                                     \
-    } else                                                                     \
-      *(pwr_tBoolean*)tp = 0;                                                  \
-                                                                               \
-    tp += sizeof(pwr_tBoolean);                                                \
-    *tsize -= sizeof(pwr_tBoolean);                                            \
+#define FLOAT_TO_BOOL(STYPE, EPS)                                                                            \
+  for (; tcount > 0 && *tsize >= sizeof(pwr_tBoolean); tcount--, scount--)                                   \
+  {                                                                                                          \
+    if (scount > 0 && !sadef.b.privatepointer)                                                               \
+    {                                                                                                        \
+      *(pwr_tBoolean*)tp = !(ABS(*(STYPE*)sp) < EPS);                                                        \
+      sp += sizeof(STYPE);                                                                                   \
+    }                                                                                                        \
+    else                                                                                                     \
+      *(pwr_tBoolean*)tp = 0;                                                                                \
+                                                                                                             \
+    tp += sizeof(pwr_tBoolean);                                                                              \
+    *tsize -= sizeof(pwr_tBoolean);                                                                          \
   }
 
-#define FLOAT_TO_NOT_BOOL(TTYPE, STYPE)                                        \
-  for (; tcount > 0 && *tsize >= sizeof(TTYPE); tcount--, scount--) {          \
-    if (scount > 0 && !sadef.b.privatepointer) {                               \
-      *(TTYPE*)tp = *(STYPE*)sp;                                               \
-      sp += sizeof(STYPE);                                                     \
-    } else                                                                     \
-      *(TTYPE*)tp = 0;                                                         \
-                                                                               \
-    tp += sizeof(TTYPE);                                                       \
-    *tsize -= sizeof(TTYPE);                                                   \
+#define FLOAT_TO_NOT_BOOL(TTYPE, STYPE)                                                                      \
+  for (; tcount > 0 && *tsize >= sizeof(TTYPE); tcount--, scount--)                                          \
+  {                                                                                                          \
+    if (scount > 0 && !sadef.b.privatepointer)                                                               \
+    {                                                                                                        \
+      *(TTYPE*)tp = *(STYPE*)sp;                                                                             \
+      sp += sizeof(STYPE);                                                                                   \
+    }                                                                                                        \
+    else                                                                                                     \
+      *(TTYPE*)tp = 0;                                                                                       \
+                                                                                                             \
+    tp += sizeof(TTYPE);                                                                                     \
+    *tsize -= sizeof(TTYPE);                                                                                 \
   }
 
-#define INT_TO_BOOL(STYPE)                                                     \
-  for (; tcount > 0 && *tsize >= sizeof(pwr_tBoolean); tcount--, scount--) {   \
-    if (scount > 0) {                                                          \
-      *(pwr_tBoolean*)tp = (*(STYPE*)sp);                       \
-      sp += sizeof(STYPE);                                                     \
-    } else                                                                     \
-      *(pwr_tBoolean*)tp = 0;                                                  \
-                                                                               \
-    tp += sizeof(pwr_tBoolean);                                                \
-    *tsize -= sizeof(pwr_tBoolean);                                            \
+#define INT_TO_BOOL(STYPE)                                                                                   \
+  for (; tcount > 0 && *tsize >= sizeof(pwr_tBoolean); tcount--, scount--)                                   \
+  {                                                                                                          \
+    if (scount > 0)                                                                                          \
+    {                                                                                                        \
+      *(pwr_tBoolean*)tp = (*(STYPE*)sp);                                                                    \
+      sp += sizeof(STYPE);                                                                                   \
+    }                                                                                                        \
+    else                                                                                                     \
+      *(pwr_tBoolean*)tp = 0;                                                                                \
+                                                                                                             \
+    tp += sizeof(pwr_tBoolean);                                                                              \
+    *tsize -= sizeof(pwr_tBoolean);                                                                          \
   }
 
-#define INT_TO_NOT_BOOL(TTYPE, STYPE)                                          \
-  for (; tcount > 0 && *tsize >= sizeof(TTYPE); tcount--, scount--) {          \
-    if (scount > 0) {                                                          \
-      *(TTYPE*)tp = *(STYPE*)sp;                                               \
-      sp += sizeof(STYPE);                                                     \
-    } else                                                                     \
-      *(TTYPE*)tp = 0;                                                         \
-                                                                               \
-    tp += sizeof(TTYPE);                                                       \
-    *tsize -= sizeof(TTYPE);                                                   \
+#define INT_TO_NOT_BOOL(TTYPE, STYPE)                                                                        \
+  for (; tcount > 0 && *tsize >= sizeof(TTYPE); tcount--, scount--)                                          \
+  {                                                                                                          \
+    if (scount > 0)                                                                                          \
+    {                                                                                                        \
+      *(TTYPE*)tp = *(STYPE*)sp;                                                                             \
+      sp += sizeof(STYPE);                                                                                   \
+    }                                                                                                        \
+    else                                                                                                     \
+      *(TTYPE*)tp = 0;                                                                                       \
+                                                                                                             \
+    tp += sizeof(TTYPE);                                                                                     \
+    *tsize -= sizeof(TTYPE);                                                                                 \
   }
 
 static pwr_tBoolean convIllegal(CONV_ARGS);
@@ -186,37 +200,36 @@ static pwr_tBoolean objidToAttrRef(CONV_ARGS);
 static pwr_tBoolean attrRefToObjid(CONV_ARGS);
 
 /** @note The member order must match conv_eIdx */
-const convFunction conv_Fctn[] = { convIllegal, convCopy, convZero,
+const convFunction conv_Fctn[] = {
+    convIllegal,    convCopy,         convZero,
 
-  boolToFloat32, boolToFloat64, boolToInt8, boolToInt16, boolToInt32,
+    boolToFloat32,  boolToFloat64,    boolToInt8,      boolToInt16,    boolToInt32,
 
-  float32ToBool, float32ToFloat64, float32ToInt8, float32ToInt16,
-  float32ToInt32,
+    float32ToBool,  float32ToFloat64, float32ToInt8,   float32ToInt16, float32ToInt32,
 
-  float64ToBool, float64ToFloat32, float64ToInt8, float64ToInt16,
-  float64ToInt32,
+    float64ToBool,  float64ToFloat32, float64ToInt8,   float64ToInt16, float64ToInt32,
 
-  int8ToBool, int8ToFloat32, int8ToFloat64, int8ToInt16, int8ToInt32,
-  int8ToUInt16, int8ToUInt32,
+    int8ToBool,     int8ToFloat32,    int8ToFloat64,   int8ToInt16,    int8ToInt32,
+    int8ToUInt16,   int8ToUInt32,
 
-  int16ToBool, int16ToFloat32, int16ToFloat64, int16ToInt8, int16ToInt32,
-  int16ToUInt8, int16ToUInt32,
+    int16ToBool,    int16ToFloat32,   int16ToFloat64,  int16ToInt8,    int16ToInt32,
+    int16ToUInt8,   int16ToUInt32,
 
-  int32ToBool, int32ToFloat32, int32ToFloat64, int32ToInt8, int32ToInt16,
-  int32ToUInt8, int32ToUInt16,
+    int32ToBool,    int32ToFloat32,   int32ToFloat64,  int32ToInt8,    int32ToInt16,
+    int32ToUInt8,   int32ToUInt16,
 
-  uint8ToBool, uint8ToFloat32, uint8ToFloat64, uint8ToInt16, uint8ToInt32,
-  uint8ToUInt16, uint8ToUInt32,
+    uint8ToBool,    uint8ToFloat32,   uint8ToFloat64,  uint8ToInt16,   uint8ToInt32,
+    uint8ToUInt16,  uint8ToUInt32,
 
-  uint16ToBool, uint16ToFloat32, uint16ToFloat64, uint16ToInt8, uint16ToInt32,
-  uint16ToUInt8, uint16ToUInt32,
+    uint16ToBool,   uint16ToFloat32,  uint16ToFloat64, uint16ToInt8,   uint16ToInt32,
+    uint16ToUInt8,  uint16ToUInt32,
 
-  uint32ToBool, uint32ToFloat32, uint32ToFloat64, uint32ToInt8, uint32ToInt16,
-  uint32ToUInt8, uint32ToUInt16,
+    uint32ToBool,   uint32ToFloat32,  uint32ToFloat64, uint32ToInt8,   uint32ToInt16,
+    uint32ToUInt8,  uint32ToUInt16,
 
-  stringToString,
+    stringToString,
 
-  objidToAttrRef, attrRefToObjid
+    objidToAttrRef, attrRefToObjid
 
 };
 
@@ -226,16 +239,19 @@ const convFunction conv_Fctn[] = { convIllegal, convCopy, convZero,
  */
 conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
 {
-  if (src == trg) {
+  if (src == trg)
+  {
     if (src == pwr_eType_String || src == pwr_eType_Text)
       return conv_eIdx_stringToString;
     else
       return conv_eIdx_copy;
   }
 
-  switch (src) {
+  switch (src)
+  {
   case pwr_eType_Boolean:
-    switch (trg) {
+    switch (trg)
+    {
     case pwr_eType_Float32:
       return conv_eIdx_boolToFloat32;
     case pwr_eType_Float64:
@@ -255,7 +271,8 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     }
 
   case pwr_eType_Float32:
-    switch (trg) {
+    switch (trg)
+    {
     case pwr_eType_Boolean:
       return conv_eIdx_float32ToBoolean;
     case pwr_eType_Float64:
@@ -275,7 +292,8 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     }
 
   case pwr_eType_Float64:
-    switch (trg) {
+    switch (trg)
+    {
     case pwr_eType_Boolean:
       return conv_eIdx_float64ToBoolean;
     case pwr_eType_Float64:
@@ -296,7 +314,8 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
 
   case pwr_eType_Int8:
   case pwr_eType_Char:
-    switch (trg) {
+    switch (trg)
+    {
     case pwr_eType_Boolean:
       return conv_eIdx_int8ToBoolean;
     case pwr_eType_Float32:
@@ -321,7 +340,8 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     }
 
   case pwr_eType_Int16:
-    switch (trg) {
+    switch (trg)
+    {
     case pwr_eType_Boolean:
       return conv_eIdx_int16ToBoolean;
     case pwr_eType_Float32:
@@ -344,7 +364,8 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     }
 
   case pwr_eType_Int32:
-    switch (trg) {
+    switch (trg)
+    {
     case pwr_eType_Boolean:
       return conv_eIdx_int32ToBoolean;
     case pwr_eType_Float32:
@@ -369,7 +390,8 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     }
 
   case pwr_eType_UInt8:
-    switch (trg) {
+    switch (trg)
+    {
     case pwr_eType_Boolean:
       return conv_eIdx_uint8ToBoolean;
     case pwr_eType_Float32:
@@ -392,7 +414,8 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     }
 
   case pwr_eType_UInt16:
-    switch (trg) {
+    switch (trg)
+    {
     case pwr_eType_Boolean:
       return conv_eIdx_uint16ToBoolean;
     case pwr_eType_Float32:
@@ -415,7 +438,8 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     }
 
   case pwr_eType_UInt32:
-    switch (trg) {
+    switch (trg)
+    {
     case pwr_eType_Boolean:
       return conv_eIdx_uint32ToBoolean;
     case pwr_eType_Float32:
@@ -441,7 +465,8 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
 
   case pwr_eType_Enum:
   case pwr_eType_Mask:
-    switch (trg) {
+    switch (trg)
+    {
     case pwr_eType_Int32:
     case pwr_eType_UInt32:
     case pwr_eType_Enum:
@@ -452,7 +477,8 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     }
 
   case pwr_eType_Objid:
-    switch (trg) {
+    switch (trg)
+    {
     case pwr_eType_AttrRef:
       return conv_eIdx_objidToAttrRef;
     default:
@@ -460,7 +486,8 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
     }
 
   case pwr_eType_AttrRef:
-    switch (trg) {
+    switch (trg)
+    {
     case pwr_eType_Objid:
       return conv_eIdx_attrRefToObjid;
     default:
@@ -474,10 +501,7 @@ conv_eIdx conv_GetIdx(pwr_eType src, pwr_eType trg)
   return conv_eIdx_invalid;
 }
 
-static pwr_tBoolean convIllegal(CONV_ARGS)
-{
-  return FALSE;
-}
+static pwr_tBoolean convIllegal(CONV_ARGS) { return FALSE; }
 
 static pwr_tBoolean convCopy(CONV_ARGS)
 {
@@ -489,7 +513,8 @@ static pwr_tBoolean convCopy(CONV_ARGS)
   tp += size;
   *tsize -= size;
 
-  if (tatot > satot) {
+  if (tatot > satot)
+  {
     size = MIN(tatot - satot, *tsize);
     memset(tp, 0, size);
     tp += size;
@@ -886,12 +911,15 @@ static pwr_tBoolean uint32ToUInt16(CONV_ARGS)
 
 static pwr_tBoolean stringToString(CONV_ARGS)
 {
-  for (; tcount > 0 && *tsize >= tasize; tcount--, scount--) {
-    if (scount > 0) {
+  for (; tcount > 0 && *tsize >= tasize; tcount--, scount--)
+  {
+    if (scount > 0)
+    {
       memcpy(tp, sp, MIN(tasize, sasize));
       *(tp + tasize - 1) = 0;
       sp += sasize;
-    } else
+    }
+    else
       *tp = 0;
 
     tp += tasize;
@@ -902,13 +930,16 @@ static pwr_tBoolean stringToString(CONV_ARGS)
 
 static pwr_tBoolean objidToAttrRef(CONV_ARGS)
 {
-  for (; tcount > 0 && *tsize >= sizeof(pwr_tObjid); tcount--, scount--) {
-    if (scount > 0 && !sadef.b.privatepointer) {
+  for (; tcount > 0 && *tsize >= sizeof(pwr_tObjid); tcount--, scount--)
+  {
+    if (scount > 0 && !sadef.b.privatepointer)
+    {
       memset(tp, 0, sizeof(pwr_sAttrRef));
       ((pwr_sAttrRef*)tp)->Objid = *(pwr_tObjid*)sp;
       ((pwr_sAttrRef*)tp)->Flags.b.Object = 1;
       sp += sizeof(pwr_tObjid);
-    } else
+    }
+    else
       memset(tp, 0, sizeof(pwr_sAttrRef));
 
     tp += sizeof(pwr_sAttrRef);
@@ -919,14 +950,19 @@ static pwr_tBoolean objidToAttrRef(CONV_ARGS)
 
 static pwr_tBoolean attrRefToObjid(CONV_ARGS)
 {
-  for (; tcount > 0 && *tsize >= sizeof(pwr_sAttrRef); tcount--, scount--) {
-    if (scount > 0 && !sadef.b.privatepointer) {
-      if (((pwr_sAttrRef*)sp)->Flags.b.Object) {
+  for (; tcount > 0 && *tsize >= sizeof(pwr_sAttrRef); tcount--, scount--)
+  {
+    if (scount > 0 && !sadef.b.privatepointer)
+    {
+      if (((pwr_sAttrRef*)sp)->Flags.b.Object)
+      {
         *(pwr_tObjid*)tp = ((pwr_sAttrRef*)sp)->Objid;
         sp += sizeof(pwr_sAttrRef);
-      } else
+      }
+      else
         *(pwr_tObjid*)tp = pwr_cNObjid;
-    } else
+    }
+    else
       *(pwr_tObjid*)tp = pwr_cNObjid;
 
     tp += sizeof(pwr_tObjid);

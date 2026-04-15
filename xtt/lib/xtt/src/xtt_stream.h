@@ -42,7 +42,8 @@
 class CoWow;
 class CoWowTimer;
 
-typedef enum {
+typedef enum
+{
   strm_mOptions_FullScreen = 1,
   strm_mOptions_Maximize = 2,
   strm_mOptions_FullMaximize = 4,
@@ -54,7 +55,8 @@ typedef enum {
   strm_mOptions_CgiParameterAuthentication = 256,
 } strm_mOptions;
 
-class XttCameraControl {
+class XttCameraControl
+{
 public:
   pwr_tURL url;
   XttCameraControl(char* x_url);
@@ -66,14 +68,14 @@ public:
   virtual void tilt_relative(double value);
   virtual void tilt_absolute(double value);
   virtual void pan_tilt_zoom_absolute(double pan, double tilt, double zoom);
-  virtual void center(
-      int x, int y, int width, int height, int stream_width, int stream_height);
-  virtual void area_zoom(int x, int y, int width, int height, int window_width,
-      int window_height, int stream_width, int stream_height);
+  virtual void center(int x, int y, int width, int height, int stream_width, int stream_height);
+  virtual void area_zoom(int x, int y, int width, int height, int window_width, int window_height,
+                         int stream_width, int stream_height);
   virtual int get_position(double* pan, double* tilt, double* zoom);
 };
 
-class XttCameraControlVapix : public XttCameraControl {
+class XttCameraControlVapix : public XttCameraControl
+{
 public:
   char outstr[20];
   char authstr[100];
@@ -87,14 +89,14 @@ public:
   void tilt_relative(double value);
   void tilt_absolute(double value);
   void pan_tilt_zoom_absolute(double pan, double tilt, double zoom);
-  void center(
-      int x, int y, int width, int height, int stream_width, int stream_height);
-  void area_zoom(int x, int y, int width, int height, int window_width,
-      int window_height, int stream_width, int stream_height);
+  void center(int x, int y, int width, int height, int stream_width, int stream_height);
+  void area_zoom(int x, int y, int width, int height, int window_width, int window_height, int stream_width,
+                 int stream_height);
   int get_position(double* pan, double* tilt, double* zoom);
 };
 
-class XttStream {
+class XttStream
+{
 public:
   void* parent_ctx;
   unsigned int options;
@@ -120,9 +122,8 @@ public:
   float connection_timeout;
   float reconnect_time;
 
-  XttStream(void* st_parent_ctx, const char* name, const char* st_uri,
-      int st_width, int st_height, int x, int y, double st_scan_time,
-      unsigned int st_options, int st_embedded, pwr_tAttrRef* st_arp);
+  XttStream(void* st_parent_ctx, const char* name, const char* st_uri, int st_width, int st_height, int x,
+            int y, double st_scan_time, unsigned int st_options, int st_embedded, pwr_tAttrRef* st_arp);
   virtual ~XttStream();
 
   void position(double pan, double tilt, double zoom);

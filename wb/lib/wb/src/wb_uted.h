@@ -61,7 +61,8 @@
 
 #define UTED_MAX_COMMANDS 40
 
-typedef struct {
+typedef struct
+{
   char qual[30];
   int insert;
   int insert_hier;
@@ -70,7 +71,8 @@ typedef struct {
   int type;
 } uted_sQual;
 
-typedef struct {
+typedef struct
+{
   char command[80];
   int process;
   int view_sensitivity;
@@ -78,7 +80,8 @@ typedef struct {
   uted_sQual qualifier[10];
 } uted_sCommand;
 
-class WUted {
+class WUted
+{
 public:
   void* parent_ctx;
   char name[80];
@@ -94,52 +97,31 @@ public:
   int dummy[20];
   static uted_sCommand commands[UTED_MAX_COMMANDS];
 
-  WUted(void* wu_parent_ctx, const char* wu_name, const char* wu_iconname,
-      ldh_tWBContext wu_ldhwb, ldh_tSesContext wu_ldhses, int wu_editmode,
-      void (*wu_quit_cb)(void*), pwr_tStatus* status);
+  WUted(void* wu_parent_ctx, const char* wu_name, const char* wu_iconname, ldh_tWBContext wu_ldhwb,
+        ldh_tSesContext wu_ldhses, int wu_editmode, void (*wu_quit_cb)(void*), pwr_tStatus* status);
   virtual ~WUted();
 
   int execute(int show);
   void message_error(pwr_tStatus sts);
   void set_editmode(int edit, ldh_tSesContext ldhses);
 
-  virtual void remove_command_window()
-  {
-  }
-  virtual void reset_qual()
-  {
-  }
-  virtual void message(const char* new_label)
-  {
-  }
-  virtual void set_command_window(char* cmd)
-  {
-  }
-  virtual void raise_window()
-  {
-  }
-  virtual void clock_cursor()
-  {
-  }
-  virtual void reset_cursor()
-  {
-  }
-  virtual void configure_quals(const char* label)
-  {
-  }
-  virtual void enable_entries(int enable)
-  {
-  }
+  virtual void remove_command_window() {}
+  virtual void reset_qual() {}
+  virtual void message(const char* new_label) {}
+  virtual void set_command_window(char* cmd) {}
+  virtual void raise_window() {}
+  virtual void clock_cursor() {}
+  virtual void reset_cursor() {}
+  virtual void configure_quals(const char* label) {}
+  virtual void enable_entries(int enable) {}
   virtual void get_value(int idx, char* str, int len) = 0;
   virtual bool get_present(int idx) = 0;
-  virtual void questionbox(char* question_title, char* question_text,
-      void (*yes_procedure)(WUted*), void (*no_procedure)(WUted*),
-      void (*cancel_procedure)(WUted*), pwr_tBoolean cancel)
+  virtual void questionbox(char* question_title, char* question_text, void (*yes_procedure)(WUted*),
+                           void (*no_procedure)(WUted*), void (*cancel_procedure)(WUted*),
+                           pwr_tBoolean cancel)
   {
   }
-  virtual void update_title(int editmode)
-  {
-  }
+  virtual void update_title(int editmode) {}
 
   static void get_message_error(pwr_tStatus sts, char* str);
   static pwr_tStatus get_command_index(const char* label, int* index);

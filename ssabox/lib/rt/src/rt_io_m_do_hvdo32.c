@@ -64,10 +64,12 @@
 
 \*----------------------------------------------------------------------------*/
 
-typedef struct {
+typedef struct
+{
   unsigned int Address[2];
   int Qbus_fp;
-  struct {
+  struct
+  {
     pwr_sClass_Po* sop[16];
     void* Data[16];
     pwr_tBoolean Found;
@@ -76,8 +78,7 @@ typedef struct {
   unsigned int ErrScanCnt;
 } io_sLocal;
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   pwr_sClass_Do_HVDO32* op = (pwr_sClass_Do_HVDO32*)cp->op;
   io_sLocal* local;
@@ -95,14 +96,15 @@ static pwr_tStatus IoCardInit(
   local->Qbus_fp = r_local->Qbus_fp;
 
   /* Init filter for Po signals */
-  for (i = 0; i < words; i++) {
+  for (i = 0; i < words; i++)
+  {
     /* The filter handles one 16-bit word */
-    for (j = 0; j < 16; j++) {
+    for (j = 0; j < 16; j++)
+    {
       if (cp->chanlist[i * 16 + j].SigClass == pwr_cClass_Po)
         local->Filter[i].sop[j] = cp->chanlist[i * 16 + j].sop;
     }
-    io_InitPoFilter(local->Filter[i].sop, &local->Filter[i].Found,
-        local->Filter[i].Data, ctx->ScanTime);
+    io_InitPoFilter(local->Filter[i].sop, &local->Filter[i].Found, local->Filter[i].Data, ctx->ScanTime);
   }
 
   local->ErrReset = 1.0 / ctx->ScanTime + 0.5;
@@ -115,8 +117,7 @@ static pwr_tStatus IoCardInit(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local;
   int i;
@@ -128,7 +129,8 @@ static pwr_tStatus IoCardClose(
   errh_Info("IO closing do card '%s'", cp->Name);
 
   /* Free filter data */
-  for (i = 0; i < words; i++) {
+  for (i = 0; i < words; i++)
+  {
     if (local->Filter[i].Found)
       io_ClosePoFilter(local->Filter[i].Data);
   }
@@ -140,8 +142,7 @@ static pwr_tStatus IoCardClose(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local = (io_sLocal*)cp->Local;
   io_sRackLocal* r_local = (io_sRackLocal*)(rp->Local);
@@ -155,22 +156,28 @@ static pwr_tStatus IoCardWrite(
   pwr_sClass_Do_HVDO32* op = (pwr_sClass_Do_HVDO32*)cp->op;
   int words = op->MaxNoOfChannels <= 16 ? 1 : 2;
 
-  for (i = 0; i < words; i++) {
+  for (i = 0; i < words; i++)
+  {
     if (i == 1 && op->MaxNoOfChannels <= 16)
       break;
 
-    if (ctx->Node->EmergBreakTrue && ctx->Node->EmergBreakSelect == FIXOUT) {
+    if (ctx->Node->EmergBreakTrue && ctx->Node->EmergBreakSelect == FIXOUT)
+    {
       if (i == 0)
         data = op->FixedOutValue1;
       else
         data = op->FixedOutValue2;
-    } else
+    }
+    else
       io_DoPackWord(cp, &data, i);
 
-    if (i == 0) {
+    if (i == 0)
+    {
       testmask = op->TestMask1;
       invmask = op->InvMask1;
-    } else {
+    }
+    else
+    {
       testmask = op->TestMask2;
       invmask = op->InvMask2;
       if (op->MaxNoOfChannels == 16)
@@ -185,7 +192,8 @@ static pwr_tStatus IoCardWrite(
       io_PoFilter(local->Filter[i].sop, &data, local->Filter[i].Data);
 
     /* Testvalues */
-    if (testmask) {
+    if (testmask)
+    {
       if (i == 0)
         testvalue = op->TestValue1;
       else
@@ -193,29 +201,34 @@ static pwr_tStatus IoCardWrite(
       data = (data & ~testmask) | (testmask & testvalue);
     }
 
-    if (r_local->Qbus_fp != 0 && r_local->s == 0) {
+    if (r_local->Qbus_fp != 0 && r_local->s == 0)
+    {
       /* Write to local Q-bus */
       wb.Data = data;
       wb.Address = local->Address[i];
       sts = write(local->Qbus_fp, &wb, sizeof(wb));
-    } else {
+    }
+    else
+    {
       /* Ethernet I/O, Request a write to current address */
       bfbeth_set_write_req(r_local, (pwr_tUInt16)local->Address[i], data);
       sts = 1;
     }
 
-    if (sts <= 0) {
+    if (sts <= 0)
+    {
       /* Increase error count and check error limits */
       op->ErrorCount++;
 
-      if (op->ErrorCount == op->ErrorSoftLimit) {
+      if (op->ErrorCount == op->ErrorSoftLimit)
+      {
         errh_Error("IO Error soft limit reached on card '%s'", cp->Name);
         ctx->IOHandler->CardErrorSoftLimit = 1;
         ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
       }
-      if (op->ErrorCount >= op->ErrorHardLimit) {
-        errh_Error(
-            "IO Error hard limit reached on card '%s', IO stopped", cp->Name);
+      if (op->ErrorCount >= op->ErrorHardLimit)
+      {
+        errh_Error("IO Error hard limit reached on card '%s', IO stopped", cp->Name);
         ctx->Node->EmergBreakTrue = 1;
         ctx->IOHandler->CardErrorHardLimit = 1;
         ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
@@ -227,7 +240,8 @@ static pwr_tStatus IoCardWrite(
 
   /* Fix for qbus errors */
   local->ErrScanCnt++;
-  if (local->ErrScanCnt >= local->ErrReset) {
+  if (local->ErrScanCnt >= local->ErrReset)
+  {
     local->ErrScanCnt = 0;
     if (op->ErrorCount > op->ErrorSoftLimit)
       op->ErrorCount--;
@@ -240,6 +254,5 @@ static pwr_tStatus IoCardWrite(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Do_HVDO32)
-    = { pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
-        pwr_BindIoMethod(IoCardWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Do_HVDO32) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                            pwr_BindIoMethod(IoCardWrite), pwr_NullMethod};

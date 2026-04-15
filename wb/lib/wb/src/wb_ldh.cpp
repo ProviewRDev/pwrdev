@@ -68,8 +68,7 @@ pwr_dImport pwr_BindClasses(Base);
 /*
   Open a db volume.
 */
-pwr_tStatus ldh_AttachVolume(
-    ldh_tWorkbench workbench, pwr_tVid vid, ldh_tVolume* volume)
+pwr_tStatus ldh_AttachVolume(ldh_tWorkbench workbench, pwr_tVid vid, ldh_tVolume* volume)
 {
   wb_env* wb = (wb_env*)workbench;
 
@@ -86,10 +85,7 @@ pwr_tStatus ldh_AttachVolume(
 /*
   Delete a db volume
 */
-pwr_tStatus ldh_DeleteVolume(ldh_tWorkbench workbench, pwr_tVid vid)
-{
-  return LDH__SUCCESS;
-}
+pwr_tStatus ldh_DeleteVolume(ldh_tWorkbench workbench, pwr_tVid vid) { return LDH__SUCCESS; }
 
 pwr_tStatus ldh_DetachVolume(ldh_tWorkbench workbench, ldh_tVolume volume)
 {
@@ -123,8 +119,7 @@ pwr_tStatus ldh_GetBufferList(ldh_tWorkbench workbench, pwr_tVid* vid)
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetNextVolume(
-    ldh_tWorkbench workbench, pwr_tVid vid, pwr_tVid* new_vid)
+pwr_tStatus ldh_GetNextVolume(ldh_tWorkbench workbench, pwr_tVid vid, pwr_tVid* new_vid)
 {
   wb_env* wb = (wb_env*)workbench;
   wb_volume v = wb->volume(vid);
@@ -139,8 +134,7 @@ pwr_tStatus ldh_GetNextVolume(
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetPreviousVolume(
-    ldh_tWorkbench workbench, pwr_tVid vid, pwr_tVid* new_vid)
+pwr_tStatus ldh_GetPreviousVolume(ldh_tWorkbench workbench, pwr_tVid vid, pwr_tVid* new_vid)
 {
   wb_env* wb = (wb_env*)workbench;
   wb_volume v = wb->volume(vid);
@@ -155,14 +149,9 @@ pwr_tStatus ldh_GetPreviousVolume(
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_LoadVolume(
-    ldh_tWorkbench workbench, char* name, ldh_tVolume* volume)
-{
-  return LDH__SUCCESS;
-}
+pwr_tStatus ldh_LoadVolume(ldh_tWorkbench workbench, char* name, ldh_tVolume* volume) { return LDH__SUCCESS; }
 
-pwr_tStatus ldh_CreatVolumeSnapshot(
-    ldh_tWorkbench workbench, char* name, ldh_tVolume* volume)
+pwr_tStatus ldh_CreatVolumeSnapshot(ldh_tWorkbench workbench, char* name, ldh_tVolume* volume)
 {
   // wb_env *wb = (wb_env *)workbench;
 
@@ -175,8 +164,7 @@ pwr_tStatus ldh_CreatVolumeSnapshot(
 /*  Convert a volume name to its corresponding
     volume identity.  */
 
-pwr_tStatus ldh_VolumeNameToId(
-    ldh_tWorkbench workbench, char* name, pwr_tVid* vid)
+pwr_tStatus ldh_VolumeNameToId(ldh_tWorkbench workbench, char* name, pwr_tVid* vid)
 {
   wb_env* wb = (wb_env*)workbench;
   wb_volume v = wb->volume(name);
@@ -188,8 +176,7 @@ pwr_tStatus ldh_VolumeNameToId(
   return v.sts();
 }
 
-pwr_tStatus ldh_GetVolumeClass(
-    ldh_tWorkbench workbench, pwr_tVid vid, pwr_tCid* cid)
+pwr_tStatus ldh_GetVolumeClass(ldh_tWorkbench workbench, pwr_tVid vid, pwr_tCid* cid)
 {
   wb_env* wb = (wb_env*)workbench;
   wb_volume v = wb->volume(vid);
@@ -202,8 +189,7 @@ pwr_tStatus ldh_GetVolumeClass(
 }
 
 /* Open a load file volume */
-pwr_tStatus ldh_OpenVolume(
-    ldh_tWorkbench workbench, ldh_tSession* session, pwr_tVid vid)
+pwr_tStatus ldh_OpenVolume(ldh_tWorkbench workbench, ldh_tSession* session, pwr_tVid vid)
 {
   wb_env* wb = (wb_env*)workbench;
   wb_volume v = wb->snapshot(vid);
@@ -240,7 +226,8 @@ pwr_tStatus ldh_ChangeObjectName(ldh_tSession session, pwr_tOid oid, char* name)
 {
   wb_session* sp = (wb_session*)session;
 
-  try {
+  try
+  {
     wb_name n(name);
     if (!n)
       return n.sts();
@@ -253,7 +240,9 @@ pwr_tStatus ldh_ChangeObjectName(ldh_tSession session, pwr_tOid oid, char* name)
 
     sp->renameObject(o, n);
     return sp->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
@@ -269,8 +258,7 @@ pwr_tStatus ldh_CheckAttrXRef(ldh_tSession session, pwr_sAttrRef* aref)
 /* Check an object cross reference.
    The reference is identified by object id and name of
    cross reference attribute.  */
-pwr_tStatus ldh_CheckObjXRef(
-    ldh_tSession session, pwr_tObjid oid, pwr_tObjName aname)
+pwr_tStatus ldh_CheckObjXRef(ldh_tSession session, pwr_tObjid oid, pwr_tObjName aname)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -278,14 +266,13 @@ pwr_tStatus ldh_CheckObjXRef(
   return o.checkXref(aname);
 }
 
-pwr_tStatus ldh_CheckObjXRefs(ldh_tSession session, pwr_tOid p,
-    pwr_tObjName paname, pwr_tOid s, pwr_tObjName saname)
+pwr_tStatus ldh_CheckObjXRefs(ldh_tSession session, pwr_tOid p, pwr_tObjName paname, pwr_tOid s,
+                              pwr_tObjName saname)
 {
   return LDH__NYI;
 }
 
-pwr_tStatus ldh_ClassNameToId(
-    ldh_tSession session, pwr_tCid* cid, const char* name)
+pwr_tStatus ldh_ClassNameToId(ldh_tSession session, pwr_tCid* cid, const char* name)
 {
   wb_session* sp = (wb_session*)session;
   wb_name n(name);
@@ -302,7 +289,8 @@ pwr_tStatus ldh_ClassNameToId(
 
 pwr_tStatus ldh_CloseSession(ldh_tSession session)
 {
-  try {
+  try
+  {
     wb_session* sp = (wb_session*)session;
 
     // sp->close();
@@ -310,7 +298,9 @@ pwr_tStatus ldh_CloseSession(ldh_tSession session)
     delete sp;
 
     return LDH__SUCCESS;
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
   return LDH__SUCCESS;
@@ -318,24 +308,28 @@ pwr_tStatus ldh_CloseSession(ldh_tSession session)
 
 pwr_tStatus ldh_CloseWB(ldh_tWorkbench workbench)
 {
-  try {
+  try
+  {
     wb_env* env = (wb_env*)workbench;
 
     delete env;
     ;
 
     return LDH__SUCCESS;
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
 
-pwr_tStatus ldh_CopyObject(ldh_tSession session, pwr_tObjid* oid, char* name,
-    pwr_tObjid srcoid, pwr_tObjid dstoid, ldh_eDest dest)
+pwr_tStatus ldh_CopyObject(ldh_tSession session, pwr_tObjid* oid, char* name, pwr_tObjid srcoid,
+                           pwr_tObjid dstoid, ldh_eDest dest)
 {
   wb_session* sp = (wb_session*)session;
 
-  try {
+  try
+  {
     wb_object s_o = sp->object(srcoid);
     if (!s_o)
       return s_o.sts();
@@ -350,24 +344,28 @@ pwr_tStatus ldh_CopyObject(ldh_tSession session, pwr_tObjid* oid, char* name,
 
     *oid = o.oid();
     return o.sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
 
-pwr_tStatus ldh_CreateObject(ldh_tSession session, pwr_tOid* oid,
-    const char* name, pwr_tCid cid, pwr_tOid doid, ldh_eDest dest)
+pwr_tStatus ldh_CreateObject(ldh_tSession session, pwr_tOid* oid, const char* name, pwr_tCid cid,
+                             pwr_tOid doid, ldh_eDest dest)
 {
   wb_session* sp = (wb_session*)session;
 
-  try {
+  try
+  {
     wb_name n(name);
     if (name && !n)
       return n.sts();
 
     wb_cdef cdef = sp->cdef(cid);
 
-    if (cdh_ObjidIsNull(doid)) {
+    if (cdh_ObjidIsNull(doid))
+    {
       doid.vid = sp->vid();
       dest = ldh_eDest_IntoLast;
     }
@@ -380,13 +378,15 @@ pwr_tStatus ldh_CreateObject(ldh_tSession session, pwr_tOid* oid,
 
     *oid = o.oid();
     return o.sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
 
-pwr_tStatus ldh_CreateVolume(ldh_tWorkbench workbench, ldh_tSession* session,
-    pwr_tVid vid, char* name, pwr_tCid cid, ldh_eVolRep volrep, char* server)
+pwr_tStatus ldh_CreateVolume(ldh_tWorkbench workbench, ldh_tSession* session, pwr_tVid vid, char* name,
+                             pwr_tCid cid, ldh_eVolRep volrep, char* server)
 {
   wb_env* ep = (wb_env*)workbench;
 
@@ -413,16 +413,18 @@ pwr_tStatus ldh_DeleteObject(ldh_tSession session, pwr_tOid oid)
   if (!o)
     return o.sts();
 
-  try {
+  try
+  {
     sp->deleteObject(o);
     return sp->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
 
-pwr_tStatus ldh_DeleteObjectTree(
-    ldh_tSession session, pwr_tOid oid, int storeix)
+pwr_tStatus ldh_DeleteObjectTree(ldh_tSession session, pwr_tOid oid, int storeix)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -430,15 +432,18 @@ pwr_tStatus ldh_DeleteObjectTree(
   if (!o)
     return o.sts();
 
-  try {
+  try
+  {
     return sp->deleteFamily(o, storeix != 0);
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
 
-pwr_tStatus ldh_GetAttrDef(ldh_tSession session, pwr_tCid cid,
-    const char* bname, const char* aname, ldh_sParDef* adef)
+pwr_tStatus ldh_GetAttrDef(ldh_tSession session, pwr_tCid cid, const char* bname, const char* aname,
+                           ldh_sParDef* adef)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -453,8 +458,7 @@ pwr_tStatus ldh_GetAttrDef(ldh_tSession session, pwr_tCid cid,
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetAttrRef(
-    ldh_tSession session, pwr_tOid oid, char* aname, pwr_sAttrRef* aref)
+pwr_tStatus ldh_GetAttrRef(ldh_tSession session, pwr_tOid oid, char* aname, pwr_sAttrRef* aref)
 {
   wb_session* sp = (wb_session*)session;
   wb_object o = sp->object(oid);
@@ -468,8 +472,7 @@ pwr_tStatus ldh_GetAttrRef(
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetAttrXRefDef(
-    ldh_tSession session, pwr_sAttrRef* aref, pwr_sAttrXRef* xref)
+pwr_tStatus ldh_GetAttrXRefDef(ldh_tSession session, pwr_sAttrRef* aref, pwr_sAttrXRef* xref)
 {
   wb_session* sp = (wb_session*)session;
   wb_attribute a = sp->attribute(aref);
@@ -506,7 +509,8 @@ pwr_tStatus ldh_GetChildMnt(ldh_tSession session, pwr_tOid oid, pwr_tOid* coid)
   if (!o)
     return o.sts();
 
-  if (o.cid() == pwr_eClass_MountObject) {
+  if (o.cid() == pwr_eClass_MountObject)
+  {
     wb_attribute a(o.sts(), o, "SysBody", "Object");
     if (!a)
       return a.sts();
@@ -517,7 +521,8 @@ pwr_tStatus ldh_GetChildMnt(ldh_tSession session, pwr_tOid oid, pwr_tOid* coid)
     wb_object mo = sp->object(moid);
     if (mo)
       mo = mo.first();
-    if (mo) {
+    if (mo)
+    {
       *coid = mo.oid();
       return mo.sts();
     }
@@ -530,8 +535,8 @@ pwr_tStatus ldh_GetChildMnt(ldh_tSession session, pwr_tOid oid, pwr_tOid* coid)
   return o.sts();
 }
 
-pwr_tStatus ldh_GetClassBody(ldh_tSession session, pwr_tCid cid,
-    const char* bname, pwr_tCid* bcid, char** body, int* size)
+pwr_tStatus ldh_GetClassBody(ldh_tSession session, pwr_tCid cid, const char* bname, pwr_tCid* bcid,
+                             char** body, int* size)
 {
   wb_session* sp = (wb_session*)session;
   wb_cdef c = sp->cdef(cid);
@@ -564,8 +569,7 @@ pwr_tStatus ldh_GetClassList(ldh_tSession session, pwr_tCid cid, pwr_tOid* oid)
   return o.sts();
 }
 
-pwr_tStatus ldh_GetTemplateObject(
-    ldh_tSession session, pwr_tCid cid, pwr_tOid* oid)
+pwr_tStatus ldh_GetTemplateObject(ldh_tSession session, pwr_tCid cid, pwr_tOid* oid)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -579,8 +583,7 @@ pwr_tStatus ldh_GetTemplateObject(
 
 /* Returns the objid of the next object of the same class.  */
 
-pwr_tStatus ldh_GetNextObject(
-    ldh_tSession session, pwr_tOid oid, pwr_tOid* new_oid)
+pwr_tStatus ldh_GetNextObject(ldh_tSession session, pwr_tOid oid, pwr_tOid* new_oid)
 {
   wb_session* sp = (wb_session*)session;
   wb_object o = sp->object(oid);
@@ -596,8 +599,7 @@ pwr_tStatus ldh_GetNextObject(
   return o.sts();
 }
 
-pwr_tStatus ldh_GetClassListAttrRef(
-    ldh_tSession session, pwr_tCid cid, pwr_sAttrRef* arp)
+pwr_tStatus ldh_GetClassListAttrRef(ldh_tSession session, pwr_tCid cid, pwr_sAttrRef* arp)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -607,8 +609,7 @@ pwr_tStatus ldh_GetClassListAttrRef(
 
 /* Returns the attrref of the next object of the same class.  */
 
-pwr_tStatus ldh_GetNextAttrRef(ldh_tSession session, pwr_tCid cid,
-    pwr_sAttrRef* arp, pwr_sAttrRef* new_arp)
+pwr_tStatus ldh_GetNextAttrRef(ldh_tSession session, pwr_tCid cid, pwr_sAttrRef* arp, pwr_sAttrRef* new_arp)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -618,8 +619,8 @@ pwr_tStatus ldh_GetNextAttrRef(ldh_tSession session, pwr_tCid cid,
 
 /* Returns the attrref of the next object of the same class.  */
 
-pwr_tStatus ldh_GetNextTemplateAttrRef(ldh_tSession session, pwr_tCid cid,
-    pwr_sAttrRef* arp, pwr_sAttrRef* new_arp)
+pwr_tStatus ldh_GetNextTemplateAttrRef(ldh_tSession session, pwr_tCid cid, pwr_sAttrRef* arp,
+                                       pwr_sAttrRef* new_arp)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -630,8 +631,7 @@ pwr_tStatus ldh_GetNextTemplateAttrRef(ldh_tSession session, pwr_tCid cid,
 /* Returns the first attribute object of the specified class in
    the specified object. */
 
-pwr_tStatus ldh_GetObjectClassList(
-    ldh_tSession session, pwr_tCid cid, pwr_tOid oid, pwr_sAttrRef* arp)
+pwr_tStatus ldh_GetObjectClassList(ldh_tSession session, pwr_tCid cid, pwr_tOid oid, pwr_sAttrRef* arp)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -646,8 +646,8 @@ pwr_tStatus ldh_GetObjectClassList(
 /* Returns the attrref of the next attribute object of the same class in
    the current object.  */
 
-pwr_tStatus ldh_GetNextObjectAttrRef(ldh_tSession session, pwr_tCid cid,
-    pwr_sAttrRef* arp, pwr_sAttrRef* new_arp)
+pwr_tStatus ldh_GetNextObjectAttrRef(ldh_tSession session, pwr_tCid cid, pwr_sAttrRef* arp,
+                                     pwr_sAttrRef* new_arp)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -662,8 +662,7 @@ pwr_tStatus ldh_GetMenu(ldh_tSession session, ldh_sMenuCall* ip)
   return sp->getMenu(ip);
 }
 
-pwr_tStatus ldh_GetNextSibling(
-    ldh_tSession session, pwr_tOid oid, pwr_tOid* noid)
+pwr_tStatus ldh_GetNextSibling(ldh_tSession session, pwr_tOid oid, pwr_tOid* noid)
 {
   wb_session* sp = (wb_session*)session;
   wb_object o = sp->object(oid);
@@ -683,8 +682,7 @@ pwr_tStatus ldh_GetNextSibling(
    in the body parameter. It is the responsibility of the caller to free
    this space when no longer needed. Use free().  */
 
-pwr_tStatus ldh_GetObjectBody(ldh_tSession session, pwr_tOid oid,
-    const char* bname, void** buff, int* size)
+pwr_tStatus ldh_GetObjectBody(ldh_tSession session, pwr_tOid oid, const char* bname, void** buff, int* size)
 {
   wb_session* sp = (wb_session*)session;
   wb_attribute a = sp->attribute(oid, bname);
@@ -701,8 +699,8 @@ pwr_tStatus ldh_GetObjectBody(ldh_tSession session, pwr_tOid oid,
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetObjectBodyDef(ldh_tSession session, pwr_tCid cid,
-    const char* bname, int maxlev, ldh_sParDef** bdef, int* rows)
+pwr_tStatus ldh_GetObjectBodyDef(ldh_tSession session, pwr_tCid cid, const char* bname, int maxlev,
+                                 ldh_sParDef** bdef, int* rows)
 {
   wb_session* sp = (wb_session*)session;
   wb_cdef c = sp->cdef(cid);
@@ -715,10 +713,12 @@ pwr_tStatus ldh_GetObjectBodyDef(ldh_tSession session, pwr_tCid cid,
   wb_adef asuper[20];
   int scnt = 0;
   asuper[scnt++] = b.adef();
-  if (asuper[scnt - 1] && asuper[scnt - 1].isSuperClass()) {
+  if (asuper[scnt - 1] && asuper[scnt - 1].isSuperClass())
+  {
     // Count rows
     *rows = 0;
-    while (asuper[scnt - 1] && asuper[scnt - 1].isSuperClass()) {
+    while (asuper[scnt - 1] && asuper[scnt - 1].isSuperClass())
+    {
       wb_cdef subc = sp->cdef(asuper[scnt - 1].subClass());
       wb_bdef subb = subc.bdef(pwr_eBix_rt);
       *rows += subb.nAttribute() - 1;
@@ -729,8 +729,10 @@ pwr_tStatus ldh_GetObjectBodyDef(ldh_tSession session, pwr_tCid cid,
     *bdef = (ldh_sParDef*)calloc(1, sizeof(ldh_sParDef) * *rows);
 
     int j = 0;
-    for (int i = scnt - 1; i >= 0; i--) {
-      for (wb_adef a = asuper[i]; a; a = a.next()) {
+    for (int i = scnt - 1; i >= 0; i--)
+    {
+      for (wb_adef a = asuper[i]; a; a = a.next())
+      {
         if (a && a.isSuperClass())
           continue;
 
@@ -748,31 +750,37 @@ pwr_tStatus ldh_GetObjectBodyDef(ldh_tSession session, pwr_tCid cid,
         break;
     }
     // Detect shadowed attributes
-    for (j = 0; j < *rows - 1; j++) {
+    for (j = 0; j < *rows - 1; j++)
+    {
       char* s1 = strrchr((*bdef)[j].ParName, '.');
       if (!s1)
         s1 = (*bdef)[j].ParName;
       else
         s1++;
-      for (int i = j + 1; i < *rows; i++) {
+      for (int i = j + 1; i < *rows; i++)
+      {
         char* s2 = strrchr((*bdef)[i].ParName, '.');
         if (!s2)
           s2 = (*bdef)[i].ParName;
         else
           s2++;
-        if (str_NoCaseStrcmp(s1, s2) == 0) {
+        if (str_NoCaseStrcmp(s1, s2) == 0)
+        {
           (*bdef)[j].Flags |= ldh_mParDef_Shadowed;
           break;
         }
       }
     }
-  } else {
+  }
+  else
+  {
     *rows = b.nAttribute();
     *bdef = (ldh_sParDef*)calloc(1, sizeof(ldh_sParDef) * *rows);
     if (*bdef == NULL)
       return LDH__INSVIRMEM;
 
-    for (wb_adef a = b.adef(); a; a = a.next()) {
+    for (wb_adef a = b.adef(); a; a = a.next())
+    {
       strcpy((*bdef)[a.index()].ParName, a.name());
       (*bdef)[a.index()].ParLevel = 1;
       (*bdef)[a.index()].ParClass = (pwr_eClass)a.cid();
@@ -782,8 +790,8 @@ pwr_tStatus ldh_GetObjectBodyDef(ldh_tSession session, pwr_tCid cid,
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetTrueObjectBodyDef(ldh_tSession session, pwr_tCid cid,
-    char* bname, int maxlev, ldh_sParDef** bdef, int* rows)
+pwr_tStatus ldh_GetTrueObjectBodyDef(ldh_tSession session, pwr_tCid cid, char* bname, int maxlev,
+                                     ldh_sParDef** bdef, int* rows)
 {
   wb_session* sp = (wb_session*)session;
   wb_cdef c = sp->cdef(cid);
@@ -798,7 +806,8 @@ pwr_tStatus ldh_GetTrueObjectBodyDef(ldh_tSession session, pwr_tCid cid,
   if (*bdef == NULL)
     return LDH__INSVIRMEM;
 
-  for (wb_adef a = b.adef(); a; a = a.next()) {
+  for (wb_adef a = b.adef(); a; a = a.next())
+  {
     strcpy((*bdef)[a.index()].ParName, a.name());
     (*bdef)[a.index()].ParLevel = 1;
     (*bdef)[a.index()].ParClass = (pwr_eClass)a.cid();
@@ -807,9 +816,8 @@ pwr_tStatus ldh_GetTrueObjectBodyDef(ldh_tSession session, pwr_tCid cid,
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetObjectBuffer(ldh_tSession session, pwr_tOid oid,
-    const char* bname, const char* aname, pwr_eClass* bufferclass, char** value,
-    int* size)
+pwr_tStatus ldh_GetObjectBuffer(ldh_tSession session, pwr_tOid oid, const char* bname, const char* aname,
+                                pwr_eClass* bufferclass, char** value, int* size)
 {
   wb_session* sp = (wb_session*)session;
   wb_attribute a = sp->attribute(oid, bname, aname);
@@ -824,8 +832,7 @@ pwr_tStatus ldh_GetObjectBuffer(ldh_tSession session, pwr_tOid oid,
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetObjectClass(
-    ldh_tSession session, pwr_tOid oid, pwr_tCid* cid)
+pwr_tStatus ldh_GetObjectClass(ldh_tSession session, pwr_tOid oid, pwr_tCid* cid)
 {
   wb_session* sp = (wb_session*)session;
   wb_object o = sp->object(oid);
@@ -837,12 +844,12 @@ pwr_tStatus ldh_GetObjectClass(
   return o.sts();
 }
 
-pwr_tStatus ldh_GetAttrRefTid(
-    ldh_tSession session, pwr_sAttrRef* arp, pwr_tTid* tid)
+pwr_tStatus ldh_GetAttrRefTid(ldh_tSession session, pwr_sAttrRef* arp, pwr_tTid* tid)
 {
   wb_session* sp = (wb_session*)session;
 
-  if (arp->Flags.b.Object) {
+  if (arp->Flags.b.Object)
+  {
     wb_object o = sp->object(arp->Objid);
     if (!o)
       return o.sts();
@@ -859,12 +866,12 @@ pwr_tStatus ldh_GetAttrRefTid(
   return a.sts();
 }
 
-pwr_tStatus ldh_GetAttrRefOrigTid(
-    ldh_tSession session, pwr_sAttrRef* arp, pwr_tTid* tid)
+pwr_tStatus ldh_GetAttrRefOrigTid(ldh_tSession session, pwr_sAttrRef* arp, pwr_tTid* tid)
 {
   wb_session* sp = (wb_session*)session;
 
-  if (arp->Flags.b.Object) {
+  if (arp->Flags.b.Object)
+  {
     wb_object o = sp->object(arp->Objid);
     if (!o)
       return o.sts();
@@ -873,21 +880,23 @@ pwr_tStatus ldh_GetAttrRefOrigTid(
     return o.sts();
   }
 
-  try {
+  try
+  {
     wb_attribute a = sp->attribute(arp);
     if (!a)
       return a.sts();
     *tid = a.originalTid();
 
     return a.sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetAttrRefType(
-    ldh_tSession session, pwr_sAttrRef* arp, pwr_eType* type)
+pwr_tStatus ldh_GetAttrRefType(ldh_tSession session, pwr_sAttrRef* arp, pwr_eType* type)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -899,8 +908,7 @@ pwr_tStatus ldh_GetAttrRefType(
   return a.sts();
 }
 
-pwr_tStatus ldh_GetObjectContext(
-    ldh_tSession session, pwr_tOid oid, ldh_sObjContext** octx)
+pwr_tStatus ldh_GetObjectContext(ldh_tSession session, pwr_tOid oid, ldh_sObjContext** octx)
 {
   wb_session* sp = (wb_session*)session;
   wb_object o = sp->object(oid);
@@ -911,8 +919,7 @@ pwr_tStatus ldh_GetObjectContext(
 
 /*  Give information about an object.  */
 
-pwr_tStatus ldh_GetObjectInfo(
-    ldh_tSession session, pwr_tOid oid, ldh_sObjInfo* ip)
+pwr_tStatus ldh_GetObjectInfo(ldh_tSession session, pwr_tOid oid, ldh_sObjInfo* ip)
 {
   wb_session* sp = (wb_session*)session;
   wb_object o = sp->object(oid);
@@ -924,8 +931,8 @@ pwr_tStatus ldh_GetObjectInfo(
   return o.sts();
 }
 
-pwr_tStatus ldh_GetObjectPar(ldh_tSession session, pwr_tOid oid,
-    const char* bname, const char* aname, char** buff, int* size)
+pwr_tStatus ldh_GetObjectPar(ldh_tSession session, pwr_tOid oid, const char* bname, const char* aname,
+                             char** buff, int* size)
 {
   wb_session* sp = (wb_session*)session;
   wb_attribute a = sp->attribute(oid, bname, aname);
@@ -942,12 +949,13 @@ pwr_tStatus ldh_GetObjectPar(ldh_tSession session, pwr_tOid oid,
   return a.sts();
 }
 
-pwr_tStatus ldh_GetAttrObjectPar(ldh_tSession session, pwr_sAttrRef* arp,
-    const char* bname, const char* aname, char** buff, int* size)
+pwr_tStatus ldh_GetAttrObjectPar(ldh_tSession session, pwr_sAttrRef* arp, const char* bname,
+                                 const char* aname, char** buff, int* size)
 {
   wb_session* sp = (wb_session*)session;
 
-  if (arp->Flags.b.Object) {
+  if (arp->Flags.b.Object)
+  {
     wb_attribute a = sp->attribute(arp->Objid, bname, aname);
     if (!a)
       return a.sts();
@@ -960,7 +968,9 @@ pwr_tStatus ldh_GetAttrObjectPar(ldh_tSession session, pwr_sAttrRef* arp,
       *size = a.size();
 
     return a.sts();
-  } else if (arp->Flags.b.ObjectAttr) {
+  }
+  else if (arp->Flags.b.ObjectAttr)
+  {
     pwr_tAName name;
 
     wb_attribute aarp = sp->attribute(arp);
@@ -984,7 +994,9 @@ pwr_tStatus ldh_GetAttrObjectPar(ldh_tSession session, pwr_sAttrRef* arp,
       *size = a.size();
 
     return a.sts();
-  } else {
+  }
+  else
+  {
     wb_attribute a = sp->attribute(arp);
     if (!a)
       return a.sts();
@@ -1000,8 +1012,7 @@ pwr_tStatus ldh_GetAttrObjectPar(ldh_tSession session, pwr_sAttrRef* arp,
   }
 }
 
-pwr_tStatus ldh_GetObjXRefDef(
-    ldh_tSession session, pwr_sAttrRef* aref, pwr_sObjXRef* ObjXRef)
+pwr_tStatus ldh_GetObjXRefDef(ldh_tSession session, pwr_sAttrRef* aref, pwr_sObjXRef* ObjXRef)
 {
   wb_session* sp = (wb_session*)session;
   wb_attribute a = sp->attribute(aref);
@@ -1046,10 +1057,10 @@ int ldh_IsAncestor(ldh_tSession session, pwr_tOid ancestor, pwr_tOid oid)
 
 /* Get previous object in the list of objects of one class
    in one volume.  */
-pwr_tStatus ldh_GetPreviousObject(
-    ldh_tSession session, pwr_tOid oid, pwr_tOid* noid)
+pwr_tStatus ldh_GetPreviousObject(ldh_tSession session, pwr_tOid oid, pwr_tOid* noid)
 {
-  try {
+  try
+  {
     wb_session* sp = (wb_session*)session;
 
     wb_object o = sp->object(oid);
@@ -1063,16 +1074,17 @@ pwr_tStatus ldh_GetPreviousObject(
     *noid = o.oid();
 
     return o.sts();
-
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
 
-pwr_tStatus ldh_GetPreviousSibling(
-    ldh_tSession session, pwr_tOid oid, pwr_tOid* noid)
+pwr_tStatus ldh_GetPreviousSibling(ldh_tSession session, pwr_tOid oid, pwr_tOid* noid)
 {
-  try {
+  try
+  {
     wb_session* sp = (wb_session*)session;
 
     wb_object o = sp->object(oid);
@@ -1080,8 +1092,9 @@ pwr_tStatus ldh_GetPreviousSibling(
     *noid = o.oid();
 
     return o.sts();
-
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
@@ -1089,18 +1102,19 @@ pwr_tStatus ldh_GetPreviousSibling(
 /* Get the number of different references from the current
    object to other objects.  */
 
-pwr_tStatus ldh_GetReferenceInfo(
-    ldh_tSession session, pwr_tOid oid, ldh_sRefInfo* rip)
+pwr_tStatus ldh_GetReferenceInfo(ldh_tSession session, pwr_tOid oid, ldh_sRefInfo* rip)
 {
   wb_session* sp = (wb_session*)session;
   wb_object o = sp->object(oid);
   if (!o)
     return o.sts();
 
-  try {
+  try
+  {
     sp->refinfo(o, rip);
-
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
   return LDH__SUCCESS;
@@ -1110,7 +1124,8 @@ pwr_tStatus ldh_GetReferenceInfo(
 
 pwr_tStatus ldh_GetRootList(ldh_tSession session, pwr_tOid* oid)
 {
-  try {
+  try
+  {
     wb_session* sp = (wb_session*)session;
     wb_object o = sp->object();
     if (!o)
@@ -1119,15 +1134,16 @@ pwr_tStatus ldh_GetRootList(ldh_tSession session, pwr_tOid* oid)
     *oid = o.oid();
 
     return o.sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
 
 /* Get first object in root list of volume with volume id 'vid'.  */
 
-pwr_tStatus ldh_GetVolumeRootList(
-    ldh_tSession session, pwr_tVid vid, pwr_tOid* oid)
+pwr_tStatus ldh_GetVolumeRootList(ldh_tSession session, pwr_tVid vid, pwr_tOid* oid)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -1145,8 +1161,7 @@ pwr_tStatus ldh_GetVolumeRootList(
   return o.sts();
 }
 
-extern "C" pwr_tStatus ldh_GetSessionInfo(
-    ldh_tSession session, ldh_sSessInfo* ip)
+extern "C" pwr_tStatus ldh_GetSessionInfo(ldh_tSession session, ldh_sSessInfo* ip)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -1158,8 +1173,7 @@ extern "C" pwr_tStatus ldh_GetSessionInfo(
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetVidInfo(
-    ldh_tWorkbench workbench, pwr_tVid vid, ldh_sVolumeInfo* ip)
+pwr_tStatus ldh_GetVidInfo(ldh_tWorkbench workbench, pwr_tVid vid, ldh_sVolumeInfo* ip)
 {
   wb_env* wb = (wb_env*)workbench;
   wb_volume v = wb->volume(vid);
@@ -1185,8 +1199,7 @@ pwr_tStatus ldh_GetVolumeInfo(ldh_tVolume volume, ldh_sVolumeInfo* ip)
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetUniqueObjectName(
-    ldh_tSession session, pwr_tOid oid, char* name)
+pwr_tStatus ldh_GetUniqueObjectName(ldh_tSession session, pwr_tOid oid, char* name)
 {
   wb_session* sp = (wb_session*)session;
   wb_object o = sp->object(oid);
@@ -1198,8 +1211,7 @@ pwr_tStatus ldh_GetUniqueObjectName(
   return o.sts();
 }
 
-pwr_tStatus ldh_IsOkCreateObject(
-    ldh_tSession session, pwr_tCid cid, pwr_tOid oid, ldh_eDest dest)
+pwr_tStatus ldh_IsOkCreateObject(ldh_tSession session, pwr_tCid cid, pwr_tOid oid, ldh_eDest dest)
 {
   wb_session* sp = (wb_session*)session;
   wb_object o = sp->object(oid);
@@ -1213,8 +1225,7 @@ pwr_tStatus ldh_IsOkCreateObject(
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_IsOkCopyObject(
-    ldh_tSession session, pwr_tOid oid, pwr_tOid doid, ldh_eDest dest)
+pwr_tStatus ldh_IsOkCopyObject(ldh_tSession session, pwr_tOid oid, pwr_tOid doid, ldh_eDest dest)
 {
   wb_session* sp = (wb_session*)session;
   wb_object d_o = sp->object(doid);
@@ -1231,8 +1242,7 @@ pwr_tStatus ldh_IsOkCopyObject(
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_IsOkMoveObject(
-    ldh_tSession session, pwr_tOid oid, pwr_tOid doid, ldh_eDest dest)
+pwr_tStatus ldh_IsOkMoveObject(ldh_tSession session, pwr_tOid oid, pwr_tOid doid, ldh_eDest dest)
 {
   wb_session* sp = (wb_session*)session;
   wb_object d_o = sp->object(doid);
@@ -1249,8 +1259,7 @@ pwr_tStatus ldh_IsOkMoveObject(
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_MoveObject(
-    ldh_tSession session, pwr_tOid oid, pwr_tOid doid, ldh_eDest dest)
+pwr_tStatus ldh_MoveObject(ldh_tSession session, pwr_tOid oid, pwr_tOid doid, ldh_eDest dest)
 {
   wb_session* sp = (wb_session*)session;
   wb_object d_o = sp->object(doid);
@@ -1261,16 +1270,18 @@ pwr_tStatus ldh_MoveObject(
     return o.sts();
   wb_destination d = d_o.destination(dest);
 
-  try {
+  try
+  {
     sp->moveObject(o, d);
     return sp->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
 
-pwr_tStatus ldh_NameToAttrRef(
-    ldh_tSession session, char* name, pwr_sAttrRef* arp)
+pwr_tStatus ldh_NameToAttrRef(ldh_tSession session, char* name, pwr_sAttrRef* arp)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -1283,12 +1294,13 @@ pwr_tStatus ldh_NameToAttrRef(
   return a.sts();
 }
 
-pwr_tStatus ldh_ArefANameToAref(ldh_tSession session, pwr_sAttrRef* arp,
-    const char* aname, pwr_sAttrRef* oarp)
+pwr_tStatus ldh_ArefANameToAref(ldh_tSession session, pwr_sAttrRef* arp, const char* aname,
+                                pwr_sAttrRef* oarp)
 {
   wb_session* sp = (wb_session*)session;
 
-  try {
+  try
+  {
     wb_attribute a = sp->attribute(arp);
     if (!a)
       return a.sts();
@@ -1298,20 +1310,22 @@ pwr_tStatus ldh_ArefANameToAref(ldh_tSession session, pwr_sAttrRef* arp,
     oa.aref(oarp);
 
     return oa.sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
 
 /*  Get the object identifier of a named object.  */
 
-pwr_tStatus ldh_NameToObjid(
-    ldh_tSession session, pwr_tOid* oid, const char* name)
+pwr_tStatus ldh_NameToObjid(ldh_tSession session, pwr_tOid* oid, const char* name)
 {
   wb_session* sp = (wb_session*)session;
   pwr_tStatus sts;
 
-  if (str_StartsWith(name, "_O")) {
+  if (str_StartsWith(name, "_O"))
+  {
     sts = cdh_StringToObjid(name, oid);
     if (ODD(sts))
       return sts;
@@ -1329,36 +1343,43 @@ pwr_tStatus ldh_NameToObjid(
    The caller is responsible for supplying a buffer at
    least as big as maxsize.  */
 
-pwr_tStatus ldh_ObjidToName(ldh_tSession session, pwr_tOid oid, int type,
-    char* buf, int maxsize, int* size)
+pwr_tStatus ldh_ObjidToName(ldh_tSession session, pwr_tOid oid, int type, char* buf, int maxsize, int* size)
 {
   wb_session* sp = (wb_session*)session;
 
-  if (cdh_ObjidIsNull(oid)) {
+  if (cdh_ObjidIsNull(oid))
+  {
     strncpy(buf, cdh_ObjidToString(oid, 1), maxsize);
     *size = strlen(buf);
     return LDH__SUCCESS;
   }
 
-  switch (type) {
-  case ldh_eName_Object: {
+  switch (type)
+  {
+  case ldh_eName_Object:
+  {
     wb_object o = sp->object(oid);
-    if (!o) { /* return o.sts(); */
+    if (!o)
+    { /* return o.sts(); */
       strncpy(buf, cdh_ObjidToString(oid, 1), maxsize);
       *size = strlen(buf);
       return LDH__SUCCESS;
     }
 
-    try {
+    try
+    {
       pwr_tOName name;
       strcpy(name, o.name());
       *size = strlen(name);
-      if (*size > maxsize - 1) {
+      if (*size > maxsize - 1)
+      {
         return LDH__NAMEBUF;
       }
 
       strcpy(buf, name);
-    } catch (wb_error& e) {
+    }
+    catch (wb_error& e)
+    {
       return e.sts();
     }
     break;
@@ -1367,34 +1388,42 @@ pwr_tStatus ldh_ObjidToName(ldh_tSession session, pwr_tOid oid, int type,
   case ldh_eName_ObjectIx:
   case ldh_eName_OixString:
   case ldh_eName_VolumeId:
-  case ldh_eName_VidString: {
+  case ldh_eName_VidString:
+  {
     char str[80];
 
     wb_name n = wb_name(cdh_ObjidToString(oid, 1));
     strcpy(str, n.name(type));
     *size = strlen(str);
-    if (*size > maxsize - 1) {
+    if (*size > maxsize - 1)
+    {
       return LDH__NAMEBUF;
     }
     strcpy(buf, str);
     break;
   }
-  default: {
+  default:
+  {
     wb_object o = sp->object(oid);
-    if (!o) { /* return o.sts(); */
+    if (!o)
+    { /* return o.sts(); */
       strncpy(buf, cdh_ObjidToString(oid, 1), maxsize);
       *size = strlen(buf);
       return LDH__SUCCESS;
     }
-    try {
+    try
+    {
       pwr_tOName name;
       strcpy(name, o.longName().name(type));
       *size = strlen(name);
-      if (*size > maxsize - 1) {
+      if (*size > maxsize - 1)
+      {
         return LDH__NAMEBUF;
       }
       strcpy(buf, name);
-    } catch (wb_error& e) {
+    }
+    catch (wb_error& e)
+    {
       return e.sts();
     }
     break;
@@ -1407,8 +1436,7 @@ pwr_tStatus ldh_ObjidToName(ldh_tSession session, pwr_tOid oid, int type,
    The caller is responsible for supplying a buffer at
    least as big as maxsize.  */
 
-pwr_tStatus ldh_TypeIdToName(
-    ldh_tSession session, pwr_tTid tid, char* buff, int maxsize, int* size)
+pwr_tStatus ldh_TypeIdToName(ldh_tSession session, pwr_tTid tid, char* buff, int maxsize, int* size)
 {
   wb_session* sp = (wb_session*)session;
   wb_tdef t = sp->tdef(tid);
@@ -1424,8 +1452,7 @@ pwr_tStatus ldh_TypeIdToName(
    The caller is responsible for supplying a buffer at
    least as big as maxsize.  */
 
-pwr_tStatus ldh_ClassIdToName(
-    ldh_tSession session, pwr_tCid cid, char* buff, int maxsize, int* size)
+pwr_tStatus ldh_ClassIdToName(ldh_tSession session, pwr_tCid cid, char* buff, int maxsize, int* size)
 {
   wb_session* sp = (wb_session*)session;
   wb_cdef c = sp->cdef(cid);
@@ -1442,27 +1469,30 @@ pwr_tStatus ldh_ClassIdToName(
     attribute reference. A pointer to the name and the size
     of it is returned.  */
 
-pwr_tStatus ldh_AttrRefToName(ldh_tSession session, pwr_sAttrRef* arp,
-    int nametype, char** aname, int* size)
+pwr_tStatus ldh_AttrRefToName(ldh_tSession session, pwr_sAttrRef* arp, int nametype, char** aname, int* size)
 {
   static char str[512];
   wb_session* sp = (wb_session*)session;
 
-  try {
-    switch (nametype) {
+  try
+  {
+    switch (nametype)
+    {
     case ldh_eName_ArefExport:
     case ldh_eName_Objid:
     case ldh_eName_ObjectIx:
     case ldh_eName_OixString:
     case ldh_eName_VolumeId:
-    case ldh_eName_VidString: {
+    case ldh_eName_VidString:
+    {
       wb_name n = wb_name(cdh_AttrRefToString(arp, 1));
       strcpy(str, n.name(nametype));
       *aname = str;
       *size = strlen(str);
       break;
     }
-    case ldh_eName_Ref: {
+    case ldh_eName_Ref:
+    {
       wb_attribute a = sp->attribute(arp);
       if (!a)
         return a.sts();
@@ -1475,7 +1505,8 @@ pwr_tStatus ldh_AttrRefToName(ldh_tSession session, pwr_sAttrRef* arp,
       *size = strlen(str);
       break;
     }
-    case 0: { // cdh_mNName
+    case 0:
+    { // cdh_mNName
       if (arp->Objid.vid == sp->vid())
         nametype = cdh_mName_path | cdh_mName_attribute;
       else
@@ -1491,7 +1522,8 @@ pwr_tStatus ldh_AttrRefToName(ldh_tSession session, pwr_sAttrRef* arp,
       *size = strlen(str);
       break;
     }
-    default: {
+    default:
+    {
       if (arp->Objid.vid == 0 && arp->Objid.oix == 0)
         return LDH__NOSUCHOBJ;
 
@@ -1506,7 +1538,9 @@ pwr_tStatus ldh_AttrRefToName(ldh_tSession session, pwr_sAttrRef* arp,
       break;
     }
     }
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
   return LDH__SUCCESS;
@@ -1521,8 +1555,7 @@ _V0.123.34.63
 
 */
 
-pwr_tStatus ldh_VolumeIdToName(
-    ldh_tWorkbench workbench, pwr_tVid vid, char* name, int maxsize, int* size)
+pwr_tStatus ldh_VolumeIdToName(ldh_tWorkbench workbench, pwr_tVid vid, char* name, int maxsize, int* size)
 {
   wb_env* wb = (wb_env*)workbench;
   wb_volume v = wb->volume(vid);
@@ -1534,8 +1567,7 @@ pwr_tStatus ldh_VolumeIdToName(
   return LDH__SUCCESS;
 }
 
-void ldh_AddThisSessionCallback(ldh_tSession session, void* editorContext,
-    ldh_tSessionCb receiveThisSession)
+void ldh_AddThisSessionCallback(ldh_tSession session, void* editorContext, ldh_tSessionCb receiveThisSession)
 {
   wb_session* sp = (wb_session*)session;
   sp->editorContext(editorContext);
@@ -1543,15 +1575,15 @@ void ldh_AddThisSessionCallback(ldh_tSession session, void* editorContext,
 }
 
 void ldh_AddOtherSessionCallback(ldh_tSession session, void* editorContext,
-    ldh_tSessionCb receiveOtherSession)
+                                 ldh_tSessionCb receiveOtherSession)
 {
   wb_session* sp = (wb_session*)session;
   sp->editorContext(editorContext);
   sp->sendOtherSession(receiveOtherSession);
 }
 
-pwr_tStatus ldh_OpenSession(ldh_tSession* session, ldh_tVolume volume,
-    ldh_eAccess access, ldh_eUtility utility)
+pwr_tStatus ldh_OpenSession(ldh_tSession* session, ldh_tVolume volume, ldh_eAccess access,
+                            ldh_eUtility utility)
 {
   wb_volume* vp = (wb_volume*)volume;
 
@@ -1562,7 +1594,8 @@ pwr_tStatus ldh_OpenSession(ldh_tSession* session, ldh_tVolume volume,
   wb_session* sp = new wb_session(*vp);
 
   sp->access(access);
-  if (sp->evenSts()) {
+  if (sp->evenSts())
+  {
     pwr_tStatus sts = sp->sts();
     delete sp;
     return sts;
@@ -1577,8 +1610,7 @@ pwr_tStatus ldh_OpenSession(ldh_tSession* session, ldh_tVolume volume,
 /* This routine creates a new memory resident workbench and populates
    it with objects from database on disk.  */
 
-pwr_tStatus ldh_OpenWB(
-    ldh_tWorkbench* workbench, char* db, unsigned int options)
+pwr_tStatus ldh_OpenWB(ldh_tWorkbench* workbench, char* db, unsigned int options)
 {
   wb_erep* erep = new wb_erep(options);
   wb_env* env = new wb_env(erep);
@@ -1588,8 +1620,7 @@ pwr_tStatus ldh_OpenWB(
   return env->sts();
 }
 
-pwr_tStatus ldh_ReadAttribute(
-    ldh_tSession session, pwr_sAttrRef* arp, void* value, int size)
+pwr_tStatus ldh_ReadAttribute(ldh_tSession session, pwr_sAttrRef* arp, void* value, int size)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -1604,8 +1635,7 @@ pwr_tStatus ldh_ReadAttribute(
 
 /* Reads a named body of an object into a buffer supplied in the call.  */
 
-pwr_tStatus ldh_ReadObjectBody(ldh_tSession session, pwr_tObjid oid,
-    const char* bname, void* value, int size)
+pwr_tStatus ldh_ReadObjectBody(ldh_tSession session, pwr_tObjid oid, const char* bname, void* value, int size)
 {
   wb_session* sp = (wb_session*)session;
   wb_attribute a = sp->attribute(oid, bname);
@@ -1652,24 +1682,26 @@ ldh_tWorkbench ldh_SessionToWB(ldh_tSession session)
 
 /* Updates a named body of an object.  */
 
-pwr_tStatus ldh_SetObjectBody(ldh_tSession session, pwr_tOid oid,
-    const char* bname, char* value, int size)
+pwr_tStatus ldh_SetObjectBody(ldh_tSession session, pwr_tOid oid, const char* bname, char* value, int size)
 {
   wb_session* sp = (wb_session*)session;
   wb_attribute a = sp->attribute(oid, bname);
   if (!a)
     return a.sts();
 
-  try {
+  try
+  {
     sp->writeAttribute(a, value);
     return sp->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
 
-pwr_tStatus ldh_SetObjectBuffer(ldh_tSession session, pwr_tOid oid,
-    const char* bname, const char* aname, char* value)
+pwr_tStatus ldh_SetObjectBuffer(ldh_tSession session, pwr_tOid oid, const char* bname, const char* aname,
+                                char* value)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -1681,38 +1713,43 @@ pwr_tStatus ldh_SetObjectBuffer(ldh_tSession session, pwr_tOid oid,
   if (!a)
     return a.sts();
 
-  try {
+  try
+  {
     sp->writeAttribute(a, value);
     return sp->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
 
 /* The same as ChangeObjectName but without notification.  */
 
-pwr_tStatus ldh_SetObjectName(
-    ldh_tSession session, pwr_tOid oid, const char* name)
+pwr_tStatus ldh_SetObjectName(ldh_tSession session, pwr_tOid oid, const char* name)
 {
   wb_session* sp = (wb_session*)session;
   wb_object o = sp->object(oid);
   if (!o)
     return o.sts();
 
-  try {
+  try
+  {
     wb_name n(name);
     if (!n)
       return n.sts();
 
     sp->renameObject(o, n);
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
   return sp->sts();
 }
 
-pwr_tStatus ldh_SetObjectPar(ldh_tSession session, pwr_tOid oid,
-    const char* bname, const char* aname, char* value, int size)
+pwr_tStatus ldh_SetObjectPar(ldh_tSession session, pwr_tOid oid, const char* bname, const char* aname,
+                             char* value, int size)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -1724,10 +1761,13 @@ pwr_tStatus ldh_SetObjectPar(ldh_tSession session, pwr_tOid oid,
   if (!a)
     return a.sts();
 
-  try {
+  try
+  {
     sp->writeAttribute(a, value, size);
     return sp->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 }
@@ -1740,8 +1780,7 @@ pwr_tStatus ldh_SetSession(ldh_tSession session, ldh_eAccess access)
   return sp->sts();
 }
 
-pwr_tStatus ldh_StringGetAttribute(
-    ldh_tSession session, pwr_sAttrRef* arp, pwr_tUInt32 maxsize, char* string)
+pwr_tStatus ldh_StringGetAttribute(ldh_tSession session, pwr_sAttrRef* arp, pwr_tUInt32 maxsize, char* string)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -1756,8 +1795,7 @@ pwr_tStatus ldh_StringGetAttribute(
 }
 
 /* If write is false this routine only checks the string.  */
-pwr_tStatus ldh_StringSetAttribute(
-    ldh_tSession session, pwr_sAttrRef* arp, char* string, pwr_tBoolean write)
+pwr_tStatus ldh_StringSetAttribute(ldh_tSession session, pwr_sAttrRef* arp, char* string, pwr_tBoolean write)
 {
   wb_session* sp = (wb_session*)session;
   wb_attribute a = sp->attribute(arp);
@@ -1770,18 +1808,20 @@ pwr_tStatus ldh_StringSetAttribute(
 
 /*  Writes an attribute of an object from a buffer supplied in the call.  */
 
-pwr_tStatus ldh_WriteAttribute(
-    ldh_tSession session, pwr_sAttrRef* arp, void* value, int size)
+pwr_tStatus ldh_WriteAttribute(ldh_tSession session, pwr_sAttrRef* arp, void* value, int size)
 {
   wb_session* sp = (wb_session*)session;
   wb_attribute a = sp->attribute(arp);
   if (!a)
     return a.sts();
 
-  try {
+  try
+  {
     sp->writeAttribute(a, value);
     return sp->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
   return LDH__SUCCESS;
@@ -1800,8 +1840,7 @@ pwr_tBoolean ldh_LocalObject(ldh_tSession session, pwr_tOid oid)
   return sp->isLocal(o);
 }
 
-pwr_tStatus ldh_SyntaxCheck(
-    ldh_tSession session, int* errorcount, int* warningcount)
+pwr_tStatus ldh_SyntaxCheck(ldh_tSession session, int* errorcount, int* warningcount)
 {
   wb_session* sp = (wb_session*)session;
   pwr_tStatus sts;
@@ -1810,9 +1849,8 @@ pwr_tStatus ldh_SyntaxCheck(
   return sts;
 }
 
-pwr_tStatus ldh_CopyObjectTrees(ldh_tSession session, pwr_sAttrRef* arp,
-    pwr_tOid doid, ldh_eDest dest, pwr_tBoolean self, int keepref, int keepsym,
-    int recycleix)
+pwr_tStatus ldh_CopyObjectTrees(ldh_tSession session, pwr_sAttrRef* arp, pwr_tOid doid, ldh_eDest dest,
+                                pwr_tBoolean self, int keepref, int keepsym, int recycleix)
 {
   pwr_tStatus sts;
 
@@ -1829,14 +1867,16 @@ pwr_tStatus ldh_CopyObjectTrees(ldh_tSession session, pwr_sAttrRef* arp,
    workbench context. The original object trees are
    left untouched.  */
 
-pwr_tStatus ldh_Copy(ldh_tSession session, pwr_sAttrRef* arp, int keepref,
-    int keepsym, int ignore_errors)
+pwr_tStatus ldh_Copy(ldh_tSession session, pwr_sAttrRef* arp, int keepref, int keepsym, int ignore_errors)
 {
   wb_session* sp = (wb_session*)session;
 
-  try {
+  try
+  {
     sp->copyOset(arp, (keepref != 0), (keepsym != 0), (ignore_errors != 0));
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
   return sp->sts();
@@ -1851,22 +1891,28 @@ pwr_tStatus ldh_Cut(ldh_tSession session, pwr_sAttrRef* arp, int keepref)
 {
   wb_session* sp = (wb_session*)session;
 
-  try {
+  try
+  {
     sp->cutOset(arp, (keepref != 0));
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
   return sp->sts();
 }
 
-pwr_tStatus ldh_Paste(ldh_tSession session, pwr_tOid doid, ldh_eDest dest,
-    int keepoid, int recycleix, char* buffer)
+pwr_tStatus ldh_Paste(ldh_tSession session, pwr_tOid doid, ldh_eDest dest, int keepoid, int recycleix,
+                      char* buffer)
 {
   wb_session* sp = (wb_session*)session;
 
-  try {
+  try
+  {
     sp->pasteOset(doid, dest, keepoid != 0, recycleix != 0, buffer);
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
   return sp->sts();
@@ -1876,23 +1922,26 @@ pwr_tStatus ldh_CreateLoadFile(ldh_tSession session)
 {
   wb_session* sp = (wb_session*)session;
 
-  try {
+  try
+  {
     sp->createSnapshot(0, 0, 0);
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
   return sp->sts();
 }
 
-pwr_tStatus ldh_WbDump(ldh_tSession session, char* objname, char* dumpfile,
-    int keep_name, int noindex, int nofocode)
+pwr_tStatus ldh_WbDump(ldh_tSession session, char* objname, char* dumpfile, int keep_name, int noindex,
+                       int nofocode)
 {
   wb_session* sp = (wb_session*)session;
   char fname[200];
 
   if (sp->type() == ldh_eVolRep_Wbl
       // || sp->cid() == pwr_eClass_ClassVolume
-      )
+  )
     return LDH__NYI;
 
   dcli_translate_filename(fname, dumpfile);
@@ -1900,7 +1949,8 @@ pwr_tStatus ldh_WbDump(ldh_tSession session, char* objname, char* dumpfile,
   if (!fp)
     return LDH__FILEOPEN;
 
-  try {
+  try
+  {
     wb_print_wbl wprint(fp);
     if (keep_name)
       wprint.keepName();
@@ -1910,11 +1960,14 @@ pwr_tStatus ldh_WbDump(ldh_tSession session, char* objname, char* dumpfile,
       wprint.noFoCode();
     if (!objname)
       wprint.printVolume(*sp);
-    else {
+    else
+    {
       wb_object o = sp->object(objname);
       wprint.printHierarchy(*sp, o);
     }
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
   return LDH__SUCCESS;
@@ -1928,9 +1981,11 @@ pwr_tStatus ldh_WbLoad(ldh_tSession session, char* loadfile, int ignore_oix)
   char db_name[200];
   char vname[32];
 
-  if (strstr(loadfile, ".dbs")) {
+  if (strstr(loadfile, ".dbs"))
+  {
     // Load vrepdbs
-    try {
+    try
+    {
       dcli_translate_filename(fname, loadfile);
       wb_vrepdbs* vdbs = new wb_vrepdbs(erep, fname);
       vdbs->load();
@@ -1950,13 +2005,17 @@ pwr_tStatus ldh_WbLoad(ldh_tSession session, char* loadfile, int ignore_oix)
       erep->merep()->copyFiles(db_name);
 
       delete vdbs;
-    } catch (wb_error& e) {
+    }
+    catch (wb_error& e)
+    {
       return e.sts();
     }
-  } else if (strstr(loadfile, ".wb_load") || strstr(loadfile, ".wb_dmp")
-      || strstr(loadfile, ".wb_rev")) {
+  }
+  else if (strstr(loadfile, ".wb_load") || strstr(loadfile, ".wb_dmp") || strstr(loadfile, ".wb_rev"))
+  {
     // load vrepwbl
-    try {
+    try
+    {
       dcli_translate_filename(fname, loadfile);
       wb_vrepwbl* vwbl = new wb_vrepwbl(erep);
       if (ignore_oix)
@@ -1972,13 +2031,14 @@ pwr_tStatus ldh_WbLoad(ldh_tSession session, char* loadfile, int ignore_oix)
 
       if (str_NoCaseStrcmp(vwbl->name(), "directory") == 0)
         volrep = ldh_eVolRep_Db;
-      else {
-        sts = lfu_GetVolumeCnf(
-            (char*)vwbl->name(), &vid, &cid, &volrep, server);
+      else
+      {
+        sts = lfu_GetVolumeCnf((char*)vwbl->name(), &vid, &cid, &volrep, server);
         if (EVEN(sts))
           return sts;
       }
-      if (volrep == ldh_eVolRep_Db) {
+      if (volrep == ldh_eVolRep_Db)
+      {
         str_ToLower(vname, vwbl->name());
         strcpy(db_name, "$pwrp_db/");
         strcat(db_name, vname);
@@ -1992,7 +2052,9 @@ pwr_tStatus ldh_WbLoad(ldh_tSession session, char* loadfile, int ignore_oix)
         db.copy(*vwbl, db_name);
         db.close();
         erep->merep()->copyFiles(db_name);
-      } else {
+      }
+      else
+      {
 #if defined PWRE_CONF_MYSQL
         char socket[80];
         char user[80];
@@ -2013,8 +2075,7 @@ pwr_tStatus ldh_WbLoad(ldh_tSession session, char* loadfile, int ignore_oix)
         cnf_get_value("mysqlSocket", socket, sizeof(socket));
 
         wb_dbms_env* env = new wb_dbms_env();
-        env->create(
-            db_name, host, user, password, cdh_Low(vname), port, socket);
+        env->create(db_name, host, user, password, cdh_Low(vname), port, socket);
 
         wb_dbms dbms(pwr_cNVid);
         dbms.copy(*vwbl, db_name);
@@ -2023,21 +2084,20 @@ pwr_tStatus ldh_WbLoad(ldh_tSession session, char* loadfile, int ignore_oix)
 #endif
       }
       delete vwbl;
-    } catch (wb_error& e) {
+    }
+    catch (wb_error& e)
+    {
       return e.sts();
     }
-  } else
+  }
+  else
     return LDH__NYI;
   return LDH__SUCCESS;
 }
 
-ldh_eVolRep ldh_VolRepType(ldh_tSession session)
-{
-  return ((wb_session*)session)->type();
-}
+ldh_eVolRep ldh_VolRepType(ldh_tSession session) { return ((wb_session*)session)->type(); }
 
-pwr_tStatus ldh_GetDocBlock(
-    ldh_tSession session, pwr_tOid oid, char** block, int* size)
+pwr_tStatus ldh_GetDocBlock(ldh_tSession session, pwr_tOid oid, char** block, int* size)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -2065,12 +2125,12 @@ pwr_tStatus ldh_SetDocBlock(ldh_tSession session, pwr_tOid oid, char* block)
   return LDH__NOSUCHBUFFER;
 }
 
-pwr_tStatus ldh_GetAttrRefInfo(
-    ldh_tSession session, pwr_sAttrRef* arp, ldh_sAttrRefInfo* info)
+pwr_tStatus ldh_GetAttrRefInfo(ldh_tSession session, pwr_sAttrRef* arp, ldh_sAttrRefInfo* info)
 {
   wb_session* sp = (wb_session*)session;
 
-  try {
+  try
+  {
     wb_attribute a = sp->attribute(arp);
     if (!a)
       return a.sts();
@@ -2082,15 +2142,16 @@ pwr_tStatus ldh_GetAttrRefInfo(
     info->type = a.type();
     info->tid = a.tid();
     info->adefCid = a.adefCid();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     return e.sts();
   }
 
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetSuperClass(
-    ldh_tSession session, pwr_tCid cid, pwr_tCid* super)
+pwr_tStatus ldh_GetSuperClass(ldh_tSession session, pwr_tCid cid, pwr_tCid* super)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -2106,8 +2167,7 @@ pwr_tStatus ldh_GetSuperClass(
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetMaskBitDef(
-    ldh_tSession session, pwr_tTid tid, ldh_sBitDef** bitdef, int* rows)
+pwr_tStatus ldh_GetMaskBitDef(ldh_tSession session, pwr_tTid tid, ldh_sBitDef** bitdef, int* rows)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -2116,7 +2176,8 @@ pwr_tStatus ldh_GetMaskBitDef(
     return to.sts();
 
   int bit_cnt = 0;
-  for (wb_object bito = to.first(); bito; bito = bito.after()) {
+  for (wb_object bito = to.first(); bito; bito = bito.after())
+  {
     if (bito.cid() == pwr_eClass_Bit)
       bit_cnt++;
   }
@@ -2125,8 +2186,10 @@ pwr_tStatus ldh_GetMaskBitDef(
 
   *bitdef = (ldh_sBitDef*)calloc(bit_cnt, sizeof(ldh_sBitDef));
   *rows = 0;
-  for (wb_object bito = to.first(); bito; bito = bito.after()) {
-    if (bito.cid() == pwr_eClass_Bit) {
+  for (wb_object bito = to.first(); bito; bito = bito.after())
+  {
+    if (bito.cid() == pwr_eClass_Bit)
+    {
       wb_attribute a = sp->attribute(bito.oid(), "SysBody");
       if (!a)
         return a.sts();
@@ -2139,8 +2202,7 @@ pwr_tStatus ldh_GetMaskBitDef(
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_GetEnumValueDef(
-    ldh_tSession session, pwr_tTid tid, ldh_sValueDef** valuedef, int* rows)
+pwr_tStatus ldh_GetEnumValueDef(ldh_tSession session, pwr_tTid tid, ldh_sValueDef** valuedef, int* rows)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -2149,7 +2211,8 @@ pwr_tStatus ldh_GetEnumValueDef(
     return to.sts();
 
   int val_cnt = 0;
-  for (wb_object valo = to.first(); valo; valo = valo.after()) {
+  for (wb_object valo = to.first(); valo; valo = valo.after())
+  {
     if (valo.cid() == pwr_eClass_Value)
       val_cnt++;
   }
@@ -2158,8 +2221,10 @@ pwr_tStatus ldh_GetEnumValueDef(
 
   *valuedef = (ldh_sValueDef*)calloc(val_cnt, sizeof(ldh_sValueDef));
   *rows = 0;
-  for (wb_object valo = to.first(); valo; valo = valo.after()) {
-    if (valo.cid() == pwr_eClass_Value) {
+  for (wb_object valo = to.first(); valo; valo = valo.after())
+  {
+    if (valo.cid() == pwr_eClass_Value)
+    {
       wb_attribute a = sp->attribute(valo.oid(), "SysBody");
       if (!a)
         return a.sts();
@@ -2172,8 +2237,7 @@ pwr_tStatus ldh_GetEnumValueDef(
   return LDH__SUCCESS;
 }
 
-pwr_tStatus ldh_CastAttribute(
-    ldh_tSession session, pwr_sAttrRef* arp, pwr_tCid cid)
+pwr_tStatus ldh_CastAttribute(ldh_tSession session, pwr_sAttrRef* arp, pwr_tCid cid)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -2181,8 +2245,7 @@ pwr_tStatus ldh_CastAttribute(
   return sp->sts();
 }
 
-pwr_tStatus ldh_DisableAttribute(
-    ldh_tSession session, pwr_sAttrRef* arp, pwr_tDisableAttr disable)
+pwr_tStatus ldh_DisableAttribute(ldh_tSession session, pwr_sAttrRef* arp, pwr_tDisableAttr disable)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -2190,8 +2253,7 @@ pwr_tStatus ldh_DisableAttribute(
   return sp->sts();
 }
 
-pwr_tStatus ldh_GetSubClass(ldh_tSession session, pwr_tCid supercid,
-    pwr_tCid subcid, pwr_tCid* nextsubcid)
+pwr_tStatus ldh_GetSubClass(ldh_tSession session, pwr_tCid supercid, pwr_tCid subcid, pwr_tCid* nextsubcid)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -2211,8 +2273,7 @@ pwr_tStatus ldh_GetModTime(ldh_tSession session, pwr_tOid oid, pwr_tTime* time)
   return o.sts();
 }
 
-pwr_tStatus ldh_AttributeDisabled(
-    ldh_tSession session, pwr_sAttrRef* arp, pwr_tDisableAttr* disabled)
+pwr_tStatus ldh_AttributeDisabled(ldh_tSession session, pwr_sAttrRef* arp, pwr_tDisableAttr* disabled)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -2225,13 +2286,9 @@ pwr_tStatus ldh_AttributeDisabled(
   return LDH__SUCCESS;
 }
 
-int ldh_ExternObject(ldh_tSession session, pwr_tOid oid)
-{
-  return oid.vid != ((wb_session*)session)->vid();
-}
+int ldh_ExternObject(ldh_tSession session, pwr_tOid oid) { return oid.vid != ((wb_session*)session)->vid(); }
 
-pwr_tStatus ldh_OpenMntSession(
-    ldh_tSession session, pwr_tOid oid, ldh_tSession* mntses)
+pwr_tStatus ldh_OpenMntSession(ldh_tSession session, pwr_tOid oid, ldh_tSession* mntses)
 {
   wb_session* sp = (wb_session*)session;
 
@@ -2254,8 +2311,7 @@ void ldh_RecixSetDestination(ldh_tSession session, const char* destination)
   sp->recix_set_destination(destination);
 }
 
-pwr_tStatus ldh_AttrArefToObjectAref(
-    ldh_tSession session, pwr_tAttrRef* arp, pwr_tAttrRef* oarp)
+pwr_tStatus ldh_AttrArefToObjectAref(ldh_tSession session, pwr_tAttrRef* arp, pwr_tAttrRef* oarp)
 {
   wb_session* sp = (wb_session*)session;
   pwr_tAName str;

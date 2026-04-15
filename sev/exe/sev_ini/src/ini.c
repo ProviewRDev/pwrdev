@@ -62,23 +62,23 @@ void ini_ProcTable(pwr_tStatus* status, ini_sContext* cp)
 
   pwr_dStatus(sts, status, INI__SUCCESS);
 
-  pp = ini_ProcInsert(sts, cp, "pwr_qmon", "pwr_qmon_%d", 0, 1, "rt_qmon",
-      cPrio_qmon, 0, 0, "-n", 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_qmon", "pwr_qmon_%d", 0, 1, "rt_qmon", cPrio_qmon, 0, 0, "-n", 0);
   pp->flags.b.qmon = 1;
   pp->proc.flags.b.system = 1;
 
   if (cp->flags.b.rootvolume)
     strcpy(sev_server_args, "");
-  pp = ini_ProcInsert(sts, cp, "pwr_sev_server", "pwr_sev_server_%d", 0, 1,
-      "sev_server", cPrio_sev_server, 0, 0, sev_server_args, 0);
+  pp = ini_ProcInsert(sts, cp, "pwr_sev_server", "pwr_sev_server_%d", 0, 1, "sev_server", cPrio_sev_server, 0,
+                      0, sev_server_args, 0);
   pp->proc.flags.b.system = 1;
 
   f = ini_OpenFile(sts, cp, &cp->applfile);
-  if (f != NULL) {
+  if (f != NULL)
+  {
     if (cp->flags.b.verbose)
-      errh_LogInfo(
-          &cp->log, "Reading Application file %s\n", cp->applfile.name);
-    for (;;) {
+      errh_LogInfo(&cp->log, "Reading Application file %s\n", cp->applfile.name);
+    for (;;)
+    {
       char* nl;
 
       s = fgets(buffer, sizeof(buffer) - 1, f);
@@ -93,7 +93,8 @@ void ini_ProcTable(pwr_tStatus* status, ini_sContext* cp)
       if (buffer[0] == '#')
         continue;
 
-      do {
+      do
+      {
         int i_load = -1;
         int i_run = -1;
         int i_debug = -1;
@@ -171,8 +172,7 @@ void ini_ProcTable(pwr_tStatus* status, ini_sContext* cp)
         else
           i_prio = atoi(prio);
 
-        pp = ini_ProcInsert(
-            sts, cp, id, name, i_load, i_run, file, i_prio, i_debug, 0, arg, 0);
+        pp = ini_ProcInsert(sts, cp, id, name, i_load, i_run, file, i_prio, i_debug, 0, arg, 0);
         if (!pp->proc.flags.b.system && !pp->proc.flags.b.base)
           pp->proc.flags.b.user = 1;
       } while (0);

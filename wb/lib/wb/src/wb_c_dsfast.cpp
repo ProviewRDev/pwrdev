@@ -46,8 +46,8 @@
 
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father,
+                              pwr_tClassId Class)
 {
   pwr_tStatus sts;
   int size;
@@ -59,20 +59,19 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
     refer to this attribute.
   */
 
-  sts = ldh_ObjidToName(
-      Session, Father, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
+  sts = ldh_ObjidToName(Session, Father, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
   strcat(Name, ".ActualValue");
 
   sts = ldh_NameToAttrRef(Session, Name, &Attribute);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     memset(&Attribute, 0, sizeof(Attribute));
   }
 
-  sts = ldh_SetObjectPar(Session, Object, "RtBody", "DataName",
-      (char*)&Attribute, sizeof(Attribute));
+  sts = ldh_SetObjectPar(Session, Object, "RtBody", "DataName", (char*)&Attribute, sizeof(Attribute));
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
@@ -83,8 +82,7 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
 
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father, pwr_tClassId Class)
 {
   pwr_tStatus sts;
   int size;
@@ -96,8 +94,7 @@ static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object,
     refer to this attribute.
   */
 
-  sts = ldh_ObjidToName(
-      Session, Father, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
+  sts = ldh_ObjidToName(Session, Father, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
@@ -107,8 +104,7 @@ static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object,
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
-  sts = ldh_SetObjectPar(Session, Object, "RtBody", "DataName",
-      (char*)&Attribute, sizeof(Attribute));
+  sts = ldh_SetObjectPar(Session, Object, "RtBody", "DataName", (char*)&Attribute, sizeof(Attribute));
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
@@ -119,5 +115,4 @@ static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object,
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(DsFast)
-    = { pwr_BindMethod(PostCreate), pwr_BindMethod(PostMove), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(DsFast) = {pwr_BindMethod(PostCreate), pwr_BindMethod(PostMove), pwr_NullMethod};

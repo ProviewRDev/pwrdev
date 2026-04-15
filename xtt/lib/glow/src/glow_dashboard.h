@@ -44,17 +44,17 @@
 /*! \addtogroup Glow */
 /*@{*/
 
-class GrowDashboard {
+class GrowDashboard
+{
 public:
-  GrowCtx *ctx;
+  GrowCtx* ctx;
   int dash_rows;
   int dash_columns;
 
   GrowDashboard(GrowCtx* glow_ctx) : ctx(glow_ctx), dash_rows(5), dash_columns(4) {}
   void position(double x, double y);
   void find_grid(double x, double y, double* x_grid, double* y_grid);
-  int get_next_free(int start_row, int start_col, 
-		    int rows, int cols, double *x, double *y);
+  int get_next_free(int start_row, int start_col, int rows, int cols, double* x, double* y);
   void save(std::ofstream& fp, glow_eSaveMode mode);
   void open(std::ifstream& fp);
 };

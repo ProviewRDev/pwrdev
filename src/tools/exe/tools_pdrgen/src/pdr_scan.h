@@ -48,7 +48,8 @@
 /*
  * kinds of tokens
  */
-enum tok_kind {
+enum tok_kind
+{
   TOK_IDENT,
   TOK_STRCONST,
   TOK_LPAREN,
@@ -92,7 +93,8 @@ typedef enum tok_kind tok_kind;
 /*
  * a token
  */
-struct token {
+struct token
+{
   tok_kind kind;
   char* str;
 };

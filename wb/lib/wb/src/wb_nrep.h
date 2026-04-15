@@ -38,24 +38,28 @@
 #define wb_nrep_h
 
 #include "wb_error.h"
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 }
 
-typedef enum {
+typedef enum
+{
   wname_eType_Vid,
   wname_eType_Oid,
   wname_eType_Aid,
   wname_eType_Name
 } wname_eType;
 
-class wb_namesegments {
+class wb_namesegments
+{
 public:
   int offs;
   int len;
 };
 
-class wb_nameattributes {
+class wb_nameattributes
+{
 public:
   int offs;
   int len;
@@ -63,7 +67,8 @@ public:
   bool isSuper;
 };
 
-class wb_nrep {
+class wb_nrep
+{
 protected:
   int m_nRef;
 
@@ -105,26 +110,11 @@ public:
   wb_nrep(const wb_nrep& n);
   ~wb_nrep();
 
-  bool hasVolume() const
-  {
-    return (vol_len > 0);
-  }
-  bool hasPath() const
-  {
-    return (num_seg > 1);
-  }
-  bool hasObject() const
-  {
-    return hasSegment();
-  }
-  bool hasSegment(int idx = 0) const
-  {
-    return (idx >= 0 && idx < num_seg);
-  }
-  bool hasAttribute(int idx = 0) const
-  {
-    return (idx >= 0 && idx < num_attr);
-  }
+  bool hasVolume() const { return (vol_len > 0); }
+  bool hasPath() const { return (num_seg > 1); }
+  bool hasObject() const { return hasSegment(); }
+  bool hasSegment(int idx = 0) const { return (idx >= 0 && idx < num_seg); }
+  bool hasAttribute(int idx = 0) const { return (idx >= 0 && idx < num_attr); }
   bool hasAttrIndex(int idx = 0) const
   {
     if (hasAttribute(idx))
@@ -137,14 +127,8 @@ public:
       return attr[idx].index;
     return 0;
   }
-  int attributes()
-  {
-    return num_attr;
-  }
-  int segments()
-  {
-    return num_seg;
-  }
+  int attributes() { return num_attr; }
+  int segments() { return num_seg; }
   char* segment(int idx = 0, char* res = 0);
   char* path(char* res = 0);
   char* volume(char* res = 0);
@@ -155,38 +139,20 @@ public:
   char* normVolume(char* res = 0);
   char* normSegment(int idx = 0, char* res = 0);
   char* normAttribute(int idx = 0, char* res = 0);
-  char* name()
-  {
-    return oname;
-  }
-  char* normName()
-  {
-    return norm_name;
-  }
+  char* name() { return oname; }
+  char* normName() { return norm_name; }
   char* name(int ntype, char* res = 0);
   char* normName(int ntype, char* res = 0);
   bool volumeIsEqual(const char* n);
   bool objectIsEqual(const char* n);
   bool segmentIsEqual(const char* n, int idx = 0);
   bool attributeIsEqual(const char* n, int idx = 0);
-  int bodyOffset() const
-  {
-    return b_offset;
-  }
-  int bodySize() const
-  {
-    return b_size;
-  }
+  int bodyOffset() const { return b_offset; }
+  int bodySize() const { return b_size; }
   char* attributesAll(int idx = 0, char* res = 0, bool true_db = false);
   char* segmentsAll(int idx = 0, char* res = 0);
-  bool hasSuper()
-  {
-    return m_hasSuper;
-  }
-  void setShadowed(bool shadowed)
-  {
-    m_shadowed = shadowed;
-  }
+  bool hasSuper() { return m_hasSuper; }
+  void setShadowed(bool shadowed) { m_shadowed = shadowed; }
   static char* unatName(const char* name);
   static bool checkObjectName(const char* name);
 };

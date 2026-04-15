@@ -43,7 +43,8 @@
 
 #include "cow_wow_gtk.h"
 
-struct s_widgets {
+struct s_widgets
+{
   GtkWidget* label;
   GtkWidget* textinput;
   GtkWidget* pane;
@@ -78,13 +79,13 @@ struct s_widgets {
   GtkWidget* changetext;
   GtkWidget* expand;
   GtkWidget* compress;
-  GtkWidget* edit_entry; /* entry of the menu */
-  GtkWidget* search_entry; /* entry of the menu */
+  GtkWidget* edit_entry;      /* entry of the menu */
+  GtkWidget* search_entry;    /* entry of the menu */
   GtkWidget* customize_entry; /* entry of the menu */
-  GtkWidget* trace_togg; /* togg under the function entry of the menu */
-  GtkWidget* simulate_togg; /* togg under the function entry of the menu */
-  GtkWidget* view_togg; /* togg under the function entry of the menu */
-  GtkWidget* edit_togg; /* togg under the function entry of the menu */
+  GtkWidget* trace_togg;      /* togg under the function entry of the menu */
+  GtkWidget* simulate_togg;   /* togg under the function entry of the menu */
+  GtkWidget* view_togg;       /* togg under the function entry of the menu */
+  GtkWidget* edit_togg;       /* togg under the function entry of the menu */
   GtkWidget* con_palette;
   GtkWidget* node_palette;
   GtkWidget* nav_palette;
@@ -116,7 +117,8 @@ struct s_widgets {
   GtkWidget* select_cp_nextdown;
 };
 
-class WFoeGtk : public WFoe {
+class WFoeGtk : public WFoe
+{
 public:
   GtkWidget* parent_wid;
   GtkWidget* toplevel;
@@ -126,50 +128,44 @@ public:
   int popupmenu_y;
   CoWowFocusTimerGtk focustimer;
 
-  WFoeGtk(void* f_parent_ctx, GtkWidget* f_parent_wid, const char* f_name,
-      pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
-      int f_map_window, ldh_eAccess f_access, unsigned int f_options,
-      pwr_tStatus* sts);
-  WFoeGtk(void* f_parent_ctx, GtkWidget* f_parent_wid, const char* f_name,
-      pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
-      vldh_t_node nodeobject, unsigned long windowindex,
-      unsigned long new_window, int f_map_window, ldh_eAccess f_access,
-      foe_eFuncAccess function_access, unsigned int f_options,
-      pwr_tStatus* sts);
+  WFoeGtk(void* f_parent_ctx, GtkWidget* f_parent_wid, const char* f_name, pwr_tObjid plcprogram,
+          ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, int f_map_window, ldh_eAccess f_access,
+          unsigned int f_options, pwr_tStatus* sts);
+  WFoeGtk(void* f_parent_ctx, GtkWidget* f_parent_wid, const char* f_name, pwr_tObjid plcprogram,
+          ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, vldh_t_node nodeobject,
+          unsigned long windowindex, unsigned long new_window, int f_map_window, ldh_eAccess f_access,
+          foe_eFuncAccess function_access, unsigned int f_options, pwr_tStatus* sts);
 
   virtual void pop();
-  virtual WAtt* watt_new(void* a_parent_ctx, ldh_tSesContext a_ldhses,
-      pwr_sAttrRef a_aref, int a_editmode, int a_advanced_user,
-      int a_display_objectname);
-  virtual WAttText* watttext_new(void* a_parent_ctx, ldh_tSesContext a_ldhses,
-      pwr_sAttrRef a_aref, int a_editmode, pwr_tStatus* status);
-  virtual WFoe* subwindow_new(void* f_parent_ctx, char* f_name,
-      pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
-      vldh_t_node nodeobject, unsigned long windowindex,
-      unsigned long new_window, int f_map_window, ldh_eAccess f_access,
-      foe_eFuncAccess function_access, unsigned int f_options,
-      pwr_tStatus* sts);
+  virtual WAtt* watt_new(void* a_parent_ctx, ldh_tSesContext a_ldhses, pwr_sAttrRef a_aref, int a_editmode,
+                         int a_advanced_user, int a_display_objectname);
+  virtual WAttText* watttext_new(void* a_parent_ctx, ldh_tSesContext a_ldhses, pwr_sAttrRef a_aref,
+                                 int a_editmode, pwr_tStatus* status);
+  virtual WFoe* subwindow_new(void* f_parent_ctx, char* f_name, pwr_tObjid plcprogram,
+                              ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, vldh_t_node nodeobject,
+                              unsigned long windowindex, unsigned long new_window, int f_map_window,
+                              ldh_eAccess f_access, foe_eFuncAccess function_access, unsigned int f_options,
+                              pwr_tStatus* sts);
   virtual void destroy();
   virtual void set_title();
   virtual void message(const char* new_label);
   virtual void msgbox(const char* new_label);
-  virtual int create_window(int x_top, int y_top, int width_adb, int height_adb,
-      ldh_tSesContext ldhsession, foe_eFuncAccess function_access);
+  virtual int create_window(int x_top, int y_top, int width_adb, int height_adb, ldh_tSesContext ldhsession,
+                            foe_eFuncAccess function_access);
   virtual int get_textinput(const char* message, int (*function)(WFoe*, char*));
   virtual int edit_set_entries();
   virtual int view_set_entries();
   virtual void set_mode_button_state(int mode, int state);
   virtual int modify_popup(unsigned long popupmenu_mask, int x, int y);
   virtual int get_selection(char* str, int len);
-  virtual void popupmsg(const char* new_label, void (*yes_procedure)(WFoe*),
-      void (*no_procedure)(WFoe*), void (*cancel_procedure)(WFoe*));
+  virtual void popupmsg(const char* new_label, void (*yes_procedure)(WFoe*), void (*no_procedure)(WFoe*),
+                        void (*cancel_procedure)(WFoe*));
 
   int register_callbacks();
   void create_confirm_dialog();
 
   static void reset_current_node(WFoe* foe);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
 
   static void activate_save(GtkWidget* w, gpointer data);
   static void activate_exit(GtkWidget* w, gpointer data);

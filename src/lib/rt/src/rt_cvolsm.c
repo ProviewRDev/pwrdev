@@ -46,8 +46,7 @@
 
 static void respondError(qcom_sGet* msg, pwr_tObjid oid, pwr_tStatus rspsts);
 
-static void respondObject(
-    qcom_sGet* msg, gdb_sObject* op, pwr_tInt32 lcount, pwr_tInt32 rcount);
+static void respondObject(qcom_sGet* msg, gdb_sObject* op, pwr_tInt32 lcount, pwr_tInt32 rcount);
 
 /* Common cache error responder.  */
 
@@ -71,8 +70,7 @@ static void respondError(qcom_sGet* get, pwr_tObjid oid, pwr_tStatus rspsts)
 
 /* Send parent path and sibling environment of an object.  */
 
-static void respondObject(
-    qcom_sGet* get, gdb_sObject* op, pwr_tInt32 lcount, pwr_tInt32 rcount)
+static void respondObject(qcom_sGet* get, gdb_sObject* op, pwr_tInt32 lcount, pwr_tInt32 rcount)
 {
   pwr_tStatus sts;
   qcom_sPut put;
@@ -94,7 +92,8 @@ static void respondObject(
   pop = op;
   pcount = 0;
   count = 0;
-  while (pop->g.oid.oix != pwr_cNObjectIx && count < net_cObjectMaxCount - 1) {
+  while (pop->g.oid.oix != pwr_cNObjectIx && count < net_cObjectMaxCount - 1)
+  {
     pop = pool_Address(NULL, gdbroot->pool, pop->l.por);
     go[count++] = &pop->g;
   }
@@ -102,13 +101,14 @@ static void respondObject(
   pcount = count;
   pop = pool_Address(NULL, gdbroot->pool, op->l.por);
 
-  if (pop != NULL) {
+  if (pop != NULL)
+  {
     /* Left siblings. (At most lcount of them.) */
 
     for (i = 0, sol = pool_Qpred(NULL, gdbroot->pool, &op->u.n.sib_ll);
-         i < lcount && sol != &pop->u.n.sib_lh
-         && count < net_cObjectMaxCount - 1;
-         i++, sol = pool_Qpred(NULL, gdbroot->pool, sol)) {
+         i < lcount && sol != &pop->u.n.sib_lh && count < net_cObjectMaxCount - 1;
+         i++, sol = pool_Qpred(NULL, gdbroot->pool, sol))
+    {
       sop = pool_Qitem(sol, gdb_sObject, u.n.sib_ll);
       go[count++] = &sop->g;
     }
@@ -116,9 +116,9 @@ static void respondObject(
     /* Right siblings. (At most rcount of them.) */
 
     for (i = 0, sol = pool_Qsucc(NULL, gdbroot->pool, &op->u.n.sib_ll);
-         i < rcount && sol != &pop->u.n.sib_lh
-         && count < net_cObjectMaxCount - 1;
-         i++, sol = pool_Qsucc(NULL, gdbroot->pool, sol)) {
+         i < rcount && sol != &pop->u.n.sib_lh && count < net_cObjectMaxCount - 1;
+         i++, sol = pool_Qsucc(NULL, gdbroot->pool, sol))
+    {
       sop = pool_Qitem(sol, gdb_sObject, u.n.sib_ll);
       go[count++] = &sop->g;
     }
@@ -128,17 +128,18 @@ static void respondObject(
 
   size = sizeof(net_sObjectR) + count * sizeof(net_sGobject);
   rsp = net_Alloc(&sts, &put, size, net_eMsg_objectR);
-  if (rsp == NULL) {
+  if (rsp == NULL)
+  {
     printf("NETH: could not allocate pams buffer for Cache send response, sts: "
            "%d\n",
-        sts);
+           sts);
     respondError(get, op->g.oid, sts);
     return;
   }
 
   int k = 0;
   /* Copy parent objects.  */
-  for (i = pcount - 1; i >= 0; i--)    
+  for (i = pcount - 1; i >= 0; i--)
     rsp->g[k++] = *(go[i]);
 
   /* Copy target object.  */
@@ -159,8 +160,7 @@ static void respondObject(
 
 /* .  */
 
-gdb_sMountedOn* cvolsm_AddMountedOn(
-    pwr_tStatus* sts, pwr_tVolumeId vid, gdb_sNode* np)
+gdb_sMountedOn* cvolsm_AddMountedOn(pwr_tStatus* sts, pwr_tVolumeId vid, gdb_sNode* np)
 {
   gdb_sMountedOn* mop;
   gdb_sVolume* vp;
@@ -196,9 +196,9 @@ void cvolsm_FlushNode(pwr_tStatus* sts, gdb_sNode* np)
 
   gdb_AssumeLocked;
 
-  for (mol = pool_Qsucc(NULL, gdbroot->pool, &np->nodmo_lh);
-       mol != &np->nodmo_lh;
-       mol = pool_Qsucc(NULL, gdbroot->pool, &np->nodmo_lh)) {
+  for (mol = pool_Qsucc(NULL, gdbroot->pool, &np->nodmo_lh); mol != &np->nodmo_lh;
+       mol = pool_Qsucc(NULL, gdbroot->pool, &np->nodmo_lh))
+  {
     mop = pool_Qitem(mol, gdb_sMountedOn, nodmo_ll);
     cvolsm_RemoveMountedOn(NULL, mop);
   }
@@ -234,8 +234,7 @@ void cvolsm_GetObjectInfo(qcom_sGet* get)
     pwr_Assert(np != NULL);
 
     memset(&Attribute, 0, sizeof(Attribute));
-    ap = vol_ArefToAttribute(
-        &sts, &Attribute, &mp->aref, gdb_mLo_owned, vol_mTrans_alias);
+    ap = vol_ArefToAttribute(&sts, &Attribute, &mp->aref, gdb_mLo_owned, vol_mTrans_alias);
     if (ap == NULL || ap->op == NULL)
       break;
 
@@ -243,14 +242,15 @@ void cvolsm_GetObjectInfo(qcom_sGet* get)
   }
   gdb_ScopeUnlock;
 
-  if (p != NULL) {
+  if (p != NULL)
+  {
     size = mp->aref.Size;
     cid.pwr = mp->aref.Body;
     cid.c.bix = 0; /* To get the class id.  */
     cp = hash_Search(&sts, gdbroot->cid_ht, &cid.pwr);
     if (cp != NULL)
-      ndc_ConvertData(&sts, np, cp, &mp->aref, rmp->info, p,
-          (pwr_tUInt32*)&size, ndc_eOp_encode, mp->aref.Offset, 0);
+      ndc_ConvertData(&sts, np, cp, &mp->aref, rmp->info, p, (pwr_tUInt32*)&size, ndc_eOp_encode,
+                      mp->aref.Offset, 0);
   }
   rmp->aref = mp->aref;
   rmp->sts = sts;
@@ -272,7 +272,8 @@ void cvolsm_NameToObject(qcom_sGet* get)
   gdb_AssumeUnlocked;
 
   pn = cdh_ParseName(&sts, &ParseName, mp->poid, mp->name, 0);
-  if (pn == NULL) {
+  if (pn == NULL)
+  {
     respondError(get, pwr_cNObjid, sts);
     return;
   }
@@ -281,11 +282,13 @@ void cvolsm_NameToObject(qcom_sGet* get)
   {
     /* Don't allow mount translation.  */
 
-    op = vol_NameToObject(
-        &sts, pn, gdb_mLo_owned, mp->trans & ~vol_mTrans_mount);
-    if (op == NULL) {
+    op = vol_NameToObject(&sts, pn, gdb_mLo_owned, mp->trans & ~vol_mTrans_mount);
+    if (op == NULL)
+    {
       respondError(get, pwr_cNObjid, sts);
-    } else {
+    }
+    else
+    {
       respondObject(get, op, mp->lcount, mp->rcount);
     }
   }
@@ -305,9 +308,12 @@ void cvolsm_OidToObject(qcom_sGet* get)
   gdb_ScopeLock
   {
     op = hash_Search(&sts, gdbroot->oid_ht, &mp->oid);
-    if (op == NULL || !op->l.flags.b.isOwned) {
+    if (op == NULL || !op->l.flags.b.isOwned)
+    {
       respondError(get, pwr_cNObjid, GDH__NOSUCHOBJ);
-    } else {
+    }
+    else
+    {
       respondObject(get, op, mp->lcount, mp->rcount);
     }
   }
@@ -356,8 +362,7 @@ void cvolsm_SetObjectInfo(qcom_sGet* get)
 
     memset(&Attribute, 0, sizeof(Attribute));
     aref = mp->aref;
-    ap = vol_ArefToAttribute(
-        &sts, &Attribute, &aref, gdb_mLo_owned, vol_mTrans_alias);
+    ap = vol_ArefToAttribute(&sts, &Attribute, &aref, gdb_mLo_owned, vol_mTrans_alias);
     if (ap == NULL || ap->op == NULL)
       break;
 
@@ -365,15 +370,17 @@ void cvolsm_SetObjectInfo(qcom_sGet* get)
   }
   gdb_ScopeUnlock;
 
-  if (p != NULL) {
+  if (p != NULL)
+  {
     size = mp->aref.Size;
     cid.pwr = mp->aref.Body;
     cid.c.bix = 0; /* To get the class id.  */
     cp = hash_Search(&sts, gdbroot->cid_ht, &cid.pwr);
-    if (cp != NULL) {
+    if (cp != NULL)
+    {
       aref = mp->aref;
-      ndc_ConvertData(&sts, np, cp, &aref, p, mp->info, (pwr_tUInt32*)&size,
-          ndc_eOp_decode, mp->aref.Offset, 0);
+      ndc_ConvertData(&sts, np, cp, &aref, p, mp->info, (pwr_tUInt32*)&size, ndc_eOp_decode, mp->aref.Offset,
+                      0);
     }
   }
 

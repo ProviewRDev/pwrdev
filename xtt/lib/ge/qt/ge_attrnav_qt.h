@@ -47,11 +47,11 @@
 class AttrNavQtTraceObject;
 
 //! The navigation area of the attribute editor.
-class AttrNavQt : public AttrNav {
+class AttrNavQt : public AttrNav
+{
 public:
-  AttrNavQt(void* xn_parent_ctx, attr_eType xn_type, const char* xn_name,
-      attr_sItem* xn_itemlist, int xn_item_cnt, QWidget** w,
-      pwr_tStatus* status);
+  AttrNavQt(void* xn_parent_ctx, attr_eType xn_type, const char* xn_name, attr_sItem* xn_itemlist,
+            int xn_item_cnt, QWidget** w, pwr_tStatus* status);
   ~AttrNavQt();
 
   QWidget* brow_widget;
@@ -65,7 +65,8 @@ private:
   AttrNavQtTraceObject* trace_obj;
 };
 
-class AttrNavQtTraceObject : public QObject {
+class AttrNavQtTraceObject : public QObject
+{
   Q_OBJECT
 
 public:

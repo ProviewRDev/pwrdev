@@ -48,7 +48,8 @@ typedef struct xmenu_s_MenuItem xmenu_sMenuItem;
 typedef struct xmenu_s_MenuCall xmenu_sMenuCall;
 typedef union xmenu_m_MenuFlags xmenu_mMenuFlags;
 
-typedef enum {
+typedef enum
+{
   xmenu_mUtility_XNav = 1 << 0,
   xmenu_mUtility_Trace = 1 << 1,
   xmenu_mUtility_Simulate = 1 << 2,
@@ -58,14 +59,16 @@ typedef enum {
   xmenu_mUtility_AttrEditor = 1 << 6
 } xmenu_mUtility;
 
-typedef enum {
+typedef enum
+{
   xmenu_eItemType_Object = 1,
   xmenu_eItemType_AttrObject = 2,
   xmenu_eItemType_Attribute = 3,
   xmenu_eItemType_Crossref = 4
 } xmenu_eItemType;
 
-typedef enum {
+typedef enum
+{
   xmenu_eMenuItem__ = 0,
   xmenu_eMenuItem_Button,
   xmenu_eMenuItem_Cascade,
@@ -74,7 +77,8 @@ typedef enum {
   xmenu_eMenuItem_
 } xmenu_eMenuItem;
 
-typedef enum {
+typedef enum
+{
   xmenu_eMenuSet__ = 0,
   xmenu_eMenuSet_Attribute,
   xmenu_eMenuSet_Class,
@@ -84,8 +88,10 @@ typedef enum {
   xmenu_eMenuSet_
 } xmenu_eMenuSet;
 
-union xmenu_m_MenuFlags {
-  struct {
+union xmenu_m_MenuFlags
+{
+  struct
+  {
     pwr_tBit Sensitive : 1;
   } f;
 
@@ -94,7 +100,8 @@ union xmenu_m_MenuFlags {
 #define xmenu_mMenuFlags_Sensitive 1
 };
 
-struct xmenu_s_MenuItem {
+struct xmenu_s_MenuItem
+{
   pwr_tString80 Name;
   pwr_tUInt32 Level;
   xmenu_eMenuItem Item;
@@ -107,7 +114,8 @@ struct xmenu_s_MenuItem {
   pwr_tString40 FilterArguments[5];
 };
 
-struct xmenu_s_MenuCall {
+struct xmenu_s_MenuCall
+{
   void* EditorContext;
   void* WindowContext;
   xmenu_eMenuSet PointedSet;
@@ -124,44 +132,30 @@ struct xmenu_s_MenuCall {
   char Arg[80];
 };
 
-typedef struct {
+typedef struct
+{
   pwr_tObjName MethodName;
   pwr_tStatus (*Method)(xmenu_sMenuCall*);
 } xtt_sMethodBinding;
 
-typedef struct {
+typedef struct
+{
   pwr_tObjName ClassName;
   xtt_sMethodBinding (*Methods)[];
 } xtt_sClassBinding;
 
 /* Base methods */
 #define pwr_BindXttMethods(Class) xtt_sMethodBinding pwr_g##Class##_XttMethods[]
-#define pwr_BindXttClasses(Type)                                               \
-  xtt_sClassBinding pwr_g##Type##_XttClassMethods[]
+#define pwr_BindXttClasses(Type) xtt_sClassBinding pwr_g##Type##_XttClassMethods[]
 #if __GNUC__ < 3 || (__GNUC__ == 3 && __GNUC_MINOR__ < 4)
-#define pwr_BindXttClass(Class)                                                \
-  {                                                                            \
-    #Class, (xtt_sMethodBinding(*)[0]) pwr_g##Class##_XttMethods               \
-  }
+#define pwr_BindXttClass(Class) {#Class, (xtt_sMethodBinding(*)[0])pwr_g##Class##_XttMethods}
 #else
-#define pwr_BindXttClass(Class)                                                \
-  {                                                                            \
-    #Class, (xtt_sMethodBinding(*)[]) pwr_g##Class##_XttMethods                \
-  }
+#define pwr_BindXttClass(Class) {#Class, (xtt_sMethodBinding(*)[])pwr_g##Class##_XttMethods}
 #endif
-#define pwr_BindXttMethod(Method)                                              \
-  {                                                                            \
-    #Method, (pwr_tStatus(*)(xmenu_sMenuCall*)) Method                         \
-  }
+#define pwr_BindXttMethod(Method) {#Method, (pwr_tStatus(*)(xmenu_sMenuCall*))Method}
 
-#define pwr_NullMethod                                                         \
-  {                                                                            \
-    "", NULL                                                                   \
-  }
+#define pwr_NullMethod {"", NULL}
 
-#define pwr_NullClass                                                          \
-  {                                                                            \
-    "", NULL                                                                   \
-  }
+#define pwr_NullClass {"", NULL}
 
 #endif

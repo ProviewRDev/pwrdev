@@ -47,26 +47,25 @@
 #include "wb_dir.h"
 
 /*************************************************************************
-*
-* Name:		dir_parse_filename
-*
-* Type		int
-*
-* Description:
-*	Parses a filename in device, directory, namn, type and version.
-*
-* Parameters
-*	filename	*char	I  Filenamn that will be parsed.
-*	dev		*char	O  device.
-*	dir		*char	O  directory.
-*	file		*char	O  filenamn.
-*	type		*char	O  type.
-*	version		*int	O  version.
-*
-**************************************************************************/
+ *
+ * Name:		dir_parse_filename
+ *
+ * Type		int
+ *
+ * Description:
+ *	Parses a filename in device, directory, namn, type and version.
+ *
+ * Parameters
+ *	filename	*char	I  Filenamn that will be parsed.
+ *	dev		*char	O  device.
+ *	dir		*char	O  directory.
+ *	file		*char	O  filenamn.
+ *	type		*char	O  type.
+ *	version		*int	O  version.
+ *
+ **************************************************************************/
 
-pwr_tStatus dir_parse_filename(
-    char* filename, char* dev, char* dir, char* file, char* type, int* version)
+pwr_tStatus dir_parse_filename(char* filename, char* dev, char* dir, char* file, char* type, int* version)
 {
   char *s, *t;
   char ldev[200];
@@ -93,7 +92,8 @@ pwr_tStatus dir_parse_filename(
   /* Directory */
   if ((s = strchr(ldir, '>')))
     s++;
-  else {
+  else
+  {
     if ((s = strchr(ldir, ']')))
       s++;
     else
@@ -111,10 +111,12 @@ pwr_tStatus dir_parse_filename(
   /* Type */
   if ((s = strchr(ltype, ';')))
     t = s++;
-  else {
+  else
+  {
     if ((s = strchr(ltype + 1, '.')))
       t = s++;
-    else {
+    else
+    {
       s = ltype;
       t = s + strlen(s);
     }
@@ -122,9 +124,12 @@ pwr_tStatus dir_parse_filename(
   strcpy(lversion, t);
   *t = 0;
 
-  if (streq(lversion, "")) {
+  if (streq(lversion, ""))
+  {
     *version = 0;
-  } else {
+  }
+  else
+  {
     sts = sscanf(lversion, "%d", version);
     if (sts != 1)
       *version = 0;
@@ -138,18 +143,18 @@ pwr_tStatus dir_parse_filename(
 }
 
 /****************************************************************************
-* Name:		dir_get_fileinfo ()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-* 	Send back creation time and size of a given file
-*
-**************************************************************************/
-pwr_tStatus dir_get_fileinfo(char* file_name, pwr_tTime* time2_ptr, int* size_p,
-    int* vmsvers_p, char* found_file)
+ * Name:		dir_get_fileinfo ()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ * 	Send back creation time and size of a given file
+ *
+ **************************************************************************/
+pwr_tStatus dir_get_fileinfo(char* file_name, pwr_tTime* time2_ptr, int* size_p, int* vmsvers_p,
+                             char* found_file)
 {
   struct stat info;
   int sts;
@@ -160,7 +165,8 @@ pwr_tStatus dir_get_fileinfo(char* file_name, pwr_tTime* time2_ptr, int* size_p,
   if (sts == -1)
     return 0;
 
-  if (time2_ptr) {
+  if (time2_ptr)
+  {
     time2_ptr->tv_sec = info.st_ctime;
     time2_ptr->tv_nsec = 0;
   }
@@ -175,17 +181,17 @@ pwr_tStatus dir_get_fileinfo(char* file_name, pwr_tTime* time2_ptr, int* size_p,
 }
 
 /*************************************************************************
-*
-* Name:		dir_TimeString
-*
-* Type		*char
-*
-* Description:
-*		Converts a VMS-time to a string.
-*
-* Parameters
-*
-**************************************************************************/
+ *
+ * Name:		dir_TimeString
+ *
+ * Type		*char
+ *
+ * Description:
+ *		Converts a VMS-time to a string.
+ *
+ * Parameters
+ *
+ **************************************************************************/
 
 char* dir_TimeString(pwr_tTime* time, char* timestr)
 {
@@ -199,17 +205,17 @@ char* dir_TimeString(pwr_tTime* time, char* timestr)
 }
 
 /*************************************************************************
-*
-* Name:		dir_CopyFile
-*
-* Type		pwr_tStatus
-*
-* Description:
-*		Copy a file.
-*
-* Parameters
-*
-**************************************************************************/
+ *
+ * Name:		dir_CopyFile
+ *
+ * Type		pwr_tStatus
+ *
+ * Description:
+ *		Copy a file.
+ *
+ * Parameters
+ *
+ **************************************************************************/
 pwr_tStatus dir_CopyFile(char* from, char* to)
 {
   int sts;
@@ -223,34 +229,31 @@ pwr_tStatus dir_CopyFile(char* from, char* to)
 }
 
 /*************************************************************************
-*
-* Name:		dir_PurgeFile
-*
-* Type		pwr_tStatus
-*
-* Description:
-*		Purge a file.
-*
-* Parameters
-*
-**************************************************************************/
-pwr_tStatus dir_PurgeFile(char* filename, int keep)
-{
-  return 1;
-}
+ *
+ * Name:		dir_PurgeFile
+ *
+ * Type		pwr_tStatus
+ *
+ * Description:
+ *		Purge a file.
+ *
+ * Parameters
+ *
+ **************************************************************************/
+pwr_tStatus dir_PurgeFile(char* filename, int keep) { return 1; }
 
 /*************************************************************************
-*
-* Name:		dir_DeleteFile
-*
-* Type		pwr_tStatus
-*
-* Description:
-*		Delete a file.
-*
-* Parameters
-*
-**************************************************************************/
+ *
+ * Name:		dir_DeleteFile
+ *
+ * Type		pwr_tStatus
+ *
+ * Description:
+ *		Delete a file.
+ *
+ * Parameters
+ *
+ **************************************************************************/
 pwr_tStatus dir_DeleteFile(char* filename)
 {
   int sts;
@@ -264,34 +267,34 @@ pwr_tStatus dir_DeleteFile(char* filename)
 }
 
 /*************************************************************************
-*
-* Name:		dir_DefineLogical
-*
-* Type		pwr_tStatus
-*
-* Description:
-*		Define a logical name.
-*
-* Parameters
-*
-**************************************************************************/
+ *
+ * Name:		dir_DefineLogical
+ *
+ * Type		pwr_tStatus
+ *
+ * Description:
+ *		Define a logical name.
+ *
+ * Parameters
+ *
+ **************************************************************************/
 pwr_tStatus dir_DefineLogical(char* name, char* value, char* table)
 {
   printf("DefineLogical: NYI\n");
   return 0;
 }
 /*************************************************************************
-*
-* Name:		dir_DeassignLogical
-*
-* Type		pwr_tStatus
-*
-* Description:
-*		Deassign a logical name.
-*
-* Parameters
-*
-**************************************************************************/
+ *
+ * Name:		dir_DeassignLogical
+ *
+ * Type		pwr_tStatus
+ *
+ * Description:
+ *		Deassign a logical name.
+ *
+ * Parameters
+ *
+ **************************************************************************/
 pwr_tStatus dir_DeassignLogical(char* name, char* table)
 {
   printf("DeassignLogical: NYI\n");
@@ -318,7 +321,8 @@ main()
 
   sts = dir_parse_filename(filename, dev, dir, file, type, &version);
 
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = dir_search_file(wild_filename, filename, 0, 0);
     if (ODD(sts))
       printf("%s\n", filename);

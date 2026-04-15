@@ -42,14 +42,15 @@
 #include "co_errno.h"
 #include "rt_errh.h"
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
   pwr_32Bits(pwr_Bits(debug, 1), pwr_Bits(k_mode, 1), /* Kernel mode.  */
-      pwr_Bits(system, 1), pwr_Bits(base, 1), pwr_Bits(user, 1),
-      pwr_Bits(load, 1), pwr_Bits(fill_0, 2), ,
+             pwr_Bits(system, 1), pwr_Bits(base, 1), pwr_Bits(user, 1), pwr_Bits(load, 1),
+             pwr_Bits(fill_0, 2), ,
 
-      pwr_Bits(fill_1, 8), , , , , , , , pwr_Bits(fill_2, 8), , , , , , , ,
-      pwr_Bits(fill_3, 8), , , , , , , ) b;
+             pwr_Bits(fill_1, 8), , , , , , , , pwr_Bits(fill_2, 8), , , , , , , , pwr_Bits(fill_3, 8), , , ,
+             , , , ) b;
 
 #define proc_mProcess__ 0
 #define proc_mProcess_debug pwr_Bit(0)
@@ -59,16 +60,16 @@ typedef union {
 #define proc_mProcess_user pwr_Bit(4)
 #define proc_mProcess_load pwr_Bit(5)
 
-#define proc_mProcess_all                                                      \
-  (proc_mProcess_system | proc_mProcess_base | proc_mProcess_user)
+#define proc_mProcess_all (proc_mProcess_system | proc_mProcess_base | proc_mProcess_user)
 
 #define proc_mProcess_ (~proc_mProcess__)
 } proc_mProcess;
 
-typedef struct {
+typedef struct
+{
   proc_mProcess flags;
-  int p_prio; /* Process priority.  */
-  int t_prio; /* Thread priority.  */
+  int p_prio;    /* Process priority.  */
+  int t_prio;    /* Thread priority.  */
   size_t k_size; /* Kernel stack size.  */
   size_t u_size; /* User stack size.  */
   char* file;

@@ -66,8 +66,9 @@
 #define DELTA 0.1
 #define WINDBORDER 3.0
 
-typedef struct {
-  GlowArrayElem *e;
+typedef struct
+{
+  GlowArrayElem* e;
   double x_right;
   double x_left;
   double y_high;
@@ -76,7 +77,8 @@ typedef struct {
   int idx;
 } sElem;
 
-typedef struct {
+typedef struct
+{
   int vert_left_border;
   int vert_right_border;
   int vert_top_border;
@@ -112,38 +114,39 @@ typedef struct {
   double window_switch_ratio;
 } sModuleData;
 
-static char *dtostr(double f)
+static char* dtostr(double f)
 {
   static char str[30];
   sprintf(str, "%g", f);
-  if (strchr(str, '.') == 0  && strchr(str,'e') == 0)
+  if (strchr(str, '.') == 0 && strchr(str, 'e') == 0)
     strcat(str, ".");
   return str;
 }
 
-GrowScriptModule *GlowExportScript::get_scriptmodule(GlowArrayElem *o, 
-    double *x, double *y)
+GrowScriptModule* GlowExportScript::get_scriptmodule(GlowArrayElem* o, double* x, double* y)
 {
   double o_x_right = -1e10;
   double o_x_left = 1e10;
   double o_y_high = -1e10;
   double o_y_low = 1e10;
-  
+
   o->get_borders(&o_x_right, &o_x_left, &o_y_high, &o_y_low);
 
-  for (int i = 0; i < ctx->a.size(); i++) {
-    if (ctx->a[i]->type() == glow_eObjectType_GrowScriptModule) {
+  for (int i = 0; i < ctx->a.size(); i++)
+  {
+    if (ctx->a[i]->type() == glow_eObjectType_GrowScriptModule)
+    {
       double m_x_right = -1e10;
       double m_x_left = 1e10;
       double m_y_high = -1e10;
       double m_y_low = 1e10;
       ctx->a[i]->get_borders(&m_x_right, &m_x_left, &m_y_high, &m_y_low);
 
-      if (o_x_right <= m_x_right && o_y_high <= m_y_high && 
-	  o_x_left >= m_x_left && o_y_low >= m_y_low) {
-	*x = m_x_left;
-	*y = m_y_low;
-	return (GrowScriptModule *)ctx->a[i];
+      if (o_x_right <= m_x_right && o_y_high <= m_y_high && o_x_left >= m_x_left && o_y_low >= m_y_low)
+      {
+        *x = m_x_left;
+        *y = m_y_low;
+        return (GrowScriptModule*)ctx->a[i];
       }
     }
   }
@@ -153,15 +156,15 @@ GrowScriptModule *GlowExportScript::get_scriptmodule(GlowArrayElem *o,
 int GlowExportScript::scriptmodule_count()
 {
   int cnt = 0;
-  for (int i = 0; i < ctx->a.size(); i++) {
+  for (int i = 0; i < ctx->a.size(); i++)
+  {
     if (ctx->a[i]->type() == glow_eObjectType_GrowScriptModule)
       cnt++;
   }
   return cnt;
 }
 
-int GlowExportScript::export_script(char* filename,
-    int (*userdata_cb)(void*, void*, std::ofstream&, char*))
+int GlowExportScript::export_script(char* filename, int (*userdata_cb)(void*, void*, std::ofstream&, char*))
 {
   char nc_name[80];
   int is_toolbar;
@@ -194,7 +197,8 @@ int GlowExportScript::export_script(char* filename,
   // Graph size
   int default_width = int((ctx->x1 - ctx->x0) * ctx->mw.zoom_factor_x);
   int default_height = int((ctx->y1 - ctx->y0) * ctx->mw.zoom_factor_y);
-  if (default_width > 0 && default_height > 0) {
+  if (default_width > 0 && default_height > 0)
+  {
     fp << "!** DefaultWidth: " << default_width << '\n';
     fp << "!** DefaultHeight: " << default_height << '\n';
   }
@@ -202,91 +206,110 @@ int GlowExportScript::export_script(char* filename,
   // Load of subgraphs
   has_toolbar = 0;
   new_line = 1;
-  if (ctx->a_nc.size() > 0) {
+  if (ctx->a_nc.size() > 0)
+  {
     fp << "!** Load: ";
     llen = 10;
-    for (int i = 0; i < ctx->a_nc.size(); i++) {
+    for (int i = 0; i < ctx->a_nc.size(); i++)
+    {
       is_toolbar = 0;
-      for (int j = 0; j < ctx->a.size(); j++) {	
-	if (ctx->a[j]->type() == glow_eObjectType_GrowToolbar &&
-	    ctx->a_nc[i] == ((GrowToolbar *)ctx->a[j])->nc) {
-	  is_toolbar = 1;
-	  has_toolbar = 1;
-	  break;
-	}
+      for (int j = 0; j < ctx->a.size(); j++)
+      {
+        if (ctx->a[j]->type() == glow_eObjectType_GrowToolbar &&
+            ctx->a_nc[i] == ((GrowToolbar*)ctx->a[j])->nc)
+        {
+          is_toolbar = 1;
+          has_toolbar = 1;
+          break;
+        }
       }
       if (is_toolbar)
-	continue;
-      if (llen + strlen(((GlowNodeClass *)ctx->a_nc[i])->n_name) + 2 > K_LINE_SIZE) {
-	fp << '\n';
-	fp << "!** Load: ";
-	llen = 10;
-	new_line = 1;
+        continue;
+      if (llen + strlen(((GlowNodeClass*)ctx->a_nc[i])->n_name) + 2 > K_LINE_SIZE)
+      {
+        fp << '\n';
+        fp << "!** Load: ";
+        llen = 10;
+        new_line = 1;
       }
       if (new_line)
-	new_line = 0;
-      else {
-	fp << ",";
-	llen++;
+        new_line = 0;
+      else
+      {
+        fp << ",";
+        llen++;
       }
-      fp << ((GlowNodeClass *)ctx->a_nc[i])->n_name;
-      llen += strlen(((GlowNodeClass *)ctx->a_nc[i])->n_name);
+      fp << ((GlowNodeClass*)ctx->a_nc[i])->n_name;
+      llen += strlen(((GlowNodeClass*)ctx->a_nc[i])->n_name);
     }
-    if (has_toolbar) {
+    if (has_toolbar)
+    {
       // Add method buttons that are not present
-      for (int j = 0; j < GeMethods::opmeth_size; j++) {
-	if (strcmp(GeMethods::op_subgraph[j], "") == 0)
-	  continue;
-	found = 0;
-	for (int i = 0; i < ctx->a_nc.size(); i++) {
-	  if (strcmp(GeMethods::op_subgraph[j], ((GlowNodeClass *)ctx->a_nc[i])->n_name) == 0) {
-	    found = 1;
-	    break;
-	  }
-	}
-	if (!found) {
-	  if (llen + strlen(GeMethods::op_subgraph[j]) + 2 > K_LINE_SIZE) {
-	    fp << '\n';
-	    fp << "!** Load: ";
-	    llen = 10;
-	    new_line = 1;
-	  }
-	  if (new_line)
-	    new_line = 0;
-	  else {
-	    fp << ",";
-	    llen++;
-	  }
-	  fp << GeMethods::op_subgraph[j];
-	  llen += strlen(GeMethods::op_subgraph[j]);
-	}
+      for (int j = 0; j < GeMethods::opmeth_size; j++)
+      {
+        if (strcmp(GeMethods::op_subgraph[j], "") == 0)
+          continue;
+        found = 0;
+        for (int i = 0; i < ctx->a_nc.size(); i++)
+        {
+          if (strcmp(GeMethods::op_subgraph[j], ((GlowNodeClass*)ctx->a_nc[i])->n_name) == 0)
+          {
+            found = 1;
+            break;
+          }
+        }
+        if (!found)
+        {
+          if (llen + strlen(GeMethods::op_subgraph[j]) + 2 > K_LINE_SIZE)
+          {
+            fp << '\n';
+            fp << "!** Load: ";
+            llen = 10;
+            new_line = 1;
+          }
+          if (new_line)
+            new_line = 0;
+          else
+          {
+            fp << ",";
+            llen++;
+          }
+          fp << GeMethods::op_subgraph[j];
+          llen += strlen(GeMethods::op_subgraph[j]);
+        }
       }
-      for (int j = 0; j < GeMethods::mntmeth_size; j++) {
-	if (strcmp(GeMethods::mnt_subgraph[j], "") == 0)
-	  continue;
-	found = 0;
-	for (int i = 0; i < ctx->a_nc.size(); i++) {
-	  if (strcmp(GeMethods::mnt_subgraph[j], ((GlowNodeClass *)ctx->a_nc[i])->n_name) == 0) {
-	    found = 1;
-	    break;
-	  }
-	}
-	if (!found) {
-	  if (llen + strlen(GeMethods::mnt_subgraph[j]) + 2 > K_LINE_SIZE) {
-	    fp << '\n';
-	    fp << "!** Load: ";
-	    llen = 10;
-	    new_line = 1;
-	  }
-	  if (new_line)
-	    new_line = 0;
-	  else {
-	    fp << ",";
-	    llen++;
-	  }
-	  fp << GeMethods::mnt_subgraph[j];
-	  llen += strlen(GeMethods::mnt_subgraph[j]);
-	}
+      for (int j = 0; j < GeMethods::mntmeth_size; j++)
+      {
+        if (strcmp(GeMethods::mnt_subgraph[j], "") == 0)
+          continue;
+        found = 0;
+        for (int i = 0; i < ctx->a_nc.size(); i++)
+        {
+          if (strcmp(GeMethods::mnt_subgraph[j], ((GlowNodeClass*)ctx->a_nc[i])->n_name) == 0)
+          {
+            found = 1;
+            break;
+          }
+        }
+        if (!found)
+        {
+          if (llen + strlen(GeMethods::mnt_subgraph[j]) + 2 > K_LINE_SIZE)
+          {
+            fp << '\n';
+            fp << "!** Load: ";
+            llen = 10;
+            new_line = 1;
+          }
+          if (new_line)
+            new_line = 0;
+          else
+          {
+            fp << ",";
+            llen++;
+          }
+          fp << GeMethods::mnt_subgraph[j];
+          llen += strlen(GeMethods::mnt_subgraph[j]);
+        }
       }
     }
     fp << '\n';
@@ -299,11 +322,13 @@ int GlowExportScript::export_script(char* filename,
   fp << ind << "float x2;" << '\n';
   fp << ind << "float y2;" << '\n';
   fp << ind << "int id;" << '\n';
-  if (module_cnt) {
+  if (module_cnt)
+  {
     mod_base_x = 1e10;
     mod_base_y = 1e10;
 
-    for (int i = 0; i < ctx->a.size(); i++) {
+    for (int i = 0; i < ctx->a.size(); i++)
+    {
       sElem e;
       e.e = ctx->a[i];
       e.x_right = -1e10;
@@ -312,59 +337,64 @@ int GlowExportScript::export_script(char* filename,
       e.y_low = 1e10;
       e.exported = 0;
       ctx->a[i]->get_borders(&e.x_right, &e.x_left, &e.y_high, &e.y_low);
-      if (ctx->a[i]->type() == glow_eObjectType_GrowScriptModule) {
-	e.idx = ((GrowScriptModule *)e.e)->module_index;
-	vmod.push_back(e);
-	if (e.x_left < mod_base_x)
-	  mod_base_x = e.x_left;
-	if (e.y_low < mod_base_y)
-	  mod_base_y = e.y_low;
+      if (ctx->a[i]->type() == glow_eObjectType_GrowScriptModule)
+      {
+        e.idx = ((GrowScriptModule*)e.e)->module_index;
+        vmod.push_back(e);
+        if (e.x_left < mod_base_x)
+          mod_base_x = e.x_left;
+        if (e.y_low < mod_base_y)
+          mod_base_y = e.y_low;
       }
       else
-	velem.push_back(e);
+        velem.push_back(e);
     }
-    for (int i = 0; i < vmod.size(); i++) {
-      for (int j = 0; j < vmod.size(); j++) {
-	if (i == vmod[j].idx) {
-	  sModuleData md;
-	  md.vert_left_border = ((GrowScriptModule *)vmod[j].e)->vert_left_border;
-	  md.vert_right_border = ((GrowScriptModule *)vmod[j].e)->vert_right_border;
-	  md.vert_top_border = ((GrowScriptModule *)vmod[j].e)->vert_top_border;
-	  md.vert_bottom_border = ((GrowScriptModule *)vmod[j].e)->vert_bottom_border;
-	  md.vert_prio = ((GrowScriptModule *)vmod[j].e)->vert_prio;
-	  md.vert_left_module = ((GrowScriptModule *)vmod[j].e)->vert_left_module;
-	  md.vert_right_module = ((GrowScriptModule *)vmod[j].e)->vert_right_module;
-	  md.vert_top_module = ((GrowScriptModule *)vmod[j].e)->vert_top_module;
-	  md.vert_bottom_module = ((GrowScriptModule *)vmod[j].e)->vert_bottom_module;
-	  md.vert_width = ((GrowScriptModule *)vmod[j].e)->vert_width;
-	  md.vert_height = ((GrowScriptModule *)vmod[j].e)->vert_height;
-	  md.vert_fix_width = ((GrowScriptModule *)vmod[j].e)->vert_fix_width;
-	  md.vert_fix_height = ((GrowScriptModule *)vmod[j].e)->vert_fix_height;
-	  md.horiz_left_border = ((GrowScriptModule *)vmod[j].e)->horiz_left_border;
-	  md.horiz_right_border = ((GrowScriptModule *)vmod[j].e)->horiz_right_border;
-	  md.horiz_top_border = ((GrowScriptModule *)vmod[j].e)->horiz_top_border;
-	  md.horiz_bottom_border = ((GrowScriptModule *)vmod[j].e)->horiz_bottom_border;
-	  md.horiz_prio = ((GrowScriptModule *)vmod[j].e)->horiz_prio;
-	  md.horiz_left_module = ((GrowScriptModule *)vmod[j].e)->horiz_left_module;
-	  md.horiz_right_module = ((GrowScriptModule *)vmod[j].e)->horiz_right_module;
-	  md.horiz_top_module = ((GrowScriptModule *)vmod[j].e)->horiz_top_module;
-	  md.horiz_bottom_module = ((GrowScriptModule *)vmod[j].e)->horiz_bottom_module;
-	  md.horiz_width = ((GrowScriptModule *)vmod[j].e)->horiz_width;
-	  md.horiz_height = ((GrowScriptModule *)vmod[j].e)->horiz_height;
-	  md.horiz_fix_width = ((GrowScriptModule *)vmod[j].e)->horiz_fix_width;
-	  md.horiz_fix_height = ((GrowScriptModule *)vmod[j].e)->horiz_fix_height;
-	  md.left_border_width = ((GrowScriptModule *)vmod[j].e)->left_border_width;
-	  md.right_border_width = ((GrowScriptModule *)vmod[j].e)->right_border_width;
-	  md.top_border_width = ((GrowScriptModule *)vmod[j].e)->top_border_width;
-	  md.bottom_border_width = ((GrowScriptModule *)vmod[j].e)->bottom_border_width;
-	  md.fill_module = ((GrowScriptModule *)vmod[j].e)->fill_module;
-	  md.window_border_width = ((GrowScriptModule *)vmod[j].e)->window_border_width;
-	  md.window_switch_ratio = ((GrowScriptModule *)vmod[j].e)->window_switch_ratio;
-	  vmdata.push_back(md);
-	}
+    for (int i = 0; i < vmod.size(); i++)
+    {
+      for (int j = 0; j < vmod.size(); j++)
+      {
+        if (i == vmod[j].idx)
+        {
+          sModuleData md;
+          md.vert_left_border = ((GrowScriptModule*)vmod[j].e)->vert_left_border;
+          md.vert_right_border = ((GrowScriptModule*)vmod[j].e)->vert_right_border;
+          md.vert_top_border = ((GrowScriptModule*)vmod[j].e)->vert_top_border;
+          md.vert_bottom_border = ((GrowScriptModule*)vmod[j].e)->vert_bottom_border;
+          md.vert_prio = ((GrowScriptModule*)vmod[j].e)->vert_prio;
+          md.vert_left_module = ((GrowScriptModule*)vmod[j].e)->vert_left_module;
+          md.vert_right_module = ((GrowScriptModule*)vmod[j].e)->vert_right_module;
+          md.vert_top_module = ((GrowScriptModule*)vmod[j].e)->vert_top_module;
+          md.vert_bottom_module = ((GrowScriptModule*)vmod[j].e)->vert_bottom_module;
+          md.vert_width = ((GrowScriptModule*)vmod[j].e)->vert_width;
+          md.vert_height = ((GrowScriptModule*)vmod[j].e)->vert_height;
+          md.vert_fix_width = ((GrowScriptModule*)vmod[j].e)->vert_fix_width;
+          md.vert_fix_height = ((GrowScriptModule*)vmod[j].e)->vert_fix_height;
+          md.horiz_left_border = ((GrowScriptModule*)vmod[j].e)->horiz_left_border;
+          md.horiz_right_border = ((GrowScriptModule*)vmod[j].e)->horiz_right_border;
+          md.horiz_top_border = ((GrowScriptModule*)vmod[j].e)->horiz_top_border;
+          md.horiz_bottom_border = ((GrowScriptModule*)vmod[j].e)->horiz_bottom_border;
+          md.horiz_prio = ((GrowScriptModule*)vmod[j].e)->horiz_prio;
+          md.horiz_left_module = ((GrowScriptModule*)vmod[j].e)->horiz_left_module;
+          md.horiz_right_module = ((GrowScriptModule*)vmod[j].e)->horiz_right_module;
+          md.horiz_top_module = ((GrowScriptModule*)vmod[j].e)->horiz_top_module;
+          md.horiz_bottom_module = ((GrowScriptModule*)vmod[j].e)->horiz_bottom_module;
+          md.horiz_width = ((GrowScriptModule*)vmod[j].e)->horiz_width;
+          md.horiz_height = ((GrowScriptModule*)vmod[j].e)->horiz_height;
+          md.horiz_fix_width = ((GrowScriptModule*)vmod[j].e)->horiz_fix_width;
+          md.horiz_fix_height = ((GrowScriptModule*)vmod[j].e)->horiz_fix_height;
+          md.left_border_width = ((GrowScriptModule*)vmod[j].e)->left_border_width;
+          md.right_border_width = ((GrowScriptModule*)vmod[j].e)->right_border_width;
+          md.top_border_width = ((GrowScriptModule*)vmod[j].e)->top_border_width;
+          md.bottom_border_width = ((GrowScriptModule*)vmod[j].e)->bottom_border_width;
+          md.fill_module = ((GrowScriptModule*)vmod[j].e)->fill_module;
+          md.window_border_width = ((GrowScriptModule*)vmod[j].e)->window_border_width;
+          md.window_switch_ratio = ((GrowScriptModule*)vmod[j].e)->window_switch_ratio;
+          vmdata.push_back(md);
+        }
       }
     }
-    if (module_cnt != vmdata.size()) {
+    if (module_cnt != vmdata.size())
+    {
       printf("Module index mismatch %d != %d\n", module_cnt, (int)vmdata.size());
       return 0;
     }
@@ -373,149 +403,167 @@ int GlowExportScript::export_script(char* filename,
     fp << ind << "float wheight = " << dtostr(ctx->y1 - ctx->y0) << ";" << '\n';
     // Vertical layout
     fp << ind << "int vmprio[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].vert_prio;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "int vmtop[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].vert_top_module;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "int vmbottom[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].vert_bottom_module;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "int vmleft[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].vert_left_module;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "int vmright[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].vert_right_module;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "float vmwidth[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << dtostr(vmdata[i].vert_width);
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "float vmheight[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << dtostr(vmdata[i].vert_height);
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "int vmfix_width[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].vert_fix_width;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "int vmfix_height[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].vert_fix_height;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     // Horizontal layout
     fp << ind << "int hmprio[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].horiz_prio;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "int hmtop[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].horiz_top_module;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "int hmbottom[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].horiz_bottom_module;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "int hmleft[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].horiz_left_module;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "int hmright[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].horiz_right_module;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "float hmwidth[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << dtostr(vmdata[i].horiz_width);
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "float hmheight[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << dtostr(vmdata[i].horiz_height);
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "int hmfix_width[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].horiz_fix_width;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "int hmfix_height[" << module_cnt << "] = (";
-    for (int i = 0; i < vmdata.size(); i++) {
+    for (int i = 0; i < vmdata.size(); i++)
+    {
       fp << vmdata[i].horiz_fix_height;
       if (i < vmdata.size() - 1)
-	fp << ",";
+        fp << ",";
       else
-	fp << ");" << '\n';
+        fp << ");" << '\n';
     }
     fp << ind << "float mcalc_x[" << module_cnt << "];" << '\n';
     fp << ind << "float mcalc_y[" << module_cnt << "];" << '\n';
@@ -531,37 +579,44 @@ int GlowExportScript::export_script(char* filename,
     fp << ind << "GetWindowDimension(wwidth,wheight);" << '\n';
     fp << ind << "if (wwidth / wheight > " << dtostr(vmdata[0].window_switch_ratio) << ")" << '\n';
     ind_incr();
-    fp << ind << "Layout(wwidth,wheight,hmprio[],hmtop[],hmbottom[],hmleft[],hmright[],hmwidth[],hmheight[],hmfix_width[],hmfix_height[],mcalc_x[],mcalc_y[],mcalc_width[],mcalc_height[]);" << '\n';
+    fp << ind
+       << "Layout(wwidth,wheight,hmprio[],hmtop[],hmbottom[],hmleft[],hmright[],hmwidth[],hmheight[],hmfix_"
+          "width[],hmfix_height[],mcalc_x[],mcalc_y[],mcalc_width[],mcalc_height[]);"
+       << '\n';
     ind_decr();
     fp << ind << "else" << '\n';
     ind_incr();
-    fp << ind << "Layout(wwidth,wheight,vmprio[],vmtop[],vmbottom[],vmleft[],vmright[],vmwidth[],vmheight[],vmfix_width[],vmfix_height[],mcalc_x[],mcalc_y[],mcalc_width[],mcalc_height[]);" << '\n';
+    fp << ind
+       << "Layout(wwidth,wheight,vmprio[],vmtop[],vmbottom[],vmleft[],vmright[],vmwidth[],vmheight[],vmfix_"
+          "width[],vmfix_height[],mcalc_x[],mcalc_y[],mcalc_width[],mcalc_height[]);"
+       << '\n';
     ind_decr();
     fp << ind << "endif" << '\n';
   }
 
-  fp << ind << "SetDraw(0);" << '\n';  
-  
+  fp << ind << "SetDraw(0);" << '\n';
+
   if (!streq(nc_name, ""))
     fp << ind << "SetGraphName(\"" << nc_name << "\");" << '\n';
-  if (module_cnt) {    
+  if (module_cnt)
+  {
     if (ctx->x0 != 0)
-      fp << ind << "SetGraphAttribute(\"x0\"," 
-	 << dtostr(ctx->x0 - vmdata[0].window_border_width) << ");" << '\n';
+      fp << ind << "SetGraphAttribute(\"x0\"," << dtostr(ctx->x0 - vmdata[0].window_border_width) << ");"
+         << '\n';
     if (ctx->y0 != 0)
-      fp << ind << "SetGraphAttribute(\"y0\"," 
-	 << dtostr(ctx->y0 - vmdata[0].window_border_width) << ");" << '\n';
+      fp << ind << "SetGraphAttribute(\"y0\"," << dtostr(ctx->y0 - vmdata[0].window_border_width) << ");"
+         << '\n';
     fp << ind << "x1 = wwidth + " << dtostr(ctx->x0 + vmdata[0].window_border_width) << ";" << '\n';
     fp << ind << "y1 = wheight + " << dtostr(ctx->y0 + vmdata[0].window_border_width) << ";" << '\n';
     fp << ind << "SetGraphAttribute(\"x1\",x1);" << '\n';
     fp << ind << "SetGraphAttribute(\"y1\",y1);" << '\n';
-  } else {
+  }
+  else
+  {
     if (ctx->x0 != 0)
-      fp << ind << "SetGraphAttribute(\"x0\"," 
-	 << dtostr(ctx->x0) << ");" << '\n';
+      fp << ind << "SetGraphAttribute(\"x0\"," << dtostr(ctx->x0) << ");" << '\n';
     if (ctx->y0 != 0)
-      fp << ind << "SetGraphAttribute(\"y0\"," 
-	 << dtostr(ctx->y0) << ");" << '\n';
+      fp << ind << "SetGraphAttribute(\"y0\"," << dtostr(ctx->y0) << ");" << '\n';
     if (ctx->x1 != 0)
       fp << ind << "SetGraphAttribute(\"x1\"," << dtostr(ctx->x1) << ");" << '\n';
     if (ctx->y1 != 0)
@@ -572,7 +627,8 @@ int GlowExportScript::export_script(char* filename,
   if (!feq(ctx->fast_scantime, 0.5))
     fp << ind << "SetGraphAttribute(\"FastScantime\"," << dtostr(ctx->fast_scantime) << ");" << '\n';
   if (!feq(ctx->animation_scantime, 0.5))
-    fp << ind << "SetGraphAttribute(\"AnimationScantime\"," << dtostr(ctx->animation_scantime) << ");" << '\n';
+    fp << ind << "SetGraphAttribute(\"AnimationScantime\"," << dtostr(ctx->animation_scantime) << ");"
+       << '\n';
   if (!streq(ctx->background_image, ""))
     fp << ind << "SetGraphAttribute(\"BackgroundImage\",\"" << ctx->background_image << "\");" << '\n';
   if (ctx->mb3_action != glow_eMB3Action_PopupMenu)
@@ -600,157 +656,177 @@ int GlowExportScript::export_script(char* filename,
   if (ctx->dash->dash_columns != 4)
     fp << ind << "SetGraphAttribute(\"DashCellColumns\"," << ctx->dash->dash_columns << ");" << '\n';
   if (streq(ctx->color_theme, "$default"))
-    fp << ind << "SetColorTheme();" << '\n'; 
-  else if (!streq(ctx->default_color_theme, "")) {
+    fp << ind << "SetColorTheme();" << '\n';
+  else if (!streq(ctx->default_color_theme, ""))
+  {
     int ct;
-    if (strncmp(ctx->default_color_theme, "pwr_colortheme", 14) == 0 && sscanf(&ctx->default_color_theme[14], "%d", &ct) == 1)
-      fp << ind << "SetColorTheme(" << ct << ");" << '\n'; 
-  }	
+    if (strncmp(ctx->default_color_theme, "pwr_colortheme", 14) == 0 &&
+        sscanf(&ctx->default_color_theme[14], "%d", &ct) == 1)
+      fp << ind << "SetColorTheme(" << ct << ");" << '\n';
+  }
   fp << ind << "SetBackgroundColor(" << ctx->background_color << ");" << '\n';
-    
-  if (module_cnt) {
+
+  if (module_cnt)
+  {
     char name[40];
 
-    for (int i = 0; i < (int)vmod.size(); i++) {
+    for (int i = 0; i < (int)vmod.size(); i++)
+    {
 
       vmod[i].e->get_object_name(name, sizeof(name), glow_eName_Object);
       fp << cind << "Module " << name << " (" << vmod[i].x_left << "," << vmod[i].y_low << ") ("
-	 << vmod[i].x_right << "," << vmod[i].y_high << ")" << '\n';
+         << vmod[i].x_right << "," << vmod[i].y_high << ")" << '\n';
       fp << ind << "if (mcalc_width[" << vmod[i].idx << "] != 0.0)" << '\n';
       ind_incr();
       fp << ind << "mx = mbase_x + mcalc_x[" << vmod[i].idx << "];" << '\n';
       fp << ind << "my = mbase_y + mcalc_y[" << vmod[i].idx << "];" << '\n';
 
-      if (vmdata[vmod[i].idx].fill_module) {
-	fp << cind << "Fill module" << '\n';
-	fp << ind << "id = CreateRectangle(mx,my,mcalc_width[" << 
-	  vmod[i].idx << "],mcalc_height[" << vmod[i].idx << "]);" << '\n';
-	fp << ind << "SetObjectFill(id,1);" << '\n';
-	fp << ind << "SetObjectFillColor(id,318);" << '\n';
-	fp << ind << "SetObjectBorder(id,0);" << '\n';
+      if (vmdata[vmod[i].idx].fill_module)
+      {
+        fp << cind << "Fill module" << '\n';
+        fp << ind << "id = CreateRectangle(mx,my,mcalc_width[" << vmod[i].idx << "],mcalc_height["
+           << vmod[i].idx << "]);" << '\n';
+        fp << ind << "SetObjectFill(id,1);" << '\n';
+        fp << ind << "SetObjectFillColor(id,318);" << '\n';
+        fp << ind << "SetObjectBorder(id,0);" << '\n';
       }
 
-      for (int j = 0; j < (int)velem.size(); j++) {
-	if ((velem[j].x_right <= vmod[i].x_right + DELTA && 
-	     velem[j].y_high <= vmod[i].y_high + DELTA && 
-	     velem[j].x_left >= vmod[i].x_left - DELTA && 
-	     velem[j].y_low >= vmod[i].y_low - DELTA) ||
-	    ((velem[j].x_right + velem[j].x_left)/2 < vmod[i].x_right &&
-	     (velem[j].x_right + velem[j].x_left)/2 > vmod[i].x_left &&
-	     (velem[j].y_high + velem[j].y_low)/2 < vmod[i].y_high &&
-	     (velem[j].y_high + velem[j].y_low)/2 > vmod[i].y_low)) {
-	  velem[j].e->export_script(this, &velem[j], &vmod[i]);
-	  velem[j].exported = 1;
-	}	
+      for (int j = 0; j < (int)velem.size(); j++)
+      {
+        if ((velem[j].x_right <= vmod[i].x_right + DELTA && velem[j].y_high <= vmod[i].y_high + DELTA &&
+             velem[j].x_left >= vmod[i].x_left - DELTA && velem[j].y_low >= vmod[i].y_low - DELTA) ||
+            ((velem[j].x_right + velem[j].x_left) / 2 < vmod[i].x_right &&
+             (velem[j].x_right + velem[j].x_left) / 2 > vmod[i].x_left &&
+             (velem[j].y_high + velem[j].y_low) / 2 < vmod[i].y_high &&
+             (velem[j].y_high + velem[j].y_low) / 2 > vmod[i].y_low))
+        {
+          velem[j].e->export_script(this, &velem[j], &vmod[i]);
+          velem[j].exported = 1;
+        }
       }
 
-      if (vmdata[vmod[i].idx].vert_top_border || vmdata[vmod[i].idx].horiz_top_border) {
-	fp << cind << "Top border" << '\n';
-	if (!(vmdata[vmod[i].idx].vert_top_border && vmdata[vmod[i].idx].horiz_top_border)) {
-	  fp << ind << "if (mtop[" << vmod[i].idx << "])" << '\n';
-	  ind_incr();
-	}
-	fp << ind << "id = CreateRectangle(mx,my,mcalc_width[" << vmod[i].idx << "]," 
-            << dtostr(vmdata[vmod[i].idx].top_border_width) << ");" << '\n';
-	fp << ind << "SetObjectFill(id,1);" << '\n';
-	fp << ind << "SetObjectFillColor(id,318);" << '\n';
-	fp << ind << "SetObjectBorder(id,0);" << '\n';
-	if (!(vmdata[vmod[i].idx].vert_top_border && vmdata[vmod[i].idx].horiz_top_border)) {
-	  ind_decr();
-	  fp << ind << "endif" << '\n';
-	}
+      if (vmdata[vmod[i].idx].vert_top_border || vmdata[vmod[i].idx].horiz_top_border)
+      {
+        fp << cind << "Top border" << '\n';
+        if (!(vmdata[vmod[i].idx].vert_top_border && vmdata[vmod[i].idx].horiz_top_border))
+        {
+          fp << ind << "if (mtop[" << vmod[i].idx << "])" << '\n';
+          ind_incr();
+        }
+        fp << ind << "id = CreateRectangle(mx,my,mcalc_width[" << vmod[i].idx << "],"
+           << dtostr(vmdata[vmod[i].idx].top_border_width) << ");" << '\n';
+        fp << ind << "SetObjectFill(id,1);" << '\n';
+        fp << ind << "SetObjectFillColor(id,318);" << '\n';
+        fp << ind << "SetObjectBorder(id,0);" << '\n';
+        if (!(vmdata[vmod[i].idx].vert_top_border && vmdata[vmod[i].idx].horiz_top_border))
+        {
+          ind_decr();
+          fp << ind << "endif" << '\n';
+        }
       }
-      if (vmdata[vmod[i].idx].vert_bottom_border || vmdata[vmod[i].idx].horiz_bottom_border) {
-	fp << cind << "Bottom border" << '\n';
-	if (!(vmdata[vmod[i].idx].vert_bottom_border && vmdata[vmod[i].idx].horiz_bottom_border)) {
-	  fp << ind << "if (mbottom[" << vmod[i].idx << "])" << '\n';
-	  ind_incr();
-	}
-        fp << ind << "y1 = my + mcalc_height[" << vmod[i].idx << "]-" << dtostr(vmdata[vmod[i].idx].bottom_border_width) << ";" << '\n';
-	fp << ind << "id = CreateRectangle(mx, y1,mcalc_width[" << vmod[i].idx << "]," 
-	   << dtostr(vmdata[vmod[i].idx].bottom_border_width) << ");" << '\n';
-	fp << ind << "SetObjectFill(id,1);" << '\n';
-	fp << ind << "SetObjectFillColor(id,318);" << '\n';
-	fp << ind << "SetObjectBorder(id,0);" << '\n';
-	if (!(vmdata[vmod[i].idx].vert_bottom_border && vmdata[vmod[i].idx].horiz_bottom_border)) {
-	  ind_decr();
-	  fp << ind << "endif" << '\n';
-	}
+      if (vmdata[vmod[i].idx].vert_bottom_border || vmdata[vmod[i].idx].horiz_bottom_border)
+      {
+        fp << cind << "Bottom border" << '\n';
+        if (!(vmdata[vmod[i].idx].vert_bottom_border && vmdata[vmod[i].idx].horiz_bottom_border))
+        {
+          fp << ind << "if (mbottom[" << vmod[i].idx << "])" << '\n';
+          ind_incr();
+        }
+        fp << ind << "y1 = my + mcalc_height[" << vmod[i].idx << "]-"
+           << dtostr(vmdata[vmod[i].idx].bottom_border_width) << ";" << '\n';
+        fp << ind << "id = CreateRectangle(mx, y1,mcalc_width[" << vmod[i].idx << "],"
+           << dtostr(vmdata[vmod[i].idx].bottom_border_width) << ");" << '\n';
+        fp << ind << "SetObjectFill(id,1);" << '\n';
+        fp << ind << "SetObjectFillColor(id,318);" << '\n';
+        fp << ind << "SetObjectBorder(id,0);" << '\n';
+        if (!(vmdata[vmod[i].idx].vert_bottom_border && vmdata[vmod[i].idx].horiz_bottom_border))
+        {
+          ind_decr();
+          fp << ind << "endif" << '\n';
+        }
       }
-      if (vmdata[vmod[i].idx].vert_left_border || vmdata[vmod[i].idx].horiz_left_border) {
-	fp << cind << "Left border" << '\n';
-	if (!(vmdata[vmod[i].idx].vert_left_border && vmdata[vmod[i].idx].horiz_left_border)) {
-	  fp << ind << "if (mleft[" << vmod[i].idx << "])" << '\n';
-	  ind_incr();
-	}
-	fp << ind << "id = CreateRectangle(mx,my," << dtostr(vmdata[vmod[i].idx].left_border_width) << ",mcalc_height[" << vmod[i].idx 
-	   << "]);" << '\n';
-	fp << ind << "SetObjectFill(id,1);" << '\n';
-	fp << ind << "SetObjectFillColor(id,318);" << '\n';
-	fp << ind << "SetObjectBorder(id,0);" << '\n';
-	if (!(vmdata[vmod[i].idx].vert_left_border && vmdata[vmod[i].idx].horiz_left_border)) {
-	  ind_decr();
-	  fp << ind << "endif" << '\n';
-	}
+      if (vmdata[vmod[i].idx].vert_left_border || vmdata[vmod[i].idx].horiz_left_border)
+      {
+        fp << cind << "Left border" << '\n';
+        if (!(vmdata[vmod[i].idx].vert_left_border && vmdata[vmod[i].idx].horiz_left_border))
+        {
+          fp << ind << "if (mleft[" << vmod[i].idx << "])" << '\n';
+          ind_incr();
+        }
+        fp << ind << "id = CreateRectangle(mx,my," << dtostr(vmdata[vmod[i].idx].left_border_width)
+           << ",mcalc_height[" << vmod[i].idx << "]);" << '\n';
+        fp << ind << "SetObjectFill(id,1);" << '\n';
+        fp << ind << "SetObjectFillColor(id,318);" << '\n';
+        fp << ind << "SetObjectBorder(id,0);" << '\n';
+        if (!(vmdata[vmod[i].idx].vert_left_border && vmdata[vmod[i].idx].horiz_left_border))
+        {
+          ind_decr();
+          fp << ind << "endif" << '\n';
+        }
       }
-      if (vmdata[vmod[i].idx].vert_right_border || vmdata[vmod[i].idx].horiz_right_border) {
-	fp << cind << "Right border" << '\n';
-	if (!(vmdata[vmod[i].idx].vert_right_border && vmdata[vmod[i].idx].horiz_right_border)) {
-	  fp << ind << "if (mright[" << vmod[i].idx << "])" << '\n';
-	  ind_incr();
-	}
-	fp << ind << "x1 = mx + mcalc_width[" << vmod[i].idx << "] - " << vmdata[vmod[i].idx].right_border_width << ";" << '\n';
-	fp << ind << "id = CreateRectangle(x1,my," << dtostr(vmdata[vmod[i].idx].right_border_width) << ",mcalc_height[" << vmod[i].idx
-	   << "]);" << '\n';
-	fp << ind << "SetObjectFill(id,1);" << '\n';
-	fp << ind << "SetObjectFillColor(id,318);" << '\n';
-	fp << ind << "SetObjectBorder(id,0);" << '\n';
-	if (!(vmdata[vmod[i].idx].vert_right_border && vmdata[vmod[i].idx].horiz_right_border)) {
-	  ind_decr();
-	  fp << ind << "endif" << '\n';
-	}
+      if (vmdata[vmod[i].idx].vert_right_border || vmdata[vmod[i].idx].horiz_right_border)
+      {
+        fp << cind << "Right border" << '\n';
+        if (!(vmdata[vmod[i].idx].vert_right_border && vmdata[vmod[i].idx].horiz_right_border))
+        {
+          fp << ind << "if (mright[" << vmod[i].idx << "])" << '\n';
+          ind_incr();
+        }
+        fp << ind << "x1 = mx + mcalc_width[" << vmod[i].idx << "] - "
+           << vmdata[vmod[i].idx].right_border_width << ";" << '\n';
+        fp << ind << "id = CreateRectangle(x1,my," << dtostr(vmdata[vmod[i].idx].right_border_width)
+           << ",mcalc_height[" << vmod[i].idx << "]);" << '\n';
+        fp << ind << "SetObjectFill(id,1);" << '\n';
+        fp << ind << "SetObjectFillColor(id,318);" << '\n';
+        fp << ind << "SetObjectBorder(id,0);" << '\n';
+        if (!(vmdata[vmod[i].idx].vert_right_border && vmdata[vmod[i].idx].horiz_right_border))
+        {
+          ind_decr();
+          fp << ind << "endif" << '\n';
+        }
       }
       ind_decr();
       fp << ind << "endif" << '\n';
       fp << cind << "End module " << name << '\n';
 
-      if ((i == (int)vmod.size() - 1) && vmdata[0].window_border_width != 0) {
-	fp << cind << "Window border" << '\n';
+      if ((i == (int)vmod.size() - 1) && vmdata[0].window_border_width != 0)
+      {
+        fp << cind << "Window border" << '\n';
 
-	fp << ind << "x1 = " << dtostr(ctx->x0 - WINDBORDER) << ";" <<  '\n';
-	fp << ind << "y1 = " << dtostr(ctx->y0 - WINDBORDER) << ";"  << '\n';
-	fp << ind << "width = wwidth + " << dtostr(2*WINDBORDER) << ";" << '\n';
-	fp << ind << "height = " << dtostr(WINDBORDER) 
-	   << ";" << '\n';
-	fp << ind << "id = CreateRectangle(x1,y1,width,height);" << '\n'; 
-	fp << ind << "SetObjectFill(id,1);" << '\n';
-	fp << ind << "SetObjectFillColor(id,318);" << '\n';
-	fp << ind << "SetObjectBorder(id,0);" << '\n';
-	
-	fp << ind << "y1 = " << dtostr(ctx->y0) << " + wheight;" << '\n';
-	fp << ind << "id = CreateRectangle(x1,y1,width,height);" << '\n'; 
-	fp << ind << "SetObjectFill(id,1);" << '\n';
-	fp << ind << "SetObjectFillColor(id,318);" << '\n';
-	fp << ind << "SetObjectBorder(id,0);" << '\n';
-		       
-	fp << ind << "y1 = " << dtostr(ctx->y0) << ";" << '\n';
-	fp << ind << "width = " << dtostr(WINDBORDER) << ";" << '\n';
-	fp << ind << "height = wheight;" << '\n';
-	fp << ind << "id = CreateRectangle(x1,y1,width,height);" << '\n'; 
-	fp << ind << "SetObjectFill(id,1);" << '\n';
-	fp << ind << "SetObjectFillColor(id,318);" << '\n';
-	fp << ind << "SetObjectBorder(id,0);" << '\n';
-	
-	fp << ind << "x1 = " << dtostr(ctx->x0) << " + wwidth;" << '\n';
-	fp << ind << "id = CreateRectangle(x1,y1,width,height);" << '\n'; 
-	fp << ind << "SetObjectFill(id,1);" << '\n';
-	fp << ind << "SetObjectFillColor(id,318);" << '\n';
-	fp << ind << "SetObjectBorder(id,0);" << '\n';
+        fp << ind << "x1 = " << dtostr(ctx->x0 - WINDBORDER) << ";" << '\n';
+        fp << ind << "y1 = " << dtostr(ctx->y0 - WINDBORDER) << ";" << '\n';
+        fp << ind << "width = wwidth + " << dtostr(2 * WINDBORDER) << ";" << '\n';
+        fp << ind << "height = " << dtostr(WINDBORDER) << ";" << '\n';
+        fp << ind << "id = CreateRectangle(x1,y1,width,height);" << '\n';
+        fp << ind << "SetObjectFill(id,1);" << '\n';
+        fp << ind << "SetObjectFillColor(id,318);" << '\n';
+        fp << ind << "SetObjectBorder(id,0);" << '\n';
+
+        fp << ind << "y1 = " << dtostr(ctx->y0) << " + wheight;" << '\n';
+        fp << ind << "id = CreateRectangle(x1,y1,width,height);" << '\n';
+        fp << ind << "SetObjectFill(id,1);" << '\n';
+        fp << ind << "SetObjectFillColor(id,318);" << '\n';
+        fp << ind << "SetObjectBorder(id,0);" << '\n';
+
+        fp << ind << "y1 = " << dtostr(ctx->y0) << ";" << '\n';
+        fp << ind << "width = " << dtostr(WINDBORDER) << ";" << '\n';
+        fp << ind << "height = wheight;" << '\n';
+        fp << ind << "id = CreateRectangle(x1,y1,width,height);" << '\n';
+        fp << ind << "SetObjectFill(id,1);" << '\n';
+        fp << ind << "SetObjectFillColor(id,318);" << '\n';
+        fp << ind << "SetObjectBorder(id,0);" << '\n';
+
+        fp << ind << "x1 = " << dtostr(ctx->x0) << " + wwidth;" << '\n';
+        fp << ind << "id = CreateRectangle(x1,y1,width,height);" << '\n';
+        fp << ind << "SetObjectFill(id,1);" << '\n';
+        fp << ind << "SetObjectFillColor(id,318);" << '\n';
+        fp << ind << "SetObjectBorder(id,0);" << '\n';
       }
     }
-    for (int j = 0; j < (int)velem.size(); j++) {
+    for (int j = 0; j < (int)velem.size(); j++)
+    {
       if (!velem[j].exported)
-	velem[j].e->export_script(this, 0, 0);
+        velem[j].e->export_script(this, 0, 0);
     }
   }
   else
@@ -769,11 +845,13 @@ int GlowExportScript::array(GlowArray* o, void* e, void* m)
   int rsts = 0;
   int sts;
 
-  for (i = 0; i < o->a_size; i++) {
-    if (o->a[i]->type() != glow_eObjectType_Con) {
-    sts = o->a[i]->export_script(this, e, m);
+  for (i = 0; i < o->a_size; i++)
+  {
+    if (o->a[i]->type() != glow_eObjectType_Con)
+    {
+      sts = o->a[i]->export_script(this, e, m);
       if (ODD(sts))
-	rsts = sts;
+        rsts = sts;
     }
   }
   return rsts;
@@ -782,9 +860,10 @@ int GlowExportScript::array(GlowArray* o, void* e, void* m)
 int GlowExportScript::node(GrowNode* o, void* e, void* m)
 {
   fp << cind << "Node " << o->n_name << ", " << o->nc->n_name << '\n';
-  if (m) {
-    sElem *elem = (sElem *)e;
-    sElem *mod = (sElem *)m;
+  if (m)
+  {
+    sElem* elem = (sElem*)e;
+    sElem* mod = (sElem*)m;
     if (fabs(elem->x_left - mod->x_left) < EPS)
       fp << ind << "x1 = mx;" << '\n';
     else
@@ -804,7 +883,8 @@ int GlowExportScript::node(GrowNode* o, void* e, void* m)
     fp << ind << "id = CreateObject(\"" << o->nc->n_name << "\",x1,y1,x2,y2);" << '\n';
   }
   else
-    fp << ind << "id = CreateObject(\"" << o->nc->n_name << "\"," << dtostr(o->x_left) << "," << dtostr(o->y_low) << "," << dtostr(o->x_right) << "," << dtostr(o->y_high) << ");" << '\n';
+    fp << ind << "id = CreateObject(\"" << o->nc->n_name << "\"," << dtostr(o->x_left) << ","
+       << dtostr(o->y_low) << "," << dtostr(o->x_right) << "," << dtostr(o->y_high) << ");" << '\n';
   fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
   if (o->shadow)
     fp << ind << "SetObjectShadow(id,1);" << '\n';
@@ -813,27 +893,28 @@ int GlowExportScript::node(GrowNode* o, void* e, void* m)
   if (o->fill_drawtype != glow_eDrawType_No)
     fp << ind << "SetObjectFillColor(id," << o->fill_drawtype << ");" << '\n';
   if (o->draw_type != glow_eDrawType_Line)
-    fp << ind << "SetObjectBorderColor(id," << o->draw_type  << ");" << '\n';
+    fp << ind << "SetObjectBorderColor(id," << o->draw_type << ");" << '\n';
   if (o->text_drawtype != glow_eDrawType_No)
-    fp << ind << "SetObjectTextColor(id," << o->text_drawtype  << ");" << '\n';
+    fp << ind << "SetObjectTextColor(id," << o->text_drawtype << ");" << '\n';
   if (o->background_drawtype != glow_eDrawType_No)
-    fp << ind << "SetObjectBackgroundColor(id," << o->background_drawtype  << ");" << '\n';
+    fp << ind << "SetObjectBackgroundColor(id," << o->background_drawtype << ");" << '\n';
   if (!feq(o->transparency, 0.0))
     fp << ind << "SetObjectAttribute(id,\"Transparency\"," << o->transparency << ");" << '\n';
   if (o->text_font != glow_eFont_No)
-    fp << ind << "SetObjectTextFont(id," << o->text_font <<  ");" << '\n';
+    fp << ind << "SetObjectTextFont(id," << o->text_font << ");" << '\n';
   if (o->text_type != glow_eDrawType_TextHelvetica)
     fp << ind << "SetObjectTextBold(id, 1);" << '\n';
 
-  if (userdata_script_cb && o->user_data) 
+  if (userdata_script_cb && o->user_data)
     userdata_script_cb(o->user_data, o, fp, ind);
 
   if (o->annotsize[0] > 0)
     fp << ind << "SetObjectAttribute(id,\"A0\",\"" << o->annotv[0] << "\");" << '\n';
-  if (o->annotsize[1] > 0) {
+  if (o->annotsize[1] > 0)
+  {
     fp << ind << "SetObjectAttribute(id,\"A1\",\"" << o->annotv[1] << "\");" << '\n';
     fp << ind << "SetObjectAttribute(id,\"Text\",\"" << o->annotv[1] << "\");" << '\n';
-  }    
+  }
 
   return 1;
 }
@@ -847,9 +928,11 @@ int GlowExportScript::rect(GrowRect* o, void* e, void* m)
   ur_x = o->trf.x(o->ur.x, o->ur.y);
   ur_y = o->trf.y(o->ur.x, o->ur.y);
 
-  fp << cind << "Rectangle " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")" << '\n';
-  if (m) {
-    sElem *mod = (sElem *)m;
+  fp << cind << "Rectangle " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y
+     << ")" << '\n';
+  if (m)
+  {
+    sElem* mod = (sElem*)m;
     if (fabs(ll_x - mod->x_left) < EPS)
       fp << ind << "x1 = mx;" << '\n';
     else
@@ -869,7 +952,8 @@ int GlowExportScript::rect(GrowRect* o, void* e, void* m)
     fp << ind << "id = CreateRectangle(x1,y1,width,height);" << '\n';
   }
   else
-    fp << ind << "id = CreateRectangle(" << dtostr(ll_x) << "," << dtostr(ll_y) << "," << dtostr(ur_x - ll_x) << "," << dtostr(ur_y - ll_y) << ");" << '\n';
+    fp << ind << "id = CreateRectangle(" << dtostr(ll_x) << "," << dtostr(ll_y) << "," << dtostr(ur_x - ll_x)
+       << "," << dtostr(ur_y - ll_y) << ");" << '\n';
   if (!streq(o->n_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
 
@@ -877,11 +961,11 @@ int GlowExportScript::rect(GrowRect* o, void* e, void* m)
     fp << ind << "SetObjectFill(id,1);" << '\n';
   if (o->fill_drawtype != glow_eDrawType_No && (o->fill || o->shadow))
     fp << ind << "SetObjectFillColor(id," << o->fill_drawtype << ");" << '\n';
- 
+
   if (o->draw_type != glow_eDrawType_Line)
-    fp << ind << "SetObjectBorderColor(id," << o->draw_type  << ");" << '\n';
+    fp << ind << "SetObjectBorderColor(id," << o->draw_type << ");" << '\n';
   if (o->background_drawtype != glow_eDrawType_No)
-    fp << ind << "SetObjectBackgroundColor(id," << o->background_drawtype  << ");" << '\n';
+    fp << ind << "SetObjectBackgroundColor(id," << o->background_drawtype << ");" << '\n';
 
   if (o->border == 0)
     fp << ind << "SetObjectBorder(id," << o->border << ");" << '\n';
@@ -928,10 +1012,13 @@ int GlowExportScript::rectrounded(GrowRectRounded* o, void* e, void* m)
   ur_x = o->trf.x(o->ur.x, o->ur.y);
   ur_y = o->trf.y(o->ur.x, o->ur.y);
 
-  fp << cind << "RoundedRect " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")" << '\n';
-  fp << cind << "Rectangle " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")" << '\n';
-  if (m) {
-    sElem *mod = (sElem *)m;
+  fp << cind << "RoundedRect " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y
+     << ")" << '\n';
+  fp << cind << "Rectangle " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y
+     << ")" << '\n';
+  if (m)
+  {
+    sElem* mod = (sElem*)m;
     fp << ind << "x1 = mx + " << dtostr(ll_x - mod->x_left) << ";" << '\n';
     fp << ind << "y1 = my + " << dtostr(ll_y - mod->y_low) << ";" << '\n';
     fp << ind << "width = " << dtostr(ur_x - ll_x) << ";" << '\n';
@@ -939,7 +1026,8 @@ int GlowExportScript::rectrounded(GrowRectRounded* o, void* e, void* m)
     fp << ind << "id = CreateRectRounded(x1,y1,width,height);" << '\n';
   }
   else
-    fp << ind << "id = CreateRectRounded(" << dtostr(ll_x) << "," << dtostr(ll_y) << "," << dtostr(ur_x - ll_x) << "," << dtostr(ur_y - ll_y) << ");" << '\n';
+    fp << ind << "id = CreateRectRounded(" << dtostr(ll_x) << "," << dtostr(ll_y) << ","
+       << dtostr(ur_x - ll_x) << "," << dtostr(ur_y - ll_y) << ");" << '\n';
   if (!streq(o->n_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
 
@@ -947,9 +1035,9 @@ int GlowExportScript::rectrounded(GrowRectRounded* o, void* e, void* m)
     fp << ind << "SetObjectFill(id,1);" << '\n';
   if (o->fill_drawtype != glow_eDrawType_No && (o->fill || o->shadow))
     fp << ind << "SetObjectFillColor(id," << o->fill_drawtype << ");" << '\n';
- 
+
   if (o->draw_type != glow_eDrawType_Line)
-    fp << ind << "SetObjectBorderColor(id," << o->draw_type  << ");" << '\n';
+    fp << ind << "SetObjectBorderColor(id," << o->draw_type << ");" << '\n';
 
   if (o->border == 0)
     fp << ind << "SetObjectBorder(id," << o->border << ");" << '\n';
@@ -993,8 +1081,9 @@ int GlowExportScript::line(GrowLine* o, void* e, void* m)
   y2 = o->trf.y(o->p2.x, o->p2.y);
 
   fp << cind << "Line " << o->n_name << " (" << x1 << "," << y1 << "),(" << x1 << "," << y2 << ")" << '\n';
-  if (m) {
-    sElem *mod = (sElem *)m;
+  if (m)
+  {
+    sElem* mod = (sElem*)m;
     if (fabs(x1 - mod->x_left) < EPS)
       fp << ind << "x1 = mx;" << '\n';
     else if (fabs(x1 - mod->x_right) < EPS)
@@ -1022,8 +1111,8 @@ int GlowExportScript::line(GrowLine* o, void* e, void* m)
     fp << ind << "id = CreateLine(x1,y1,x2,y2);" << '\n';
   }
   else
-    fp << ind << "id = CreateLine(" << dtostr(x1) << "," << dtostr(y1) << "," << dtostr(x2) << 
-      "," << dtostr(y2) << ");" << '\n';
+    fp << ind << "id = CreateLine(" << dtostr(x1) << "," << dtostr(y1) << "," << dtostr(x2) << ","
+       << dtostr(y2) << ");" << '\n';
   if (!streq(o->n_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
 
@@ -1048,14 +1137,16 @@ int GlowExportScript::polyline(GrowPolyLine* o, void* e, void* m)
   x2 = o->trf.x(((GlowPoint*)o->a_points[1])->x, ((GlowPoint*)o->a_points[1])->y);
   y2 = o->trf.y(((GlowPoint*)o->a_points[1])->x, ((GlowPoint*)o->a_points[1])->y);
 
+  fp << cind << "Polyline " << o->n_name << " (" << x1 << "," << y1 << "),(" << x2 << "," << y2 << ")"
+     << '\n';
+  fp << ind << "id = CreatePolyLine(" << dtostr(x1) << "," << dtostr(y1) << "," << dtostr(x2) << ","
+     << dtostr(y2) << ");" << '\n';
 
-  fp << cind << "Polyline " << o->n_name << " (" << x1 << "," << y1 << "),(" << x2 << "," << y2 << ")" << '\n';
-  fp << ind << "id = CreatePolyLine(" << dtostr(x1) << "," << dtostr(y1) << "," << dtostr(x2) << "," << dtostr(y2) << ");" << '\n';
-
-  for (int i = 2; i < o->a_points.a_size; i++) {
+  for (int i = 2; i < o->a_points.a_size; i++)
+  {
     x1 = o->trf.x(((GlowPoint*)o->a_points[i])->x, ((GlowPoint*)o->a_points[i])->y);
     y1 = o->trf.y(((GlowPoint*)o->a_points[i])->x, ((GlowPoint*)o->a_points[i])->y);
-    fp << ind << "PolyLineAdd(id," << dtostr(x1) << "," << dtostr(y1) << ");" << '\n';    
+    fp << ind << "PolyLineAdd(id," << dtostr(x1) << "," << dtostr(y1) << ");" << '\n';
   }
   if (!streq(o->n_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
@@ -1066,9 +1157,9 @@ int GlowExportScript::polyline(GrowPolyLine* o, void* e, void* m)
     fp << ind << "SetObjectFillColor(id," << o->fill_drawtype << ");" << '\n';
 
   if (o->draw_type != glow_eDrawType_Line)
-    fp << ind << "SetObjectBorderColor(id," << o->draw_type  << ");" << '\n';
+    fp << ind << "SetObjectBorderColor(id," << o->draw_type << ");" << '\n';
   if (o->background_drawtype != glow_eDrawType_No)
-    fp << ind << "SetObjectBackgroundColor(id," << o->background_drawtype  << ");" << '\n';
+    fp << ind << "SetObjectBackgroundColor(id," << o->background_drawtype << ");" << '\n';
   if (o->border == 0)
     fp << ind << "SetObjectBorder(id," << o->border << ");" << '\n';
   if (o->line_width != 1)
@@ -1144,19 +1235,22 @@ int GlowExportScript::text(GrowText* o, void* e, void* m)
   y1 = o->trf.y(o->p.x, o->p.y);
 
   fp << cind << "Text " << o->n_name << " (" << x1 << "," << y1 << ")" << '\n';
-  if (m) {
-    sElem *mod = (sElem *)m;
+  if (m)
+  {
+    sElem* mod = (sElem*)m;
     fp << ind << "x1 = mx + " << dtostr(x1 - mod->x_left) << ";" << '\n';
     fp << ind << "y1 = my + " << dtostr(y1 - mod->y_low) << ";" << '\n';
-    fp << ind << "id = CreateText(\"" << o->text << "\",x1,y1," <<
-    textsize << "," << o->font << "," << bold << "," << o->color_drawtype << ");" << '\n';
+    fp << ind << "id = CreateText(\"" << o->text << "\",x1,y1," << textsize << "," << o->font << "," << bold
+       << "," << o->color_drawtype << ");" << '\n';
   }
-  else {
-    fp << ind << "id = CreateText(\"" << o->text << "\"," << dtostr(o->p.x) << "," << dtostr(o->p.y) << "," <<
-      textsize << "," << o->font << "," << bold << "," << o->color_drawtype << ");" << '\n';
+  else
+  {
+    fp << ind << "id = CreateText(\"" << o->text << "\"," << dtostr(o->p.x) << "," << dtostr(o->p.y) << ","
+       << textsize << "," << o->font << "," << bold << "," << o->color_drawtype << ");" << '\n';
     if (o->trf.is_modified())
-      fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << "," << dtostr(o->trf.a13) << "," 
-        << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << "," << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
+      fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << ","
+         << dtostr(o->trf.a13) << "," << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << ","
+         << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
   }
   if (!streq(o->n_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
@@ -1177,10 +1271,7 @@ int GlowExportScript::text(GrowText* o, void* e, void* m)
   return 1;
 }
 
-int GlowExportScript::annot(GrowSubAnnot* o, void* e, void* m)
-{
-  return 0;
-}
+int GlowExportScript::annot(GrowSubAnnot* o, void* e, void* m) { return 0; }
 
 int GlowExportScript::arc(GrowArc* o, void* e, void* m)
 {
@@ -1191,9 +1282,11 @@ int GlowExportScript::arc(GrowArc* o, void* e, void* m)
   ur_x = o->trf.x(o->ur.x, o->ur.y);
   ur_y = o->trf.y(o->ur.x, o->ur.y);
 
-  fp << cind << "Arc " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")" << '\n';
-  if (m) {
-    sElem *mod = (sElem *)m;
+  fp << cind << "Arc " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")"
+     << '\n';
+  if (m)
+  {
+    sElem* mod = (sElem*)m;
     fp << ind << "x1 = mx + " << dtostr(ll_x - mod->x_left) << ";" << '\n';
     fp << ind << "y1 = my + " << dtostr(ll_y - mod->y_low) << ";" << '\n';
     fp << ind << "x2 = mx + " << dtostr(ur_x - mod->x_left) << ";" << '\n';
@@ -1201,12 +1294,13 @@ int GlowExportScript::arc(GrowArc* o, void* e, void* m)
     fp << ind << "id = CreateArc(x1,y1,x2,y2," << o->angle1 << "," << o->angle2 << ");" << '\n';
   }
   else
-    fp << ind << "id = CreateArc(" << dtostr(ll_x) << "," << dtostr(ll_y) << "," << dtostr(ur_x) << 
-      "," << dtostr(ur_y) << "," << o->angle1 << "," << o->angle2 << ");" << '\n';
+    fp << ind << "id = CreateArc(" << dtostr(ll_x) << "," << dtostr(ll_y) << "," << dtostr(ur_x) << ","
+       << dtostr(ur_y) << "," << o->angle1 << "," << o->angle2 << ");" << '\n';
   if (!streq(o->n_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
 
-  if (o->fill) {
+  if (o->fill)
+  {
     fp << ind << "SetObjectFill(id,1);" << '\n';
     fp << ind << "SetObjectFillColor(id," << o->fill_drawtype << ");" << '\n';
   }
@@ -1215,7 +1309,7 @@ int GlowExportScript::arc(GrowArc* o, void* e, void* m)
   if (o->line_width != 1)
     fp << ind << "SetObjectLineWidth(id," << o->line_width << ");" << '\n';
   if (o->draw_type != glow_eDrawType_Line)
-    fp << ind << "SetObjectBorderColor(id," << o->draw_type  << ");" << '\n';
+    fp << ind << "SetObjectBorderColor(id," << o->draw_type << ");" << '\n';
   if (o->shadow)
     fp << ind << "SetObjectShadow(id,1);" << '\n';
   if (!feq(o->shadow_width, 5.0))
@@ -1248,10 +1342,7 @@ int GlowExportScript::arc(GrowArc* o, void* e, void* m)
   return 1;
 }
 
-int GlowExportScript::point(GlowPoint* o, GlowTransform* trf)
-{
-  return 0;
-}
+int GlowExportScript::point(GlowPoint* o, GlowTransform* trf) { return 0; }
 
 int GlowExportScript::bar(GrowBar* o, void* e, void* m)
 {
@@ -1262,24 +1353,26 @@ int GlowExportScript::bar(GrowBar* o, void* e, void* m)
   ur_x = o->trf.x(o->ur.x, o->ur.y);
   ur_y = o->trf.y(o->ur.x, o->ur.y);
 
-  fp << cind << "Bar " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")" << '\n';
-  fp << ind << "id = CreateBar(" << dtostr(o->ll.x) << "," << dtostr(o->ll.y) << "," << dtostr(o->ur.x) << 
-    "," << dtostr(o->ur.y) << ");" << '\n';
+  fp << cind << "Bar " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")"
+     << '\n';
+  fp << ind << "id = CreateBar(" << dtostr(o->ll.x) << "," << dtostr(o->ll.y) << "," << dtostr(o->ur.x) << ","
+     << dtostr(o->ur.y) << ");" << '\n';
   if (o->trf.is_modified())
-    fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << "," << dtostr(o->trf.a13) << "," 
-        << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << "," << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
+    fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << ","
+       << dtostr(o->trf.a13) << "," << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << ","
+       << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
   if (!streq(o->n_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
 
   if (!o->fill)
     fp << ind << "SetObjectFill(id,0);" << '\n';
-  if (o->fill) 
+  if (o->fill)
     fp << ind << "SetObjectFillColor(id," << o->fill_drawtype << ");" << '\n';
 
   if (!o->border)
     fp << ind << "SetObjectBorder(id,0);" << '\n';
   if (o->draw_type != glow_eDrawType_No)
-    fp << ind << "SetObjectBorderColor(id," << o->draw_type  << ");" << '\n';
+    fp << ind << "SetObjectBorderColor(id," << o->draw_type << ");" << '\n';
 
   if (o->min_value != 0)
     fp << ind << "SetObjectAttribute(id,\"Bar.MinValue\"," << dtostr(o->min_value) << ");" << '\n';
@@ -1294,7 +1387,7 @@ int GlowExportScript::bar(GrowBar* o, void* e, void* m)
   if (o->bar_borderwidth != 1)
     fp << ind << "SetObjectAttribute(id,\"Bar.BorderWidth\"," << o->bar_borderwidth << ");" << '\n';
 
-  if (userdata_script_cb && o->user_data) 
+  if (userdata_script_cb && o->user_data)
     userdata_script_cb(o->user_data, o, fp, ind);
 
   return 1;
@@ -1309,24 +1402,26 @@ int GlowExportScript::pie(GrowPie* o, void* e, void* m)
   ur_x = o->trf.x(o->ur.x, o->ur.y);
   ur_y = o->trf.y(o->ur.x, o->ur.y);
 
-  fp << cind << "Pie " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")" << '\n';
-  fp << ind << "id = CreatePie(" << dtostr(o->ll.x) << "," << dtostr(o->ll.y) << "," << dtostr(o->ur.x) << 
-    "," << dtostr(o->ur.y) << ");" << '\n';
+  fp << cind << "Pie " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")"
+     << '\n';
+  fp << ind << "id = CreatePie(" << dtostr(o->ll.x) << "," << dtostr(o->ll.y) << "," << dtostr(o->ur.x) << ","
+     << dtostr(o->ur.y) << ");" << '\n';
   if (o->trf.is_modified())
-    fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << "," << dtostr(o->trf.a13) << "," 
-        << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << "," << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
+    fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << ","
+       << dtostr(o->trf.a13) << "," << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << ","
+       << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
   if (!streq(o->n_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
 
   if (!o->fill)
     fp << ind << "SetObjectFill(id,0);" << '\n';
-  if (o->fill) 
+  if (o->fill)
     fp << ind << "SetObjectFillColor(id," << o->fill_drawtype << ");" << '\n';
 
   if (!o->border)
     fp << ind << "SetObjectBorder(id,0);" << '\n';
   if (o->draw_type != glow_eDrawType_No)
-    fp << ind << "SetObjectBorderColor(id," << o->draw_type  << ");" << '\n';
+    fp << ind << "SetObjectBorderColor(id," << o->draw_type << ");" << '\n';
   if (o->shadow)
     fp << ind << "SetObjectShadow(id,1);" << '\n';
 
@@ -1350,12 +1445,14 @@ int GlowExportScript::pie(GrowPie* o, void* e, void* m)
     fp << ind << "SetObjectAttribute(id,\"Pie.MinValue\"," << dtostr(o->min_value) << ");" << '\n';
   if (!feq(o->max_value, 100.0))
     fp << ind << "SetObjectAttribute(id,\"Pie.MaxValue\"," << dtostr(o->max_value) << ");" << '\n';
-  for (int i = 0; i < o->sectors; i++) {
+  for (int i = 0; i < o->sectors; i++)
+  {
     if (o->sector_color[i] != glow_eDrawType_Inherit)
-      fp << ind << "SetObjectAttribute(id,\"Pie.SectorColor" << i + 1 << "\"," << o->sector_color[i] << ");" << '\n';
+      fp << ind << "SetObjectAttribute(id,\"Pie.SectorColor" << i + 1 << "\"," << o->sector_color[i] << ");"
+         << '\n';
   }
 
-  if (userdata_script_cb && o->user_data) 
+  if (userdata_script_cb && o->user_data)
     userdata_script_cb(o->user_data, o, fp, ind);
 
   return 1;
@@ -1369,29 +1466,32 @@ int GlowExportScript::trend(GrowTrend* o, void* e, void* m)
   ll_y = o->trf.y(o->ll.x, o->ll.y);
   ur_x = o->trf.x(o->ur.x, o->ur.y);
   ur_y = o->trf.y(o->ur.x, o->ur.y);
-  //ll_x = o->ll.x;
-  //ll_y = o->ll.y;
-  //ur_x = o->ur.x;
-  //ur_y = o->ur.y;
+  // ll_x = o->ll.x;
+  // ll_y = o->ll.y;
+  // ur_x = o->ur.x;
+  // ur_y = o->ur.y;
 
-  fp << cind << "Trend " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")" << '\n';
-  fp << ind << "id = CreateTrend(" << dtostr(ll_x) << "," << dtostr(ll_y) << "," << dtostr(ur_x) << 
-    "," << dtostr(ur_y) << ");" << '\n';
-  //if (o->trf.is_modified())
-    //    fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << "," << dtostr(o->trf.a13) << "," 
-    //    << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << "," << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
+  fp << cind << "Trend " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")"
+     << '\n';
+  fp << ind << "id = CreateTrend(" << dtostr(ll_x) << "," << dtostr(ll_y) << "," << dtostr(ur_x) << ","
+     << dtostr(ur_y) << ");" << '\n';
+  // if (o->trf.is_modified())
+  //     fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << "," <<
+  //     dtostr(o->trf.a13) << ","
+  //     << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << "," << dtostr(o->trf.a23) << "," <<
+  //     dtostr(o->trf.rotation) << ");" << '\n';
   if (!streq(o->n_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
 
   if (!o->fill)
     fp << ind << "SetObjectFill(id,0);" << '\n';
-  if (o->fill) 
+  if (o->fill)
     fp << ind << "SetObjectFillColor(id," << o->fill_drawtype << ");" << '\n';
 
   if (!o->border)
     fp << ind << "SetObjectBorder(id,0);" << '\n';
   if (o->draw_type != glow_eDrawType_No)
-    fp << ind << "SetObjectBorderColor(id," << o->draw_type  << ");" << '\n';
+    fp << ind << "SetObjectBorderColor(id," << o->draw_type << ");" << '\n';
 
   if (o->no_of_points != 100)
     fp << ind << "SetObjectAttribute(id,\"Trend.NoOfPoints\"," << o->no_of_points << ");" << '\n';
@@ -1412,7 +1512,8 @@ int GlowExportScript::trend(GrowTrend* o, void* e, void* m)
   if (o->curve_drawtype[0] != glow_eDrawType_Color145)
     fp << ind << "SetObjectAttribute(id,\"Trend.CurveColor1\"," << o->curve_drawtype[0] << ");" << '\n';
   if (o->curve_fill_drawtype[0] != glow_eDrawType_Color139)
-    fp << ind << "SetObjectAttribute(id,\"Trend.CurveFillColor1\"," << o->curve_fill_drawtype[0] << ");" << '\n';
+    fp << ind << "SetObjectAttribute(id,\"Trend.CurveFillColor1\"," << o->curve_fill_drawtype[0] << ");"
+       << '\n';
   if (!feq(o->y_max_value[1], 100.0))
     fp << ind << "SetObjectAttribute(id,\"Trend.MaxValue2\"," << dtostr(o->y_max_value[1]) << ");" << '\n';
   if (o->y_min_value[1] != 0)
@@ -1420,11 +1521,12 @@ int GlowExportScript::trend(GrowTrend* o, void* e, void* m)
   if (o->curve_drawtype[1] != glow_eDrawType_Color295)
     fp << ind << "SetObjectAttribute(id,\"Trend.CurveColor2\"," << o->curve_drawtype[1] << ");" << '\n';
   if (o->curve_fill_drawtype[1] != glow_eDrawType_Color289)
-    fp << ind << "SetObjectAttribute(id,\"Trend.CurveFillColor2\"," << o->curve_fill_drawtype[1] << ");" << '\n';
+    fp << ind << "SetObjectAttribute(id,\"Trend.CurveFillColor2\"," << o->curve_fill_drawtype[1] << ");"
+       << '\n';
   if (o->direction != glow_eHorizDirection_Left)
     fp << ind << "SetObjectAttribute(id,\"Trend.Direction\"," << o->direction << ");" << '\n';
 
-  if (userdata_script_cb && o->user_data) 
+  if (userdata_script_cb && o->user_data)
     userdata_script_cb(o->user_data, o, fp, ind);
 
   return 1;
@@ -1439,28 +1541,30 @@ int GlowExportScript::axis(GrowAxis* o, void* e, void* m)
   ur_x = o->trf.x(o->ur.x, o->ur.y);
   ur_y = o->trf.y(o->ur.x, o->ur.y);
 
-  fp << cind << "Axis " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")" << '\n';
+  fp << cind << "Axis " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")"
+     << '\n';
   if (o->user_data)
-    fp << ind << "id = CreateAxis(" << dtostr(o->ll.x) << "," << dtostr(o->ll.y) << "," << dtostr(o->ur.x) << 
-      "," << dtostr(o->ur.y) << ",0,1,eDirection_Left);" << '\n';
+    fp << ind << "id = CreateAxis(" << dtostr(o->ll.x) << "," << dtostr(o->ll.y) << "," << dtostr(o->ur.x)
+       << "," << dtostr(o->ur.y) << ",0,1,eDirection_Left);" << '\n';
   else
-    fp << ind << "id = CreateAxis(" << dtostr(o->ll.x) << "," << dtostr(o->ll.y) << "," << dtostr(o->ur.x) << 
-      "," << dtostr(o->ur.y) << ",0,0,eDirection_Left);" << '\n';
+    fp << ind << "id = CreateAxis(" << dtostr(o->ll.x) << "," << dtostr(o->ll.y) << "," << dtostr(o->ur.x)
+       << "," << dtostr(o->ur.y) << ",0,0,eDirection_Left);" << '\n';
   if (o->trf.is_modified())
     fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << ","
-         << dtostr(o->trf.a13) << "," << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << "," 
-         << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
+       << dtostr(o->trf.a13) << "," << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << ","
+       << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
   if (!streq(o->n_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
 
   if (o->draw_type != glow_eDrawType_No)
-    fp << ind << "SetObjectBorderColor(id," << o->draw_type  << ");" << '\n';
+    fp << ind << "SetObjectBorderColor(id," << o->draw_type << ");" << '\n';
   if (o->text_color_drawtype != glow_eDrawType_No)
-    fp << ind << "SetObjectTextColor(id," << o->text_color_drawtype  << ");" << '\n';
+    fp << ind << "SetObjectTextColor(id," << o->text_color_drawtype << ");" << '\n';
   if (o->text_size != 1)
-    fp << ind << "SetObjectTextSize(id," << o->text_size  << ");" << '\n';
+    fp << ind << "SetObjectTextSize(id," << o->text_size << ");" << '\n';
 
-  if (o->user_data) {
+  if (o->user_data)
+  {
     if (o->min_value != 0)
       fp << ind << "SetObjectAttribute(id,\"Axis.MinValue\"," << dtostr(o->min_value) << ");" << '\n';
     if (!feq(o->max_value, 100.0))
@@ -1473,7 +1577,9 @@ int GlowExportScript::axis(GrowAxis* o, void* e, void* m)
       fp << ind << "SetObjectAttribute(id,\"Axis.ValueQuotient\"," << o->valuequotient << ");" << '\n';
     if (!streq(o->format, "%3.0f"))
       fp << ind << "SetObjectAttribute(id,\"Axis.Format\",\"" << o->format << "\");" << '\n';
-  } else {
+  }
+  else
+  {
     if (o->min_value != 0)
       fp << ind << "SetObjectAttribute(id,\"MinValue\"," << dtostr(o->min_value) << ");" << '\n';
     if (!feq(o->max_value, 100.0))
@@ -1487,7 +1593,7 @@ int GlowExportScript::axis(GrowAxis* o, void* e, void* m)
     if (!streq(o->format, "%3.0f"))
       fp << ind << "SetObjectAttribute(id,\"Format\",\"" << o->format << "\");" << '\n';
   }
-  if (userdata_script_cb && o->user_data) 
+  if (userdata_script_cb && o->user_data)
     userdata_script_cb(o->user_data, o, fp, ind);
 
   return 1;
@@ -1502,8 +1608,10 @@ int GlowExportScript::image(GrowImage* o, void* e, void* m)
   ur_x = o->trf.x(o->ur.x, o->ur.y);
   ur_y = o->trf.y(o->ur.x, o->ur.y);
 
-  fp << cind << "Image " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")" << '\n';
-  fp << ind << "id = CreateImage(\"" << o->image_filename << "\"," << dtostr(ll_x) << "," << dtostr(ll_y) << "," << dtostr(ur_x) << "," << dtostr(ur_y) << ");" << '\n';
+  fp << cind << "Image " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")"
+     << '\n';
+  fp << ind << "id = CreateImage(\"" << o->image_filename << "\"," << dtostr(ll_x) << "," << dtostr(ll_y)
+     << "," << dtostr(ur_x) << "," << dtostr(ur_y) << ");" << '\n';
   if (!streq(o->n_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
 
@@ -1519,30 +1627,35 @@ int GlowExportScript::window(GrowWindow* o, void* e, void* m)
   ur_x = o->trf.x(o->ur.x, o->ur.y);
   ur_y = o->trf.y(o->ur.x, o->ur.y);
 
-  fp << cind << "Window " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")" << '\n';
-  fp << ind << "id = CreateWindow(" << dtostr(o->ll.x) << "," << dtostr(o->ll.y) << "," << dtostr(o->ur.x) << 
-    "," << dtostr(o->ur.y) << ");" << '\n';
+  fp << cind << "Window " << o->n_name << " (" << ll_x << "," << ll_y << "),(" << ur_x << "," << ur_y << ")"
+     << '\n';
+  fp << ind << "id = CreateWindow(" << dtostr(o->ll.x) << "," << dtostr(o->ll.y) << "," << dtostr(o->ur.x)
+     << "," << dtostr(o->ur.y) << ");" << '\n';
   if (o->trf.is_modified())
-    fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << "," << dtostr(o->trf.a13) << "," 
-        << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << "," << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
+    fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << ","
+       << dtostr(o->trf.a13) << "," << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << ","
+       << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
   if (!streq(o->n_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
 
   if (!o->border)
     fp << ind << "SetObjectBorder(id,0);" << '\n';
   if (o->draw_type != glow_eDrawType_Line)
-    fp << ind << "SetObjectBorderColor(id," << o->draw_type  << ");" << '\n';
+    fp << ind << "SetObjectBorderColor(id," << o->draw_type << ");" << '\n';
 
   if (!streq(o->input_file_name, ""))
     fp << ind << "SetObjectAttribute(id,\"Window.FileName\",\"" << o->input_file_name << "\");" << '\n';
   if (!feq(o->window_scale, 1.0))
     fp << ind << "SetObjectAttribute(id,\"Window.Scale\"," << dtostr(o->window_scale) << ");" << '\n';
   if (o->vertical_scrollbar != 0)
-    fp << ind << "SetObjectAttribute(id,\"Window.VerticalScrollbar\"," << o->vertical_scrollbar << ");" << '\n';
+    fp << ind << "SetObjectAttribute(id,\"Window.VerticalScrollbar\"," << o->vertical_scrollbar << ");"
+       << '\n';
   if (o->horizontal_scrollbar != 0)
-    fp << ind << "SetObjectAttribute(id,\"Window.HorizontalScrollbar\"," << o->horizontal_scrollbar << ");" << '\n';
+    fp << ind << "SetObjectAttribute(id,\"Window.HorizontalScrollbar\"," << o->horizontal_scrollbar << ");"
+       << '\n';
   if (!feq(o->scrollbar_width, 0.5))
-    fp << ind << "SetObjectAttribute(id,\"Window.ScrollbarWidth\"," << dtostr(o->scrollbar_width) << ");" << '\n';
+    fp << ind << "SetObjectAttribute(id,\"Window.ScrollbarWidth\"," << dtostr(o->scrollbar_width) << ");"
+       << '\n';
   if (o->scrollbar_color != glow_eDrawType_LightGray)
     fp << ind << "SetObjectAttribute(id,\"Window.ScrollbarColor\"," << o->scrollbar_color << ");" << '\n';
   if (!streq(o->owner, ""))
@@ -1559,12 +1672,15 @@ int GlowExportScript::group(GrowGroup* o, void* e, void* m)
   fp << cind << "Group " << o->n_name << '\n';
   fp << ind << "SelectClear();" << '\n';
 
-  for (int i = 0; i < o->nc->a.size(); i++) {
-    if (o->nc->a[i]->type() != glow_eObjectType_Con) {
+  for (int i = 0; i < o->nc->a.size(); i++)
+  {
+    if (o->nc->a[i]->type() != glow_eObjectType_Con)
+    {
       sts = o->nc->a[i]->export_script(this, 0, m);
-      if (ODD(sts)) {
-	fp << ind << "SelectAdd(id);" << '\n';
-	sumsts = sts;
+      if (ODD(sts))
+      {
+        fp << ind << "SelectAdd(id);" << '\n';
+        sumsts = sts;
       }
     }
   }
@@ -1572,10 +1688,11 @@ int GlowExportScript::group(GrowGroup* o, void* e, void* m)
     return 0;
 
   fp << ind << "id = GroupSelected();" << '\n';
-  
+
   if (o->trf.is_modified())
-    fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << "," << dtostr(o->trf.a13) << "," 
-        << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << "," << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
+    fp << ind << "SetObjectTransform(id," << dtostr(o->trf.a11) << "," << dtostr(o->trf.a12) << ","
+       << dtostr(o->trf.a13) << "," << dtostr(o->trf.a21) << "," << dtostr(o->trf.a22) << ","
+       << dtostr(o->trf.a23) << "," << dtostr(o->trf.rotation) << ");" << '\n';
 
   fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
   if (o->shadow)
@@ -1587,7 +1704,7 @@ int GlowExportScript::group(GrowGroup* o, void* e, void* m)
   if (!feq(o->transparency, 0.0))
     fp << ind << "SetObjectAttribute(id,\"Transparency\"," << o->transparency << ");" << '\n';
 
-  if (userdata_script_cb && o->user_data) 
+  if (userdata_script_cb && o->user_data)
     userdata_script_cb(o->user_data, o, fp, ind);
   return 1;
 }
@@ -1603,15 +1720,18 @@ int GlowExportScript::layer(GrowLayer* o, void* e, void* m)
   if (!feq(o->transparency, 0.0))
     fp << ind << "SetObjectAttribute(id,\"Transparency\"," << o->transparency << ");" << '\n';
 
-  if (userdata_script_cb && o->user_data) 
+  if (userdata_script_cb && o->user_data)
     userdata_script_cb(o->user_data, o, fp, ind);
   fp << ind << "LayerSetActive(id, 1);" << '\n';
 
-  for (int i = 0; i < o->size(); i++) {
-    if (o->a[i]->type() != glow_eObjectType_Con) {
+  for (int i = 0; i < o->size(); i++)
+  {
+    if (o->a[i]->type() != glow_eObjectType_Con)
+    {
       sts = o->a[i]->export_script(this, 0, m);
-      if (ODD(sts)) {
-	sumsts = sts;
+      if (ODD(sts))
+      {
+        sumsts = sts;
       }
     }
   }
@@ -1619,7 +1739,7 @@ int GlowExportScript::layer(GrowLayer* o, void* e, void* m)
     return 0;
 
   fp << ind << "LayerResetActiveAll();" << '\n';
-  
+
   return 1;
 }
 
@@ -1628,9 +1748,10 @@ int GlowExportScript::toolbar(GrowToolbar* o, void* e, void* m)
 
   fp << cind << "Toolbar " << o->n_name << '\n';
 
-  if (m) {
-    sElem *elem = (sElem *)e;
-    sElem *mod = (sElem *)m;
+  if (m)
+  {
+    sElem* elem = (sElem*)e;
+    sElem* mod = (sElem*)m;
     fp << ind << "x1 = mx + " << dtostr(elem->x_left - mod->x_left) << ";" << '\n';
     fp << ind << "y1 = my + " << dtostr(elem->y_low - mod->y_low) << ";" << '\n';
     fp << ind << "x2 = x1 + " << dtostr(elem->x_right - elem->x_left) << ";" << '\n';
@@ -1638,7 +1759,8 @@ int GlowExportScript::toolbar(GrowToolbar* o, void* e, void* m)
     fp << ind << "id = CreateToolbar(\"" << o->nc->n_name << "\",x1,y1,x2,y2);" << '\n';
   }
   else
-    fp << ind << "id = CreateToolbar(\"" << o->nc->n_name << "\"," << dtostr(o->x_left) << "," << dtostr(o->y_low) << "," << dtostr(o->x_right) << "," << dtostr(o->y_high) << ");" << '\n';
+    fp << ind << "id = CreateToolbar(\"" << o->nc->n_name << "\"," << dtostr(o->x_left) << ","
+       << dtostr(o->y_low) << "," << dtostr(o->x_right) << "," << dtostr(o->y_high) << ");" << '\n';
 
   fp << ind << "SetObjectAttribute(id,\"Name\",\"" << o->n_name << "\");" << '\n';
   if (o->shadow)
@@ -1650,12 +1772,9 @@ int GlowExportScript::toolbar(GrowToolbar* o, void* e, void* m)
   if (!feq(o->transparency, 0.0))
     fp << ind << "SetObjectAttribute(id,\"Transparency\"," << o->transparency << ");" << '\n';
 
-  if (userdata_script_cb && o->user_data) 
+  if (userdata_script_cb && o->user_data)
     userdata_script_cb(o->user_data, o, fp, ind);
   return 1;
 }
 
-int GlowExportScript::scriptmodule(GrowScriptModule* o, void* e, void* m)
-{
-  return 1;
-}
+int GlowExportScript::scriptmodule(GrowScriptModule* o, void* e, void* m) { return 1; }

@@ -45,7 +45,8 @@
 
 class WUtedQtWidget;
 
-class WUtedQt : public WUted {
+class WUtedQt : public WUted
+{
 public:
   QLabel* label;
   QWidget* quit;
@@ -56,9 +57,8 @@ public:
   QCheckBox* present[UTED_QUALS];
   QAction* optmenubuttons[UTED_MAX_COMMANDS];
 
-  WUtedQt(void* wu_parent_ctx, const char* wu_name, const char* wu_iconname,
-      ldh_tWBContext wu_ldhwb, ldh_tSesContext wu_ldhses, int wu_editmode,
-      void (*wu_quit_cb)(void*), pwr_tStatus* status);
+  WUtedQt(void* wu_parent_ctx, const char* wu_name, const char* wu_iconname, ldh_tWBContext wu_ldhwb,
+          ldh_tSesContext wu_ldhses, int wu_editmode, void (*wu_quit_cb)(void*), pwr_tStatus* status);
   ~WUtedQt();
   void remove_command_window();
   void reset_qual();
@@ -71,16 +71,16 @@ public:
   void enable_entries(int enable);
   void get_value(int idx, char* str, int len);
   bool get_present(int idx);
-  void questionbox(char* question_title, char* question_text,
-      void (*yes_procedure)(WUted*), void (*no_procedure)(WUted*),
-      void (*cancel_procedure)(WUted*), pwr_tBoolean cancel);
+  void questionbox(char* question_title, char* question_text, void (*yes_procedure)(WUted*),
+                   void (*no_procedure)(WUted*), void (*cancel_procedure)(WUted*), pwr_tBoolean cancel);
   void update_title(int editmode);
 
 private:
   WUtedQtWidget* toplevel;
 };
 
-class WUtedQtWidget : public QWidget {
+class WUtedQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

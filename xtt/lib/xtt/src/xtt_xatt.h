@@ -43,10 +43,10 @@
 
 class XAttNav;
 
-class XAtt {
+class XAtt
+{
 public:
-  XAtt(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user,
-      int* xa_sts);
+  XAtt(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user, int* xa_sts);
   virtual ~XAtt();
   void* parent_ctx;
   pwr_sAttrRef objar;
@@ -58,33 +58,19 @@ public:
   void* object;
   void (*close_cb)(void*, void*);
   void (*redraw_cb)(void*);
-  void (*popup_menu_cb)(
-      void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
-  int (*call_method_cb)(void*, const char*, const char*, pwr_sAttrRef,
-      unsigned long, unsigned long, char*);
+  void (*popup_menu_cb)(void*, pwr_sAttrRef, unsigned long, unsigned long, char*, int x, int y);
+  int (*call_method_cb)(void*, const char*, const char*, pwr_sAttrRef, unsigned long, unsigned long, char*);
   int (*is_authorized_cb)(void*, unsigned int);
   void* client_data;
   brow_tObject input_node;
   char input_name[80];
 
-  virtual void message(char severity, const char* message)
-  {
-  }
-  virtual void set_prompt(const char* prompt)
-  {
-  }
-  virtual void change_value(int set_focus)
-  {
-  }
-  virtual void change_value_close()
-  {
-  }
-  virtual void pop()
-  {
-  }
-  virtual void print()
-  {
-  }
+  virtual void message(char severity, const char* message) {}
+  virtual void set_prompt(const char* prompt) {}
+  virtual void change_value(int set_focus) {}
+  virtual void change_value_close() {}
+  virtual void pop() {}
+  virtual void print() {}
 
   int open_changevalue(char* name);
   void swap(int mode);
@@ -96,8 +82,8 @@ public:
   void activate_help();
   void activate_print();
 
-  static void xatt_popup_menu_cb(void* ctx, pwr_sAttrRef attrref,
-      unsigned long item_type, unsigned long utility, char* arg, int x, int y);
+  static void xatt_popup_menu_cb(void* ctx, pwr_sAttrRef attrref, unsigned long item_type,
+                                 unsigned long utility, char* arg, int x, int y);
   static int xatt_is_authorized_cb(void* ctx, unsigned int access);
   static void message_cb(void* xatt, char severity, const char* message);
   static void change_value_cb(void* xatt);

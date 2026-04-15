@@ -51,8 +51,7 @@
 
 #include "xtt_xnav_brow.h"
 
-XNavBrow::XNavBrow(
-    BrowCtx* brow_ctx, void* brow_userdata, brow_eUserType brow_usertype)
+XNavBrow::XNavBrow(BrowCtx* brow_ctx, void* brow_userdata, brow_eUserType brow_usertype)
     : ctx(brow_ctx), userdata(brow_userdata), usertype(brow_usertype)
 {
   strcpy(push_command, "");
@@ -153,18 +152,14 @@ void XNavBrow::create_nodeclasses()
 
   // Create common-class
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
+  brow_CreateNodeClass(ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
   brow_AddAnnotPixmap(nc_object, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_object, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_object, 2, 1.1, 0.1, flow_eDrawType_LineRed, 2, 0);
   brow_AddAnnotPixmap(nc_object, 3, 1.8, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_object, 2.9, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_object, 7.9, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_object, 11.9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 2.9, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_object, 7.9, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 11.9, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_object, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create attribute nodeclass
@@ -172,39 +167,26 @@ void XNavBrow::create_nodeclasses()
   brow_CreateNodeClass(ctx, "NavigatorAttr", flow_eNodeGroup_Common, &nc_attr);
   brow_AddAnnotPixmap(nc_attr, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_attr, 1, 1.4, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_attr, 2.9, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_attr, 8.9, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_attr, 2.9, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_attr, 8.9, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_attr, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create table nodeclass
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorTable", flow_eNodeGroup_Common, &nc_table);
+  brow_CreateNodeClass(ctx, "NavigatorTable", flow_eNodeGroup_Common, &nc_table);
   brow_AddAnnotPixmap(nc_table, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_table, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_table, 2, 1.1, 0.1, flow_eDrawType_LineRed, 2, 0);
-  brow_AddAnnot(nc_table, 2.9, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table, 8.9, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 12.9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 16.9, 0.6, 3, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 20.9, 0.6, 4, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 24.9, 0.6, 5, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 28.9, 0.6, 6, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 32.9, 0.6, 7, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 35.9, 0.6, 8, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_table, 38.9, 0.6, 9, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 2.9, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table, 8.9, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 12.9, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 16.9, 0.6, 3, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 20.9, 0.6, 4, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 24.9, 0.6, 5, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 28.9, 0.6, 6, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 32.9, 0.6, 7, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 35.9, 0.6, 8, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_table, 38.9, 0.6, 9, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_table, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create text
@@ -212,69 +194,48 @@ void XNavBrow::create_nodeclasses()
   brow_CreateNodeClass(ctx, "NavigatorText", flow_eNodeGroup_Common, &nc_text);
   brow_AddAnnotPixmap(nc_text, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_text, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_text, 2.9, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_text, 7.9, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_text, 11.9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_text, 2.9, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_text, 7.9, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_text, 11.9, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_text, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create Header
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorHead", flow_eNodeGroup_Common, &nc_header);
+  brow_CreateNodeClass(ctx, "NavigatorHead", flow_eNodeGroup_Common, &nc_header);
   brow_AddAnnotPixmap(nc_header, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_header, 2.9, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_header, 8.9, 0.6, 1, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_header, 2.9, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_header, 8.9, 0.6, 1, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_header, 0, 0, 20, 0.83, flow_eDrawType_LineGray, 2, 1);
 
   // Create Header2
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorHeadLarge", flow_eNodeGroup_Common, &nc_headerlarge);
+  brow_CreateNodeClass(ctx, "NavigatorHeadLarge", flow_eNodeGroup_Common, &nc_headerlarge);
   brow_AddAnnotPixmap(nc_headerlarge, 0, 0.5, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_headerlarge, 2.9, 1.0, 0, flow_eDrawType_TextRobotoBold,
-      4, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_headerlarge, 8.9, 1.0, 1, flow_eDrawType_TextRobotoBold,
-      4, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_headerlarge, 2.9, 1.0, 0, flow_eDrawType_TextRobotoBold, 4, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_headerlarge, 8.9, 1.0, 1, flow_eDrawType_TextRobotoBold, 4, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_headerlarge, 0, 0, 20, 1.4, flow_eDrawType_LineGray, -1, 1);
 
   // Create TableHeader
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorTableHead", flow_eNodeGroup_Common, &nc_table_header);
+  brow_CreateNodeClass(ctx, "NavigatorTableHead", flow_eNodeGroup_Common, &nc_table_header);
   brow_AddAnnotPixmap(nc_table_header, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_table_header, 2.9, 0.6, 0, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 8.9, 0.6, 1, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 12.9, 0.6, 2, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 16.9, 0.6, 3, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 20.9, 0.6, 4, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 24.9, 0.6, 5, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 28.9, 0.6, 6, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 32.9, 0.6, 7, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 35.9, 0.6, 8, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_table_header, 38.9, 0.6, 9, flow_eDrawType_TextRobotoBold,
-      2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 2.9, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 8.9, 0.6, 1, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 12.9, 0.6, 2, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 16.9, 0.6, 3, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 20.9, 0.6, 4, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 24.9, 0.6, 5, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 28.9, 0.6, 6, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 32.9, 0.6, 7, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 35.9, 0.6, 8, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_table_header, 38.9, 0.6, 9, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_table_header, 0, 0, 20, 0.83, flow_eDrawType_LineGray, 2, 1);
 
   brow_CreateNodeClass(ctx, "NavigatorEnum", flow_eNodeGroup_Common, &nc_enum);
   brow_AddRadiobutton(nc_enum, 12, 0.03, 0.7, 0.7, 0, flow_eDrawType_Line, 1);
   brow_AddAnnotPixmap(nc_enum, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddAnnotPixmap(nc_enum, 1, 1.1, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_enum, 2.9, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_enum, 2.9, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_enum, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 
@@ -292,7 +253,4 @@ void XNavBrow::brow_setup()
   brow_SetCtxUserData(ctx, userdata);
 }
 
-void XNavBrow::set_push_command(char* cmd)
-{
-  strcpy(push_command, cmd);
-}
+void XNavBrow::set_push_command(char* cmd) { strcpy(push_command, cmd); }

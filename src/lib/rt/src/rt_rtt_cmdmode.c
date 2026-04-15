@@ -54,18 +54,21 @@
 
 #include "dtt_rttsys_functions.h"
 
-#define IF_NOGDH_RETURN                                                        \
-  if (!rtt_gdh_started) {                                                      \
-    rtt_message('E', "Rtt is not connected to nethandler");                    \
-    return RTT__NOPICTURE;                                                     \
+#define IF_NOGDH_RETURN                                                                                      \
+  if (!rtt_gdh_started)                                                                                      \
+  {                                                                                                          \
+    rtt_message('E', "Rtt is not connected to nethandler");                                                  \
+    return RTT__NOPICTURE;                                                                                   \
   }
 
-typedef struct {
+typedef struct
+{
   char key[80];
   char value[80];
 } rtt_t_symboltable;
 
-typedef struct {
+typedef struct
+{
   char p1[80];
   char p2[80];
   char p3[80];
@@ -89,17 +92,17 @@ static int rtt_symbol_to_float(float* int_value, char* value);
 static int rtt_get_attr_value(char* attrname, char* value);
 
 /*************************************************************************
-*
-* Name:		rtt_store_symbols()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Store all symbols in a rtt commandfile.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_store_symbols()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Store all symbols in a rtt commandfile.
+ *
+ **************************************************************************/
 int rtt_store_symbols(char* filename)
 {
   char filename_str[80];
@@ -115,13 +118,17 @@ int rtt_store_symbols(char* filename)
   if (file == 0)
     return RTT__NOFILE;
 
-  for (i = 0; i < rtt_symboltable_count; i++) {
+  for (i = 0; i < rtt_symboltable_count; i++)
+  {
     fprintf(file, "define %s \"", rtt_symboltable[i].key);
-    for (s = rtt_symboltable[i].value; *s; s++) {
-      if (*s == '"') {
+    for (s = rtt_symboltable[i].value; *s; s++)
+    {
+      if (*s == '"')
+      {
         fputc('\\', file);
         fputc(*s, file);
-      } else
+      }
+      else
         fputc(*s, file);
     }
     fprintf(file, "\"\n");
@@ -134,52 +141,53 @@ int rtt_store_symbols(char* filename)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_show_symbols()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Show all symbols in a view-window.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_show_symbols()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Show all symbols in a view-window.
+ *
+ **************************************************************************/
 int rtt_show_symbols(menu_ctx ctx)
 {
   char* buff;
   int i;
   int sts;
 
-  if (rtt_symboltable_count == 0) {
+  if (rtt_symboltable_count == 0)
+  {
     rtt_message('I', "No symbol is defined");
     return RTT__NOPICTURE;
   }
   buff = calloc(1, CMD_BUFF_SIZE);
   sprintf(buff, " %-20.20s  %s\n\n", "Symbol", "Value");
-  for (i = 0; i < rtt_symboltable_count; i++) {
-    sprintf(buff + strlen(buff), " %-20.20s  %s\n", rtt_symboltable[i].key,
-        rtt_symboltable[i].value);
+  for (i = 0; i < rtt_symboltable_count; i++)
+  {
+    sprintf(buff + strlen(buff), " %-20.20s  %s\n", rtt_symboltable[i].key, rtt_symboltable[i].value);
   }
   sts = rtt_view(ctx, 0, buff, "Rtt Symbols", RTT_VIEWTYPE_BUF);
   free(buff);
   return sts;
 }
 /*************************************************************************
-*
-* Name:		rtt_replace_symbol()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Replace a symbol in the symbol table.
-*	A string surrounde by ' will replaced if then string is found
-*	to be a symbol. If the symbol is surrounded by #' the symbol
-*	will not be replaced.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_replace_symbol()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Replace a symbol in the symbol table.
+ *	A string surrounde by ' will replaced if then string is found
+ *	to be a symbol. If the symbol is surrounded by #' the symbol
+ *	will not be replaced.
+ *
+ **************************************************************************/
 int rtt_replace_symbol(char* command, char* newcommand)
 {
   char* s;
@@ -199,22 +207,29 @@ int rtt_replace_symbol(char* command, char* newcommand)
   s = command;
   t = news;
 
-  while (*s != 0) {
-    if ((unsigned char)*s == '#') {
-      if (ignore_symbolmode) {
+  while (*s != 0)
+  {
+    if ((unsigned char)*s == '#')
+    {
+      if (ignore_symbolmode)
+      {
         strcpy(t, "#");
         t++;
       }
       ignore_symbolmode = 1;
-    } else if (*s == '\'') {
-      if (symbolmode) {
+    }
+    else if (*s == '\'')
+    {
+      if (symbolmode)
+      {
         /* End of potential symbol */
         size = (long int)s - (long int)u;
         strncpy(symbol, u, size);
         symbol[size] = 0;
         rtt_toupper(upper_symbol, symbol);
         sts = rtt_get_symbol(upper_symbol, value);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           /* It was no symbol */
           strcpy(t, "'");
           t++;
@@ -222,25 +237,36 @@ int rtt_replace_symbol(char* command, char* newcommand)
           t += strlen(symbol);
           strcat(t, "'");
           t++;
-        } else {
+        }
+        else
+        {
           /* Symbol found */
           strcpy(t, value);
           t += strlen(value);
         }
         symbolmode = 0;
-      } else {
-        if (ignore_symbolmode) {
+      }
+      else
+      {
+        if (ignore_symbolmode)
+        {
           strcpy(t, "'");
           t++;
-        } else {
+        }
+        else
+        {
           symbolmode = 1;
           u = s + 1;
         }
       }
       ignore_symbolmode = 0;
-    } else {
-      if (!symbolmode) {
-        if (ignore_symbolmode) {
+    }
+    else
+    {
+      if (!symbolmode)
+      {
+        if (ignore_symbolmode)
+        {
           strcpy(t, "#");
           t++;
         }
@@ -251,11 +277,15 @@ int rtt_replace_symbol(char* command, char* newcommand)
     }
     s++;
   }
-  if (ignore_symbolmode) {
+  if (ignore_symbolmode)
+  {
     strcpy(t, "#");
-  } else if (symbolmode) {
+  }
+  else if (symbolmode)
+  {
     strcpy(t, u);
-  } else
+  }
+  else
     *t = 0;
 
   strcpy(newcommand, news);
@@ -263,65 +293,76 @@ int rtt_replace_symbol(char* command, char* newcommand)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_get_symbol()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get a symbol from the symbol table.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_symbol()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get a symbol from the symbol table.
+ *
+ **************************************************************************/
 int rtt_get_symbol(char* key, char* value)
 {
   int i;
   int sts;
 
-  if (*key == '#') {
+  if (*key == '#')
+  {
     /* This is an attribute reference */
     IF_NOGDH_RETURN;
     sts = rtt_get_attr_value(&key[1], value);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Object not found");
       return 0;
     }
     return RTT__SUCCESS;
   }
   /* Check if system symbol */
-  if (!strcmp("RTT_PLATFORM", key)) {
+  if (!strcmp("RTT_PLATFORM", key))
+  {
     strcpy(value, rtt_platform);
     return RTT__SUCCESS;
   }
-  if (!strcmp("RTT_HW", key)) {
+  if (!strcmp("RTT_HW", key))
+  {
     strcpy(value, rtt_hw);
     return RTT__SUCCESS;
   }
-  if (!strcmp("RTT_OS", key)) {
+  if (!strcmp("RTT_OS", key))
+  {
     strcpy(value, rtt_os);
     return RTT__SUCCESS;
   }
-  if (!strcmp("RTT_NODE", key)) {
+  if (!strcmp("RTT_NODE", key))
+  {
     strcpy(value, rtt_node);
     return RTT__SUCCESS;
   }
-  if (!strcmp("RTT_SYS", key)) {
+  if (!strcmp("RTT_SYS", key))
+  {
     strcpy(value, rtt_sys);
     return RTT__SUCCESS;
   }
-  if (!strcmp("RTT_IDENT", key)) {
+  if (!strcmp("RTT_IDENT", key))
+  {
     strcpy(value, rtt_ident);
     return RTT__SUCCESS;
   }
-  if (!strcmp("RTT_TIME", key)) {
+  if (!strcmp("RTT_TIME", key))
+  {
     rtt_update_time();
     strcpy(value, rtt_time);
     return RTT__SUCCESS;
   }
 
-  for (i = 0; i < rtt_symboltable_count; i++) {
-    if (!strcmp(rtt_symboltable[i].key, key)) {
+  for (i = 0; i < rtt_symboltable_count; i++)
+  {
+    if (!strcmp(rtt_symboltable[i].key, key))
+    {
       strcpy(value, rtt_symboltable[i].value);
       return RTT__SUCCESS;
     }
@@ -330,29 +371,33 @@ int rtt_get_symbol(char* key, char* value)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_get_cmd_symbol()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get a symbol from the symbol table. Abbrevations is allowed.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_cmd_symbol()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get a symbol from the symbol table. Abbrevations is allowed.
+ *
+ **************************************************************************/
 int rtt_get_symbol_cmd(char* key, char* value)
 {
   int i;
   int found;
 
   found = 0;
-  for (i = 0; i < rtt_symboltable_count; i++) {
-    if (!strcmp(rtt_symboltable[i].key, key)) {
+  for (i = 0; i < rtt_symboltable_count; i++)
+  {
+    if (!strcmp(rtt_symboltable[i].key, key))
+    {
       /* Perfect match */
       strcpy(value, rtt_symboltable[i].value);
       return RTT__SUCCESS;
-    } else if (!str_StartsWith(rtt_symboltable[i].key, key)) {
+    }
+    else if (!str_StartsWith(rtt_symboltable[i].key, key))
+    {
       if (found)
         return RTT__SYMBOL_AMBIG;
       strcpy(value, rtt_symboltable[i].value);
@@ -366,17 +411,17 @@ int rtt_get_symbol_cmd(char* key, char* value)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_define_symbol()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Define a symbol in the symbol table.
-*
-**************************************************************************/
+ *
+ * Name:		rtt_define_symbol()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Define a symbol in the symbol table.
+ *
+ **************************************************************************/
 int rtt_define_symbol(char* key, char* arg1, char* arg2, char* arg3)
 {
   int i;
@@ -389,119 +434,161 @@ int rtt_define_symbol(char* key, char* arg1, char* arg2, char* arg3)
   float float_value2;
   int sts;
 
-  if (rtt_symboltable_count >= RTT_SYMBOLTABLE_SIZE) {
+  if (rtt_symboltable_count >= RTT_SYMBOLTABLE_SIZE)
+  {
     rtt_message('E', "Symboltable is full");
     return RTT__NOPICTURE;
   }
-  if (strlen(key) > sizeof(rtt_symboltable[0].key) - 1) {
+  if (strlen(key) > sizeof(rtt_symboltable[0].key) - 1)
+  {
     rtt_message('E', "Symbol name to long");
     return RTT__HOLDCOMMAND;
   }
 
   /* Check if arg1 is an operator */
-  if (!strcmp(arg1, "++")) {
+  if (!strcmp(arg1, "++"))
+  {
     /* Get the old value */
     sts = rtt_get_symbol(key, value);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Symbol not found");
       return RTT__HOLDCOMMAND;
     }
 
     /* convert to integer or float */
-    if (ODD(rtt_symbol_to_int(&int_value, value))) {
+    if (ODD(rtt_symbol_to_int(&int_value, value)))
+    {
       int_value++;
       sprintf(value, "%d", int_value);
-    } else if (ODD(rtt_symbol_to_float(&float_value, value))) {
+    }
+    else if (ODD(rtt_symbol_to_float(&float_value, value)))
+    {
       float_value++;
       sprintf(value, "%f", float_value);
-    } else {
+    }
+    else
+    {
       rtt_message('E', "Error in symbol type");
       return RTT__HOLDCOMMAND;
     }
-  } else if (!strcmp(arg1, "--")) {
+  }
+  else if (!strcmp(arg1, "--"))
+  {
     /* Get the old value */
     sts = rtt_get_symbol(key, value);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rtt_message('E', "Symbol not found");
       return RTT__HOLDCOMMAND;
     }
 
     /* convert to integer or float */
-    if (ODD(rtt_symbol_to_int(&int_value, value))) {
+    if (ODD(rtt_symbol_to_int(&int_value, value)))
+    {
       int_value--;
       sprintf(value, "%d", int_value);
-    } else if (ODD(rtt_symbol_to_float(&float_value, value))) {
+    }
+    else if (ODD(rtt_symbol_to_float(&float_value, value)))
+    {
       float_value--;
       sprintf(value, "%f", float_value);
-    } else {
+    }
+    else
+    {
       rtt_message('E', "Error in symbol type");
       return RTT__HOLDCOMMAND;
     }
-  } else if (arg2 == 0) {
+  }
+  else if (arg2 == 0)
+  {
     /* arg1 is the value */
     strcpy(value, arg1);
-  } else {
+  }
+  else
+  {
     /* arg2 is the operator */
-    if (arg3 == 0) {
+    if (arg3 == 0)
+    {
       rtt_message('E', "Syntax error");
       return RTT__HOLDCOMMAND;
     }
-    if (!strcmp(arg2, "+")) {
-      if (ODD(rtt_symbol_to_int(&int_value1, arg1))
-          && ODD(rtt_symbol_to_int(&int_value2, arg3))) {
+    if (!strcmp(arg2, "+"))
+    {
+      if (ODD(rtt_symbol_to_int(&int_value1, arg1)) && ODD(rtt_symbol_to_int(&int_value2, arg3)))
+      {
         int_value = int_value1 + int_value2;
         sprintf(value, "%d", int_value);
-      } else if (ODD(rtt_symbol_to_float(&float_value1, arg1))
-          && ODD(rtt_symbol_to_float(&float_value2, arg3))) {
+      }
+      else if (ODD(rtt_symbol_to_float(&float_value1, arg1)) && ODD(rtt_symbol_to_float(&float_value2, arg3)))
+      {
         float_value = float_value1 + float_value2;
         sprintf(value, "%f", float_value);
-      } else {
+      }
+      else
+      {
         rtt_message('E', "Error in symbol type");
         return RTT__HOLDCOMMAND;
       }
-    } else if (!strcmp(arg2, "-")) {
-      if (ODD(rtt_symbol_to_int(&int_value1, arg1))
-          && ODD(rtt_symbol_to_int(&int_value2, arg3))) {
+    }
+    else if (!strcmp(arg2, "-"))
+    {
+      if (ODD(rtt_symbol_to_int(&int_value1, arg1)) && ODD(rtt_symbol_to_int(&int_value2, arg3)))
+      {
         int_value = int_value1 - int_value2;
         sprintf(value, "%d", int_value);
-      } else if (ODD(rtt_symbol_to_float(&float_value1, arg1))
-          && ODD(rtt_symbol_to_float(&float_value2, arg3))) {
+      }
+      else if (ODD(rtt_symbol_to_float(&float_value1, arg1)) && ODD(rtt_symbol_to_float(&float_value2, arg3)))
+      {
         float_value = float_value1 - float_value2;
         sprintf(value, "%f", float_value);
-      } else {
+      }
+      else
+      {
         rtt_message('E', "Error in symbol type");
         return RTT__HOLDCOMMAND;
       }
-    } else if (!strcmp(arg2, "*")) {
-      if (ODD(rtt_symbol_to_int(&int_value1, arg1))
-          && ODD(rtt_symbol_to_int(&int_value2, arg3))) {
+    }
+    else if (!strcmp(arg2, "*"))
+    {
+      if (ODD(rtt_symbol_to_int(&int_value1, arg1)) && ODD(rtt_symbol_to_int(&int_value2, arg3)))
+      {
         int_value = int_value1 * int_value2;
         sprintf(value, "%d", int_value);
-      } else if (ODD(rtt_symbol_to_float(&float_value1, arg1))
-          && ODD(rtt_symbol_to_float(&float_value2, arg3))) {
+      }
+      else if (ODD(rtt_symbol_to_float(&float_value1, arg1)) && ODD(rtt_symbol_to_float(&float_value2, arg3)))
+      {
         float_value = float_value1 * float_value2;
         sprintf(value, "%f", float_value);
-      } else {
+      }
+      else
+      {
         rtt_message('E', "Error in symbol type");
         return RTT__HOLDCOMMAND;
       }
-    } else if (!strcmp(arg2, "/")) {
-      if (ODD(rtt_symbol_to_int(&int_value1, arg1))
-          && ODD(rtt_symbol_to_int(&int_value2, arg3))) {
+    }
+    else if (!strcmp(arg2, "/"))
+    {
+      if (ODD(rtt_symbol_to_int(&int_value1, arg1)) && ODD(rtt_symbol_to_int(&int_value2, arg3)))
+      {
         int_value = int_value1 / int_value2;
         sprintf(value, "%d", int_value);
-      } else if (ODD(rtt_symbol_to_float(&float_value1, arg1))
-          && ODD(rtt_symbol_to_float(&float_value2, arg3))) {
+      }
+      else if (ODD(rtt_symbol_to_float(&float_value1, arg1)) && ODD(rtt_symbol_to_float(&float_value2, arg3)))
+      {
         float_value = float_value1 / float_value2;
         sprintf(value, "%f", float_value);
-      } else {
+      }
+      else
+      {
         rtt_message('E', "Error in symbol type");
         return RTT__HOLDCOMMAND;
       }
     }
   }
 
-  if (strlen(value) > sizeof(rtt_symboltable[0].value) - 1) {
+  if (strlen(value) > sizeof(rtt_symboltable[0].value) - 1)
+  {
     rtt_message('E', "Symbol value to long");
     return RTT__HOLDCOMMAND;
   }
@@ -524,9 +611,12 @@ int rtt_define_symbol(char* key, char* arg1, char* arg2, char* arg3)
     strcpy(rtt_cmdargtable[rtt_command_level - 1].p7, value);
   else if (!strcmp(key, "P8"))
     strcpy(rtt_cmdargtable[rtt_command_level - 1].p8, value);
-  else {
-    for (i = 0; i < rtt_symboltable_count; i++) {
-      if (!strcmp(rtt_symboltable[i].key, key)) {
+  else
+  {
+    for (i = 0; i < rtt_symboltable_count; i++)
+    {
+      if (!strcmp(rtt_symboltable[i].key, key))
+      {
         strcpy(rtt_symboltable[i].value, value);
         return RTT__NOPICTURE;
       }
@@ -569,19 +659,19 @@ static int rtt_symbol_to_float(float* float_value, char* value)
 }
 
 /*************************************************************************
-*
-* Name:		rtt_attribute_func()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Backcall function for ccm.
-*
-**************************************************************************/
-int rtt_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float,
-    ccm_tInt* return_int, char* return_string)
+ *
+ * Name:		rtt_attribute_func()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Backcall function for ccm.
+ *
+ **************************************************************************/
+int rtt_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float, ccm_tInt* return_int,
+                       char* return_string)
 {
   int sts;
   pwr_tAName hier_name;
@@ -605,8 +695,7 @@ int rtt_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float,
     return sts;
 
   /* Get type of attribute */
-  sts = gdh_GetAttributeCharacteristics(
-      name, &attrtype, &attrsize, &attroffs, &attrelem);
+  sts = gdh_GetAttributeCharacteristics(name, &attrtype, &attrsize, &attroffs, &attrelem);
   if (EVEN(sts))
     return sts;
 
@@ -619,11 +708,13 @@ int rtt_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float,
   s = strchr(name, '[');
   if (s == 0)
     element = 0;
-  else {
+  else
+  {
     t = strchr(name, ']');
     if (t == 0)
       return RTT__ELEMSYNTAX;
-    else {
+    else
+    {
       len = t - s - 1;
       strncpy(elementstr, s + 1, len);
       elementstr[len] = 0;
@@ -636,53 +727,64 @@ int rtt_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float,
 
   object_element = object_par + element * (attrsize / attrelem);
 
-  switch (attrtype) {
-  case pwr_eType_Boolean: {
+  switch (attrtype)
+  {
+  case pwr_eType_Boolean:
+  {
     int_val = *(pwr_tBoolean*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Float32: {
+  case pwr_eType_Float32:
+  {
     float_val = *(pwr_tFloat32*)object_element;
     decl = CCM_DECL_FLOAT;
     break;
   }
-  case pwr_eType_Float64: {
+  case pwr_eType_Float64:
+  {
     float_val = *(pwr_tFloat64*)object_element;
     decl = CCM_DECL_FLOAT;
     break;
   }
-  case pwr_eType_Char: {
+  case pwr_eType_Char:
+  {
     int_val = *(pwr_tChar*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Int8: {
+  case pwr_eType_Int8:
+  {
     int_val = *(pwr_tInt8*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Int16: {
+  case pwr_eType_Int16:
+  {
     int_val = *(pwr_tInt16*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Int32: {
+  case pwr_eType_Int32:
+  {
     int_val = *(pwr_tInt32*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_Int64: {
+  case pwr_eType_Int64:
+  {
     int_val = *(pwr_tInt64*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_UInt8: {
+  case pwr_eType_UInt8:
+  {
     int_val = *(pwr_tUInt8*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_UInt16: {
+  case pwr_eType_UInt16:
+  {
     int_val = *(pwr_tUInt16*)object_element;
     decl = CCM_DECL_INT;
     break;
@@ -691,32 +793,36 @@ int rtt_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float,
   case pwr_eType_ClassId:
   case pwr_eType_TypeId:
   case pwr_eType_VolumeId:
-  case pwr_eType_ObjectIx: {
+  case pwr_eType_ObjectIx:
+  {
     int_val = *(pwr_tUInt32*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_UInt64: {
+  case pwr_eType_UInt64:
+  {
     int_val = *(pwr_tUInt64*)object_element;
     decl = CCM_DECL_INT;
     break;
   }
-  case pwr_eType_String: {
+  case pwr_eType_String:
+  {
     strncpy(string_val, object_element, sizeof(string_val));
     string_val[sizeof(string_val) - 1] = 0;
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_Text: {
+  case pwr_eType_Text:
+  {
     strncpy(string_val, object_element, sizeof(string_val));
     string_val[sizeof(string_val) - 1] = 0;
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_Objid: {
+  case pwr_eType_Objid:
+  {
     /* Get the object name from ldh */
-    sts = gdh_ObjidToName(*(pwr_tObjid*)object_element, hier_name,
-        sizeof(hier_name), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(*(pwr_tObjid*)object_element, hier_name, sizeof(hier_name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       strcpy(string_val, "Undefined Object");
     else
@@ -725,10 +831,11 @@ int rtt_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float,
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_AttrRef: {
+  case pwr_eType_AttrRef:
+  {
     /* Get the object name from ldh */
-    sts = gdh_AttrrefToName((pwr_sAttrRef*)object_element, hier_name,
-        sizeof(hier_name), cdh_mName_volumeStrict);
+    sts = gdh_AttrrefToName((pwr_sAttrRef*)object_element, hier_name, sizeof(hier_name),
+                            cdh_mName_volumeStrict);
     if (EVEN(sts))
       strcpy(string_val, "Undefined attribute");
     else
@@ -737,10 +844,10 @@ int rtt_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float,
     decl = CCM_DECL_STRING;
     break;
   }
-  case pwr_eType_Time: {
+  case pwr_eType_Time:
+  {
     /* Convert time to ascii */
-    sts = time_AtoAscii((pwr_tTime*)object_element, time_eFormat_DateAndTime,
-        string_val, sizeof(string_val));
+    sts = time_AtoAscii((pwr_tTime*)object_element, time_eFormat_DateAndTime, string_val, sizeof(string_val));
     string_val[20] = 0;
     decl = CCM_DECL_STRING;
     break;
@@ -759,16 +866,16 @@ int rtt_attribute_func(char* name, int* return_decl, ccm_tFloat* return_float,
 }
 
 /*************************************************************************
-*
-* Name:		rtt_get_attr_value()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
+ *
+ * Name:		rtt_get_attr_value()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
 
 static int rtt_get_attr_value(char* attrname, char* value)
 {
@@ -778,25 +885,29 @@ static int rtt_get_attr_value(char* attrname, char* value)
   ccm_tString return_string;
   int decl;
 
-  sts = rtt_attribute_func(
-      attrname, &decl, &return_float, &return_int, return_string);
+  sts = rtt_attribute_func(attrname, &decl, &return_float, &return_int, return_string);
   if (EVEN(sts))
     return sts;
 
-  switch (decl) {
+  switch (decl)
+  {
   case CCM_DECL_INT:
     sprintf(value, ccm_cIntFormat, return_int);
     break;
 
   case CCM_DECL_FLOAT:
     /* If value is close to integer, round it */
-    if (fabs(return_float - floor(return_float)) <= FLT_EPSILON) {
+    if (fabs(return_float - floor(return_float)) <= FLT_EPSILON)
+    {
       return_int = return_float + FLT_EPSILON;
       sprintf(value, ccm_cIntFormat, return_int);
-    } else if (fabs(return_float - floor(return_float) + 1) <= FLT_EPSILON) {
+    }
+    else if (fabs(return_float - floor(return_float) + 1) <= FLT_EPSILON)
+    {
       return_int = return_float + FLT_EPSILON;
       sprintf(value, ccm_cIntFormat, return_int);
-    } else
+    }
+    else
       sprintf(value, "%f", return_float);
     break;
   case pwr_eType_String:

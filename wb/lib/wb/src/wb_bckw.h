@@ -43,43 +43,29 @@
 
 #include "wb_bckwnav.h"
 
-class WbBckW {
+class WbBckW
+{
 public:
-  WbBckW(void* l_parent_ctx, ldh_tSesContext l_ldhses, const char* bckw_name,
-      wb_bck_list* l_list, int l_editmode, pwr_tStatus* status);
+  WbBckW(void* l_parent_ctx, ldh_tSesContext l_ldhses, const char* bckw_name, wb_bck_list* l_list,
+         int l_editmode, pwr_tStatus* status);
   virtual ~WbBckW();
 
-  virtual void print()
-  {
-  }
-  virtual void set_title(char* title)
-  {
-  }
+  virtual void print() {}
+  virtual void set_title(char* title) {}
   void show();
-  void activate_print()
-  {
-    print();
-  }
+  void activate_print() { print(); }
   void activate_transfer_wb();
   void activate_filter();
   void activate_open();
   void activate_diff();
   void activate_diff_wb();
-  void activate_check_all()
-  {
-    bckwnav->check_all();
-  }
-  void activate_check_clear()
-  {
-    bckwnav->check_clear();
-  }
+  void activate_check_all() { bckwnav->check_all(); }
+  void activate_check_clear() { bckwnav->check_clear(); }
 
   static void transfer_wb_ok(void* ctx, void* data);
   static void filter_cb(void* ctx, void* data, char* text);
-  static void file_selected_cb(
-      void* ctx, char* filename, wow_eFileSelType file_type);
-  static void diff_file_selected_cb(
-      void* ctx, char* filename, wow_eFileSelType file_type);
+  static void file_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type);
+  static void diff_file_selected_cb(void* ctx, char* filename, wow_eFileSelType file_type);
 
   void* parent_ctx;
   ldh_tSesContext ldhses;

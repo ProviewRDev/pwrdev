@@ -52,7 +52,8 @@ class GlowExportFlow;
   (.pwsg) it is
   saved as a GlowConPoint object.
 */
-class GrowConPoint : public GlowConPoint {
+class GrowConPoint : public GlowConPoint
+{
 public:
   //! Constuctor
   /*!
@@ -64,9 +65,8 @@ public:
     \param d 		Conpoint direction.
     \param nodraw	Don't draw the object now.
   */
-  GrowConPoint(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0,
-      int cp_num = 0, glow_eDirection d = glow_eDirection_Center,
-      int nodraw = 0);
+  GrowConPoint(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0, int cp_num = 0,
+               glow_eDirection d = glow_eDirection_Center, int nodraw = 0);
 
   //! Destructor
   /*! Removes the object from the context's arrays, and erases it from the
@@ -89,8 +89,7 @@ public:
     as
     current callback object.
   */
-  int event_handler(
-      GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
 
   //! Calculate the border for a set of objects or for a parent node.
   /*!
@@ -103,8 +102,7 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(GlowTransform* t, double* x_right, double* x_left,
-      double* y_high, double* y_low);
+  void get_borders(GlowTransform* t, double* x_right, double* x_left, double* y_high, double* y_low);
 
   //! Calculate the border for a set of objects, without transformation.
   /*!
@@ -116,8 +114,7 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(
-      double* x1_right, double* x1_left, double* y1_high, double* y1_low)
+  void get_borders(double* x1_right, double* x1_left, double* y1_high, double* y1_low)
   {
     get_borders((GlowTransform*)NULL, x1_right, x1_left, y1_high, y1_low);
   }
@@ -132,8 +129,7 @@ public:
 
     Calls the get_border function for the arc object.
   */
-  void get_node_borders(GlowTransform* t, double* x_right, double* x_left,
-      double* y_high, double* y_low);
+  void get_node_borders(GlowTransform* t, double* x_right, double* x_left, double* y_high, double* y_low);
 
   //! Update the borders of the object.
   /*! The borders of the object is stored in x_right, x_left, y_high and y_low.
@@ -146,7 +142,7 @@ public:
   }
 
   //! Not implemented
-  void print(double ll_x, double ll_y, double ur_x, double ur_y){}
+  void print(double ll_x, double ll_y, double ur_x, double ur_y) {}
   void zoom();
   void nav_zoom();
 
@@ -218,24 +214,18 @@ public:
   /*!
     \return Return 1 if object is highlighted, else 0.
   */
-  int get_highlight()
-  {
-    return highlight;
-  }
+  int get_highlight() { return highlight; }
 
   //! Not implemented.
-  void set_inverse(int on){}
+  void set_inverse(int on) {}
 
   //! Not implemented.
-  int get_inverse()
-  {
-    return inverse;
-  }
+  int get_inverse() { return inverse; }
 
   //! Not used.
-  void set_hot(int on){}
+  void set_hot(int on) {}
 
-  int get_hot(){return hot;}
+  int get_hot() { return hot; }
 
   //! Insert object in select list, if it is inside the selection area.
   /*!
@@ -246,16 +236,13 @@ public:
     \param select_policy Current select policy.
   */
   void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
-      glow_eSelectPolicy select_policy);
+                            glow_eSelectPolicy select_policy);
 
   //! Get the object type
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowConPoint;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowConPoint; }
 
   //! Measure the extent of the object.
   /*!
@@ -272,44 +259,35 @@ public:
     *ur_y = y_high;
   }
 
-  double x_right; //!< Right border of object.
-  double x_left; //!< Left border of object.
-  double y_high; //!< High border of object.
-  double y_low; //!< Low border of object.
-  int hot; //!< Object is hot, i.e. the cursor is currently on the object.
-  GlowPoint pzero; //!< Not used.
+  double x_right;       //!< Right border of object.
+  double x_left;        //!< Left border of object.
+  double y_high;        //!< High border of object.
+  double y_low;         //!< Low border of object.
+  int hot;              //!< Object is hot, i.e. the cursor is currently on the object.
+  GlowPoint pzero;      //!< Not used.
   GlowPoint stored_pos; //!< Not used.
-  int highlight; //!< Object is highlighted, i.e. painted with red color.
-  int inverse; //!< Not implemented.
-  GlowArc arc; //!< The arc object that is the symbol of the connectionpoint.
-  void* user_data; //!< User data.
+  int highlight;        //!< Object is highlighted, i.e. painted with red color.
+  int inverse;          //!< Not implemented.
+  GlowArc arc;          //!< The arc object that is the symbol of the connectionpoint.
+  void* user_data;      //!< User data.
 
   //! Set user data.
   /*!
     \param data User data.
   */
-  void set_user_data(void* data)
-  {
-    user_data = data;
-  }
+  void set_user_data(void* data) { user_data = data; }
 
   //! Get user data.
   /*!
     \param data User data.
   */
-  void get_user_data(void** data)
-  {
-    *data = user_data;
-  }
+  void get_user_data(void** data) { *data = user_data; }
 
   //! Get grow context.
   /*!
     \return The context.
   */
-  void* get_ctx()
-  {
-    return this->ctx;
-  }
+  void* get_ctx() { return this->ctx; }
 
   //! Draw the object.
   /*!
@@ -325,8 +303,8 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Add a transform to the current transform.
   /*!
@@ -344,24 +322,15 @@ public:
     The transform is multiplied with the stored transform, to give to new
     transform for the object.
   */
-  void set_transform_from_stored(GlowTransform* t)
-  {
-    trf.set_from_stored(t), get_node_borders();
-  }
+  void set_transform_from_stored(GlowTransform* t) { trf.set_from_stored(t), get_node_borders(); }
 
   //! Store the current transform
   /*! The stored transform can be used as starting point for future scaling or
    * rotations.
    */
-  void store_transform()
-  {
-    trf.store();
-  }
+  void store_transform() { trf.store(); }
 
-  void get_ctx(void** c)
-  {
-    *c = (void*)ctx;
-  } //!< Should be replace by get_ctx() !!
+  void get_ctx(void** c) { *c = (void*)ctx; } //!< Should be replace by get_ctx() !!
 
   //! Moves object to alignment line or point.
   /*!

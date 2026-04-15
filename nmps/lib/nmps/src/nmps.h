@@ -39,14 +39,14 @@
 
 #include "rt_plc.h"
 
-#define NMPS_CELL_MAXSIZE                                                      \
-  120 /* Number of  dataobject in                                              \
+#define NMPS_CELL_MAXSIZE                                                                                    \
+  120 /* Number of  dataobject in                                                                            \
          NMpsCell och NMpsSelectCell */
-#define NMPS_CELLMIR_SIZE                                                      \
-  30 /* Number of dataobject in                                                \
+#define NMPS_CELLMIR_SIZE                                                                                    \
+  30 /* Number of dataobject in                                                                              \
         NMpsMirrorCell */
-#define MMPS_CELLMIR_ORIGCELL_SIZE                                             \
-  10 /* Size of the origcell-array                                             \
+#define MMPS_CELLMIR_ORIGCELL_SIZE                                                                           \
+  10 /* Size of the origcell-array                                                                           \
         in NMpsMirrorCell */
 #define NMPS_OPTYPE_EXTINSERT 0
 #define NMPS_OPTYPE_EXTINSERT_IDX 1
@@ -80,7 +80,8 @@
 #ifndef nmps_data_info
 #define nmps_data_info
 /* Data structure for one dataobject in a NMpsCell and NMpsStoreCell */
-typedef struct {
+typedef struct
+{
   pwr_tDataRef DataP pwr_dAlignLW;
   pwr_tBoolean Data_Front pwr_dAlignW;
   pwr_tBoolean Data_Back pwr_dAlignW;
@@ -91,14 +92,16 @@ typedef struct {
 } plc_t_DataInfo;
 
 /* Data structure for one dataobjekt in a NMpsMirrorCell */
-typedef struct {
+typedef struct
+{
   pwr_tDataRef DataP pwr_dAlignLW;
   gdh_tDlid Data_Dlid pwr_dAlignW;
 } plc_t_DataInfoMirCell;
 #endif
 
 /* Data structure for the copyarea in a  NMpsMirrorCell */
-typedef struct {
+typedef struct
+{
   plc_t_DataInfoMirCell datainfo[NMPS_CELLMIR_SIZE];
 } nmps_t_mircell_copyarea;
 
@@ -129,8 +132,7 @@ void NMpsCell120_exec(plc_sThread* tp, pwr_sClass_NMpsCell120* object);
 void NMpsStoreCell60_init(pwr_sClass_NMpsStoreCell60* object);
 void NMpsStoreCell60_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell60* object);
 void NMpsStoreCell120_init(pwr_sClass_NMpsStoreCell120* object);
-void NMpsStoreCell120_exec(
-    plc_sThread* tp, pwr_sClass_NMpsStoreCell120* object);
+void NMpsStoreCell120_exec(plc_sThread* tp, pwr_sClass_NMpsStoreCell120* object);
 void CellDisp_init(pwr_sClass_CellDisp* object);
 void CellDisp_exec(plc_sThread* tp, pwr_sClass_CellDisp* object);
 void CellDispMir_init(pwr_sClass_CellDispMir* object);

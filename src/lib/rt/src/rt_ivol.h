@@ -43,7 +43,8 @@
 #include "rt_vol.h"
 #include "rt_lst.h"
 
-typedef struct {
+typedef struct
+{
   tree_sNode tree;
   lst_sEntry ll;
   pwr_tBoolean isVolRef;
@@ -60,7 +61,8 @@ typedef struct {
   tree_sTable* oid_t;
 } ivol_sVolume;
 
-typedef struct {
+typedef struct
+{
   pwr_tNodeId nid;
   pwr_tObjid nod_oid;
   pwr_tVolumeId vid;
@@ -72,7 +74,8 @@ typedef struct {
   pwr_tTime rtVersion;
 } ivol_sNode;
 
-typedef struct {
+typedef struct
+{
   tree_sNode tree;
   gdb_sObject* op;
   dbs_sObject oh;
@@ -87,13 +90,15 @@ typedef struct {
   void* body;
 } ivol_sObject;
 
-typedef struct {
+typedef struct
+{
   gdb_sObject* op;
   pwr_tUInt32 size;
   void* body;
 } ivol_sBody;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 offs;
   pwr_tUInt32 size;
   lst_sEntry seg_ll;
@@ -108,10 +113,8 @@ pwr_tBoolean ivol_DecodeBody(pwr_tStatus*, void*, gdb_sClass*);
 pwr_tBoolean ivol_DeleteVolume(pwr_tStatus*, gdb_sVolume*);
 ivol_sBody* ivol_GetBody(pwr_tStatus*, pwr_tObjid, ivol_sBody*);
 pwr_tBoolean ivol_InitiateVolumeUpdate(pwr_tStatus*, ivol_sVolume*);
-gdb_sObject* ivol_LoadObject(
-    pwr_tStatus*, ivol_sVolume*, dbs_sObject*, pwr_tBitMask);
-gdb_sScObject* ivol_LoadScObject(
-    pwr_tStatus*, ivol_sVolume*, dbs_sScObject*, pwr_tBitMask);
+gdb_sObject* ivol_LoadObject(pwr_tStatus*, ivol_sVolume*, dbs_sObject*, pwr_tBitMask);
+gdb_sScObject* ivol_LoadScObject(pwr_tStatus*, ivol_sVolume*, dbs_sScObject*, pwr_tBitMask);
 gdb_sVolume* ivol_LoadVolume(pwr_tStatus*, dbs_sVolume*, const co_mFormat*);
 pwr_tBoolean ivol_RebuildVolume(pwr_tStatus*, ivol_sVolume*, const co_mFormat*);
 

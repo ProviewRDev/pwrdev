@@ -50,11 +50,11 @@
 
 class WdaQtWidget;
 
-class WdaQt : public Wda {
+class WdaQt : public Wda
+{
 public:
-  WdaQt(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_tObjid wa_objid,
-      pwr_tClassId wa_classid, const char* wa_attribute, int wa_editmode,
-      int wa_advanced_user, int wa_display_objectname);
+  WdaQt(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_tObjid wa_objid, pwr_tClassId wa_classid,
+        const char* wa_attribute, int wa_editmode, int wa_advanced_user, int wa_display_objectname);
   ~WdaQt();
   QWidget* brow_widget;
   QWidget* form_widget;
@@ -81,7 +81,8 @@ private:
   WdaQtWidget* toplevel;
 };
 
-class WdaQtWidget : public QWidget {
+class WdaQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:
@@ -105,8 +106,7 @@ public slots:
   void activate_cmd_entry();
   void activate_cmd_scrolled_ok();
   void activate_cmd_scrolled_ca();
-  void class_activate_ok(
-      char* hiername, char* searchname, char* classname, bool attrobjects);
+  void class_activate_ok(char* hiername, char* searchname, char* classname, bool attrobjects);
 
 private:
   WdaQt* wda;

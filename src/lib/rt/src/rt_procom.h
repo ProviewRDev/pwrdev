@@ -39,8 +39,9 @@
 
 #include "co_procom.h"
 
-class rt_procom : public co_procom {
-  public:
+class rt_procom : public co_procom
+{
+public:
   errh_eAnix m_anix;
   char m_name[32];
   pwr_tSid m_sid;
@@ -49,22 +50,18 @@ class rt_procom : public co_procom {
   int m_global;
   qcom_sGet* m_getmsg;
 
-  rt_procom(co_provider* p, errh_eAnix anix, const char* name, pwr_tSid sid,
-      pwr_tVid vid, const char* volumename, int global);
+  rt_procom(co_provider* p, errh_eAnix anix, const char* name, pwr_tSid sid, pwr_tVid vid,
+            const char* volumename, int global);
   void init();
   void mainLoop();
-  virtual ~rt_procom()
-  {
-  }
+  virtual ~rt_procom() {}
   virtual void provideObjects(pwr_tStatus, std::vector<procom_obj>&);
-  virtual void provideObject(pwr_tStatus sts, pwr_tOix oix, pwr_tOix fthoix,
-      pwr_tOix bwsoix, pwr_tOix fwsoix, pwr_tOix fchoix, pwr_tOix lchoix,
-      pwr_tCid cid, const char* name, const char* longname)
+  virtual void provideObject(pwr_tStatus sts, pwr_tOix oix, pwr_tOix fthoix, pwr_tOix bwsoix, pwr_tOix fwsoix,
+                             pwr_tOix fchoix, pwr_tOix lchoix, pwr_tCid cid, const char* name,
+                             const char* longname)
   {
   }
-  virtual void provideBody(pwr_tStatus sts, pwr_tOix oix, int size, void* body)
-  {
-  }
+  virtual void provideBody(pwr_tStatus sts, pwr_tOix oix, int size, void* body) {}
   virtual void provideAttr(pwr_tStatus sts, pwr_tOix oix, int size, void* buff);
   virtual void provideStatus(pwr_tStatus sts);
   virtual void flushNodes();

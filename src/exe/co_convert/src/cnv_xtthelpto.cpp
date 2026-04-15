@@ -36,28 +36,17 @@
 
 #include "cnv_xtthelpto.h"
 
-CnvXtthelpTo::~CnvXtthelpTo()
-{
-}
+CnvXtthelpTo::~CnvXtthelpTo() {}
 
-Cnv_eXtthelpToType CnvXtthelpTo::type()
-{
-  return Cnv_eXtthelpToType_Html;
-}
+Cnv_eXtthelpToType CnvXtthelpTo::type() { return Cnv_eXtthelpToType_Html; }
 
-void* CnvXtthelpTo::insert(navh_eItemType item_type, const char* text1,
-    const char* text2, const char* text3, const char* link,
-    const char* link_bookmark, const char* file_name, navh_eHelpFile file_type,
-    int help_index, const char* bookmark, int coding)
+void* CnvXtthelpTo::insert(navh_eItemType item_type, const char* text1, const char* text2, const char* text3,
+                           const char* link, const char* link_bookmark, const char* file_name,
+                           navh_eHelpFile file_type, int help_index, const char* bookmark, int coding)
 {
   return 0;
 }
 
-bool CnvXtthelpTo::confpass()
-{
-  return false;
-}
+bool CnvXtthelpTo::confpass() { return false; }
 
-void CnvXtthelpTo::set_confpass(bool conf)
-{
-}
+void CnvXtthelpTo::set_confpass(bool conf) {}

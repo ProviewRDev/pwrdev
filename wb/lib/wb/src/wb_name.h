@@ -137,15 +137,14 @@ using namespace std;
 
 class wb_nrep;
 
-class wb_name : public wb_status {
+class wb_name : public wb_status
+{
 protected:
   wb_nrep* m_nrep;
   static const char* m_emptyString;
 
 public:
-  wb_name() : wb_status(LDH__NONAME), m_nrep(0)
-  {
-  }
+  wb_name() : wb_status(LDH__NONAME), m_nrep(0) {}
   wb_name(const char*);
   wb_name(wb_nrep*);
   wb_name(const wb_name&);
@@ -211,9 +210,6 @@ private:
   void check() const;
 };
 
-inline ostream& operator<< (ostream& os, const wb_name& name)
-{
-  return os << name.c_str();
-}
+inline ostream& operator<<(ostream& os, const wb_name& name) { return os << name.c_str(); }
 
 #endif

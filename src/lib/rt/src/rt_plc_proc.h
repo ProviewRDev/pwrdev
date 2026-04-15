@@ -53,7 +53,8 @@
 
 typedef struct plc_proctbl plc_sProctbl;
 
-struct plc_proctbl {
+struct plc_proctbl
+{
   pwr_tObjid thread;
   void (*init)(int, plc_sThread*);
   void (*exec)(int, plc_sThread*);

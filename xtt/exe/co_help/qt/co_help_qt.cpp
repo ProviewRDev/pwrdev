@@ -41,7 +41,7 @@
 #include "co_help_qt.h"
 
 #include "cow_qt_helpers.h"
-//#include "cow_style_qt.h"
+// #include "cow_style_qt.h"
 
 #include <QApplication>
 
@@ -70,18 +70,15 @@ int main(int argc, char* argv[])
   return app.exec();
 }
 
-CoHelpQt::~CoHelpQt()
-{
-  delete xhelp;
-}
+CoHelpQt::~CoHelpQt() { delete xhelp; }
 
-CoHelpQt::CoHelpQt(int argc, char* argv[], int* return_sts)
-    : CoHelpMain(argc, argv, return_sts)
+CoHelpQt::CoHelpQt(int argc, char* argv[], int* return_sts) : CoHelpMain(argc, argv, return_sts)
 {
   pwr_tStatus sts;
 
   log_debug("%s ", argv[0]);
-  for (int i = 1; i < argc; i++) {
+  for (int i = 1; i < argc; i++)
+  {
     fprintf(stderr, "%s ", argv[i]);
   }
   fprintf(stderr, "\n");

@@ -46,7 +46,8 @@
 
 #include "remote_pvd_udp.h"
 
-typedef struct sSubItem {
+typedef struct sSubItem
+{
   int rix;
   pwr_tObjid oid;
   pwr_tObjName attribute;
@@ -82,37 +83,44 @@ static void pwrsrv_Oid(rpvd_sMsgOid* msg)
   rmsg.Oid = msg->Oid;
 
   sts = gdh_GetObjectClass(msg->Oid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rmsg.Status = sts;
     udp_Send((char*)&rmsg, sizeof(rmsg));
     return;
   }
 
   plist[psize++] = msg->Oid;
-  for (sts = gdh_GetParent(plist[psize - 1], &o); ODD(sts);
-       sts = gdh_GetParent(plist[psize - 1], &o)) {
+  for (sts = gdh_GetParent(plist[psize - 1], &o); ODD(sts); sts = gdh_GetParent(plist[psize - 1], &o))
+  {
     plist[psize++] = o;
   }
   /* Add volume object */
   plist[psize].oix = 0;
   plist[psize++].vid = msg->Oid.vid;
 
-  for (j = 0; j < psize; j++) {
+  for (j = 0; j < psize; j++)
+  {
     i = psize - j - 1;
 
     sts = gdh_GetObjectClass(plist[i], &cid);
 
-    if (i == psize - 1) {
+    if (i == psize - 1)
+    {
       /* Volume object */
       fth.oix = 0;
 
       sts = gdh_GetRootList(&fch);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         fch.oix = 0;
         lch.oix = 0;
-      } else {
+      }
+      else
+      {
         sts = 1;
-        for (lch = fch; ODD(sts); sts = gdh_GetNextSibling(lch, &o)) {
+        for (lch = fch; ODD(sts); sts = gdh_GetNextSibling(lch, &o))
+        {
           lch = o;
         }
       }
@@ -122,18 +130,23 @@ static void pwrsrv_Oid(rpvd_sMsgOid* msg)
       sts = gdh_ObjidToName(plist[i], name, sizeof(name), cdh_mName_volume);
       if ((s = strrchr(name, ':')))
         *s = 0;
-    } else {
+    }
+    else
+    {
       sts = gdh_GetParent(plist[i], &fth);
       if (EVEN(sts))
         fth.oix = 0;
       sts = gdh_GetChild(plist[i], &fch);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         fch.oix = 0;
         lch.oix = 0;
-      } else {
+      }
+      else
+      {
         lch = fch;
-        for (sts = gdh_GetNextSibling(lch, &o); ODD(sts);
-             sts = gdh_GetNextSibling(lch, &o)) {
+        for (sts = gdh_GetNextSibling(lch, &o); ODD(sts); sts = gdh_GetNextSibling(lch, &o))
+        {
           lch = o;
         }
       }
@@ -167,10 +180,11 @@ static void pwrsrv_ObjectName(rpvd_sMsgObjectName* msg)
   /* Simulate an oid request */
   m.Type = rpvd_eMsg_Oid;
   m.Id = msg->Id;
-  if (msg->POid.oix) {
-    sts = gdh_ObjidToName(
-        msg->POid, name, sizeof(name), cdh_mName_volumeStrict);
-    if (EVEN(sts)) {
+  if (msg->POid.oix)
+  {
+    sts = gdh_ObjidToName(msg->POid, name, sizeof(name), cdh_mName_volumeStrict);
+    if (EVEN(sts))
+    {
       rpvd_sMsgObject rmsg;
       rmsg.Type = rpvd_eMsg_Object;
       rmsg.Id = msg->Id;
@@ -180,10 +194,12 @@ static void pwrsrv_ObjectName(rpvd_sMsgObjectName* msg)
     }
     strcat(name, "-");
     strcat(name, msg->Name);
-  } else
+  }
+  else
     strncpy(name, msg->Name, sizeof(name));
   sts = gdh_NameToObjid(name, &m.Oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rpvd_sMsgObject rmsg;
     rmsg.Type = rpvd_eMsg_Object;
     rmsg.Id = msg->Id;
@@ -210,7 +226,8 @@ static void pwrsrv_ReadAttribute(rpvd_sMsgReadAttribute* msg)
   strcpy(rmsg.Attribute, msg->Attribute);
 
   sts = gdh_ObjidToName(msg->Oid, name, sizeof(name), cdh_mName_volumeStrict);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rmsg.Status = sts;
     udp_Send((char*)&rmsg, sizeof(rmsg));
     return;
@@ -220,7 +237,8 @@ static void pwrsrv_ReadAttribute(rpvd_sMsgReadAttribute* msg)
   strcat(name, msg->Attribute);
 
   sts = gdh_GetAttributeCharacteristics(name, &atid, &asize, &aoffs, &aelem);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rmsg.Status = sts;
     udp_Send((char*)&rmsg, sizeof(rmsg));
     return;
@@ -245,7 +263,8 @@ static void pwrsrv_WriteAttribute(rpvd_sMsgWriteAttribute* msg)
   rmsg.Id = msg->Id;
 
   sts = gdh_ObjidToName(msg->Oid, name, sizeof(name), cdh_mName_volumeStrict);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rmsg.Status = sts;
     udp_Send((char*)&rmsg, sizeof(rmsg));
     return;
@@ -255,7 +274,8 @@ static void pwrsrv_WriteAttribute(rpvd_sMsgWriteAttribute* msg)
   strcat(name, msg->Attribute);
 
   sts = gdh_GetAttributeCharacteristics(name, &atid, &asize, &aoffs, &aelem);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rmsg.Status = sts;
     udp_Send((char*)&rmsg, sizeof(rmsg));
     return;
@@ -281,32 +301,40 @@ static void pwrsrv_SubAdd(rpvd_sMsgSubAdd* msg)
   rmsg.Id = msg->Id;
 
   /* Check that this rix doesn't exist */
-  for (si = pwrsrv_sublist; si; si = si->next) {
-    if (si->rix == msg->Rix) {
+  for (si = pwrsrv_sublist; si; si = si->next)
+  {
+    if (si->rix == msg->Rix)
+    {
       return;
     }
   }
 
   sts = gdh_ObjidToName(msg->Oid, name, sizeof(name), cdh_mName_volumeStrict);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rmsg.Status = sts;
     udp_Send((char*)&rmsg, sizeof(rmsg));
     return;
   }
 
-  if (!streq(msg->Attribute, "")) {
+  if (!streq(msg->Attribute, ""))
+  {
     strcat(name, ".");
     strcat(name, msg->Attribute);
 
     sts = gdh_GetAttributeCharacteristics(name, &atid, &asize, &aoffs, &aelem);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rmsg.Status = sts;
       udp_Send((char*)&rmsg, sizeof(rmsg));
       return;
     }
-  } else {
+  }
+  else
+  {
     sts = gdh_GetObjectSize(msg->Oid, &asize);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       rmsg.Status = sts;
       udp_Send((char*)&rmsg, sizeof(rmsg));
       return;
@@ -315,7 +343,8 @@ static void pwrsrv_SubAdd(rpvd_sMsgSubAdd* msg)
 
   /* Direct link to atttribute */
   sts = gdh_RefObjectInfo(name, &p, &dlid, asize);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     rmsg.Status = sts;
     udp_Send((char*)&rmsg, sizeof(rmsg));
     return;
@@ -350,8 +379,10 @@ static void pwrsrv_SubRemove(rpvd_sMsgSubRemove* msg)
   rmsg.Id = msg->Id;
 
   // Remove and unref
-  for (si = pwrsrv_sublist; si; si = si->next) {
-    if (si->rix == msg->Rix) {
+  for (si = pwrsrv_sublist; si; si = si->next)
+  {
+    if (si->rix == msg->Rix)
+    {
       gdh_UnrefObjectInfo(si->dlid);
       if (si->prev)
         si->prev->next = si->next;
@@ -385,8 +416,10 @@ static void pwrsrv_SubSend(rpvd_sMsgAny* m)
 
   subp = (char*)&msg.Data;
 
-  for (si = pwrsrv_sublist; si; si = si->next) {
-    if (subp - (char*)&msg.Data + 8 + si->size + 4 > sizeof(msg.Data)) {
+  for (si = pwrsrv_sublist; si; si = si->next)
+  {
+    if (subp - (char*)&msg.Data + 8 + si->size + 4 > sizeof(msg.Data))
+    {
       /* Buffer is full, send */
       *(int*)subp = -1;
 
@@ -426,7 +459,8 @@ static void pwrsrv_NodeUp(rpvd_sMsgAny* msg)
   rmsg.Status = GDH__SUCCESS;
 
   /* Remove all subcli */
-  for (si = pwrsrv_sublist; si; si = si_next) {
+  for (si = pwrsrv_sublist; si; si = si_next)
+  {
     si_next = si->next;
     free((char*)si);
   }
@@ -455,24 +489,29 @@ int main(int argc, char* argv[])
   int udp_port;
 
   /* Read arguments */
-  if (argc < 3) {
+  if (argc < 3)
+  {
     usage();
     exit(0);
   }
   strncpy(remote_address, argv[1], sizeof(remote_address));
   strncpy(remote_host_name, argv[2], sizeof(remote_host_name));
 
-  if (argc >= 4) {
+  if (argc >= 4)
+  {
     sts = sscanf(argv[3], "%d", &udp_port);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       usage();
       exit(0);
     }
-  } else
+  }
+  else
     udp_port = 3051;
 
   sts = udp_Init(remote_address, remote_host_name, udp_port);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     exit(0);
   }
 
@@ -486,12 +525,17 @@ int main(int argc, char* argv[])
   if (ODD(sts) && sts != REM__TIMEOUT && ODD(rmsg->Status))
     printf("Link up\n");
 
-  for (;;) {
+  for (;;)
+  {
     sts = udp_Receive((char**)&msg, 5000);
-    if (sts == REM__TIMEOUT) {
+    if (sts == REM__TIMEOUT)
+    {
       printf("Alive\n");
-    } else if (ODD(sts)) {
-      switch (msg->Any.Type) {
+    }
+    else if (ODD(sts))
+    {
+      switch (msg->Any.Type)
+      {
       case rpvd_eMsg_Oid:
         pwrsrv_Oid(&msg->Oid);
         break;

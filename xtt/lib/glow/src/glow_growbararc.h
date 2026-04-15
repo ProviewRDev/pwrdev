@@ -51,7 +51,8 @@
   events when the
   object is clicked on, moved etc.
 */
-class GrowBarArc : public GrowArc {
+class GrowBarArc : public GrowArc
+{
 public:
   //! Constuctor
   /*!
@@ -67,10 +68,10 @@ public:
     \param t_drawtype	Drawtype for text.
     \param nodraw	Don't draw the object now.
   */
-  GrowBarArc(GrowCtx* glow_ctx, const char* name, double x1 = 0, double y1 = 0,
-      double x2 = 0, double y2 = 0, int ang1 = 0, int ang2 = 0, double width = 1, int border = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      glow_eDrawType fill_d_type = glow_eDrawType_Line, int nodraw = 0);
+  GrowBarArc(GrowCtx* glow_ctx, const char* name, double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0,
+             int ang1 = 0, int ang2 = 0, double width = 1, int border = 0,
+             glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
+             glow_eDrawType fill_d_type = glow_eDrawType_Line, int nodraw = 0);
 
   //! Destructorx
   /*! Remove the object from context, and erase it from the screen.
@@ -123,21 +124,17 @@ public:
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowBarArc;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowBarArc; }
 
-  double max_value; //!< Max value for the scale.
-  double min_value; //!< Min value for the scale.
-  double bar_width; //!< Bar width.
-  double bar_value; //!< Bar value.
-  glow_eDrawType bar_drawtype; //!< Color the bar is drawn with.
-  glow_eDrawType
-      bar_bordercolor; //!< Color the border of the bar is drawn with.
-  int bar_borderwidth; //!< With of the border of the bar.
-  int bar_direction; //!< Bar direction.
-  GlowTraceData trace; //!< Almost obsolete
+  double max_value;               //!< Max value for the scale.
+  double min_value;               //!< Min value for the scale.
+  double bar_width;               //!< Bar width.
+  double bar_value;               //!< Bar value.
+  glow_eDrawType bar_drawtype;    //!< Color the bar is drawn with.
+  glow_eDrawType bar_bordercolor; //!< Color the border of the bar is drawn with.
+  int bar_borderwidth;            //!< With of the border of the bar.
+  int bar_direction;              //!< Bar direction.
+  GlowTraceData trace;            //!< Almost obsolete
 
   //! Draw the object.
   /*!
@@ -153,8 +150,8 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();
@@ -172,7 +169,7 @@ public:
     \param min		Min value.
     \param max		Max value.
   */
-  void get_range(double *min, double *max);
+  void get_range(double* min, double* max);
 
   //! Set the range for the bar value
   /*!
@@ -188,10 +185,12 @@ public:
   void set_value(double value)
   {
     bar_value = value;
-    if (!parent) {
+    if (!parent)
+    {
       draw();
     }
-    else {
+    else
+    {
       parent->draw();
     }
   }
@@ -224,8 +223,8 @@ public:
     used to generate
     java code for the bean.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ofstream& fp);
 
   //! Scan trace
   /*! Calls the trace scan callback for the object.

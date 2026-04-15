@@ -45,7 +45,8 @@
 
 #define pb_cModuleClassFile "$pwr_exe/pb_module_classes.dat"
 
-typedef enum {
+typedef enum
+{
   attrnav_eItemType_PbBase,
   attrnav_eItemType_PbEnum,
   attrnav_eItemType_PbEnumValue,
@@ -58,7 +59,8 @@ typedef enum {
   attrnav_eItemType_PbEnumByteOrder
 } attrnav_eItemType;
 
-typedef enum {
+typedef enum
+{
   attrnav_mOpen_All = ~0,
   attrnav_mOpen_Children = 1 << 0,
   attrnav_mOpen_Attributes = 1 << 1
@@ -116,8 +118,7 @@ public:
   CoWowTimer* trace_timerid;
   char modelname[80];
 
-  GsdAttrNav(void* xn_parent_ctx, const char* xn_name, pb_gsd* xn_gsd,
-             int xn_edit_mode, pwr_tStatus* status);
+  GsdAttrNav(void* xn_parent_ctx, const char* xn_name, pb_gsd* xn_gsd, int xn_edit_mode, pwr_tStatus* status);
   virtual ~GsdAttrNav();
 
   virtual void set_inputfocus() {}
@@ -134,20 +135,16 @@ public:
   void zoom(double zoom_factor);
   void unzoom();
   void get_zoom(double* zoom_factor);
-  int search_class(const char* filename, const char* model, const char* module,
-                   char* mclass);
+  int search_class(const char* filename, const char* model, const char* module, char* mclass);
 
   static void trace_scan(void* data);
   static int trace_scan_bc(brow_tObject object, void* p);
-  static int trace_connect_bc(brow_tObject object, char* name, char* attr,
-                              flow_eTraceType type, void** p);
+  static int trace_connect_bc(brow_tObject object, char* name, char* attr, flow_eTraceType type, void** p);
   static int trace_disconnect_bc(brow_tObject object);
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
-  static int attr_string_to_value(int type_id, const char* value_str,
-                                  void* buffer_ptr, int buff_size,
+  static int attr_string_to_value(int type_id, const char* value_str, void* buffer_ptr, int buff_size,
                                   int attr_size);
-  static void attrvalue_to_string(int type_id, void* value_ptr, char* str,
-                                  int size, int* len, char* format);
+  static void attrvalue_to_string(int type_id, void* value_ptr, char* str, int size, int* len, char* format);
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
 };
 
@@ -170,11 +167,9 @@ public:
 class ItemPbBase : public ItemPb
 {
 public:
-  ItemPbBase(GsdAttrNav* attrnav, const char* item_name, const char* attr,
-             int attr_type, int attr_size, double attr_min_limit,
-             double attr_max_limit, void* attr_value_p, int attr_noedit,
-             gsd_sPrmText* attr_enumtext, brow_tNode dest,
-             flow_eDest dest_code);
+  ItemPbBase(GsdAttrNav* attrnav, const char* item_name, const char* attr, int attr_type, int attr_size,
+             double attr_min_limit, double attr_max_limit, void* attr_value_p, int attr_noedit,
+             gsd_sPrmText* attr_enumtext, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemPbBase();
 
   void* value_p;
@@ -192,11 +187,9 @@ public:
 class ItemPbEnum : public ItemPbBase
 {
 public:
-  ItemPbEnum(GsdAttrNav* attrnav, const char* item_name, const char* attr,
-             int attr_type, int attr_size, double attr_min_limit,
-             double attr_max_limit, void* attr_value_p, int attr_noedit,
-             gsd_sPrmText* attr_enumtext, brow_tNode dest,
-             flow_eDest dest_code);
+  ItemPbEnum(GsdAttrNav* attrnav, const char* item_name, const char* attr, int attr_type, int attr_size,
+             double attr_min_limit, double attr_max_limit, void* attr_value_p, int attr_noedit,
+             gsd_sPrmText* attr_enumtext, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemPbEnum();
 
   int old_value;
@@ -208,9 +201,8 @@ public:
 class ItemPbEnumValue : public ItemPb
 {
 public:
-  ItemPbEnumValue(GsdAttrNav* attrnav, const char* item_name, int item_num,
-                  int item_type_id, void* attr_value_p, brow_tNode dest,
-                  flow_eDest dest_code);
+  ItemPbEnumValue(GsdAttrNav* attrnav, const char* item_name, int item_num, int item_type_id,
+                  void* attr_value_p, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemPbEnumValue();
 
   int num;
@@ -224,8 +216,7 @@ public:
 class ItemPbModule : public ItemPb
 {
 public:
-  ItemPbModule(GsdAttrNav* attrnav, const char* item_name,
-               gsd_sModuleConf* item_mconf, brow_tNode dest,
+  ItemPbModule(GsdAttrNav* attrnav, const char* item_name, gsd_sModuleConf* item_mconf, brow_tNode dest,
                flow_eDest dest_code);
   virtual ~ItemPbModule() {}
 
@@ -241,8 +232,7 @@ public:
 class ItemPbModuleType : public ItemPb
 {
 public:
-  ItemPbModuleType(GsdAttrNav* attrnav, const char* item_name,
-                   gsd_sModuleConf* item_mconf, brow_tNode dest,
+  ItemPbModuleType(GsdAttrNav* attrnav, const char* item_name, gsd_sModuleConf* item_mconf, brow_tNode dest,
                    flow_eDest dest_code);
   virtual ~ItemPbModuleType() {}
 
@@ -257,8 +247,7 @@ public:
 class ItemPbModuleData : public ItemPb
 {
 public:
-  ItemPbModuleData(GsdAttrNav* attrnav, const char* item_name,
-                   gsd_sModuleConf* item_mconf, brow_tNode dest,
+  ItemPbModuleData(GsdAttrNav* attrnav, const char* item_name, gsd_sModuleConf* item_mconf, brow_tNode dest,
                    flow_eDest dest_code);
   virtual ~ItemPbModuleData() {}
 
@@ -272,8 +261,7 @@ public:
 class ItemPbModuleClass : public ItemPb
 {
 public:
-  ItemPbModuleClass(GsdAttrNav* attrnav, const char* item_name,
-                    gsd_sModuleConf* item_mconf, brow_tNode dest,
+  ItemPbModuleClass(GsdAttrNav* attrnav, const char* item_name, gsd_sModuleConf* item_mconf, brow_tNode dest,
                     flow_eDest dest_code);
   virtual ~ItemPbModuleClass() {}
 
@@ -288,8 +276,7 @@ public:
 class ItemPbPrmData : public ItemPb
 {
 public:
-  ItemPbPrmData(GsdAttrNav* attrnav, const char* item_name, brow_tNode dest,
-                flow_eDest dest_code);
+  ItemPbPrmData(GsdAttrNav* attrnav, const char* item_name, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemPbPrmData() {}
 
   virtual int open_children(GsdAttrNav* attrnav, double x, double y);
@@ -299,8 +286,7 @@ public:
 class ItemPbMoreData : public ItemPb
 {
 public:
-  ItemPbMoreData(GsdAttrNav* attrnav, const char* item_name, brow_tNode dest,
-                 flow_eDest dest_code);
+  ItemPbMoreData(GsdAttrNav* attrnav, const char* item_name, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemPbMoreData() {}
   virtual int open_children(GsdAttrNav* attrnav, double x, double y);
 };
@@ -309,11 +295,9 @@ public:
 class ItemPbEnumByteOrder : public ItemPbBase
 {
 public:
-  ItemPbEnumByteOrder(GsdAttrNav* attrnav, const char* item_name,
-                      const char* attr, int attr_type, int attr_size,
-                      double attr_min_limit, double attr_max_limit,
-                      void* attr_value_p, int attr_noedit, brow_tNode dest,
-                      flow_eDest dest_code);
+  ItemPbEnumByteOrder(GsdAttrNav* attrnav, const char* item_name, const char* attr, int attr_type,
+                      int attr_size, double attr_min_limit, double attr_max_limit, void* attr_value_p,
+                      int attr_noedit, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemPbEnumByteOrder() {}
 
   int old_value;

@@ -43,10 +43,11 @@
 
 #include "cow_wow_gtk.h"
 
-class XCrrGtk : public XCrr {
+class XCrrGtk : public XCrr
+{
 public:
-  XCrrGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx, pwr_sAttrRef* xa_objar,
-      int xa_advanced_user, int* xa_sts);
+  XCrrGtk(GtkWidget* xa_parent_wid, void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user,
+          int* xa_sts);
   ~XCrrGtk();
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
@@ -62,8 +63,7 @@ public:
   static void activate_print(GtkWidget* w, gpointer data);
   static void activate_openplc(GtkWidget* w, gpointer data);
   static void activate_help(GtkWidget* w, gpointer data);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
 };
 
 #endif

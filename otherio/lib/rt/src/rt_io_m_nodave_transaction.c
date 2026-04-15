@@ -58,8 +58,7 @@
 /*----------------------------------------------------------------------------*\
    Init method for the Modbus module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local;
   pwr_sClass_Nodave_Transaction* op;
@@ -78,8 +77,7 @@ static pwr_tStatus IoCardInit(
 /*----------------------------------------------------------------------------*\
    Read method for libnodave transaction
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local = (io_sCardLocal*)cp->Local;
   io_sRackLocal* local_rack = (io_sRackLocal*)rp->Local;
@@ -87,24 +85,29 @@ static pwr_tStatus IoCardRead(
   pwr_sClass_Nodave_PLC* plcp = (pwr_sClass_Nodave_PLC*)rp->op;
   int res;
 
-  if (op->Continuous == pwr_eYesNoEnum_No) {
+  if (op->Continuous == pwr_eYesNoEnum_No)
+  {
     /* Only read if triggered by op */
     if (!op->SendOp)
       return IO__SUCCESS;
-    else if (local->op_write) {
+    else if (local->op_write)
+    {
       op->SendOp = 0;
       local->op_read = 0;
       local->op_write = 0;
-    } else
+    }
+    else
       local->op_read = 1;
   }
 
   if (local->input_size == 0)
     return IO__SUCCESS;
 
-  if (op->ScanInterval > 1) {
+  if (op->ScanInterval > 1)
+  {
     local->has_read_method = 1;
-    if (local->interval_cnt != 0) {
+    if (local->interval_cnt != 0)
+    {
       local->interval_cnt++;
       if (local->interval_cnt >= op->ScanInterval)
         local->interval_cnt = 0;
@@ -113,36 +116,44 @@ static pwr_tStatus IoCardRead(
     local->interval_cnt++;
   }
 
-  if (local_rack->status == IO__SUCCESS || local_rack->reset_inputs) {
+  if (local_rack->status == IO__SUCCESS || local_rack->reset_inputs)
+  {
     if (local_rack->reset_inputs)
       memset(local->input_area, 0, local->input_size);
-    else {
-      res = daveReadBytes(local_rack->dc, op->Area, op->DataBlock, op->Address,
-          local->input_size, local->input_area);
-      if (res != 0) {
+    else
+    {
+      res = daveReadBytes(local_rack->dc, op->Area, op->DataBlock, op->Address, local->input_size,
+                          local->input_area);
+      if (res != 0)
+      {
         strncpy(op->Status, daveStrerror(res), sizeof(op->Status));
         plcp->ErrorCount++;
         local->status = res;
 
-        if (plcp->ErrorCount >= plcp->ErrorLimit) {
-          if (plcp->StallAction == pwr_eStallActionEnum_ResetInputs) {
+        if (plcp->ErrorCount >= plcp->ErrorLimit)
+        {
+          if (plcp->StallAction == pwr_eStallActionEnum_ResetInputs)
+          {
             memset(local->input_area, 0, local->input_size);
             local_rack->reset_inputs = 1;
-          } else if (plcp->StallAction == pwr_eStallActionEnum_EmergencyBreak) {
+          }
+          else if (plcp->StallAction == pwr_eStallActionEnum_EmergencyBreak)
+          {
             errh_Error("IO Card ErrorLimit reached '%s', IO stopped", cp->Name);
             ctx->Node->EmergBreakTrue = 1;
             return IO__ERRDEVICE;
           }
         }
-      } else if (local->status != 0) {
+      }
+      else if (local->status != 0)
+      {
         strncpy(op->Status, "Success", sizeof(op->Status));
         local->status = res;
       }
     }
 
     if (res == 0 || local_rack->reset_inputs)
-      io_bus_card_read(ctx, rp, cp, local->input_area, NULL, plcp->ByteOrdering,
-          plcp->FloatRepresentation);
+      io_bus_card_read(ctx, rp, cp, local->input_area, NULL, plcp->ByteOrdering, plcp->FloatRepresentation);
   }
   return IO__SUCCESS;
 }
@@ -150,8 +161,7 @@ static pwr_tStatus IoCardRead(
 /*----------------------------------------------------------------------------*\
    Write method for the Nodave transaction
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sCardLocal* local = (io_sCardLocal*)cp->Local;
   io_sRackLocal* local_rack = (io_sRackLocal*)rp->Local;
@@ -159,55 +169,69 @@ static pwr_tStatus IoCardWrite(
   pwr_sClass_Nodave_PLC* plcp = (pwr_sClass_Nodave_PLC*)rp->op;
   int res;
 
-  if (op->Continuous == pwr_eYesNoEnum_No) {
+  if (op->Continuous == pwr_eYesNoEnum_No)
+  {
     /* Only write if triggered by op */
     if (!op->SendOp)
       return IO__SUCCESS;
-    else if (local->op_read) {
+    else if (local->op_read)
+    {
       op->SendOp = 0;
       local->op_read = 0;
       local->op_write = 0;
-    } else
+    }
+    else
       local->op_write = 1;
   }
 
   if (local->output_size == 0)
     return IO__SUCCESS;
 
-  if (op->ScanInterval > 1) {
-    if (!local->has_read_method) {
-      if (local->interval_cnt != 0) {
+  if (op->ScanInterval > 1)
+  {
+    if (!local->has_read_method)
+    {
+      if (local->interval_cnt != 0)
+      {
         local->interval_cnt++;
         if (local->interval_cnt >= op->ScanInterval)
           local->interval_cnt = 0;
         return IO__SUCCESS;
       }
       local->interval_cnt++;
-    } else if (local->interval_cnt != 1)
+    }
+    else if (local->interval_cnt != 1)
       return IO__SUCCESS;
   }
 
-  if (local_rack->status == IO__SUCCESS) {
-    io_bus_card_write(ctx, cp, local->output_area, plcp->ByteOrdering,
-        plcp->FloatRepresentation);
+  if (local_rack->status == IO__SUCCESS)
+  {
+    io_bus_card_write(ctx, cp, local->output_area, plcp->ByteOrdering, plcp->FloatRepresentation);
 
-    res = daveWriteBytes(local_rack->dc, op->Area, op->DataBlock, op->Address,
-        local->output_size, local->output_area);
-    if (res != 0) {
+    res = daveWriteBytes(local_rack->dc, op->Area, op->DataBlock, op->Address, local->output_size,
+                         local->output_area);
+    if (res != 0)
+    {
       strncpy(op->Status, daveStrerror(res), sizeof(op->Status));
       plcp->ErrorCount++;
       local->status = res;
 
-      if (plcp->ErrorCount >= plcp->ErrorLimit) {
-        if (plcp->StallAction == pwr_eStallActionEnum_ResetInputs) {
+      if (plcp->ErrorCount >= plcp->ErrorLimit)
+      {
+        if (plcp->StallAction == pwr_eStallActionEnum_ResetInputs)
+        {
           local_rack->reset_inputs = 1;
-        } else if (plcp->StallAction == pwr_eStallActionEnum_EmergencyBreak) {
+        }
+        else if (plcp->StallAction == pwr_eStallActionEnum_EmergencyBreak)
+        {
           errh_Error("IO Card ErrorLimit reached '%s', IO stopped", cp->Name);
           ctx->Node->EmergBreakTrue = 1;
           return IO__ERRDEVICE;
         }
       }
-    } else if (local->status != 0) {
+    }
+    else if (local->status != 0)
+    {
       strncpy(op->Status, "Success", sizeof(op->Status));
       local->status = res;
     }
@@ -217,24 +241,15 @@ static pwr_tStatus IoCardWrite(
 }
 
 #else
-static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap)
-{
-  return IO__RELEASEBUILD;
-}
-static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap)
-{
-  return IO__RELEASEBUILD;
-}
-static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap)
-{
-  return IO__RELEASEBUILD;
-}
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap) { return IO__RELEASEBUILD; }
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap) { return IO__RELEASEBUILD; }
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap) { return IO__RELEASEBUILD; }
 #endif
 
 /*----------------------------------------------------------------------------*\
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Nodave_Transaction)
-    = { pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardRead),
-        pwr_BindIoMethod(IoCardWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Nodave_Transaction) = {pwr_BindIoMethod(IoCardInit),
+                                                     pwr_BindIoMethod(IoCardRead),
+                                                     pwr_BindIoMethod(IoCardWrite), pwr_NullMethod};

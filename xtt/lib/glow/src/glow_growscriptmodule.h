@@ -54,7 +54,8 @@
   object is clicked on, moved etc.
 */
 
-class GrowScriptModule : public GrowRect {
+class GrowScriptModule : public GrowRect
+{
 public:
   //! Constuctor
   /*!
@@ -72,12 +73,10 @@ public:
     \param fill_d_type	Fill color.
     \param nodraw	Don't draw the object now.
   */
-  GrowScriptModule(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0,
-      double w = 0, double h = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int fill_rect = 0,
-      int display_border = 1, glow_eDrawType fill_d_type = glow_eDrawType_Line,
-      int nodraw = 0);
+  GrowScriptModule(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0, double w = 0,
+                   double h = 0, glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
+                   glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int fill_rect = 0,
+                   int display_border = 1, glow_eDrawType fill_d_type = glow_eDrawType_Line, int nodraw = 0);
 
   //! Destructor
   /*! Remove the object from context, and erase it from the screen.
@@ -101,10 +100,7 @@ public:
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowScriptModule;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowScriptModule; }
 
   int export_script(GlowExportScript* es, void* o, void* m);
 

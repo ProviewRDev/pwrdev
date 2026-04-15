@@ -53,5 +53,4 @@ static pwr_tStatus Build(ldh_sMenuCall* ip)
   return build.sts();
 }
 
-pwr_dExport pwr_BindMethods(Application)
-    = { pwr_BindMethod(Build), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(Application) = {pwr_BindMethod(Build), pwr_NullMethod};

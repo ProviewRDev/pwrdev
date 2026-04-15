@@ -41,11 +41,11 @@
 
 #include "wb_bckwnav.h"
 
-class WbBckWNavGtk : public WbBckWNav {
+class WbBckWNavGtk : public WbBckWNav
+{
 public:
-  WbBckWNavGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid,
-      ldh_tSession bckw_ldhses, wb_bck_list* l_list, int l_editmode,
-      GtkWidget** w);
+  WbBckWNavGtk(void* bckw_parent_ctx, GtkWidget* bckw_parent_wid, ldh_tSession bckw_ldhses,
+               wb_bck_list* l_list, int l_editmode, GtkWidget** w);
   ~WbBckWNavGtk();
 
   GtkWidget* parent_wid;

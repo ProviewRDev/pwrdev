@@ -48,26 +48,16 @@
 
 #if defined PWRE_CONF_CIFX
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp) { return IO__SUCCESS; }
 
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp) { return IO__SUCCESS; }
 
 #else
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   return IO__RELEASEBUILD;
 }
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   return IO__RELEASEBUILD;
 }
@@ -75,6 +65,5 @@ static pwr_tStatus IoCardClose(
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(Hilscher_cifX_Module)
-    = { pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
-        pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Hilscher_cifX_Module) = {pwr_BindIoMethod(IoCardInit),
+                                                       pwr_BindIoMethod(IoCardClose), pwr_NullMethod};

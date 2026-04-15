@@ -150,8 +150,7 @@ static T_CCRL ccrl_obj;
 #pragma check_stack(off)
 #endif
 
-FUNCTION LOCAL USIGN16 ccrl_determine_role(IN T_CRL_STATIC FAR* crl_ptr,
-                                           IN USIGN8* role_ptr)
+FUNCTION LOCAL USIGN16 ccrl_determine_role(IN T_CRL_STATIC FAR* crl_ptr, IN USIGN8* role_ptr)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -201,8 +200,7 @@ R_CL      -> Receiver of multicast/broadcast messages
   }
 }
 
-FUNCTION LOCAL VOID ccrl_correct_crl_entry(IN USIGN16 cr, IN USIGN8 role,
-                                           INOUT T_CRL_STATIC FAR* crl_ptr)
+FUNCTION LOCAL VOID ccrl_correct_crl_entry(IN USIGN16 cr, IN USIGN8 role, INOUT T_CRL_STATIC FAR* crl_ptr)
 
 /*------------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -257,8 +255,7 @@ FUNCTIONAL_DESCRIPTION
   return;
 }
 
-FUNCTION LOCAL VOID ccrl_update_resrc_ctr(INOUT USIGN8* stored_number_ptr,
-                                          INOUT USIGN8* current_number_ptr)
+FUNCTION LOCAL VOID ccrl_update_resrc_ctr(INOUT USIGN8* stored_number_ptr, INOUT USIGN8* current_number_ptr)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -285,9 +282,8 @@ FUNCTIONAL_DESCRIPTION
   return;
 }
 
-FUNCTION LOCAL VOID
-ccrl_adapt_resrces(IN T_CCRL_CONN_RESRCES* in_resrces_ptr,
-                   INOUT T_CCRL_CONN_RESRCES* out_resrces_ptr)
+FUNCTION LOCAL VOID ccrl_adapt_resrces(IN T_CCRL_CONN_RESRCES* in_resrces_ptr,
+                                       INOUT T_CCRL_CONN_RESRCES* out_resrces_ptr)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -298,14 +294,10 @@ FUNCTIONAL_DESCRIPTION
 
   FUNCTION_BODY
 
-  ccrl_update_resrc_ctr(&in_resrces_ptr->no_of_fal_sdbs,
-                        &out_resrces_ptr->no_of_fal_sdbs);
-  ccrl_update_resrc_ctr(&in_resrces_ptr->no_of_fdl_sdbs,
-                        &out_resrces_ptr->no_of_fdl_sdbs);
-  ccrl_update_resrc_ctr(&in_resrces_ptr->no_of_data_buffer,
-                        &out_resrces_ptr->no_of_data_buffer);
-  ccrl_update_resrc_ctr(&in_resrces_ptr->no_of_api_buffer,
-                        &out_resrces_ptr->no_of_api_buffer);
+  ccrl_update_resrc_ctr(&in_resrces_ptr->no_of_fal_sdbs, &out_resrces_ptr->no_of_fal_sdbs);
+  ccrl_update_resrc_ctr(&in_resrces_ptr->no_of_fdl_sdbs, &out_resrces_ptr->no_of_fdl_sdbs);
+  ccrl_update_resrc_ctr(&in_resrces_ptr->no_of_data_buffer, &out_resrces_ptr->no_of_data_buffer);
+  ccrl_update_resrc_ctr(&in_resrces_ptr->no_of_api_buffer, &out_resrces_ptr->no_of_api_buffer);
 
   return;
 }
@@ -354,9 +346,8 @@ possible return values:
   return;
 }
 
-FUNCTION GLOBAL USIGN16 CALL_CONV
-ccrl_resrces_add_entry(IN USIGN16 cr, IN T_CRL_STATIC FAR* crl_ptr,
-                       OUT T_FMB_CONFIG_CRL FAR* config_ptr)
+FUNCTION GLOBAL USIGN16 CALL_CONV ccrl_resrces_add_entry(IN USIGN16 cr, IN T_CRL_STATIC FAR* crl_ptr,
+                                                         OUT T_FMB_CONFIG_CRL FAR* config_ptr)
 
 /*------------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -467,22 +458,22 @@ possible return values:
                            (max_scc     /* snd DTC.req */
                             + max_sac)) /* snd DTA.req */
                        + 1              /* snd ABT.req */
-                       );
+    );
 
     lli_api_snd_resrc = (USIGN8)(min(ci, 1) /* snd IDLE.req */
                                  + 1        /* LLI abort resrc */
-                                 );
+    );
 
     rcv_res = (USIGN8)(max(1,           /* rcv ASS_RES_PDU */
                            (max_scc     /* rcv DTC_RES_PDU */
                             + max_sac)) /* rcv DTA_ACK_PDU */
-                       );
+    );
 
     rcv_ind = (USIGN8)(max(1,           /* rcv ASS_REQ_PDU */
                            (max_rcc     /* rcv DTC_REQ_PDU */
                             + max_rac)) /* rcv DTA_REQ_PDU */
                        + 1              /* rcv ABT_REQ_PDU */
-                       );
+    );
 
     lli_rcv_ind = (USIGN8)min(ci, 1); /* rcv IDLE_REQ_PDU */
     fdl_sap = 1;                      /* act/deact LSAP */
@@ -509,19 +500,19 @@ possible return values:
 
     lli_api_resrc = (USIGN8)(min(ci, 1) /* snd IDLE_REQ_PDU */
                              + 1        /* LLI abort resrc */
-                             );
+    );
 
     snd_req_csrd = (USIGN8)(max(1,           /* snd ASS.req */
                                 (max_scc     /* snd DTC.req */
                                  + max_sac)) /* snd DTA.req */
                             + 1              /* snd ABT.req */
-                            );
+    );
 
     snd_req_srd = max_sac; /* snd DTA.req (high) */
 
     rcv_ind_csrd = (USIGN8)(max_rac /* rcv DTA_REQ_PDU */
                             + 1     /* rcv ABT_REQ_PDU */
-                            );
+    );
 
     snd_res_srd = max_rac; /* snd DTA.ack (high)*/
 
@@ -546,23 +537,23 @@ possible return values:
 
     snd_req = (USIGN8)(max_sac /* snd DTA.req */
                        + 1     /* snd ABT.req */
-                       );
+    );
 
     rcv_res = max_sac; /* rcv DTA_ACK_PDU */
 
     lli_sr_snd_resrc = (USIGN8)(min(ci, 1) /* snd IDLE.req */
                                 + 1        /* LLI abort resrc */
-                                );
+    );
 
     rcv_ind = (USIGN8)(max(1,           /* rcv ASS_REQ_PDU */
                            (max_rcc     /* rcv DTC_REQ_PDU */
                             + max_rac)) /* rcv DTA_REQ_PDU */
                        + 1              /* rcv ABT_REQ_PDU */
-                       );
+    );
 
     lli_rcv_ind = (USIGN8)(min(ci, 1) /* rcv IDLE_REQ_PDU */
                            + 2        /* rcv poll telegrams */
-                           );
+    );
     fdl_sap = 1; /* act/deact LSAP */
 
     break;
@@ -583,27 +574,22 @@ possible return values:
     return (E_FM7_CRL_INVALID_ENTRY);
   }
 
-  no_of_fal_sdbs = (USIGN16)(snd_req + snd_req_csrd + rcv_ind + rcv_ind_csrd +
-                             lli_api_resrc + lli_api_snd_resrc +
-                             lli_sr_snd_resrc + lli_evt_resrc);
+  no_of_fal_sdbs = (USIGN16)(snd_req + snd_req_csrd + rcv_ind + rcv_ind_csrd + lli_api_resrc +
+                             lli_api_snd_resrc + lli_sr_snd_resrc + lli_evt_resrc);
 
-  no_of_fdl_sdbs =
-      (USIGN16)(snd_req + snd_req_srd + rcv_res + rcv_ind + snd_res_srd +
-                lli_api_snd_resrc + lli_sr_snd_resrc + lli_rcv_ind + fdl_sap +
-                lli_poll_elem);
+  no_of_fdl_sdbs = (USIGN16)(snd_req + snd_req_srd + rcv_res + rcv_ind + snd_res_srd + lli_api_snd_resrc +
+                             lli_sr_snd_resrc + lli_rcv_ind + fdl_sap + lli_poll_elem);
 
   no_of_fdl_sdbs = (USIGN16)(no_of_fdl_sdbs + fdl_rsap);
 
   no_of_data_buffer =
-      (USIGN16)(snd_req + snd_req_csrd + snd_req_srd + rcv_res + rcv_ind +
-                rcv_ind_csrd + lli_sr_snd_resrc + lli_poll_elem + lli_idm +
-                lli_rcv_ind + fdl_rsap + lli_evt_resrc);
+      (USIGN16)(snd_req + snd_req_csrd + snd_req_srd + rcv_res + rcv_ind + rcv_ind_csrd + lli_sr_snd_resrc +
+                lli_poll_elem + lli_idm + lli_rcv_ind + fdl_rsap + lli_evt_resrc);
 
-  no_of_api_buffer = (USIGN16)(snd_res_srd + lli_api_resrc + lli_api_snd_resrc +
-                               lli_poll_elem);
+  no_of_api_buffer = (USIGN16)(snd_res_srd + lli_api_resrc + lli_api_snd_resrc + lli_poll_elem);
 
-  if ((no_of_fal_sdbs > 0xFF) || (no_of_fdl_sdbs > 0xFF) ||
-      (no_of_data_buffer > 0xFF) || (no_of_api_buffer > 0xFF))
+  if ((no_of_fal_sdbs > 0xFF) || (no_of_fdl_sdbs > 0xFF) || (no_of_data_buffer > 0xFF) ||
+      (no_of_api_buffer > 0xFF))
   {
     return (E_FM7_CRL_INVALID_ENTRY);
   }
@@ -617,25 +603,19 @@ possible return values:
 
   if ((role == M_MM) && (_IS_I_CONN(crl_ptr->conn_attr)))
   {
-    ccrl_adapt_resrces(
-        &ccrl_obj.isap_resrces[_CCRL_MAP_SAP_NR(crl_ptr->loc_lsap)],
-        &conn_resrc);
+    ccrl_adapt_resrces(&ccrl_obj.isap_resrces[_CCRL_MAP_SAP_NR(crl_ptr->loc_lsap)], &conn_resrc);
   }
 
-  ccrl_obj.ccrl.max_no_fal_sdbs =
-      (USIGN16)(ccrl_obj.ccrl.max_no_fal_sdbs + conn_resrc.no_of_fal_sdbs);
+  ccrl_obj.ccrl.max_no_fal_sdbs = (USIGN16)(ccrl_obj.ccrl.max_no_fal_sdbs + conn_resrc.no_of_fal_sdbs);
 
-  ccrl_obj.ccrl.max_no_fdl_sdbs =
-      (USIGN16)(ccrl_obj.ccrl.max_no_fdl_sdbs + conn_resrc.no_of_fdl_sdbs);
+  ccrl_obj.ccrl.max_no_fdl_sdbs = (USIGN16)(ccrl_obj.ccrl.max_no_fdl_sdbs + conn_resrc.no_of_fdl_sdbs);
 
-  ccrl_obj.ccrl.max_no_data_buffer = (USIGN16)(
-      ccrl_obj.ccrl.max_no_data_buffer + conn_resrc.no_of_data_buffer);
+  ccrl_obj.ccrl.max_no_data_buffer =
+      (USIGN16)(ccrl_obj.ccrl.max_no_data_buffer + conn_resrc.no_of_data_buffer);
 
-  ccrl_obj.ccrl.max_no_api_buffer =
-      (USIGN16)(ccrl_obj.ccrl.max_no_api_buffer + conn_resrc.no_of_api_buffer);
+  ccrl_obj.ccrl.max_no_api_buffer = (USIGN16)(ccrl_obj.ccrl.max_no_api_buffer + conn_resrc.no_of_api_buffer);
 
-  ccrl_obj.ccrl.max_no_poll_entries =
-      (USIGN16)(ccrl_obj.ccrl.max_no_poll_entries + lli_poll_elem);
+  ccrl_obj.ccrl.max_no_poll_entries = (USIGN16)(ccrl_obj.ccrl.max_no_poll_entries + lli_poll_elem);
 
   *config_ptr = ccrl_obj.ccrl;
 

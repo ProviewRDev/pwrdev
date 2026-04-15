@@ -37,26 +37,19 @@
 #include "cnv_classdep.h"
 extern "C" {
 #include "co_cdh.h"
-#include "co_time.h"
 #include "co_dcli.h"
+#include "co_time.h"
 }
 #include "co_lng.h"
 #include "co_string.h"
 
-CdpItem::CdpItem() : idx(0), fth(0), fch(0), lch(0), fws(0), bws(0)
-{
-}
+CdpItem::CdpItem() : idx(0), fth(0), fch(0), lch(0), fws(0), bws(0) {}
 
-CnvClassDep::CnvClassDep(CnvCtx* cnv_ctx) : ctx(cnv_ctx)
-{
-}
+CnvClassDep::CnvClassDep(CnvCtx *cnv_ctx) : ctx(cnv_ctx) {}
 
-CnvClassDep::~CnvClassDep()
-{
-}
+CnvClassDep::~CnvClassDep() {}
 
-int CnvClassDep::read()
-{
+int CnvClassDep::read() {
   pwr_tFileName fname, found_file;
   pwr_tStatus sts;
   int idx;
@@ -134,8 +127,7 @@ int CnvClassDep::read()
   return 1;
 }
 
-void CnvClassDep::print(int idx, int level)
-{
+void CnvClassDep::print(int idx, int level) {
   for (int i = classlist[idx].fch; i; i = classlist[i].fws) {
     for (int j = 0; j < level; j++)
       printf("  ");
@@ -145,8 +137,7 @@ void CnvClassDep::print(int idx, int level)
   }
 }
 
-void CnvClassDep::print_html_classtable(int idx)
-{
+void CnvClassDep::print_html_classtable(int idx) {
   char fname[512];
   int parentlist[100];
   int parent_cnt = 0;
@@ -156,7 +147,7 @@ void CnvClassDep::print_html_classtable(int idx)
     parentlist[parent_cnt++] = fth;
 
   sprintf(fname, "%s%s_%s_ctree.html", ctx->dir, classlist[idx].volumename,
-      classlist[idx].name);
+          classlist[idx].name);
   dcli_translate_filename(fname, fname);
   std::ofstream fp(fname);
 
@@ -191,7 +182,7 @@ void CnvClassDep::print_html_classtable(int idx)
     fp << "<table id=\"ctree\"><tr>\n";
     for (int i = parent_cnt - 1; i >= 0; i--) {
       sprintf(href, "%s_%s.html", classlist[parentlist[i]].volumename,
-          classlist[parentlist[i]].name);
+              classlist[parentlist[i]].name);
       str_ToLower(href, href);
       fp << "<td id=\"ctree\"><a href=\"" << href << "\">"
          << classlist[parentlist[i]].name << "</a></td>\n";
@@ -208,8 +199,7 @@ void CnvClassDep::print_html_classtable(int idx)
      << "</html>\n";
 }
 
-void CnvClassDep::print_html_classtable_children(std::ofstream& fp, int idx)
-{
+void CnvClassDep::print_html_classtable_children(std::ofstream &fp, int idx) {
   char href[200];
 
   if (classlist[idx].fch == 0)
@@ -230,8 +220,7 @@ void CnvClassDep::print_html_classtable_children(std::ofstream& fp, int idx)
   fp << "</table>\n";
 }
 
-bool CnvClassDep::find(char* name, int* idx)
-{
+bool CnvClassDep::find(char *name, int *idx) {
   for (int i = 0; i < (int)classlist.size(); i++) {
     if (str_NoCaseStrcmp(name, classlist[i].name) == 0) {
       *idx = i;

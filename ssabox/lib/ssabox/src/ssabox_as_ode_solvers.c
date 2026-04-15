@@ -35,15 +35,14 @@
  **/
 
 /*2005-02-13      File: AS_ODE_Solvers.c
-* Author: Jonas Haulin   email: joha7211@student.uu.se
-* Contains functions that will integrate the discretized DE:s for sway angle,
-* trolley position and cable length
-*/
+ * Author: Jonas Haulin   email: joha7211@student.uu.se
+ * Contains functions that will integrate the discretized DE:s for sway angle,
+ * trolley position and cable length
+ */
 
 #include "ssabox_as_ode_solvers.h"
 
-void AS_thetaIntegrator(
-    double* thetam, double* thetac, double Lc, double DLc, double ac, double dt)
+void AS_thetaIntegrator(double* thetam, double* thetac, double Lc, double DLc, double ac, double dt)
 {
   /* Function: thetaIntegrator
    * Simulation of sway of crane load.
@@ -59,10 +58,9 @@ void AS_thetaIntegrator(
    * thetap - sway angle at time n+1 */
 
   /*Solving the discretized ODE for thetap*/
-  double thetap
-      = (2.0 * (*thetac) * Lc + (*thetam) * (dt * DLc - Lc)
-            - (dt * dt) * (ac * cos(*thetac) + AS_GRAV_ACCEL * sin(*thetac)))
-      / (dt * DLc + Lc);
+  double thetap = (2.0 * (*thetac) * Lc + (*thetam) * (dt * DLc - Lc) -
+                   (dt * dt) * (ac * cos(*thetac) + AS_GRAV_ACCEL * sin(*thetac))) /
+                  (dt * DLc + Lc);
   *thetam = *thetac;
   *thetac = thetap;
 }
@@ -85,10 +83,7 @@ void AS_xIntegratorUA(double* xm, double* xc, double uc, double ac, double dt)
   *xc = xp;
 }
 
-void AS_xcIntegratorU(double* xc, double uc, double dt)
-{
-  *xc += uc * dt;
-}
+void AS_xcIntegratorU(double* xc, double uc, double dt) { *xc += uc * dt; }
 
 void AS_xIntegrator2U(double* xm, double* xc, double um, double dt)
 {
@@ -105,7 +100,4 @@ void AS_uIntegratorFwd(double* uc, double ac, double dt)
   *uc += ac * dt;
 }
 
-void AS_LIntegratorFwd(double* Lc, double DLc, double dt)
-{
-  *Lc += DLc * dt;
-}
+void AS_LIntegratorFwd(double* Lc, double DLc, double dt) { *Lc += DLc * dt; }

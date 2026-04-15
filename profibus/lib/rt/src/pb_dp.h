@@ -158,8 +158,7 @@
 #define DP_AUTO_UPLOAD_DOWNLOAD_SEQ 0x40
 #define DP_AUTO_ACT_PARAM 0x20
 
-#define DP_AUTO_REMOTE_SERVICES                                                \
-  (DP_AUTO_GET_MASTER_DIAG | DP_AUTO_UPLOAD_DOWNLOAD_SEQ | DP_AUTO_ACT_PARAM)
+#define DP_AUTO_REMOTE_SERVICES (DP_AUTO_GET_MASTER_DIAG | DP_AUTO_UPLOAD_DOWNLOAD_SEQ | DP_AUTO_ACT_PARAM)
 
 #define DP_USER_REMOTE_SERVICES 0x00
 
@@ -196,9 +195,8 @@
 #define DP_PRM_FREEZE_REQ 0x10
 #define DP_PRM_WD_ON 0x08
 
-#define DP_PRM_STATION_STATUS                                                  \
-  (DP_PRM_LOCK_REQ | DP_PRM_UNLOCK_REQ | DP_PRM_SYNC_REQ | DP_PRM_FREEZE_REQ | \
-   DP_PRM_WD_ON)
+#define DP_PRM_STATION_STATUS                                                                                \
+  (DP_PRM_LOCK_REQ | DP_PRM_UNLOCK_REQ | DP_PRM_SYNC_REQ | DP_PRM_FREEZE_REQ | DP_PRM_WD_ON)
 
 /*--- DP SLAVE GLOBAL CONTROL BITS -----------------------------------------*/
 
@@ -208,9 +206,8 @@
 #define DP_CONTROL_UNFREEZE 0x04
 #define DP_CONTROL_CLEAR_DATA 0x02
 
-#define DP_CONTROL_COMMAND                                                     \
-  (DP_CONTROL_SYNC | DP_CONTROL_UNSYNC | DP_CONTROL_FREEZE |                   \
-   DP_CONTROL_UNFREEZE | DP_CONTROL_CLEAR_DATA)
+#define DP_CONTROL_COMMAND                                                                                   \
+  (DP_CONTROL_SYNC | DP_CONTROL_UNSYNC | DP_CONTROL_FREEZE | DP_CONTROL_UNFREEZE | DP_CONTROL_CLEAR_DATA)
 
 /*--- DP AREA CODES --------------------------------------------------------*/
 
@@ -277,9 +274,8 @@
 #define DP_DIAG_2_STAT_DIAG 0x02
 #define DP_DIAG_2_PRM_REQ 0x01
 
-#define DP_DIAG_2_STATUS                                                       \
-  (DP_DIAG_2_DEACTIVATED | DP_DIAG_2_SYNC_MODE | DP_DIAG_2_FREEZE_MODE |       \
-   DP_DIAG_2_WD_ON | DP_DIAG_2_PRM_REQ)
+#define DP_DIAG_2_STATUS                                                                                     \
+  (DP_DIAG_2_DEACTIVATED | DP_DIAG_2_SYNC_MODE | DP_DIAG_2_FREEZE_MODE | DP_DIAG_2_WD_ON | DP_DIAG_2_PRM_REQ)
 
 #define DP_DIAG_3_EXT_DIAG_OVERFLOW 0x80
 
@@ -1028,11 +1024,11 @@ typedef struct _T_DP_FM2_EVENT_IND
 
 typedef struct _T_ADDR
 {
-  USIGN8 api;               /* default: set to 0 */
-  USIGN8 scl;               /* default: set to 0 */
-  OCTET network_address[6]; /* use only when [d|s]_type is set to 1 */
+  USIGN8 api;                          /* default: set to 0 */
+  USIGN8 scl;                          /* default: set to 0 */
+  OCTET network_address[6];            /* use only when [d|s]_type is set to 1 */
   /* OCTET    mac_address[x_len-8]; */ /* use only when [d|s]_type is set to 1
-                                          */
+                                        */
 
 } T_ADDR;
 
@@ -1065,11 +1061,9 @@ typedef struct _T_DP_INITIATE_REQ
 
 /*--------------------------------------------------------------------------*/
 
-#define DP_INITIATE_S_ADDR(x)                                                  \
-  ((T_ADDR FAR*)(((USIGN8 FAR*)&((x)->add_addr_param)) + sizeof(T_ADD_ADDR)))
-#define DP_INITIATE_D_ADDR(x)                                                  \
-  ((T_ADDR FAR*)(((USIGN8 FAR*)&((x)->add_addr_param)) + sizeof(T_ADD_ADDR) +  \
-                 (x)->add_addr_param.s_len))
+#define DP_INITIATE_S_ADDR(x) ((T_ADDR FAR*)(((USIGN8 FAR*)&((x)->add_addr_param)) + sizeof(T_ADD_ADDR)))
+#define DP_INITIATE_D_ADDR(x)                                                                                \
+  ((T_ADDR FAR*)(((USIGN8 FAR*)&((x)->add_addr_param)) + sizeof(T_ADD_ADDR) + (x)->add_addr_param.s_len))
 
 /*--------------------------------------------------------------------------*/
 

@@ -38,7 +38,8 @@
 
 #include <fstream>
 
-extern "C" {
+extern "C"
+{
 #include "co_dcli.h"
 #include "co_cdh.h"
 #include "co_time.h"
@@ -46,12 +47,12 @@ extern "C" {
 #include "co_string.h"
 #include "cnv_changelog.h"
 
-CnvChangeLog::CnvChangeLog(CnvCtx* cnv_ctx, char* from_str)
-    : ctx(cnv_ctx), from(0)
+CnvChangeLog::CnvChangeLog(CnvCtx* cnv_ctx, char* from_str) : ctx(cnv_ctx), from(0)
 {
   pwr_tStatus sts;
 
-  if (!streq(from_str, "")) {
+  if (!streq(from_str, ""))
+  {
     sts = time_AsciiToA(from_str, &from_time);
     if (ODD(sts))
       from = 1;
@@ -103,19 +104,23 @@ int CnvChangeLog::read(const char* module)
   if (!fp)
     return 0;
 
-  while (1) {
+  while (1)
+  {
     sts = CnvCtx::read_line(orig_line, sizeof(orig_line), fp);
     if (!sts)
       break;
     else if (orig_line[0] == '#')
       continue;
-    else {
-      if (isdigit(orig_line[0])) {
+    else
+    {
+      if (isdigit(orig_line[0]))
+      {
         LogEntry p;
 
         // New log entry
         i = 0;
-        for (s = orig_line; *s && *s != 32 && *s != 9; s++) {
+        for (s = orig_line; *s && *s != 32 && *s != 9; s++)
+        {
           if (i >= (int)sizeof(timstr1))
             break;
           timstr1[i++] = *s;
@@ -126,7 +131,8 @@ int CnvChangeLog::read(const char* module)
           ;
 
         i = 0;
-        for (; *s && *s != 32 && *s != 9; s++) {
+        for (; *s && *s != 32 && *s != 9; s++)
+        {
           if (i >= (int)sizeof(p.signature))
             break;
           p.signature[i++] = *s;
@@ -137,7 +143,8 @@ int CnvChangeLog::read(const char* module)
           ;
 
         i = 0;
-        for (; *s && *s != 32 && *s != 9; s++) {
+        for (; *s && *s != 32 && *s != 9; s++)
+        {
           if (i >= (int)sizeof(p.component) - 1)
             break;
           p.component[i++] = *s;
@@ -153,12 +160,14 @@ int CnvChangeLog::read(const char* module)
         else
           strncpy(p.module, module, sizeof(p.module));
 
-        sprintf(timstr2, "20%c%c-%c%c-%c%c 00:00", timstr1[0], timstr1[1],
-            timstr1[2], timstr1[3], timstr1[4], timstr1[5]);
+        sprintf(timstr2, "20%c%c-%c%c-%c%c 00:00", timstr1[0], timstr1[1], timstr1[2], timstr1[3], timstr1[4],
+                timstr1[5]);
         time_FormAsciiToA(timstr2, MINUTE, 0, &p.time);
 
         entries.push_back(p);
-      } else {
+      }
+      else
+      {
         // Continuation of log entry
         str_trim(line, orig_line);
         if (streq(line, ""))
@@ -180,10 +189,14 @@ void CnvChangeLog::sort_time()
 {
   int n = entries.size();
 
-  for (int gap = n / 2; 0 < gap; gap /= 2) {
-    for (int i = gap; i < n; i++) {
-      for (int j = i - gap; 0 <= j; j -= gap) {
-        if (entries[j + gap].time.tv_sec < entries[j].time.tv_sec) {
+  for (int gap = n / 2; 0 < gap; gap /= 2)
+  {
+    for (int i = gap; i < n; i++)
+    {
+      for (int j = i - gap; 0 <= j; j -= gap)
+      {
+        if (entries[j + gap].time.tv_sec < entries[j].time.tv_sec)
+        {
           LogEntry temp = entries[j];
           entries[j] = entries[j + gap];
           entries[j + gap] = temp;
@@ -197,10 +210,14 @@ void CnvChangeLog::sort_module()
 {
   int n = entries.size();
 
-  for (int gap = n / 2; 0 < gap; gap /= 2) {
-    for (int i = gap; i < n; i++) {
-      for (int j = i - gap; 0 <= j; j -= gap) {
-        if (strcmp(entries[j + gap].module, entries[j].module) > 0) {
+  for (int gap = n / 2; 0 < gap; gap /= 2)
+  {
+    for (int i = gap; i < n; i++)
+    {
+      for (int j = i - gap; 0 <= j; j -= gap)
+      {
+        if (strcmp(entries[j + gap].module, entries[j].module) > 0)
+        {
           LogEntry temp = entries[j];
           entries[j] = entries[j + gap];
           entries[j + gap] = temp;
@@ -214,10 +231,14 @@ void CnvChangeLog::sort_component()
 {
   int n = entries.size();
 
-  for (int gap = n / 2; 0 < gap; gap /= 2) {
-    for (int i = gap; i < n; i++) {
-      for (int j = i - gap; 0 <= j; j -= gap) {
-        if (strcmp(entries[j + gap].component, entries[j].component) > 0) {
+  for (int gap = n / 2; 0 < gap; gap /= 2)
+  {
+    for (int i = gap; i < n; i++)
+    {
+      for (int j = i - gap; 0 <= j; j -= gap)
+      {
+        if (strcmp(entries[j + gap].component, entries[j].component) > 0)
+        {
           LogEntry temp = entries[j];
           entries[j] = entries[j + gap];
           entries[j + gap] = temp;
@@ -231,10 +252,14 @@ void CnvChangeLog::sort_signature()
 {
   int n = entries.size();
 
-  for (int gap = n / 2; 0 < gap; gap /= 2) {
-    for (int i = gap; i < n; i++) {
-      for (int j = i - gap; 0 <= j; j -= gap) {
-        if (strcmp(entries[j + gap].signature, entries[j].signature) > 0) {
+  for (int gap = n / 2; 0 < gap; gap /= 2)
+  {
+    for (int i = gap; i < n; i++)
+    {
+      for (int j = i - gap; 0 <= j; j -= gap)
+      {
+        if (strcmp(entries[j + gap].signature, entries[j].signature) > 0)
+        {
           LogEntry temp = entries[j];
           entries[j] = entries[j + gap];
           entries[j + gap] = temp;
@@ -249,18 +274,19 @@ void CnvChangeLog::print()
   char timstr1[40];
 
   sort_time();
-  for (int i = 0; i < (int)entries.size(); i++) {
-    if (from) {
+  for (int i = 0; i < (int)entries.size(); i++)
+  {
+    if (from)
+    {
       if (time_Acomp(&entries[i].time, &from_time) < 0)
         continue;
     }
 
-    time_AtoAscii(
-        &entries[i].time, time_eFormat_DateAndTime, timstr1, sizeof(timstr1));
+    time_AtoAscii(&entries[i].time, time_eFormat_DateAndTime, timstr1, sizeof(timstr1));
     timstr1[11] = 0;
 
-    printf("%s %4s %-8s %-8s %s\n", timstr1, entries[i].signature,
-        entries[i].module, entries[i].component, entries[i].text);
+    printf("%s %4s %-8s %-8s %s\n", timstr1, entries[i].signature, entries[i].module, entries[i].component,
+           entries[i].text);
   }
 }
 
@@ -291,20 +317,20 @@ void CnvChangeLog::print_docbook()
      << "<td><classname>Module_____</classname></td>\n"
      << "<td><classname>Change</classname></td></tr>\n";
 
-  for (int i = (int)entries.size() - 1; i >= 0; i--) {
-    if (from) {
+  for (int i = (int)entries.size() - 1; i >= 0; i--)
+  {
+    if (from)
+    {
       if (time_Acomp(&entries[i].time, &from_time) < 0)
         continue;
     }
 
-    time_AtoAscii(
-        &entries[i].time, time_eFormat_DateAndTime, timstr1, sizeof(timstr1));
+    time_AtoAscii(&entries[i].time, time_eFormat_DateAndTime, timstr1, sizeof(timstr1));
     timstr1[11] = 0;
 
-    fp << "<tr><td>" << timstr1 << "</td><td>" << entries[i].module << "/"
-       << entries[i].component << "</td>\n"
-       << "<td>" << entries[i].text << " /" << entries[i].signature
-       << "</td></tr>\n";
+    fp << "<tr><td>" << timstr1 << "</td><td>" << entries[i].module << "/" << entries[i].component
+       << "</td>\n"
+       << "<td>" << entries[i].text << " /" << entries[i].signature << "</td></tr>\n";
   }
   fp << "</tbody></table></section></article>\n";
 }
@@ -334,20 +360,20 @@ void CnvChangeLog::print_html()
      << "         <td><b>Change</b></td>\n"
      << "         <td><b>Sign</b></td></tr>\n";
 
-  for (int i = (int)entries.size() - 1; i >= 0; i--) {
-    if (from) {
+  for (int i = (int)entries.size() - 1; i >= 0; i--)
+  {
+    if (from)
+    {
       if (time_Acomp(&entries[i].time, &from_time) < 0)
         continue;
     }
 
-    time_AtoAscii(
-        &entries[i].time, time_eFormat_DateAndTime, timstr1, sizeof(timstr1));
+    time_AtoAscii(&entries[i].time, time_eFormat_DateAndTime, timstr1, sizeof(timstr1));
     timstr1[11] = 0;
 
-    fp << "<tr><td>" << timstr1 << "</td><td>" << entries[i].module << "/"
-       << entries[i].component << "</td>\n"
-       << "<td>" << entries[i].text << "</td><td>" << entries[i].signature
-       << "</td></tr>\n";
+    fp << "<tr><td>" << timstr1 << "</td><td>" << entries[i].module << "/" << entries[i].component
+       << "</td>\n"
+       << "<td>" << entries[i].text << "</td><td>" << entries[i].signature << "</td></tr>\n";
   }
   fp << "    </table></div>\n"
      << "  </body>\n"
@@ -368,7 +394,8 @@ void CnvChangeLog::from_git()
   system(cmd);
 
   std::ifstream fp(tmpfile);
-  while (fp.getline(line, sizeof(line))) {
+  while (fp.getline(line, sizeof(line)))
+  {
     date[0] = line[2];
     date[1] = line[3];
     date[2] = line[5];
@@ -377,7 +404,8 @@ void CnvChangeLog::from_git()
     date[5] = line[9];
     date[6] = 0;
 
-    if ((s1 = strchr(line, '\'')) && (s2 = strchr(s1 + 1, '\''))) {
+    if ((s1 = strchr(line, '\'')) && (s2 = strchr(s1 + 1, '\'')))
+    {
       *s2 = 0;
       strncpy(user, s1 + 1, sizeof(user));
 

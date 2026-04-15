@@ -22,7 +22,8 @@
 #define setport__
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #ifdef BCCWIN
@@ -33,15 +34,15 @@ extern "C" {
 #define EXPORTSPEC __declspec(dllimport)
 #endif
 
-EXPORTSPEC HANDLE __stdcall setPort(char* name, char* baud, char parity);
+  EXPORTSPEC HANDLE __stdcall setPort(char* name, char* baud, char parity);
 
-EXPORTSPEC int __stdcall closePort(HANDLE port);
+  EXPORTSPEC int __stdcall closePort(HANDLE port);
 #endif
 
 #ifdef LINUX
-int setPort(char* name, char* baud, char parity);
+  int setPort(char* name, char* baud, char parity);
 
-int closePort(int port);
+  int closePort(int port);
 #endif
 
 #ifdef __cplusplus

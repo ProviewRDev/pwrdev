@@ -54,27 +54,28 @@
 #include "rt_aproc.h"
 #include "rt_pwr_msg.h"
 
-#define Log_Error(a, b)                                                        \
-  errh_CErrLog(DS__ERROR, errh_ErrArgAF(b), errh_ErrArgMsg(a), NULL)
-#define Log_Error_Exit(a, b)                                                   \
-  {                                                                            \
-    Log_Error(a, b);                                                           \
-    exit(a);                                                                   \
+#define Log_Error(a, b) errh_CErrLog(DS__ERROR, errh_ErrArgAF(b), errh_ErrArgMsg(a), NULL)
+#define Log_Error_Exit(a, b)                                                                                 \
+  {                                                                                                          \
+    Log_Error(a, b);                                                                                         \
+    exit(a);                                                                                                 \
   }
-#define If_Error_Log_Exit(a, b)                                                \
-  if ((a & 1) != 1)                                                            \
+#define If_Error_Log_Exit(a, b)                                                                              \
+  if ((a & 1) != 1)                                                                                          \
   Log_Error_Exit(a, b)
 
-typedef struct s_ListEntry {
+typedef struct s_ListEntry
+{
   struct s_ListEntry* next;
   pwr_sClass_DsTrend* o; /* Pointer to DsTrend object */
-  pwr_tSubid o_subid; /* SubId for DsTrend object */
+  pwr_tSubid o_subid;    /* SubId for DsTrend object */
 } trend_sListEntry;
 
-typedef struct s_ListEntryTC {
+typedef struct s_ListEntryTC
+{
   struct s_ListEntryTC* next;
   pwr_sClass_DsTrendCurve* o; /* Pointer to DsTrendCurve object */
-  pwr_tSubid o_subid; /* SubId for DsTrendCurve object */
+  pwr_tSubid o_subid;         /* SubId for DsTrendCurve object */
   void* datap[10];
   pwr_tSubid data_subid[10];
   unsigned int data_size[10];
@@ -92,7 +93,8 @@ typedef struct s_ListEntryTC {
   int first_scan;
 } trend_sListEntryTC;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 scantime;
   pwr_tFloat32 scantime_tc;
   unsigned int dstrend_multiple;
@@ -130,20 +132,23 @@ int main(int argc, char** argv)
   sts = gdh_Init("ds_trend");
   If_Error_Log_Exit(sts, "gdh_Init");
 
-  if (!qcom_Init(&sts, 0, "pwr_trend")) {
+  if (!qcom_Init(&sts, 0, "pwr_trend"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     exit(sts);
   }
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, &qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, &qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     exit(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, &qid, &qini)) {
+  if (!qcom_Bind(&sts, &qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     exit(-1);
   }
@@ -156,11 +161,14 @@ int main(int argc, char** argv)
 
   /* Fetch ScanTime */
   sts = gdh_GetClassList(pwr_cClass_DsTrendConf, &ObjId);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Info("Couldn't get the DsTrendConf object. Used ScanTime = 1 s");
     ctx->scantime = 1;
     ctx->scantime_tc = 1.0;
-  } else {
+  }
+  else
+  {
     gdh_ObjidToPointer(ObjId, (pwr_tAddress*)&TConfP);
     ctx->scantime = TConfP->ScanTime;
     if (ctx->scantime > 3600)
@@ -178,7 +186,8 @@ int main(int argc, char** argv)
 
   InitOK = FALSE;
   sts = InitTrendlist(ctx);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     /* This should be removed when we can wait for init messages. */
     errh_SetStatus(0);
     errh_Info("No DsTrend objects configured");
@@ -193,38 +202,49 @@ int main(int argc, char** argv)
   aproc_TimeStamp(ctx->scantime, 5.0);
   errh_SetStatus(PWR__SRUN);
 
-  for (;;) {
+  for (;;)
+  {
     time_GetTimeMonotonic(&CurrentTime);
     time_Aadd(&NextScan, &LastScan, &ScanDeltaTime);
-    if (time_Acomp(&CurrentTime, &NextScan) < 0) {
+    if (time_Acomp(&CurrentTime, &NextScan) < 0)
+    {
       time_Adiff(&WaitTime, &NextScan, &CurrentTime);
       tmo = 1000 * time_DToFloat(0, &WaitTime);
 
       get.maxSize = sizeof(mp);
       get.data = mp;
       qcom_Get(&sts, &qid, &get, tmo);
-      if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
+      if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+      {
         if (!swap)
           StoreData(ctx);
-      } else {
+      }
+      else
+      {
         ini_mEvent new_event;
         qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
         new_event.m = ep->mask;
-        if (new_event.b.oldPlcStop && !swap) {
+        if (new_event.b.oldPlcStop && !swap)
+        {
           swap = 1;
           errh_SetStatus(PWR__SRVRESTART);
           CloseTrendlist(ctx);
-        } else if (new_event.b.swapDone && swap) {
+        }
+        else if (new_event.b.swapDone && swap)
+        {
           swap = 0;
           sts = InitTrendlist(ctx);
           errh_SetStatus(PWR__SRUN);
           errh_Info("Warm restart completed");
-        } else if (new_event.b.terminate) {
+        }
+        else if (new_event.b.terminate)
+        {
           exit(0);
         }
       }
-    } else if (!swap)
+    }
+    else if (!swap)
       StoreData(ctx);
 
     LastScan = NextScan;
@@ -243,7 +263,8 @@ static void CloseTrendlist(trend_tCtx ctx)
   /* Free old list */
 
   ep = ctx->o_list;
-  while (ep != NULL) {
+  while (ep != NULL)
+  {
     tmp = ep;
     gdh_UnrefObjectInfo(ep->o->DataSubId);
     gdh_UnrefObjectInfo(ep->o_subid);
@@ -269,7 +290,8 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
   /* the DsTrend objects. */
 
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_DsTrend, &aref); ODD(sts);
-       sts = gdh_GetNextAttrRef(pwr_cClass_DsTrend, &aref, &aref)) {
+       sts = gdh_GetNextAttrRef(pwr_cClass_DsTrend, &aref, &aref))
+  {
     trend_sListEntry* ep;
     pwr_sClass_DsTrend* o;
 
@@ -279,22 +301,24 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
 
     /* Check if parent object is disabled */
     sts = gdh_AttrArefToObjectAref(&aref, &oaref);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = gdh_ArefDisabled(&oaref, &disabled);
       if (ODD(sts) && disabled)
         continue;
     }
 
     ep = calloc(1, sizeof(*ep));
-    if (ep == NULL) {
+    if (ep == NULL)
+    {
       errh_CErrLog(DS__ERRALLOC, NULL);
       errh_SetStatus(PWR__SRVTERM);
       exit(DS__ERRALLOC);
     }
 
-    sts = gdh_RefObjectInfo(
-        name, (pwr_tAddress*)&ep->o, &ep->o_subid, sizeof(*ep->o));
-    if (EVEN(sts)) {
+    sts = gdh_RefObjectInfo(name, (pwr_tAddress*)&ep->o, &ep->o_subid, sizeof(*ep->o));
+    if (EVEN(sts))
+    {
       errh_Error("Couldn't get subscription for '%s'\n%m", name, sts);
       free(ep);
       continue;
@@ -309,33 +333,32 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
 
     /* Initiate DsTrend object, sampled attribute must be on local node */
 
-    sts = gdh_DLRefObjectInfoAttrref((pwr_sAttrRef*)&o->DataName,
-        (pwr_tAddress*)&o->DataPointer, &o->DataSubId);
-    if (EVEN(sts)) {
+    sts = gdh_DLRefObjectInfoAttrref((pwr_sAttrRef*)&o->DataName, (pwr_tAddress*)&o->DataPointer,
+                                     &o->DataSubId);
+    if (EVEN(sts))
+    {
       if (sts == GDH__RTDBNULL && IsDisabled(&o->DataName))
         continue;
 
-      errh_Error(
-          "Couldn't get direct link to %s's attribute DataName\n%m", name, sts);
+      errh_Error("Couldn't get direct link to %s's attribute DataName\n%m", name, sts);
       gdh_UnrefObjectInfo(ep->o_subid);
       free(ep);
       continue;
     }
 
-    sts = gdh_GetAttributeCharAttrref(
-        (pwr_sAttrRef*)&o->DataName, &type, &dummy, &dummy, &dummy);
-    if (EVEN(sts)) {
-      errh_Error(
-          "Couldn't get datatype for %s's attribute DataName\n%m", name, sts);
+    sts = gdh_GetAttributeCharAttrref((pwr_sAttrRef*)&o->DataName, &type, &dummy, &dummy, &dummy);
+    if (EVEN(sts))
+    {
+      errh_Error("Couldn't get datatype for %s's attribute DataName\n%m", name, sts);
       gdh_UnrefObjectInfo(ep->o_subid);
       free(ep);
       continue;
     }
     tix = cdh_TypeIdToIndex(type);
 
-    if (!IsValidType(tix)) {
-      errh_Error("No valid datatype for %s's attribute DataName\n%m", name,
-          DS__ERRTYPE);
+    if (!IsValidType(tix))
+    {
+      errh_Error("No valid datatype for %s's attribute DataName\n%m", name, DS__ERRTYPE);
       gdh_UnrefObjectInfo(ep->o_subid);
       free(ep);
       continue;
@@ -361,7 +384,8 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
      the DsTrend objects.  */
 
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_DsTrendCurve, &aref); ODD(sts);
-       sts = gdh_GetNextAttrRef(pwr_cClass_DsTrendCurve, &aref, &aref)) {
+       sts = gdh_GetNextAttrRef(pwr_cClass_DsTrendCurve, &aref, &aref))
+  {
     trend_sListEntryTC* ep;
     pwr_sClass_DsTrendCurve* o;
     int i;
@@ -373,14 +397,16 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
 
     /* Check if parent object is disabled */
     sts = gdh_AttrArefToObjectAref(&aref, &oaref);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       sts = gdh_ArefDisabled(&oaref, &disabled);
       if (ODD(sts) && disabled)
         continue;
     }
 
     ep = calloc(1, sizeof(*ep));
-    if (ep == NULL) {
+    if (ep == NULL)
+    {
       errh_CErrLog(DS__ERRALLOC, NULL);
       errh_SetStatus(PWR__SRVTERM);
       exit(DS__ERRALLOC);
@@ -388,16 +414,17 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
 
     ep->first_scan = 1;
 
-    sts = gdh_RefObjectInfo(
-        name, (pwr_tAddress*)&ep->o, &ep->o_subid, sizeof(*ep->o));
-    if (EVEN(sts)) {
+    sts = gdh_RefObjectInfo(name, (pwr_tAddress*)&ep->o, &ep->o_subid, sizeof(*ep->o));
+    if (EVEN(sts))
+    {
       errh_Error("Couldn't get subscription for '%s'\n%m", name, sts);
       free(ep);
       continue;
     }
     o = ep->o;
 
-    if (o->Function & 1) {
+    if (o->Function & 1)
+    {
       /* Data stored by user */
       gdh_UnrefObjectInfo(ep->o_subid);
       free(ep);
@@ -405,34 +432,33 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
     }
 
     ep->multiple = (int)(o->ScanTime / ctx->scantime_tc + 0.5);
-    o->NoOfSample
-        = (int)(o->StorageTime / ctx->scantime_tc * ep->multiple + 0.5);
+    o->NoOfSample = (int)(o->StorageTime / ctx->scantime_tc * ep->multiple + 0.5);
 
     /* Initiate DsTrendCuve object, sampled attribute must be on local node */
 
     found = 0;
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 10; i++)
+    {
       if (cdh_ObjidIsNull(o->Attribute[i].Objid))
         continue;
 
       /* Link to attribute */
-      sts = gdh_DLRefObjectInfoAttrref((pwr_sAttrRef*)&o->Attribute[i],
-          (pwr_tAddress*)&ep->datap[i], &ep->data_subid[i]);
-      if (EVEN(sts)) {
+      sts = gdh_DLRefObjectInfoAttrref((pwr_sAttrRef*)&o->Attribute[i], (pwr_tAddress*)&ep->datap[i],
+                                       &ep->data_subid[i]);
+      if (EVEN(sts))
+      {
         if (sts == GDH__RTDBNULL && IsDisabled(&o->Attribute[i]))
           continue;
 
-        errh_Error("Couldn't get direct link to %s's attribute %d, %m", name,
-            i + 1, sts);
+        errh_Error("Couldn't get direct link to %s's attribute %d, %m", name, i + 1, sts);
         ep->datap[i] = 0;
         continue;
       }
 
-      sts = gdh_GetAttributeCharAttrref(
-          (pwr_sAttrRef*)&o->Attribute[i], &type, &dummy, &dummy, &dummy);
-      if (EVEN(sts)) {
-        errh_Error(
-            "Couldn't get datatype for %s's attribute DataName\n%m", name, sts);
+      sts = gdh_GetAttributeCharAttrref((pwr_sAttrRef*)&o->Attribute[i], &type, &dummy, &dummy, &dummy);
+      if (EVEN(sts))
+      {
+        errh_Error("Couldn't get datatype for %s's attribute DataName\n%m", name, sts);
         gdh_UnrefObjectInfo(ep->data_subid[i]);
         ep->datap[i] = 0;
         continue;
@@ -440,9 +466,9 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
       tix = cdh_TypeIdToIndex(type);
       ep->data_size[i] = cdh_TypeToSize(type);
 
-      if (!IsValidType(tix)) {
-        errh_Error("No valid datatype for %s's attribute DataName\n%m", name,
-            DS__ERRTYPE);
+      if (!IsValidType(tix))
+      {
+        errh_Error("No valid datatype for %s's attribute DataName\n%m", name, DS__ERRTYPE);
         gdh_UnrefObjectInfo(ep->data_subid[i]);
         ep->datap[i] = 0;
         continue;
@@ -451,21 +477,19 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
       o->AttributeType[i] = type;
 
       /* Link to buffer */
-      sts = gdh_DLRefObjectInfoAttrref((pwr_sAttrRef*)&o->Buffers[i],
-          (pwr_tAddress*)&ep->buffheadp[i], &ep->buff_subid[i]);
-      if (EVEN(sts)) {
-        errh_Error(
-            "Couldn't get direct link to %s's buffer %d, %m", name, i + 1, sts);
+      sts = gdh_DLRefObjectInfoAttrref((pwr_sAttrRef*)&o->Buffers[i], (pwr_tAddress*)&ep->buffheadp[i],
+                                       &ep->buff_subid[i]);
+      if (EVEN(sts))
+      {
+        errh_Error("Couldn't get direct link to %s's buffer %d, %m", name, i + 1, sts);
         gdh_UnrefObjectInfo(ep->data_subid[i]);
         ep->datap[i] = 0;
         continue;
       }
-      ep->buffp[i] = (char*)ep->buffheadp[i]
-          + pwr_AlignLW(sizeof(pwr_sClass_CircBuffHeader));
+      ep->buffp[i] = (char*)ep->buffheadp[i] + pwr_AlignLW(sizeof(pwr_sClass_CircBuffHeader));
 
       /* Get buffer size */
-      sts = gdh_GetAttributeCharAttrref(
-          &o->Buffers[i], 0, &ep->buff_size[i], 0, 0);
+      sts = gdh_GetAttributeCharAttrref(&o->Buffers[i], 0, &ep->buff_size[i], 0, 0);
       if (EVEN(sts))
         return sts;
 
@@ -473,7 +497,8 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
 
       found = 1;
     }
-    if (!found) {
+    if (!found)
+    {
       errh_Error("No valid attributes for %s", name);
       gdh_UnrefObjectInfo(ep->o_subid);
       free(ep);
@@ -481,17 +506,18 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
     }
 
     /* Link to time buffer */
-    if (cdh_ObjidIsNotNull(o->TimeBuffer.Objid)) {
-      sts = gdh_DLRefObjectInfoAttrref((pwr_sAttrRef*)&o->TimeBuffer,
-          (pwr_tAddress*)&ep->timeheadp, &ep->timebuff_subid);
-      if (EVEN(sts)) {
-        errh_Error(
-            "Couldn't get direct link to %s's time buffer, %m", name, sts);
+    if (cdh_ObjidIsNotNull(o->TimeBuffer.Objid))
+    {
+      sts = gdh_DLRefObjectInfoAttrref((pwr_sAttrRef*)&o->TimeBuffer, (pwr_tAddress*)&ep->timeheadp,
+                                       &ep->timebuff_subid);
+      if (EVEN(sts))
+      {
+        errh_Error("Couldn't get direct link to %s's time buffer, %m", name, sts);
         ep->timeheadp = 0;
         ep->timebuffp = 0;
-      } else
-        ep->timebuffp = (char*)ep->timeheadp
-            + pwr_AlignLW(sizeof(pwr_sClass_CircBuffHeader));
+      }
+      else
+        ep->timebuffp = (char*)ep->timeheadp + pwr_AlignLW(sizeof(pwr_sClass_CircBuffHeader));
 
       if (o->TimeResolution == pwr_eTimeResolutionEnum_Nanosecond)
         ep->time_size = 8;
@@ -499,8 +525,7 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
         ep->time_size = 4;
 
       /* Get buffer size */
-      sts = gdh_GetAttributeCharAttrref(
-          &o->TimeBuffer, 0, &ep->timebuff_size, 0, 0);
+      sts = gdh_GetAttributeCharAttrref(&o->TimeBuffer, 0, &ep->timebuff_size, 0, 0);
       if (EVEN(sts))
         return sts;
 
@@ -508,25 +533,29 @@ static pwr_tStatus InitTrendlist(trend_tCtx ctx)
     }
 
     /* Calculate number of samples */
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 10; i++)
+    {
       if (!ep->datap[i])
         continue;
 
       if (o->NoOfSample > ep->buff_size[i] / ep->data_size[i])
         o->NoOfSample = ep->buff_size[i] / ep->data_size[i];
     }
-    if (ep->timebuffp) {
+    if (ep->timebuffp)
+    {
       if (o->NoOfSample > ep->timebuff_size / ep->time_size)
         o->NoOfSample = ep->timebuff_size / ep->time_size;
     }
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 10; i++)
+    {
       if (!ep->datap[i])
         continue;
 
       ep->buffheadp[i]->Size = o->NoOfSample;
       ep->buffheadp[i]->ElementSize = ep->data_size[i];
     }
-    if (ep->timebuffp) {
+    if (ep->timebuffp)
+    {
       ep->timeheadp->Size = o->NoOfSample;
       ep->timeheadp->ElementSize = ep->time_size;
     }
@@ -545,7 +574,8 @@ static pwr_tBoolean IsValidType(pwr_eTix type)
 {
   pwr_tBoolean valid = TRUE;
 
-  switch (type) {
+  switch (type)
+  {
   case pwr_eTix_Boolean:
   case pwr_eTix_Float32:
   case pwr_eTix_Float64:
@@ -568,30 +598,34 @@ static pwr_tBoolean IsValidType(pwr_eTix type)
 
 static void StoreData(trend_tCtx ctx)
 {
-  if (ctx->dstrend_multiple_cnt == 0) {
+  if (ctx->dstrend_multiple_cnt == 0)
+  {
     trend_sListEntry* ep;
     pwr_tFloat32* BuffP;
     pwr_sClass_DsTrend* o;
 
     /* Scan the DsTrendlist */
 
-    for (ep = ctx->o_list; ep != NULL; ep = ep->next) {
+    for (ep = ctx->o_list; ep != NULL; ep = ep->next)
+    {
       o = ep->o;
 
       /* If position equal first position in buffer  */
 
-      if (o->NextWriteIndex[o->WriteBuffer] == 0) {
+      if (o->NextWriteIndex[o->WriteBuffer] == 0)
+      {
         o->BufferStatus[o->WriteBuffer] = 1;
         time_GetTime(&o->BufferTime[o->WriteBuffer]);
       }
 
-      if (o->NextMultiple == 0) {
+      if (o->NextMultiple == 0)
+      {
         /* Store data in buffer */
 
-        BuffP = &o->DataBuffer[o->NextWriteIndex[o->WriteBuffer]
-            + (o->WriteBuffer * o->NoOfBufElement)];
+        BuffP = &o->DataBuffer[o->NextWriteIndex[o->WriteBuffer] + (o->WriteBuffer * o->NoOfBufElement)];
 
-        switch (o->DataType) {
+        switch (o->DataType)
+        {
         case pwr_eTix_Boolean:
           *BuffP = *(pwr_tBoolean*)o->DataPointer;
           break;
@@ -629,10 +663,11 @@ static void StoreData(trend_tCtx ctx)
 
         /* If buffert full then mark next buffer*/
 
-        if (o->NextWriteIndex[o->WriteBuffer] >= o->NoOfSample) {
-          o->BufferStatus[o->WriteBuffer] = 0; /* sts = read */
+        if (o->NextWriteIndex[o->WriteBuffer] >= o->NoOfSample)
+        {
+          o->BufferStatus[o->WriteBuffer] = 0;   /* sts = read */
           o->NextWriteIndex[o->WriteBuffer] = 0; /* First position */
-          o->WriteBuffer = 1 - o->WriteBuffer; /* Change buffer */
+          o->WriteBuffer = 1 - o->WriteBuffer;   /* Change buffer */
         }
       }
       o->NextMultiple--;
@@ -645,7 +680,8 @@ static void StoreData(trend_tCtx ctx)
 
   /* Scan the DsTrendCurveList */
 
-  if (ctx->o_list_tc) {
+  if (ctx->o_list_tc)
+  {
     trend_sListEntryTC* ep;
     void* BuffP;
     pwr_sClass_DsTrendCurve* o;
@@ -655,46 +691,59 @@ static void StoreData(trend_tCtx ctx)
     pwr_tTime time;
     int first_sample;
 
-    for (ep = ctx->o_list_tc; ep != NULL; ep = ep->next) {
+    for (ep = ctx->o_list_tc; ep != NULL; ep = ep->next)
+    {
       o = ep->o;
 
-      if (ep->multiple_cnt == 0) {
+      if (ep->multiple_cnt == 0)
+      {
         first_sample = 0;
 
-        if (ep->first_scan) {
-          if (ep->buffheadp[0]) {
-            if (ep->buffheadp[0]->LastIndex == 0
-                && ep->buffheadp[0]->FirstIndex == 0) {
+        if (ep->first_scan)
+        {
+          if (ep->buffheadp[0])
+          {
+            if (ep->buffheadp[0]->LastIndex == 0 && ep->buffheadp[0]->FirstIndex == 0)
+            {
               current_index = 0;
               first_sample = 1;
-            } else
+            }
+            else
               current_index = ep->buffheadp[0]->LastIndex + 1;
-          } else
+          }
+          else
             first_sample = 1;
           ep->first_scan = 0;
-        } else {
+        }
+        else
+        {
           current_index = o->LastIndex + 1;
           first_index = o->FirstIndex;
         }
         if (current_index >= o->NoOfSample)
           current_index = 0;
 
-        if (current_index == first_index && !first_sample) {
+        if (current_index == first_index && !first_sample)
+        {
           first_index++;
           if (first_index >= o->NoOfSample)
             first_index = 0;
         }
 
         /* Store data in buffer */
-        if (ep->timebuffp) {
+        if (ep->timebuffp)
+        {
           time_GetTime(&time);
           BuffP = (char*)ep->timebuffp + current_index * ep->time_size;
-          if (ep->time_size == 8) {
+          if (ep->time_size == 8)
+          {
             unsigned int tv_sec = (unsigned int)time.tv_sec;
             unsigned int tv_nsec = (unsigned int)time.tv_nsec;
             memcpy(BuffP, &tv_sec, 4);
             memcpy(BuffP + 4, &tv_nsec, 4);
-          } else {
+          }
+          else
+          {
             unsigned int tv_sec = (unsigned int)time.tv_sec;
             memcpy(BuffP, &tv_sec, 4);
           }
@@ -702,8 +751,10 @@ static void StoreData(trend_tCtx ctx)
           ep->timeheadp->FirstIndex = first_index;
         }
 
-        for (i = 0; i < 10; i++) {
-          if (ep->datap[i]) {
+        for (i = 0; i < 10; i++)
+        {
+          if (ep->datap[i])
+          {
             BuffP = (char*)ep->buffp[i] + current_index * ep->data_size[i];
             memcpy(BuffP, ep->datap[i], ep->data_size[i]);
 

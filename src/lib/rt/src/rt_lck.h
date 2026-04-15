@@ -38,22 +38,22 @@
 #define rt_timesig_lock_h
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "rt_sect.h"
 
-typedef enum {
-  lck_eLock_NMps,
-  lck_eLock_Time,
-  lck_eLock_Str,
-  lck_eLock__
-} lck_eLock;
+  typedef enum
+  {
+    lck_eLock_NMps,
+    lck_eLock_Time,
+    lck_eLock_Str,
+    lck_eLock__
+  } lck_eLock;
 
-#define lck_Lock(lock)                                                         \
-  sect_Lock(NULL, lck_locksect[lock], (sect_sMutex*)lck_locksect[lock]->base);
-#define lck_Unlock(lock)                                                       \
-  sect_Unlock(NULL, lck_locksect[lock], (sect_sMutex*)lck_locksect[lock]->base);
+#define lck_Lock(lock) sect_Lock(NULL, lck_locksect[lock], (sect_sMutex*)lck_locksect[lock]->base);
+#define lck_Unlock(lock) sect_Unlock(NULL, lck_locksect[lock], (sect_sMutex*)lck_locksect[lock]->base);
 
 #define lck_LockNMps lck_Lock(lck_eLock_NMps)
 #define lck_UnlockNMps lck_Unlock(lck_eLock_NMps)
@@ -62,11 +62,11 @@ typedef enum {
 #define lck_LockStr lck_Lock(lck_eLock_Str)
 #define lck_UnlockStr lck_Unlock(lck_eLock_Str)
 
-extern sect_sHead* lck_locksect[lck_eLock__];
+  extern sect_sHead* lck_locksect[lck_eLock__];
 
-void lck_Create(pwr_tStatus* sts, lck_eLock lock);
-void lck_Delete(pwr_tStatus* sts, lck_eLock lock);
-void lck_Unlink(pwr_tStatus* sts, lck_eLock lock);
+  void lck_Create(pwr_tStatus* sts, lck_eLock lock);
+  void lck_Delete(pwr_tStatus* sts, lck_eLock lock);
+  void lck_Unlink(pwr_tStatus* sts, lck_eLock lock);
 
 #if defined __cplusplus
 }

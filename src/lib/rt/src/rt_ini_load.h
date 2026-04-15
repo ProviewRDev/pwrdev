@@ -42,18 +42,19 @@
 #include "rt_qini.h"
 #include "rt_proc.h"
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(ignoreWarning, 1), pwr_Bits(ignoreError, 1),
-      pwr_Bits(ignoreFatal, 1), pwr_Bits(verbose, 1), pwr_Bits(restart, 1),
-      pwr_Bits(stop, 1), pwr_Bits(daemonize, 1), pwr_Bits(fill_0, 1), ,
+  pwr_32Bits(pwr_Bits(ignoreWarning, 1), pwr_Bits(ignoreError, 1), pwr_Bits(ignoreFatal, 1),
+             pwr_Bits(verbose, 1), pwr_Bits(restart, 1), pwr_Bits(stop, 1), pwr_Bits(daemonize, 1),
+             pwr_Bits(fill_0, 1), ,
 
-      pwr_Bits(interactive, 1), pwr_Bits(busid, 1), pwr_Bits(hostname, 1),
-      pwr_Bits(nodename, 1), pwr_Bits(fill_1, 4), , , ,
+             pwr_Bits(interactive, 1), pwr_Bits(busid, 1), pwr_Bits(hostname, 1), pwr_Bits(nodename, 1),
+             pwr_Bits(fill_1, 4), , , ,
 
-      pwr_Bits(applfile, 1), pwr_Bits(aliasfile, 1), pwr_Bits(bootfile, 1),
-      pwr_Bits(plcfile, 1), pwr_Bits(nodefile, 1), pwr_Bits(rootvolume, 1),
-      pwr_Bits(fill_2, 2), , pwr_Bits(fill_3, 8), , , , , , ) b;
+             pwr_Bits(applfile, 1), pwr_Bits(aliasfile, 1), pwr_Bits(bootfile, 1), pwr_Bits(plcfile, 1),
+             pwr_Bits(nodefile, 1), pwr_Bits(rootvolume, 1), pwr_Bits(fill_2, 2), , pwr_Bits(fill_3, 8), , , ,
+             , , ) b;
 
 #define ini_mContext__ 0
 #define ini_mContext_ignoreWarning pwr_Bit(0)
@@ -79,17 +80,16 @@ typedef union {
 #define ini_mContext_ (~ini_mContext__)
 } ini_mContext;
 
-typedef union {
+typedef union
+{
   pwr_tBitMask m;
-  pwr_32Bits(pwr_Bits(neth, 1), pwr_Bits(qmon, 1), pwr_Bits(plc, 1),
-      pwr_Bits(fill_0, 5), , , , ,
+  pwr_32Bits(pwr_Bits(neth, 1), pwr_Bits(qmon, 1), pwr_Bits(plc, 1), pwr_Bits(fill_0, 5), , , , ,
 
-      pwr_Bits(run, 1), pwr_Bits(running, 1), pwr_Bits(reap, 1),
-      pwr_Bits(fill_1, 5), , , , ,
+             pwr_Bits(run, 1), pwr_Bits(running, 1), pwr_Bits(reap, 1), pwr_Bits(fill_1, 5), , , , ,
 
-      pwr_Bits(fill_2, 8), , , , , , , ,
+             pwr_Bits(fill_2, 8), , , , , , , ,
 
-      pwr_Bits(inited, 1), pwr_Bits(fill_3, 8), , , , , , ) b;
+             pwr_Bits(inited, 1), pwr_Bits(fill_3, 8), , , , , , ) b;
 
 #define ini_mProc__ 0
 #define ini_mProc_neth pwr_Bit(0)
@@ -105,13 +105,15 @@ typedef union {
 #define ini_mProc_ (~ini_mProc__)
 } ini_mProc;
 
-typedef struct {
+typedef struct
+{
   char name[256];
   int* errcount;
   void (*logOpenFail)(errh_sLog*, const char*, ...);
 } ini_sFile;
 
-typedef struct {
+typedef struct
+{
   tree_sNode t;
   lst_sEntry proc_ll;
   char id[40];
@@ -120,7 +122,8 @@ typedef struct {
   void* objectp;
 } ini_sProc;
 
-typedef struct {
+typedef struct
+{
   ini_mContext flags;
   char alias[80];
   char nodename[80];
@@ -174,15 +177,15 @@ pwr_tBoolean ini_CreateDb(pwr_tStatus*, ini_sContext*);
 pwr_tBoolean ini_DecodeBodies(pwr_tStatus*, ini_sContext*, pwr_tBoolean);
 pwr_tBoolean ini_FreeBodies(pwr_tStatus*, ini_sContext*, pwr_tBoolean);
 pwr_tBoolean ini_IterVolumes(pwr_tStatus*, ini_sContext*,
-    pwr_tBoolean (*func)(pwr_tStatus*, ini_sContext*, ivol_sVolume*));
+                             pwr_tBoolean (*func)(pwr_tStatus*, ini_sContext*, ivol_sVolume*));
 char* ini_LoadDirectory(pwr_tStatus*, ini_sContext*);
 pwr_tBoolean ini_LoadNode(pwr_tStatus*, ini_sContext*);
 pwr_tBoolean ini_LoadVolume(pwr_tStatus*, ini_sContext*, ivol_sVolume*);
 FILE* ini_OpenFile(pwr_tStatus*, ini_sContext*, ini_sFile*);
-ini_sProc* ini_ProcInsert(pwr_tStatus*, ini_sContext*, char*, char*, int, int,
-    char*, int, int, pwr_tCid, char*, void*);
+ini_sProc* ini_ProcInsert(pwr_tStatus*, ini_sContext*, char*, char*, int, int, char*, int, int, pwr_tCid,
+                          char*, void*);
 void ini_ProcIter(pwr_tStatus*, ini_sContext*, int, int,
-    void (*func)(pwr_tStatus*, ini_sContext*, ini_sProc*));
+                  void (*func)(pwr_tStatus*, ini_sContext*, ini_sProc*));
 void ini_ProcLoad(pwr_tStatus*, ini_sContext*, ini_sProc*);
 void ini_ProcStart(pwr_tStatus*, ini_sContext*, ini_sProc*);
 void ini_ProcPrio(pwr_tStatus*, ini_sContext*, ini_sProc*);

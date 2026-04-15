@@ -44,16 +44,18 @@
 
 class CnvCtx;
 
-class PwgFile {
-  public:
+class PwgFile
+{
+public:
   PwgFile(char* name, char* title, char* group);
   pwr_tFileName m_fname;
   char m_title[200];
   char m_group[200];
 };
 
-class CnvPwgToXtthelp {
-  public:
+class CnvPwgToXtthelp
+{
+public:
   CnvPwgToXtthelp(CnvCtx* cnv_ctx);
   int exec_file(char* fname);
   int exec_filelist(char* title);

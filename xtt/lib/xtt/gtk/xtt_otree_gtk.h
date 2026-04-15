@@ -43,11 +43,11 @@
 
 /* xtt_otree.h -- Object tree viewer */
 
-class XttOTreeGtk : public XttOTree {
+class XttOTreeGtk : public XttOTree
+{
 public:
-  XttOTreeGtk(GtkWidget* parent_wid, void* xn_parent_ctx, const char* title,
-      pwr_tAttrRef* xn_itemlist, int xn_item_cnt, unsigned int xn_options,
-      pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*));
+  XttOTreeGtk(GtkWidget* parent_wid, void* xn_parent_ctx, const char* title, pwr_tAttrRef* xn_itemlist,
+              int xn_item_cnt, unsigned int xn_options, pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*));
   virtual ~XttOTreeGtk();
 };
 

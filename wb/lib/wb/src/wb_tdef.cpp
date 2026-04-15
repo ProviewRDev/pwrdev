@@ -38,9 +38,7 @@
 #include "wb_tdef.h"
 #include "wb_tdrep.h"
 
-wb_tdef::wb_tdef() : wb_status(LDH__NOTYPE), m_tdrep(0)
-{
-}
+wb_tdef::wb_tdef() : wb_status(LDH__NOTYPE), m_tdrep(0) {}
 
 wb_tdef::wb_tdef(wb_tdrep* tdrep) : wb_status(LDH__SUCCESS), m_tdrep(tdrep)
 {
@@ -53,22 +51,28 @@ wb_tdef::wb_tdef(wb_tdrep* tdrep) : wb_status(LDH__SUCCESS), m_tdrep(tdrep)
 wb_tdef::wb_tdef(wb_adef& a)
 {
   const wb_adrep* adrep = a;
-  try {
+  try
+  {
     m_tdrep = new wb_tdrep(*adrep);
     m_tdrep->ref();
     m_sts = m_tdrep->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     m_sts = e.sts();
   }
 }
 
 wb_tdef::wb_tdef(wb_mvrep* mvrep, pwr_tTid tid)
 {
-  try {
+  try
+  {
     m_tdrep = new wb_tdrep(mvrep, tid);
     m_tdrep->ref();
     m_sts = m_tdrep->sts();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     m_sts = e.sts();
   }
 }

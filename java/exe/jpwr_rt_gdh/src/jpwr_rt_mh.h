@@ -5,7 +5,8 @@
 #ifndef _Included_jpwr_rt_Mh
 #define _Included_jpwr_rt_Mh
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 #undef jpwr_rt_Mh_mh_mEventFlags_Return
 #define jpwr_rt_Mh_mh_mEventFlags_Return 1L
@@ -63,81 +64,73 @@ extern "C" {
 #define jpwr_rt_Mh_mh_eEvent_Alarm 64L
 #undef jpwr_rt_Mh_mh_eEvent_
 #define jpwr_rt_Mh_mh_eEvent_ 65L
-/* Inaccessible static: lastMhrEvent */
-/* Inaccessible static: newAlarmArrived */
-/* Inaccessible static: newEventArrived */
-/* Inaccessible static: clearAlarmList */
-/* Inaccessible static: nrOfAlarmsArrived */
-/* Inaccessible static: maxNoOfAlarms */
-/* Inaccessible static: maxNoOfEvents */
-/* Inaccessible static: initDone */
-/* Inaccessible static: currentSystemGroup */
-/* Inaccessible static: currentUser */
-/* Inaccessible static: currentPassword */
-/* Inaccessible static: currentPrivilege */
-/*
- * Class:     jpwr_rt_Mh
- * Method:    initIDs
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_jpwr_rt_Mh_initIDs
-  (JNIEnv *, jclass);
+  /* Inaccessible static: lastMhrEvent */
+  /* Inaccessible static: newAlarmArrived */
+  /* Inaccessible static: newEventArrived */
+  /* Inaccessible static: clearAlarmList */
+  /* Inaccessible static: nrOfAlarmsArrived */
+  /* Inaccessible static: maxNoOfAlarms */
+  /* Inaccessible static: maxNoOfEvents */
+  /* Inaccessible static: initDone */
+  /* Inaccessible static: currentSystemGroup */
+  /* Inaccessible static: currentUser */
+  /* Inaccessible static: currentPassword */
+  /* Inaccessible static: currentPrivilege */
+  /*
+   * Class:     jpwr_rt_Mh
+   * Method:    initIDs
+   * Signature: ()V
+   */
+  JNIEXPORT void JNICALL Java_jpwr_rt_Mh_initIDs(JNIEnv*, jclass);
 
-/*
- * Class:     jpwr_rt_Mh
- * Method:    outunitAck
- * Signature: (Ljpwr/rt/MhrsEventId;)Ljpwr/rt/PwrtStatus;
- */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Mh_outunitAck
-  (JNIEnv *, jobject, jobject);
+  /*
+   * Class:     jpwr_rt_Mh
+   * Method:    outunitAck
+   * Signature: (Ljpwr/rt/MhrsEventId;)Ljpwr/rt/PwrtStatus;
+   */
+  JNIEXPORT jobject JNICALL Java_jpwr_rt_Mh_outunitAck(JNIEnv*, jobject, jobject);
 
-/*
- * Class:     jpwr_rt_Mh
- * Method:    outunitConnect
- * Signature: (Ljpwr/rt/PwrtObjid;)Ljpwr/rt/PwrtStatus;
- */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Mh_outunitConnect
-  (JNIEnv *, jobject, jobject);
+  /*
+   * Class:     jpwr_rt_Mh
+   * Method:    outunitConnect
+   * Signature: (Ljpwr/rt/PwrtObjid;)Ljpwr/rt/PwrtStatus;
+   */
+  JNIEXPORT jobject JNICALL Java_jpwr_rt_Mh_outunitConnect(JNIEnv*, jobject, jobject);
 
-/*
- * Class:     jpwr_rt_Mh
- * Method:    outunitDisConnect
- * Signature: ()Ljpwr/rt/PwrtStatus;
- */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Mh_outunitDisConnect
-  (JNIEnv *, jobject);
+  /*
+   * Class:     jpwr_rt_Mh
+   * Method:    outunitDisConnect
+   * Signature: ()Ljpwr/rt/PwrtStatus;
+   */
+  JNIEXPORT jobject JNICALL Java_jpwr_rt_Mh_outunitDisConnect(JNIEnv*, jobject);
 
-/*
- * Class:     jpwr_rt_Mh
- * Method:    outunitReceive
- * Signature: ()Ljpwr/rt/PwrtStatus;
- */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Mh_outunitReceive
-  (JNIEnv *, jobject);
+  /*
+   * Class:     jpwr_rt_Mh
+   * Method:    outunitReceive
+   * Signature: ()Ljpwr/rt/PwrtStatus;
+   */
+  JNIEXPORT jobject JNICALL Java_jpwr_rt_Mh_outunitReceive(JNIEnv*, jobject);
 
-/*
- * Class:     jpwr_rt_Mh
- * Method:    outunitUnBlock
- * Signature: (Ljpwr/rt/PwrtObjid;)Ljpwr/rt/PwrtStatus;
- */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Mh_outunitUnBlock
-  (JNIEnv *, jobject, jobject);
+  /*
+   * Class:     jpwr_rt_Mh
+   * Method:    outunitUnBlock
+   * Signature: (Ljpwr/rt/PwrtObjid;)Ljpwr/rt/PwrtStatus;
+   */
+  JNIEXPORT jobject JNICALL Java_jpwr_rt_Mh_outunitUnBlock(JNIEnv*, jobject, jobject);
 
-/*
- * Class:     jpwr_rt_Mh
- * Method:    outunitUpdate
- * Signature: ()Ljpwr/rt/PwrtStatus;
- */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Mh_outunitUpdate
-  (JNIEnv *, jobject);
+  /*
+   * Class:     jpwr_rt_Mh
+   * Method:    outunitUpdate
+   * Signature: ()Ljpwr/rt/PwrtStatus;
+   */
+  JNIEXPORT jobject JNICALL Java_jpwr_rt_Mh_outunitUpdate(JNIEnv*, jobject);
 
-/*
- * Class:     jpwr_rt_Mh
- * Method:    translateFilename
- * Signature: (Ljava/lang/String;)Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_jpwr_rt_Mh_translateFilename
-  (JNIEnv *, jclass, jstring);
+  /*
+   * Class:     jpwr_rt_Mh
+   * Method:    translateFilename
+   * Signature: (Ljava/lang/String;)Ljava/lang/String;
+   */
+  JNIEXPORT jstring JNICALL Java_jpwr_rt_Mh_translateFilename(JNIEnv*, jclass, jstring);
 
 #ifdef __cplusplus
 }

@@ -48,26 +48,28 @@
 
 #include "xtt_fast_qt.h"
 
-XttFastQt::XttFastQt(void* parent_ctx, char* name, QWidget** w,
-    pwr_sAttrRef* fast_arp, int width, int height, unsigned int options,
-    int xn_color_theme, void* basewidget, int* sts)
+XttFastQt::XttFastQt(void* parent_ctx, char* name, QWidget** w, pwr_sAttrRef* fast_arp, int width, int height,
+                     unsigned int options, int xn_color_theme, void* basewidget, int* sts)
     : XttFast(parent_ctx, name, fast_arp, xn_color_theme, sts)
 {
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     // Error from XttFast constructor
     return;
   }
   *sts = XNAV__SUCCESS;
 
   char title[250];
-  if (!streq(name, "")) {
+  if (!streq(name, ""))
+  {
     strncpy(title, name, sizeof(title));
-  } else {
+  }
+  else
+  {
     gdh_AttrrefToName(fast_arp, title, sizeof(title), cdh_mNName);
   }
 
-  curve = new GeCurveQt(this, title, NULL, gcd, 0, width, height, options,
-      color_theme, basewidget);
+  curve = new GeCurveQt(this, title, NULL, gcd, 0, width, height, options, color_theme, basewidget);
   curve->close_cb = fast_close_cb;
   curve->help_cb = fast_help_cb;
   curve->export_cb = fast_export_cb;
@@ -79,21 +81,21 @@ XttFastQt::XttFastQt(void* parent_ctx, char* name, QWidget** w,
   timerid->add(1000, fast_scan, this);
 }
 
-XttFastQt::XttFastQt(void* parent_ctx, const char* name,
-    QWidget** w, char* filename, int xn_color_theme, void* basewidget, int* sts)
+XttFastQt::XttFastQt(void* parent_ctx, const char* name, QWidget** w, char* filename, int xn_color_theme,
+                     void* basewidget, int* sts)
     : XttFast(parent_ctx, name, filename, xn_color_theme, sts)
 {
   char title[250];
   strncpy(title, filename, sizeof(title));
 
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     // Error from XttFast constructor
     return;
   }
   *sts = XNAV__SUCCESS;
 
-  curve = new GeCurveQt(this, title, NULL, gcd, 1, 0, 0, 0, color_theme,
-      basewidget);
+  curve = new GeCurveQt(this, title, NULL, gcd, 1, 0, 0, 0, color_theme, basewidget);
   curve->close_cb = fast_close_cb;
   curve->help_cb = fast_help_cb;
   curve->enable(0);
@@ -106,16 +108,20 @@ XttFastQt::XttFastQt(void* parent_ctx, const char* name,
 
 XttFastQt::~XttFastQt()
 {
-  if (timerid) {
+  if (timerid)
+  {
     timerid->remove();
   }
-  for (int i = 0; i < fast_cnt; i++) {
+  for (int i = 0; i < fast_cnt; i++)
+  {
     gdh_UnrefObjectInfo(new_subid);
   }
-  if (curve) {
+  if (curve)
+  {
     delete curve;
   }
-  if (gcd) {
+  if (gcd)
+  {
     delete gcd;
   }
   delete wow;

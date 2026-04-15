@@ -41,7 +41,8 @@
 #include "sev_db.h"
 #include <hdf5.h>
 
-typedef struct {
+typedef struct
+{
   int items_alloc;
   int objectitems_alloc;
   int objectitemattr_alloc;
@@ -52,7 +53,8 @@ typedef struct {
   int dum[3];
 } sev_sCmn;
 
-typedef struct {
+typedef struct
+{
   unsigned int data_size;
   int data_type;
   int first_idx;
@@ -61,7 +63,8 @@ typedef struct {
   unsigned last_time;
 } sev_sHeader;
 
-typedef struct {
+typedef struct
+{
   unsigned int time;
   unsigned int ntime;
   int eventtype;
@@ -73,7 +76,8 @@ typedef struct {
   char eventname[80];
 } sev_sEventDb;
 
-typedef struct {
+typedef struct
+{
   float current_load;
   float medium_load;
   float storage_rate;
@@ -84,7 +88,8 @@ typedef struct {
   unsigned int eventstore_msg_cnt;
 } sev_sStatDb;
 
-typedef enum {
+typedef enum
+{
   sev_eDataType_,
   sev_eDataType_Boolean,
   sev_eDataType_BooleanHt,
@@ -170,293 +175,342 @@ typedef enum {
   sev_eDataType_Unknown = 10001
 } sev_eDataType;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
 } sev_sDataType_Any;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tBoolean value;
 } sev_sDataType_Boolean;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tBoolean value;
 } sev_sDataType_BooleanHt;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tBoolean value;
 } sev_sDataType_BooleanDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tBoolean value;
 } sev_sDataType_BooleanHtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tInt8 value;
 } sev_sDataType_Int8;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tInt8 value;
 } sev_sDataType_Int8Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tInt8 value;
 } sev_sDataType_Int8Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tInt8 value;
 } sev_sDataType_Int8HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tInt16 value;
 } sev_sDataType_Int16;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tInt16 value;
 } sev_sDataType_Int16Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tInt16 value;
 } sev_sDataType_Int16Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tInt16 value;
 } sev_sDataType_Int16HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tInt32 value;
 } sev_sDataType_Int32;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tInt32 value;
 } sev_sDataType_Int32Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tInt32 value;
 } sev_sDataType_Int32Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tInt32 value;
 } sev_sDataType_Int32HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tInt64 value;
 } sev_sDataType_Int64;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tInt64 value;
 } sev_sDataType_Int64Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tInt64 value;
 } sev_sDataType_Int64Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tInt64 value;
 } sev_sDataType_Int64HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt8 value;
 } sev_sDataType_UInt8;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt8 value;
 } sev_sDataType_UInt8Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tUInt8 value;
 } sev_sDataType_UInt8Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tUInt8 value;
 } sev_sDataType_UInt8HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt16 value;
 } sev_sDataType_UInt16;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt16 value;
 } sev_sDataType_UInt16Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tUInt16 value;
 } sev_sDataType_UInt16Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tUInt16 value;
 } sev_sDataType_UInt16HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 value;
 } sev_sDataType_UInt32;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 value;
 } sev_sDataType_UInt32Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tUInt32 value;
 } sev_sDataType_UInt32Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tUInt32 value;
 } sev_sDataType_UInt32HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt64 value;
 } sev_sDataType_UInt64;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt64 value;
 } sev_sDataType_UInt64Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tUInt64 value;
 } sev_sDataType_UInt64Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tUInt64 value;
 } sev_sDataType_UInt64HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tFloat32 value;
 } sev_sDataType_Float32;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tFloat32 value;
 } sev_sDataType_Float32Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tFloat32 value;
 } sev_sDataType_Float32Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tFloat32 value;
 } sev_sDataType_Float32HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tFloat64 value;
 } sev_sDataType_Float64;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tFloat64 value;
 } sev_sDataType_Float64Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tFloat64 value;
 } sev_sDataType_Float64Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tFloat64 value;
 } sev_sDataType_Float64HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 value;
 } sev_sDataType_Time;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 value;
   pwr_tUInt32 nvalue;
 } sev_sDataType_TimeHt;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tUInt32 value;
 } sev_sDataType_TimeDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
@@ -464,25 +518,29 @@ typedef struct {
   pwr_tUInt32 nvalue;
 } sev_sDataType_TimeHtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tInt64 value;
 } sev_sDataType_DeltaTime;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tInt64 value;
   pwr_tInt64 nvalue;
 } sev_sDataType_DeltaTimeHt;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tInt64 value;
 } sev_sDataType_DeltaTimeDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
@@ -490,175 +548,204 @@ typedef struct {
   pwr_tInt64 nvalue;
 } sev_sDataType_DeltaTimeHtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tString8 value;
 } sev_sDataType_String8;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tString8 value;
 } sev_sDataType_String8Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tString8 value;
 } sev_sDataType_String8Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tString8 value;
 } sev_sDataType_String8HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tString16 value;
 } sev_sDataType_String16;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tString16 value;
 } sev_sDataType_String16Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tString16 value;
 } sev_sDataType_String16Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tString16 value;
 } sev_sDataType_String16HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tString32 value;
 } sev_sDataType_String32;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tString32 value;
 } sev_sDataType_String32Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tString32 value;
 } sev_sDataType_String32Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tString32 value;
 } sev_sDataType_String32HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tString40 value;
 } sev_sDataType_String40;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tString40 value;
 } sev_sDataType_String40Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tString40 value;
 } sev_sDataType_String40Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tString40 value;
 } sev_sDataType_String40HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tString80 value;
 } sev_sDataType_String80;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tString80 value;
 } sev_sDataType_String80Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tString80 value;
 } sev_sDataType_String80Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tString80 value;
 } sev_sDataType_String80HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tString132 value;
 } sev_sDataType_String132;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tString132 value;
 } sev_sDataType_String132Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tString132 value;
 } sev_sDataType_String132Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tString132 value;
 } sev_sDataType_String132HtDb;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tString256 value;
 } sev_sDataType_String256;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tString256 value;
 } sev_sDataType_String256Ht;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 jump;
   pwr_tString256 value;
 } sev_sDataType_String256Db;
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 time;
   pwr_tUInt32 ntime;
   pwr_tUInt32 jump;
   pwr_tString256 value;
 } sev_sDataType_String256HtDb;
 
-typedef union {
+typedef union
+{
   sev_sDataType_Any dtAny;
   sev_sDataType_Boolean dtBoolean;
   sev_sDataType_BooleanHt dtBooleanHt;
@@ -742,7 +829,8 @@ typedef union {
   sev_sDataType_String256HtDb dtString256HtDb;
 } sev_uDataType;
 
-class sev_dbhdf5 : public sev_db {
+class sev_dbhdf5 : public sev_db
+{
 public:
   static const unsigned int constMaxColNameLength = 64;
   static const unsigned int m_cItemsInitSize = 50;
@@ -766,86 +854,72 @@ public:
   ~sev_dbhdf5();
 
   int open_db();
-  int check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname,
-      pwr_tDeltaTime storagetime, pwr_eType type, unsigned int size,
-      char* description, char* unit, pwr_tFloat32 scantime,
-      pwr_tFloat32 deadband, pwr_tMask options, unsigned int* idx);
-  int add_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname,
-      pwr_tDeltaTime storagetime, pwr_eType type, unsigned int size,
-      char* description, char* unit, pwr_tFloat32 scantime,
-      pwr_tFloat32 deadband, pwr_tMask options, unsigned int* idx);
-  int store_value(pwr_tStatus* sts, void* thread, int item_idx, int attr_idx,
-      pwr_tTime time, void* buf, unsigned int size);
-  int get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
-      pwr_tMask options, float deadband, char* aname, pwr_eType type,
-      unsigned int size, pwr_tFloat32 scantime, pwr_tTime* creatime,
-      pwr_tTime* starttime, pwr_tTime* endtime, int maxsize, pwr_tTime** tbuf,
-      void** vbuf, unsigned int* bsize);
-  int delete_old_data(pwr_tStatus* sts, void* thread, char* tablename,
-      pwr_tMask options, pwr_tTime limit, pwr_tFloat32 scantime,
-      pwr_tFloat32 garbagecycle);
+  int check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname, pwr_tDeltaTime storagetime,
+                 pwr_eType type, unsigned int size, char* description, char* unit, pwr_tFloat32 scantime,
+                 pwr_tFloat32 deadband, pwr_tMask options, unsigned int* idx);
+  int add_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname, pwr_tDeltaTime storagetime,
+               pwr_eType type, unsigned int size, char* description, char* unit, pwr_tFloat32 scantime,
+               pwr_tFloat32 deadband, pwr_tMask options, unsigned int* idx);
+  int store_value(pwr_tStatus* sts, void* thread, int item_idx, int attr_idx, pwr_tTime time, void* buf,
+                  unsigned int size);
+  int get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid, pwr_tMask options, float deadband, char* aname,
+                 pwr_eType type, unsigned int size, pwr_tFloat32 scantime, pwr_tTime* creatime,
+                 pwr_tTime* starttime, pwr_tTime* endtime, int maxsize, pwr_tTime** tbuf, void** vbuf,
+                 unsigned int* bsize);
+  int delete_old_data(pwr_tStatus* sts, void* thread, char* tablename, pwr_tMask options, pwr_tTime limit,
+                      pwr_tFloat32 scantime, pwr_tFloat32 garbagecycle);
   int delete_item(pwr_tStatus* sts, pwr_tOid oid, char* aname);
 
   int get_items(pwr_tStatus* sts);
-  int store_item(pwr_tStatus* sts, char* tabelname, pwr_tOid oid, char* oname,
-      char* aname, pwr_tDeltaTime storagetime, pwr_eType vtype,
-      unsigned int vsize, char* description, char* unit, pwr_tFloat32 scantime,
-      pwr_tFloat32 deadband, pwr_tMask options, unsigned int* idx);
+  int store_item(pwr_tStatus* sts, char* tabelname, pwr_tOid oid, char* oname, char* aname,
+                 pwr_tDeltaTime storagetime, pwr_eType vtype, unsigned int vsize, char* description,
+                 char* unit, pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options,
+                 unsigned int* idx);
   int update_item(sev_item* item);
   int remove_item(pwr_tStatus* sts, pwr_tOid oid, char* aname);
   static sev_db* open_database();
   static char* oid_to_table(pwr_tOid oid, char* aname);
-  int check_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
-      char* oname, char* aname, pwr_tDeltaTime storagetime, char* description,
-      pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options,
-      unsigned int attrnum, sev_sHistAttr* attr, unsigned int* idx);
-  int add_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
-      char* oname, char* aname, pwr_tDeltaTime storagetime, char* description,
-      pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options,
-      unsigned int attrnum, sev_sHistAttr* attr, unsigned int* idx);
-  int store_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
-      char* oname, char* aname, pwr_tDeltaTime storagetime, char* description,
-      pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options,
-      unsigned int attrnum, sev_sHistAttr* attr, unsigned int* idx);
-  int create_objecttable(pwr_tStatus* sts, char* tablename, pwr_tMask options,
-      float deadband, pwr_tDeltaTime storage_time, pwr_tFloat32 scantime,
-      unsigned int attrnum, sev_sHistAttr* attr);
-  int store_objectvalue(pwr_tStatus* sts, int item_idx, int attr_idx,
-      pwr_tTime time, void* buf, void* oldbuf, unsigned int size);
-  int get_item(pwr_tStatus* sts, void* thread, sev_item* item, pwr_tOid oid,
-      char* attributename);
-  int get_item(
-      pwr_tStatus* sts, unsigned int* idx, pwr_tOid oid, char* attributename);
-  int get_objectitem(pwr_tStatus* sts, void* thread, sev_item* item,
-      pwr_tOid oid, char* attributename);
+  int check_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                       pwr_tDeltaTime storagetime, char* description, pwr_tFloat32 scantime,
+                       pwr_tFloat32 deadband, pwr_tMask options, unsigned int attrnum, sev_sHistAttr* attr,
+                       unsigned int* idx);
+  int add_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                     pwr_tDeltaTime storagetime, char* description, pwr_tFloat32 scantime,
+                     pwr_tFloat32 deadband, pwr_tMask options, unsigned int attrnum, sev_sHistAttr* attr,
+                     unsigned int* idx);
+  int store_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                       pwr_tDeltaTime storagetime, char* description, pwr_tFloat32 scantime,
+                       pwr_tFloat32 deadband, pwr_tMask options, unsigned int attrnum, sev_sHistAttr* attr,
+                       unsigned int* idx);
+  int create_objecttable(pwr_tStatus* sts, char* tablename, pwr_tMask options, float deadband,
+                         pwr_tDeltaTime storage_time, pwr_tFloat32 scantime, unsigned int attrnum,
+                         sev_sHistAttr* attr);
+  int store_objectvalue(pwr_tStatus* sts, int item_idx, int attr_idx, pwr_tTime time, void* buf, void* oldbuf,
+                        unsigned int size);
+  int get_item(pwr_tStatus* sts, void* thread, sev_item* item, pwr_tOid oid, char* attributename);
+  int get_item(pwr_tStatus* sts, unsigned int* idx, pwr_tOid oid, char* attributename);
+  int get_objectitem(pwr_tStatus* sts, void* thread, sev_item* item, pwr_tOid oid, char* attributename);
   int get_objectitems(pwr_tStatus* sts);
-  int get_objectitemattributes(
-      pwr_tStatus* sts, sev_item* item, char* tablename);
-  int check_objectitemattr(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
-      char* aname, char* oname, pwr_eType type, unsigned int size,
-      unsigned int* idx);
-  int delete_old_objectdata(pwr_tStatus* sts, void* thread, char* tablename,
-      pwr_tMask options, pwr_tTime limit, pwr_tFloat32 scantime,
-      pwr_tFloat32 garbagecycle);
-  int check_deadband(pwr_eType type, unsigned int size, pwr_tFloat32 deadband,
-      void* value, void* oldvalue);
-  int get_objectvalues(pwr_tStatus* sts, void* thread, sev_item* item,
-      unsigned int size, pwr_tTime* starttime, pwr_tTime* endtime, int maxsize,
-      pwr_tTime** tbuf, void** vbuf, unsigned int* bsize);
+  int get_objectitemattributes(pwr_tStatus* sts, sev_item* item, char* tablename);
+  int check_objectitemattr(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* aname, char* oname,
+                           pwr_eType type, unsigned int size, unsigned int* idx);
+  int delete_old_objectdata(pwr_tStatus* sts, void* thread, char* tablename, pwr_tMask options,
+                            pwr_tTime limit, pwr_tFloat32 scantime, pwr_tFloat32 garbagecycle);
+  int check_deadband(pwr_eType type, unsigned int size, pwr_tFloat32 deadband, void* value, void* oldvalue);
+  int get_objectvalues(pwr_tStatus* sts, void* thread, sev_item* item, unsigned int size,
+                       pwr_tTime* starttime, pwr_tTime* endtime, int maxsize, pwr_tTime** tbuf, void** vbuf,
+                       unsigned int* bsize);
   int delete_event_table(pwr_tStatus* sts, char* tablename);
   int create_event_table(pwr_tStatus* sts, char* tablename, pwr_tMask options,
 
-      pwr_tDeltaTime storage_time, pwr_tFloat32 scantime);
+                         pwr_tDeltaTime storage_time, pwr_tFloat32 scantime);
   int store_event(pwr_tStatus* sts, void* thread, int item_idx, sev_event* ep);
   int checkAndUpdateVersion(unsigned int version);
-  int create_table(pwr_tStatus* sts, char* tablename, pwr_eType type,
-      unsigned int size, pwr_tMask options, float deadband,
-      pwr_tDeltaTime storage_time, pwr_tFloat32 scantime);
+  int create_table(pwr_tStatus* sts, char* tablename, pwr_eType type, unsigned int size, pwr_tMask options,
+                   float deadband, pwr_tDeltaTime storage_time, pwr_tFloat32 scantime);
   int delete_table(pwr_tStatus* sts, char* tablename);
-  int handle_objectchange(
-      pwr_tStatus* sts, char* tablename, unsigned int item_idx, bool newObject);
-  int handle_itemchange(
-      pwr_tStatus* sts, char* tablename, unsigned int item_idx);
+  int handle_objectchange(pwr_tStatus* sts, char* tablename, unsigned int item_idx, bool newObject);
+  int handle_itemchange(pwr_tStatus* sts, char* tablename, unsigned int item_idx);
   int store_stat(sev_sStat* stat);
 
   int create_db(char* dbname);
@@ -855,19 +929,16 @@ public:
   int items_extend();
   int objectitems_extend();
   int objectitemattr_extend();
-  sev_eDataType get_datatype(
-      pwr_eType type, pwr_tMask options, unsigned int size);
+  sev_eDataType get_datatype(pwr_eType type, pwr_tMask options, unsigned int size);
   int get_mdatatype(sev_eDataType type, unsigned int size, hid_t* mtype);
   int get_fdatatype(sev_eDataType type, unsigned int size, hid_t* ftype);
   void free_mdatatype();
-  int time_to_idx(hid_t dataset_id, hid_t memspace_id, hid_t dataspace_id,
-      hid_t mtype, unsigned int stime, int size, int low_idx, int high_idx,
-      unsigned int low_time, unsigned int high_time, int resolution,
-      unsigned int prev_time, int* iter, int* ridx);
-  int get_time(hid_t dataset_id, hid_t memspace_id, hid_t dataspace_id,
-      hid_t mtype, int idx, unsigned int* time);
-  int get_objectitem_datatype(
-      int item_idx, hid_t* atype, unsigned int* size, int* value_offset);
+  int time_to_idx(hid_t dataset_id, hid_t memspace_id, hid_t dataspace_id, hid_t mtype, unsigned int stime,
+                  int size, int low_idx, int high_idx, unsigned int low_time, unsigned int high_time,
+                  int resolution, unsigned int prev_time, int* iter, int* ridx);
+  int get_time(hid_t dataset_id, hid_t memspace_id, hid_t dataspace_id, hid_t mtype, int idx,
+               unsigned int* time);
+  int get_objectitem_datatype(int item_idx, hid_t* atype, unsigned int* size, int* value_offset);
 };
 #endif
 #endif

@@ -39,7 +39,8 @@
 #include "wb_foe_msg.h"
 #include "wb_goenm4.h"
 
-typedef enum {
+typedef enum
+{
   goen_eGraphIndex_Step = 2,
   goen_eGraphIndex_InitStep = 3,
   goen_eGraphIndex_SubStep = 4,
@@ -87,28 +88,27 @@ static float f_strheight = GOEN_F_OBJNAME_STRHEIGHT;
 /*_Methods defined for this module_______________________________________*/
 
 /*************************************************************************
-*
-* Name:		goen_create_nodetype_m4()
-*
-* Type
-*
-* Type		Parameter	IOGF	Description
-*    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
-*    Widget	        widget			Neted widget
-*    unsigned long 	*mask			Mask for drawing inputs/outputs
-*    int		color			Highlight color
-*    Cursor		cursor			Hot cursor
-*    unsigned long      *node_type_id		Nodetypeid for created nodetype
-*
-* Description:
-*	Create a nodetype
-*
-**************************************************************************/
+ *
+ * Name:		goen_create_nodetype_m4()
+ *
+ * Type
+ *
+ * Type		Parameter	IOGF	Description
+ *    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
+ *    Widget	        widget			Neted widget
+ *    unsigned long 	*mask			Mask for drawing inputs/outputs
+ *    int		color			Highlight color
+ *    Cursor		cursor			Hot cursor
+ *    unsigned long      *node_type_id		Nodetypeid for created nodetype
+ *
+ * Description:
+ *	Create a nodetype
+ *
+ **************************************************************************/
 
-int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
-    ldh_tSesContext ldhses, flow_tCtx ctx, unsigned int* mask,
-    unsigned long subwindowmark, unsigned long node_width,
-    flow_tNodeClass* node_class, vldh_t_node node)
+int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid, ldh_tSesContext ldhses,
+                            flow_tCtx ctx, unsigned int* mask, unsigned long subwindowmark,
+                            unsigned long node_width, flow_tNodeClass* node_class, vldh_t_node node)
 {
   int graph_index;
   int annot_count;
@@ -131,11 +131,12 @@ int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 
   /* Get number of annotations and the width of the annotations */
   sts = WGre::get_annotations(node, (char*)annot_str, annot_nr, &annot_count,
-      sizeof(annot_str) / sizeof(annot_str[0]), sizeof(annot_str[0]));
+                              sizeof(annot_str) / sizeof(annot_str[0]), sizeof(annot_str[0]));
   if (EVEN(sts))
     return sts;
 
-  switch (graph_index) {
+  switch (graph_index)
+  {
   case goen_eGraphIndex_RedWarning:
   case goen_eGraphIndex_YellowWarning:
     flow_CreateNodeClass(ctx, name, flow_eNodeGroup_Safety, &nc);
@@ -144,183 +145,146 @@ int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
     flow_CreateNodeClass(ctx, name, flow_eNodeGroup_Common, &nc);
   }
 
-  switch (graph_index) {
-  case goen_eGraphIndex_Step: {
+  switch (graph_index)
+  {
+  case goen_eGraphIndex_Step:
+  {
     f_width = GOEN_F_GRID * 2.5;
     f_height = GOEN_F_GRID * 2.5;
 
-    flow_AddRect(nc, -f_width / 2, -f_height / 2, f_width, f_height,
-        flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
-    flow_AddLine(nc, 0, -f_height / 2 - f_pinlength, 0, -f_height / 2,
-        flow_eDrawType_Line, 2);
-    flow_AddConPoint(
-        nc, 0, -f_height / 2 - f_pinlength, 0, flow_eDirection_Down);
-    flow_AddLine(nc, f_width / 2, 0, f_width / 2 + f_pinlength, 0,
-        flow_eDrawType_Line, 2);
-    flow_AddConPoint(
-        nc, f_width / 2 + f_pinlength, 0, 1, flow_eDirection_Right);
-    flow_AddLine(nc, 0, f_height / 2, 0, f_height / 2 + f_pinlength,
-        flow_eDrawType_Line, 2);
+    flow_AddRect(nc, -f_width / 2, -f_height / 2, f_width, f_height, flow_eDrawType_Line, 2,
+                 flow_mDisplayLevel_1);
+    flow_AddLine(nc, 0, -f_height / 2 - f_pinlength, 0, -f_height / 2, flow_eDrawType_Line, 2);
+    flow_AddConPoint(nc, 0, -f_height / 2 - f_pinlength, 0, flow_eDirection_Down);
+    flow_AddLine(nc, f_width / 2, 0, f_width / 2 + f_pinlength, 0, flow_eDrawType_Line, 2);
+    flow_AddConPoint(nc, f_width / 2 + f_pinlength, 0, 1, flow_eDirection_Right);
+    flow_AddLine(nc, 0, f_height / 2, 0, f_height / 2 + f_pinlength, flow_eDrawType_Line, 2);
     flow_AddConPoint(nc, 0, f_height / 2 + f_pinlength, 2, flow_eDirection_Up);
-    flow_AddAnnot(nc, -f_width / 2 + f_strlength, 0, 0,
-        flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
-        flow_mDisplayLevel_1);
+    flow_AddAnnot(nc, -f_width / 2 + f_strlength, 0, 0, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
+                  flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
 
     /* Add execute order display */
-    flow_AddFilledRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase,
-        flow_mDisplayLevel_2);
-    flow_AddRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed,
-        1, flow_mDisplayLevel_2);
+    flow_AddFilledRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2, GOEN_DISPLAYNODEWIDTH,
+                       GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase, flow_mDisplayLevel_2);
+    flow_AddRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2, GOEN_DISPLAYNODEWIDTH,
+                 GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed, 1, flow_mDisplayLevel_2);
     flow_AddAnnot(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH + f_strlength,
-        (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_height / 2,
-        GOEN_DISPLAYNODE_ANNOT, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
-        flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
+                  (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_height / 2, GOEN_DISPLAYNODE_ANNOT,
+                  flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
     break;
   }
-  case goen_eGraphIndex_InitStep: {
+  case goen_eGraphIndex_InitStep:
+  {
     float f_delta = GOEN_F_GRID / 4;
 
     f_width = GOEN_F_GRID * 2.5;
     f_height = GOEN_F_GRID * 2.5;
-    flow_AddRect(nc, -f_width / 2, -f_height / 2, f_width, f_height,
-        flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
-    flow_AddRect(nc, -f_width / 2 + f_delta, -f_height / 2 + f_delta,
-        f_width - 2 * f_delta, f_height - 2 * f_delta, flow_eDrawType_Line, 1,
-        flow_mDisplayLevel_1);
-    flow_AddLine(nc, 0, -f_height / 2 - f_pinlength, 0, -f_height / 2,
-        flow_eDrawType_Line, 2);
-    flow_AddConPoint(
-        nc, 0, -f_height / 2 - f_pinlength, 0, flow_eDirection_Down);
-    flow_AddLine(nc, f_width / 2, 0, f_width / 2 + f_pinlength, 0,
-        flow_eDrawType_Line, 2);
-    flow_AddConPoint(
-        nc, f_width / 2 + f_pinlength, 0, 1, flow_eDirection_Right);
-    flow_AddLine(nc, 0, f_height / 2, 0, f_height / 2 + f_pinlength,
-        flow_eDrawType_Line, 2);
+    flow_AddRect(nc, -f_width / 2, -f_height / 2, f_width, f_height, flow_eDrawType_Line, 2,
+                 flow_mDisplayLevel_1);
+    flow_AddRect(nc, -f_width / 2 + f_delta, -f_height / 2 + f_delta, f_width - 2 * f_delta,
+                 f_height - 2 * f_delta, flow_eDrawType_Line, 1, flow_mDisplayLevel_1);
+    flow_AddLine(nc, 0, -f_height / 2 - f_pinlength, 0, -f_height / 2, flow_eDrawType_Line, 2);
+    flow_AddConPoint(nc, 0, -f_height / 2 - f_pinlength, 0, flow_eDirection_Down);
+    flow_AddLine(nc, f_width / 2, 0, f_width / 2 + f_pinlength, 0, flow_eDrawType_Line, 2);
+    flow_AddConPoint(nc, f_width / 2 + f_pinlength, 0, 1, flow_eDirection_Right);
+    flow_AddLine(nc, 0, f_height / 2, 0, f_height / 2 + f_pinlength, flow_eDrawType_Line, 2);
     flow_AddConPoint(nc, 0, f_height / 2 + f_pinlength, 2, flow_eDirection_Up);
-    flow_AddAnnot(nc, -f_width / 2 + f_strlength, 0, 0,
-        flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
-        flow_mDisplayLevel_1);
+    flow_AddAnnot(nc, -f_width / 2 + f_strlength, 0, 0, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
+                  flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
     /* Add execute order display */
-    flow_AddFilledRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase,
-        flow_mDisplayLevel_2);
-    flow_AddRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed,
-        1, flow_mDisplayLevel_2);
+    flow_AddFilledRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2, GOEN_DISPLAYNODEWIDTH,
+                       GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase, flow_mDisplayLevel_2);
+    flow_AddRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2, GOEN_DISPLAYNODEWIDTH,
+                 GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed, 1, flow_mDisplayLevel_2);
     flow_AddAnnot(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH + f_strlength,
-        (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_height / 2,
-        GOEN_DISPLAYNODE_ANNOT, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
-        flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
+                  (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_height / 2, GOEN_DISPLAYNODE_ANNOT,
+                  flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
     break;
   }
-  case goen_eGraphIndex_SubStep: {
+  case goen_eGraphIndex_SubStep:
+  {
     float f_delta = GOEN_F_GRID / 4;
 
     f_width = GOEN_F_GRID * 2.5;
     f_height = GOEN_F_GRID * 2.5;
     if (subwindowmark & 1)
-      flow_AddLine(nc, -f_width / 2, -f_height / 2 + f_delta, f_width / 2,
-          -f_height / 2 + f_delta, flow_eDrawType_LineGray, 6);
+      flow_AddLine(nc, -f_width / 2, -f_height / 2 + f_delta, f_width / 2, -f_height / 2 + f_delta,
+                   flow_eDrawType_LineGray, 6);
     else
-      flow_AddLine(nc, -f_width / 2, -f_height / 2 + f_delta, f_width / 2,
-          -f_height / 2 + f_delta, flow_eDrawType_Line, 6);
-    flow_AddRect(nc, -f_width / 2, -f_height / 2, f_width, f_height,
-        flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
+      flow_AddLine(nc, -f_width / 2, -f_height / 2 + f_delta, f_width / 2, -f_height / 2 + f_delta,
+                   flow_eDrawType_Line, 6);
+    flow_AddRect(nc, -f_width / 2, -f_height / 2, f_width, f_height, flow_eDrawType_Line, 2,
+                 flow_mDisplayLevel_1);
 
-    flow_AddLine(nc, 0, -f_height / 2 - f_pinlength, 0, -f_height / 2,
-        flow_eDrawType_Line, 2);
-    flow_AddConPoint(
-        nc, 0, -f_height / 2 - f_pinlength, 0, flow_eDirection_Down);
-    flow_AddLine(nc, f_width / 2, 0, f_width / 2 + f_pinlength, 0,
-        flow_eDrawType_Line, 2);
-    flow_AddConPoint(
-        nc, f_width / 2 + f_pinlength, 0, 1, flow_eDirection_Right);
-    flow_AddLine(nc, 0, f_height / 2, 0, f_height / 2 + f_pinlength,
-        flow_eDrawType_Line, 2);
+    flow_AddLine(nc, 0, -f_height / 2 - f_pinlength, 0, -f_height / 2, flow_eDrawType_Line, 2);
+    flow_AddConPoint(nc, 0, -f_height / 2 - f_pinlength, 0, flow_eDirection_Down);
+    flow_AddLine(nc, f_width / 2, 0, f_width / 2 + f_pinlength, 0, flow_eDrawType_Line, 2);
+    flow_AddConPoint(nc, f_width / 2 + f_pinlength, 0, 1, flow_eDirection_Right);
+    flow_AddLine(nc, 0, f_height / 2, 0, f_height / 2 + f_pinlength, flow_eDrawType_Line, 2);
     flow_AddConPoint(nc, 0, f_height / 2 + f_pinlength, 2, flow_eDirection_Up);
-    flow_AddAnnot(nc, -f_width / 2 + f_strlength, 0, 0,
-        flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
-        flow_mDisplayLevel_1);
+    flow_AddAnnot(nc, -f_width / 2 + f_strlength, 0, 0, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
+                  flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
     /* Add execute order display */
-    flow_AddFilledRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase,
-        flow_mDisplayLevel_2);
-    flow_AddRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed,
-        1, flow_mDisplayLevel_2);
+    flow_AddFilledRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2, GOEN_DISPLAYNODEWIDTH,
+                       GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase, flow_mDisplayLevel_2);
+    flow_AddRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2, GOEN_DISPLAYNODEWIDTH,
+                 GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed, 1, flow_mDisplayLevel_2);
     flow_AddAnnot(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH + f_strlength,
-        (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_height / 2,
-        GOEN_DISPLAYNODE_ANNOT, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
-        flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
+                  (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_height / 2, GOEN_DISPLAYNODE_ANNOT,
+                  flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
     break;
   }
-  case goen_eGraphIndex_SSEnd: {
+  case goen_eGraphIndex_SSEnd:
+  {
     f_width = GOEN_F_GRID * 2.5;
     f_height = GOEN_F_GRID * 2.5;
-    flow_AddRect(nc, -f_width / 2, -f_height / 2, f_width, f_height,
-        flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
-    flow_AddLine(nc, 0, -f_height / 2 - f_pinlength, 0, -f_height / 2,
-        flow_eDrawType_Line, 2);
-    flow_AddConPoint(
-        nc, 0, -f_height / 2 - f_pinlength, 0, flow_eDirection_Down);
-    flow_AddLine(nc, f_width / 2, 0, f_width / 2 + f_pinlength, 0,
-        flow_eDrawType_Line, 2);
-    flow_AddConPoint(
-        nc, f_width / 2 + f_pinlength, 0, 1, flow_eDirection_Right);
-    flow_AddAnnot(nc, -f_width / 2 + f_strlength, 0, 0,
-        flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
-        flow_mDisplayLevel_1);
+    flow_AddRect(nc, -f_width / 2, -f_height / 2, f_width, f_height, flow_eDrawType_Line, 2,
+                 flow_mDisplayLevel_1);
+    flow_AddLine(nc, 0, -f_height / 2 - f_pinlength, 0, -f_height / 2, flow_eDrawType_Line, 2);
+    flow_AddConPoint(nc, 0, -f_height / 2 - f_pinlength, 0, flow_eDirection_Down);
+    flow_AddLine(nc, f_width / 2, 0, f_width / 2 + f_pinlength, 0, flow_eDrawType_Line, 2);
+    flow_AddConPoint(nc, f_width / 2 + f_pinlength, 0, 1, flow_eDirection_Right);
+    flow_AddAnnot(nc, -f_width / 2 + f_strlength, 0, 0, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
+                  flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
     /* Add execute order display */
-    flow_AddFilledRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase,
-        flow_mDisplayLevel_2);
-    flow_AddRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed,
-        1, flow_mDisplayLevel_2);
+    flow_AddFilledRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2, GOEN_DISPLAYNODEWIDTH,
+                       GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase, flow_mDisplayLevel_2);
+    flow_AddRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2, GOEN_DISPLAYNODEWIDTH,
+                 GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed, 1, flow_mDisplayLevel_2);
     flow_AddAnnot(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH + f_strlength,
-        (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_height / 2,
-        GOEN_DISPLAYNODE_ANNOT, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
-        flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
+                  (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_height / 2, GOEN_DISPLAYNODE_ANNOT,
+                  flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
     break;
   }
-  case goen_eGraphIndex_SSBegin: {
+  case goen_eGraphIndex_SSBegin:
+  {
     f_width = GOEN_F_GRID * 2.5;
     f_height = GOEN_F_GRID * 2.5;
-    flow_AddRect(nc, -f_width / 2, -f_height / 2, f_width, f_height,
-        flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
-    flow_AddLine(nc, f_width / 2, 0, f_width / 2 + f_pinlength, 0,
-        flow_eDrawType_Line, 2);
-    flow_AddConPoint(
-        nc, f_width / 2 + f_pinlength, 0, 0, flow_eDirection_Right);
-    flow_AddLine(nc, 0, f_height / 2, 0, f_height / 2 + f_pinlength,
-        flow_eDrawType_Line, 2);
+    flow_AddRect(nc, -f_width / 2, -f_height / 2, f_width, f_height, flow_eDrawType_Line, 2,
+                 flow_mDisplayLevel_1);
+    flow_AddLine(nc, f_width / 2, 0, f_width / 2 + f_pinlength, 0, flow_eDrawType_Line, 2);
+    flow_AddConPoint(nc, f_width / 2 + f_pinlength, 0, 0, flow_eDirection_Right);
+    flow_AddLine(nc, 0, f_height / 2, 0, f_height / 2 + f_pinlength, flow_eDrawType_Line, 2);
     flow_AddConPoint(nc, 0, f_height / 2 + f_pinlength, 1, flow_eDirection_Up);
-    flow_AddAnnot(nc, -f_width / 2 + f_strlength, 0, 0,
-        flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
-        flow_mDisplayLevel_1);
+    flow_AddAnnot(nc, -f_width / 2 + f_strlength, 0, 0, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
+                  flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
     /* Add execute order display */
-    flow_AddFilledRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase,
-        flow_mDisplayLevel_2);
-    flow_AddRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed,
-        1, flow_mDisplayLevel_2);
+    flow_AddFilledRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2, GOEN_DISPLAYNODEWIDTH,
+                       GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase, flow_mDisplayLevel_2);
+    flow_AddRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, -f_height / 2, GOEN_DISPLAYNODEWIDTH,
+                 GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed, 1, flow_mDisplayLevel_2);
     flow_AddAnnot(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH + f_strlength,
-        (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_height / 2,
-        GOEN_DISPLAYNODE_ANNOT, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
-        flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
+                  (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_height / 2, GOEN_DISPLAYNODE_ANNOT,
+                  flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
     break;
   }
-  case goen_eGraphIndex_Trans: {
+  case goen_eGraphIndex_Trans:
+  {
     float f_delta = GOEN_F_GRID / 5;
 
     f_width = GOEN_F_GRID * 1.6;
     if (subwindowmark & 1)
-      flow_AddLine(nc, -f_width / 2, f_delta, f_width / 2, f_delta,
-          flow_eDrawType_LineGray, 6);
+      flow_AddLine(nc, -f_width / 2, f_delta, f_width / 2, f_delta, flow_eDrawType_LineGray, 6);
 
     flow_AddLine(nc, -f_width / 2, 0, f_width / 2, 0, flow_eDrawType_Line, 4);
     flow_AddLine(nc, 0, -f_pinlength, 0, 0, flow_eDrawType_Line, 2);
@@ -328,99 +292,79 @@ int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
     flow_AddLine(nc, 0, 0, 0, f_pinlength, flow_eDrawType_Line, 2);
     flow_AddConPoint(nc, 0, f_pinlength, 2, flow_eDirection_Up);
     flow_AddConPoint(nc, -f_width / 2, 0, 1, flow_eDirection_Left);
-    flow_AddAnnot(nc, f_strlength, -f_strheight / 2, 0,
-        flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
-        flow_mDisplayLevel_1);
+    flow_AddAnnot(nc, f_strlength, -f_strheight / 2, 0, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
+                  flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
     /* Add execute order display */
-    flow_AddFilledRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, 0,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase,
-        flow_mDisplayLevel_2);
-    flow_AddRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, 0,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed,
-        1, flow_mDisplayLevel_2);
+    flow_AddFilledRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, 0, GOEN_DISPLAYNODEWIDTH,
+                       GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase, flow_mDisplayLevel_2);
+    flow_AddRect(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH, 0, GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT,
+                 flow_eDrawType_LineRed, 1, flow_mDisplayLevel_2);
     flow_AddAnnot(nc, f_width / 2 - GOEN_DISPLAYNODEWIDTH + f_strlength,
-        (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0, GOEN_DISPLAYNODE_ANNOT,
-        flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
-        flow_mDisplayLevel_2);
+                  (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0, GOEN_DISPLAYNODE_ANNOT,
+                  flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
     break;
   }
-  case goen_eGraphIndex_Point: {
+  case goen_eGraphIndex_Point:
+  {
     float f_radius = GOEN_F_GRID / 5;
 
-    flow_AddArc(nc, -f_radius / 2, -f_radius / 2, f_radius / 2, f_radius / 2, 0,
-        360, flow_eDrawType_Line, 2);
+    flow_AddArc(nc, -f_radius / 2, -f_radius / 2, f_radius / 2, f_radius / 2, 0, 360, flow_eDrawType_Line, 2);
     flow_AddConPoint(nc, 0, 0, 0, flow_eDirection_Center);
     break;
   }
-  case goen_eGraphIndex_OrderAct: {
+  case goen_eGraphIndex_OrderAct:
+  {
     f_width = GOEN_F_GRID * 4;
     f_height = GOEN_F_GRID;
 
-    flow_AddRect(nc, 0, -f_height / 2, f_width, f_height, flow_eDrawType_Line,
-        2, flow_mDisplayLevel_1);
-    flow_AddLine(
-        nc, f_width, 0, f_width + f_pinlength, 0, flow_eDrawType_Line, 2);
+    flow_AddRect(nc, 0, -f_height / 2, f_width, f_height, flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
+    flow_AddLine(nc, f_width, 0, f_width + f_pinlength, 0, flow_eDrawType_Line, 2);
     flow_AddConPoint(nc, f_width + f_pinlength, 0, 0, flow_eDirection_Right);
-    flow_AddText(nc, "OrderAct", f_strlength, 0.5 * f_strheight,
-        flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+    flow_AddText(nc, "OrderAct", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     break;
   }
-  case goen_eGraphIndex_SetCond: {
+  case goen_eGraphIndex_SetCond:
+  {
     f_width = GOEN_F_GRID * 4;
     f_height = GOEN_F_GRID;
 
-    flow_AddRect(nc, 0, -f_height / 2, f_width, f_height, flow_eDrawType_Line,
-        2, flow_mDisplayLevel_1);
+    flow_AddRect(nc, 0, -f_height / 2, f_width, f_height, flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
     flow_AddLine(nc, -f_pinlength, 0, 0, 0, flow_eDrawType_Line, 2);
     flow_AddConPoint(nc, -f_pinlength, 0, 0, flow_eDirection_Left);
-    flow_AddText(nc, "SetCond", f_strlength, 0.5 * f_strheight,
-        flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+    flow_AddText(nc, "SetCond", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
 
     /* Add execute order display */
-    flow_AddFilledRect(nc, f_width - GOEN_DISPLAYNODEWIDTH, -f_height / 2,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase,
-        flow_mDisplayLevel_2);
-    flow_AddRect(nc, f_width - GOEN_DISPLAYNODEWIDTH, -f_height / 2,
-        GOEN_DISPLAYNODEWIDTH, GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed,
-        1, flow_mDisplayLevel_2);
+    flow_AddFilledRect(nc, f_width - GOEN_DISPLAYNODEWIDTH, -f_height / 2, GOEN_DISPLAYNODEWIDTH,
+                       GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineErase, flow_mDisplayLevel_2);
+    flow_AddRect(nc, f_width - GOEN_DISPLAYNODEWIDTH, -f_height / 2, GOEN_DISPLAYNODEWIDTH,
+                 GOEN_DISPLAYNODEHEIGHT, flow_eDrawType_LineRed, 1, flow_mDisplayLevel_2);
     flow_AddAnnot(nc, f_width - GOEN_DISPLAYNODEWIDTH + f_strlength,
-        (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_height / 2,
-        GOEN_DISPLAYNODE_ANNOT, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
-        flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
+                  (GOEN_DISPLAYNODEHEIGHT + f_strheight) / 2.0 - f_height / 2, GOEN_DISPLAYNODE_ANNOT,
+                  flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, flow_mDisplayLevel_2);
     break;
   }
-  case goen_eGraphIndex_ShowPlcAttr: {
+  case goen_eGraphIndex_ShowPlcAttr:
+  {
     float f_yoffs = GOEN_F_GRID / 2;
     float f_repeat = GOEN_F_GRID;
     f_width = GOEN_F_GRID * 9;
     f_height = GOEN_F_GRID * 3;
 
-    flow_AddRect(nc, 0, -f_yoffs, f_width, f_height, flow_eDrawType_Line, 2,
-        flow_mDisplayLevel_1);
-    flow_AddLine(nc, 0, f_repeat - f_yoffs, f_width, f_repeat - f_yoffs,
-        flow_eDrawType_Line, 2);
-    flow_AddLine(nc, 0, f_repeat * 2 - f_yoffs, f_width, f_repeat * 2 - f_yoffs,
-        flow_eDrawType_Line, 2);
-    flow_AddAnnot(nc, f_repeat * 2.7, f_repeat - f_strheight * 0.25 - f_yoffs,
-        0, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE,
-        flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
-    flow_AddAnnot(nc, f_repeat * 2.7,
-        f_repeat * 2 - f_strheight * 0.25 - f_yoffs, 1,
-        flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
-        flow_mDisplayLevel_1);
-    flow_AddAnnot(nc, f_repeat * 2.7,
-        f_repeat * 3 - f_strheight * 0.25 - f_yoffs, 2,
-        flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine,
-        flow_mDisplayLevel_1);
-    flow_AddText(nc, "Volume", f_strlength / 3,
-        f_repeat - f_strheight * 0.3 - f_yoffs, flow_eDrawType_TextRoboto,
-        1);
-    flow_AddText(nc, "ScanTime", f_strlength / 3,
-        f_repeat * 2 - f_strheight * 0.3 - f_yoffs,
-        flow_eDrawType_TextRoboto, 1);
-    flow_AddText(nc, "Reset", f_strlength / 3,
-        f_repeat * 3 - f_strheight * 0.3 - f_yoffs,
-        flow_eDrawType_TextRoboto, 1);
+    flow_AddRect(nc, 0, -f_yoffs, f_width, f_height, flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
+    flow_AddLine(nc, 0, f_repeat - f_yoffs, f_width, f_repeat - f_yoffs, flow_eDrawType_Line, 2);
+    flow_AddLine(nc, 0, f_repeat * 2 - f_yoffs, f_width, f_repeat * 2 - f_yoffs, flow_eDrawType_Line, 2);
+    flow_AddAnnot(nc, f_repeat * 2.7, f_repeat - f_strheight * 0.25 - f_yoffs, 0, flow_eDrawType_TextRoboto,
+                  GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
+    flow_AddAnnot(nc, f_repeat * 2.7, f_repeat * 2 - f_strheight * 0.25 - f_yoffs, 1,
+                  flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
+    flow_AddAnnot(nc, f_repeat * 2.7, f_repeat * 3 - f_strheight * 0.25 - f_yoffs, 2,
+                  flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE, flow_eAnnotType_OneLine, flow_mDisplayLevel_1);
+    flow_AddText(nc, "Volume", f_strlength / 3, f_repeat - f_strheight * 0.3 - f_yoffs,
+                 flow_eDrawType_TextRoboto, 1);
+    flow_AddText(nc, "ScanTime", f_strlength / 3, f_repeat * 2 - f_strheight * 0.3 - f_yoffs,
+                 flow_eDrawType_TextRoboto, 1);
+    flow_AddText(nc, "Reset", f_strlength / 3, f_repeat * 3 - f_strheight * 0.3 - f_yoffs,
+                 flow_eDrawType_TextRoboto, 1);
     break;
   }
   case goen_eGraphIndex_GetAgeneric:
@@ -428,33 +372,26 @@ int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   case goen_eGraphIndex_GetSgeneric:
   case goen_eGraphIndex_GetIgeneric:
   case goen_eGraphIndex_GetATgeneric:
-  case goen_eGraphIndex_GetDTgeneric: {
+  case goen_eGraphIndex_GetDTgeneric:
+  {
     f_width = GOEN_F_GRID * 4;
     f_height = GOEN_F_GRID;
 
-    flow_AddRect(nc, 0, -f_height / 2, f_width, f_height, flow_eDrawType_Line,
-        2, flow_mDisplayLevel_1);
-    flow_AddLine(
-        nc, f_width, 0, f_width + f_pinlength, 0, flow_eDrawType_Line, 2);
+    flow_AddRect(nc, 0, -f_height / 2, f_width, f_height, flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
+    flow_AddLine(nc, f_width, 0, f_width + f_pinlength, 0, flow_eDrawType_Line, 2);
     flow_AddConPoint(nc, f_width + f_pinlength, 0, 0, flow_eDirection_Right);
     if (graph_index == goen_eGraphIndex_GetAgeneric)
-      flow_AddText(nc, "GetA", f_strlength, 0.5 * f_strheight,
-          flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+      flow_AddText(nc, "GetA", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     else if (graph_index == goen_eGraphIndex_GetSgeneric)
-      flow_AddText(nc, "GetS", f_strlength, 0.5 * f_strheight,
-          flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+      flow_AddText(nc, "GetS", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     else if (graph_index == goen_eGraphIndex_GetIgeneric)
-      flow_AddText(nc, "GetI", f_strlength, 0.5 * f_strheight,
-          flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+      flow_AddText(nc, "GetI", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     else if (graph_index == goen_eGraphIndex_GetATgeneric)
-      flow_AddText(nc, "GetAT", f_strlength, 0.5 * f_strheight,
-          flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+      flow_AddText(nc, "GetAT", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     else if (graph_index == goen_eGraphIndex_GetDTgeneric)
-      flow_AddText(nc, "GetDT", f_strlength, 0.5 * f_strheight,
-          flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+      flow_AddText(nc, "GetDT", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     else
-      flow_AddText(nc, "GetD", f_strlength, 0.5 * f_strheight,
-          flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+      flow_AddText(nc, "GetD", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     break;
   }
   case goen_eGraphIndex_StoAgeneric:
@@ -462,32 +399,26 @@ int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   case goen_eGraphIndex_StoSgeneric:
   case goen_eGraphIndex_StoIgeneric:
   case goen_eGraphIndex_StoATgeneric:
-  case goen_eGraphIndex_StoDTgeneric: {
+  case goen_eGraphIndex_StoDTgeneric:
+  {
     f_width = GOEN_F_GRID * 4;
     f_height = GOEN_F_GRID;
 
-    flow_AddRect(nc, 0, -f_height / 2, f_width, f_height, flow_eDrawType_Line,
-        2, flow_mDisplayLevel_1);
+    flow_AddRect(nc, 0, -f_height / 2, f_width, f_height, flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
     flow_AddLine(nc, -f_pinlength, 0, 0, 0, flow_eDrawType_Line, 2);
     flow_AddConPoint(nc, -f_pinlength, 0, 0, flow_eDirection_Left);
     if (graph_index == goen_eGraphIndex_StoAgeneric)
-      flow_AddText(nc, "StoA", f_strlength, 0.5 * f_strheight,
-          flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+      flow_AddText(nc, "StoA", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     else if (graph_index == goen_eGraphIndex_StoSgeneric)
-      flow_AddText(nc, "StoS", f_strlength, 0.5 * f_strheight,
-          flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+      flow_AddText(nc, "StoS", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     else if (graph_index == goen_eGraphIndex_StoIgeneric)
-      flow_AddText(nc, "StoI", f_strlength, 0.5 * f_strheight,
-          flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+      flow_AddText(nc, "StoI", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     else if (graph_index == goen_eGraphIndex_StoATgeneric)
-      flow_AddText(nc, "StoAT", f_strlength, 0.5 * f_strheight,
-          flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+      flow_AddText(nc, "StoAT", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     else if (graph_index == goen_eGraphIndex_StoDTgeneric)
-      flow_AddText(nc, "StoDT", f_strlength, 0.5 * f_strheight,
-          flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+      flow_AddText(nc, "StoDT", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     else
-      flow_AddText(nc, "StoD", f_strlength, 0.5 * f_strheight,
-          flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+      flow_AddText(nc, "StoD", f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     break;
   }
   case goen_eGraphIndex_FirstScan:
@@ -496,11 +427,13 @@ int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
   case goen_eGraphIndex_False:
   case goen_eGraphIndex_DataQCurrentData:
   case goen_eGraphIndex_DataQCurrentIdx:
-  case goen_eGraphIndex_DataQCurrentBus: {
+  case goen_eGraphIndex_DataQCurrentBus:
+  {
     char text[80];
     int w = 0;
 
-    switch (graph_index) {
+    switch (graph_index)
+    {
     case goen_eGraphIndex_FirstScan:
       w = 4;
       strcpy(text, "FirstScan");
@@ -535,17 +468,15 @@ int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
     f_width = GOEN_F_GRID * w;
     f_height = GOEN_F_GRID;
 
-    flow_AddRect(nc, 0, -f_height / 2, f_width, f_height, flow_eDrawType_Line,
-        2, flow_mDisplayLevel_1);
-    flow_AddLine(
-        nc, f_width, 0, f_width + f_pinlength, 0, flow_eDrawType_Line, 2);
+    flow_AddRect(nc, 0, -f_height / 2, f_width, f_height, flow_eDrawType_Line, 2, flow_mDisplayLevel_1);
+    flow_AddLine(nc, f_width, 0, f_width + f_pinlength, 0, flow_eDrawType_Line, 2);
     flow_AddConPoint(nc, f_width + f_pinlength, 0, 0, flow_eDirection_Right);
-    flow_AddText(nc, text, f_strlength, 0.5 * f_strheight,
-        flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
+    flow_AddText(nc, text, f_strlength, 0.5 * f_strheight, flow_eDrawType_TextRoboto, GOEN_F_TEXTSIZE);
     break;
   }
   case goen_eGraphIndex_RedWarning:
-  case goen_eGraphIndex_YellowWarning: {
+  case goen_eGraphIndex_YellowWarning:
+  {
     flow_eDrawType draw_type;
 
     f_width = GOEN_F_GRID * 2;
@@ -556,10 +487,8 @@ int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
     else
       draw_type = flow_eDrawType_Yellow;
 
-    flow_AddFilledTriangle(nc, 0, GOEN_F_GRID / 2, f_width, f_height, draw_type,
-        flow_mDisplayLevel_1);
-    flow_AddTriangle(nc, 0, GOEN_F_GRID / 2, f_width, f_height,
-        flow_eDrawType_Line, 1, flow_mDisplayLevel_1);
+    flow_AddFilledTriangle(nc, 0, GOEN_F_GRID / 2, f_width, f_height, draw_type, flow_mDisplayLevel_1);
+    flow_AddTriangle(nc, 0, GOEN_F_GRID / 2, f_width, f_height, flow_eDrawType_Line, 1, flow_mDisplayLevel_1);
 
     break;
   }
@@ -569,25 +498,25 @@ int goen_create_nodetype_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 }
 
 /*************************************************************************
-*
-* Name:		goen_get_point_info()
-*
-* Type
-*
-* Type		Parameter	IOGF	Description
-*    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
-*    unsigned long	point			Connection point nr
-*    unsigned long 	*mask			Mask for drawing inputs/outputs
-*    goen_conpoint_type	*info_pointer		Pointer to calculated data
-*
-* Description:
-*	Calculates relativ koordinates for a connectionpoint and investigates
-*	the connectionpoint type.
-*
-**************************************************************************/
-int goen_get_point_info_m4(WGre* grectx, pwr_sGraphPlcNode* graphbody,
-    unsigned long point, unsigned int* mask, unsigned long node_width,
-    goen_conpoint_type* info_pointer, vldh_t_node node)
+ *
+ * Name:		goen_get_point_info()
+ *
+ * Type
+ *
+ * Type		Parameter	IOGF	Description
+ *    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
+ *    unsigned long	point			Connection point nr
+ *    unsigned long 	*mask			Mask for drawing inputs/outputs
+ *    goen_conpoint_type	*info_pointer		Pointer to calculated data
+ *
+ * Description:
+ *	Calculates relativ koordinates for a connectionpoint and investigates
+ *	the connectionpoint type.
+ *
+ **************************************************************************/
+int goen_get_point_info_m4(WGre* grectx, pwr_sGraphPlcNode* graphbody, unsigned long point,
+                           unsigned int* mask, unsigned long node_width, goen_conpoint_type* info_pointer,
+                           vldh_t_node node)
 {
   info_pointer->x = 0;
   info_pointer->y = 0;
@@ -596,25 +525,24 @@ int goen_get_point_info_m4(WGre* grectx, pwr_sGraphPlcNode* graphbody,
 }
 
 /*************************************************************************
-*
-* Name:		goen_get_parameter_m4()
-*
-* Type
-*
-* Type		Parameter	IOGF	Description
-*    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
-*    unsigned long	point			Connection point nr
-*    unsigned long 	*mask			Mask for drawing inputs/outputs
-*    unsigned long	*par_type		Input or output parameter
-*
-* Description:
-*	Gets pointer to parameterdata for connectionpoint.
-*
-**************************************************************************/
-int goen_get_parameter_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
-    ldh_tSesContext ldhses, unsigned long con_point, unsigned int* mask,
-    unsigned long* par_type, unsigned long* par_inverted,
-    unsigned long* par_index)
+ *
+ * Name:		goen_get_parameter_m4()
+ *
+ * Type
+ *
+ * Type		Parameter	IOGF	Description
+ *    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
+ *    unsigned long	point			Connection point nr
+ *    unsigned long 	*mask			Mask for drawing inputs/outputs
+ *    unsigned long	*par_type		Input or output parameter
+ *
+ * Description:
+ *	Gets pointer to parameterdata for connectionpoint.
+ *
+ **************************************************************************/
+int goen_get_parameter_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid, ldh_tSesContext ldhses,
+                          unsigned long con_point, unsigned int* mask, unsigned long* par_type,
+                          unsigned long* par_inverted, unsigned long* par_index)
 {
   ldh_sParDef* bodydef;
   int rows;
@@ -624,7 +552,8 @@ int goen_get_parameter_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 
   /* Get the runtime paramters for this class */
   sts = ldh_GetObjectBodyDef(ldhses, cid, "RtBody", 1, &bodydef, &rows);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     /* This object contains only a devbody */
     sts = ldh_GetObjectBodyDef(ldhses, cid, "DevBody", 1, &bodydef, &rows);
     if (EVEN(sts))
@@ -637,8 +566,10 @@ int goen_get_parameter_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 
   input_found = 0;
   output_found = 0;
-  for (i = 0; i < (int)inputs; i++) {
-    if (bodydef[i].Par->Input.Graph.ConPointNr == con_point) {
+  for (i = 0; i < (int)inputs; i++)
+  {
+    if (bodydef[i].Par->Input.Graph.ConPointNr == con_point)
+    {
       *par_type = PAR_INPUT;
       *par_index = i;
       *par_inverted = GOEN_NOT_INVERTED;
@@ -646,9 +577,12 @@ int goen_get_parameter_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
       break;
     }
   }
-  if (input_found == 0) {
-    for (i = inputs + interns; i < int(inputs + interns + outputs); i++) {
-      if (bodydef[i].Par->Output.Graph.ConPointNr == con_point) {
+  if (input_found == 0)
+  {
+    for (i = inputs + interns; i < int(inputs + interns + outputs); i++)
+    {
+      if (bodydef[i].Par->Output.Graph.ConPointNr == con_point)
+      {
         *par_type = PAR_OUTPUT;
         *par_index = i;
         *par_inverted = GOEN_NOT_INVERTED;
@@ -666,22 +600,21 @@ int goen_get_parameter_m4(pwr_sGraphPlcNode* graphbody, pwr_tClassId cid,
 }
 
 /*************************************************************************
-*
-* Name:		goen_get_location_point_m4()
-*
-* Type
-*
-* Type		Parameter	IOGF	Description
-*    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
-*    goen_point_type	*info_pointer		Locationpoint
-*
-* Description:
-*	Calculates kooridates for locationpoint relativ geomtrical center.
-*
-**************************************************************************/
-int goen_get_location_point_m4(WGre* grectx, pwr_sGraphPlcNode* graphbody,
-    unsigned int* mask, unsigned long node_width, goen_point_type* info_pointer,
-    vldh_t_node node)
+ *
+ * Name:		goen_get_location_point_m4()
+ *
+ * Type
+ *
+ * Type		Parameter	IOGF	Description
+ *    pwr_sGraphPlcNode	*graphbody	Pointer to objecttype data
+ *    goen_point_type	*info_pointer		Locationpoint
+ *
+ * Description:
+ *	Calculates kooridates for locationpoint relativ geomtrical center.
+ *
+ **************************************************************************/
+int goen_get_location_point_m4(WGre* grectx, pwr_sGraphPlcNode* graphbody, unsigned int* mask,
+                               unsigned long node_width, goen_point_type* info_pointer, vldh_t_node node)
 {
   return GOEN__SUCCESS;
 }

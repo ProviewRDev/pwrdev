@@ -72,7 +72,8 @@ main(int argc, char* argv[])
   if (!qcom_CreateQ(&sts, &qid, NULL))
     exit(sts);
 
-  for (i = 1; i < max; i++) {
+  for (i = 1; i < max; i++)
+  {
     for (j = 0; j < 500; j++)
       ++data[j];
     sp = qcom_Alloc(&sts, sizeof(data));
@@ -90,11 +91,13 @@ main(int argc, char* argv[])
     tmo = 10 + (i % 3) * 3000;
     sp = qcom_Request(&sts, &loop, &put, &qid, &get, tmo);
 
-    if (sp == NULL) {
+    if (sp == NULL)
+    {
       printf("\n%d tmo: %d empty buffer\n", i, tmo);
       continue;
     }
-    for (j = 0; j < 500; j++) {
+    for (j = 0; j < 500; j++)
+    {
       if (data[j] != *(int*)sp)
         break;
       sp += sizeof(int);

@@ -41,7 +41,8 @@
 
 #define qmon_cMsgClassAction 205
 
-typedef enum {
+typedef enum
+{
   qmon_eMsgTypeAction_NodeActive,
   qmon_eMsgTypeAction_NodePassive,
   qmon_eMsgTypeAction_Connect,

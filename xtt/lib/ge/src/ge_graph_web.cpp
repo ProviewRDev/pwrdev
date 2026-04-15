@@ -57,7 +57,8 @@
 #include "wb_trv.h"
 #endif
 
-typedef enum {
+typedef enum
+{
   graph_eWebTarget_RightFrame = 0,
   graph_eWebTarget_ParentWindow = 1,
   graph_eWebTarget_SeparateWindow = 2
@@ -102,14 +103,13 @@ int Graph::generate_web(ldh_tSesContext ldhses, pwr_tOid opplaceweb_oid)
   pwr_tOName opplaceweb_name;
 
   // Get OpPlaceWeb data
-  sts = ldh_ObjidToName(ldhses, opplaceweb_oid, ldh_eName_Hierarchy,
-      opplaceweb_name, sizeof(opplaceweb_name), &size);
+  sts = ldh_ObjidToName(ldhses, opplaceweb_oid, ldh_eName_Hierarchy, opplaceweb_name, sizeof(opplaceweb_name),
+                        &size);
   if (EVEN(sts))
     return sts;
 
   // Attribute FileName
-  sts = ldh_GetObjectPar(
-      ldhses, opplaceweb_oid, "RtBody", "FileName", &value_p, &size);
+  sts = ldh_GetObjectPar(ldhses, opplaceweb_oid, "RtBody", "FileName", &value_p, &size);
   if (EVEN(sts))
     return sts;
   if (streq(value_p, ""))
@@ -119,32 +119,28 @@ int Graph::generate_web(ldh_tSesContext ldhses, pwr_tOid opplaceweb_oid)
   free(value_p);
 
   // Attribute Title
-  sts = ldh_GetObjectPar(
-      ldhses, opplaceweb_oid, "RtBody", "Title", &value_p, &size);
+  sts = ldh_GetObjectPar(ldhses, opplaceweb_oid, "RtBody", "Title", &value_p, &size);
   if (EVEN(sts))
     return sts;
   strcpy(title, value_p);
   free(value_p);
 
   // Attribute Text
-  sts = ldh_GetObjectPar(
-      ldhses, opplaceweb_oid, "RtBody", "Text", &value_p, &size);
+  sts = ldh_GetObjectPar(ldhses, opplaceweb_oid, "RtBody", "Text", &value_p, &size);
   if (EVEN(sts))
     return sts;
   strcpy(text, value_p);
   free(value_p);
 
   // Attribute StyleSheet
-  sts = ldh_GetObjectPar(
-      ldhses, opplaceweb_oid, "RtBody", "StyleSheet", &value_p, &size);
+  sts = ldh_GetObjectPar(ldhses, opplaceweb_oid, "RtBody", "StyleSheet", &value_p, &size);
   if (EVEN(sts))
     return sts;
   strcpy(style_sheet, value_p);
   free(value_p);
 
   // Attribute StartURL
-  sts = ldh_GetObjectPar(
-      ldhses, opplaceweb_oid, "RtBody", "StartURL", &value_p, &size);
+  sts = ldh_GetObjectPar(ldhses, opplaceweb_oid, "RtBody", "StartURL", &value_p, &size);
   if (EVEN(sts))
     return sts;
   strcpy(start_URL, value_p);
@@ -202,7 +198,8 @@ int Graph::generate_web_help()
 
   // If $pwrp_load/xtt_help.dat exist convert this to html
   sts = dcli_search_file(pwr_cNameProjectXttHelp, fname, DCLI_DIR_SEARCH_INIT);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     system("co_convert -d $pwrp_web -t " pwr_cNameProjectXttHelp);
   }
   sts = dcli_search_file(pwr_cNameProjectXttHelp, fname, DCLI_DIR_SEARCH_END);

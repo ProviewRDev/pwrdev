@@ -43,14 +43,11 @@
 void Sim_SigGen_exec(plc_sThread* tp, pwr_sClass_Sim_SigGen* plc_obj);
 void Sim_Integrator_exec(plc_sThread* tp, pwr_sClass_Sim_Integrator* plc_obj);
 void Sim_LagFilter_exec(plc_sThread* tp, pwr_sClass_Sim_LagFilter* plc_obj);
-void Sim_LeadLagFilter_exec(
-    plc_sThread* tp, pwr_sClass_Sim_LeadLagFilter* plc_obj);
+void Sim_LeadLagFilter_exec(plc_sThread* tp, pwr_sClass_Sim_LeadLagFilter* plc_obj);
 void Sim_SouFilter_exec(plc_sThread* tp, pwr_sClass_Sim_SouFilter* plc_obj);
-void Sim_SouTOoFilter_exec(
-    plc_sThread* tp, pwr_sClass_Sim_SouTOoFilter* plc_obj);
+void Sim_SouTOoFilter_exec(plc_sThread* tp, pwr_sClass_Sim_SouTOoFilter* plc_obj);
 void Sim_Delay_exec(plc_sThread* tp, pwr_sClass_Sim_Delay* plc_obj);
-void Sim_SlewRateLimiter_exec(
-    plc_sThread* tp, pwr_sClass_Sim_SlewRateLimiter* plc_obj);
+void Sim_SlewRateLimiter_exec(plc_sThread* tp, pwr_sClass_Sim_SlewRateLimiter* plc_obj);
 void Sim_SignalGeneratorFo_init(pwr_sClass_Sim_SignalGeneratorFo* o);
 void Sim_SignalGeneratorFo_exec(plc_sThread* tp, pwr_sClass_Sim_SignalGeneratorFo* o);
 void Sim_CylinderTankFo_init(pwr_sClass_Sim_CylinderTankFo* o);

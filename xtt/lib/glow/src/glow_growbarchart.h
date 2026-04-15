@@ -54,7 +54,8 @@
   events when the
   object is clicked on, moved etc.
 */
-class GrowBarChart : public GrowRect {
+class GrowBarChart : public GrowRect
+{
 public:
   //! Constuctor
   /*!
@@ -68,11 +69,9 @@ public:
     \param line_w	Linewidth of border.
     \param nodraw	Don't draw the object now.
   */
-  GrowBarChart(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0,
-      double w = 0, double h = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      int display_border = 1, int display_shadow = 0,
-      glow_eDrawType fill_d_type = glow_eDrawType_Line, int nodraw = 0);
+  GrowBarChart(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0, double w = 0, double h = 0,
+               glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1, int display_border = 1,
+               int display_shadow = 0, glow_eDrawType fill_d_type = glow_eDrawType_Line, int nodraw = 0);
 
   //! Destructor
   /*! Remove the object from context, and erase it from the screen.
@@ -140,21 +139,18 @@ public:
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowBarChart;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowBarChart; }
 
-  int bars; //!< Number of bars.
-  int barsegments; //!< Number of bar parts.
-  double min_value; //!< Range mininum value
-  double max_value; //!< Range maximum value
-  int vertical_lines; //!< Number of vertical lines
-  int horizontal_lines; //!< Number of horizontal lines
-  glow_eDrawType line_color; //!< Color of vertical and horizontal lines
-  glow_eDrawType bar_color[BARCHART_MAX_BARSEGMENTS]; //!< Bar color.
+  int bars;                                                      //!< Number of bars.
+  int barsegments;                                               //!< Number of bar parts.
+  double min_value;                                              //!< Range mininum value
+  double max_value;                                              //!< Range maximum value
+  int vertical_lines;                                            //!< Number of vertical lines
+  int horizontal_lines;                                          //!< Number of horizontal lines
+  glow_eDrawType line_color;                                     //!< Color of vertical and horizontal lines
+  glow_eDrawType bar_color[BARCHART_MAX_BARSEGMENTS];            //!< Bar color.
   float bar_values[BARCHART_MAX_BARSEGMENTS][BARCHART_MAX_BARS]; //!< Bar size
-  GlowTraceData trace; //!< Obsolete
+  GlowTraceData trace;                                           //!< Obsolete
 
   //! Draw the object.
   /*!
@@ -170,8 +166,8 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();
@@ -184,14 +180,12 @@ public:
   */
   void align(double x, double y, glow_eAlignDirection direction);
 
-  void set_conf(int bar_num, int barsegment_num, double min_val, double max_val,
-      int vert_lines, int horiz_lines, glow_eDrawType lcolor,
-      glow_eDrawType* color);
+  void set_conf(int bar_num, int barsegment_num, double min_val, double max_val, int vert_lines,
+                int horiz_lines, glow_eDrawType lcolor, glow_eDrawType* color);
   void get_conf(int* bars, int* barsegments, double* min_val, double* max_val);
-  void set_values(float* values1, float* values2, float* values3,
-      float* values4, float* values5, float* values6, float* values7,
-      float* values8, float* values9, float* values10, float* values11,
-      float* values12);
+  void set_values(float* values1, float* values2, float* values3, float* values4, float* values5,
+                  float* values6, float* values7, float* values8, float* values9, float* values10,
+                  float* values11, float* values12);
 
   //! Export the object as a javabean.
   /*!
@@ -209,12 +203,12 @@ public:
     used to generate
     java code for the bean.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ofstream& fp);
 
   //! Set configuration values for the barchart.
-  void set_conf(double max_val, double min_val, int no_of_lines, int long_quot,
-      int value_quot, double rot, const char* format);
+  void set_conf(double max_val, double min_val, int no_of_lines, int long_quot, int value_quot, double rot,
+                const char* format);
 
   //! Conversion between different versions of Glow
   /*!

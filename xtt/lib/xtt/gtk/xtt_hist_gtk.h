@@ -43,10 +43,11 @@
 
 #include "xtt_hist.h"
 
-class HistGtk : public Hist {
+class HistGtk : public Hist
+{
 public:
-  HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid, char* hist_name,
-      pwr_tAttrRef* arp, pwr_tStatus* status);
+  HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid, char* hist_name, pwr_tAttrRef* arp,
+          pwr_tStatus* status);
   ~HistGtk();
 
   GtkWidget* parent_wid;
@@ -83,13 +84,11 @@ public:
   GtkWidget* search_vbox;
 
   void set_num_of_events(int nrOfEvents);
-  void set_search_string(
-      const char* s1, const char* s2, const char* s3, const char* s4);
+  void set_search_string(const char* s1, const char* s2, const char* s3, const char* s4);
   void SetListTime(pwr_tTime StartTime, pwr_tTime StopTime, int Sensitive);
   void insert_eventname(const char* name);
 
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_print(GtkWidget* w, gpointer data);
   static void activate_export(GtkWidget* w, gpointer data);
@@ -117,16 +116,15 @@ public:
 // Dummy for other platforms then OS_LINUX
 #include "xtt_hist.h"
 
-class HistGtk : public Hist {
+class HistGtk : public Hist
+{
 public:
-  HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid, char* hist_name,
-      pwr_tAttrRef* arp, pwr_tStatus* status)
+  HistGtk(void* hist_parent_ctx, GtkWidget* hist_parent_wid, char* hist_name, pwr_tAttrRef* arp,
+          pwr_tStatus* status)
       : Hist(hist_parent_ctx, hist_name, arp, status)
   {
   }
-  ~HistGtk()
-  {
-  }
+  ~HistGtk() {}
 };
 
 #endif

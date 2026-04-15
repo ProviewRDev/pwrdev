@@ -42,12 +42,11 @@
 
 #include "wb_bckwnav_qt.h"
 
-WbBckWNavQt::WbBckWNavQt(void* l_parent_ctx, ldh_tSession l_ldhses,
-    wb_bck_list* l_list, int l_editmode, QWidget** w)
+WbBckWNavQt::WbBckWNavQt(void* l_parent_ctx, ldh_tSession l_ldhses, wb_bck_list* l_list, int l_editmode,
+                         QWidget** w)
     : WbBckWNav(l_parent_ctx, l_ldhses, l_list, l_editmode)
 {
-  form_widget
-      = scrolledbrowwidgetqt_new(WbBckWNav::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetqt_new(WbBckWNav::init_brow_cb, this, &brow_widget);
 
   // Create the root item
   *w = form_widget;
@@ -59,7 +58,4 @@ WbBckWNavQt::~WbBckWNavQt()
   form_widget->close();
 }
 
-void WbBckWNavQt::set_input_focus()
-{
-  brow_widget->setFocus();
-}
+void WbBckWNavQt::set_input_focus() { brow_widget->setFocus(); }

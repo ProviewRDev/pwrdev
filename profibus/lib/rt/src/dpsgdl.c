@@ -71,10 +71,8 @@ LOCAL_DATA
 #if defined(WIN32) || defined(_WIN32) || defined(WIN16) || defined(_WIN16)
 #pragma check_stack(off)
 #endif
-FUNCTION PUBLIC INT16 dpsgdl_get_data_len(IN INT16 result, IN USIGN8 service,
-                                          IN USIGN8 primitive,
-                                          IN USIGN8 FAR* data_ptr,
-                                          OUT INT16 FAR* data_len_ptr)
+FUNCTION PUBLIC INT16 dpsgdl_get_data_len(IN INT16 result, IN USIGN8 service, IN USIGN8 primitive,
+                                          IN USIGN8 FAR* data_ptr, OUT INT16 FAR* data_len_ptr)
 /*------------------------------------------------------------------------*/
 /* FUNCTIONAL_DESCRIPTION                                                 */
 /*------------------------------------------------------------------------*/
@@ -90,7 +88,7 @@ FUNCTION PUBLIC INT16 dpsgdl_get_data_len(IN INT16 result, IN USIGN8 service,
 
   switch (primitive)
   {
-  /*--- USER REQUESTS ----------------------------------------------------*/
+    /*--- USER REQUESTS ----------------------------------------------------*/
 
   case REQ:
   {
@@ -100,21 +98,18 @@ FUNCTION PUBLIC INT16 dpsgdl_get_data_len(IN INT16 result, IN USIGN8 service,
     {
       init_slave_req_ptr = (T_DPS_INIT_SLAVE_REQ FAR*)data_ptr;
 
-      if ((init_slave_req_ptr->cfg_data_len == 0) ||
-          (init_slave_req_ptr->cfg_data_len > DP_MAX_CFG_DATA_LEN))
+      if ((init_slave_req_ptr->cfg_data_len == 0) || (init_slave_req_ptr->cfg_data_len > DP_MAX_CFG_DATA_LEN))
       {
         return (E_IF_INVALID_DATA_SIZE);
       }
 
-      if (init_slave_req_ptr->enhanced_init_data_len >
-          sizeof(init_slave_req_ptr->enhanced_init_data))
+      if (init_slave_req_ptr->enhanced_init_data_len > sizeof(init_slave_req_ptr->enhanced_init_data))
       {
         return (E_IF_INVALID_DATA_SIZE);
       }
 
-      *data_len_ptr = sizeof(T_DPS_INIT_SLAVE_REQ) -
-                      (sizeof(init_slave_req_ptr->enhanced_init_data) -
-                       init_slave_req_ptr->enhanced_init_data_len);
+      *data_len_ptr = sizeof(T_DPS_INIT_SLAVE_REQ) - (sizeof(init_slave_req_ptr->enhanced_init_data) -
+                                                      init_slave_req_ptr->enhanced_init_data_len);
       break;
     } /* case DPS_INIT_SLAVE */
 
@@ -132,8 +127,7 @@ FUNCTION PUBLIC INT16 dpsgdl_get_data_len(IN INT16 result, IN USIGN8 service,
       }
 
       *data_len_ptr =
-          sizeof(T_DPS_SLAVE_DIAG_REQ) -
-          (DP_MAX_EXT_DIAG_DATA_LEN - slave_diag_req_ptr->ext_diag_data_len);
+          sizeof(T_DPS_SLAVE_DIAG_REQ) - (DP_MAX_EXT_DIAG_DATA_LEN - slave_diag_req_ptr->ext_diag_data_len);
       break;
     }
 
@@ -154,7 +148,7 @@ FUNCTION PUBLIC INT16 dpsgdl_get_data_len(IN INT16 result, IN USIGN8 service,
     break;
   } /* case REQ */
 
-  /*---- USER RESPONSES --------------------------------------------------*/
+    /*---- USER RESPONSES --------------------------------------------------*/
 
   case RES:
   {
@@ -175,7 +169,7 @@ FUNCTION PUBLIC INT16 dpsgdl_get_data_len(IN INT16 result, IN USIGN8 service,
     break;
   } /* case RES */
 
-  /*---- WRONG PRIMITIVE -------------------------------------------------*/
+    /*---- WRONG PRIMITIVE -------------------------------------------------*/
 
   default:
     return (E_IF_INVALID_PRIMITIVE);

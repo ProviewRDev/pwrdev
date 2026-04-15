@@ -74,10 +74,13 @@ void write_most()
   definition* def;
   version_list* vp;
 
-  for (l = defined; l != NULL; l = l->next) {
+  for (l = defined; l != NULL; l = l->next)
+  {
     def = (definition*)l->val;
-    if (def->def_kind == DEF_PROGRAM) {
-      for (vp = def->def.pr.versions; vp != NULL; vp = vp->next) {
+    if (def->def_kind == DEF_PROGRAM)
+    {
+      for (vp = def->def.pr.versions; vp != NULL; vp = vp->next)
+      {
         f_print(fout, "\nstatic void ");
         pvname(def->def_name, vp->vers_num);
         f_print(fout, "();");
@@ -92,14 +95,16 @@ void write_most()
 #ifdef WIN32
   f_print(fout, "#ifdef WIN32\n\trpc_nt_init();\n#endif\n\n");
 #endif
-  for (l = defined; l != NULL; l = l->next) {
+  for (l = defined; l != NULL; l = l->next)
+  {
     def = (definition*)l->val;
-    if (def->def_kind != DEF_PROGRAM) {
+    if (def->def_kind != DEF_PROGRAM)
+    {
       continue;
     }
-    for (vp = def->def.pr.versions; vp != NULL; vp = vp->next) {
-      f_print(
-          fout, "\t(void)pmap_unset(%s, %s);\n", def->def_name, vp->vers_name);
+    for (vp = def->def.pr.versions; vp != NULL; vp = vp->next)
+    {
+      f_print(fout, "\t(void)pmap_unset(%s, %s);\n", def->def_name, vp->vers_name);
     }
   }
 }
@@ -115,32 +120,35 @@ void write_register(char* transp)
 
   f_print(fout, "\n");
   f_print(fout, "\t%s = svc%s_create(RPC_ANYSOCK", TRANSP, transp);
-  if (streq(transp, "tcp")) {
+  if (streq(transp, "tcp"))
+  {
     f_print(fout, ", 0, 0");
   }
   f_print(fout, ");\n");
   f_print(fout, "\tif (%s == NULL) {\n", TRANSP);
-  f_print(fout,
-      "\t\t(void)fprintf(stderr, \"cannot create %s service.\\n\");\n", transp);
+  f_print(fout, "\t\t(void)fprintf(stderr, \"cannot create %s service.\\n\");\n", transp);
 #ifdef WIN32
   f_print(fout, "#ifdef WIN32\n\t\trpc_nt_exit();\n#endif\n");
 #endif
   f_print(fout, "\t\texit(1);\n");
   f_print(fout, "\t}\n");
 
-  for (l = defined; l != NULL; l = l->next) {
+  for (l = defined; l != NULL; l = l->next)
+  {
     def = (definition*)l->val;
-    if (def->def_kind != DEF_PROGRAM) {
+    if (def->def_kind != DEF_PROGRAM)
+    {
       continue;
     }
-    for (vp = def->def.pr.versions; vp != NULL; vp = vp->next) {
-      f_print(fout, "\tif (!svc_register(%s, %s, %s, ", TRANSP, def->def_name,
-          vp->vers_name);
+    for (vp = def->def.pr.versions; vp != NULL; vp = vp->next)
+    {
+      f_print(fout, "\tif (!svc_register(%s, %s, %s, ", TRANSP, def->def_name, vp->vers_name);
       pvname(def->def_name, vp->vers_num);
       f_print(fout, ", IPPROTO_%s)) {\n", streq(transp, "udp") ? "UDP" : "TCP");
-      f_print(fout, "\t\t(void)fprintf(stderr, \"unable to register (%s, %s, "
-                    "%s).\\n\");\n",
-          def->def_name, vp->vers_name, transp);
+      f_print(fout,
+              "\t\t(void)fprintf(stderr, \"unable to register (%s, %s, "
+              "%s).\\n\");\n",
+              def->def_name, vp->vers_name, transp);
 #ifdef WIN32
       f_print(fout, "#ifdef WIN32\n\t\trpc_nt_exit();\n#endif\n");
 #endif
@@ -169,9 +177,11 @@ void write_programs(char* storage)
   list* l;
   definition* def;
 
-  for (l = defined; l != NULL; l = l->next) {
+  for (l = defined; l != NULL; l = l->next)
+  {
     def = (definition*)l->val;
-    if (def->def_kind == DEF_PROGRAM) {
+    if (def->def_kind == DEF_PROGRAM)
+    {
       write_program(def, storage);
     }
   }
@@ -195,8 +205,10 @@ struct call_params {\n\
 };\n\
 ");
 
-  for (vp = def->def.pr.versions; vp != NULL; vp = vp->next) {
-    if (storage != NULL) {
+  for (vp = def->def.pr.versions; vp != NULL; vp = vp->next)
+  {
+    if (storage != NULL)
+    {
       f_print(fout, "%s ", storage);
     }
     f_print(fout, "void ");
@@ -207,10 +219,12 @@ struct call_params {\n\
 
 #endif
 
-  for (vp = def->def.pr.versions; vp != NULL; vp = vp->next) {
+  for (vp = def->def.pr.versions; vp != NULL; vp = vp->next)
+  {
     f_print(fout, "\n");
 
-    if (storage != NULL) {
+    if (storage != NULL)
+    {
       f_print(fout, "%s ", storage);
     }
     f_print(fout, "void\n");
@@ -222,8 +236,10 @@ struct call_params {\n\
 
     filled = 0;
     f_print(fout, "\tunion {\n");
-    for (proc = vp->procs; proc != NULL; proc = proc->next) {
-      if (streq(proc->arg_type, "void")) {
+    for (proc = vp->procs; proc != NULL; proc = proc->next)
+    {
+      if (streq(proc->arg_type, "void"))
+      {
         continue;
       }
       filled = 1;
@@ -232,7 +248,8 @@ struct call_params {\n\
       pvname(proc->proc_name, vp->vers_num);
       f_print(fout, "_arg;\n");
     }
-    if (!filled) {
+    if (!filled)
+    {
       f_print(fout, "\t\tint fill;\n");
     }
     f_print(fout, "\t} %s;\n", ARG);
@@ -253,17 +270,17 @@ struct call_params {\n\
 
     f_print(fout, "\tswitch (%s->rq_proc) {\n", RQSTP);
 
-    if (!nullproc(vp->procs)) {
+    if (!nullproc(vp->procs))
+    {
       f_print(fout, "\tcase NULLPROC:\n");
-      f_print(fout, "\t\t(void)svc_sendreply(%s, xdr_void, (char *)NULL);\n",
-          TRANSP);
+      f_print(fout, "\t\t(void)svc_sendreply(%s, xdr_void, (char *)NULL);\n", TRANSP);
       f_print(fout, "\t\treturn;\n\n");
     }
-    for (proc = vp->procs; proc != NULL; proc = proc->next) {
+    for (proc = vp->procs; proc != NULL; proc = proc->next)
+    {
       f_print(fout, "\tcase %s:\n", proc->proc_name);
       f_print(fout, "\t\txdr_%s = xdr_%s;\n", ARG, stringfix(proc->arg_type));
-      f_print(
-          fout, "\t\txdr_%s = xdr_%s;\n", RESULT, stringfix(proc->res_type));
+      f_print(fout, "\t\txdr_%s = xdr_%s;\n", RESULT, stringfix(proc->res_type));
       f_print(fout, "\t\t%s = (char *(*)()) ", ROUTINE);
       pvname(proc->proc_name, vp->vers_num);
       f_print(fout, ";\n");
@@ -298,11 +315,11 @@ struct call_params {\n\
 	params->xdr_argument = xdr_%s;\n\
 	params->xdr_result = xdr_%s;\n\
 \n",
-        RQSTP, RQSTP, TRANSP, ARG, ARG, ARG, ROUTINE, ARG, RESULT);
+            RQSTP, RQSTP, TRANSP, ARG, ARG, ARG, ROUTINE, ARG, RESULT);
 
     f_print(fout, "\
 	threadHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)",
-        RQSTP, TRANSP);
+            RQSTP, TRANSP);
 
     pvname(def->def_name, vp->vers_num);
 
@@ -324,7 +341,7 @@ struct call_params *params;\n\
 	struct svc_req *%s;\n\
 	SVCXPRT *%s;\n\
 	void *%s;\n",
-        RQSTP, TRANSP, ARG);
+            RQSTP, TRANSP, ARG);
 
     f_print(fout, "\tvoid (*destroy_proc)();\n\n");
     f_print(fout, "\tchar *%s;\n", RESULT);
@@ -345,8 +362,7 @@ struct call_params *params;\n\
     f_print(fout, "#endif\n\n");
 #endif
     f_print(fout, "\t%s = (*%s)(&%s, %s);\n", RESULT, ROUTINE, ARG, RQSTP);
-    f_print(fout, "\tif (%s != NULL && !svc_sendreply(%s, xdr_%s, %s)) {\n",
-        RESULT, TRANSP, RESULT, RESULT);
+    f_print(fout, "\tif (%s != NULL && !svc_sendreply(%s, xdr_%s, %s)) {\n", RESULT, TRANSP, RESULT, RESULT);
     printerr("systemerr", TRANSP);
     f_print(fout, "\t}\n");
 
@@ -358,8 +374,7 @@ struct call_params *params;\n\
 #endif
 
     printif("freeargs", TRANSP, "&", ARG);
-    f_print(
-        fout, "\t\t(void)fprintf(stderr, \"unable to free arguments\\n\");\n");
+    f_print(fout, "\t\t(void)fprintf(stderr, \"unable to free arguments\\n\");\n");
 #ifdef WIN32
     f_print(fout, "#ifdef WIN32\n\t\trpc_nt_exit();\n#endif\n");
 #endif
@@ -377,21 +392,19 @@ struct call_params *params;\n\
   }
 }
 
-static void printerr(char* err, char* transp)
-{
-  f_print(fout, "\t\tsvcerr_%s(%s);\n", err, transp);
-}
+static void printerr(char* err, char* transp) { f_print(fout, "\t\tsvcerr_%s(%s);\n", err, transp); }
 
 static void printif(char* proc, char* transp, char* prefix, char* arg)
 {
-  f_print(fout, "\tif (!svc_%s(%s, xdr_%s, %s%s)) {\n", proc, transp, arg,
-      prefix, arg);
+  f_print(fout, "\tif (!svc_%s(%s, xdr_%s, %s%s)) {\n", proc, transp, arg, prefix, arg);
 }
 
 static int nullproc(proc_list* proc)
 {
-  for (; proc != NULL; proc = proc->next) {
-    if (streq(proc->proc_num, "0")) {
+  for (; proc != NULL; proc = proc->next)
+  {
+    if (streq(proc->proc_num, "0"))
+    {
       return (1);
     }
   }

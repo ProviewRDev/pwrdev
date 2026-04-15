@@ -49,8 +49,7 @@ CoLog::CoLog(const char* filename) : m_wow(0), m_level(1)
   m_recall = new CoWowRecall();
 }
 
-void CoLog::log(
-    const char* category, const char* str, const char* cmt, unsigned int opt)
+void CoLog::log(const char* category, const char* str, const char* cmt, unsigned int opt)
 {
   std::ofstream fp;
   pwr_tStatus sts;
@@ -65,20 +64,20 @@ void CoLog::log(
 
   if (cmt)
     strncpy(comment, cmt, sizeof(comment));
-  else if (m_level == 1 && m_wow && opt & log_mOption_Comment) {
+  else if (m_level == 1 && m_wow && opt & log_mOption_Comment)
+  {
     wow_sModalInputDialog* ret;
 
-    ret = m_wow->CreateModalInputDialog("Log Comment", "Comment", "Ok",
-        "Cancel", 0, 0, sizeof(comment) - 1, m_recall);
-    if (ret->status == wow_eModalDialogReturn_Button1
-        || ret->status == wow_eModalDialogReturn_ReturnPressed)
+    ret = m_wow->CreateModalInputDialog("Log Comment", "Comment", "Ok", "Cancel", 0, 0, sizeof(comment) - 1,
+                                        m_recall);
+    if (ret->status == wow_eModalDialogReturn_Button1 || ret->status == wow_eModalDialogReturn_ReturnPressed)
       strncpy(comment, ret->input_str, sizeof(comment));
     free(ret);
   }
   fp.open(m_filename, std::ios::out | std::ios::app);
-  if (!fp) {
-    fprintf(
-        stderr, "Warning! CoLog::log could not open log file %s\n", m_filename);
+  if (!fp)
+  {
+    fprintf(stderr, "Warning! CoLog::log could not open log file %s\n", m_filename);
     return;
   }
 
@@ -105,8 +104,8 @@ void CoLog::log(
   fp.close();
 }
 
-void CoLog::get(char categories[][20], char* item,
-    void item_cb(void*, pwr_tTime, char*, char*, char*, char*), void* ctx)
+void CoLog::get(char categories[][20], char* item, void item_cb(void*, pwr_tTime, char*, char*, char*, char*),
+                void* ctx)
 {
   std::ifstream fp;
   char line[1024];
@@ -120,25 +119,29 @@ void CoLog::get(char categories[][20], char* item,
 
   fp.open(m_filename);
 
-  while (fp.getline(line, sizeof(line))) {
-    parts = dcli_parse(line, " ", "", (char*)line_array,
-        sizeof(line_array) / sizeof(line_array[0]), sizeof(line_array[0]), 0);
+  while (fp.getline(line, sizeof(line)))
+  {
+    parts = dcli_parse(line, " ", "", (char*)line_array, sizeof(line_array) / sizeof(line_array[0]),
+                       sizeof(line_array[0]), 0);
 
-    if (item
-        && !(item[strlen(item) - 1] == '*'
-               && str_NoCaseStrncmp(line_array[6], item, strlen(item) - 1) == 0)
-        && str_NoCaseStrcmp(line_array[6], item) != 0)
+    if (item &&
+        !(item[strlen(item) - 1] == '*' && str_NoCaseStrncmp(line_array[6], item, strlen(item) - 1) == 0) &&
+        str_NoCaseStrcmp(line_array[6], item) != 0)
       continue;
 
     int found = 0;
-    if (categories) {
-      for (int i = 0; !streq(categories[i], ""); i++) {
-        if (streq(categories[i], line_array[4])) {
+    if (categories)
+    {
+      for (int i = 0; !streq(categories[i], ""); i++)
+      {
+        if (streq(categories[i], line_array[4]))
+        {
           found = 1;
           break;
         }
       }
-    } else
+    }
+    else
       found = 1;
 
     if (!found)
@@ -156,8 +159,7 @@ void CoLog::get(char categories[][20], char* item,
       continue;
 
     if (parts > 7)
-      item_cb(ctx, time, line_array[4], line_array[5], line_array[6],
-          line_array[7]);
+      item_cb(ctx, time, line_array[4], line_array[5], line_array[6], line_array[7]);
     else
       item_cb(ctx, time, line_array[4], line_array[5], line_array[6], 0);
   }

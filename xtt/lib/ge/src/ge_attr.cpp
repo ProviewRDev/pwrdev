@@ -46,26 +46,17 @@
 #include "ge_dyn.h"
 #include "ge_msg.h"
 
-Attr::~Attr()
-{
-}
+Attr::~Attr() {}
 
-Attr::Attr(void* a_parent_ctx, attr_eType a_type, void* a_object,
-      attr_sItem* itemlist, int item_cnt,
-      void (*a_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, 
-      grow_tObject*, int))
-    : parent_ctx(a_parent_ctx), type(a_type), embedded(0), input_open(0),
-      object(a_object), close_cb(0), redraw_cb(0), get_subgraph_info_cb(0),
-      get_dyn_info_cb(0), reconfigure_attr_cb(0), store_cb(0), recall_cb(0),
-      set_data_cb(0), get_plant_select_cb(0), get_current_colors_cb(0),
-      get_current_color_tone_cb(0),
-      get_object_list_cb(a_get_object_list_cb), open_value_input_cb(),
-      set_inputfocus_cb(0),
-      traverse_inputfocus_cb(0), client_data(0), recall_idx(-1),
-      original_data(0)
+Attr::Attr(void* a_parent_ctx, attr_eType a_type, void* a_object, attr_sItem* itemlist, int item_cnt,
+           void (*a_get_object_list_cb)(void*, unsigned int, grow_tObject**, int*, grow_tObject*, int))
+    : parent_ctx(a_parent_ctx), type(a_type), embedded(0), input_open(0), object(a_object), close_cb(0),
+      redraw_cb(0), get_subgraph_info_cb(0), get_dyn_info_cb(0), reconfigure_attr_cb(0), store_cb(0),
+      recall_cb(0), set_data_cb(0), get_plant_select_cb(0), get_current_colors_cb(0),
+      get_current_color_tone_cb(0), get_object_list_cb(a_get_object_list_cb), open_value_input_cb(),
+      set_inputfocus_cb(0), traverse_inputfocus_cb(0), client_data(0), recall_idx(-1), original_data(0)
 {
-  if (type == attr_eType_ObjectTree ||
-      type == attr_eType_Layers)
+  if (type == attr_eType_ObjectTree || type == attr_eType_Layers)
     embedded = 1;
 }
 
@@ -88,8 +79,10 @@ void Attr::recall_next()
 
   if (recall_cb)
     sts = (recall_cb)(parent_ctx, object, idx, &old_data);
-  if (ODD(sts)) {
-    if (recall_idx == -1 && !original_data) {
+  if (ODD(sts))
+  {
+    if (recall_idx == -1 && !original_data)
+    {
       original_data = old_data;
       recall_idx = 0;
     }
@@ -106,20 +99,27 @@ void Attr::recall_prev()
   if (recall_idx < 0)
     return;
   recall_idx--;
-  if (recall_idx == -1) {
+  if (recall_idx == -1)
+  {
     // Get original data
-    if (set_data_cb) {
+    if (set_data_cb)
+    {
       (set_data_cb)(parent_ctx, object, original_data);
       Attr::reconfigure_attr_c((void*)this);
       original_data = 0;
     }
-  } else {
-    if (recall_cb) {
+  }
+  else
+  {
+    if (recall_cb)
+    {
       sts = (recall_cb)(parent_ctx, object, recall_idx, &old_p);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         Attr::reconfigure_attr_c((void*)this);
         delete old_p;
-      } else
+      }
+      else
         recall_idx++;
     }
   }
@@ -133,13 +133,12 @@ int Attr::get_plant_select_c(void* attr_ctx, char* value, int size)
   return 0;
 }
 
-int Attr::get_current_colors_c(void* attr_ctx, glow_eDrawType* fill_color,
-    glow_eDrawType* border_color, glow_eDrawType* text_color)
+int Attr::get_current_colors_c(void* attr_ctx, glow_eDrawType* fill_color, glow_eDrawType* border_color,
+                               glow_eDrawType* text_color)
 {
   Attr* attr = (Attr*)attr_ctx;
   if (attr->get_current_colors_cb)
-    return attr->get_current_colors_cb(
-        attr->parent_ctx, fill_color, border_color, text_color);
+    return attr->get_current_colors_cb(attr->parent_ctx, fill_color, border_color, text_color);
   return 0;
 }
 
@@ -151,18 +150,15 @@ int Attr::get_current_color_tone_c(void* attr_ctx, glow_eDrawType* color_tone)
   return 0;
 }
 
-int Attr::get_subgraph_info_c(
-    void* attr_ctx, char* name, attr_sItem** itemlist, int* item_cnt)
+int Attr::get_subgraph_info_c(void* attr_ctx, char* name, attr_sItem** itemlist, int* item_cnt)
 {
   Attr* attr = (Attr*)attr_ctx;
   if (attr->get_subgraph_info_cb)
-    return attr->get_subgraph_info_cb(
-        attr->parent_ctx, name, itemlist, item_cnt);
+    return attr->get_subgraph_info_cb(attr->parent_ctx, name, itemlist, item_cnt);
   return 0;
 }
 
-int Attr::get_dyn_info_c(
-    void* attr_ctx, GeDyn* dyn, attr_sItem** itemlist, int* item_cnt)
+int Attr::get_dyn_info_c(void* attr_ctx, GeDyn* dyn, attr_sItem** itemlist, int* item_cnt)
 {
   Attr* attr = (Attr*)attr_ctx;
   if (attr->get_dyn_info_cb)
@@ -170,23 +166,16 @@ int Attr::get_dyn_info_c(
   return 0;
 }
 
-void Attr::change_value_c(void* attr)
-{
-  ((Attr*)attr)->change_value();
-}
+void Attr::change_value_c(void* attr) { ((Attr*)attr)->change_value(); }
 
-int Attr::reconfigure_attr_c(void* attr)
-{
-  return ((Attr*)attr)->reconfigure_attr();
-}
+int Attr::reconfigure_attr_c(void* attr) { return ((Attr*)attr)->reconfigure_attr(); }
 
-void Attr::get_object_list_c(void* attr_ctx, unsigned int type,
-    grow_tObject** list, int* list_cnt, grow_tObject* parent, int parent_cnt)
+void Attr::get_object_list_c(void* attr_ctx, unsigned int type, grow_tObject** list, int* list_cnt,
+                             grow_tObject* parent, int parent_cnt)
 {
   Attr* attr = (Attr*)attr_ctx;
   if (attr->get_object_list_cb)
-    attr->get_object_list_cb(
-        attr->parent_ctx, type, list, list_cnt, parent, parent_cnt);
+    attr->get_object_list_cb(attr->parent_ctx, type, list, list_cnt, parent, parent_cnt);
 }
 
 int Attr::set_inputfocus_c(void* attr_ctx)
@@ -213,10 +202,7 @@ void Attr::message(void* attr, int popup, char severity, const char* message)
     ((Attr*)attr)->message(severity, message);
 }
 
-void Attr::refresh_objects(unsigned int type)
-{
-  attrnav->refresh_objects(type);
-}
+void Attr::refresh_objects(unsigned int type) { attrnav->refresh_objects(type); }
 
 int Attr::set_attr_value(char* value_str)
 {

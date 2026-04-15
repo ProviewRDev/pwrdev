@@ -56,7 +56,8 @@ pwr_tBoolean sanc_Subscribe(pwr_tStatus* sts, gdb_sObject* op)
   if (op->l.flags.b.isNative)
     pwr_Return(NO, sts, SAN__NATIVE);
 
-  if (op->u.c.flags.m & (gdb_mCo_sancAdd | gdb_mCo_sancAct)) {
+  if (op->u.c.flags.m & (gdb_mCo_sancAdd | gdb_mCo_sancAct))
+  {
     op->u.c.sanexp = 0;
     return YES;
   }
@@ -64,7 +65,8 @@ pwr_tBoolean sanc_Subscribe(pwr_tStatus* sts, gdb_sObject* op)
   vp = pool_Address(NULL, gdbroot->pool, op->l.vr);
   np = pool_Address(NULL, gdbroot->pool, vp->l.nr);
 
-  if (op->u.c.flags.b.sancRem) {
+  if (op->u.c.flags.b.sancRem)
+  {
     pool_Qremove(NULL, gdbroot->pool, &op->u.c.sanc_ll);
     op->u.c.flags.b.sancRem = 0;
     pwr_Assert(np->sancRem_lc != 0);
@@ -98,8 +100,9 @@ void sanc_SubscribeMountServers(pwr_tStatus* status, gdb_sNode* np)
 
   gdb_AssumeLocked;
 
-  for (msl = pool_Qsucc(NULL, gdbroot->pool, &np->nodms_lh);
-       msl != &np->nodms_lh; msl = pool_Qsucc(NULL, gdbroot->pool, msl)) {
+  for (msl = pool_Qsucc(NULL, gdbroot->pool, &np->nodms_lh); msl != &np->nodms_lh;
+       msl = pool_Qsucc(NULL, gdbroot->pool, msl))
+  {
     msp = pool_Qitem(msl, gdb_sMountServer, nodms_ll);
 
     op = pool_Address(sts, gdbroot->pool, msp->msor);

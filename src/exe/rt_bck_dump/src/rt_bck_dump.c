@@ -63,7 +63,8 @@ int main(int argc, char** argv)
    * Open file
    */
 
-  if (argc > 1 && streq(argv[1], "-h")) {
+  if (argc > 1 && streq(argv[1], "-h"))
+  {
     printf("\
 \n\
 	rt_bck_dump   Dump content of backupfile in hex.\n\
@@ -77,14 +78,17 @@ int main(int argc, char** argv)
     exit(0);
   }
 
-  if (argc == 1) {
+  if (argc == 1)
+  {
     printf("Name of backup file: ");
     scanf("%s", (char*)&filename);
-  } else
+  }
+  else
     strcpy(filename, argv[1]);
 
   f = fopen(filename, "rb");
-  if (f == NULL) {
+  if (f == NULL)
+  {
     perror("fopen");
     return 1;
   }
@@ -96,21 +100,21 @@ int main(int argc, char** argv)
   fseek(f, 0, 0);
   fread(&fh, sizeof fh, 1, f);
   printf("Layout version:       %d\n", fh.version);
-  if (fh.version != BCK_FILE_VERSION) {
+  if (fh.version != BCK_FILE_VERSION)
+  {
     printf("This program is built with header version %d\n", BCK_FILE_VERSION);
     fclose(f);
     return 1;
   }
 
-  time_AtoAscii(
-      &fh.creationtime, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+  time_AtoAscii(&fh.creationtime, time_eFormat_DateAndTime, timstr, sizeof(timstr));
 
   printf("Created:              %s\n", timstr);
 
-  for (c = 0; c < 2; c++) {
+  for (c = 0; c < 2; c++)
+  {
     printf("%s cycle:\n", c == 0 ? "Fast" : "Slow");
-    time_AtoAscii(
-        &fh.updatetime[c], time_eFormat_DateAndTime, timstr, sizeof(timstr));
+    time_AtoAscii(&fh.updatetime[c], time_eFormat_DateAndTime, timstr, sizeof(timstr));
 
     printf("  Updated:            %s\n", timstr);
     printf("  Curdata pointer:    %x\n", fh.curdata[c]);
@@ -122,7 +126,8 @@ int main(int argc, char** argv)
    */
 
   printf("\n");
-  for (c = 0; c < 2; c++) {
+  for (c = 0; c < 2; c++)
+  {
     if ((fh.curdata[c] == 0) || (fh.cursize[c] == 0))
       continue;
 
@@ -130,21 +135,23 @@ int main(int argc, char** argv)
     fread(&ch, sizeof ch, 1, f);
 
     printf("\n%s cycleheader:\n", c == 0 ? "Fast" : "Slow");
-    time_AtoAscii(
-        &ch.objtime, time_eFormat_DateAndTime, timstr, sizeof(timstr));
+    time_AtoAscii(&ch.objtime, time_eFormat_DateAndTime, timstr, sizeof(timstr));
 
     printf("  Objtime:            %s\n", timstr);
     printf("  Length:             %x\n", ch.length);
     printf("  Cycle:              %x\n", ch.cycle);
     printf("  Segments:           %x\n", ch.segments);
 
-    for (d = 0; d < ch.segments; d++) {
+    for (d = 0; d < ch.segments; d++)
+    {
       printf("\n  Data header %d:\n", d + 1);
       fread(&dh, sizeof dh, 1, f);
-      if (dh.namesize > 0) {
+      if (dh.namesize > 0)
+      {
         namep = malloc(dh.namesize + 1);
         csts = fread(namep, dh.namesize + 1, 1, f);
-      } else
+      }
+      else
         namep = NULL;
       printf("    Valid:            %x\n", dh.valid);
       printf("    Dynamic:          %x\n", dh.dynamic);
@@ -167,7 +174,8 @@ int main(int argc, char** argv)
       datap = malloc(dh.size);
       fread(datap, dh.size, 1, f);
       p = datap;
-      for (i = 0; i < dh.size; i++, p++) {
+      for (i = 0; i < dh.size; i++, p++)
+      {
         if ((i % 16) == 0)
           printf("\n	");
         printf("%02x ", *p);

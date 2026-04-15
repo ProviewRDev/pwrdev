@@ -5,14 +5,16 @@
 
 #if defined PWRE_CONF_MQTT
 
-typedef enum {
+typedef enum
+{
   mqtt_eCon_NotConnected = 0,
   mqtt_eCon_Connected = 1,
   mqtt_eCon_WaitConnect = 2
 } mqtt_eCon;
 
-typedef struct {
-  struct mosquitto *mosq;
+typedef struct
+{
+  struct mosquitto* mosq;
   int is_subscriber;
   int is_publisher;
   mqtt_eCon connected;

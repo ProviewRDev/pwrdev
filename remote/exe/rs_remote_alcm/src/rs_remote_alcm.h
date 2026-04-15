@@ -59,25 +59,29 @@
 
 typedef unsigned short int channel_type;
 
-typedef struct {
+typedef struct
+{
   unsigned short int completion_status, transfer_size, w3, w4;
 } iosb_type;
 
-typedef struct {
+typedef struct
+{
   char destination_address[6]; /* Destination address (us) */
-  char source_address[6]; /* Source address (remnode) */
-  short int protocol_type; /* Type of protocol (60-06) */
+  char source_address[6];      /* Source address (remnode) */
+  short int protocol_type;     /* Type of protocol (60-06) */
 } net_header_type;
 
-typedef struct {
-  char msg_type; /* Type of message */
+typedef struct
+{
+  char msg_type;            /* Type of message */
   unsigned char msg_seqnum; /* Sequence number */
   unsigned char filler[46]; /* Padding */
 
   unsigned short data[725]; /* Data */
 } net_buffer_type;
 
-typedef struct {
+typedef struct
+{
   short int trans_code;
   short int future_use;
   short int length;
@@ -85,7 +89,8 @@ typedef struct {
   unsigned char data[1440];
 } apl_buffer;
 
-typedef struct {
+typedef struct
+{
   short int trans_code;
   short int future_use;
   short int length;
@@ -93,7 +98,8 @@ typedef struct {
   unsigned short int time[7];
 } clock_buffer;
 
-typedef struct {
+typedef struct
+{
   short int trans_code;
   short int common_name[2];
   short int offset;

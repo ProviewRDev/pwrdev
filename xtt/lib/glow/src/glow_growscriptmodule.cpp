@@ -45,28 +45,26 @@
 #include "glow_draw.h"
 #include "glow_exportscript.h"
 
-GrowScriptModule::GrowScriptModule(GrowCtx* glow_ctx, const char* name, double x, double y,
-    double w, double h, glow_eDrawType border_d_type, int line_w,
-    glow_mDisplayLevel display_lev, int fill_rect, int display_border,
-    glow_eDrawType fill_d_type, int nodraw)
-    : GrowRect(glow_ctx, name, x, y, w, h, border_d_type, line_w, 0,
-	       display_lev, fill_rect, display_border, 0, fill_d_type, nodraw),
-      module_index(0), left_border_width(0.5), right_border_width(0.5), top_border_width(0.5), 
-      bottom_border_width(0.5), fill_module(0),
-      vert_left_border(0), vert_right_border(0), vert_top_border(0), vert_bottom_border(0),
-      vert_prio(0), vert_left_module(0), vert_right_module(0), vert_top_module(0), vert_bottom_module(0),
-      vert_width(0), vert_height(0), vert_fix_width(0), vert_fix_height(0),
-      horiz_left_border(0), horiz_right_border(0), horiz_top_border(0), horiz_bottom_border(0),
-      horiz_prio(0), horiz_left_module(0), horiz_right_module(0), horiz_top_module(0), horiz_bottom_module(0),
-      horiz_width(0), horiz_height(0), horiz_fix_width(0), horiz_fix_height(0), window_border_width(0), window_switch_ratio(1)
+GrowScriptModule::GrowScriptModule(GrowCtx* glow_ctx, const char* name, double x, double y, double w,
+                                   double h, glow_eDrawType border_d_type, int line_w,
+                                   glow_mDisplayLevel display_lev, int fill_rect, int display_border,
+                                   glow_eDrawType fill_d_type, int nodraw)
+    : GrowRect(glow_ctx, name, x, y, w, h, border_d_type, line_w, 0, display_lev, fill_rect, display_border,
+               0, fill_d_type, nodraw),
+      module_index(0), left_border_width(0.5), right_border_width(0.5), top_border_width(0.5),
+      bottom_border_width(0.5), fill_module(0), vert_left_border(0), vert_right_border(0), vert_top_border(0),
+      vert_bottom_border(0), vert_prio(0), vert_left_module(0), vert_right_module(0), vert_top_module(0),
+      vert_bottom_module(0), vert_width(0), vert_height(0), vert_fix_width(0), vert_fix_height(0),
+      horiz_left_border(0), horiz_right_border(0), horiz_top_border(0), horiz_bottom_border(0), horiz_prio(0),
+      horiz_left_module(0), horiz_right_module(0), horiz_top_module(0), horiz_bottom_module(0),
+      horiz_width(0), horiz_height(0), horiz_fix_width(0), horiz_fix_height(0), window_border_width(0),
+      window_switch_ratio(1)
 {
   if (!nodraw)
     draw();
 }
 
-GrowScriptModule::~GrowScriptModule()
-{
-}
+GrowScriptModule::~GrowScriptModule() {}
 
 void GrowScriptModule::save(std::ofstream& fp, glow_eSaveMode mode)
 {
@@ -116,15 +114,18 @@ void GrowScriptModule::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowScriptModule: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowScriptModule:
       break;
     case glow_eSave_GrowScriptModule_module_index:
@@ -248,4 +249,3 @@ int GrowScriptModule::export_script(GlowExportScript* es, void* o, void* m)
 {
   return es->scriptmodule(this, o, m);
 }
-

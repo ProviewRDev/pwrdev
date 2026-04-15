@@ -34,7 +34,6 @@
  * General Public License plus this exception.
  */
 
-
 #ifndef dataq_backup_h
 #define dataq_backup_h
 
@@ -44,17 +43,20 @@
 #define QBCK_FILE_EXT1 ".bck1"
 #define QBCK_FILE_EXT2 ".bck2"
 
-typedef struct {
+typedef struct
+{
   pwr_tTime creationtime;
   int version;
 } qbck_tFileHeader;
 
-typedef struct {
+typedef struct
+{
   pwr_tTime time;
   char type[32];
 } qbck_tRecordHeader;
 
-typedef struct {
+typedef struct
+{
   char type[32];
   pwr_tOid objid;
   pwr_tCid class;
@@ -62,7 +64,8 @@ typedef struct {
   int last;
 } qbck_tQueueHeader;
 
-typedef struct {
+typedef struct
+{
   char type[32];
   pwr_tOid objid;
   char data_name[120];
@@ -79,4 +82,3 @@ typedef struct {
 #define HEADERTYPE_DATAEND "Headertype data end"
 
 #endif
-

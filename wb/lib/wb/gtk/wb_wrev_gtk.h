@@ -43,10 +43,10 @@
 
 #include "cow_wow_gtk.h"
 
-class WRevGtk : public WRev {
+class WRevGtk : public WRev
+{
 public:
-  WRevGtk(
-      GtkWidget* wa_parent_wid, void* wa_parent_ctx, ldh_tSession wb_ldhses);
+  WRevGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx, ldh_tSession wb_ldhses);
   ~WRevGtk();
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
@@ -68,9 +68,8 @@ public:
   void reset_cursor();
   void flush();
   void create_input_dialog();
-  void open_input_dialog(const char* text1, const char* text2,
-      const char* title, const char* init_text1, const char* init_text2,
-      void (*ok_cb)(WRev*, char*, char*));
+  void open_input_dialog(const char* text1, const char* text2, const char* title, const char* init_text1,
+                         const char* init_text2, void (*ok_cb)(WRev*, char*, char*));
 
   static void activate_store(GtkWidget* w, gpointer data);
   static void activate_restore(GtkWidget* w, gpointer data);
@@ -84,8 +83,7 @@ public:
   static void activate_help(GtkWidget* w, gpointer data);
   static void activate_india_ok(GtkWidget* w, gpointer data);
   static void activate_india_cancel(GtkWidget* w, gpointer data);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
 };
 
 #endif

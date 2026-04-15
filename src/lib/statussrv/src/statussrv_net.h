@@ -43,23 +43,27 @@
 #define stssrv_cApplSize 50
 #define stssrv_cApplOffset (stssrv_cServerSize + stssrv_cPlcSize)
 
-typedef enum {
-  stssrv_eMsgType_Status 	= 1,
-  stssrv_eMsgType_ExtStatus 	= 2
+typedef enum
+{
+  stssrv_eMsgType_Status = 1,
+  stssrv_eMsgType_ExtStatus = 2
 } stssrv_eMsgType;
 
-typedef struct {
+typedef struct
+{
   unsigned int length;
   unsigned int version;
   unsigned int id;
   unsigned int type;
 } stssrv_sMsgHead;
 
-typedef struct {
+typedef struct
+{
   stssrv_sMsgHead head;
 } stssrv_sRequest;
 
-typedef struct {
+typedef struct
+{
   stssrv_sMsgHead head;
   unsigned int Sts;
   char Version[20];
@@ -82,13 +86,15 @@ typedef struct {
   char UserStatus5Str[80];
 } stssrv_sRespondStatus;
 
-typedef struct {
+typedef struct
+{
   unsigned int Sts;
   char StsStr[80];
   char Name[32];
 } stssrv_sProcElem;
-  
-typedef struct {
+
+typedef struct
+{
   stssrv_sMsgHead head;
   stssrv_sProcElem Server[stssrv_cServerSize];
   stssrv_sProcElem Plc[stssrv_cPlcSize];

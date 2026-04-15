@@ -45,7 +45,8 @@
 
 class WGeQtWidget;
 
-class WGeQt : public WGe {
+class WGeQt : public WGe
+{
 public:
   QWidget* grow_widget;
   QWidget* form_widget;
@@ -60,9 +61,8 @@ public:
   void set_size(int width, int height);
   void set_subwindow_release();
 
-  WGeQt(void* parent_ctx, char* name, char* filename, int scrollbar, int menu,
-      int navigator, int width, int height, int x, int y, char* object_name,
-      int modal);
+  WGeQt(void* parent_ctx, char* name, char* filename, int scrollbar, int menu, int navigator, int width,
+        int height, int x, int y, char* object_name, int modal);
   ~WGeQt();
 
   static void change_value_cb(void* ge_ctx, void* value_object, char* text);
@@ -73,7 +73,8 @@ private:
   WGeQtWidget* toplevel;
 };
 
-class WGeQtWidget : public QWidget {
+class WGeQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

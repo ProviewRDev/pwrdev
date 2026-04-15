@@ -59,17 +59,16 @@ static pwr_tStatus EditClassVolume(ldh_sMenuCall* ip)
   char cmd[510];
   pwr_eClassVolumeDatabaseEnum* dbenum;
 
-  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Object,
-      name, sizeof(name), &size);
+  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Object, name, sizeof(name), &size);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody",
-      "Database", (char**)&dbenum, &size);
+  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody", "Database", (char**)&dbenum, &size);
   if (EVEN(sts))
     return sts;
 
-  switch (*dbenum) {
+  switch (*dbenum)
+  {
   case pwr_eClassVolumeDatabaseEnum_WbLoad:
     str_ToLower(name, name);
     sprintf(fname, "$pwrp_db/%s.wb_load", name);
@@ -79,16 +78,18 @@ static pwr_tStatus EditClassVolume(ldh_sMenuCall* ip)
     ip->wnav->command(cmd);
     break;
   case pwr_eClassVolumeDatabaseEnum_BerkeleyDb:
-  case pwr_eClassVolumeDatabaseEnum_MySql: {
+  case pwr_eClassVolumeDatabaseEnum_MySql:
+  {
     pwr_tFileName filename;
 
     str_ToLower(name, name);
     dcli_translate_filename(filename, "$pwr_exe/wb_open_db.sh");
-    sprintf(cmd, "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename,
-        CoLogin::username(), CoLogin::ucpassword(), name, name);
+    sprintf(cmd, "%s \"%s\" \"%s\" \"%s\" \"%s\" &", filename, CoLogin::username(), CoLogin::ucpassword(),
+            name, name);
 
     sts = system(cmd);
-    if (sts == -1 || sts == 127) {
+    if (sts == -1 || sts == 127)
+    {
       printf("-- Error when creating process.\n");
       return sts;
     }
@@ -106,5 +107,4 @@ static pwr_tStatus EditClassVolume(ldh_sMenuCall* ip)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(ClassVolumeConfig)
-    = { pwr_BindMethod(EditClassVolume), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(ClassVolumeConfig) = {pwr_BindMethod(EditClassVolume), pwr_NullMethod};

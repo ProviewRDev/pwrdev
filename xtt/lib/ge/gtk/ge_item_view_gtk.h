@@ -39,7 +39,8 @@
 
 #include "ge.h"
 
-class GeItemViewGtk {
+class GeItemViewGtk
+{
 private:
   gpointer ge_ctx;
   GtkWidget* toplevel_widget;
@@ -58,8 +59,7 @@ public:
   static char* selected_text(GtkWidget*);
   static void activate_menu_open(GtkWidget*, gpointer);
   static void activate_menu_delete(GtkWidget*, gpointer);
-  static void activate_tree_widget(
-      GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
+  static void activate_tree_widget(GtkTreeView*, GtkTreePath*, GtkTreeViewColumn*, gpointer);
   static gboolean focus_out_tree_widget(GtkWidget*, GdkEvent*, gpointer);
 };
 

@@ -70,12 +70,12 @@ static void print_ifarg(char* arg);
 
 static void space();
 
-static void print_ifstat(int indent, char* prefix, char* type, relation rel,
-    char* amax, char* objname, char* name);
+static void print_ifstat(int indent, char* prefix, char* type, relation rel, char* amax, char* objname,
+                         char* name);
 
 static void emit_enum(definition* def);
 
-//static void emit_union(definition* def);
+// static void emit_union(definition* def);
 
 static void emit_struct(definition* def);
 
@@ -88,17 +88,19 @@ static void print_stat(declaration* dec);
  */
 void emit(definition* def)
 {
-  if (def->def_kind == DEF_PROGRAM || def->def_kind == DEF_CONST) {
+  if (def->def_kind == DEF_PROGRAM || def->def_kind == DEF_CONST)
+  {
     return;
   }
   print_header(def);
-  switch (def->def_kind) {
+  switch (def->def_kind)
+  {
   case DEF_UNION:
     fprintf(stderr, "*** Error: Union not supported\n");
     exit(1);
 
-    //emit_union(def);
-    //break;
+    // emit_union(def);
+    // break;
   case DEF_ENUM:
     emit_enum(def);
     break;
@@ -117,9 +119,12 @@ void emit(definition* def)
 
 static int findtype(definition* def, char* type)
 {
-  if (def->def_kind == DEF_PROGRAM || def->def_kind == DEF_CONST) {
+  if (def->def_kind == DEF_PROGRAM || def->def_kind == DEF_CONST)
+  {
     return (0);
-  } else {
+  }
+  else
+  {
     return (streq(def->def_name, type));
   }
 }
@@ -160,18 +165,19 @@ static void print_ifopen(int indent, char* name)
   f_print(fout, "if (!pdr_%s(pdrs", name);
 }
 
-static void print_ifarg(char* arg)
-{
-  f_print(fout, ", %s", arg);
-}
+static void print_ifarg(char* arg) { f_print(fout, ", %s", arg); }
 
 static void print_ifsizeof(char* prefix, char* type)
 {
-  if (streq(type, "bool")) {
+  if (streq(type, "bool"))
+  {
     f_print(fout, ", sizeof(bool_t), pdr_bool");
-  } else {
+  }
+  else
+  {
     f_print(fout, ", sizeof(");
-    if (undefined(type) && prefix) {
+    if (undefined(type) && prefix)
+    {
       f_print(fout, "%s ", prefix);
     }
     f_print(fout, "%s), pdr_%s", type, type);
@@ -187,17 +193,15 @@ static void print_ifclose(int indent)
   f_print(fout, "}\n");
 }
 
-static void space()
-{
-  f_print(fout, "\n\n");
-}
+static void space() { f_print(fout, "\n\n"); }
 
-static void print_ifstat(int indent, char* prefix, char* type, relation rel,
-    char* amax, char* objname, char* name)
+static void print_ifstat(int indent, char* prefix, char* type, relation rel, char* amax, char* objname,
+                         char* name)
 {
   char* alt = NULL;
 
-  switch (rel) {
+  switch (rel)
+  {
   case REL_POINTER:
     print_ifopen(indent, "pointer");
     print_ifarg("(char **)");
@@ -205,50 +209,68 @@ static void print_ifstat(int indent, char* prefix, char* type, relation rel,
     print_ifsizeof(prefix, type);
     break;
   case REL_VECTOR:
-    if (streq(type, "string")) {
+    if (streq(type, "string"))
+    {
       alt = "string";
-    } else if (streq(type, "opaque")) {
+    }
+    else if (streq(type, "opaque"))
+    {
       alt = "opaque";
     }
-    if (alt) {
+    if (alt)
+    {
       print_ifopen(indent, alt);
       print_ifarg(objname);
-    } else {
+    }
+    else
+    {
       print_ifopen(indent, "vector");
       print_ifarg("(char *)");
       f_print(fout, "%s", objname);
     }
     print_ifarg(amax);
-    if (!alt) {
+    if (!alt)
+    {
       print_ifsizeof(prefix, type);
     }
     break;
   case REL_ARRAY:
-    if (streq(type, "string")) {
+    if (streq(type, "string"))
+    {
       alt = "string";
-    } else if (streq(type, "opaque")) {
+    }
+    else if (streq(type, "opaque"))
+    {
       alt = "bytes";
     }
-    if (streq(type, "string")) {
+    if (streq(type, "string"))
+    {
       print_ifopen(indent, alt);
       print_ifarg(objname);
-    } else {
-      if (alt) {
+    }
+    else
+    {
+      if (alt)
+      {
         print_ifopen(indent, alt);
-      } else {
+      }
+      else
+      {
         print_ifopen(indent, "array");
       }
       print_ifarg("(char **)");
-      if (*objname == '&') {
-        f_print(fout, "%s.%s_val, (u_int *)%s.%s_len", objname, name, objname,
-            name);
-      } else {
-        f_print(fout, "&%s->%s_val, (u_int *)&%s->%s_len", objname, name,
-            objname, name);
+      if (*objname == '&')
+      {
+        f_print(fout, "%s.%s_val, (u_int *)%s.%s_len", objname, name, objname, name);
+      }
+      else
+      {
+        f_print(fout, "&%s->%s_val, (u_int *)&%s->%s_len", objname, name, objname, name);
       }
     }
     print_ifarg(amax);
-    if (!alt) {
+    if (!alt)
+    {
       print_ifsizeof(prefix, type);
     }
     break;
@@ -316,7 +338,8 @@ static void emit_struct(definition* def)
 {
   decl_list* dl;
 
-  for (dl = def->def.st.decls; dl != NULL; dl = dl->next) {
+  for (dl = def->def.st.decls; dl != NULL; dl = dl->next)
+  {
     print_stat(&dl->decl);
   }
 }
@@ -339,9 +362,12 @@ static void print_stat(declaration* dec)
   relation rel = dec->rel;
   char name[256];
 
-  if (isvectordef(type, rel)) {
+  if (isvectordef(type, rel))
+  {
     s_print(name, "objp->%s", dec->name);
-  } else {
+  }
+  else
+  {
     s_print(name, "&objp->%s", dec->name);
   }
   print_ifstat(1, prefix, type, rel, amax, name, dec->name);

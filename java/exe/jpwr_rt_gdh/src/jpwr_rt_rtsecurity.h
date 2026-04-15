@@ -5,15 +5,15 @@
 #ifndef _Included_jpwr_rt_RtSecurity
 #define _Included_jpwr_rt_RtSecurity
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-/*
- * Class:     jpwr_rt_RtSecurity
- * Method:    checkUser
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljpwr/rt/CdhrInt;
- */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_RtSecurity_checkUser
-  (JNIEnv *, jclass, jstring, jstring, jstring);
+  /*
+   * Class:     jpwr_rt_RtSecurity
+   * Method:    checkUser
+   * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljpwr/rt/CdhrInt;
+   */
+  JNIEXPORT jobject JNICALL Java_jpwr_rt_RtSecurity_checkUser(JNIEnv*, jclass, jstring, jstring, jstring);
 
 #ifdef __cplusplus
 }

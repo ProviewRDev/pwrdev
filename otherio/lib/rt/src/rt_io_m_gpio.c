@@ -56,17 +56,22 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   int i;
 
   fp = fopen("/sys/class/gpio/export", "w");
-  if (!fp) {
+  if (!fp)
+  {
     errh_Error("GPIO unable to open \"/sys/class/gpio/export\", %s", rp->Name);
     sts = IO__INITFAIL;
     op->Status = sts;
     return sts;
   }
 
-  for (cp = rp->cardlist; cp; cp = cp->next) {
-    for (i = 0; i < GPIO_MAX_CHANNELS; i++) {
-      if (cp->chanlist[i].cop) {
-        switch (cp->chanlist[i].ChanClass) {
+  for (cp = rp->cardlist; cp; cp = cp->next)
+  {
+    for (i = 0; i < GPIO_MAX_CHANNELS; i++)
+    {
+      if (cp->chanlist[i].cop)
+      {
+        switch (cp->chanlist[i].ChanClass)
+        {
         case pwr_cClass_ChanDi:
           fprintf(fp, "%u", ((pwr_sClass_ChanDi*)cp->chanlist[i].cop)->Number);
           fflush(fp);
@@ -98,5 +103,5 @@ static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(GPIO) = { pwr_BindIoMethod(IoRackInit),
-  pwr_BindIoMethod(IoRackClose), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(GPIO) = {pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackClose),
+                                       pwr_NullMethod};

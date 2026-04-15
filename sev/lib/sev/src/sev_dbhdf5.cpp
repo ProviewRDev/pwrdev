@@ -92,7 +92,8 @@ static int debug = 0;
 #endif
 #define H5_S1 H5T_C_S1
 
-typedef struct {
+typedef struct
+{
   unsigned int id;
   char tablename[256];
   unsigned int vid;
@@ -112,7 +113,8 @@ typedef struct {
   unsigned int deleted;
 } sev_sItem;
 
-typedef struct {
+typedef struct
+{
   unsigned int id;
   char tablename[256];
   unsigned int vid;
@@ -129,7 +131,8 @@ typedef struct {
   unsigned int deleted;
 } sev_sObjectItem;
 
-typedef struct {
+typedef struct
+{
   char tablename[256];
   char attributename[256];
   unsigned int attributeidx;
@@ -202,12 +205,9 @@ int sev_dbhdf5::create_types()
   m_objectattributes_mtype = H5Tcreate(H5T_COMPOUND, 528);
   hsts = H5Tinsert(m_objectattributes_mtype, "tablename", 0, str_type256);
   hsts = H5Tinsert(m_objectattributes_mtype, "attributename", 256, str_type256);
-  hsts = H5Tinsert(
-      m_objectattributes_mtype, "attributeidx", 512, H5T_NATIVE_UINT);
-  hsts = H5Tinsert(
-      m_objectattributes_mtype, "attributetype", 516, H5T_NATIVE_UINT);
-  hsts = H5Tinsert(
-      m_objectattributes_mtype, "attributesize", 520, H5T_NATIVE_UINT);
+  hsts = H5Tinsert(m_objectattributes_mtype, "attributeidx", 512, H5T_NATIVE_UINT);
+  hsts = H5Tinsert(m_objectattributes_mtype, "attributetype", 516, H5T_NATIVE_UINT);
+  hsts = H5Tinsert(m_objectattributes_mtype, "attributesize", 520, H5T_NATIVE_UINT);
   hsts = H5Tinsert(m_objectattributes_mtype, "deleted", 524, H5T_NATIVE_UINT);
 
   m_header_mtype = H5Tcreate(H5T_COMPOUND, 24);
@@ -255,10 +255,8 @@ int sev_dbhdf5::create_db(char* dbname)
 
   // Create group /Dir and /Tables
 
-  hid_t dir_group_id
-      = H5Gcreate2(m_file, cName_Dir, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-  hid_t data_group_id
-      = H5Gcreate2(m_file, cName_Tables, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t dir_group_id = H5Gcreate2(m_file, cName_Dir, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t data_group_id = H5Gcreate2(m_file, cName_Tables, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   // Create file type for items dataset
   hid_t str_type256 = H5Tcopy(H5T_C_S1);
@@ -293,8 +291,8 @@ int sev_dbhdf5::create_db(char* dbname)
   hid_t properties = H5Pcreate(H5P_DATASET_CREATE);
   hsts = H5Pset_chunk(properties, 1, &dim);
   hid_t dataspace_id = H5Screate_simple(1, &dim, &max_dim);
-  hid_t dataset_id = H5Dcreate2(dir_group_id, "Items", item_ftype, dataspace_id,
-      H5P_DEFAULT, properties, H5P_DEFAULT);
+  hid_t dataset_id =
+      H5Dcreate2(dir_group_id, "Items", item_ftype, dataspace_id, H5P_DEFAULT, properties, H5P_DEFAULT);
 
   // Create file type for object items dataset
   hid_t obj_item_ftype = H5Tcreate(H5T_COMPOUND, 888);
@@ -319,8 +317,8 @@ int sev_dbhdf5::create_db(char* dbname)
   hid_t obj_properties = H5Pcreate(H5P_DATASET_CREATE);
   hsts = H5Pset_chunk(obj_properties, 1, &dim);
   hid_t obj_dataspace_id = H5Screate_simple(1, &dim, &max_dim);
-  hid_t obj_dataset_id = H5Dcreate2(dir_group_id, "ObjectItems", obj_item_ftype,
-      obj_dataspace_id, H5P_DEFAULT, obj_properties, H5P_DEFAULT);
+  hid_t obj_dataset_id = H5Dcreate2(dir_group_id, "ObjectItems", obj_item_ftype, obj_dataspace_id,
+                                    H5P_DEFAULT, obj_properties, H5P_DEFAULT);
 
   // Create file type for object item attributes dataset
   hid_t obj_item_attr_ftype = H5Tcreate(H5T_COMPOUND, 528);
@@ -337,9 +335,8 @@ int sev_dbhdf5::create_db(char* dbname)
   hid_t objattr_properties = H5Pcreate(H5P_DATASET_CREATE);
   hsts = H5Pset_chunk(objattr_properties, 1, &dim);
   hid_t objattr_dataspace_id = H5Screate_simple(1, &dim, &max_dim);
-  hid_t objattr_dataset_id
-      = H5Dcreate2(dir_group_id, "ObjectItemAttributes", obj_item_attr_ftype,
-          objattr_dataspace_id, H5P_DEFAULT, objattr_properties, H5P_DEFAULT);
+  hid_t objattr_dataset_id = H5Dcreate2(dir_group_id, "ObjectItemAttributes", obj_item_attr_ftype,
+                                        objattr_dataspace_id, H5P_DEFAULT, objattr_properties, H5P_DEFAULT);
 
   // Create file type for statistics
   hid_t stat_ftype = H5Tcreate(H5T_COMPOUND, 32);
@@ -355,14 +352,14 @@ int sev_dbhdf5::create_db(char* dbname)
   // Create dataset ObjectItemsAttributes
   dim = 1;
   hid_t stat_dataspace_id = H5Screate_simple(1, &dim, NULL);
-  hid_t stat_dataset_id = H5Dcreate2(dir_group_id, "Stat", stat_ftype,
-      stat_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t stat_dataset_id =
+      H5Dcreate2(dir_group_id, "Stat", stat_ftype, stat_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   // Create dataset Cmn
   dim = 10;
   hid_t cmn_dataspace_id = H5Screate_simple(1, &dim, NULL);
-  hid_t cmn_dataset_id = H5Dcreate2(dir_group_id, "Cmn", H5T_STD_I32LE,
-      cmn_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t cmn_dataset_id =
+      H5Dcreate2(dir_group_id, "Cmn", H5T_STD_I32LE, cmn_dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   write_cmn();
 
   hsts = H5Fflush(m_file, H5F_SCOPE_GLOBAL);
@@ -411,18 +408,23 @@ int sev_dbhdf5::open_db()
   dcli_translate_filename(dbname, dbname);
 
   sts = dcli_file_time(dbname, &time);
-  if (sts == DCLI__NOFILE) {
+  if (sts == DCLI__NOFILE)
+  {
     // Create the database
     create_db(dbname);
-  } else {
+  }
+  else
+  {
     // Open the database
     m_file = H5Fopen(dbname, H5F_ACC_RDWR, H5P_DEFAULT);
-    if (m_file == -1) {
+    if (m_file == -1)
+    {
       errh_Error("Unable to open database '%s'", dbname);
       return 0;
     }
   }
-  if (!m_file) {
+  if (!m_file)
+  {
     errh_Error("Unable to open database '%s'", dbname);
     return 0;
   }
@@ -436,8 +438,7 @@ int sev_dbhdf5::open_db()
 int sev_dbhdf5::read_cmn()
 {
   hid_t dataset_id = H5Dopen2(m_file, cName_Dir cName_Cmn, H5P_DEFAULT);
-  herr_t status = H5Dread(
-      dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &m_cmn);
+  herr_t status = H5Dread(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &m_cmn);
   status = H5Dclose(dataset_id);
   return 1;
 }
@@ -445,23 +446,19 @@ int sev_dbhdf5::read_cmn()
 int sev_dbhdf5::write_cmn()
 {
   hid_t dataset_id = H5Dopen2(m_file, cName_Dir cName_Cmn, H5P_DEFAULT);
-  herr_t status = H5Dwrite(
-      dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &m_cmn);
+  herr_t status = H5Dwrite(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &m_cmn);
   status = H5Dclose(dataset_id);
   return 1;
 }
 
-int sev_dbhdf5::checkAndUpdateVersion(unsigned int version)
-{
-  return 1;
-}
+int sev_dbhdf5::checkAndUpdateVersion(unsigned int version) { return 1; }
 
-sev_eDataType sev_dbhdf5::get_datatype(
-    pwr_eType type, pwr_tMask options, unsigned int size)
+sev_eDataType sev_dbhdf5::get_datatype(pwr_eType type, pwr_tMask options, unsigned int size)
 {
   sev_eDataType dtype;
 
-  switch (type) {
+  switch (type)
+  {
   case pwr_eType_Boolean:
     dtype = sev_eDataType_Boolean;
     break;
@@ -502,7 +499,8 @@ sev_eDataType sev_dbhdf5::get_datatype(
     dtype = sev_eDataType_DeltaTime;
     break;
   case pwr_eType_String:
-    switch (size) {
+    switch (size)
+    {
     case 8:
       dtype = sev_eDataType_String8;
       break;
@@ -532,27 +530,24 @@ sev_eDataType sev_dbhdf5::get_datatype(
     return sev_eDataType_Unknown;
   }
 
-  if (options & pwr_mSevOptionsMask_HighTimeResolution
-      && !(options & pwr_mSevOptionsMask_UseDeadBand))
+  if (options & pwr_mSevOptionsMask_HighTimeResolution && !(options & pwr_mSevOptionsMask_UseDeadBand))
     dtype = sev_eDataType(dtype + 1);
-  else if (!(options & pwr_mSevOptionsMask_HighTimeResolution)
-      && options & pwr_mSevOptionsMask_UseDeadBand)
+  else if (!(options & pwr_mSevOptionsMask_HighTimeResolution) && options & pwr_mSevOptionsMask_UseDeadBand)
     dtype = sev_eDataType(dtype + 2);
-  else if (options & pwr_mSevOptionsMask_HighTimeResolution
-      && options & pwr_mSevOptionsMask_UseDeadBand)
+  else if (options & pwr_mSevOptionsMask_HighTimeResolution && options & pwr_mSevOptionsMask_UseDeadBand)
     dtype = sev_eDataType(dtype + 3);
 
   return dtype;
 }
 
-int sev_dbhdf5::get_fdatatype(
-    sev_eDataType type, unsigned int size, hid_t* mtype)
+int sev_dbhdf5::get_fdatatype(sev_eDataType type, unsigned int size, hid_t* mtype)
 {
   herr_t hsts;
   hid_t str_type;
 
   // Create type
-  switch (type) {
+  switch (type)
+  {
   case sev_eDataType_Boolean:
     *mtype = H5Tcreate(H5T_COMPOUND, 8);
     hsts = H5Tinsert(*mtype, "time", 0, H5T_STD_U32LE);
@@ -1156,20 +1151,21 @@ int sev_dbhdf5::get_fdatatype(
   return 1;
 }
 
-int sev_dbhdf5::get_mdatatype(
-    sev_eDataType type, unsigned int size, hid_t* mtype)
+int sev_dbhdf5::get_mdatatype(sev_eDataType type, unsigned int size, hid_t* mtype)
 {
   herr_t hsts;
   hid_t str_type;
 
-  if (m_value_mtype[type]) {
+  if (m_value_mtype[type])
+  {
     // Type already created
     *mtype = m_value_mtype[type];
     return 1;
   }
 
   // Create type
-  switch (type) {
+  switch (type)
+  {
   case sev_eDataType_Boolean:
     *mtype = H5Tcreate(H5T_COMPOUND, 8);
     hsts = H5Tinsert(*mtype, "time", 0, H5_U32);
@@ -1776,20 +1772,21 @@ int sev_dbhdf5::get_mdatatype(
 
 void sev_dbhdf5::free_mdatatype()
 {
-  for (int i = 0; i < sev_eDataType__; i++) {
-    if (m_value_mtype[i]) {
+  for (int i = 0; i < sev_eDataType__; i++)
+  {
+    if (m_value_mtype[i])
+    {
       H5Tclose(m_value_mtype[i]);
       m_value_mtype[i] = 0;
     }
   }
 }
 
-int sev_dbhdf5::create_table(pwr_tStatus* sts, char* tablename, pwr_eType type,
-    unsigned int size, pwr_tMask options, float deadband,
-    pwr_tDeltaTime storage_time, pwr_tFloat32 scantime)
+int sev_dbhdf5::create_table(pwr_tStatus* sts, char* tablename, pwr_eType type, unsigned int size,
+                             pwr_tMask options, float deadband, pwr_tDeltaTime storage_time,
+                             pwr_tFloat32 scantime)
 {
-  unsigned int table_len
-      = int((pwr_tFloat32(storage_time.tv_sec) / scantime + 0.5));
+  unsigned int table_len = int((pwr_tFloat32(storage_time.tv_sec) / scantime + 0.5));
   char gname[200], dname[200];
   herr_t hsts;
   hsize_t dim, max_dim;
@@ -1805,8 +1802,7 @@ int sev_dbhdf5::create_table(pwr_tStatus* sts, char* tablename, pwr_eType type,
   strcpy(gname, cName_Tables);
   strcat(gname, "/");
   strcat(gname, tablename);
-  hid_t group_id
-      = H5Gcreate2(m_file, gname, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t group_id = H5Gcreate2(m_file, gname, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   strcpy(dname, gname);
   strcat(dname, cName_Data);
@@ -1815,8 +1811,8 @@ int sev_dbhdf5::create_table(pwr_tStatus* sts, char* tablename, pwr_eType type,
   hid_t properties = H5Pcreate(H5P_DATASET_CREATE);
   hsts = H5Pset_chunk(properties, 1, &dim);
   hid_t dataspace_id = H5Screate_simple(1, &dim, &max_dim);
-  hid_t dataset_id = H5Dcreate2(m_file, dname, table_ftype, dataspace_id,
-      H5P_DEFAULT, properties, H5P_DEFAULT);
+  hid_t dataset_id =
+      H5Dcreate2(m_file, dname, table_ftype, dataspace_id, H5P_DEFAULT, properties, H5P_DEFAULT);
 
   H5Pclose(properties);
   H5Sclose(dataspace_id);
@@ -1834,8 +1830,7 @@ int sev_dbhdf5::create_table(pwr_tStatus* sts, char* tablename, pwr_eType type,
   strcat(dname, cName_Header);
   dim = 1;
   dataspace_id = H5Screate_simple(1, &dim, 0);
-  dataset_id = H5Dcreate2(m_file, dname, header_ftype, dataspace_id,
-      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  dataset_id = H5Dcreate2(m_file, dname, header_ftype, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   sev_sHeader header;
   header.data_size = table_len;
@@ -1845,8 +1840,7 @@ int sev_dbhdf5::create_table(pwr_tStatus* sts, char* tablename, pwr_eType type,
   header.first_time = 0;
   header.last_time = 0;
 
-  hsts = H5Dwrite(
-      dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
+  hsts = H5Dwrite(dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
 
   H5Sclose(dataspace_id);
   H5Dclose(dataset_id);
@@ -1882,8 +1876,8 @@ int sev_dbhdf5::delete_table(pwr_tStatus* sts, char* tablename)
   return 1;
 }
 
-int sev_dbhdf5::create_event_table(pwr_tStatus* sts, char* tablename,
-    pwr_tMask options, pwr_tDeltaTime storage_time, pwr_tFloat32 scantime)
+int sev_dbhdf5::create_event_table(pwr_tStatus* sts, char* tablename, pwr_tMask options,
+                                   pwr_tDeltaTime storage_time, pwr_tFloat32 scantime)
 {
   unsigned int table_len = int(scantime);
   char gname[200], dname[200];
@@ -1911,8 +1905,7 @@ int sev_dbhdf5::create_event_table(pwr_tStatus* sts, char* tablename,
   strcpy(gname, cName_Tables);
   strcat(gname, "/");
   strcat(gname, tablename);
-  hid_t group_id
-      = H5Gcreate2(m_file, gname, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t group_id = H5Gcreate2(m_file, gname, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   strcpy(dname, gname);
   strcat(dname, cName_Data);
@@ -1921,8 +1914,8 @@ int sev_dbhdf5::create_event_table(pwr_tStatus* sts, char* tablename,
   hid_t properties = H5Pcreate(H5P_DATASET_CREATE);
   hsts = H5Pset_chunk(properties, 1, &dim);
   hid_t dataspace_id = H5Screate_simple(1, &dim, &max_dim);
-  hid_t dataset_id = H5Dcreate2(m_file, dname, table_ftype, dataspace_id,
-      H5P_DEFAULT, properties, H5P_DEFAULT);
+  hid_t dataset_id =
+      H5Dcreate2(m_file, dname, table_ftype, dataspace_id, H5P_DEFAULT, properties, H5P_DEFAULT);
 
   H5Pclose(properties);
   H5Sclose(dataspace_id);
@@ -1940,8 +1933,7 @@ int sev_dbhdf5::create_event_table(pwr_tStatus* sts, char* tablename,
   strcat(dname, cName_Header);
   dim = 1;
   dataspace_id = H5Screate_simple(1, &dim, 0);
-  dataset_id = H5Dcreate2(m_file, dname, header_ftype, dataspace_id,
-      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  dataset_id = H5Dcreate2(m_file, dname, header_ftype, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   sev_sHeader header;
   header.data_size = table_len;
@@ -1951,8 +1943,7 @@ int sev_dbhdf5::create_event_table(pwr_tStatus* sts, char* tablename,
   header.first_time = 0;
   header.last_time = 0;
 
-  hsts = H5Dwrite(
-      dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
+  hsts = H5Dwrite(dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
 
   H5Sclose(dataspace_id);
   H5Dclose(dataset_id);
@@ -2013,8 +2004,7 @@ int sev_dbhdf5::objectitems_extend()
 
 int sev_dbhdf5::objectitemattr_extend()
 {
-  hid_t dataset_id
-      = H5Dopen2(m_file, cName_Dir cName_ObjectItemAttributes, H5P_DEFAULT);
+  hid_t dataset_id = H5Dopen2(m_file, cName_Dir cName_ObjectItemAttributes, H5P_DEFAULT);
   hsize_t dim = m_cmn.objectitemattr_alloc + m_cItemsExtendSize;
   herr_t hsts = H5Dset_extent(dataset_id, &dim);
   m_cmn.objectitemattr_alloc += m_cItemsExtendSize;
@@ -2025,16 +2015,17 @@ int sev_dbhdf5::objectitemattr_extend()
   return 1;
 }
 
-int sev_dbhdf5::store_item(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
-    char* oname, char* aname, pwr_tDeltaTime storagetime, pwr_eType vtype,
-    unsigned int vsize, char* description, char* unit, pwr_tFloat32 scantime,
-    pwr_tFloat32 deadband, pwr_tMask options, unsigned int* idx)
+int sev_dbhdf5::store_item(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                           pwr_tDeltaTime storagetime, pwr_eType vtype, unsigned int vsize, char* description,
+                           char* unit, pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options,
+                           unsigned int* idx)
 {
   sev_sItem item;
   pwr_tTime current_time;
   herr_t hsts;
 
-  if (m_cmn.next_items_idx >= m_cmn.items_alloc) {
+  if (m_cmn.next_items_idx >= m_cmn.items_alloc)
+  {
     // Extend items dataset
     items_extend();
   }
@@ -2071,12 +2062,10 @@ int sev_dbhdf5::store_item(pwr_tStatus* sts, char* tablename, pwr_tOid oid,
   hid_t memspace_id = H5Screate_simple(1, &dim, NULL);
   hid_t dataspace_id = H5Dget_space(dataset_id);
 
-  hsts = H5Sselect_hyperslab(
-      dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+  hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
   // Write the dataset
-  hsts = H5Dwrite(
-      dataset_id, m_item_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &item);
+  hsts = H5Dwrite(dataset_id, m_item_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &item);
 
   *idx = m_cmn.next_items_idx;
   m_cmn.next_items_idx++;
@@ -2109,12 +2098,10 @@ int sev_dbhdf5::update_item(sev_item* item)
   hid_t memspace_id = H5Screate_simple(1, &dim, NULL);
   hid_t dataspace_id = H5Dget_space(dataset_id);
 
-  hsts = H5Sselect_hyperslab(
-      dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+  hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
   // Read the dataset
-  hsts = H5Dwrite(
-      dataset_id, m_item_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &ritem);
+  hsts = H5Dwrite(dataset_id, m_item_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &ritem);
 
   ritem.id = item->id;
   strncpy(ritem.tablename, item->tablename, sizeof(ritem.tablename));
@@ -2136,8 +2123,7 @@ int sev_dbhdf5::update_item(sev_item* item)
 
   // Create the data space for the dataset.
   // Write the dataset
-  hsts = H5Dwrite(
-      dataset_id, m_item_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &item);
+  hsts = H5Dwrite(dataset_id, m_item_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &item);
 
   hsts = H5Fflush(m_file, H5F_SCOPE_GLOBAL);
 
@@ -2149,10 +2135,7 @@ int sev_dbhdf5::update_item(sev_item* item)
   return 1;
 }
 
-int sev_dbhdf5::remove_item(pwr_tStatus* sts, pwr_tOid oid, char* aname)
-{
-  return 1;
-}
+int sev_dbhdf5::remove_item(pwr_tStatus* sts, pwr_tOid oid, char* aname) { return 1; }
 
 int sev_dbhdf5::get_items(pwr_tStatus* sts)
 {
@@ -2166,19 +2149,18 @@ int sev_dbhdf5::get_items(pwr_tStatus* sts)
   hid_t memspace_id = H5Screate_simple(1, &dim, NULL);
   hid_t dataspace_id = H5Dget_space(dataset_id);
 
-  for (int idx = 0; idx < m_cmn.next_items_idx; idx++) {
+  for (int idx = 0; idx < m_cmn.next_items_idx; idx++)
+  {
     // Create the data space for the dataset.
     hsize_t offset = idx;
     hsize_t count = dim;
     hsize_t stride = 1;
     hsize_t block = 1;
 
-    hsts = H5Sselect_hyperslab(
-        dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+    hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
     // Read the dataset
-    hsts = H5Dread(dataset_id, m_item_mtype, memspace_id, dataspace_id,
-        H5P_DEFAULT, &ritem);
+    hsts = H5Dread(dataset_id, m_item_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &ritem);
 
     if (ritem.deleted == 1 || ritem.vid == 0)
       continue;
@@ -2217,8 +2199,8 @@ int sev_dbhdf5::get_items(pwr_tStatus* sts)
   return 1;
 }
 
-int sev_dbhdf5::store_value(pwr_tStatus* sts, void* thread, int item_idx,
-    int attr_idx, pwr_tTime time, void* buf, unsigned int size)
+int sev_dbhdf5::store_value(pwr_tStatus* sts, void* thread, int item_idx, int attr_idx, pwr_tTime time,
+                            void* buf, unsigned int size)
 {
   sev_uDataType data;
   sev_sHeader header;
@@ -2228,9 +2210,9 @@ int sev_dbhdf5::store_value(pwr_tStatus* sts, void* thread, int item_idx,
 
   if (streq(m_items[item_idx].attr[0].aname, "Events"))
     return 1;
-  if (m_items[item_idx].attrnum > 1) {
-    return store_objectvalue(
-        sts, item_idx, attr_idx, time, buf, m_items[item_idx].old_value, size);
+  if (m_items[item_idx].attrnum > 1)
+  {
+    return store_objectvalue(sts, item_idx, attr_idx, time, buf, m_items[item_idx].old_value, size);
   }
 
   // Read header
@@ -2244,17 +2226,20 @@ int sev_dbhdf5::store_value(pwr_tStatus* sts, void* thread, int item_idx,
   if (dataset_id == -1)
     return SEV__NOSUCHTABLE;
 
-  hsts = H5Dread(
-      dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
+  hsts = H5Dread(dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
 
-  if (header.first_idx == -1) {
+  if (header.first_idx == -1)
+  {
     header.first_idx = 0;
     header.last_idx = 0;
-  } else {
+  }
+  else
+  {
     header.last_idx++;
     if (header.last_idx >= (int)header.data_size)
       header.last_idx = 0;
-    if (header.last_idx == header.first_idx) {
+    if (header.last_idx == header.first_idx)
+    {
       header.first_idx++;
       if (header.first_idx >= (int)header.data_size)
         header.first_idx = 0;
@@ -2262,294 +2247,342 @@ int sev_dbhdf5::store_value(pwr_tStatus* sts, void* thread, int item_idx,
   }
 
   header.last_time = time.tv_sec;
-  hsts = H5Dwrite(
-      dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
+  hsts = H5Dwrite(dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
   H5Dclose(dataset_id);
 
-  switch (header.data_type) {
-  case sev_eDataType_Boolean: {
+  switch (header.data_type)
+  {
+  case sev_eDataType_Boolean:
+  {
     data.dtBoolean.time = time.tv_sec;
     data.dtBoolean.value = *(pwr_tBoolean*)buf;
     break;
   }
-  case sev_eDataType_BooleanHt: {
+  case sev_eDataType_BooleanHt:
+  {
     data.dtBooleanHt.time = time.tv_sec;
     data.dtBooleanHt.ntime = time.tv_nsec;
     data.dtBooleanHt.value = *(pwr_tBoolean*)buf;
     break;
   }
-  case sev_eDataType_BooleanDb: {
+  case sev_eDataType_BooleanDb:
+  {
     data.dtBooleanDb.time = time.tv_sec;
     data.dtBooleanDb.jump = 0;
     data.dtBooleanDb.value = *(pwr_tBoolean*)buf;
     break;
   }
-  case sev_eDataType_BooleanHtDb: {
+  case sev_eDataType_BooleanHtDb:
+  {
     data.dtBooleanHtDb.time = time.tv_sec;
     data.dtBooleanHtDb.ntime = time.tv_nsec;
     data.dtBooleanHtDb.jump = 0;
     data.dtBooleanHtDb.value = *(pwr_tBoolean*)buf;
     break;
   }
-  case sev_eDataType_Int8: {
+  case sev_eDataType_Int8:
+  {
     data.dtInt8.time = time.tv_sec;
     data.dtInt8.value = *(pwr_tInt8*)buf;
     break;
   }
-  case sev_eDataType_Int8Ht: {
+  case sev_eDataType_Int8Ht:
+  {
     data.dtInt8Ht.time = time.tv_sec;
     data.dtInt8Ht.ntime = time.tv_nsec;
     data.dtInt8Ht.value = *(pwr_tInt8*)buf;
     break;
   }
-  case sev_eDataType_Int8Db: {
+  case sev_eDataType_Int8Db:
+  {
     data.dtInt8Db.time = time.tv_sec;
     data.dtInt8Db.jump = 0;
     data.dtInt8Db.value = *(pwr_tInt8*)buf;
     break;
   }
-  case sev_eDataType_Int8HtDb: {
+  case sev_eDataType_Int8HtDb:
+  {
     data.dtInt8HtDb.time = time.tv_sec;
     data.dtInt8HtDb.ntime = time.tv_nsec;
     data.dtInt8HtDb.jump = 0;
     data.dtInt8HtDb.value = *(pwr_tInt8*)buf;
     break;
   }
-  case sev_eDataType_Int16: {
+  case sev_eDataType_Int16:
+  {
     data.dtInt16.time = time.tv_sec;
     data.dtInt16.value = *(pwr_tInt16*)buf;
     break;
   }
-  case sev_eDataType_Int16Ht: {
+  case sev_eDataType_Int16Ht:
+  {
     data.dtInt16Ht.time = time.tv_sec;
     data.dtInt16Ht.ntime = time.tv_nsec;
     data.dtInt16Ht.value = *(pwr_tInt16*)buf;
     break;
   }
-  case sev_eDataType_Int16Db: {
+  case sev_eDataType_Int16Db:
+  {
     data.dtInt16Db.time = time.tv_sec;
     data.dtInt16Db.jump = 0;
     data.dtInt16Db.value = *(pwr_tInt16*)buf;
     break;
   }
-  case sev_eDataType_Int16HtDb: {
+  case sev_eDataType_Int16HtDb:
+  {
     data.dtInt16HtDb.time = time.tv_sec;
     data.dtInt16HtDb.ntime = time.tv_nsec;
     data.dtInt16HtDb.jump = 0;
     data.dtInt16HtDb.value = *(pwr_tInt16*)buf;
     break;
   }
-  case sev_eDataType_Int32: {
+  case sev_eDataType_Int32:
+  {
     data.dtInt32.time = time.tv_sec;
     data.dtInt32.value = *(pwr_tInt32*)buf;
     break;
   }
-  case sev_eDataType_Int32Ht: {
+  case sev_eDataType_Int32Ht:
+  {
     data.dtInt32Ht.time = time.tv_sec;
     data.dtInt32Ht.ntime = time.tv_nsec;
     data.dtInt32Ht.value = *(pwr_tInt32*)buf;
     break;
   }
-  case sev_eDataType_Int32Db: {
+  case sev_eDataType_Int32Db:
+  {
     data.dtInt32Db.time = time.tv_sec;
     data.dtInt32Db.jump = 0;
     data.dtInt32Db.value = *(pwr_tInt32*)buf;
     break;
   }
-  case sev_eDataType_Int32HtDb: {
+  case sev_eDataType_Int32HtDb:
+  {
     data.dtInt32HtDb.time = time.tv_sec;
     data.dtInt32HtDb.ntime = time.tv_nsec;
     data.dtInt32HtDb.jump = 0;
     data.dtInt32HtDb.value = *(pwr_tInt32*)buf;
     break;
   }
-  case sev_eDataType_Int64: {
+  case sev_eDataType_Int64:
+  {
     data.dtInt64.time = time.tv_sec;
     data.dtInt64.value = *(pwr_tInt64*)buf;
     break;
   }
-  case sev_eDataType_Int64Ht: {
+  case sev_eDataType_Int64Ht:
+  {
     data.dtInt64Ht.time = time.tv_sec;
     data.dtInt64Ht.ntime = time.tv_nsec;
     data.dtInt64Ht.value = *(pwr_tInt64*)buf;
     break;
   }
-  case sev_eDataType_Int64Db: {
+  case sev_eDataType_Int64Db:
+  {
     data.dtInt64Db.time = time.tv_sec;
     data.dtInt64Db.jump = 0;
     data.dtInt64Db.value = *(pwr_tInt64*)buf;
     break;
   }
-  case sev_eDataType_Int64HtDb: {
+  case sev_eDataType_Int64HtDb:
+  {
     data.dtInt64HtDb.time = time.tv_sec;
     data.dtInt64HtDb.ntime = time.tv_nsec;
     data.dtInt64HtDb.jump = 0;
     data.dtInt64HtDb.value = *(pwr_tInt64*)buf;
     break;
   }
-  case sev_eDataType_UInt8: {
+  case sev_eDataType_UInt8:
+  {
     data.dtUInt8.time = time.tv_sec;
     data.dtUInt8.value = *(pwr_tUInt8*)buf;
     break;
   }
-  case sev_eDataType_UInt8Ht: {
+  case sev_eDataType_UInt8Ht:
+  {
     data.dtUInt8Ht.time = time.tv_sec;
     data.dtUInt8Ht.ntime = time.tv_nsec;
     data.dtUInt8Ht.value = *(pwr_tUInt8*)buf;
     break;
   }
-  case sev_eDataType_UInt8Db: {
+  case sev_eDataType_UInt8Db:
+  {
     data.dtUInt8Db.time = time.tv_sec;
     data.dtUInt8Db.jump = 0;
     data.dtUInt8Db.value = *(pwr_tUInt8*)buf;
     break;
   }
-  case sev_eDataType_UInt8HtDb: {
+  case sev_eDataType_UInt8HtDb:
+  {
     data.dtUInt8HtDb.time = time.tv_sec;
     data.dtUInt8HtDb.ntime = time.tv_nsec;
     data.dtUInt8HtDb.jump = 0;
     data.dtUInt8HtDb.value = *(pwr_tUInt8*)buf;
     break;
   }
-  case sev_eDataType_UInt16: {
+  case sev_eDataType_UInt16:
+  {
     data.dtUInt16.time = time.tv_sec;
     data.dtUInt16.value = *(pwr_tUInt16*)buf;
     break;
   }
-  case sev_eDataType_UInt16Ht: {
+  case sev_eDataType_UInt16Ht:
+  {
     data.dtUInt16Ht.time = time.tv_sec;
     data.dtUInt16Ht.ntime = time.tv_nsec;
     data.dtUInt16Ht.value = *(pwr_tUInt16*)buf;
     break;
   }
-  case sev_eDataType_UInt16Db: {
+  case sev_eDataType_UInt16Db:
+  {
     data.dtUInt16Db.time = time.tv_sec;
     data.dtUInt16Db.jump = 0;
     data.dtUInt16Db.value = *(pwr_tUInt16*)buf;
     break;
   }
-  case sev_eDataType_UInt16HtDb: {
+  case sev_eDataType_UInt16HtDb:
+  {
     data.dtUInt16HtDb.time = time.tv_sec;
     data.dtUInt16HtDb.ntime = time.tv_nsec;
     data.dtUInt16HtDb.jump = 0;
     data.dtUInt16HtDb.value = *(pwr_tUInt16*)buf;
     break;
   }
-  case sev_eDataType_UInt32: {
+  case sev_eDataType_UInt32:
+  {
     data.dtUInt32.time = time.tv_sec;
     data.dtUInt32.value = *(pwr_tUInt32*)buf;
     break;
   }
-  case sev_eDataType_UInt32Ht: {
+  case sev_eDataType_UInt32Ht:
+  {
     data.dtUInt32Ht.time = time.tv_sec;
     data.dtUInt32Ht.ntime = time.tv_nsec;
     data.dtUInt32Ht.value = *(pwr_tUInt32*)buf;
     break;
   }
-  case sev_eDataType_UInt32Db: {
+  case sev_eDataType_UInt32Db:
+  {
     data.dtUInt32Db.time = time.tv_sec;
     data.dtUInt32Db.jump = 0;
     data.dtUInt32Db.value = *(pwr_tUInt32*)buf;
     break;
   }
-  case sev_eDataType_UInt32HtDb: {
+  case sev_eDataType_UInt32HtDb:
+  {
     data.dtUInt32HtDb.time = time.tv_sec;
     data.dtUInt32HtDb.ntime = time.tv_nsec;
     data.dtUInt32HtDb.jump = 0;
     data.dtUInt32HtDb.value = *(pwr_tUInt32*)buf;
     break;
   }
-  case sev_eDataType_UInt64: {
+  case sev_eDataType_UInt64:
+  {
     data.dtUInt64.time = time.tv_sec;
     data.dtUInt64.value = *(pwr_tUInt64*)buf;
     break;
   }
-  case sev_eDataType_UInt64Ht: {
+  case sev_eDataType_UInt64Ht:
+  {
     data.dtUInt64Ht.time = time.tv_sec;
     data.dtUInt64Ht.ntime = time.tv_nsec;
     data.dtUInt64Ht.value = *(pwr_tUInt64*)buf;
     break;
   }
-  case sev_eDataType_UInt64Db: {
+  case sev_eDataType_UInt64Db:
+  {
     data.dtUInt64Db.time = time.tv_sec;
     data.dtUInt64Db.jump = 0;
     data.dtUInt64Db.value = *(pwr_tUInt64*)buf;
     break;
   }
-  case sev_eDataType_UInt64HtDb: {
+  case sev_eDataType_UInt64HtDb:
+  {
     data.dtUInt64HtDb.time = time.tv_sec;
     data.dtUInt64HtDb.ntime = time.tv_nsec;
     data.dtUInt64HtDb.jump = 0;
     data.dtUInt64HtDb.value = *(pwr_tUInt64*)buf;
     break;
   }
-  case sev_eDataType_Float32: {
+  case sev_eDataType_Float32:
+  {
     data.dtFloat32.time = time.tv_sec;
     data.dtFloat32.value = *(pwr_tFloat32*)buf;
     break;
   }
-  case sev_eDataType_Float32Ht: {
+  case sev_eDataType_Float32Ht:
+  {
     data.dtFloat32Ht.time = time.tv_sec;
     data.dtFloat32Ht.ntime = time.tv_nsec;
     data.dtFloat32Ht.value = *(pwr_tFloat32*)buf;
     break;
   }
-  case sev_eDataType_Float32Db: {
+  case sev_eDataType_Float32Db:
+  {
     data.dtFloat32Db.time = time.tv_sec;
     data.dtFloat32Db.jump = 0;
     data.dtFloat32Db.value = *(pwr_tFloat32*)buf;
     break;
   }
-  case sev_eDataType_Float32HtDb: {
+  case sev_eDataType_Float32HtDb:
+  {
     data.dtFloat32HtDb.time = time.tv_sec;
     data.dtFloat32HtDb.ntime = time.tv_nsec;
     data.dtFloat32HtDb.jump = 0;
     data.dtFloat32HtDb.value = *(pwr_tFloat32*)buf;
     break;
   }
-  case sev_eDataType_Float64: {
+  case sev_eDataType_Float64:
+  {
     data.dtFloat64.time = time.tv_sec;
     data.dtFloat64.value = *(pwr_tFloat64*)buf;
     break;
   }
-  case sev_eDataType_Float64Ht: {
+  case sev_eDataType_Float64Ht:
+  {
     data.dtFloat64Ht.time = time.tv_sec;
     data.dtFloat64Ht.ntime = time.tv_nsec;
     data.dtFloat64Ht.value = *(pwr_tFloat64*)buf;
     break;
   }
-  case sev_eDataType_Float64Db: {
+  case sev_eDataType_Float64Db:
+  {
     data.dtFloat64Db.time = time.tv_sec;
     data.dtFloat64Db.jump = 0;
     data.dtFloat64Db.value = *(pwr_tFloat64*)buf;
     break;
   }
-  case sev_eDataType_Float64HtDb: {
+  case sev_eDataType_Float64HtDb:
+  {
     data.dtFloat64HtDb.time = time.tv_sec;
     data.dtFloat64HtDb.ntime = time.tv_nsec;
     data.dtFloat64HtDb.jump = 0;
     data.dtFloat64HtDb.value = *(pwr_tFloat64*)buf;
     break;
   }
-  case sev_eDataType_Time: {
+  case sev_eDataType_Time:
+  {
     data.dtTime.time = time.tv_sec;
     data.dtTime.value = ((pwr_tTime*)buf)->tv_sec;
     break;
   }
-  case sev_eDataType_TimeHt: {
+  case sev_eDataType_TimeHt:
+  {
     data.dtTimeHt.time = time.tv_sec;
     data.dtTimeHt.ntime = time.tv_nsec;
     data.dtTimeHt.value = ((pwr_tTime*)buf)->tv_sec;
     data.dtTimeHt.nvalue = ((pwr_tTime*)buf)->tv_nsec;
     break;
   }
-  case sev_eDataType_TimeDb: {
+  case sev_eDataType_TimeDb:
+  {
     data.dtTimeDb.time = time.tv_sec;
     data.dtTimeDb.jump = 0;
     data.dtTimeDb.value = ((pwr_tTime*)buf)->tv_sec;
     break;
   }
-  case sev_eDataType_TimeHtDb: {
+  case sev_eDataType_TimeHtDb:
+  {
     data.dtTimeHtDb.time = time.tv_sec;
     data.dtTimeHtDb.ntime = time.tv_nsec;
     data.dtTimeHtDb.jump = 0;
@@ -2557,25 +2590,29 @@ int sev_dbhdf5::store_value(pwr_tStatus* sts, void* thread, int item_idx,
     data.dtTimeHtDb.nvalue = ((pwr_tTime*)buf)->tv_nsec;
     break;
   }
-  case sev_eDataType_DeltaTime: {
+  case sev_eDataType_DeltaTime:
+  {
     data.dtDeltaTime.time = time.tv_sec;
     data.dtDeltaTime.value = ((pwr_tDeltaTime*)buf)->tv_sec;
     break;
   }
-  case sev_eDataType_DeltaTimeHt: {
+  case sev_eDataType_DeltaTimeHt:
+  {
     data.dtDeltaTimeHt.time = time.tv_sec;
     data.dtDeltaTimeHt.ntime = time.tv_nsec;
     data.dtDeltaTimeHt.value = ((pwr_tDeltaTime*)buf)->tv_sec;
     data.dtDeltaTimeHt.nvalue = ((pwr_tDeltaTime*)buf)->tv_nsec;
     break;
   }
-  case sev_eDataType_DeltaTimeDb: {
+  case sev_eDataType_DeltaTimeDb:
+  {
     data.dtDeltaTimeDb.time = time.tv_sec;
     data.dtDeltaTimeDb.jump = 0;
     data.dtDeltaTimeDb.value = ((pwr_tDeltaTime*)buf)->tv_sec;
     break;
   }
-  case sev_eDataType_DeltaTimeHtDb: {
+  case sev_eDataType_DeltaTimeHtDb:
+  {
     data.dtDeltaTimeHtDb.time = time.tv_sec;
     data.dtDeltaTimeHtDb.ntime = time.tv_nsec;
     data.dtDeltaTimeHtDb.jump = 0;
@@ -2583,168 +2620,196 @@ int sev_dbhdf5::store_value(pwr_tStatus* sts, void* thread, int item_idx,
     data.dtDeltaTimeHtDb.nvalue = ((pwr_tDeltaTime*)buf)->tv_nsec;
     break;
   }
-  case sev_eDataType_String8: {
+  case sev_eDataType_String8:
+  {
     data.dtString8.time = time.tv_sec;
     strncpy(data.dtString8.value, (char*)buf, sizeof(data.dtString8.value));
     break;
   }
-  case sev_eDataType_String8Ht: {
+  case sev_eDataType_String8Ht:
+  {
     data.dtString8Ht.time = time.tv_sec;
     data.dtString8Ht.ntime = time.tv_nsec;
     strncpy(data.dtString8.value, (char*)buf, sizeof(data.dtString8.value));
     break;
   }
-  case sev_eDataType_String8Db: {
+  case sev_eDataType_String8Db:
+  {
     data.dtString8Db.time = time.tv_sec;
     data.dtString8Db.jump = 0;
     strncpy(data.dtString8.value, (char*)buf, sizeof(data.dtString8.value));
     break;
   }
-  case sev_eDataType_String8HtDb: {
+  case sev_eDataType_String8HtDb:
+  {
     data.dtString8HtDb.time = time.tv_sec;
     data.dtString8HtDb.ntime = time.tv_nsec;
     data.dtString8HtDb.jump = 0;
     strncpy(data.dtString8.value, (char*)buf, sizeof(data.dtString8.value));
     break;
   }
-  case sev_eDataType_String16: {
+  case sev_eDataType_String16:
+  {
     data.dtString16.time = time.tv_sec;
     strncpy(data.dtString16.value, (char*)buf, sizeof(data.dtString16.value));
     break;
   }
-  case sev_eDataType_String16Ht: {
+  case sev_eDataType_String16Ht:
+  {
     data.dtString16Ht.time = time.tv_sec;
     data.dtString16Ht.ntime = time.tv_nsec;
     strncpy(data.dtString16.value, (char*)buf, sizeof(data.dtString16.value));
     break;
   }
-  case sev_eDataType_String16Db: {
+  case sev_eDataType_String16Db:
+  {
     data.dtString16Db.time = time.tv_sec;
     data.dtString16Db.jump = 0;
     strncpy(data.dtString16.value, (char*)buf, sizeof(data.dtString16.value));
     break;
   }
-  case sev_eDataType_String16HtDb: {
+  case sev_eDataType_String16HtDb:
+  {
     data.dtString16HtDb.time = time.tv_sec;
     data.dtString16HtDb.ntime = time.tv_nsec;
     data.dtString16HtDb.jump = 0;
     strncpy(data.dtString16.value, (char*)buf, sizeof(data.dtString16.value));
     break;
   }
-  case sev_eDataType_String32: {
+  case sev_eDataType_String32:
+  {
     data.dtString32.time = time.tv_sec;
     strncpy(data.dtString32.value, (char*)buf, sizeof(data.dtString32.value));
     break;
   }
-  case sev_eDataType_String32Ht: {
+  case sev_eDataType_String32Ht:
+  {
     data.dtString32Ht.time = time.tv_sec;
     data.dtString32Ht.ntime = time.tv_nsec;
     strncpy(data.dtString32.value, (char*)buf, sizeof(data.dtString32.value));
     break;
   }
-  case sev_eDataType_String32Db: {
+  case sev_eDataType_String32Db:
+  {
     data.dtString32Db.time = time.tv_sec;
     data.dtString32Db.jump = 0;
     strncpy(data.dtString32.value, (char*)buf, sizeof(data.dtString32.value));
     break;
   }
-  case sev_eDataType_String32HtDb: {
+  case sev_eDataType_String32HtDb:
+  {
     data.dtString32HtDb.time = time.tv_sec;
     data.dtString32HtDb.ntime = time.tv_nsec;
     data.dtString32HtDb.jump = 0;
     strncpy(data.dtString32.value, (char*)buf, sizeof(data.dtString32.value));
     break;
   }
-  case sev_eDataType_String40: {
+  case sev_eDataType_String40:
+  {
     data.dtString40.time = time.tv_sec;
     strncpy(data.dtString40.value, (char*)buf, sizeof(data.dtString40.value));
     break;
   }
-  case sev_eDataType_String40Ht: {
+  case sev_eDataType_String40Ht:
+  {
     data.dtString40Ht.time = time.tv_sec;
     data.dtString40Ht.ntime = time.tv_nsec;
     strncpy(data.dtString40.value, (char*)buf, sizeof(data.dtString40.value));
     break;
   }
-  case sev_eDataType_String40Db: {
+  case sev_eDataType_String40Db:
+  {
     data.dtString40Db.time = time.tv_sec;
     data.dtString40Db.jump = 0;
     strncpy(data.dtString40.value, (char*)buf, sizeof(data.dtString40.value));
     break;
   }
-  case sev_eDataType_String40HtDb: {
+  case sev_eDataType_String40HtDb:
+  {
     data.dtString40HtDb.time = time.tv_sec;
     data.dtString40HtDb.ntime = time.tv_nsec;
     data.dtString40HtDb.jump = 0;
     strncpy(data.dtString40.value, (char*)buf, sizeof(data.dtString40.value));
     break;
   }
-  case sev_eDataType_String80: {
+  case sev_eDataType_String80:
+  {
     data.dtString80.time = time.tv_sec;
     strncpy(data.dtString80.value, (char*)buf, sizeof(data.dtString80.value));
     break;
   }
-  case sev_eDataType_String80Ht: {
+  case sev_eDataType_String80Ht:
+  {
     data.dtString80Ht.time = time.tv_sec;
     data.dtString80Ht.ntime = time.tv_nsec;
     strncpy(data.dtString80.value, (char*)buf, sizeof(data.dtString80.value));
     break;
   }
-  case sev_eDataType_String80Db: {
+  case sev_eDataType_String80Db:
+  {
     data.dtString80Db.time = time.tv_sec;
     data.dtString80Db.jump = 0;
     strncpy(data.dtString80.value, (char*)buf, sizeof(data.dtString80.value));
     break;
   }
-  case sev_eDataType_String80HtDb: {
+  case sev_eDataType_String80HtDb:
+  {
     data.dtString80HtDb.time = time.tv_sec;
     data.dtString80HtDb.ntime = time.tv_nsec;
     data.dtString80HtDb.jump = 0;
     strncpy(data.dtString80.value, (char*)buf, sizeof(data.dtString80.value));
     break;
   }
-  case sev_eDataType_String132: {
+  case sev_eDataType_String132:
+  {
     data.dtString132.time = time.tv_sec;
     strncpy(data.dtString132.value, (char*)buf, sizeof(data.dtString132.value));
     break;
   }
-  case sev_eDataType_String132Ht: {
+  case sev_eDataType_String132Ht:
+  {
     data.dtString132Ht.time = time.tv_sec;
     data.dtString132Ht.ntime = time.tv_nsec;
     strncpy(data.dtString132.value, (char*)buf, sizeof(data.dtString132.value));
     break;
   }
-  case sev_eDataType_String132Db: {
+  case sev_eDataType_String132Db:
+  {
     data.dtString132Db.time = time.tv_sec;
     data.dtString132Db.jump = 0;
     strncpy(data.dtString132.value, (char*)buf, sizeof(data.dtString132.value));
     break;
   }
-  case sev_eDataType_String132HtDb: {
+  case sev_eDataType_String132HtDb:
+  {
     data.dtString132HtDb.time = time.tv_sec;
     data.dtString132HtDb.ntime = time.tv_nsec;
     data.dtString132HtDb.jump = 0;
     strncpy(data.dtString132.value, (char*)buf, sizeof(data.dtString132.value));
     break;
   }
-  case sev_eDataType_String256: {
+  case sev_eDataType_String256:
+  {
     data.dtString256.time = time.tv_sec;
     strncpy(data.dtString256.value, (char*)buf, sizeof(data.dtString256.value));
     break;
   }
-  case sev_eDataType_String256Ht: {
+  case sev_eDataType_String256Ht:
+  {
     data.dtString256Ht.time = time.tv_sec;
     data.dtString256Ht.ntime = time.tv_nsec;
     strncpy(data.dtString256.value, (char*)buf, sizeof(data.dtString256.value));
     break;
   }
-  case sev_eDataType_String256Db: {
+  case sev_eDataType_String256Db:
+  {
     data.dtString256Db.time = time.tv_sec;
     data.dtString256Db.jump = 0;
     strncpy(data.dtString256.value, (char*)buf, sizeof(data.dtString256.value));
     break;
   }
-  case sev_eDataType_String256HtDb: {
+  case sev_eDataType_String256HtDb:
+  {
     data.dtString256HtDb.time = time.tv_sec;
     data.dtString256HtDb.ntime = time.tv_nsec;
     data.dtString256HtDb.jump = 0;
@@ -2773,12 +2838,10 @@ int sev_dbhdf5::store_value(pwr_tStatus* sts, void* thread, int item_idx,
   hid_t memspace_id = H5Screate_simple(1, &dim, NULL);
   hid_t dataspace_id = H5Dget_space(dataset_id);
 
-  hsts = H5Sselect_hyperslab(
-      dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+  hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
   // Write the dataset
-  hsts = H5Dwrite(
-      dataset_id, mdatatype, memspace_id, dataspace_id, H5P_DEFAULT, &data);
+  hsts = H5Dwrite(dataset_id, mdatatype, memspace_id, dataspace_id, H5P_DEFAULT, &data);
 
   hsts = H5Sclose(memspace_id);
   hsts = H5Sclose(dataspace_id);
@@ -2789,15 +2852,15 @@ int sev_dbhdf5::store_value(pwr_tStatus* sts, void* thread, int item_idx,
   return 1;
 }
 
-int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
-    pwr_tMask options, float deadband, char* aname, pwr_eType type,
-    unsigned int size, pwr_tFloat32 scantime, pwr_tTime* creatime,
-    pwr_tTime* starttime, pwr_tTime* endtime, int maxsize, pwr_tTime** tbuf,
-    void** vbuf, unsigned int* bsize)
+int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid, pwr_tMask options, float deadband,
+                           char* aname, pwr_eType type, unsigned int size, pwr_tFloat32 scantime,
+                           pwr_tTime* creatime, pwr_tTime* starttime, pwr_tTime* endtime, int maxsize,
+                           pwr_tTime** tbuf, void** vbuf, unsigned int* bsize)
 {
   unsigned int item_idx;
   get_item(sts, &item_idx, oid, aname);
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     return 0;
   }
 
@@ -2820,8 +2883,7 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
   strcat(dname, cName_Header);
 
   hid_t dataset_id = H5Dopen2(m_file, dname, H5P_DEFAULT);
-  hsts = H5Dread(
-      dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
+  hsts = H5Dread(dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
 
   if (header.first_idx == -1)
     return 0;
@@ -2840,42 +2902,44 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
     return 0;
 
   // Read time for first idx
-  pwr_tStatus lsts = get_time(dataset_id, memspace_id, dataspace_id, mdatatype,
-      header.first_idx, &first_time);
+  pwr_tStatus lsts =
+      get_time(dataset_id, memspace_id, dataspace_id, mdatatype, header.first_idx, &first_time);
 
   to = endtime->tv_sec;
   from = starttime->tv_sec;
   int res = (int)((float)(to - from) / scantime / 1000);
   if (res < 2)
     res = 2;
-  if (to < header.first_time || from > header.last_time) {
+  if (to < header.first_time || from > header.last_time)
+  {
     printf("No samples\n");
     return 0;
   }
   if (to > header.last_time)
     to_idx = header.last_idx;
-  else {
-    lsts = time_to_idx(dataset_id, memspace_id, dataspace_id, mdatatype, to,
-        header.data_size, header.first_idx, header.last_idx, first_time,
-        header.last_time, res, 0, &to_iter, &to_idx);
+  else
+  {
+    lsts =
+        time_to_idx(dataset_id, memspace_id, dataspace_id, mdatatype, to, header.data_size, header.first_idx,
+                    header.last_idx, first_time, header.last_time, res, 0, &to_iter, &to_idx);
   }
 
   if (from < first_time)
     from_idx = header.first_idx;
-  else {
-    lsts = time_to_idx(dataset_id, memspace_id, dataspace_id, mdatatype, from,
-        header.data_size, header.first_idx, header.last_idx, first_time,
-        header.last_time, res, 0, &from_iter, &from_idx);
+  else
+  {
+    lsts = time_to_idx(dataset_id, memspace_id, dataspace_id, mdatatype, from, header.data_size,
+                       header.first_idx, header.last_idx, first_time, header.last_time, res, 0, &from_iter,
+                       &from_idx);
   }
-  if (from_iter == ITER_MAX + 1 || to_iter == ITER_MAX + 1) {
+  if (from_iter == ITER_MAX + 1 || to_iter == ITER_MAX + 1)
+  {
     *sts = SEV__RANGE;
     return 0;
   }
 
-  printf("first time %d, last time %d res %d\n", first_time, header.last_time,
-      res);
-  printf("from idx  %d, to idx  %d, iter %d %d\n", from_idx, to_idx, from_iter,
-      to_iter);
+  printf("first time %d, last time %d res %d\n", first_time, header.last_time, res);
+  printf("from idx  %d, to idx  %d, iter %d %d\n", from_idx, to_idx, from_iter, to_iter);
 
   *tbuf = (pwr_tTime*)calloc(maxsize, sizeof(pwr_tTime));
   *vbuf = calloc(maxsize, size);
@@ -2889,7 +2953,8 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
     to_j += header.data_size;
   int div = (to_j - from_j) / maxsize + 1;
   printf("range %d div %d\n", to_j - from_j, div);
-  for (int j = from_j; j < to_j; j++) {
+  for (int j = from_j; j < to_j; j++)
+  {
     if (bcnt >= maxsize)
       break;
 
@@ -2905,22 +2970,23 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
     hsize_t stride = 1;
     hsize_t block = 1;
 
-    hsts = H5Sselect_hyperslab(
-        dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+    hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
     // Read the dataset
-    hsts = H5Dread(
-        dataset_id, mdatatype, memspace_id, dataspace_id, H5P_DEFAULT, &data);
+    hsts = H5Dread(dataset_id, mdatatype, memspace_id, dataspace_id, H5P_DEFAULT, &data);
 
-    switch (header.data_type) {
-    case sev_eDataType_Boolean: {
+    switch (header.data_type)
+    {
+    case sev_eDataType_Boolean:
+    {
       tbufp->tv_sec = data.dtBoolean.time;
       *(pwr_tBoolean*)vbufp = data.dtBoolean.value;
       tbufp++;
       vbufp += sizeof(pwr_tBoolean);
       break;
     }
-    case sev_eDataType_BooleanHt: {
+    case sev_eDataType_BooleanHt:
+    {
       tbufp->tv_sec = data.dtBooleanHt.time;
       tbufp->tv_nsec = data.dtBooleanHt.ntime;
       *(pwr_tBoolean*)vbufp = data.dtBooleanHt.value;
@@ -2928,14 +2994,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tBoolean);
       break;
     }
-    case sev_eDataType_BooleanDb: {
+    case sev_eDataType_BooleanDb:
+    {
       tbufp->tv_sec = data.dtBooleanDb.time;
       *(pwr_tBoolean*)vbufp = data.dtBooleanDb.value;
       tbufp++;
       vbufp += sizeof(pwr_tBoolean);
       break;
     }
-    case sev_eDataType_BooleanHtDb: {
+    case sev_eDataType_BooleanHtDb:
+    {
       tbufp->tv_sec = data.dtBooleanHtDb.time;
       tbufp->tv_nsec = data.dtBooleanHtDb.ntime;
       *(pwr_tBoolean*)vbufp = data.dtBooleanHtDb.value;
@@ -2943,14 +3011,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tBoolean);
       break;
     }
-    case sev_eDataType_Int8: {
+    case sev_eDataType_Int8:
+    {
       tbufp->tv_sec = data.dtInt8.time;
       *(pwr_tInt8*)vbufp = data.dtInt8.value;
       tbufp++;
       vbufp += sizeof(pwr_tInt8);
       break;
     }
-    case sev_eDataType_Int8Ht: {
+    case sev_eDataType_Int8Ht:
+    {
       tbufp->tv_sec = data.dtInt8Ht.time;
       tbufp->tv_nsec = data.dtInt8Ht.ntime;
       *(pwr_tInt8*)vbufp = data.dtInt8Ht.value;
@@ -2958,14 +3028,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tInt8);
       break;
     }
-    case sev_eDataType_Int8Db: {
+    case sev_eDataType_Int8Db:
+    {
       tbufp->tv_sec = data.dtInt8Db.time;
       *(pwr_tInt8*)vbufp = data.dtInt8Db.value;
       tbufp++;
       vbufp += sizeof(pwr_tInt8);
       break;
     }
-    case sev_eDataType_Int8HtDb: {
+    case sev_eDataType_Int8HtDb:
+    {
       tbufp->tv_sec = data.dtInt8HtDb.time;
       tbufp->tv_nsec = data.dtInt8HtDb.ntime;
       *(pwr_tInt8*)vbufp = data.dtInt8HtDb.value;
@@ -2973,14 +3045,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tInt8);
       break;
     }
-    case sev_eDataType_Int16: {
+    case sev_eDataType_Int16:
+    {
       tbufp->tv_sec = data.dtInt16.time;
       *(pwr_tInt16*)vbufp = data.dtInt16.value;
       tbufp++;
       vbufp += sizeof(pwr_tInt16);
       break;
     }
-    case sev_eDataType_Int16Ht: {
+    case sev_eDataType_Int16Ht:
+    {
       tbufp->tv_sec = data.dtInt16Ht.time;
       tbufp->tv_nsec = data.dtInt16Ht.ntime;
       *(pwr_tInt16*)vbufp = data.dtInt16Ht.value;
@@ -2988,14 +3062,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tInt16);
       break;
     }
-    case sev_eDataType_Int16Db: {
+    case sev_eDataType_Int16Db:
+    {
       tbufp->tv_sec = data.dtInt16Db.time;
       *(pwr_tInt16*)vbufp = data.dtInt16Db.value;
       tbufp++;
       vbufp += sizeof(pwr_tInt16);
       break;
     }
-    case sev_eDataType_Int16HtDb: {
+    case sev_eDataType_Int16HtDb:
+    {
       tbufp->tv_sec = data.dtInt16HtDb.time;
       tbufp->tv_nsec = data.dtInt16HtDb.ntime;
       *(pwr_tInt16*)vbufp = data.dtInt16HtDb.value;
@@ -3003,14 +3079,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tInt16);
       break;
     }
-    case sev_eDataType_Int32: {
+    case sev_eDataType_Int32:
+    {
       tbufp->tv_sec = data.dtInt32.time;
       *(pwr_tInt32*)vbufp = data.dtInt32.value;
       tbufp++;
       vbufp += sizeof(pwr_tInt32);
       break;
     }
-    case sev_eDataType_Int32Ht: {
+    case sev_eDataType_Int32Ht:
+    {
       tbufp->tv_sec = data.dtInt32Ht.time;
       tbufp->tv_nsec = data.dtInt32Ht.ntime;
       *(pwr_tInt32*)vbufp = data.dtInt32Ht.value;
@@ -3018,14 +3096,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tInt32);
       break;
     }
-    case sev_eDataType_Int32Db: {
+    case sev_eDataType_Int32Db:
+    {
       tbufp->tv_sec = data.dtInt32Db.time;
       *(pwr_tInt32*)vbufp = data.dtInt32Db.value;
       tbufp++;
       vbufp += sizeof(pwr_tInt32);
       break;
     }
-    case sev_eDataType_Int32HtDb: {
+    case sev_eDataType_Int32HtDb:
+    {
       tbufp->tv_sec = data.dtInt32HtDb.time;
       tbufp->tv_nsec = data.dtInt32HtDb.ntime;
       *(pwr_tInt32*)vbufp = data.dtInt32HtDb.value;
@@ -3033,14 +3113,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tInt32);
       break;
     }
-    case sev_eDataType_Int64: {
+    case sev_eDataType_Int64:
+    {
       tbufp->tv_sec = data.dtInt64.time;
       *(pwr_tInt64*)vbufp = data.dtInt64.value;
       tbufp++;
       vbufp += sizeof(pwr_tInt64);
       break;
     }
-    case sev_eDataType_Int64Ht: {
+    case sev_eDataType_Int64Ht:
+    {
       tbufp->tv_sec = data.dtInt64Ht.time;
       tbufp->tv_nsec = data.dtInt64Ht.ntime;
       *(pwr_tInt64*)vbufp = data.dtInt64Ht.value;
@@ -3048,14 +3130,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tInt64);
       break;
     }
-    case sev_eDataType_Int64Db: {
+    case sev_eDataType_Int64Db:
+    {
       tbufp->tv_sec = data.dtInt64Db.time;
       *(pwr_tInt64*)vbufp = data.dtInt64Db.value;
       tbufp++;
       vbufp += sizeof(pwr_tInt64);
       break;
     }
-    case sev_eDataType_Int64HtDb: {
+    case sev_eDataType_Int64HtDb:
+    {
       tbufp->tv_sec = data.dtInt64HtDb.time;
       tbufp->tv_nsec = data.dtInt64HtDb.ntime;
       *(pwr_tInt64*)vbufp = data.dtInt64HtDb.value;
@@ -3063,14 +3147,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tInt64);
       break;
     }
-    case sev_eDataType_UInt8: {
+    case sev_eDataType_UInt8:
+    {
       tbufp->tv_sec = data.dtUInt8.time;
       *(pwr_tUInt8*)vbufp = data.dtUInt8.value;
       tbufp++;
       vbufp += sizeof(pwr_tUInt8);
       break;
     }
-    case sev_eDataType_UInt8Ht: {
+    case sev_eDataType_UInt8Ht:
+    {
       tbufp->tv_sec = data.dtUInt8Ht.time;
       tbufp->tv_nsec = data.dtUInt8Ht.ntime;
       *(pwr_tUInt8*)vbufp = data.dtUInt8Ht.value;
@@ -3078,14 +3164,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tUInt8);
       break;
     }
-    case sev_eDataType_UInt8Db: {
+    case sev_eDataType_UInt8Db:
+    {
       tbufp->tv_sec = data.dtUInt8Db.time;
       *(pwr_tUInt8*)vbufp = data.dtUInt8Db.value;
       tbufp++;
       vbufp += sizeof(pwr_tUInt8);
       break;
     }
-    case sev_eDataType_UInt8HtDb: {
+    case sev_eDataType_UInt8HtDb:
+    {
       tbufp->tv_sec = data.dtUInt8HtDb.time;
       tbufp->tv_nsec = data.dtUInt8HtDb.ntime;
       *(pwr_tUInt8*)vbufp = data.dtUInt8HtDb.value;
@@ -3093,14 +3181,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tUInt8);
       break;
     }
-    case sev_eDataType_UInt16: {
+    case sev_eDataType_UInt16:
+    {
       tbufp->tv_sec = data.dtUInt16.time;
       *(pwr_tUInt16*)vbufp = data.dtUInt16.value;
       tbufp++;
       vbufp += sizeof(pwr_tUInt16);
       break;
     }
-    case sev_eDataType_UInt16Ht: {
+    case sev_eDataType_UInt16Ht:
+    {
       tbufp->tv_sec = data.dtUInt16Ht.time;
       tbufp->tv_nsec = data.dtUInt16Ht.ntime;
       *(pwr_tUInt16*)vbufp = data.dtUInt16Ht.value;
@@ -3108,14 +3198,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tUInt16);
       break;
     }
-    case sev_eDataType_UInt16Db: {
+    case sev_eDataType_UInt16Db:
+    {
       tbufp->tv_sec = data.dtUInt16Db.time;
       *(pwr_tUInt16*)vbufp = data.dtUInt16Db.value;
       tbufp++;
       vbufp += sizeof(pwr_tUInt16);
       break;
     }
-    case sev_eDataType_UInt16HtDb: {
+    case sev_eDataType_UInt16HtDb:
+    {
       tbufp->tv_sec = data.dtUInt16HtDb.time;
       tbufp->tv_nsec = data.dtUInt16HtDb.ntime;
       *(pwr_tUInt16*)vbufp = data.dtUInt16HtDb.value;
@@ -3123,14 +3215,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tUInt16);
       break;
     }
-    case sev_eDataType_UInt32: {
+    case sev_eDataType_UInt32:
+    {
       tbufp->tv_sec = data.dtUInt32.time;
       *(pwr_tUInt32*)vbufp = data.dtUInt32.value;
       tbufp++;
       vbufp += sizeof(pwr_tUInt32);
       break;
     }
-    case sev_eDataType_UInt32Ht: {
+    case sev_eDataType_UInt32Ht:
+    {
       tbufp->tv_sec = data.dtUInt32Ht.time;
       tbufp->tv_nsec = data.dtUInt32Ht.ntime;
       *(pwr_tUInt32*)vbufp = data.dtUInt32Ht.value;
@@ -3138,14 +3232,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tUInt32);
       break;
     }
-    case sev_eDataType_UInt32Db: {
+    case sev_eDataType_UInt32Db:
+    {
       tbufp->tv_sec = data.dtUInt32Db.time;
       *(pwr_tUInt32*)vbufp = data.dtUInt32Db.value;
       tbufp++;
       vbufp += sizeof(pwr_tUInt32);
       break;
     }
-    case sev_eDataType_UInt32HtDb: {
+    case sev_eDataType_UInt32HtDb:
+    {
       tbufp->tv_sec = data.dtUInt32HtDb.time;
       tbufp->tv_nsec = data.dtUInt32HtDb.ntime;
       *(pwr_tUInt32*)vbufp = data.dtUInt32HtDb.value;
@@ -3153,14 +3249,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tUInt32);
       break;
     }
-    case sev_eDataType_UInt64: {
+    case sev_eDataType_UInt64:
+    {
       tbufp->tv_sec = data.dtUInt64.time;
       *(pwr_tUInt64*)vbufp = data.dtUInt64.value;
       tbufp++;
       vbufp += sizeof(pwr_tUInt64);
       break;
     }
-    case sev_eDataType_UInt64Ht: {
+    case sev_eDataType_UInt64Ht:
+    {
       tbufp->tv_sec = data.dtUInt64Ht.time;
       tbufp->tv_nsec = data.dtUInt64Ht.ntime;
       *(pwr_tUInt64*)vbufp = data.dtUInt64Ht.value;
@@ -3168,14 +3266,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tUInt64);
       break;
     }
-    case sev_eDataType_UInt64Db: {
+    case sev_eDataType_UInt64Db:
+    {
       tbufp->tv_sec = data.dtUInt64Db.time;
       *(pwr_tUInt64*)vbufp = data.dtUInt64Db.value;
       tbufp++;
       vbufp += sizeof(pwr_tUInt64);
       break;
     }
-    case sev_eDataType_UInt64HtDb: {
+    case sev_eDataType_UInt64HtDb:
+    {
       tbufp->tv_sec = data.dtUInt64HtDb.time;
       tbufp->tv_nsec = data.dtUInt64HtDb.ntime;
       *(pwr_tUInt64*)vbufp = data.dtUInt64HtDb.value;
@@ -3183,14 +3283,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tUInt64);
       break;
     }
-    case sev_eDataType_Float32: {
+    case sev_eDataType_Float32:
+    {
       tbufp->tv_sec = data.dtFloat32.time;
       *(pwr_tFloat32*)vbufp = data.dtFloat32.value;
       tbufp++;
       vbufp += sizeof(pwr_tFloat32);
       break;
     }
-    case sev_eDataType_Float32Ht: {
+    case sev_eDataType_Float32Ht:
+    {
       tbufp->tv_sec = data.dtFloat32Ht.time;
       tbufp->tv_nsec = data.dtFloat32Ht.ntime;
       *(pwr_tFloat32*)vbufp = data.dtFloat32Ht.value;
@@ -3198,14 +3300,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tFloat32);
       break;
     }
-    case sev_eDataType_Float32Db: {
+    case sev_eDataType_Float32Db:
+    {
       tbufp->tv_sec = data.dtFloat32Db.time;
       *(pwr_tFloat32*)vbufp = data.dtFloat32Db.value;
       tbufp++;
       vbufp += sizeof(pwr_tFloat32);
       break;
     }
-    case sev_eDataType_Float32HtDb: {
+    case sev_eDataType_Float32HtDb:
+    {
       tbufp->tv_sec = data.dtFloat32HtDb.time;
       tbufp->tv_nsec = data.dtFloat32HtDb.ntime;
       *(pwr_tFloat32*)vbufp = data.dtFloat32HtDb.value;
@@ -3213,14 +3317,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tFloat32);
       break;
     }
-    case sev_eDataType_Float64: {
+    case sev_eDataType_Float64:
+    {
       tbufp->tv_sec = data.dtFloat64.time;
       *(pwr_tFloat64*)vbufp = data.dtFloat64.value;
       tbufp++;
       vbufp += sizeof(pwr_tFloat64);
       break;
     }
-    case sev_eDataType_Float64Ht: {
+    case sev_eDataType_Float64Ht:
+    {
       tbufp->tv_sec = data.dtFloat64Ht.time;
       tbufp->tv_nsec = data.dtFloat64Ht.ntime;
       *(pwr_tFloat64*)vbufp = data.dtFloat64Ht.value;
@@ -3228,14 +3334,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tFloat64);
       break;
     }
-    case sev_eDataType_Float64Db: {
+    case sev_eDataType_Float64Db:
+    {
       tbufp->tv_sec = data.dtFloat64Db.time;
       *(pwr_tFloat64*)vbufp = data.dtFloat64Db.value;
       tbufp++;
       vbufp += sizeof(pwr_tFloat64);
       break;
     }
-    case sev_eDataType_Float64HtDb: {
+    case sev_eDataType_Float64HtDb:
+    {
       tbufp->tv_sec = data.dtFloat64HtDb.time;
       tbufp->tv_nsec = data.dtFloat64HtDb.ntime;
       *(pwr_tFloat64*)vbufp = data.dtFloat64HtDb.value;
@@ -3243,14 +3351,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tFloat64);
       break;
     }
-    case sev_eDataType_Time: {
+    case sev_eDataType_Time:
+    {
       tbufp->tv_sec = data.dtTime.time;
       ((pwr_tTime*)vbufp)->tv_sec = data.dtTime.value;
       tbufp++;
       vbufp += sizeof(pwr_tTime);
       break;
     }
-    case sev_eDataType_TimeHt: {
+    case sev_eDataType_TimeHt:
+    {
       tbufp->tv_sec = data.dtTimeHt.time;
       tbufp->tv_nsec = data.dtTimeHt.ntime;
       ((pwr_tTime*)vbufp)->tv_sec = data.dtTimeHt.value;
@@ -3259,14 +3369,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tTime);
       break;
     }
-    case sev_eDataType_TimeDb: {
+    case sev_eDataType_TimeDb:
+    {
       tbufp->tv_sec = data.dtTimeDb.time;
       ((pwr_tTime*)vbufp)->tv_sec = data.dtTimeDb.value;
       tbufp++;
       vbufp += sizeof(pwr_tTime);
       break;
     }
-    case sev_eDataType_TimeHtDb: {
+    case sev_eDataType_TimeHtDb:
+    {
       tbufp->tv_sec = data.dtTimeHtDb.time;
       tbufp->tv_nsec = data.dtTimeHtDb.ntime;
       ((pwr_tTime*)vbufp)->tv_sec = data.dtTimeHtDb.value;
@@ -3275,14 +3387,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tTime);
       break;
     }
-    case sev_eDataType_DeltaTime: {
+    case sev_eDataType_DeltaTime:
+    {
       tbufp->tv_sec = data.dtDeltaTime.time;
       ((pwr_tDeltaTime*)vbufp)->tv_sec = data.dtDeltaTime.value;
       tbufp++;
       vbufp += sizeof(pwr_tDeltaTime);
       break;
     }
-    case sev_eDataType_DeltaTimeHt: {
+    case sev_eDataType_DeltaTimeHt:
+    {
       tbufp->tv_sec = data.dtDeltaTimeHt.time;
       tbufp->tv_nsec = data.dtDeltaTimeHt.ntime;
       ((pwr_tDeltaTime*)vbufp)->tv_sec = data.dtDeltaTimeHt.value;
@@ -3291,14 +3405,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tDeltaTime);
       break;
     }
-    case sev_eDataType_DeltaTimeDb: {
+    case sev_eDataType_DeltaTimeDb:
+    {
       tbufp->tv_sec = data.dtDeltaTimeDb.time;
       ((pwr_tDeltaTime*)vbufp)->tv_sec = data.dtDeltaTimeDb.value;
       tbufp++;
       vbufp += sizeof(pwr_tDeltaTime);
       break;
     }
-    case sev_eDataType_DeltaTimeHtDb: {
+    case sev_eDataType_DeltaTimeHtDb:
+    {
       tbufp->tv_sec = data.dtDeltaTimeHtDb.time;
       tbufp->tv_nsec = data.dtDeltaTimeHtDb.ntime;
       ((pwr_tDeltaTime*)vbufp)->tv_sec = data.dtDeltaTimeHtDb.value;
@@ -3307,14 +3423,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tDeltaTime);
       break;
     }
-    case sev_eDataType_String8: {
+    case sev_eDataType_String8:
+    {
       tbufp->tv_sec = data.dtString8.time;
       strncpy(vbufp, data.dtString8.value, sizeof(pwr_tString8));
       tbufp++;
       vbufp += sizeof(pwr_tString8);
       break;
     }
-    case sev_eDataType_String8Ht: {
+    case sev_eDataType_String8Ht:
+    {
       tbufp->tv_sec = data.dtString8Ht.time;
       tbufp->tv_nsec = data.dtString8Ht.ntime;
       strncpy(vbufp, data.dtString8Ht.value, sizeof(pwr_tString8));
@@ -3322,14 +3440,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString8);
       break;
     }
-    case sev_eDataType_String8Db: {
+    case sev_eDataType_String8Db:
+    {
       tbufp->tv_sec = data.dtString8Db.time;
       strncpy(vbufp, data.dtString8Db.value, sizeof(pwr_tString8));
       tbufp++;
       vbufp += sizeof(pwr_tString8);
       break;
     }
-    case sev_eDataType_String8HtDb: {
+    case sev_eDataType_String8HtDb:
+    {
       tbufp->tv_sec = data.dtString8HtDb.time;
       tbufp->tv_nsec = data.dtString8HtDb.ntime;
       strncpy(vbufp, data.dtString8HtDb.value, sizeof(pwr_tString8));
@@ -3337,14 +3457,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString8);
       break;
     }
-    case sev_eDataType_String16: {
+    case sev_eDataType_String16:
+    {
       tbufp->tv_sec = data.dtString16.time;
       strncpy(vbufp, data.dtString16.value, sizeof(pwr_tString16));
       tbufp++;
       vbufp += sizeof(pwr_tString16);
       break;
     }
-    case sev_eDataType_String16Ht: {
+    case sev_eDataType_String16Ht:
+    {
       tbufp->tv_sec = data.dtString16Ht.time;
       tbufp->tv_nsec = data.dtString16Ht.ntime;
       strncpy(vbufp, data.dtString16Ht.value, sizeof(pwr_tString16));
@@ -3352,14 +3474,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString16);
       break;
     }
-    case sev_eDataType_String16Db: {
+    case sev_eDataType_String16Db:
+    {
       tbufp->tv_sec = data.dtString16Db.time;
       strncpy(vbufp, data.dtString16Db.value, sizeof(pwr_tString16));
       tbufp++;
       vbufp += sizeof(pwr_tString16);
       break;
     }
-    case sev_eDataType_String16HtDb: {
+    case sev_eDataType_String16HtDb:
+    {
       tbufp->tv_sec = data.dtString16HtDb.time;
       tbufp->tv_nsec = data.dtString16HtDb.ntime;
       strncpy(vbufp, data.dtString16HtDb.value, sizeof(pwr_tString16));
@@ -3367,14 +3491,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString16);
       break;
     }
-    case sev_eDataType_String32: {
+    case sev_eDataType_String32:
+    {
       tbufp->tv_sec = data.dtString32.time;
       strncpy(vbufp, data.dtString32.value, sizeof(pwr_tString32));
       tbufp++;
       vbufp += sizeof(pwr_tString32);
       break;
     }
-    case sev_eDataType_String32Ht: {
+    case sev_eDataType_String32Ht:
+    {
       tbufp->tv_sec = data.dtString32Ht.time;
       tbufp->tv_nsec = data.dtString32Ht.ntime;
       strncpy(vbufp, data.dtString32Ht.value, sizeof(pwr_tString32));
@@ -3382,14 +3508,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString32);
       break;
     }
-    case sev_eDataType_String32Db: {
+    case sev_eDataType_String32Db:
+    {
       tbufp->tv_sec = data.dtString32Db.time;
       strncpy(vbufp, data.dtString32Db.value, sizeof(pwr_tString32));
       tbufp++;
       vbufp += sizeof(pwr_tString32);
       break;
     }
-    case sev_eDataType_String32HtDb: {
+    case sev_eDataType_String32HtDb:
+    {
       tbufp->tv_sec = data.dtString32HtDb.time;
       tbufp->tv_nsec = data.dtString32HtDb.ntime;
       strncpy(vbufp, data.dtString32HtDb.value, sizeof(pwr_tString32));
@@ -3397,14 +3525,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString32);
       break;
     }
-    case sev_eDataType_String40: {
+    case sev_eDataType_String40:
+    {
       tbufp->tv_sec = data.dtString40.time;
       strncpy(vbufp, data.dtString40.value, sizeof(pwr_tString40));
       tbufp++;
       vbufp += sizeof(pwr_tString40);
       break;
     }
-    case sev_eDataType_String40Ht: {
+    case sev_eDataType_String40Ht:
+    {
       tbufp->tv_sec = data.dtString40Ht.time;
       tbufp->tv_nsec = data.dtString40Ht.ntime;
       strncpy(vbufp, data.dtString40Ht.value, sizeof(pwr_tString40));
@@ -3412,14 +3542,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString40);
       break;
     }
-    case sev_eDataType_String40Db: {
+    case sev_eDataType_String40Db:
+    {
       tbufp->tv_sec = data.dtString40Db.time;
       strncpy(vbufp, data.dtString40Db.value, sizeof(pwr_tString40));
       tbufp++;
       vbufp += sizeof(pwr_tString40);
       break;
     }
-    case sev_eDataType_String40HtDb: {
+    case sev_eDataType_String40HtDb:
+    {
       tbufp->tv_sec = data.dtString40HtDb.time;
       tbufp->tv_nsec = data.dtString40HtDb.ntime;
       strncpy(vbufp, data.dtString40HtDb.value, sizeof(pwr_tString40));
@@ -3427,14 +3559,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString40);
       break;
     }
-    case sev_eDataType_String80: {
+    case sev_eDataType_String80:
+    {
       tbufp->tv_sec = data.dtString80.time;
       strncpy(vbufp, data.dtString80.value, sizeof(pwr_tString80));
       tbufp++;
       vbufp += sizeof(pwr_tString80);
       break;
     }
-    case sev_eDataType_String80Ht: {
+    case sev_eDataType_String80Ht:
+    {
       tbufp->tv_sec = data.dtString80Ht.time;
       tbufp->tv_nsec = data.dtString80Ht.ntime;
       strncpy(vbufp, data.dtString80Ht.value, sizeof(pwr_tString80));
@@ -3442,14 +3576,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString80);
       break;
     }
-    case sev_eDataType_String80Db: {
+    case sev_eDataType_String80Db:
+    {
       tbufp->tv_sec = data.dtString80Db.time;
       strncpy(vbufp, data.dtString80Db.value, sizeof(pwr_tString80));
       tbufp++;
       vbufp += sizeof(pwr_tString80);
       break;
     }
-    case sev_eDataType_String80HtDb: {
+    case sev_eDataType_String80HtDb:
+    {
       tbufp->tv_sec = data.dtString80HtDb.time;
       tbufp->tv_nsec = data.dtString80HtDb.ntime;
       strncpy(vbufp, data.dtString80HtDb.value, sizeof(pwr_tString80));
@@ -3457,14 +3593,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString80);
       break;
     }
-    case sev_eDataType_String132: {
+    case sev_eDataType_String132:
+    {
       tbufp->tv_sec = data.dtString132.time;
       strncpy(vbufp, data.dtString132.value, sizeof(pwr_tString132));
       tbufp++;
       vbufp += sizeof(pwr_tString132);
       break;
     }
-    case sev_eDataType_String132Ht: {
+    case sev_eDataType_String132Ht:
+    {
       tbufp->tv_sec = data.dtString132Ht.time;
       tbufp->tv_nsec = data.dtString132Ht.ntime;
       strncpy(vbufp, data.dtString132Ht.value, sizeof(pwr_tString132));
@@ -3472,14 +3610,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString132);
       break;
     }
-    case sev_eDataType_String132Db: {
+    case sev_eDataType_String132Db:
+    {
       tbufp->tv_sec = data.dtString132Db.time;
       strncpy(vbufp, data.dtString132Db.value, sizeof(pwr_tString132));
       tbufp++;
       vbufp += sizeof(pwr_tString132);
       break;
     }
-    case sev_eDataType_String132HtDb: {
+    case sev_eDataType_String132HtDb:
+    {
       tbufp->tv_sec = data.dtString132HtDb.time;
       tbufp->tv_nsec = data.dtString132HtDb.ntime;
       strncpy(vbufp, data.dtString132HtDb.value, sizeof(pwr_tString132));
@@ -3487,14 +3627,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString132);
       break;
     }
-    case sev_eDataType_String256: {
+    case sev_eDataType_String256:
+    {
       tbufp->tv_sec = data.dtString256.time;
       strncpy(vbufp, data.dtString256.value, sizeof(pwr_tString256));
       tbufp++;
       vbufp += sizeof(pwr_tString256);
       break;
     }
-    case sev_eDataType_String256Ht: {
+    case sev_eDataType_String256Ht:
+    {
       tbufp->tv_sec = data.dtString256Ht.time;
       tbufp->tv_nsec = data.dtString256Ht.ntime;
       strncpy(vbufp, data.dtString256Ht.value, sizeof(pwr_tString256));
@@ -3502,14 +3644,16 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
       vbufp += sizeof(pwr_tString256);
       break;
     }
-    case sev_eDataType_String256Db: {
+    case sev_eDataType_String256Db:
+    {
       tbufp->tv_sec = data.dtString256Db.time;
       strncpy(vbufp, data.dtString256Db.value, sizeof(pwr_tString256));
       tbufp++;
       vbufp += sizeof(pwr_tString256);
       break;
     }
-    case sev_eDataType_String256HtDb: {
+    case sev_eDataType_String256HtDb:
+    {
       tbufp->tv_sec = data.dtString256HtDb.time;
       tbufp->tv_nsec = data.dtString256HtDb.ntime;
       strncpy(vbufp, data.dtString256HtDb.value, sizeof(pwr_tString256));
@@ -3535,8 +3679,7 @@ int sev_dbhdf5::get_values(pwr_tStatus* sts, void* thread, pwr_tOid oid,
   return 1;
 }
 
-int sev_dbhdf5::store_event(
-    pwr_tStatus* sts, void* thread, int item_idx, sev_event* ep)
+int sev_dbhdf5::store_event(pwr_tStatus* sts, void* thread, int item_idx, sev_event* ep)
 {
   hid_t mdatatype;
   herr_t hsts;
@@ -3566,17 +3709,20 @@ int sev_dbhdf5::store_event(
 
   sev_sHeader header;
   hid_t dataset_id = H5Dopen2(m_file, dname, H5P_DEFAULT);
-  hsts = H5Dread(
-      dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
+  hsts = H5Dread(dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
 
-  if (header.first_idx == -1) {
+  if (header.first_idx == -1)
+  {
     header.first_idx = 0;
     header.last_idx = 0;
-  } else {
+  }
+  else
+  {
     header.last_idx++;
     if (header.last_idx >= (int)header.data_size)
       header.last_idx = 0;
-    if (header.last_idx == header.first_idx) {
+    if (header.last_idx == header.first_idx)
+    {
       header.first_idx++;
       if (header.first_idx >= (int)header.data_size)
         header.first_idx = 0;
@@ -3584,8 +3730,7 @@ int sev_dbhdf5::store_event(
   }
 
   header.last_time = ep->time.tv_sec;
-  hsts = H5Dwrite(
-      dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
+  hsts = H5Dwrite(dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
   H5Dclose(dataset_id);
 
   // Create the data space for the dataset
@@ -3602,12 +3747,10 @@ int sev_dbhdf5::store_event(
   hid_t memspace_id = H5Screate_simple(1, &dim, NULL);
   hid_t dataspace_id = H5Dget_space(dataset_id);
 
-  hsts = H5Sselect_hyperslab(
-      dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+  hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
   // Write the dataset
-  hsts = H5Dwrite(
-      dataset_id, m_event_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &data);
+  hsts = H5Dwrite(dataset_id, m_event_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &data);
 
   hsts = H5Sclose(memspace_id);
   hsts = H5Sclose(dataspace_id);
@@ -3618,68 +3761,80 @@ int sev_dbhdf5::store_event(
   return 1;
 }
 
-int sev_dbhdf5::check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname,
-    char* aname, pwr_tDeltaTime storagetime, pwr_eType type, unsigned int size,
-    char* description, char* unit, pwr_tFloat32 scantime, pwr_tFloat32 deadband,
-    pwr_tMask options, unsigned int* idx)
+int sev_dbhdf5::check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname,
+                           pwr_tDeltaTime storagetime, pwr_eType type, unsigned int size, char* description,
+                           char* unit, pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options,
+                           unsigned int* idx)
 {
   pwr_tTime uptime;
 
   time_GetTime(&uptime);
 
-  for (unsigned int i = 0; i < m_items.size(); i++) {
+  for (unsigned int i = 0; i < m_items.size(); i++)
+  {
     if (m_items[i].deleted)
       continue;
 
-    if (cdh_ObjidIsEqual(oid, m_items[i].oid)
-        && str_NoCaseStrcmp(aname, m_items[i].attr[0].aname) == 0) {
+    if (cdh_ObjidIsEqual(oid, m_items[i].oid) && str_NoCaseStrcmp(aname, m_items[i].attr[0].aname) == 0)
+    {
       bool itemdefchange = false;
       bool modified = false;
-      if (type != m_items[i].attr[0].type || size != m_items[i].attr[0].size) {
+      if (type != m_items[i].attr[0].type || size != m_items[i].attr[0].size)
+      {
         itemdefchange = true;
       }
 
-      if (storagetime.tv_sec != m_items[i].storagetime.tv_sec) {
+      if (storagetime.tv_sec != m_items[i].storagetime.tv_sec)
+      {
         m_items[i].storagetime = storagetime;
         modified = true;
       }
-      if (!streq(oname, m_items[i].oname)) {
+      if (!streq(oname, m_items[i].oname))
+      {
         strncpy(m_items[i].oname, oname, sizeof(m_items[i].oname));
         modified = true;
       }
-      if (type != m_items[i].attr[0].type) {
+      if (type != m_items[i].attr[0].type)
+      {
         m_items[i].attr[0].type = type;
         modified = true;
       }
-      if (size != m_items[i].attr[0].size) {
+      if (size != m_items[i].attr[0].size)
+      {
         m_items[i].attr[0].size = size;
         modified = true;
       }
-      if (scantime != m_items[i].scantime) {
+      if (scantime != m_items[i].scantime)
+      {
         m_items[i].scantime = scantime;
         modified = true;
       }
-      if (deadband != m_items[i].deadband) {
+      if (deadband != m_items[i].deadband)
+      {
         m_items[i].deadband = deadband;
         modified = true;
       }
-      if (!streq(description, m_items[i].description)) {
-        strncpy(m_items[i].description, description,
-            sizeof(m_items[i].description));
+      if (!streq(description, m_items[i].description))
+      {
+        strncpy(m_items[i].description, description, sizeof(m_items[i].description));
         modified = true;
       }
-      if (!streq(unit, m_items[i].attr[0].unit)) {
+      if (!streq(unit, m_items[i].attr[0].unit))
+      {
         strncpy(m_items[i].attr[0].unit, unit, sizeof(m_items[i].attr[0].unit));
         modified = true;
       }
 
-      if (modified) {
+      if (modified)
+      {
         m_items[i].modtime = uptime;
         update_item(&m_items[i]);
       }
 
-      if (itemdefchange) {
-        if (!handle_itemchange(sts, m_items[i].tablename, i)) {
+      if (itemdefchange)
+      {
+        if (!handle_itemchange(sts, m_items[i].tablename, i))
+        {
           *idx = i;
           return 1;
         }
@@ -3693,24 +3848,23 @@ int sev_dbhdf5::check_item(pwr_tStatus* sts, pwr_tOid oid, char* oname,
   return 0;
 }
 
-int sev_dbhdf5::add_item(pwr_tStatus* sts, pwr_tOid oid, char* oname,
-    char* aname, pwr_tDeltaTime storagetime, pwr_eType type, unsigned int size,
-    char* description, char* unit, pwr_tFloat32 scantime, pwr_tFloat32 deadband,
-    pwr_tMask options, unsigned int* idx)
+int sev_dbhdf5::add_item(pwr_tStatus* sts, pwr_tOid oid, char* oname, char* aname, pwr_tDeltaTime storagetime,
+                         pwr_eType type, unsigned int size, char* description, char* unit,
+                         pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options, unsigned int* idx)
 {
   char tablename[256];
   unsigned int db_idx;
 
-  store_item(sts, tablename, oid, oname, aname, storagetime, type, size,
-      description, unit, scantime, deadband, options, &db_idx);
+  store_item(sts, tablename, oid, oname, aname, storagetime, type, size, description, unit, scantime,
+             deadband, options, &db_idx);
   if (EVEN(*sts))
     return 0;
 
   if (streq(aname, "Events"))
     create_event_table(sts, tablename, options, storagetime, scantime);
-  else {
-    create_table(
-        sts, tablename, type, size, options, deadband, storagetime, scantime);
+  else
+  {
+    create_table(sts, tablename, type, size, options, deadband, storagetime, scantime);
   }
   if (EVEN(*sts))
     return 0;
@@ -3751,7 +3905,8 @@ int sev_dbhdf5::delete_item(pwr_tStatus* sts, pwr_tOid oid, char* aname)
 {
   unsigned int idx;
   get_item(sts, &idx, oid, aname);
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     return 0;
   }
 
@@ -3762,61 +3917,67 @@ int sev_dbhdf5::delete_item(pwr_tStatus* sts, pwr_tOid oid, char* aname)
   return 1;
 }
 
-int sev_dbhdf5::delete_old_data(pwr_tStatus* sts, void* thread, char* tablename,
-    pwr_tMask options, pwr_tTime limit, pwr_tFloat32 scantime,
-    pwr_tFloat32 garbagecycle)
+int sev_dbhdf5::delete_old_data(pwr_tStatus* sts, void* thread, char* tablename, pwr_tMask options,
+                                pwr_tTime limit, pwr_tFloat32 scantime, pwr_tFloat32 garbagecycle)
 {
   return 1;
 }
 
-int sev_dbhdf5::check_objectitem(pwr_tStatus* sts, char* tablename,
-    pwr_tOid oid, char* oname, char* aname, pwr_tDeltaTime storagetime,
-    char* description, pwr_tFloat32 scantime, pwr_tFloat32 deadband,
-    pwr_tMask options, unsigned int attrnum, sev_sHistAttr* attr,
-    unsigned int* idx)
+int sev_dbhdf5::check_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                                 pwr_tDeltaTime storagetime, char* description, pwr_tFloat32 scantime,
+                                 pwr_tFloat32 deadband, pwr_tMask options, unsigned int attrnum,
+                                 sev_sHistAttr* attr, unsigned int* idx)
 {
   pwr_tTime uptime;
 
   time_GetTime(&uptime);
 
-  for (unsigned int i = 0; i < m_items.size(); i++) {
+  for (unsigned int i = 0; i < m_items.size(); i++)
+  {
     if (m_items[i].deleted)
       continue;
 
-    if (cdh_ObjidIsEqual(oid, m_items[i].oid)
-        && str_NoCaseStrcmp(oname, m_items[i].oname) == 0) {
+    if (cdh_ObjidIsEqual(oid, m_items[i].oid) && str_NoCaseStrcmp(oname, m_items[i].oname) == 0)
+    {
       bool itemdefchange = false;
       bool modified = false;
 
-      if (storagetime.tv_sec != m_items[i].storagetime.tv_sec) {
+      if (storagetime.tv_sec != m_items[i].storagetime.tv_sec)
+      {
         m_items[i].storagetime = storagetime;
         modified = true;
       }
-      if (!streq(oname, m_items[i].oname)) {
+      if (!streq(oname, m_items[i].oname))
+      {
         strncpy(m_items[i].oname, oname, sizeof(m_items[i].oname));
         modified = true;
       }
-      if (scantime != m_items[i].scantime) {
+      if (scantime != m_items[i].scantime)
+      {
         m_items[i].scantime = scantime;
         modified = true;
       }
-      if (deadband != m_items[i].deadband) {
+      if (deadband != m_items[i].deadband)
+      {
         m_items[i].deadband = deadband;
         modified = true;
       }
-      if (!streq(description, m_items[i].description)) {
-        strncpy(m_items[i].description, description,
-            sizeof(m_items[i].description));
+      if (!streq(description, m_items[i].description))
+      {
+        strncpy(m_items[i].description, description, sizeof(m_items[i].description));
         modified = true;
       }
 
-      if (modified) {
+      if (modified)
+      {
         m_items[i].modtime = uptime;
         update_item(&m_items[i]);
       }
 
-      if (itemdefchange) {
-        if (!handle_itemchange(sts, m_items[i].tablename, i)) {
+      if (itemdefchange)
+      {
+        if (!handle_itemchange(sts, m_items[i].tablename, i))
+        {
           *idx = i;
           return 1;
         }
@@ -3830,24 +3991,24 @@ int sev_dbhdf5::check_objectitem(pwr_tStatus* sts, char* tablename,
   return 0;
 }
 
-int sev_dbhdf5::add_objectitem(pwr_tStatus* sts, char* tname, pwr_tOid oid,
-    char* oname, char* aname, pwr_tDeltaTime storagetime, char* description,
-    pwr_tFloat32 scantime, pwr_tFloat32 deadband, pwr_tMask options,
-    unsigned int attrnum, sev_sHistAttr* attr, unsigned int* idx)
+int sev_dbhdf5::add_objectitem(pwr_tStatus* sts, char* tname, pwr_tOid oid, char* oname, char* aname,
+                               pwr_tDeltaTime storagetime, char* description, pwr_tFloat32 scantime,
+                               pwr_tFloat32 deadband, pwr_tMask options, unsigned int attrnum,
+                               sev_sHistAttr* attr, unsigned int* idx)
 {
   char tablename[256];
   unsigned int db_idx;
 
-  store_objectitem(sts, tablename, oid, oname, aname, storagetime, description,
-      scantime, deadband, options, attrnum, attr, &db_idx);
+  store_objectitem(sts, tablename, oid, oname, aname, storagetime, description, scantime, deadband, options,
+                   attrnum, attr, &db_idx);
   if (EVEN(*sts))
     return 0;
 
   if (streq(aname, "Events"))
     create_event_table(sts, tablename, options, storagetime, scantime);
-  else {
-    create_objecttable(sts, tablename, options, deadband, storagetime, scantime,
-        attrnum, attr);
+  else
+  {
+    create_objecttable(sts, tablename, options, deadband, storagetime, scantime, attrnum, attr);
   }
   if (EVEN(*sts))
     return 0;
@@ -3871,7 +4032,8 @@ int sev_dbhdf5::add_objectitem(pwr_tStatus* sts, char* tname, pwr_tOid oid,
   // Only tables with id are implemented
   item.options |= pwr_mSevOptionsMask_ReadOptimized;
 
-  for (size_t i = 0; i < attrnum; i++) {
+  for (size_t i = 0; i < attrnum; i++)
+  {
     sev_attr a;
     strncpy(a.aname, attr[i].aname, sizeof(a.aname));
     a.type = attr[i].type;
@@ -3888,17 +4050,17 @@ int sev_dbhdf5::add_objectitem(pwr_tStatus* sts, char* tname, pwr_tOid oid,
 
   return 1;
 }
-int sev_dbhdf5::store_objectitem(pwr_tStatus* sts, char* tablename,
-    pwr_tOid oid, char* oname, char* aname, pwr_tDeltaTime storagetime,
-    char* description, pwr_tFloat32 scantime, pwr_tFloat32 deadband,
-    pwr_tMask options, unsigned int attrnum, sev_sHistAttr* attr,
-    unsigned int* idx)
+int sev_dbhdf5::store_objectitem(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* oname, char* aname,
+                                 pwr_tDeltaTime storagetime, char* description, pwr_tFloat32 scantime,
+                                 pwr_tFloat32 deadband, pwr_tMask options, unsigned int attrnum,
+                                 sev_sHistAttr* attr, unsigned int* idx)
 {
   sev_sObjectItem item;
   pwr_tTime current_time;
   herr_t hsts;
 
-  if (m_cmn.next_objectitems_idx >= m_cmn.objectitems_alloc) {
+  if (m_cmn.next_objectitems_idx >= m_cmn.objectitems_alloc)
+  {
     // Extend items dataset
     objectitems_extend();
   }
@@ -3932,12 +4094,10 @@ int sev_dbhdf5::store_objectitem(pwr_tStatus* sts, char* tablename,
   hid_t memspace_id = H5Screate_simple(1, &dim, NULL);
   hid_t dataspace_id = H5Dget_space(dataset_id);
 
-  hsts = H5Sselect_hyperslab(
-      dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+  hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
   // Write the dataset
-  hsts = H5Dwrite(
-      dataset_id, m_item_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &item);
+  hsts = H5Dwrite(dataset_id, m_item_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &item);
 
   *idx = m_cmn.next_objectitems_idx;
   m_cmn.next_objectitems_idx++;
@@ -3948,7 +4108,8 @@ int sev_dbhdf5::store_objectitem(pwr_tStatus* sts, char* tablename,
   hsts = H5Sclose(dataspace_id);
   hsts = H5Dclose(dataset_id);
 
-  for (size_t i = 0; i < attrnum; i++) {
+  for (size_t i = 0; i < attrnum; i++)
+  {
     sev_sObjectAttributes adata;
 
     strncpy(adata.tablename, tablename, sizeof(adata.tablename));
@@ -3964,17 +4125,14 @@ int sev_dbhdf5::store_objectitem(pwr_tStatus* sts, char* tablename,
     hsize_t stride = 1;
     hsize_t block = 1;
 
-    hid_t dataset_id
-        = H5Dopen2(m_file, cName_Dir cName_ObjectItemAttributes, H5P_DEFAULT);
+    hid_t dataset_id = H5Dopen2(m_file, cName_Dir cName_ObjectItemAttributes, H5P_DEFAULT);
     hid_t memspace_id = H5Screate_simple(1, &dim, NULL);
     hid_t dataspace_id = H5Dget_space(dataset_id);
 
-    hsts = H5Sselect_hyperslab(
-        dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+    hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
     // Write the dataset
-    hsts = H5Dwrite(dataset_id, m_objectattributes_mtype, memspace_id,
-        dataspace_id, H5P_DEFAULT, &adata);
+    hsts = H5Dwrite(dataset_id, m_objectattributes_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &adata);
     m_cmn.next_objectitemattr_idx++;
   }
 
@@ -3986,12 +4144,11 @@ int sev_dbhdf5::store_objectitem(pwr_tStatus* sts, char* tablename,
   return 1;
 }
 
-int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename,
-    pwr_tMask options, float deadband, pwr_tDeltaTime storage_time,
-    pwr_tFloat32 scantime, unsigned int attrnum, sev_sHistAttr* attr)
+int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename, pwr_tMask options, float deadband,
+                                   pwr_tDeltaTime storage_time, pwr_tFloat32 scantime, unsigned int attrnum,
+                                   sev_sHistAttr* attr)
 {
-  unsigned int table_len
-      = int((pwr_tFloat32(storage_time.tv_sec) / scantime + 0.5));
+  unsigned int table_len = int((pwr_tFloat32(storage_time.tv_sec) / scantime + 0.5));
   char gname[200], dname[200];
   herr_t hsts;
   hsize_t dim, max_dim;
@@ -4006,7 +4163,8 @@ int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename,
   if (options & pwr_mSevOptionsMask_UseDeadBand)
     ftype_size += 4;
 
-  for (unsigned int i = 0; i < attrnum; i++) {
+  for (unsigned int i = 0; i < attrnum; i++)
+  {
     sev_eDataType dtype = get_datatype(attr[i].type, options, attr[i].size);
     if (dtype == sev_eDataType_Unknown)
       return 0;
@@ -4018,17 +4176,21 @@ int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename,
   table_ftype = H5Tcreate(H5T_COMPOUND, ftype_size);
   hsts = H5Tinsert(table_ftype, "time", offs, H5T_STD_U32LE);
   offs += 4;
-  if (options & pwr_mSevOptionsMask_HighTimeResolution) {
+  if (options & pwr_mSevOptionsMask_HighTimeResolution)
+  {
     hsts = H5Tinsert(table_ftype, "ntime", offs, H5T_STD_U32LE);
     offs += 4;
   }
-  if (options & pwr_mSevOptionsMask_UseDeadBand) {
+  if (options & pwr_mSevOptionsMask_UseDeadBand)
+  {
     hsts = H5Tinsert(table_ftype, "jump", offs, H5T_STD_U32LE);
     offs += 4;
   }
-  for (unsigned int i = 0; i < attrnum; i++) {
+  for (unsigned int i = 0; i < attrnum; i++)
+  {
     hid_t atype;
-    switch (attr[i].type) {
+    switch (attr[i].type)
+    {
     case pwr_eType_Boolean:
       atype = H5T_STD_U32LE;
       break;
@@ -4074,7 +4236,8 @@ int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename,
     hsts = H5Tinsert(table_ftype, attr[i].aname, offs, atype);
     offs += attr[i].size;
 
-    switch (attr[i].type) {
+    switch (attr[i].type)
+    {
     case pwr_eType_String:
     case pwr_eType_Time:
     case pwr_eType_DeltaTime:
@@ -4088,8 +4251,7 @@ int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename,
   strcpy(gname, cName_Tables);
   strcat(gname, "/");
   strcat(gname, tablename);
-  hid_t group_id
-      = H5Gcreate2(m_file, gname, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t group_id = H5Gcreate2(m_file, gname, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   strcpy(dname, gname);
   strcat(dname, cName_Data);
@@ -4098,8 +4260,8 @@ int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename,
   hid_t properties = H5Pcreate(H5P_DATASET_CREATE);
   hsts = H5Pset_chunk(properties, 1, &dim);
   hid_t dataspace_id = H5Screate_simple(1, &dim, &max_dim);
-  hid_t dataset_id = H5Dcreate2(m_file, dname, table_ftype, dataspace_id,
-      H5P_DEFAULT, properties, H5P_DEFAULT);
+  hid_t dataset_id =
+      H5Dcreate2(m_file, dname, table_ftype, dataspace_id, H5P_DEFAULT, properties, H5P_DEFAULT);
 
   H5Pclose(properties);
   H5Sclose(dataspace_id);
@@ -4117,8 +4279,7 @@ int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename,
   strcat(dname, cName_Header);
   dim = 1;
   dataspace_id = H5Screate_simple(1, &dim, 0);
-  dataset_id = H5Dcreate2(m_file, dname, header_ftype, dataspace_id,
-      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  dataset_id = H5Dcreate2(m_file, dname, header_ftype, dataspace_id, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   sev_sHeader header;
   header.data_size = table_len;
@@ -4128,8 +4289,7 @@ int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename,
   header.first_time = 0;
   header.last_time = 0;
 
-  hsts = H5Dwrite(
-      dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
+  hsts = H5Dwrite(dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
 
   H5Sclose(dataspace_id);
   H5Dclose(dataset_id);
@@ -4142,14 +4302,16 @@ int sev_dbhdf5::create_objecttable(pwr_tStatus* sts, char* tablename,
   return 1;
 }
 
-int sev_dbhdf5::check_objectitemattr(pwr_tStatus* sts, char* tablename,
-    pwr_tOid oid, char* aname, char* oname, pwr_eType type, unsigned int size,
-    unsigned int* idx)
+int sev_dbhdf5::check_objectitemattr(pwr_tStatus* sts, char* tablename, pwr_tOid oid, char* aname,
+                                     char* oname, pwr_eType type, unsigned int size, unsigned int* idx)
 {
   sev_item* item = &m_items[*idx];
-  for (size_t j = 0; j < item->attr.size(); j++) {
-    if (str_NoCaseStrcmp(aname, item->attr[j].aname) == 0) {
-      if (type != item->attr[j].type || size != item->attr[j].size) {
+  for (size_t j = 0; j < item->attr.size(); j++)
+  {
+    if (str_NoCaseStrcmp(aname, item->attr[j].aname) == 0)
+    {
+      if (type != item->attr[j].type || size != item->attr[j].size)
+      {
         *sts = SEV__NOSUCHITEM;
         return 0;
         /*
@@ -4171,8 +4333,7 @@ int sev_dbhdf5::check_objectitemattr(pwr_tStatus* sts, char* tablename,
   return 0;
 }
 
-int sev_dbhdf5::get_objectitem_datatype(
-    int item_idx, hid_t* atype, unsigned int* size, int* value_offset)
+int sev_dbhdf5::get_objectitem_datatype(int item_idx, hid_t* atype, unsigned int* size, int* value_offset)
 {
   hid_t mdatatype;
   herr_t hsts;
@@ -4186,9 +4347,10 @@ int sev_dbhdf5::get_objectitem_datatype(
   if (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand)
     mtype_size += 4;
 
-  for (size_t i = 0; i < m_items[item_idx].attr.size(); i++) {
-    sev_eDataType dtype = get_datatype(m_items[item_idx].attr[i].type,
-        m_items[item_idx].options, m_items[item_idx].attr[i].size);
+  for (size_t i = 0; i < m_items[item_idx].attr.size(); i++)
+  {
+    sev_eDataType dtype = get_datatype(m_items[item_idx].attr[i].type, m_items[item_idx].options,
+                                       m_items[item_idx].attr[i].size);
     if (dtype == sev_eDataType_Unknown)
       return 0;
 
@@ -4199,18 +4361,22 @@ int sev_dbhdf5::get_objectitem_datatype(
   mdatatype = H5Tcreate(H5T_COMPOUND, mtype_size);
   hsts = H5Tinsert(mdatatype, "time", offs, H5T_STD_U32LE);
   offs += 4;
-  if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution) {
+  if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution)
+  {
     hsts = H5Tinsert(mdatatype, "ntime", offs, H5T_STD_U32LE);
     offs += 4;
   }
-  if (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand) {
+  if (m_items[item_idx].options & pwr_mSevOptionsMask_UseDeadBand)
+  {
     hsts = H5Tinsert(mdatatype, "jump", offs, H5T_STD_U32LE);
     offs += 4;
   }
   *value_offset = offs;
-  for (size_t i = 0; i < m_items[item_idx].attr.size(); i++) {
+  for (size_t i = 0; i < m_items[item_idx].attr.size(); i++)
+  {
     hid_t atype;
-    switch (m_items[item_idx].attr[i].type) {
+    switch (m_items[item_idx].attr[i].type)
+    {
     case pwr_eType_Boolean:
       atype = H5T_STD_U32LE;
       break;
@@ -4256,7 +4422,8 @@ int sev_dbhdf5::get_objectitem_datatype(
     hsts = H5Tinsert(mdatatype, m_items[item_idx].attr[i].aname, offs, atype);
     offs += m_items[item_idx].attr[i].size;
 
-    switch (m_items[item_idx].attr[i].type) {
+    switch (m_items[item_idx].attr[i].type)
+    {
     case pwr_eType_String:
     case pwr_eType_Time:
     case pwr_eType_DeltaTime:
@@ -4270,8 +4437,8 @@ int sev_dbhdf5::get_objectitem_datatype(
   return SEV__SUCCESS;
 }
 
-int sev_dbhdf5::store_objectvalue(pwr_tStatus* sts, int item_idx, int attr_idx,
-    pwr_tTime time, void* buf, void* oldbuf, unsigned int size)
+int sev_dbhdf5::store_objectvalue(pwr_tStatus* sts, int item_idx, int attr_idx, pwr_tTime time, void* buf,
+                                  void* oldbuf, unsigned int size)
 {
   hid_t mdatatype;
   herr_t hsts;
@@ -4286,7 +4453,8 @@ int sev_dbhdf5::store_objectvalue(pwr_tStatus* sts, int item_idx, int attr_idx,
   int offs = 0;
   *(pwr_tUInt32*)(&data[offs]) = time.tv_sec;
   offs += 4;
-  if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution) {
+  if (m_items[item_idx].options & pwr_mSevOptionsMask_HighTimeResolution)
+  {
     *(pwr_tUInt32*)(&data[offs]) = time.tv_nsec;
     offs += 4;
   }
@@ -4303,17 +4471,20 @@ int sev_dbhdf5::store_objectvalue(pwr_tStatus* sts, int item_idx, int attr_idx,
 
   sev_sHeader header;
   hid_t dataset_id = H5Dopen2(m_file, dname, H5P_DEFAULT);
-  hsts = H5Dread(
-      dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
+  hsts = H5Dread(dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
 
-  if (header.first_idx == -1) {
+  if (header.first_idx == -1)
+  {
     header.first_idx = 0;
     header.last_idx = 0;
-  } else {
+  }
+  else
+  {
     header.last_idx++;
     if (header.last_idx >= (int)header.data_size)
       header.last_idx = 0;
-    if (header.last_idx == header.first_idx) {
+    if (header.last_idx == header.first_idx)
+    {
       header.first_idx++;
       if (header.first_idx >= (int)header.data_size)
         header.first_idx = 0;
@@ -4321,8 +4492,7 @@ int sev_dbhdf5::store_objectvalue(pwr_tStatus* sts, int item_idx, int attr_idx,
   }
 
   header.last_time = time.tv_sec;
-  hsts = H5Dwrite(
-      dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
+  hsts = H5Dwrite(dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
   H5Dclose(dataset_id);
 
   // Create the data space for the dataset
@@ -4339,12 +4509,10 @@ int sev_dbhdf5::store_objectvalue(pwr_tStatus* sts, int item_idx, int attr_idx,
   hid_t memspace_id = H5Screate_simple(1, &dim, NULL);
   hid_t dataspace_id = H5Dget_space(dataset_id);
 
-  hsts = H5Sselect_hyperslab(
-      dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+  hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
   // Write the dataset
-  hsts = H5Dwrite(
-      dataset_id, mdatatype, memspace_id, dataspace_id, H5P_DEFAULT, data);
+  hsts = H5Dwrite(dataset_id, mdatatype, memspace_id, dataspace_id, H5P_DEFAULT, data);
 
   free(data);
   hsts = H5Sclose(memspace_id);
@@ -4357,8 +4525,7 @@ int sev_dbhdf5::store_objectvalue(pwr_tStatus* sts, int item_idx, int attr_idx,
   return 1;
 }
 
-int sev_dbhdf5::get_item(pwr_tStatus* sts, void* thread, sev_item* item,
-    pwr_tOid oid, char* attributename)
+int sev_dbhdf5::get_item(pwr_tStatus* sts, void* thread, sev_item* item, pwr_tOid oid, char* attributename)
 {
   unsigned int idx;
 
@@ -4372,15 +4539,16 @@ int sev_dbhdf5::get_item(pwr_tStatus* sts, void* thread, sev_item* item,
   return 1;
 }
 
-int sev_dbhdf5::get_item(
-    pwr_tStatus* sts, unsigned int* idx, pwr_tOid oid, char* attributename)
+int sev_dbhdf5::get_item(pwr_tStatus* sts, unsigned int* idx, pwr_tOid oid, char* attributename)
 {
-  for (unsigned int i = 0; i < m_items.size(); i++) {
+  for (unsigned int i = 0; i < m_items.size(); i++)
+  {
     if (m_items[i].deleted)
       continue;
 
-    if (cdh_ObjidIsEqual(oid, m_items[i].oid)
-        && str_NoCaseStrcmp(attributename, m_items[i].attr[0].aname) == 0) {
+    if (cdh_ObjidIsEqual(oid, m_items[i].oid) &&
+        str_NoCaseStrcmp(attributename, m_items[i].attr[0].aname) == 0)
+    {
       *idx = i;
       *sts = SEV__SUCCESS;
       return 1;
@@ -4390,8 +4558,8 @@ int sev_dbhdf5::get_item(
   return 0;
 }
 
-int sev_dbhdf5::get_objectitem(pwr_tStatus* sts, void* thread, sev_item* item,
-    pwr_tOid oid, char* attributename)
+int sev_dbhdf5::get_objectitem(pwr_tStatus* sts, void* thread, sev_item* item, pwr_tOid oid,
+                               char* attributename)
 {
   sev_sObjectItem ritem;
   herr_t hsts;
@@ -4402,25 +4570,24 @@ int sev_dbhdf5::get_objectitem(pwr_tStatus* sts, void* thread, sev_item* item,
   hid_t dataspace_id = H5Dget_space(dataset_id);
 
   int found = 0;
-  for (int idx = 0; idx < m_cmn.next_objectitems_idx; idx++) {
+  for (int idx = 0; idx < m_cmn.next_objectitems_idx; idx++)
+  {
     // Create the data space for the dataset.
     hsize_t offset = idx;
     hsize_t count = dim;
     hsize_t stride = 1;
     hsize_t block = 1;
 
-    hsts = H5Sselect_hyperslab(
-        dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+    hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
     // Read the dataset
-    hsts = H5Dread(dataset_id, m_objectitem_mtype, memspace_id, dataspace_id,
-        H5P_DEFAULT, &ritem);
+    hsts = H5Dread(dataset_id, m_objectitem_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &ritem);
 
     if (ritem.deleted == 1 || ritem.vid == 0)
       continue;
 
-    if (ritem.oix == oid.oix && ritem.vid == oid.vid
-        && str_NoCaseStrcmp(attributename, ritem.aname) == 0) {
+    if (ritem.oix == oid.oix && ritem.vid == oid.vid && str_NoCaseStrcmp(attributename, ritem.aname) == 0)
+    {
       item->id = ritem.id;
       strncpy(item->tablename, ritem.tablename, sizeof(item->tablename));
       item->oid.vid = ritem.vid;
@@ -4445,7 +4612,8 @@ int sev_dbhdf5::get_objectitem(pwr_tStatus* sts, void* thread, sev_item* item,
     }
   }
 
-  if (!found) {
+  if (!found)
+  {
     *sts = SEV__NOSUCHITEM;
     return 0;
   }
@@ -4462,19 +4630,18 @@ int sev_dbhdf5::get_objectitems(pwr_tStatus* sts)
   hid_t memspace_id = H5Screate_simple(1, &dim, NULL);
   hid_t dataspace_id = H5Dget_space(dataset_id);
 
-  for (int idx = 0; idx < m_cmn.next_objectitems_idx; idx++) {
+  for (int idx = 0; idx < m_cmn.next_objectitems_idx; idx++)
+  {
     // Create the data space for the dataset.
     hsize_t offset = idx;
     hsize_t count = dim;
     hsize_t stride = 1;
     hsize_t block = 1;
 
-    hsts = H5Sselect_hyperslab(
-        dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+    hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
     // Read the dataset
-    hsts = H5Dread(dataset_id, m_objectitem_mtype, memspace_id, dataspace_id,
-        H5P_DEFAULT, &ritem);
+    hsts = H5Dread(dataset_id, m_objectitem_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &ritem);
 
     if (ritem.deleted == 1 || ritem.vid == 0)
       continue;
@@ -4507,37 +4674,35 @@ int sev_dbhdf5::get_objectitems(pwr_tStatus* sts)
   return 1;
 }
 
-int sev_dbhdf5::get_objectitemattributes(
-    pwr_tStatus* sts, sev_item* item, char* tablename)
+int sev_dbhdf5::get_objectitemattributes(pwr_tStatus* sts, sev_item* item, char* tablename)
 {
   sev_sObjectAttributes ritem;
   herr_t hsts;
 
   hsize_t dim = 1;
-  hid_t dataset_id
-      = H5Dopen2(m_file, cName_Dir cName_ObjectItemAttributes, H5P_DEFAULT);
+  hid_t dataset_id = H5Dopen2(m_file, cName_Dir cName_ObjectItemAttributes, H5P_DEFAULT);
   hid_t memspace_id = H5Screate_simple(1, &dim, NULL);
   hid_t dataspace_id = H5Dget_space(dataset_id);
 
   int found = 0;
-  for (int idx = 0; idx < m_cmn.next_objectitemattr_idx; idx++) {
+  for (int idx = 0; idx < m_cmn.next_objectitemattr_idx; idx++)
+  {
     // Create the data space for the dataset.
     hsize_t offset = idx;
     hsize_t count = dim;
     hsize_t stride = 1;
     hsize_t block = 1;
 
-    hsts = H5Sselect_hyperslab(
-        dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+    hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
     // Read the dataset
-    hsts = H5Dread(dataset_id, m_objectattributes_mtype, memspace_id,
-        dataspace_id, H5P_DEFAULT, &ritem);
+    hsts = H5Dread(dataset_id, m_objectattributes_mtype, memspace_id, dataspace_id, H5P_DEFAULT, &ritem);
 
     if (ritem.deleted == 1 || ritem.attributesize == 0)
       continue;
 
-    if (streq(ritem.tablename, tablename)) {
+    if (streq(ritem.tablename, tablename))
+    {
       sev_attr a;
 
       strncpy(a.aname, ritem.attributename, sizeof(a.aname));
@@ -4551,7 +4716,8 @@ int sev_dbhdf5::get_objectitemattributes(
     }
   }
 
-  if (!found) {
+  if (!found)
+  {
     *sts = SEV__NOSUCHATTR;
     return 0;
   }
@@ -4560,71 +4726,77 @@ int sev_dbhdf5::get_objectitemattributes(
   return 1;
 }
 
-int sev_dbhdf5::delete_old_objectdata(pwr_tStatus* sts, void* thread,
-    char* tablename, pwr_tMask options, pwr_tTime limit, pwr_tFloat32 scantime,
-    pwr_tFloat32 garbagecycle)
+int sev_dbhdf5::delete_old_objectdata(pwr_tStatus* sts, void* thread, char* tablename, pwr_tMask options,
+                                      pwr_tTime limit, pwr_tFloat32 scantime, pwr_tFloat32 garbagecycle)
 {
   return 1;
 }
 
-int sev_dbhdf5::check_deadband(pwr_eType type, unsigned int size,
-    pwr_tFloat32 deadband, void* value, void* oldvalue)
+int sev_dbhdf5::check_deadband(pwr_eType type, unsigned int size, pwr_tFloat32 deadband, void* value,
+                               void* oldvalue)
 {
   int deadband_active = 0;
-  switch (type) {
+  switch (type)
+  {
   case pwr_eType_Float32:
-    if (ABS(*(pwr_tFloat32*)value - *(pwr_tFloat32*)oldvalue) < deadband) {
+    if (ABS(*(pwr_tFloat32*)value - *(pwr_tFloat32*)oldvalue) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_Float64:
-    if (ABS(*(pwr_tFloat64*)value - *(pwr_tFloat64*)oldvalue) < deadband) {
+    if (ABS(*(pwr_tFloat64*)value - *(pwr_tFloat64*)oldvalue) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_Int64:
-    if (ABS(*(pwr_tInt64*)value - *(pwr_tInt64*)oldvalue) < deadband) {
+    if (ABS(*(pwr_tInt64*)value - *(pwr_tInt64*)oldvalue) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_Int32:
-    if (ABS(*(pwr_tInt32*)value - *(pwr_tInt32*)oldvalue) < deadband) {
+    if (ABS(*(pwr_tInt32*)value - *(pwr_tInt32*)oldvalue) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_Int16:
-    if (ABS(*(pwr_tInt16*)value - *(pwr_tInt16*)oldvalue) < deadband) {
+    if (ABS(*(pwr_tInt16*)value - *(pwr_tInt16*)oldvalue) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_Int8:
   case pwr_eType_Char:
-    if (ABS(*(pwr_tInt8*)value - *(pwr_tInt8*)oldvalue) < deadband) {
+    if (ABS(*(pwr_tInt8*)value - *(pwr_tInt8*)oldvalue) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_UInt64:
-    if (ABS(((pwr_tInt64)(*(pwr_tUInt64*)value - *(pwr_tUInt64*)oldvalue)))
-        < deadband) {
+    if (ABS(((pwr_tInt64)(*(pwr_tUInt64*)value - *(pwr_tUInt64*)oldvalue))) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_UInt32:
   case pwr_eType_Boolean:
-    if (ABS(((pwr_tInt32)(*(pwr_tUInt32*)value - *(pwr_tUInt32*)oldvalue)))
-        < deadband) {
+    if (ABS(((pwr_tInt32)(*(pwr_tUInt32*)value - *(pwr_tUInt32*)oldvalue))) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_UInt16:
-    if (ABS(((pwr_tInt16)(*(pwr_tUInt16*)value - *(pwr_tUInt16*)oldvalue)))
-        < deadband) {
+    if (ABS(((pwr_tInt16)(*(pwr_tUInt16*)value - *(pwr_tUInt16*)oldvalue))) < deadband)
+    {
       deadband_active = 1;
     }
     break;
   case pwr_eType_UInt8:
-    if (ABS(((pwr_tInt8)(*(pwr_tUInt8*)value - *(pwr_tUInt8*)oldvalue)))
-        < deadband) {
+    if (ABS(((pwr_tInt8)(*(pwr_tUInt8*)value - *(pwr_tUInt8*)oldvalue))) < deadband)
+    {
       deadband_active = 1;
     }
     break;
@@ -4632,7 +4804,8 @@ int sev_dbhdf5::check_deadband(pwr_eType type, unsigned int size,
   case pwr_eType_Text:
   case pwr_eType_Time:
   case pwr_eType_DeltaTime:
-    if (!memcmp(value, oldvalue, size)) {
+    if (!memcmp(value, oldvalue, size))
+    {
       deadband_active = 1;
     }
     break;
@@ -4641,13 +4814,14 @@ int sev_dbhdf5::check_deadband(pwr_eType type, unsigned int size,
   return deadband_active;
 }
 
-int sev_dbhdf5::get_objectvalues(pwr_tStatus* sts, void* thread, sev_item* item,
-    unsigned int size, pwr_tTime* starttime, pwr_tTime* endtime, int maxsize,
-    pwr_tTime** tbuf, void** vbuf, unsigned int* bsize)
+int sev_dbhdf5::get_objectvalues(pwr_tStatus* sts, void* thread, sev_item* item, unsigned int size,
+                                 pwr_tTime* starttime, pwr_tTime* endtime, int maxsize, pwr_tTime** tbuf,
+                                 void** vbuf, unsigned int* bsize)
 {
   unsigned int item_idx;
   get_item(sts, &item_idx, item->oid, item->attr[0].aname);
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     return 0;
   }
 
@@ -4673,8 +4847,7 @@ int sev_dbhdf5::get_objectvalues(pwr_tStatus* sts, void* thread, sev_item* item,
   strcat(dname, cName_Header);
 
   hid_t dataset_id = H5Dopen2(m_file, dname, H5P_DEFAULT);
-  hsts = H5Dread(
-      dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
+  hsts = H5Dread(dataset_id, m_header_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &header);
 
   if (header.first_idx == -1)
     return 0;
@@ -4689,38 +4862,39 @@ int sev_dbhdf5::get_objectvalues(pwr_tStatus* sts, void* thread, sev_item* item,
   hid_t head_dataspace_id = H5Dget_space(dataset_id);
 
   // Read time for first idx
-  pwr_tStatus lsts = get_time(dataset_id, head_memspace_id, head_dataspace_id,
-      mdatatype, header.first_idx, &first_time);
+  pwr_tStatus lsts =
+      get_time(dataset_id, head_memspace_id, head_dataspace_id, mdatatype, header.first_idx, &first_time);
 
   to = endtime->tv_sec;
   from = starttime->tv_sec;
   int res = (int)((float)(to - from) / item->scantime / 1000);
   if (res < 2)
     res = 2;
-  if (to < header.first_time || from > header.last_time) {
+  if (to < header.first_time || from > header.last_time)
+  {
     printf("No samples\n");
     return 0;
   }
   if (to > header.last_time)
     to_idx = header.last_idx;
-  else {
-    lsts = time_to_idx(dataset_id, head_memspace_id, head_dataspace_id,
-        mdatatype, to, header.data_size, header.first_idx, header.last_idx,
-        first_time, header.last_time, res, 0, &to_iter, &to_idx);
+  else
+  {
+    lsts = time_to_idx(dataset_id, head_memspace_id, head_dataspace_id, mdatatype, to, header.data_size,
+                       header.first_idx, header.last_idx, first_time, header.last_time, res, 0, &to_iter,
+                       &to_idx);
   }
 
   if (from < first_time)
     from_idx = header.first_idx;
-  else {
-    lsts = time_to_idx(dataset_id, head_memspace_id, head_dataspace_id,
-        mdatatype, from, header.data_size, header.first_idx, header.last_idx,
-        first_time, header.last_time, res, 0, &from_iter, &from_idx);
+  else
+  {
+    lsts = time_to_idx(dataset_id, head_memspace_id, head_dataspace_id, mdatatype, from, header.data_size,
+                       header.first_idx, header.last_idx, first_time, header.last_time, res, 0, &from_iter,
+                       &from_idx);
   }
 
-  printf("first time %d, last time %d res %d\n", first_time, header.last_time,
-      res);
-  printf("from idx  %d, to idx  %d, iter %d %d\n", from_idx, to_idx, from_iter,
-      to_iter);
+  printf("first time %d, last time %d res %d\n", first_time, header.last_time, res);
+  printf("from idx  %d, to idx  %d, iter %d %d\n", from_idx, to_idx, from_iter, to_iter);
 
   *tbuf = (pwr_tTime*)calloc(maxsize, sizeof(pwr_tTime));
   *vbuf = calloc(maxsize, size);
@@ -4747,7 +4921,8 @@ int sev_dbhdf5::get_objectvalues(pwr_tStatus* sts, void* thread, sev_item* item,
   hid_t memspace_id = H5Screate_simple(1, &dim, NULL);
   hid_t dataspace_id = H5Dget_space(dataset_id);
 
-  for (int j = from_j; j < to_j; j++) {
+  for (int j = from_j; j < to_j; j++)
+  {
     if (bcnt >= maxsize)
       break;
 
@@ -4763,12 +4938,10 @@ int sev_dbhdf5::get_objectvalues(pwr_tStatus* sts, void* thread, sev_item* item,
     hsize_t stride = 1;
     hsize_t block = 1;
 
-    hsts = H5Sselect_hyperslab(
-        dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+    hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
     // Read the dataset
-    hsts = H5Dread(
-        dataset_id, mdatatype, memspace_id, dataspace_id, H5P_DEFAULT, data);
+    hsts = H5Dread(dataset_id, mdatatype, memspace_id, dataspace_id, H5P_DEFAULT, data);
 
     tbufp->tv_sec = *(pwr_tUInt32*)data;
     if (item->options & pwr_mSevOptionsMask_HighTimeResolution)
@@ -4794,8 +4967,8 @@ int sev_dbhdf5::get_objectvalues(pwr_tStatus* sts, void* thread, sev_item* item,
   return 1;
 }
 
-int sev_dbhdf5::get_time(hid_t dataset_id, hid_t memspace_id,
-    hid_t dataspace_id, hid_t mtype, int idx, unsigned int* time)
+int sev_dbhdf5::get_time(hid_t dataset_id, hid_t memspace_id, hid_t dataspace_id, hid_t mtype, int idx,
+                         unsigned int* time)
 {
   herr_t hsts;
   sev_uDataType data;
@@ -4807,22 +4980,20 @@ int sev_dbhdf5::get_time(hid_t dataset_id, hid_t memspace_id,
   hsize_t stride = 1;
   hsize_t block = 1;
 
-  hsts = H5Sselect_hyperslab(
-      dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
+  hsts = H5Sselect_hyperslab(dataspace_id, H5S_SELECT_SET, &offset, &stride, &count, &block);
 
   // Read the dataset
-  hsts = H5Dread(
-      dataset_id, mtype, memspace_id, dataspace_id, H5P_DEFAULT, &data);
+  hsts = H5Dread(dataset_id, mtype, memspace_id, dataspace_id, H5P_DEFAULT, &data);
 
   *time = data.dtAny.time;
 
   return 1;
 }
 
-int sev_dbhdf5::time_to_idx(hid_t dataset_id, hid_t memspace_id,
-    hid_t dataspace_id, hid_t mtype, unsigned int stime, int size, int low_idx,
-    int high_idx, unsigned int low_time, unsigned int high_time, int resolution,
-    unsigned int prev_time, int* iter, int* ridx)
+int sev_dbhdf5::time_to_idx(hid_t dataset_id, hid_t memspace_id, hid_t dataspace_id, hid_t mtype,
+                            unsigned int stime, int size, int low_idx, int high_idx, unsigned int low_time,
+                            unsigned int high_time, int resolution, unsigned int prev_time, int* iter,
+                            int* ridx)
 {
   unsigned int time;
   int idx;
@@ -4834,9 +5005,7 @@ int sev_dbhdf5::time_to_idx(hid_t dataset_id, hid_t memspace_id,
   if (high_idx < low_idx)
     high_idx += size;
 
-  idx = (int)((float)(high_idx - low_idx) / (high_time - low_time)
-          * (stime - low_time)
-      + low_idx + 0.5);
+  idx = (int)((float)(high_idx - low_idx) / (high_time - low_time) * (stime - low_time) + low_idx + 0.5);
   if (idx >= size)
     idx -= size;
   if (idx >= size)
@@ -4844,46 +5013,48 @@ int sev_dbhdf5::time_to_idx(hid_t dataset_id, hid_t memspace_id,
   get_time(dataset_id, memspace_id, dataspace_id, mtype, idx, &time);
   if (debug)
     printf("%d Search time : %d %d\n", idx, stime, time);
-  if (ABS((int)time - (int)stime) <= resolution) {
+  if (ABS((int)time - (int)stime) <= resolution)
+  {
     *ridx = idx;
     return 1;
   }
-  if (prev_time && ABS((int)time - (int)prev_time) <= 1) {
+  if (prev_time && ABS((int)time - (int)prev_time) <= 1)
+  {
     if (ABS((int)time - (int)low_time) > ABS((int)high_time - (int)time))
       idx = high_idx - (high_idx - low_idx) / 10;
     else
       idx = low_idx + (high_idx - low_idx) / 10;
     get_time(dataset_id, memspace_id, dataspace_id, mtype, idx, &time);
     printf("%d Search time : %d %d\n", idx, stime, time);
-    if (ABS((int)time - (int)stime) <= resolution) {
+    if (ABS((int)time - (int)stime) <= resolution)
+    {
       *ridx = idx;
       return 1;
     }
   }
-  if (abs(high_idx - low_idx) <= 1) {
+  if (abs(high_idx - low_idx) <= 1)
+  {
     *ridx = idx;
     return 1;
   }
 
-  if (time < stime) {
+  if (time < stime)
+  {
     low_time = time;
     low_idx = idx;
-  } else {
+  }
+  else
+  {
     high_time = time;
     high_idx = idx;
   }
-  return time_to_idx(dataset_id, memspace_id, dataspace_id, mtype, stime, size,
-      low_idx, high_idx, low_time, high_time, resolution, time, iter, ridx);
+  return time_to_idx(dataset_id, memspace_id, dataspace_id, mtype, stime, size, low_idx, high_idx, low_time,
+                     high_time, resolution, time, iter, ridx);
 }
 
-int sev_dbhdf5::handle_itemchange(
-    pwr_tStatus* sts, char* tablename, unsigned int item_idx)
-{
-  return 1;
-}
+int sev_dbhdf5::handle_itemchange(pwr_tStatus* sts, char* tablename, unsigned int item_idx) { return 1; }
 
-int sev_dbhdf5::handle_objectchange(
-    pwr_tStatus* sts, char* tablename, unsigned int item_idx, bool newObject)
+int sev_dbhdf5::handle_objectchange(pwr_tStatus* sts, char* tablename, unsigned int item_idx, bool newObject)
 {
   return 1;
 }
@@ -4903,8 +5074,7 @@ int sev_dbhdf5::store_stat(sev_sStat* stat)
   data.eventstore_msg_cnt = stat->eventstore_msg_cnt;
 
   hid_t dataset_id = H5Dopen2(m_file, cName_Dir cName_Stat, H5P_DEFAULT);
-  hsts = H5Dwrite(
-      dataset_id, m_stat_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &data);
+  hsts = H5Dwrite(dataset_id, m_stat_mtype, H5S_ALL, H5S_ALL, H5P_DEFAULT, &data);
   H5Dclose(dataset_id);
   return 1;
 }
@@ -4915,11 +5085,11 @@ char* sev_dbhdf5::oid_to_table(pwr_tOid oid, char* aname)
   unsigned char vid[4];
 
   memcpy(&vid, &oid.vid, sizeof(vid));
-  sprintf(tbl, "O%3.3u_%3.3u_%3.3u_%3.3u_%8.8x_%s", vid[3], vid[2], vid[1],
-      vid[0], oid.oix, cdh_Low(aname));
+  sprintf(tbl, "O%3.3u_%3.3u_%3.3u_%3.3u_%8.8x_%s", vid[3], vid[2], vid[1], vid[0], oid.oix, cdh_Low(aname));
 
   // Replace '.' in attribute with '_'
-  for (char* s = tbl; *s; s++) {
+  for (char* s = tbl; *s; s++)
+  {
     if (*s == '.')
       *s = '_';
     if (*s == '[')
@@ -4940,8 +5110,10 @@ sev_dbhdf5::~sev_dbhdf5()
   H5Tclose(m_stat_mtype);
   H5Fclose(m_file);
 
-  for (size_t idx = 0; idx < m_items.size(); idx++) {
-    if (m_items[idx].old_value != 0) {
+  for (size_t idx = 0; idx < m_items.size(); idx++)
+  {
+    if (m_items[idx].old_value != 0)
+    {
       free(m_items[idx].old_value);
       m_items[idx].old_value = 0;
     }

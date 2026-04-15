@@ -42,14 +42,12 @@
 
 #include "glow_conclass.h"
 
-GlowConClass::GlowConClass(GrowCtx* glow_ctx, const char* name,
-    glow_eConType contype, glow_eCorner cornertype, glow_eDrawType d_type,
-    int line_w, double arrow_w, double arrow_l, double round_corner_amnt,
-    glow_eConGroup grp)
-    : GlowArrayElem(glow_ctx), zero(glow_ctx, 0, 0), con_type(contype),
-      corner(cornertype), draw_type(d_type), line_width(line_w),
-      arrow_width(arrow_w), arrow_length(arrow_l),
-      round_corner_amount(round_corner_amnt), group(grp)
+GlowConClass::GlowConClass(GrowCtx* glow_ctx, const char* name, glow_eConType contype,
+                           glow_eCorner cornertype, glow_eDrawType d_type, int line_w, double arrow_w,
+                           double arrow_l, double round_corner_amnt, glow_eConGroup grp)
+    : GlowArrayElem(glow_ctx), zero(glow_ctx, 0, 0), con_type(contype), corner(cornertype), draw_type(d_type),
+      line_width(line_w), arrow_width(arrow_w), arrow_length(arrow_l), round_corner_amount(round_corner_amnt),
+      group(grp)
 {
   strcpy(n_name, name);
   zero.nav_zoom();
@@ -58,8 +56,8 @@ GlowConClass::GlowConClass(GrowCtx* glow_ctx, const char* name,
 
 void GlowConClass::save(std::ofstream& fp, glow_eSaveMode mode)
 {
-  if ((mode == glow_eSaveMode_Trace && group != glow_eConGroup_Trace)
-      || (mode == glow_eSaveMode_Edit && group == glow_eConGroup_Trace))
+  if ((mode == glow_eSaveMode_Trace && group != glow_eConGroup_Trace) ||
+      (mode == glow_eSaveMode_Edit && group == glow_eConGroup_Trace))
     return;
   fp << int(glow_eSave_ConClass) << '\n';
   fp << int(glow_eSave_ConClass_cc_name) << FSPACE << n_name << '\n';
@@ -69,8 +67,7 @@ void GlowConClass::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_ConClass_line_width) << FSPACE << line_width << '\n';
   fp << int(glow_eSave_ConClass_arrow_width) << FSPACE << arrow_width << '\n';
   fp << int(glow_eSave_ConClass_arrow_length) << FSPACE << arrow_length << '\n';
-  fp << int(glow_eSave_ConClass_round_corner_amount) << FSPACE
-     << round_corner_amount << '\n';
+  fp << int(glow_eSave_ConClass_round_corner_amount) << FSPACE << round_corner_amount << '\n';
   fp << int(glow_eSave_ConClass_group) << FSPACE << int(group) << '\n';
   fp << int(glow_eSave_End) << '\n';
 }
@@ -82,15 +79,18 @@ void GlowConClass::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GlowConClass: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_ConClass:
       break;
     case glow_eSave_ConClass_cc_name:
@@ -139,8 +139,10 @@ void GlowConClass::open(std::ifstream& fp)
 
 void GlowConClass::convert(glow_eConvert version)
 {
-  switch (version) {
-  case glow_eConvert_V34: {
+  switch (version)
+  {
+  case glow_eConvert_V34:
+  {
     // Conversion of colors
     draw_type = GlowColor::convert(version, draw_type);
 

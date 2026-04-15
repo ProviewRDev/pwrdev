@@ -50,14 +50,11 @@
 //
 // Create the navigator widget
 //
-LogNavGtk::LogNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-    LogNav_hier *xn_tree, GtkWidget** w,
-    pwr_tStatus* status)
-    : LogNav(xn_parent_ctx, xn_tree, status),
-      parent_wid(xn_parent_wid)
+LogNavGtk::LogNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, LogNav_hier* xn_tree, GtkWidget** w,
+                     pwr_tStatus* status)
+    : LogNav(xn_parent_ctx, xn_tree, status), parent_wid(xn_parent_wid)
 {
-  form_widget
-      = scrolledbrowwidgetgtk_new(LogNav::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetgtk_new(LogNav::init_brow_cb, this, &brow_widget);
 
   gtk_widget_show_all(brow_widget);
 
@@ -76,7 +73,4 @@ LogNavGtk::~LogNavGtk()
   gtk_widget_destroy(form_widget);
 }
 
-void LogNavGtk::set_inputfocus()
-{
-  gtk_widget_grab_focus(brow_widget);
-}
+void LogNavGtk::set_inputfocus() { gtk_widget_grab_focus(brow_widget); }

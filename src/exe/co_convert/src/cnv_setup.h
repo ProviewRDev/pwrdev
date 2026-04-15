@@ -40,21 +40,23 @@
 /* cnv_setup.h -- Setup */
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "pwr.h"
 
 #define MAX_GROUPS 100
 
-class CnvSetup {
+  class CnvSetup
+  {
   public:
-  int group_cnt;
-  char groups[MAX_GROUPS][40];
-  char groups_startpage[MAX_GROUPS][80];
+    int group_cnt;
+    char groups[MAX_GROUPS][40];
+    char groups_startpage[MAX_GROUPS][80];
 
-  int setup(char* filename);
-};
+    int setup(char* filename);
+  };
 
 #if defined __cplusplus
 }

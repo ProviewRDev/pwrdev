@@ -752,31 +752,32 @@
 #define E_SERVICE_NOT_EXECUTABLE 25     /* service not executable */
 #endif
 
-#define E_IF_FATAL_ERROR 7                 /* unrecoverable error on board */
-#define E_IF_INIT_INVALID_PARAMETER 8      /* invalid initialize parameter */
-#define E_IF_LOADER_ERROR 9                /* download firmware error */
-#define E_IF_NO_CNTRL_RES 10               /* controller does not respond */
-#define E_IF_INVALID_CNTRL_TYPE_VERSION 11 /* inv. controller type or SW       \
-                                              vers.*/
-#define E_IF_INVALID_LAYER 12              /* invalid layer */
-#define E_IF_INVALID_SERVICE 13            /* invalid service identifier */
-#define E_IF_INVALID_PRIMITIVE 14          /* invalid service primitive */
-#define E_IF_INVALID_DATA_SIZE 15          /* not enough cmi data block memory*/
-#define E_IF_INVALID_COMM_REF 16           /* invalid communication reference */
-#define E_IF_INVALID_CMI_CALL 19           /* invalid CMI call */
-#define E_IF_CMI_ERROR 20                  /* error occured in CMI */
-#define E_IF_RESOURCE_UNAVAILABLE 21       /* no resource available */
-#define E_IF_NO_PARALLEL_SERVICES 22       /* no parallel services allowed */
-#define E_IF_SERVICE_CONSTR_CONFLICT 23    /* serv. tempor. not executable */
-#define E_IF_SERVICE_NOT_SUPPORTED 24      /* service not supported */
-#define E_IF_SERVICE_NOT_EXECUTABLE 25     /* service not executable */
-#define E_IF_INVALID_VERSION 26            /* invalid version */
-#define E_IF_STATE_CONFLICT 27             /* state conflict  */
-#define E_IF_NO_CNTRL_PRESENT 28           /* controller not available */
-#define E_IF_INVALID_PARAMETER 30          /* wrong parameter in REQ or RES */
-#define E_IF_INIT_FAILED 31                /* init. API or Controller failed */
-#define E_IF_EXIT_FAILED 32                /* exit API or Controller failed */
-#define E_IF_PAPI_NOT_INITIALIZED 33       /* API not initialized */
+#define E_IF_FATAL_ERROR 7            /* unrecoverable error on board */
+#define E_IF_INIT_INVALID_PARAMETER 8 /* invalid initialize parameter */
+#define E_IF_LOADER_ERROR 9           /* download firmware error */
+#define E_IF_NO_CNTRL_RES 10          /* controller does not respond */
+#define E_IF_INVALID_CNTRL_TYPE_VERSION                                                                      \
+  11                                    /* inv. controller type or SW                                        \
+                                           vers.*/
+#define E_IF_INVALID_LAYER 12           /* invalid layer */
+#define E_IF_INVALID_SERVICE 13         /* invalid service identifier */
+#define E_IF_INVALID_PRIMITIVE 14       /* invalid service primitive */
+#define E_IF_INVALID_DATA_SIZE 15       /* not enough cmi data block memory*/
+#define E_IF_INVALID_COMM_REF 16        /* invalid communication reference */
+#define E_IF_INVALID_CMI_CALL 19        /* invalid CMI call */
+#define E_IF_CMI_ERROR 20               /* error occured in CMI */
+#define E_IF_RESOURCE_UNAVAILABLE 21    /* no resource available */
+#define E_IF_NO_PARALLEL_SERVICES 22    /* no parallel services allowed */
+#define E_IF_SERVICE_CONSTR_CONFLICT 23 /* serv. tempor. not executable */
+#define E_IF_SERVICE_NOT_SUPPORTED 24   /* service not supported */
+#define E_IF_SERVICE_NOT_EXECUTABLE 25  /* service not executable */
+#define E_IF_INVALID_VERSION 26         /* invalid version */
+#define E_IF_STATE_CONFLICT 27          /* state conflict  */
+#define E_IF_NO_CNTRL_PRESENT 28        /* controller not available */
+#define E_IF_INVALID_PARAMETER 30       /* wrong parameter in REQ or RES */
+#define E_IF_INIT_FAILED 31             /* init. API or Controller failed */
+#define E_IF_EXIT_FAILED 32             /* exit API or Controller failed */
+#define E_IF_PAPI_NOT_INITIALIZED 33    /* API not initialized */
 
 #define E_IF_NO_DEVICE_CONNECTION 34 /* no PROFIBUS device connection */
 

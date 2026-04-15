@@ -36,7 +36,8 @@
 
 /* co_logwnav_gtk.cpp -- History log window */
 
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 #include "co_time.h"
 }
@@ -45,12 +46,10 @@ extern "C" {
 
 #include "flow_browwidget_gtk.h"
 
-CoLogWNavGtk::CoLogWNavGtk(
-    void* l_parent_ctx, GtkWidget* l_parent_wid, int l_show_item, GtkWidget** w)
+CoLogWNavGtk::CoLogWNavGtk(void* l_parent_ctx, GtkWidget* l_parent_wid, int l_show_item, GtkWidget** w)
     : CoLogWNav(l_parent_ctx, l_show_item), parent_wid(l_parent_wid)
 {
-  form_widget
-      = scrolledbrowwidgetgtk_new(CoLogWNav::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetgtk_new(CoLogWNav::init_brow_cb, this, &brow_widget);
 
   gtk_widget_show_all(brow_widget);
 
@@ -67,7 +66,4 @@ CoLogWNavGtk::~CoLogWNavGtk()
   gtk_widget_destroy(form_widget);
 }
 
-void CoLogWNavGtk::set_input_focus()
-{
-  gtk_widget_grab_focus(brow_widget);
-}
+void CoLogWNavGtk::set_input_focus() { gtk_widget_grab_focus(brow_widget); }

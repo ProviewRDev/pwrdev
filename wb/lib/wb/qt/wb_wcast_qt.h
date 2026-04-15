@@ -43,10 +43,11 @@
 
 #include <QWidget>
 
-class WCastQt : public WCast {
+class WCastQt : public WCast
+{
 public:
-  WCastQt(void* wc_parent_ctx, QWidget* wc_parent_wid, const char* wc_name,
-      ldh_tSesContext wc_ldhses, pwr_sAttrRef wc_aref, pwr_tStatus* status);
+  WCastQt(void* wc_parent_ctx, QWidget* wc_parent_wid, const char* wc_name, ldh_tSesContext wc_ldhses,
+          pwr_sAttrRef wc_aref, pwr_tStatus* status);
   ~WCastQt();
 };
 

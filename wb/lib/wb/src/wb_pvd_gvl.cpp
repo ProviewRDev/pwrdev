@@ -60,7 +60,8 @@ void wb_pvd_gvl::save(pwr_tStatus* sts)
   *sts = LDH__SUCCESS;
   dcli_translate_filename(fname, "$pwra_db/pwr_volumelist.dat");
   of.open(fname);
-  if (!of) {
+  if (!of)
+  {
     *sts = LDH__FILEOPEN;
     return;
   }
@@ -73,22 +74,23 @@ void wb_pvd_gvl::save(pwr_tStatus* sts)
 
 void wb_pvd_gvl::save_item(pwr_tOix oix, std::ofstream& of)
 {
-  switch (m_list[oix].cid) {
-  case pwr_eClass_Hier: {
+  switch (m_list[oix].cid)
+  {
+  case pwr_eClass_Hier:
+  {
     pwr_sHier* body = (pwr_sHier*)m_list[oix].body;
-    of << "!**Menu " << m_list[oix].name << " { // " << body->Description
-       << '\n';
+    of << "!**Menu " << m_list[oix].name << " { // " << body->Description << '\n';
 
     for (int ix = m_list[oix].fchoix; ix; ix = m_list[ix].fwsoix)
       save_item(ix, of);
     of << "!**}\n";
     break;
   }
-  case pwr_cClass_VolumeReg: {
+  case pwr_cClass_VolumeReg:
+  {
     pwr_sClass_VolumeReg* body = (pwr_sClass_VolumeReg*)m_list[oix].body;
 
-    of << "	" << m_list[oix].name << "	"
-       << cdh_VolumeIdToString(0, 0, body->VolumeId, 0, 0) << "	"
+    of << "	" << m_list[oix].name << "	" << cdh_VolumeIdToString(0, 0, body->VolumeId, 0, 0) << "	"
        << body->Project << '\n';
 
     for (int ix = m_list[oix].fchoix; ix; ix = m_list[ix].fwsoix)
@@ -104,27 +106,30 @@ bool wb_pvd_gvl::check_list(pwr_tStatus* sts)
   int error_cnt = 0;
   char msg[200];
 
-  for (int i = 0; i < (int)m_list.size(); i++) {
+  for (int i = 0; i < (int)m_list.size(); i++)
+  {
     if (m_list[i].flags & procom_obj_mFlags_Deleted)
       continue;
 
-    switch (m_list[i].cid) {
-    case pwr_cClass_VolumeReg: {
+    switch (m_list[i].cid)
+    {
+    case pwr_cClass_VolumeReg:
+    {
       pwr_sClass_VolumeReg* body = (pwr_sClass_VolumeReg*)m_list[i].body;
       pwr_tOid oid;
 
       oid.oix = m_list[i].oix;
       oid.vid = ldh_cProjectListVolume;
 
-      if (body->VolumeId == 0) {
-        sprintf(
-            msg, "VolumeId is missing, in object %s", longname(m_list[i].oix));
+      if (body->VolumeId == 0)
+      {
+        sprintf(msg, "VolumeId is missing, in object %s", longname(m_list[i].oix));
         MsgWindow::message('E', msg, msgw_ePop_No, oid);
         error_cnt++;
       }
-      if (streq(body->Project, "")) {
-        sprintf(
-            msg, "Project is missing, in object %s", longname(m_list[i].oix));
+      if (streq(body->Project, ""))
+      {
+        sprintf(msg, "Project is missing, in object %s", longname(m_list[i].oix));
         MsgWindow::message('E', msg, msgw_ePop_No, oid);
         error_cnt++;
       }
@@ -133,7 +138,8 @@ bool wb_pvd_gvl::check_list(pwr_tStatus* sts)
     default:;
     }
   }
-  if (error_cnt) {
+  if (error_cnt)
+  {
     sprintf(msg, "%d error(s) found, Save aborted", error_cnt);
     MsgWindow::message('E', msg, msgw_ePop_Yes);
     *sts = LDH__SYNTAX;
@@ -169,26 +175,33 @@ void wb_pvd_gvl::load(pwr_tStatus* rsts)
 
   dcli_translate_filename(fname, "$pwra_db/pwr_volumelist.dat");
   is.open(fname);
-  if (!is) {
+  if (!is)
+  {
     *rsts = LDH__NEWFILE;
     return;
   }
 
-  while (is.getline(line, sizeof(line))) {
+  while (is.getline(line, sizeof(line)))
+  {
     line_cnt++;
-    if (line[0] == '!') {
-      if (str_StartsWith(line, "!**Menu")) {
+    if (line[0] == '!')
+    {
+      if (str_StartsWith(line, "!**Menu"))
+      {
         // Add Hier
         char* s = strstr(line, "// ");
-        if (s) {
+        if (s)
+        {
           strncpy(description, s + 3, sizeof(description));
           description[sizeof(description) - 1] = 0;
-        } else
+        }
+        else
           strcpy(description, "");
 
-        num = dcli_parse(line, " 	", "", (char*)line_item,
-            sizeof(line_item) / sizeof(line_item[0]), sizeof(line_item[0]), 0);
-        if (num < 3) {
+        num = dcli_parse(line, " 	", "", (char*)line_item, sizeof(line_item) / sizeof(line_item[0]),
+                         sizeof(line_item[0]), 0);
+        if (num < 3)
+        {
           std::cout << "Syntax error " << fname << " row " << line_cnt << '\n';
           continue;
         }
@@ -215,8 +228,11 @@ void wb_pvd_gvl::load(pwr_tStatus* rsts)
 
         menu_stack[menu_cnt] = plantitem.oix;
         menu_cnt++;
-      } else if (str_StartsWith(line, "!**}")) {
-        if (menu_cnt == 0) {
+      }
+      else if (str_StartsWith(line, "!**}"))
+      {
+        if (menu_cnt == 0)
+        {
           std::cout << "Syntax error " << fname << " row " << line_cnt << '\n';
           continue;
         }
@@ -226,9 +242,10 @@ void wb_pvd_gvl::load(pwr_tStatus* rsts)
     }
     str_trim(line, line);
 
-    num = dcli_parse(line, " 	", "", (char*)line_item,
-        sizeof(line_item) / sizeof(line_item[0]), sizeof(line_item[0]), 0);
-    if (num != 3) {
+    num = dcli_parse(line, " 	", "", (char*)line_item, sizeof(line_item) / sizeof(line_item[0]),
+                     sizeof(line_item[0]), 0);
+    if (num != 3)
+    {
       std::cout << "Syntax error " << fname << " row " << line_cnt << '\n';
       continue;
     }
@@ -237,13 +254,13 @@ void wb_pvd_gvl::load(pwr_tStatus* rsts)
     strcpy(volitem.name, line_item[0]);
 
     volitem.body_size = sizeof(pwr_sClass_VolumeReg);
-    pwr_sClass_VolumeReg* volbody
-        = (pwr_sClass_VolumeReg*)calloc(1, volitem.body_size);
+    pwr_sClass_VolumeReg* volbody = (pwr_sClass_VolumeReg*)calloc(1, volitem.body_size);
 
     volitem.body = volbody;
     strcpy(volbody->Project, line_item[2]);
     sts = cdh_StringToVolumeId(line_item[1], &volbody->VolumeId);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       std::cout << "Syntax error " << fname << " row " << line_cnt << '\n';
       continue;
     }

@@ -41,19 +41,17 @@
 #include "glow_rect.h"
 #include "glow_text.h"
 
-class GrowSubAnnot : public GlowAnnot {
+class GrowSubAnnot : public GlowAnnot
+{
 public:
-  GrowSubAnnot(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0,
-      int annot_num = 0,
-      glow_eDrawType d_type = glow_eDrawType_TextHelveticaBold,
-      glow_eDrawType color_d_type = glow_eDrawType_Line, int t_size = 2,
-      glow_eAnnotType a_type = glow_eAnnotType_OneLine, int rel_pos = 0,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int nodraw = 0);
+  GrowSubAnnot(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0, int annot_num = 0,
+               glow_eDrawType d_type = glow_eDrawType_TextHelveticaBold,
+               glow_eDrawType color_d_type = glow_eDrawType_Line, int t_size = 2,
+               glow_eAnnotType a_type = glow_eAnnotType_OneLine, int rel_pos = 0,
+               glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int nodraw = 0);
   ~GrowSubAnnot();
-  int event_handler(
-      GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
-  void get_borders(
-      double* x1_right, double* x1_left, double* y1_high, double* y1_low)
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
+  void get_borders(double* x1_right, double* x1_left, double* y1_high, double* y1_low)
   {
     rect.get_borders(0, 0, x1_right, x1_left, y1_high, y1_low, NULL);
   }
@@ -63,7 +61,7 @@ public:
     x_right = y_high = -1e37;
     rect.get_borders(0, 0, &x_right, &x_left, &y_high, &y_low, NULL);
   }
-  void print(double ll_x, double ll_y, double ur_x, double ur_y){}
+  void print(double ll_x, double ll_y, double ur_x, double ur_y) {}
   void zoom();
   void nav_zoom();
   void save(std::ofstream& fp, glow_eSaveMode mode);
@@ -73,23 +71,14 @@ public:
   void move(double delta_x, double delta_y, int grid);
   void move_noerase(int delta_x, int delta_y, int grid);
   void set_highlight(int on);
-  int get_highlight()
-  {
-    return highlight;
-  }
-  void set_inverse(int on){}
-  int get_inverse()
-  {
-    return inverse;
-  }
-  void set_hot(int on){}
-  int get_hot(){return hot;}
+  int get_highlight() { return highlight; }
+  void set_inverse(int on) {}
+  int get_inverse() { return inverse; }
+  void set_hot(int on) {}
+  int get_hot() { return hot; }
   void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
-      glow_eSelectPolicy select_policy);
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowSubAnnot;
-  }
+                            glow_eSelectPolicy select_policy);
+  glow_eObjectType type() { return glow_eObjectType_GrowSubAnnot; }
   void measure(double* ll_x, double* ll_y, double* ur_x, double* ur_y)
   {
     *ll_x = x_left;
@@ -111,36 +100,18 @@ public:
   void* user_data;
   GlowTransform trf;
   glow_eAdjustment adjustment;
-  void set_user_data(void* data)
-  {
-    user_data = data;
-  }
-  void get_user_data(void** data)
-  {
-    *data = user_data;
-  }
-  void* get_ctx()
-  {
-    return this->ctx;
-  }
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void set_user_data(void* data) { user_data = data; }
+  void get_user_data(void** data) { *data = user_data; }
+  void* get_ctx() { return this->ctx; }
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
   void set_transform(GlowTransform* t);
-  void set_transform_from_stored(GlowTransform* t)
-  {
-    trf.set_from_stored(t), get_node_borders();
-  }
-  void store_transform()
-  {
-    trf.store();
-  }
-  void get_ctx(void** c)
-  {
-    *c = (void*)ctx;
-  }
+  void set_transform_from_stored(GlowTransform* t) { trf.set_from_stored(t), get_node_borders(); }
+  void store_transform() { trf.store(); }
+  void get_ctx(void** c) { *c = (void*)ctx; }
   void align(double x, double y, glow_eAlignDirection direction);
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ofstream& fp);
   void convert(glow_eConvert version);
   void set_original_text_color(glow_eDrawType drawtype)
   {

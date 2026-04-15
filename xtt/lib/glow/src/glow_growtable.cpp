@@ -85,28 +85,23 @@ static int growtable_cell_is_zero(const GrowTable* table, int column, int row)
   return i < len && table->cell_value[offs + i] == '0' && i + 1 == len;
 }
 
-GrowTable::GrowTable(GrowCtx* glow_ctx, const char* name, double x, double y,
-    double w, double h, glow_eDrawType border_d_type, int line_w, int fill_rect,
-    glow_eDrawType fill_d_type, glow_mDisplayLevel display_lev, int nodraw)
-    : GrowRect(glow_ctx, name, x, y, w, h, border_d_type, line_w, 0,
-          display_lev, fill_rect, 1, 0, fill_d_type, nodraw),
-      user_data(0), vertical_scrollbar(0), horizontal_scrollbar(0),
-      scrollbar_width(0.5), v_scrollbar(0), h_scrollbar(0), v_value(0),
-      h_value(0), table_x0(0), table_x1(0), table_y0(0), table_y1(0),
-      scrollbar_color(glow_eDrawType_LightGray),
-      scrollbar_bg_color(glow_eDrawType_MediumGray), window_scale(1),
-      y_low_offs(0), x_left_offs(0), rows(10), columns(2), header_row(0),
-      header_column(0), text_size(1),
-      text_drawtype(glow_eDrawType_TextHelvetica),
-      text_color_drawtype(glow_eDrawType_Line), header_text_size(1),
-      header_text_drawtype(glow_eDrawType_TextHelvetica),
-      header_text_color(glow_eDrawType_Line), header_row_height(0.8),
-      row_height(0.6), value_size(0), cell_value(0), selected_cell_row(-1),
-      selected_cell_column(-1), select_drawtype(glow_eDrawType_Inherit),
-      input_focus(0), header_text_bold(0), options(glow_mTableOptions_No), 
-      font(glow_eFont_Helvetica)
+GrowTable::GrowTable(GrowCtx* glow_ctx, const char* name, double x, double y, double w, double h,
+                     glow_eDrawType border_d_type, int line_w, int fill_rect, glow_eDrawType fill_d_type,
+                     glow_mDisplayLevel display_lev, int nodraw)
+    : GrowRect(glow_ctx, name, x, y, w, h, border_d_type, line_w, 0, display_lev, fill_rect, 1, 0,
+               fill_d_type, nodraw),
+      user_data(0), vertical_scrollbar(0), horizontal_scrollbar(0), scrollbar_width(0.5), v_scrollbar(0),
+      h_scrollbar(0), v_value(0), h_value(0), table_x0(0), table_x1(0), table_y0(0), table_y1(0),
+      scrollbar_color(glow_eDrawType_LightGray), scrollbar_bg_color(glow_eDrawType_MediumGray),
+      window_scale(1), y_low_offs(0), x_left_offs(0), rows(10), columns(2), header_row(0), header_column(0),
+      text_size(1), text_drawtype(glow_eDrawType_TextHelvetica), text_color_drawtype(glow_eDrawType_Line),
+      header_text_size(1), header_text_drawtype(glow_eDrawType_TextHelvetica),
+      header_text_color(glow_eDrawType_Line), header_row_height(0.8), row_height(0.6), value_size(0),
+      cell_value(0), selected_cell_row(-1), selected_cell_column(-1), select_drawtype(glow_eDrawType_Inherit),
+      input_focus(0), header_text_bold(0), options(glow_mTableOptions_No), font(glow_eFont_Helvetica)
 {
-  for (int i = 0; i < TABLE_MAX_COL; i++) {
+  for (int i = 0; i < TABLE_MAX_COL; i++)
+  {
     strcpy(header_text[i], "");
     column_width[i] = 4;
     column_size[i] = 12;
@@ -121,7 +116,8 @@ GrowTable::GrowTable(GrowCtx* glow_ctx, const char* name, double x, double y,
 
 GrowTable::~GrowTable()
 {
-  if (!ctx->nodraw) {
+  if (!ctx->nodraw)
+  {
     draw();
   }
   if (v_scrollbar)
@@ -136,54 +132,38 @@ GrowTable::~GrowTable()
 void GrowTable::save(std::ofstream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowTable) << '\n';
-  fp << int(glow_eSave_GrowTable_scrollbar_width) << FSPACE << scrollbar_width
-     << '\n';
-  fp << int(glow_eSave_GrowTable_scrollbar_color) << FSPACE << scrollbar_color
-     << '\n';
-  fp << int(glow_eSave_GrowTable_scrollbar_bg_color) << FSPACE
-     << scrollbar_bg_color << '\n';
-  fp << int(glow_eSave_GrowTable_vertical_scrollbar) << FSPACE
-     << vertical_scrollbar << '\n';
-  fp << int(glow_eSave_GrowTable_horizontal_scrollbar) << FSPACE
-     << horizontal_scrollbar << '\n';
-  fp << int(glow_eSave_GrowTable_window_scale) << FSPACE << window_scale
-     << '\n';
+  fp << int(glow_eSave_GrowTable_scrollbar_width) << FSPACE << scrollbar_width << '\n';
+  fp << int(glow_eSave_GrowTable_scrollbar_color) << FSPACE << scrollbar_color << '\n';
+  fp << int(glow_eSave_GrowTable_scrollbar_bg_color) << FSPACE << scrollbar_bg_color << '\n';
+  fp << int(glow_eSave_GrowTable_vertical_scrollbar) << FSPACE << vertical_scrollbar << '\n';
+  fp << int(glow_eSave_GrowTable_horizontal_scrollbar) << FSPACE << horizontal_scrollbar << '\n';
+  fp << int(glow_eSave_GrowTable_window_scale) << FSPACE << window_scale << '\n';
   fp << int(glow_eSave_GrowTable_rows) << FSPACE << rows << '\n';
   fp << int(glow_eSave_GrowTable_columns) << FSPACE << columns << '\n';
   fp << int(glow_eSave_GrowTable_header_row) << FSPACE << header_row << '\n';
-  fp << int(glow_eSave_GrowTable_header_column) << FSPACE << header_column
-     << '\n';
+  fp << int(glow_eSave_GrowTable_header_column) << FSPACE << header_column << '\n';
   fp << int(glow_eSave_GrowTable_text_size) << FSPACE << text_size << '\n';
-  fp << int(glow_eSave_GrowTable_text_drawtype) << FSPACE << text_drawtype
-     << '\n';
-  fp << int(glow_eSave_GrowTable_text_color_drawtype) << FSPACE
-     << text_color_drawtype << '\n';
-  fp << int(glow_eSave_GrowTable_header_text_size) << FSPACE << header_text_size
-     << '\n';
-  fp << int(glow_eSave_GrowTable_header_text_drawtype) << FSPACE
-     << header_text_drawtype << '\n';
-  fp << int(glow_eSave_GrowTable_header_text_color) << FSPACE
-     << header_text_color << '\n';
-  fp << int(glow_eSave_GrowTable_header_text_bold) << FSPACE << header_text_bold
-     << '\n';
-  fp << int(glow_eSave_GrowTable_header_row_height) << FSPACE
-     << header_row_height << '\n';
+  fp << int(glow_eSave_GrowTable_text_drawtype) << FSPACE << text_drawtype << '\n';
+  fp << int(glow_eSave_GrowTable_text_color_drawtype) << FSPACE << text_color_drawtype << '\n';
+  fp << int(glow_eSave_GrowTable_header_text_size) << FSPACE << header_text_size << '\n';
+  fp << int(glow_eSave_GrowTable_header_text_drawtype) << FSPACE << header_text_drawtype << '\n';
+  fp << int(glow_eSave_GrowTable_header_text_color) << FSPACE << header_text_color << '\n';
+  fp << int(glow_eSave_GrowTable_header_text_bold) << FSPACE << header_text_bold << '\n';
+  fp << int(glow_eSave_GrowTable_header_row_height) << FSPACE << header_row_height << '\n';
   fp << int(glow_eSave_GrowTable_row_height) << FSPACE << row_height << '\n';
   fp << int(glow_eSave_GrowTable_options) << FSPACE << options << '\n';
-  fp << int(glow_eSave_GrowTable_select_drawtype) << FSPACE << select_drawtype
-     << '\n';
+  fp << int(glow_eSave_GrowTable_select_drawtype) << FSPACE << select_drawtype << '\n';
   fp << int(glow_eSave_GrowTable_font) << FSPACE << (int)font << '\n';
-  for (int i = 0; i < TABLE_MAX_COL; i++) {
-    fp << int(glow_eSave_GrowTable_column_width1) + 2 * i << FSPACE
-       << column_width[i] << '\n';
-    fp << int(glow_eSave_GrowTable_header_text1) + 2 * i << FSPACE
-       << header_text[i] << '\n';
-    fp << int(glow_eSave_GrowTable_column_adjustment1) + i << FSPACE
-       << int(column_adjustment[i]) << '\n';
+  for (int i = 0; i < TABLE_MAX_COL; i++)
+  {
+    fp << int(glow_eSave_GrowTable_column_width1) + 2 * i << FSPACE << column_width[i] << '\n';
+    fp << int(glow_eSave_GrowTable_header_text1) + 2 * i << FSPACE << header_text[i] << '\n';
+    fp << int(glow_eSave_GrowTable_column_adjustment1) + i << FSPACE << int(column_adjustment[i]) << '\n';
   }
   fp << int(glow_eSave_GrowTable_rect_part) << '\n';
   GrowRect::save(fp, mode);
-  if (user_data && ctx->userdata_save_callback) {
+  if (user_data && ctx->userdata_save_callback)
+  {
     fp << int(glow_eSave_GrowTable_userdata_cb) << '\n';
     (ctx->userdata_save_callback)(&fp, this, glow_eUserdataCbType_Node);
   }
@@ -197,15 +177,18 @@ void GrowTable::open(std::ifstream& fp)
   char dummy[40];
   int tmp;
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowTable: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowTable:
       break;
     case glow_eSave_GrowTable_scrollbar_width:
@@ -441,23 +424,25 @@ void GrowTable::draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y)
 {
   int tmp;
 
-  if (ll_x > ur_x) {
+  if (ll_x > ur_x)
+  {
     /* Shift */
     tmp = ll_x;
     ll_x = ur_x;
     ur_x = tmp;
   }
-  if (ll_y > ur_y) {
+  if (ll_y > ur_y)
+  {
     /* Shift */
     tmp = ll_y;
     ll_y = ur_y;
     ur_y = tmp;
   }
 
-  if (x_right * w->zoom_factor_x - w->offset_x + 1 >= ll_x
-      && x_left * w->zoom_factor_x - w->offset_x <= ur_x
-      && y_high * w->zoom_factor_y - w->offset_y + 1 >= ll_y
-      && y_low * w->zoom_factor_y - w->offset_y <= ur_y) {
+  if (x_right * w->zoom_factor_x - w->offset_x + 1 >= ll_x &&
+      x_left * w->zoom_factor_x - w->offset_x <= ur_x &&
+      y_high * w->zoom_factor_y - w->offset_y + 1 >= ll_y && y_low * w->zoom_factor_y - w->offset_y <= ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
   }
 }
@@ -470,21 +455,23 @@ void GrowTable::draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y)
   int obj_ur_y = int(y_high * w->zoom_factor_y) - w->offset_y;
   int obj_ll_y = int(y_low * w->zoom_factor_y) - w->offset_y;
 
-  if (*ll_x > *ur_x) {
+  if (*ll_x > *ur_x)
+  {
     /* Shift */
     tmp = *ll_x;
     *ll_x = *ur_x;
     *ur_x = tmp;
   }
-  if (*ll_y > *ur_y) {
+  if (*ll_y > *ur_y)
+  {
     /* Shift */
     tmp = *ll_y;
     *ll_y = *ur_y;
     *ur_y = tmp;
   }
 
-  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y
-      && obj_ll_y <= *ur_y) {
+  if (obj_ur_x >= *ll_x && obj_ll_x <= *ur_x && obj_ur_y >= *ll_y && obj_ll_y <= *ur_y)
+  {
     draw(w, (GlowTransform*)NULL, highlight, hot, NULL, NULL, NULL);
 
     // Increase the redraw area
@@ -505,15 +492,17 @@ void GrowTable::set_highlight(int on)
   draw();
 }
 
-void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode, void *transpnode)
+void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+                     void* transpnode)
 {
-  if (w == &ctx->navw) {
+  if (w == &ctx->navw)
+  {
     if (ctx->no_nav)
       return;
     hot = 0;
   }
-  if (w == &ctx->navw) {
+  if (w == &ctx->navw)
+  {
     draw_brief(w, t, highlight, hot, node, colornode);
     return;
   }
@@ -527,25 +516,25 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   idx = MAX(0, idx);
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
 
-  int text_idx
-      = int(w->zoom_factor_y / w->base_zoom_factor * (text_size + 4) - 4);
+  int text_idx = int(w->zoom_factor_y / w->base_zoom_factor * (text_size + 4) - 4);
   double tsize = w->zoom_factor_y / w->base_zoom_factor * (8 + 2 * text_size);
   text_idx = MIN(text_idx, DRAW_TYPE_SIZE - 1);
-  int header_text_idx = int(
-      w->zoom_factor_y / w->base_zoom_factor * (header_text_size + 4) - 4);
+  int header_text_idx = int(w->zoom_factor_y / w->base_zoom_factor * (header_text_size + 4) - 4);
   header_text_idx = MIN(header_text_idx, DRAW_TYPE_SIZE - 1);
-  double header_tsize
-      = w->zoom_factor_y / w->base_zoom_factor * (8 + 2 * header_text_size);
+  double header_tsize = w->zoom_factor_y / w->base_zoom_factor * (8 + 2 * header_text_size);
 
   int ll_x, ll_y, ur_x, ur_y;
   double dx1, dy1, dx2, dy2;
 
-  if (!t) {
+  if (!t)
+  {
     dx1 = trf.x(ll.x, ll.y);
     dy1 = trf.y(ll.x, ll.y);
     dx2 = trf.x(ur.x, ur.y);
     dy2 = trf.y(ur.x, ur.y);
-  } else {
+  }
+  else
+  {
     dx1 = trf.x(t, ll.x, ll.y);
     dy1 = trf.y(t, ll.x, ll.y);
     dx2 = trf.x(t, ur.x, ur.y);
@@ -556,28 +545,29 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   dy1 = MIN(dy1, dy2);
   dy2 = MAX(dy1, dy2);
 
-  if (v_scrollbar) {
+  if (v_scrollbar)
+  {
     if (!h_scrollbar)
-      v_scrollbar->set_position(dx2 - scrollbar_width, dy1 + y_low_offs,
-          scrollbar_width, dy2 - (dy1 + y_low_offs));
+      v_scrollbar->set_position(dx2 - scrollbar_width, dy1 + y_low_offs, scrollbar_width,
+                                dy2 - (dy1 + y_low_offs));
     else
-      v_scrollbar->set_position(dx2 - scrollbar_width, dy1 + y_low_offs,
-          scrollbar_width, dy2 - (dy1 + y_low_offs) - scrollbar_width);
+      v_scrollbar->set_position(dx2 - scrollbar_width, dy1 + y_low_offs, scrollbar_width,
+                                dy2 - (dy1 + y_low_offs) - scrollbar_width);
     v_scrollbar->draw(w, 0, 0, 0, 0, 0, 0);
   }
-  if (h_scrollbar) {
+  if (h_scrollbar)
+  {
     if (!v_scrollbar)
-      h_scrollbar->set_position(dx1 + x_left_offs, dy2 - scrollbar_width,
-          dx2 - (dx1 + x_left_offs), scrollbar_width);
+      h_scrollbar->set_position(dx1 + x_left_offs, dy2 - scrollbar_width, dx2 - (dx1 + x_left_offs),
+                                scrollbar_width);
     else
       h_scrollbar->set_position(dx1 + x_left_offs, dy2 - scrollbar_width,
-          dx2 - (dx1 + x_left_offs) - scrollbar_width, scrollbar_width);
+                                dx2 - (dx1 + x_left_offs) - scrollbar_width, scrollbar_width);
     h_scrollbar->draw(w, 0, 0, 0, 0, 0, 0);
   }
 
   drawtype = ((GrowCtx*)ctx)
-                 ->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
-                     highlight, (GrowNode*)colornode, 0);
+                 ->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight, (GrowNode*)colornode, 0);
 
   glow_eDrawType light_drawtype;
   glow_eDrawType dark_drawtype;
@@ -597,12 +587,8 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
 
   int o_ll_x = int((dx1 + x_left_offs) * w->zoom_factor_x) - w->offset_x;
   int o_ll_y = int((dy1 + y_low_offs) * w->zoom_factor_y) - w->offset_y;
-  int o_ur_x
-      = int((dx2 - vertical_scrollbar * scrollbar_width) * w->zoom_factor_x)
-      - w->offset_x;
-  int o_ur_y
-      = int((dy2 - horizontal_scrollbar * scrollbar_width) * w->zoom_factor_y)
-      - w->offset_y;
+  int o_ur_x = int((dx2 - vertical_scrollbar * scrollbar_width) * w->zoom_factor_x) - w->offset_x;
+  int o_ur_y = int((dy2 - horizontal_scrollbar * scrollbar_width) * w->zoom_factor_y) - w->offset_y;
 
   int t_ll_x = o_ll_x - int(h_value * w->zoom_factor_x);
   int t_ll_y = o_ll_y - int(v_value * w->zoom_factor_y);
@@ -622,53 +608,51 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   if (header_column)
     header_w = int(column_width[0] * w->zoom_factor_x);
 
-  if (header_row) {
+  if (header_row)
+  {
     if (fill)
-      ctx->gdraw->fill_rect(
-          w, ll_x, ll_y, ur_x - ll_x, header_h, fill_drawtype);
+      ctx->gdraw->fill_rect(w, ll_x, ll_y, ur_x - ll_x, header_h, fill_drawtype);
 
-    ctx->gdraw->set_clip_rectangle(
-        w, ll_x + header_w, ll_y, ur_x, ll_y + header_h);
+    ctx->gdraw->set_clip_rectangle(w, ll_x + header_w, ll_y, ur_x, ll_y + header_h);
 
-    if (shadow) {
+    if (shadow)
+    {
       x = t_ll_x;
       y = ll_y;
-      for (int i = header_column; i < columns + 1; i++) {
+      for (int i = header_column; i < columns + 1; i++)
+      {
         if (x > ur_x)
           break;
         if (i != header_column)
-          ctx->gdraw->line(w, int(x) - 1, ll_y, int(x) - 1, ll_y + header_h,
-              dark_drawtype, 0, 0);
+          ctx->gdraw->line(w, int(x) - 1, ll_y, int(x) - 1, ll_y + header_h, dark_drawtype, 0, 0);
         if (i != columns)
-          ctx->gdraw->line(w, int(x) + 1, ll_y, int(x) + 1, ll_y + header_h,
-              light_drawtype, 0, 0);
+          ctx->gdraw->line(w, int(x) + 1, ll_y, int(x) + 1, ll_y + header_h, light_drawtype, 0, 0);
         x += column_width[i] * w->zoom_factor_x;
       }
-      ctx->gdraw->line(
-          w, ll_x, ll_y + 1, t_ur_x, ll_y + 1, light_drawtype, 0, 0);
-      ctx->gdraw->line(w, ll_x, ll_y + header_h - 1, t_ur_x,
-          ll_y + header_h - 1, dark_drawtype, 1, 0);
+      ctx->gdraw->line(w, ll_x, ll_y + 1, t_ur_x, ll_y + 1, light_drawtype, 0, 0);
+      ctx->gdraw->line(w, ll_x, ll_y + header_h - 1, t_ur_x, ll_y + header_h - 1, dark_drawtype, 1, 0);
     }
     x = t_ll_x;
     y = ll_y;
 
-    for (int i = header_column; i < columns + 1; i++) {
+    for (int i = header_column; i < columns + 1; i++)
+    {
       if (x > ur_x)
         break;
-      ctx->gdraw->line(
-          w, int(x), ll_y, int(x), ll_y + header_h, drawtype, idx, 0);
+      ctx->gdraw->line(w, int(x), ll_y, int(x), ll_y + header_h, drawtype, idx, 0);
       x += column_width[i] * w->zoom_factor_x;
     }
 
     x = t_ll_x;
     y = ll_y;
 
-    for (int i = header_column; i < columns; i++) {
-      if (header_text_idx >= 0 && !streq(header_text[i], "")) {
-        ctx->gdraw->text(w, int(x + text_offs), int(y + header_h - 4),
-            header_text[i], strlen(header_text[i]), header_text_drawtype,
-            header_text_color, header_text_idx, highlight, 0, font,
-            header_tsize, 0);
+    for (int i = header_column; i < columns; i++)
+    {
+      if (header_text_idx >= 0 && !streq(header_text[i], ""))
+      {
+        ctx->gdraw->text(w, int(x + text_offs), int(y + header_h - 4), header_text[i], strlen(header_text[i]),
+                         header_text_drawtype, header_text_color, header_text_idx, highlight, 0, font,
+                         header_tsize, 0);
       }
       x += column_width[i] * w->zoom_factor_x;
       if (x > ur_x)
@@ -676,95 +660,97 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     }
     ctx->gdraw->reset_clip_rectangle(w);
 
-    if (header_w) {
-      if (shadow) {
-        ctx->gdraw->line(w, ll_x + header_w - 1, ll_y, ll_x + header_w - 1,
-            ll_y + header_h, dark_drawtype, 1, 0);
-        ctx->gdraw->line(w, ll_x - 1, ll_y + header_h - 1, ll_x + header_w,
-            ll_y + header_h - 1, dark_drawtype, 1, 0);
-        ctx->gdraw->line(
-            w, ll_x, ll_y + 1, ll_x + header_w, ll_y + 1, light_drawtype, 0, 0);
-        ctx->gdraw->line(
-            w, ll_x + 1, ll_y, ll_x + 1, ll_y + header_h, light_drawtype, 0, 0);
+    if (header_w)
+    {
+      if (shadow)
+      {
+        ctx->gdraw->line(w, ll_x + header_w - 1, ll_y, ll_x + header_w - 1, ll_y + header_h, dark_drawtype, 1,
+                         0);
+        ctx->gdraw->line(w, ll_x - 1, ll_y + header_h - 1, ll_x + header_w, ll_y + header_h - 1,
+                         dark_drawtype, 1, 0);
+        ctx->gdraw->line(w, ll_x, ll_y + 1, ll_x + header_w, ll_y + 1, light_drawtype, 0, 0);
+        ctx->gdraw->line(w, ll_x + 1, ll_y, ll_x + 1, ll_y + header_h, light_drawtype, 0, 0);
       }
-      ctx->gdraw->line(w, ll_x + header_w, ll_y, ll_x + header_w,
-          ll_y + header_h, drawtype, idx, 0);
+      ctx->gdraw->line(w, ll_x + header_w, ll_y, ll_x + header_w, ll_y + header_h, drawtype, idx, 0);
     }
     ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x, header_h, drawtype, idx, 0);
 
-    if (header_column) {
+    if (header_column)
+    {
       // Draw header of header column header
       x = ll_x;
       y = ll_y;
       if (header_text_idx >= 0 && !streq(header_text[0], ""))
-        ctx->gdraw->text(w, int(x + text_offs), int(y + header_h - 4),
-            header_text[0], strlen(header_text[0]), header_text_drawtype,
-            header_text_color, header_text_idx, highlight, 0, font, tsize, 0);
+        ctx->gdraw->text(w, int(x + text_offs), int(y + header_h - 4), header_text[0], strlen(header_text[0]),
+                         header_text_drawtype, header_text_color, header_text_idx, highlight, 0, font, tsize,
+                         0);
     }
   }
 
-  if (header_column) {
+  if (header_column)
+  {
     if (fill)
-      ctx->gdraw->fill_rect(w, ll_x, ll_y + header_h, header_w,
-          ur_y - ll_y - header_h, fill_drawtype);
+      ctx->gdraw->fill_rect(w, ll_x, ll_y + header_h, header_w, ur_y - ll_y - header_h, fill_drawtype);
 
-    ctx->gdraw->set_clip_rectangle(
-        w, ll_x, ll_y + header_h, ll_x + header_w, ur_y);
+    ctx->gdraw->set_clip_rectangle(w, ll_x, ll_y + header_h, ll_x + header_w, ur_y);
 
     // Draw selected cell, if cell in header column
-    if (selected_cell_row >= 0 && selected_cell_column == 0) {
+    if (selected_cell_row >= 0 && selected_cell_column == 0)
+    {
       x = ll_x;
       y = t_ll_y + row_height * w->zoom_factor_y * selected_cell_row;
-      ctx->gdraw->fill_rect(w, int(x), int(y), header_w,
-          int(row_height * w->zoom_factor_y), sel_drawtype);
+      ctx->gdraw->fill_rect(w, int(x), int(y), header_w, int(row_height * w->zoom_factor_y), sel_drawtype);
     }
 
-    if (shadow) {
+    if (shadow)
+    {
       x = ll_x;
       y = t_ll_y;
-      for (int i = 0; i < rows + 1; i++) {
+      for (int i = 0; i < rows + 1; i++)
+      {
         if (y > ur_y)
           break;
-        if (y > ll_y) {
+        if (y > ll_y)
+        {
           if (i != 0)
-            ctx->gdraw->line(w, ll_x, int(y) - 1, ll_x + header_w, int(y) - 1,
-                dark_drawtype, 0, 0);
+            ctx->gdraw->line(w, ll_x, int(y) - 1, ll_x + header_w, int(y) - 1, dark_drawtype, 0, 0);
           if (i != rows)
-            ctx->gdraw->line(w, ll_x, int(y) + 1, ll_x + header_w, int(y) + 1,
-                light_drawtype, 0, 0);
+            ctx->gdraw->line(w, ll_x, int(y) + 1, ll_x + header_w, int(y) + 1, light_drawtype, 0, 0);
         }
         y += row_height * w->zoom_factor_y;
       }
-      ctx->gdraw->line(
-          w, ll_x + 1, ll_y + header_h, ll_x + 1, ur_y, light_drawtype, 0, 0);
-      ctx->gdraw->line(w, ll_x + header_w - 1, ll_y + header_h,
-          ll_x + header_w - 1, ur_y, dark_drawtype, 1, 0);
+      ctx->gdraw->line(w, ll_x + 1, ll_y + header_h, ll_x + 1, ur_y, light_drawtype, 0, 0);
+      ctx->gdraw->line(w, ll_x + header_w - 1, ll_y + header_h, ll_x + header_w - 1, ur_y, dark_drawtype, 1,
+                       0);
     }
     x = ll_x;
     y = t_ll_y;
 
-    for (int i = 0; i < rows; i++) {
+    for (int i = 0; i < rows; i++)
+    {
       y += row_height * w->zoom_factor_y;
       if (y - row_height * w->zoom_factor_y > ur_y)
         break;
-      if (y > ll_y) {
-        ctx->gdraw->line(
-            w, ll_x, int(y), ll_x + header_w, int(y), drawtype, idx, 0);
+      if (y > ll_y)
+      {
+        ctx->gdraw->line(w, ll_x, int(y), ll_x + header_w, int(y), drawtype, idx, 0);
 
         offs = growtable_cell_offset(this, 0, i);
         int text_len = growtable_cell_length(this, 0, i);
 
-        if (text_idx >= 0 && text_len != 0) {
+        if (text_idx >= 0 && text_len != 0)
+        {
           int text_x = int(x) + text_offs;
 
-          if (column_adjustment[0] == glow_eAdjustment_Right
-              || column_adjustment[0] == glow_eAdjustment_Center) {
+          if (column_adjustment[0] == glow_eAdjustment_Right ||
+              column_adjustment[0] == glow_eAdjustment_Center)
+          {
             int width, height, descent;
-            ctx->gdraw->get_text_extent(cell_value + offs,
-                text_len, text_drawtype, text_idx, font,
-                &width, &height, &descent, tsize, 0);
+            ctx->gdraw->get_text_extent(cell_value + offs, text_len, text_drawtype, text_idx, font, &width,
+                                        &height, &descent, tsize, 0);
 
-            switch (column_adjustment[0]) {
+            switch (column_adjustment[0])
+            {
             case glow_eAdjustment_Left:
               break;
             case glow_eAdjustment_Right:
@@ -775,63 +761,61 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
               break;
             }
           }
-          ctx->gdraw->text(w, text_x, int(y - 5), cell_value + offs,
-              text_len, text_drawtype, text_color_drawtype, text_idx,
-              highlight, 0, font, tsize, 0);
+          ctx->gdraw->text(w, text_x, int(y - 5), cell_value + offs, text_len, text_drawtype,
+                           text_color_drawtype, text_idx, highlight, 0, font, tsize, 0);
         }
       }
     }
     ctx->gdraw->reset_clip_rectangle(w);
-    ctx->gdraw->rect(w, ll_x, ll_y + header_h - 1, header_w,
-        ur_y - ll_y - header_h + 1, drawtype, idx, 0);
+    ctx->gdraw->rect(w, ll_x, ll_y + header_h - 1, header_w, ur_y - ll_y - header_h + 1, drawtype, idx, 0);
   }
 
   // Draw table
   if (fill)
-    ctx->gdraw->fill_rect(
-        w, o_ll_x, o_ll_y, o_ur_x - o_ll_x, o_ur_y - o_ll_y, fill_drawtype);
+    ctx->gdraw->fill_rect(w, o_ll_x, o_ll_y, o_ur_x - o_ll_x, o_ur_y - o_ll_y, fill_drawtype);
 
   ctx->gdraw->set_clip_rectangle(w, o_ll_x, o_ll_y, o_ur_x, o_ur_y);
 
-  if (selected_cell_row >= 0 && !(header_column && selected_cell_column == 0)) {
+  if (selected_cell_row >= 0 && !(header_column && selected_cell_column == 0))
+  {
     // Draw selected cell, if cell not in header column
     x = t_ll_x;
     for (int i = header_column; i < selected_cell_column; i++)
       x += column_width[i] * w->zoom_factor_x;
     y = t_ll_y + row_height * w->zoom_factor_y * selected_cell_row;
-    ctx->gdraw->fill_rect(w, int(x), int(y),
-        int(column_width[selected_cell_column] * w->zoom_factor_x),
-        int(row_height * w->zoom_factor_y), sel_drawtype);
+    ctx->gdraw->fill_rect(w, int(x), int(y), int(column_width[selected_cell_column] * w->zoom_factor_x),
+                          int(row_height * w->zoom_factor_y), sel_drawtype);
   }
 
-  if (shadow) {
+  if (shadow)
+  {
     x = t_ll_x;
     y = t_ll_y;
 
-    for (int i = header_column; i < columns + 1; i++) {
+    for (int i = header_column; i < columns + 1; i++)
+    {
       if (x > ur_x)
         break;
-      if (x > ll_x) {
+      if (x > ll_x)
+      {
         if (i != header_column)
-          ctx->gdraw->line(
-              w, int(x) - 1, t_ll_y, int(x) - 1, t_ur_y, dark_drawtype, 0, 0);
+          ctx->gdraw->line(w, int(x) - 1, t_ll_y, int(x) - 1, t_ur_y, dark_drawtype, 0, 0);
         if (i != columns)
-          ctx->gdraw->line(
-              w, int(x) + 1, t_ll_y, int(x) + 1, t_ur_y, light_drawtype, 0, 0);
+          ctx->gdraw->line(w, int(x) + 1, t_ll_y, int(x) + 1, t_ur_y, light_drawtype, 0, 0);
       }
       x += column_width[i] * w->zoom_factor_x;
     }
 
-    for (int i = 0; i < rows + 1; i++) {
+    for (int i = 0; i < rows + 1; i++)
+    {
       if (y > ur_y)
         break;
-      if (y > ll_y) {
+      if (y > ll_y)
+      {
         if (i != 0)
-          ctx->gdraw->line(
-              w, t_ll_x, int(y - 1), t_ur_x, int(y) - 1, dark_drawtype, 0, 0);
+          ctx->gdraw->line(w, t_ll_x, int(y - 1), t_ur_x, int(y) - 1, dark_drawtype, 0, 0);
         if (i != rows)
-          ctx->gdraw->line(
-              w, t_ll_x, int(y) + 1, t_ur_x, int(y) + 1, light_drawtype, 0, 0);
+          ctx->gdraw->line(w, t_ll_x, int(y) + 1, t_ur_x, int(y) + 1, light_drawtype, 0, 0);
       }
       y += row_height * w->zoom_factor_y;
     }
@@ -840,7 +824,8 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   x = t_ll_x;
   y = t_ll_y;
 
-  for (int i = header_column; i < columns + 1; i++) {
+  for (int i = header_column; i < columns + 1; i++)
+  {
     if (x > ur_x)
       break;
     if (x > ll_x)
@@ -848,7 +833,8 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     x += column_width[i] * w->zoom_factor_x;
   }
 
-  for (int i = 0; i < rows + 1; i++) {
+  for (int i = 0; i < rows + 1; i++)
+  {
     if (y > ur_y)
       break;
     if (y > ll_y)
@@ -862,60 +848,65 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     column_offs += column_size[i] * rows;
   x = t_ll_x;
   int x_border = ll_x - int(column_width[0] * w->zoom_factor_x);
-  for (int i = header_column; i < columns; i++) {
+  for (int i = header_column; i < columns; i++)
+  {
     if (x > ur_x)
       break;
 
-    if (x > x_border) {
+    if (x > x_border)
+    {
       // Draw column i
       y = t_ll_y;
-      for (int j = 0; j < rows; j++) {
+      for (int j = 0; j < rows; j++)
+      {
         y += row_height * w->zoom_factor_y;
         if (y - row_height * w->zoom_factor_y > ur_y)
           break;
 
-        if (options & glow_mTableOptions_ZeroIfHeader) {
+        if (options & glow_mTableOptions_ZeroIfHeader)
+        {
           // Don't draw the row if the value in the first column is zero
           if (growtable_cell_is_empty(this, 0, j))
             continue;
         }
-        if (options & glow_mTableOptions_ZeroIfHeaderIs0) {
+        if (options & glow_mTableOptions_ZeroIfHeaderIs0)
+        {
           // Don't draw the row if the value in the first column is zero
           if (growtable_cell_is_zero(this, 0, j))
             continue;
         }
 
-        if (y > ll_y) {
+        if (y > ll_y)
+        {
           offs = column_offs + column_size[i] * j;
           int text_len = growtable_cell_length(this, i, j);
 
-          if (text_idx >= 0 && text_len != 0) {
+          if (text_idx >= 0 && text_len != 0)
+          {
             int text_x = int(x) + text_offs;
 
-            if (column_adjustment[i] == glow_eAdjustment_Right
-                || column_adjustment[i] == glow_eAdjustment_Center) {
+            if (column_adjustment[i] == glow_eAdjustment_Right ||
+                column_adjustment[i] == glow_eAdjustment_Center)
+            {
               int width, height, descent;
-              ctx->gdraw->get_text_extent(cell_value + offs,
-                  text_len, text_drawtype, text_idx, font,
-                  &width, &height, &descent, tsize, 0);
+              ctx->gdraw->get_text_extent(cell_value + offs, text_len, text_drawtype, text_idx, font, &width,
+                                          &height, &descent, tsize, 0);
 
-              switch (column_adjustment[i]) {
+              switch (column_adjustment[i])
+              {
               case glow_eAdjustment_Left:
                 break;
               case glow_eAdjustment_Right:
-                text_x = int(x + column_width[i] * w->zoom_factor_x) - text_offs
-                    - width;
+                text_x = int(x + column_width[i] * w->zoom_factor_x) - text_offs - width;
                 break;
               case glow_eAdjustment_Center:
-                text_x
-                    = int(x + (column_width[i] * w->zoom_factor_x - width) / 2);
+                text_x = int(x + (column_width[i] * w->zoom_factor_x - width) / 2);
                 break;
               }
             }
 
-            ctx->gdraw->text(w, text_x, int(y - 5), cell_value + offs,
-                text_len, text_drawtype, text_color_drawtype, text_idx,
-                highlight, 0, font, tsize, 0);
+            ctx->gdraw->text(w, text_x, int(y - 5), cell_value + offs, text_len, text_drawtype,
+                             text_color_drawtype, text_idx, highlight, 0, font, tsize, 0);
           }
         }
       }
@@ -927,22 +918,17 @@ void GrowTable::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
   ctx->gdraw->reset_clip_rectangle(w);
 
   // Draw frame
-  ctx->gdraw->rect(
-      w, o_ll_x, o_ll_y, ur_x - o_ll_x, ur_y - o_ll_y, drawtype, idx, 0);
-  if (input_focus) {
-    ctx->gdraw->line(w, ll_x - 2, ll_y - 2, ll_x - 2, ur_y + 2,
-        glow_eDrawType_DarkGray, 0, 0);
-    ctx->gdraw->line(w, ll_x - 2, ll_y - 2, ur_x + 2, ll_y - 2,
-        glow_eDrawType_DarkGray, 0, 0);
-    ctx->gdraw->line(w, ll_x - 2, ur_y + 2, ur_x + 2, ur_y + 2,
-        glow_eDrawType_LightGray, 0, 0);
-    ctx->gdraw->line(w, ur_x + 2, ll_y - 2, ur_x + 2, ur_y + 2,
-        glow_eDrawType_LightGray, 0, 0);
+  ctx->gdraw->rect(w, o_ll_x, o_ll_y, ur_x - o_ll_x, ur_y - o_ll_y, drawtype, idx, 0);
+  if (input_focus)
+  {
+    ctx->gdraw->line(w, ll_x - 2, ll_y - 2, ll_x - 2, ur_y + 2, glow_eDrawType_DarkGray, 0, 0);
+    ctx->gdraw->line(w, ll_x - 2, ll_y - 2, ur_x + 2, ll_y - 2, glow_eDrawType_DarkGray, 0, 0);
+    ctx->gdraw->line(w, ll_x - 2, ur_y + 2, ur_x + 2, ur_y + 2, glow_eDrawType_LightGray, 0, 0);
+    ctx->gdraw->line(w, ur_x + 2, ll_y - 2, ur_x + 2, ur_y + 2, glow_eDrawType_LightGray, 0, 0);
   }
 }
 
-void GrowTable::draw_brief(GlowWind* w, GlowTransform* t, int highlight,
-    int hot, void* node, void* colornode)
+void GrowTable::draw_brief(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode)
 {
   if (!(display_level & ctx->display_level))
     return;
@@ -954,12 +940,15 @@ void GrowTable::draw_brief(GlowWind* w, GlowTransform* t, int highlight,
   idx = MIN(idx, DRAW_TYPE_SIZE - 1);
   int x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
 
-  if (!t) {
+  if (!t)
+  {
     x1 = int(trf.x(ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = int(trf.y(ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
     x2 = int(trf.x(ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
     y2 = int(trf.y(ur.x, ur.y) * w->zoom_factor_y) - w->offset_y;
-  } else {
+  }
+  else
+  {
     x1 = int(trf.x(t, ll.x, ll.y) * w->zoom_factor_x) - w->offset_x;
     y1 = int(trf.y(t, ll.x, ll.y) * w->zoom_factor_y) - w->offset_y;
     x2 = int(trf.x(t, ur.x, ur.y) * w->zoom_factor_x) - w->offset_x;
@@ -971,11 +960,9 @@ void GrowTable::draw_brief(GlowWind* w, GlowTransform* t, int highlight,
   ur_y = MAX(y1, y2);
 
   if (fill)
-    ctx->gdraw->fill_rect(
-        w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, fill_drawtype);
+    ctx->gdraw->fill_rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, fill_drawtype);
 
-  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight,
-      highlight, (GrowNode*)colornode, 0);
+  drawtype = ctx->get_drawtype(draw_type, glow_eDrawType_LineHighlight, highlight, (GrowNode*)colornode, 0);
   ctx->gdraw->rect(w, ll_x, ll_y, ur_x - ll_x, ur_y - ll_y, drawtype, idx, 0);
 }
 
@@ -1002,16 +989,14 @@ void GrowTable::trace_close()
 
 void GrowTable::draw()
 {
-  ctx->draw(&ctx->mw,
-      x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-      y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-      x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-      y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-  ctx->draw(&ctx->navw,
-      x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-      y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-      x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-      y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+  ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+            y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+            x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+            y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+  ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+            y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+            x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+            y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
 }
 
 void GrowTable::align(double x, double y, glow_eAlignDirection direction)
@@ -1020,7 +1005,8 @@ void GrowTable::align(double x, double y, glow_eAlignDirection direction)
 
   ctx->set_defered_redraw();
   draw();
-  switch (direction) {
+  switch (direction)
+  {
   case glow_eAlignDirection_CenterVert:
     dx = x - (x_right + x_left) / 2;
     dy = 0;
@@ -1060,19 +1046,21 @@ void GrowTable::align(double x, double y, glow_eAlignDirection direction)
   ctx->redraw_defered();
 }
 
-void GrowTable::export_javabean(GlowTransform* t, void* node,
-    glow_eExportPass pass, int* shape_cnt, int node_cnt, int in_nc,
-    std::ofstream& fp)
+void GrowTable::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
+                                int node_cnt, int in_nc, std::ofstream& fp)
 {
   double x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
   double cwidth[TABLE_MAX_COL];
 
-  if (!t) {
+  if (!t)
+  {
     x1 = trf.x(ll.x, ll.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = trf.y(ll.x, ll.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = trf.x(ur.x, ur.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y2 = trf.y(ur.x, ur.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
-  } else {
+  }
+  else
+  {
     x1 = trf.x(t, ll.x, ll.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
     y1 = trf.y(t, ll.x, ll.y) * ctx->mw.zoom_factor_y - ctx->mw.offset_y;
     x2 = trf.x(t, ur.x, ur.y) * ctx->mw.zoom_factor_x - ctx->mw.offset_x;
@@ -1088,24 +1076,24 @@ void GrowTable::export_javabean(GlowTransform* t, void* node,
     cwidth[i] = column_width[i] * ctx->mw.zoom_factor_x;
 
   ((GrowCtx*)ctx)
-      ->export_jbean->table(ll_x, ll_y, ur_x, ur_y, fill_drawtype, fill, rows,
-          columns, header_row, header_column, text_size, text_drawtype,
-          header_row_height * ctx->mw.zoom_factor_y,
-          row_height * ctx->mw.zoom_factor_y, (double*)cwidth,
-          (char*)header_text, pass, shape_cnt, node_cnt, fp);
+      ->export_jbean->table(ll_x, ll_y, ur_x, ur_y, fill_drawtype, fill, rows, columns, header_row,
+                            header_column, text_size, text_drawtype,
+                            header_row_height * ctx->mw.zoom_factor_y, row_height * ctx->mw.zoom_factor_y,
+                            (double*)cwidth, (char*)header_text, pass, shape_cnt, node_cnt, fp);
 }
 
 void GrowTable::convert(glow_eConvert version)
 {
-  switch (version) {
-  case glow_eConvert_V34: {
+  switch (version)
+  {
+  case glow_eConvert_V34:
+  {
     // Conversion of colors
   }
   }
 }
 
-int GrowTable::event_handler(
-    GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
+int GrowTable::event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
 {
   int sts, v_sts, h_sts;
 
@@ -1114,7 +1102,8 @@ int GrowTable::event_handler(
     v_sts = v_scrollbar->event_handler(w, event, x, y, fx, fy);
   if (h_scrollbar)
     h_sts = h_scrollbar->event_handler(w, event, x, y, fx, fy);
-  if (v_sts || h_sts) {
+  if (v_sts || h_sts)
+  {
     if (event == ctx->event_move_node)
       return 0;
     return 1;
@@ -1127,9 +1116,11 @@ int GrowTable::event_handler(
   if (!ctx->trace_started)
     return sts;
 
-  switch (event) {
+  switch (event)
+  {
   case glow_eEvent_MB1Click:
-  case glow_eEvent_MB3Press: {
+  case glow_eEvent_MB3Press:
+  {
     int column = -1;
     int row = -1;
 
@@ -1142,23 +1133,29 @@ int GrowTable::event_handler(
     double t_ll_x = o_ll_x - h_value;
     double t_ll_y = o_ll_y - v_value;
 
-    if (o_ll_y <= fy && fy <= o_ur_y) {
+    if (o_ll_y <= fy && fy <= o_ur_y)
+    {
       if (header_column && x_left <= fx && fx <= x_left + x_left_offs)
         column = 0;
-      else if (o_ll_x <= fx && fx <= o_ur_x) {
+      else if (o_ll_x <= fx && fx <= o_ur_x)
+      {
         double column_x_right = t_ll_x;
-        for (int i = header_column; i < columns; i++) {
+        for (int i = header_column; i < columns; i++)
+        {
           column_x_right += column_width[i];
-          if (fx <= column_x_right) {
+          if (fx <= column_x_right)
+          {
             column = i;
             break;
           }
         }
       }
       double row_y_high = t_ll_y;
-      for (int i = 0; i < rows; i++) {
+      for (int i = 0; i < rows; i++)
+      {
         row_y_high += row_height;
-        if (fy <= row_y_high) {
+        if (fy <= row_y_high)
+        {
           row = i;
           break;
         }
@@ -1172,19 +1169,21 @@ int GrowTable::event_handler(
   case glow_eEvent_ScrollUp:
     if (!ctx->trace_started)
       return 0;
-    if (v_scrollbar) {
+    if (v_scrollbar)
+    {
       double rx, ry;
 
       // Convert koordinates to local koordinates
       trf.reverse(fx, fy, &rx, &ry);
       sts = local_event_handler(event, rx, ry);
-      if (sts) {
+      if (sts)
+      {
         v_value -= (table_y1 - table_y0) * window_scale / 50;
         if (v_value < table_y0 * window_scale)
           v_value = table_y0 * window_scale;
         draw();
-        v_scrollbar->set_value(v_value, y_high - (y_low + y_low_offs)
-                - scrollbar_width * horizontal_scrollbar);
+        v_scrollbar->set_value(v_value,
+                               y_high - (y_low + y_low_offs) - scrollbar_width * horizontal_scrollbar);
         return 1;
       }
     }
@@ -1192,23 +1191,21 @@ int GrowTable::event_handler(
   case glow_eEvent_ScrollDown:
     if (!ctx->trace_started)
       return 0;
-    if (v_scrollbar) {
+    if (v_scrollbar)
+    {
       double rx, ry;
 
       // Convert koordinates to local koordinates
       trf.reverse(fx, fy, &rx, &ry);
       sts = local_event_handler(event, rx, ry);
-      if (sts) {
+      if (sts)
+      {
         v_value += (table_y1 - table_y0) * window_scale / 50;
-        if (v_value > (table_y1 - (y_high - y_low
-                                      - scrollbar_width * horizontal_scrollbar))
-                * window_scale)
-          v_value = (table_y1 - (y_high - y_low
-                                    - scrollbar_width * horizontal_scrollbar))
-              * window_scale;
+        if (v_value > (table_y1 - (y_high - y_low - scrollbar_width * horizontal_scrollbar)) * window_scale)
+          v_value = (table_y1 - (y_high - y_low - scrollbar_width * horizontal_scrollbar)) * window_scale;
         draw();
-        v_scrollbar->set_value(v_value, y_high - (y_low + y_low_offs)
-                - scrollbar_width * horizontal_scrollbar);
+        v_scrollbar->set_value(v_value,
+                               y_high - (y_low + y_low_offs) - scrollbar_width * horizontal_scrollbar);
         return 1;
       }
     }
@@ -1245,7 +1242,8 @@ void GrowTable::configure()
 {
   table_x0 = table_y0 = 0;
   table_x1 = 0;
-  for (int i = 0; i < columns; i++) {
+  for (int i = 0; i < columns; i++)
+  {
     if (header_column && i == 0)
       continue;
     table_x1 += column_width[i];
@@ -1276,7 +1274,8 @@ void GrowTable::configure_scrollbars()
 {
   double x0, y0, width, height;
 
-  if (vertical_scrollbar && !v_scrollbar) {
+  if (vertical_scrollbar && !v_scrollbar)
+  {
     x0 = x_right - scrollbar_width;
     y0 = y_low + y_low_offs;
     width = scrollbar_width;
@@ -1285,30 +1284,36 @@ void GrowTable::configure_scrollbars()
     else
       height = y_high - (y_low + y_low_offs);
 
-    v_scrollbar = new GrowScrollBar(ctx, "vScrollbar", x0, y0, width, height,
-        glow_eDir_Vertical, glow_eDrawType_Line, 1, display_level,
-        scrollbar_bg_color, scrollbar_color, 1);
+    v_scrollbar =
+        new GrowScrollBar(ctx, "vScrollbar", x0, y0, width, height, glow_eDir_Vertical, glow_eDrawType_Line,
+                          1, display_level, scrollbar_bg_color, scrollbar_color, 1);
     v_scrollbar->register_value_changed_cb((void*)this, &v_value_changed_cb);
     v_scrollbar->set_value(table_y0 * window_scale,
-        y_high - (y_low + y_low_offs) - scrollbar_width * horizontal_scrollbar);
+                           y_high - (y_low + y_low_offs) - scrollbar_width * horizontal_scrollbar);
     v_scrollbar->set_range(table_y0 * window_scale, table_y1 * window_scale);
     v_scrollbar->set_shadow(shadow);
     v_value = table_y0 * window_scale;
-  } else if (!vertical_scrollbar && v_scrollbar) {
+  }
+  else if (!vertical_scrollbar && v_scrollbar)
+  {
     delete v_scrollbar;
     v_scrollbar = 0;
     v_value = table_y0 * window_scale;
-  } else if (v_scrollbar) {
+  }
+  else if (v_scrollbar)
+  {
     // Reconfigure range and length
     v_scrollbar->set_value(table_y0 * window_scale,
-        y_high - (y_low + y_low_offs) - scrollbar_width * horizontal_scrollbar);
+                           y_high - (y_low + y_low_offs) - scrollbar_width * horizontal_scrollbar);
     v_value = table_y0 * window_scale;
     v_scrollbar->set_range(table_y0 * window_scale, table_y1 * window_scale);
     v_scrollbar->set_shadow(shadow);
-  } else
+  }
+  else
     v_value = table_y0 * window_scale;
 
-  if (horizontal_scrollbar && !h_scrollbar) {
+  if (horizontal_scrollbar && !h_scrollbar)
+  {
     x0 = x_left + x_left_offs;
     y0 = y_high - scrollbar_width;
     height = scrollbar_width;
@@ -1317,27 +1322,32 @@ void GrowTable::configure_scrollbars()
     else
       width = x_right - (x_left + x_left_offs);
 
-    h_scrollbar = new GrowScrollBar(ctx, "vScrollbar", x0, y0, width, height,
-        glow_eDir_Horizontal, glow_eDrawType_Line, 1, display_level,
-        scrollbar_bg_color, scrollbar_color, 1);
+    h_scrollbar =
+        new GrowScrollBar(ctx, "vScrollbar", x0, y0, width, height, glow_eDir_Horizontal, glow_eDrawType_Line,
+                          1, display_level, scrollbar_bg_color, scrollbar_color, 1);
     h_scrollbar->register_value_changed_cb((void*)this, &h_value_changed_cb);
-    h_scrollbar->set_value(table_x0 * window_scale, x_right
-            - (x_left + x_left_offs) - scrollbar_width * vertical_scrollbar);
+    h_scrollbar->set_value(table_x0 * window_scale,
+                           x_right - (x_left + x_left_offs) - scrollbar_width * vertical_scrollbar);
     h_scrollbar->set_range(table_x0 * window_scale, table_x1 * window_scale);
     h_scrollbar->set_shadow(shadow);
     h_value = table_x0 * window_scale;
-  } else if (!horizontal_scrollbar && h_scrollbar) {
+  }
+  else if (!horizontal_scrollbar && h_scrollbar)
+  {
     delete h_scrollbar;
     h_scrollbar = 0;
     h_value = table_x0 * window_scale;
-  } else if (h_scrollbar) {
+  }
+  else if (h_scrollbar)
+  {
     // Reconfigure lenght and range
-    h_scrollbar->set_value(table_x0 * window_scale, x_right
-            - (x_left + x_left_offs) - scrollbar_width * vertical_scrollbar);
+    h_scrollbar->set_value(table_x0 * window_scale,
+                           x_right - (x_left + x_left_offs) - scrollbar_width * vertical_scrollbar);
     h_value = table_x0 * window_scale;
     h_scrollbar->set_range(table_x0 * window_scale, table_x1 * window_scale);
     h_scrollbar->set_shadow(shadow);
-  } else
+  }
+  else
     h_value = table_x0 * window_scale;
 }
 
@@ -1345,7 +1355,8 @@ void GrowTable::v_value_changed_cb(void* o, double value)
 {
   GrowTable* gw = (GrowTable*)o;
 
-  if (!feq(gw->v_value, value)) {
+  if (!feq(gw->v_value, value))
+  {
     gw->v_value = value;
     gw->draw();
   }
@@ -1355,7 +1366,8 @@ void GrowTable::h_value_changed_cb(void* o, double value)
 {
   GrowTable* gw = (GrowTable*)o;
 
-  if (!feq(gw->h_value, value)) {
+  if (!feq(gw->h_value, value))
+  {
     gw->h_value = value;
     gw->draw();
   }
@@ -1369,8 +1381,8 @@ void GrowTable::set_textsize(int size)
 
 void GrowTable::set_textbold(int bold)
 {
-  if ((bold && text_drawtype == glow_eDrawType_TextHelveticaBold)
-      || (!bold && text_drawtype == glow_eDrawType_TextHelvetica))
+  if ((bold && text_drawtype == glow_eDrawType_TextHelveticaBold) ||
+      (!bold && text_drawtype == glow_eDrawType_TextHelvetica))
     return;
 
   if (bold)
@@ -1440,12 +1452,15 @@ int GrowTable::get_selected_cell(int* column, int* row)
 
 void GrowTable::set_input_focus(int focus, glow_eEvent event)
 {
-  if (focus && !input_focus) {
+  if (focus && !input_focus)
+  {
     input_focus = 1;
     draw();
 
     ctx->register_inputfocus(this, 1);
-  } else if (!focus && input_focus) {
+  }
+  else if (!focus && input_focus)
+  {
     input_focus = 0;
     draw();
 
@@ -1474,7 +1489,8 @@ int GrowTable::make_cell_visible(int column, int row)
   double t_ll_y = o_ll_y - v_value;
 
   scroll_x = 0;
-  if (!(header_column && column == 0)) {
+  if (!(header_column && column == 0))
+  {
     cell_x_left = t_ll_x;
     for (i = header_column; i < column; i++)
       cell_x_left += column_width[i];
@@ -1482,7 +1498,8 @@ int GrowTable::make_cell_visible(int column, int row)
 
     if (cell_x_left < o_ll_x)
       scroll_x = cell_x_left - o_ll_x;
-    else if (cell_x_right > o_ur_x) {
+    else if (cell_x_right > o_ur_x)
+    {
       scroll_x = cell_x_right - o_ur_x;
       if (scroll_x > cell_x_left - o_ll_x)
         scroll_x = cell_x_left - o_ll_x;
@@ -1500,16 +1517,18 @@ int GrowTable::make_cell_visible(int column, int row)
     // scroll_y = cell_y_high - o_ur_y;
     scroll_y = MAX(cell_y_high - o_ur_y, int(table_size / 3) * row_height);
 
-  if (!feq(scroll_x, 0.0) && horizontal_scrollbar) {
+  if (!feq(scroll_x, 0.0) && horizontal_scrollbar)
+  {
     h_value += scroll_x;
     h_value = h_scrollbar->set_value(h_value);
   }
-  if (!feq(scroll_y, 0.0) && vertical_scrollbar) {
+  if (!feq(scroll_y, 0.0) && vertical_scrollbar)
+  {
     v_value += scroll_y;
     v_value = v_scrollbar->set_value(v_value);
   }
-  if ((!feq(scroll_x, 0.0) && horizontal_scrollbar)
-      || (!feq(scroll_y, 0.0) && vertical_scrollbar)) {
+  if ((!feq(scroll_x, 0.0) && horizontal_scrollbar) || (!feq(scroll_y, 0.0) && vertical_scrollbar))
+  {
     draw();
     return 1;
   }

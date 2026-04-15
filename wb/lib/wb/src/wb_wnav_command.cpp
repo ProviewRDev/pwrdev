@@ -6183,9 +6183,9 @@ static int wnav_clone_func(void* client_data, void* client_flag)
       if (clone_cnt > 1)
       {
         // Open list dialog
-        char (*clone_vect)[80];
+        char(*clone_vect)[80];
 
-        clone_vect = (char (*)[80])calloc(clone_cnt + 1, 80);
+        clone_vect = (char(*)[80])calloc(clone_cnt + 1, 80);
         clone_cnt = 0;
         for (int idx = 0; idx < volumecount; idx++)
         {

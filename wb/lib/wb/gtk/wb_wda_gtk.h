@@ -43,12 +43,12 @@
 
 #include "cow_wow_gtk.h"
 
-class WdaGtk : public Wda {
+class WdaGtk : public Wda
+{
 public:
-  WdaGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx,
-      ldh_tSesContext wa_ldhses, pwr_tObjid wa_objid, pwr_tClassId wa_classid,
-      const char* wa_attribute, int wa_editmode, int wa_advanced_user,
-      int wa_display_objectname);
+  WdaGtk(GtkWidget* wa_parent_wid, void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_tObjid wa_objid,
+         pwr_tClassId wa_classid, const char* wa_attribute, int wa_editmode, int wa_advanced_user,
+         int wa_display_objectname);
   ~WdaGtk();
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
@@ -95,8 +95,7 @@ public:
   static void activate_prevattr(GtkWidget* w, gpointer data);
   static void activate_help(GtkWidget* w, gpointer data);
   static void activate_cmd_input(GtkWidget* w, gpointer data);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void valchanged_cmd_input(GtkWidget* w, gpointer data);
   static void activate_cmd_scrolled_ok(GtkWidget* w, gpointer data);
   static void activate_cmd_scrolled_ca(GtkWidget* w, gpointer data);

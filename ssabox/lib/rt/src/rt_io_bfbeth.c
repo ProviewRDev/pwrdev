@@ -18,8 +18,7 @@ void bfbeth_set_read_req(io_sRackLocal* r, pwr_tUInt16 address)
   return;
 }
 
-void bfbeth_set_write_req(
-    io_sRackLocal* r, pwr_tUInt16 address, pwr_tUInt16 data)
+void bfbeth_set_write_req(io_sRackLocal* r, pwr_tUInt16 address, pwr_tUInt16 data)
 {
   r->write_req.item[r->next_write_req_item].address = address;
   r->write_req.item[r->next_write_req_item].data = data;
@@ -32,8 +31,10 @@ pwr_tUInt16 bfbeth_get_data(io_sRackLocal* r, pwr_tUInt16 address, int* sts)
   int i;
 
   *sts = -1;
-  for (i = 0; i < 350; i++) {
-    if (r->read_area.item[i].address == address) {
+  for (i = 0; i < 350; i++)
+  {
+    if (r->read_area.item[i].address == address)
+    {
       *sts = 1;
       return (r->read_area.item[i].data);
     }
@@ -54,8 +55,10 @@ void bfbeth_get_write_status(io_sRackLocal* r, pwr_tUInt16 address, int* sts)
   int i;
 
   *sts = 0;
-  for (i = 0; i < 350; i++) {
-    if ((0x8000 | r->write_area.item[i].address) == address) {
+  for (i = 0; i < 350; i++)
+  {
+    if ((0x8000 | r->write_area.item[i].address) == address)
+    {
       *sts = 0x8000 & r->write_area.item[i].address ? 1 : -1;
       return;
     }

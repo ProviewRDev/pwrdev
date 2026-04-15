@@ -50,20 +50,19 @@
 #include <QToolBar>
 #include <QVBoxLayout>
 
-class OpCmd {
+class OpCmd
+{
 public:
   QMenu* w;
   pwr_tCmd cmd;
 
-  OpCmd(QMenu* widget, const char* command) : w(widget)
-  {
-    strncpy(cmd, command, sizeof(cmd));
-  }
+  OpCmd(QMenu* widget, const char* command) : w(widget) { strncpy(cmd, command, sizeof(cmd)); }
 };
 
 class OpQtWidget;
 
-class OpQt : public Op {
+class OpQt : public Op
+{
 public:
   OpQt(void* op_parent_ctx, char* opplace, pwr_tStatus* status);
   ~OpQt();
@@ -109,8 +108,7 @@ public:
   void update_alarm_info();
   void add_close_button();
   int get_cmd(QMenu* w, char* cmd);
-  int create_menu_item(
-      const char* name, int pixmap, int append, const char* cmd);
+  int create_menu_item(const char* name, int pixmap, int append, const char* cmd);
   int delete_menu_item(const char* name);
   void change_sup_color(void* imagew, op_eSupColor color);
   void set_title(char* user);
@@ -123,7 +121,8 @@ private:
   OpQtWidget* toplevel;
 };
 
-class OpQtWidget : public QFrame {
+class OpQtWidget : public QFrame
+{
   Q_OBJECT
 
 public:
@@ -165,7 +164,8 @@ private:
   OpQt* op;
 };
 
-class ClickableFrame : public QFrame {
+class ClickableFrame : public QFrame
+{
   Q_OBJECT
 
 public:

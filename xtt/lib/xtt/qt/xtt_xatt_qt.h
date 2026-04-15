@@ -49,10 +49,10 @@
 
 class XAttQtWidget;
 
-class XAttQt : public XAtt {
+class XAttQt : public XAtt
+{
 public:
-  XAttQt(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user,
-      int* xa_sts);
+  XAttQt(void* xa_parent_ctx, pwr_sAttrRef* xa_objar, int xa_advanced_user, int* xa_sts);
   ~XAttQt();
   QWidget* brow_widget;
   QWidget* form_widget;
@@ -77,7 +77,8 @@ private:
   XAttQtWidget* toplevel;
 };
 
-class XAttQtWidget : public QWidget {
+class XAttQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

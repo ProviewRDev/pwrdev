@@ -43,7 +43,8 @@ class wb_vrep;
 class wb_object;
 class wb_recix;
 
-class wb_srep {
+class wb_srep
+{
 protected:
   ldh_eAccess m_access;
   ldh_eUtility m_utility;
@@ -81,18 +82,9 @@ public:
   bool commit(pwr_tStatus* sts);
   bool abort(pwr_tStatus* sts);
 
-  void editorContext(void* ctx)
-  {
-    m_editorContext = ctx;
-  }
-  void sendThisSession(ldh_tSessionCb thisSessionCb)
-  {
-    m_thisSessionCb = thisSessionCb;
-  }
-  void sendOtherSession(ldh_tSessionCb otherSessionCb)
-  {
-    m_otherSessionCb = otherSessionCb;
-  }
+  void editorContext(void* ctx) { m_editorContext = ctx; }
+  void sendThisSession(ldh_tSessionCb thisSessionCb) { m_thisSessionCb = thisSessionCb; }
+  void sendOtherSession(ldh_tSessionCb otherSessionCb) { m_otherSessionCb = otherSessionCb; }
   ldh_sEvent* newEvent();
   void deleteEvents();
   void eventNewFamily(ldh_sEvent* ep, wb_object o);
@@ -103,16 +95,10 @@ public:
   void eventSendAllSessions(ldh_eEvent event);
   void eventSendSession(ldh_eEvent event);
   ldh_sEvent* eventStart(pwr_tOid Object, ldh_eEvent event);
-  void update()
-  {
-    m_nUpdate++;
-  }
+  void update() { m_nUpdate++; }
   void recix_add(wb_object o);
   void recix_clear();
   void recix_set_destination(const char* d);
-  wb_recix* recix()
-  {
-    return m_recix;
-  }
+  wb_recix* recix() { return m_recix; }
 };
 #endif

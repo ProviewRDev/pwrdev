@@ -57,13 +57,14 @@ void sum_exec(plc_sThread* tp, pwr_sClass_sum* object)
 {
 #define sumsize 8
   pwr_tFloat32** ptr; /* Pointer to ptr to input */
-  int i; /* Loopindex */
-  float sum; /* Result */
+  int i;              /* Loopindex */
+  float sum;          /* Result */
   /* Initialize */
   sum = object->Const;
   ptr = &object->In1P;
   /* SUM loop */
-  for (i = 0; i < sumsize; i++) {
+  for (i = 0; i < sumsize; i++)
+  {
     if (*ptr != NULL)
       sum += **ptr * object->FVect[i];
 
@@ -89,16 +90,18 @@ void maxmin_exec(plc_sThread* tp, pwr_sClass_maxmin* object)
 
   float minval; /* Lowest value */
   float maxval; /* Highest value */
-  int i; /* Loopcounter */
-  float** ptr; /* Pointer to ptr to digin */
+  int i;        /* Loopcounter */
+  float** ptr;  /* Pointer to ptr to digin */
 
   /* Initialize */
   ptr = &object->In1P;
   minval = maxmin_maxfloat;
   maxval = maxmin_minfloat;
   /* MaxMin loop */
-  for (i = 0; i < maxminsize; i++) {
-    if (*ptr != NULL) {
+  for (i = 0; i < maxminsize; i++)
+  {
+    if (*ptr != NULL)
+    {
       if (**ptr > maxval)
         maxval = **ptr;
       if (**ptr < minval)
@@ -123,20 +126,28 @@ void limit_exec(plc_sThread* tp, pwr_sClass_limit* object)
   object->Min = *object->MinP;
   object->In = *object->InP;
 
-  if (object->In > object->Max) {
+  if (object->In > object->Max)
+  {
     object->ActVal = object->Max;
     object->High = TRUE;
     object->Low = FALSE;
-  } else if (object->In < object->Min) {
+  }
+  else if (object->In < object->Min)
+  {
     object->Low = TRUE;
-    if (object->Min <= object->Max) {
+    if (object->Min <= object->Max)
+    {
       object->ActVal = object->Min;
       object->High = FALSE;
-    } else {
+    }
+    else
+    {
       object->ActVal = object->Max;
       object->High = TRUE;
     }
-  } else {
+  }
+  else
+  {
     object->ActVal = object->In;
     object->High = FALSE;
     object->Low = FALSE;
@@ -154,10 +165,12 @@ void comph_exec(plc_sThread* tp, pwr_sClass_comph* object)
   object->In = *object->InP;
   object->Lim = *object->LimP;
 
-  if (object->High) {
+  if (object->High)
+  {
     if (object->In <= (object->Lim - object->Hysteres))
       object->High = FALSE;
-  } else if (object->In > object->Lim)
+  }
+  else if (object->In > object->Lim)
     object->High = TRUE;
 }
 
@@ -172,10 +185,12 @@ void compl_exec(plc_sThread* tp, pwr_sClass_compl* object)
   object->In = *object->InP;
   object->Lim = *object->LimP;
 
-  if (object->Low) {
+  if (object->Low)
+  {
     if (object->In >= (object->Lim + object->Hysteres))
       object->Low = FALSE;
-  } else if (object->In < object->Lim)
+  }
+  else if (object->In < object->Lim)
     object->Low = TRUE;
 }
 
@@ -190,10 +205,13 @@ void select_exec(plc_sThread* tp, pwr_sClass_select* object)
 {
   object->Control = *object->ControlP;
 
-  if (object->Control) {
+  if (object->Control)
+  {
     object->ActVal = *object->HighP;
     object->NotActVal = *object->LowP;
-  } else {
+  }
+  else
+  {
     object->ActVal = *object->LowP;
     object->NotActVal = *object->HighP;
   }
@@ -226,14 +244,14 @@ void ramp_exec(plc_sThread* tp, pwr_sClass_ramp* object)
 {
   float limit1; /* First limit */
   float limit2; /* Second limit at sign change */
-  float old; /* Actual start value */
-  float out; /* New output */
-  float scan; /* scantime in seconds */
+  float old;    /* Actual start value */
+  float out;    /* New output */
+  float scan;   /* scantime in seconds */
 
   /* Assume new output as unlimited as a start */
   out = object->In = *object->InP; /* Get aimed value */
-  old = *object->FeedBP; /* Startvalue */
-  scan = *object->ScanTime; /* Get scantime */
+  old = *object->FeedBP;           /* Startvalue */
+  scan = *object->ScanTime;        /* Get scantime */
 
   if (out > old) /* Increase */
   {
@@ -242,7 +260,8 @@ void ramp_exec(plc_sThread* tp, pwr_sClass_ramp* object)
       limit1 = scan * object->RampUp;
       if ((limit1 > 0.0) && (out > old + limit1))
         out = old + limit1;
-    } else if (out <= 0.0) /* Negative rising towards zero */
+    }
+    else if (out <= 0.0) /* Negative rising towards zero */
     {
       if (object->RampUpAbs)
         limit1 = scan * object->RampDown;
@@ -250,23 +269,28 @@ void ramp_exec(plc_sThread* tp, pwr_sClass_ramp* object)
         limit1 = scan * object->RampUp;
       if ((limit1 > 0.0) && (out > old + limit1))
         out = old + limit1;
-    } else /* From Neg to Pos */
+    }
+    else /* From Neg to Pos */
     {
-      if (object->RampUpAbs) {
+      if (object->RampUpAbs)
+      {
         limit1 = scan * object->RampDown;
         limit2 = scan * object->RampUp;
-      } else
+      }
+      else
         limit1 = limit2 = scan * object->RampUp;
 
       if (limit1 <= 0.0) /* No limit up to zero */
       {
         if ((limit2 > 0.0) && (out > limit2))
           out = limit2;
-      } else if (old <= -limit1) /* Will still not reach zero */
+      }
+      else if (old <= -limit1) /* Will still not reach zero */
       {
         if (out > old + limit1)
           out = old + limit1;
-      } else if (limit2 > 0) /* Use second limitation above zero */
+      }
+      else if (limit2 > 0) /* Use second limitation above zero */
       {
         if (old < -limit2)
           out = 0.0;
@@ -285,28 +309,34 @@ void ramp_exec(plc_sThread* tp, pwr_sClass_ramp* object)
         limit1 = scan * object->RampDown;
       if ((limit1 > 0.0) && (out < old - limit1))
         out = old - limit1;
-    } else if (out >= 0.0) /* Positive falling towards zero */
+    }
+    else if (out >= 0.0) /* Positive falling towards zero */
     {
       limit1 = scan * object->RampDown;
       if ((limit1 > 0.0) && (out < old - limit1))
         out = old - limit1;
-    } else /* From Pos to Neg */
+    }
+    else /* From Pos to Neg */
     {
-      if (object->RampUpAbs) {
+      if (object->RampUpAbs)
+      {
         limit1 = scan * object->RampDown;
         limit2 = scan * object->RampUp;
-      } else
+      }
+      else
         limit1 = limit2 = scan * object->RampDown;
 
       if (limit1 <= 0.0) /* No limit down to zero */
       {
         if ((limit2 > 0.0) && (out < -limit2))
           out = -limit2;
-      } else if (old >= limit1) /* Will still not reach zero */
+      }
+      else if (old >= limit1) /* Will still not reach zero */
       {
         if (out < old - limit1)
           out = old - limit1;
-      } else if (limit2 > 0) /* Use second limitation below zero */
+      }
+      else if (limit2 > 0) /* Use second limitation below zero */
       {
         if (old > limit2)
           out = 0.0;
@@ -338,11 +368,12 @@ void filter_exec(plc_sThread* tp, pwr_sClass_filter* object)
   float kd;
 
   object->In = *object->InP;
-  if (object->FiltCon > 0.0) {
+  if (object->FiltCon > 0.0)
+  {
     kd = 1.0 / (1.0 + *object->ScanTime / object->FiltCon);
-    object->ActVal
-        = *object->FeedBP + (object->In - *object->FeedBP) * (1.0 - kd);
-  } else
+    object->ActVal = *object->FeedBP + (object->In - *object->FeedBP) * (1.0 - kd);
+  }
+  else
     object->ActVal = object->In;
 }
 
@@ -370,7 +401,8 @@ void speed_exec(plc_sThread* tp, pwr_sClass_speed* object)
 void timint_exec(plc_sThread* tp, pwr_sClass_timint* object)
 {
   /* Clear ? */
-  if (*object->ClearP && !object->Clear) {
+  if (*object->ClearP && !object->Clear)
+  {
     object->OldAcc = object->ActVal;
     object->ActVal = 0;
   }
@@ -387,7 +419,8 @@ void timint_exec(plc_sThread* tp, pwr_sClass_timint* object)
 */
 void timemean_exec(plc_sThread* tp, pwr_sClass_timemean* o)
 {
-  if (*o->ResetP && !o->Reset) {
+  if (*o->ResetP && !o->Reset)
+  {
     /* Reset */
     o->ActVal = o->AccMean;
     o->AccTime = 0;
@@ -395,8 +428,7 @@ void timemean_exec(plc_sThread* tp, pwr_sClass_timemean* o)
   o->Reset = *o->ResetP;
 
   /* Calculate new value */
-  o->AccMean = (*o->InP * *o->ScanTime + o->AccMean * o->AccTime)
-      / (*o->ScanTime + o->AccTime);
+  o->AccMean = (*o->InP * *o->ScanTime + o->AccMean * o->AccTime) / (*o->ScanTime + o->AccTime);
   o->AccTime += *o->ScanTime;
 }
 
@@ -432,8 +464,10 @@ void curve_exec(plc_sThread* tp, pwr_sClass_curve* object)
       y1 = *tabpointer++;
       if (object->In <= x1)
         object->ActVal = y1;
-      else {
-        for (; (number > 1) && (object->In > x1); number--) {
+      else
+      {
+        for (; (number > 1) && (object->In > x1); number--)
+        {
           x0 = x1;
           x1 = *tabpointer++;
           y0 = y1;
@@ -442,8 +476,7 @@ void curve_exec(plc_sThread* tp, pwr_sClass_curve* object)
         if (object->In > x1)
           object->ActVal = y1; /* End of table */
         else
-          object->ActVal = y0
-              + (y1 - y0) * (object->In - x0) / (x1 - x0); /* Interpollation */
+          object->ActVal = y0 + (y1 - y0) * (object->In - x0) / (x1 - x0); /* Interpollation */
       }
     }
   }
@@ -494,7 +527,7 @@ void adelay_exec(plc_sThread* tp, pwr_sClass_adelay* object)
   maxindex = sizeof(object->TimVect) / 4;
 
   /*		Get input
-  */
+   */
   object->In = *object->InP;
   object->Tim = *object->TimP;
 
@@ -502,7 +535,8 @@ void adelay_exec(plc_sThread* tp, pwr_sClass_adelay* object)
                   MaxCount is number of cycles before each shift
   */
   object->Count++;
-  if (object->Count >= object->MaxCount) {
+  if (object->Count >= object->MaxCount)
+  {
     object->StoInd++;
     if ((object->StoInd >= maxindex) || (object->StoInd < 0))
       object->StoInd = 0;
@@ -510,13 +544,13 @@ void adelay_exec(plc_sThread* tp, pwr_sClass_adelay* object)
       object->StoredNumbers++;
     object->Count = 0;
     object->TimVect[object->StoInd] = object->In;
-  } else
-    object->TimVect[object->StoInd]
-        = (object->TimVect[object->StoInd] * object->Count + object->In)
-        / (object->Count + 1);
+  }
+  else
+    object->TimVect[object->StoInd] =
+        (object->TimVect[object->StoInd] * object->Count + object->In) / (object->Count + 1);
 
   /*		Calculate position for output
-  */
+   */
   actoff = (object->Tim / tp->f_scan_time - object->Count) / object->MaxCount;
   if (actoff >= object->StoredNumbers)
     actoff = object->StoredNumbers - 1;
@@ -548,8 +582,7 @@ void pispeed_exec(plc_sThread* tp, pwr_sClass_pispeed* object)
   piold = object->PulsIn;
   object->PulsIn = *object->PulsInP;
   /* Calculate flow */
-  object->ActVal = (object->PulsIn - piold) * object->Gain * object->TimFact
-      / *object->ScanTime;
+  object->ActVal = (object->PulsIn - piold) * object->Gain * object->TimFact / *object->ScanTime;
 }
 
 /*_*
@@ -567,7 +600,8 @@ void DtoMask_exec(plc_sThread* tp, pwr_sClass_DtoMask* object)
 
   d = &object->d1;
   dp = &object->d1P;
-  for (i = 0; i < 32; i++) {
+  for (i = 0; i < 32; i++)
+  {
     *d = **dp;
     if (*d)
       val |= m;
@@ -592,7 +626,8 @@ void MaskToD_exec(plc_sThread* tp, pwr_sClass_MaskToD* object)
 
   d = &object->od1;
   object->Mask = *object->MaskP;
-  for (i = 0; i < 32; i++) {
+  for (i = 0; i < 32; i++)
+  {
     if (object->Mask & m)
       *d = TRUE;
     else
@@ -616,9 +651,11 @@ void DtoEnum_exec(plc_sThread* tp, pwr_sClass_DtoEnum* object)
 
   d = &object->d0;
   dp = &object->d0P;
-  for (i = 0; i < 32; i++) {
+  for (i = 0; i < 32; i++)
+  {
     *d = **dp;
-    if (*d) {
+    if (*d)
+    {
       val = object->EnumValues[i];
       break;
     }
@@ -641,7 +678,8 @@ void EnumToD_exec(plc_sThread* tp, pwr_sClass_EnumToD* object)
 
   d = &object->od0;
   object->Enum = *object->EnumP;
-  for (i = 0; i < 32; i++) {
+  for (i = 0; i < 32; i++)
+  {
     if (object->Enum == object->EnumValues[i])
       *d = TRUE;
     else
@@ -791,7 +829,8 @@ void IAdd_exec(plc_sThread* tp, pwr_sClass_IAdd* o)
   pwr_tInt32** inp = &o->In1P;
   pwr_tInt32 sum = 0;
 
-  for (i = 0; i < IADD_SIZE; i++) {
+  for (i = 0; i < IADD_SIZE; i++)
+  {
     sum += **inp;
 
     inp = (pwr_tInt32**)((char*)inp + pwr_cInputOffset);
@@ -810,7 +849,8 @@ void IMul_exec(plc_sThread* tp, pwr_sClass_IMul* o)
   pwr_tInt32** inp = &o->In1P;
   pwr_tInt32 result = **inp;
 
-  for (i = 1; i < IMUL_SIZE; i++) {
+  for (i = 1; i < IMUL_SIZE; i++)
+  {
     inp = (pwr_tInt32**)((char*)inp + pwr_cInputOffset);
     result *= **inp;
   }
@@ -821,10 +861,7 @@ void IMul_exec(plc_sThread* tp, pwr_sClass_IMul* o)
   ISub Integer subtraction.
   @aref isub ISub
 */
-void ISub_exec(plc_sThread* tp, pwr_sClass_ISub* o)
-{
-  o->ActVal = *o->In1P - *o->In2P;
-}
+void ISub_exec(plc_sThread* tp, pwr_sClass_ISub* o) { o->ActVal = *o->In1P - *o->In2P; }
 
 /*_*
   IDiv Integer division.
@@ -849,7 +886,8 @@ void IMax_exec(plc_sThread* tp, pwr_sClass_IMax* o)
   pwr_tInt32** inp = &o->In1P;
   pwr_tInt32 result = INT_MIN;
 
-  for (i = 0; i < IMAX_SIZE; i++) {
+  for (i = 0; i < IMAX_SIZE; i++)
+  {
     if (**inp > result)
       result = **inp;
     inp = (pwr_tInt32**)((char*)inp + pwr_cInputOffset);
@@ -868,7 +906,8 @@ void IMin_exec(plc_sThread* tp, pwr_sClass_IMin* o)
   pwr_tInt32** inp = &o->In1P;
   pwr_tInt32 result = INT_MAX;
 
-  for (i = 0; i < IMIN_SIZE; i++) {
+  for (i = 0; i < IMIN_SIZE; i++)
+  {
     if (**inp < result)
       result = **inp;
     inp = (pwr_tInt32**)((char*)inp + pwr_cInputOffset);
@@ -899,20 +938,28 @@ void ILimit_exec(plc_sThread* tp, pwr_sClass_ILimit* o)
   o->Min = *o->MinP;
   o->In = *o->InP;
 
-  if (o->In > o->Max) {
+  if (o->In > o->Max)
+  {
     o->ActVal = o->Max;
     o->High = TRUE;
     o->Low = FALSE;
-  } else if (o->In < o->Min) {
+  }
+  else if (o->In < o->Min)
+  {
     o->Low = TRUE;
-    if (o->Min <= o->Max) {
+    if (o->Min <= o->Max)
+    {
       o->ActVal = o->Min;
       o->High = FALSE;
-    } else {
+    }
+    else
+    {
       o->ActVal = o->Max;
       o->High = TRUE;
     }
-  } else {
+  }
+  else
+  {
     o->ActVal = o->In;
     o->High = FALSE;
     o->Low = FALSE;
@@ -962,7 +1009,8 @@ void Demux_exec(plc_sThread* tp, pwr_sClass_Demux* o)
   pwr_tFloat32* outp = &o->Out0;
 
   idx = o->Index = *o->IndexP;
-  for (i = 0; i < DEMUX_SIZE; i++) {
+  for (i = 0; i < DEMUX_SIZE; i++)
+  {
     if (i == idx)
       *outp = *o->InP;
     else
@@ -982,7 +1030,8 @@ void IDemux_exec(plc_sThread* tp, pwr_sClass_IDemux* o)
   pwr_tInt32* outp = &o->Out0;
 
   idx = o->Index = *o->IndexP;
-  for (i = 0; i < IDEMUX_SIZE; i++) {
+  for (i = 0; i < IDEMUX_SIZE; i++)
+  {
     if (i == idx)
       *outp = *o->InP;
     else
@@ -1002,7 +1051,8 @@ void Add_exec(plc_sThread* tp, pwr_sClass_Add* o)
   pwr_tFloat32** inp = &o->In1P;
   pwr_tFloat32 sum = 0;
 
-  for (i = 0; i < ADD_SIZE; i++) {
+  for (i = 0; i < ADD_SIZE; i++)
+  {
     sum += **inp;
 
     inp = (pwr_tFloat32**)((char*)inp + pwr_cInputOffset);
@@ -1021,7 +1071,8 @@ void Mul_exec(plc_sThread* tp, pwr_sClass_Mul* o)
   pwr_tFloat32** inp = &o->In1P;
   pwr_tFloat32 result = **inp;
 
-  for (i = 1; i < MUL_SIZE; i++) {
+  for (i = 1; i < MUL_SIZE; i++)
+  {
     inp = (pwr_tFloat32**)((char*)inp + pwr_cInputOffset);
     result *= **inp;
   }
@@ -1032,19 +1083,13 @@ void Mul_exec(plc_sThread* tp, pwr_sClass_Mul* o)
   Sub Analog subtraction.
   @aref sub Sub
 */
-void Sub_exec(plc_sThread* tp, pwr_sClass_Sub* o)
-{
-  o->ActVal = *o->In1P - *o->In2P;
-}
+void Sub_exec(plc_sThread* tp, pwr_sClass_Sub* o) { o->ActVal = *o->In1P - *o->In2P; }
 
 /*_*
   Div Analog division.
   @aref div Div
 */
-void Div_exec(plc_sThread* tp, pwr_sClass_Div* o)
-{
-  o->ActVal = *o->In1P / *o->In2P;
-}
+void Div_exec(plc_sThread* tp, pwr_sClass_Div* o) { o->ActVal = *o->In1P / *o->In2P; }
 
 /*_*
   Max Maximum function.
@@ -1057,7 +1102,8 @@ void Max_exec(plc_sThread* tp, pwr_sClass_Max* o)
   pwr_tFloat32** inp = &o->In1P;
   pwr_tFloat32 result = -1E37;
 
-  for (i = 0; i < AMAX_SIZE; i++) {
+  for (i = 0; i < AMAX_SIZE; i++)
+  {
     if (**inp > result)
       result = **inp;
     inp = (pwr_tFloat32**)((char*)inp + pwr_cInputOffset);
@@ -1076,7 +1122,8 @@ void Min_exec(plc_sThread* tp, pwr_sClass_Min* o)
   pwr_tFloat32** inp = &o->In1P;
   pwr_tFloat32 result = 1E37;
 
-  for (i = 0; i < AMIN_SIZE; i++) {
+  for (i = 0; i < AMIN_SIZE; i++)
+  {
     if (**inp < result)
       result = **inp;
     inp = (pwr_tFloat32**)((char*)inp + pwr_cInputOffset);
@@ -1090,11 +1137,12 @@ void Min_exec(plc_sThread* tp, pwr_sClass_Min* o)
 */
 void Random_exec(plc_sThread* tp, pwr_sClass_Random* o)
 {
-  if ( o->CondP == &o->Cond)
-    o->ActVal = o->MinValue + (float)(rand())/RAND_MAX * (o->MaxValue - o->MinValue);
-  else {
-    if ( *o->CondP && !o->CondOld)
-      o->ActVal = o->MinValue + (float)(rand())/RAND_MAX * (o->MaxValue - o->MinValue);
+  if (o->CondP == &o->Cond)
+    o->ActVal = o->MinValue + (float)(rand()) / RAND_MAX * (o->MaxValue - o->MinValue);
+  else
+  {
+    if (*o->CondP && !o->CondOld)
+      o->ActVal = o->MinValue + (float)(rand()) / RAND_MAX * (o->MaxValue - o->MinValue);
     o->CondOld = *o->CondP;
   }
 }
@@ -1123,8 +1171,7 @@ void BwShiftRight_exec(plc_sThread* tp, pwr_sClass_BwShiftRight* o)
 */
 void BwRotateRight_exec(plc_sThread* tp, pwr_sClass_BwRotateRight* o)
 {
-  o->Out = ((unsigned int)(*o->InP) << (32 - *o->NumP))
-      | ((unsigned int)(*o->InP) >> (*o->NumP));
+  o->Out = ((unsigned int)(*o->InP) << (32 - *o->NumP)) | ((unsigned int)(*o->InP) >> (*o->NumP));
 }
 
 /*_*
@@ -1133,8 +1180,7 @@ void BwRotateRight_exec(plc_sThread* tp, pwr_sClass_BwRotateRight* o)
 */
 void BwRotateLeft_exec(plc_sThread* tp, pwr_sClass_BwRotateLeft* o)
 {
-  o->Out = ((unsigned int)(*o->InP) >> (32 - *o->NumP))
-      | ((unsigned int)(*o->InP) << (*o->NumP));
+  o->Out = ((unsigned int)(*o->InP) >> (32 - *o->NumP)) | ((unsigned int)(*o->InP) << (*o->NumP));
 }
 
 /*_*
@@ -1206,7 +1252,8 @@ void AtMax_exec(plc_sThread* tp, pwr_sClass_AtMax* o)
   pwr_tTime** inp = &o->In1P;
   pwr_tTime result = PWR_ATTIME_MIN;
 
-  for (i = 0; i < ATMAX_SIZE; i++) {
+  for (i = 0; i < ATMAX_SIZE; i++)
+  {
     if (time_Acomp_NE(*inp, &result) == 1)
       result = **inp;
     inp = (pwr_tTime**)((char*)inp + pwr_cInputOffsetAt);
@@ -1225,7 +1272,8 @@ void AtMin_exec(plc_sThread* tp, pwr_sClass_AtMin* o)
   pwr_tTime** inp = &o->In1P;
   pwr_tTime result = PWR_ATTIME_MAX;
 
-  for (i = 0; i < ATMIN_SIZE; i++) {
+  for (i = 0; i < ATMIN_SIZE; i++)
+  {
     if (time_Acomp_NE(*inp, &result) == -1)
       result = **inp;
     inp = (pwr_tTime**)((char*)inp + pwr_cInputOffsetAt);
@@ -1244,7 +1292,8 @@ void DtMax_exec(plc_sThread* tp, pwr_sClass_DtMax* o)
   pwr_tDeltaTime** inp = &o->In1P;
   pwr_tDeltaTime result = PWR_DTTIME_MIN;
 
-  for (i = 0; i < DTMAX_SIZE; i++) {
+  for (i = 0; i < DTMAX_SIZE; i++)
+  {
     if (time_Dcomp_NE(*inp, &result) == 1)
       result = **inp;
     inp = (pwr_tDeltaTime**)((char*)inp + pwr_cInputOffsetDt);
@@ -1263,7 +1312,8 @@ void DtMin_exec(plc_sThread* tp, pwr_sClass_DtMin* o)
   pwr_tDeltaTime** inp = &o->In1P;
   pwr_tDeltaTime result = PWR_DTTIME_MAX;
 
-  for (i = 0; i < DTMIN_SIZE; i++) {
+  for (i = 0; i < DTMIN_SIZE; i++)
+  {
     if (time_Dcomp_NE(*inp, &result) == -1)
       result = **inp;
     inp = (pwr_tDeltaTime**)((char*)inp + pwr_cInputOffsetDt);
@@ -1281,20 +1331,28 @@ void AtLimit_exec(plc_sThread* tp, pwr_sClass_AtLimit* o)
   o->Min = *o->MinP;
   o->In = *o->InP;
 
-  if (time_Acomp_NE(&o->In, &o->Max) == 1) {
+  if (time_Acomp_NE(&o->In, &o->Max) == 1)
+  {
     o->ActVal = o->Max;
     o->High = TRUE;
     o->Low = FALSE;
-  } else if (time_Acomp_NE(&o->In, &o->Min) == -1) {
+  }
+  else if (time_Acomp_NE(&o->In, &o->Min) == -1)
+  {
     o->Low = TRUE;
-    if (time_Acomp_NE(&o->Min, &o->Max) <= 0) {
+    if (time_Acomp_NE(&o->Min, &o->Max) <= 0)
+    {
       o->ActVal = o->Min;
       o->High = FALSE;
-    } else {
+    }
+    else
+    {
       o->ActVal = o->Max;
       o->High = TRUE;
     }
-  } else {
+  }
+  else
+  {
     o->ActVal = o->In;
     o->High = FALSE;
     o->Low = FALSE;
@@ -1311,20 +1369,28 @@ void DtLimit_exec(plc_sThread* tp, pwr_sClass_DtLimit* o)
   o->Min = *o->MinP;
   o->In = *o->InP;
 
-  if (time_Dcomp_NE(&o->In, &o->Max) == 1) {
+  if (time_Dcomp_NE(&o->In, &o->Max) == 1)
+  {
     o->ActVal = o->Max;
     o->High = TRUE;
     o->Low = FALSE;
-  } else if (time_Dcomp_NE(&o->In, &o->Min) == -1) {
+  }
+  else if (time_Dcomp_NE(&o->In, &o->Min) == -1)
+  {
     o->Low = TRUE;
-    if (time_Dcomp_NE(&o->Min, &o->Max) <= 0) {
+    if (time_Dcomp_NE(&o->Min, &o->Max) <= 0)
+    {
       o->ActVal = o->Min;
       o->High = FALSE;
-    } else {
+    }
+    else
+    {
       o->ActVal = o->Max;
       o->High = TRUE;
     }
-  } else {
+  }
+  else
+  {
     o->ActVal = o->In;
     o->High = FALSE;
     o->Low = FALSE;
@@ -1342,7 +1408,8 @@ void AtDemux_exec(plc_sThread* tp, pwr_sClass_AtDemux* o)
   pwr_tTime* outp = &o->Out0;
 
   idx = o->Index = *o->IndexP;
-  for (i = 0; i < ATDEMUX_SIZE; i++) {
+  for (i = 0; i < ATDEMUX_SIZE; i++)
+  {
     if (i == idx)
       *outp = *o->InP;
     else
@@ -1361,7 +1428,8 @@ void DtDemux_exec(plc_sThread* tp, pwr_sClass_DtDemux* o)
   pwr_tDeltaTime* outp = &o->Out0;
 
   idx = o->Index = *o->IndexP;
-  for (i = 0; i < ATDEMUX_SIZE; i++) {
+  for (i = 0; i < ATDEMUX_SIZE; i++)
+  {
     if (i == idx)
       *outp = *o->InP;
     else
@@ -1432,7 +1500,8 @@ void StrAdd_exec(plc_sThread* tp, pwr_sClass_StrAdd* o)
   pwr_tString80** inp = &o->In1P;
   pwr_tString80 sum = "";
 
-  for (i = 0; i < STRADD_SIZE; i++) {
+  for (i = 0; i < STRADD_SIZE; i++)
+  {
     strncat(sum, **inp, sizeof(sum) - strlen(sum) - 1);
 
     inp = (pwr_tString80**)((char*)inp + pwr_cInputOffsetStr);
@@ -1445,10 +1514,7 @@ void StrAdd_exec(plc_sThread* tp, pwr_sClass_StrAdd* o)
   StrTrim Remove leading and trailing spaces.
   @aref strtrim StrTrim
 */
-void StrTrim_exec(plc_sThread* tp, pwr_sClass_StrTrim* o)
-{
-  str_trim(o->ActVal, *o->InP);
-}
+void StrTrim_exec(plc_sThread* tp, pwr_sClass_StrTrim* o) { str_trim(o->ActVal, *o->InP); }
 
 /*_*
   StrParse Parse a string.
@@ -1458,8 +1524,7 @@ void StrParse_exec(plc_sThread* tp, pwr_sClass_StrParse* o)
 {
 #define STRPARSE_SIZE 10
   int i, tokens;
-  tokens = dcli_parse(*o->InP, o->Delimiter, "", o->Token1, STRPARSE_SIZE,
-      sizeof(o->Token1), 1);
+  tokens = dcli_parse(*o->InP, o->Delimiter, "", o->Token1, STRPARSE_SIZE, sizeof(o->Token1), 1);
   for (i = tokens; i < STRPARSE_SIZE; i++)
     *(char*)((char*)o->Token1 + i * sizeof(o->Token1)) = 0;
 }

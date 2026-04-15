@@ -64,10 +64,12 @@
 
 \*----------------------------------------------------------------------------*/
 
-typedef struct {
+typedef struct
+{
   unsigned int Address[2];
   int Qbus_fp;
-  struct {
+  struct
+  {
     pwr_sClass_Di* sop[16];
     void* Data[16];
     pwr_tBoolean Found;
@@ -76,8 +78,7 @@ typedef struct {
   unsigned int ErrScanCnt;
 } io_sLocal;
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   pwr_sClass_Ssab_BaseDiCard* op;
   io_sLocal* local;
@@ -94,12 +95,12 @@ static pwr_tStatus IoCardInit(
   local->Qbus_fp = ((io_sRackLocal*)(rp->Local))->Qbus_fp;
 
   /* Init filter */
-  for (i = 0; i < 2; i++) {
+  for (i = 0; i < 2; i++)
+  {
     /* The filter handles one 16-bit word */
     for (j = 0; j < 16; j++)
       local->Filter[i].sop[j] = cp->chanlist[i * 16 + j].sop;
-    io_InitDiFilter(local->Filter[i].sop, &local->Filter[i].Found,
-        local->Filter[i].Data, ctx->ScanTime);
+    io_InitDiFilter(local->Filter[i].sop, &local->Filter[i].Found, local->Filter[i].Data, ctx->ScanTime);
   }
 
   local->ErrReset = 1.0 / ctx->ScanTime + 0.5;
@@ -112,8 +113,7 @@ static pwr_tStatus IoCardInit(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local;
   int i;
@@ -123,7 +123,8 @@ static pwr_tStatus IoCardClose(
   errh_Info("IO closing di card '%s'", cp->Name);
 
   /* Free filter data */
-  for (i = 0; i < 2; i++) {
+  for (i = 0; i < 2; i++)
+  {
     if (local->Filter[i].Found)
       io_CloseDiFilter(local->Filter[i].Data);
   }
@@ -135,8 +136,7 @@ static pwr_tStatus IoCardClose(
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local;
   io_sRackLocal* r_local = (io_sRackLocal*)(rp->Local);
@@ -153,11 +153,15 @@ static pwr_tStatus IoCardRead(
   local = (io_sLocal*)cp->Local;
   op = (pwr_sClass_Ssab_BaseDiCard*)cp->op;
 
-  for (i = 0; i < 2; i++) {
-    if (i == 0) {
+  for (i = 0; i < 2; i++)
+  {
+    if (i == 0)
+    {
       convmask = op->ConvMask1;
       invmask = op->InvMask1;
-    } else {
+    }
+    else
+    {
       convmask = op->ConvMask2;
       invmask = op->InvMask2;
       if (!convmask)
@@ -166,49 +170,57 @@ static pwr_tStatus IoCardRead(
         break;
     }
 
-    if (r_local->Qbus_fp != 0 && r_local->s == 0) {
+    if (r_local->Qbus_fp != 0 && r_local->s == 0)
+    {
       /* Read from local Q-bus */
       rb.Address = local->Address[i];
       sts = read(local->Qbus_fp, &rb, sizeof(rb));
       data = (unsigned short)rb.Data;
-    } else {
+    }
+    else
+    {
       /* Ethernet I/O, Get data from current address */
       data = bfbeth_get_data(r_local, (pwr_tUInt16)local->Address[i], &sts);
       /* Yes, we want to read this address the next time aswell */
       bfbeth_set_read_req(r_local, (pwr_tUInt16)local->Address[i]);
 
-      if (sts == -1) {
+      if (sts == -1)
+      {
         /* Error handling for ethernet Qbus-I/O */
         rrp = (pwr_sClass_Ssab_RemoteRack*)rp->op;
-        if (bfb_error == 0) {
+        if (bfb_error == 0)
+        {
           op->ErrorCount++;
           bfb_error = 1;
-          if (op->ErrorCount == op->ErrorSoftLimit) {
+          if (op->ErrorCount == op->ErrorSoftLimit)
+          {
             errh_Error("IO Error soft limit reached on card '%s'", cp->Name);
             ctx->IOHandler->CardErrorSoftLimit = 1;
             ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
           }
-          if (op->ErrorCount == op->ErrorHardLimit) {
-            errh_Error(
-                "IO Error hard limit reached on card '%s', stall action %d",
-                cp->Name, rrp->StallAction);
+          if (op->ErrorCount == op->ErrorHardLimit)
+          {
+            errh_Error("IO Error hard limit reached on card '%s', stall action %d", cp->Name,
+                       rrp->StallAction);
             ctx->IOHandler->CardErrorHardLimit = 1;
             ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
           }
-          if (op->ErrorCount >= op->ErrorHardLimit
-              && rrp->StallAction == pwr_eSsabStallAction_ResetInputs) {
+          if (op->ErrorCount >= op->ErrorHardLimit && rrp->StallAction == pwr_eSsabStallAction_ResetInputs)
+          {
             data = 0;
             sts = 1;
           }
-          if (op->ErrorCount >= op->ErrorHardLimit
-              && rrp->StallAction == pwr_eSsabStallAction_EmergencyBreak) {
+          if (op->ErrorCount >= op->ErrorHardLimit && rrp->StallAction == pwr_eSsabStallAction_EmergencyBreak)
+          {
             ctx->Node->EmergBreakTrue = 1;
             return IO__ERRDEVICE;
           }
         }
         if (sts == -1)
           continue;
-      } else {
+      }
+      else
+      {
         op->ErrorCount = 0;
       }
     }
@@ -219,14 +231,15 @@ static pwr_tStatus IoCardRead(
       /* Increase error count and check error limits */
       op->ErrorCount++;
 
-      if (op->ErrorCount == op->ErrorSoftLimit) {
+      if (op->ErrorCount == op->ErrorSoftLimit)
+      {
         errh_Error("IO Error soft limit reached on card '%s'", cp->Name);
         ctx->IOHandler->CardErrorSoftLimit = 1;
         ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
       }
-      if (op->ErrorCount >= op->ErrorHardLimit) {
-        errh_Error(
-            "IO Error hard limit reached on card '%s', IO stopped", cp->Name);
+      if (op->ErrorCount >= op->ErrorHardLimit)
+      {
+        errh_Error("IO Error hard limit reached on card '%s', IO stopped", cp->Name);
         ctx->Node->EmergBreakTrue = 1;
         ctx->IOHandler->CardErrorHardLimit = 1;
         ctx->IOHandler->ErrorHardLimitObject = cdh_ObjidToAref(cp->Objid);
@@ -248,7 +261,8 @@ static pwr_tStatus IoCardRead(
 
   /* Fix for qbus errors */
   local->ErrScanCnt++;
-  if (local->ErrScanCnt >= local->ErrReset) {
+  if (local->ErrScanCnt >= local->ErrReset)
+  {
     local->ErrScanCnt = 0;
     if (op->ErrorCount > op->ErrorSoftLimit)
       op->ErrorCount--;
@@ -261,5 +275,5 @@ static pwr_tStatus IoCardRead(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Ssab_Di) = { pwr_BindIoMethod(IoCardInit),
-  pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Ssab_Di) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                          pwr_BindIoMethod(IoCardRead), pwr_NullMethod};

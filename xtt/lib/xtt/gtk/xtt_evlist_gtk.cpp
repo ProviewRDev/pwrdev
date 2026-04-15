@@ -48,11 +48,9 @@
 
 #include "xtt_evlist_gtk.h"
 
-EvListGtk::EvListGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid,
-    ev_eType ev_type, int ev_size, int ev_eventname_seg, GtkWidget** w,
-    void (*ev_init_cb)(void*))
-    : EvList(ev_parent_ctx, ev_type, ev_size, ev_eventname_seg, ev_init_cb),
-      parent_wid(ev_parent_wid)
+EvListGtk::EvListGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, ev_eType ev_type, int ev_size,
+                     int ev_eventname_seg, GtkWidget** w, void (*ev_init_cb)(void*))
+    : EvList(ev_parent_ctx, ev_type, ev_size, ev_eventname_seg, ev_init_cb), parent_wid(ev_parent_wid)
 {
   form_widget = scrolledbrowwidgetgtk_new(init_brow_cb, this, &brow_widget);
 
@@ -77,15 +75,9 @@ EvListGtk::~EvListGtk()
   gtk_widget_destroy(form_widget);
 }
 
-void EvListGtk::set_input_focus()
-{
-  gtk_widget_grab_focus(brow_widget);
-}
+void EvListGtk::set_input_focus() { gtk_widget_grab_focus(brow_widget); }
 
-void EvListGtk::bell()
-{
-  gdk_display_beep(gtk_widget_get_display(brow_widget));
-}
+void EvListGtk::bell() { gdk_display_beep(gtk_widget_get_display(brow_widget)); }
 
 void EvListGtk::popup_position(int x_event, int y_event, int* x, int* y)
 {
@@ -100,14 +92,16 @@ void EvListGtk::print(const char* title)
 
   strcpy(print_title, title);
   syi_NodeName(&sts, nodename, sizeof(nodename));
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     strcat(print_title, " ");
     strcat(print_title, nodename);
   }
 
-  CoWowGtk::CreateBrowPrintDialogGtk(print_title, brow->ctx,
-      flow_eOrientation_Landscape, 1.0, 0 /* GTK_WINDOW(parent_wid) */, &sts);
-  if (sts == WOW__PRINTDIALOGDISABLED) {
+  CoWowGtk::CreateBrowPrintDialogGtk(print_title, brow->ctx, flow_eOrientation_Landscape, 1.0,
+                                     0 /* GTK_WINDOW(parent_wid) */, &sts);
+  if (sts == WOW__PRINTDIALOGDISABLED)
+  {
     pwr_tFileName filename;
     pwr_tCmd cmd;
 

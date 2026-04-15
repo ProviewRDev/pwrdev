@@ -36,13 +36,13 @@
 
 /*************************************************************************
  *
-* 	PROGRAM		rs_nmps_appl
-*
-*       Modifierad
-*		971002	Claes Sjöfors	Skapad
-*
-*	Funktion:	Applikationsgränssnitt mot Nmps.
-**************************************************************************/
+ * 	PROGRAM		rs_nmps_appl
+ *
+ *       Modifierad
+ *		971002	Claes Sjöfors	Skapad
+ *
+ *	Funktion:	Applikationsgränssnitt mot Nmps.
+ **************************************************************************/
 
 /*! \file nmps_appl.c
     \brief Function for \ref  NMpsAppl.
@@ -55,10 +55,10 @@
 #include "co_cdh.h"
 #include "co_string.h"
 
-#include "rt_lck.h"
+#include "rs_nmps_msg.h"
 #include "rt_gdh_msg.h"
 #include "rt_hash_msg.h"
-#include "rs_nmps_msg.h"
+#include "rt_lck.h"
 
 #include "nmps.h"
 #include "nmps_appl.h"
@@ -73,17 +73,17 @@ typedef struct nmpsappl_s_data_list {
   gdh_tDlid subid;
   int remove;
   int pending_remove;
-  struct nmpsappl_s_data_list* prev_ptr;
-  struct nmpsappl_s_data_list* next_ptr;
+  struct nmpsappl_s_data_list *prev_ptr;
+  struct nmpsappl_s_data_list *next_ptr;
 } nmpsappl_t_data_list;
 
 typedef struct nmpsappl_s_basectx {
-  nmpsappl_t_cellist* cellist;
+  nmpsappl_t_cellist *cellist;
   int cellist_count;
   nmpsappl_t_ctx applctx_list;
   int applctx_count;
-  nmpsappl_t_data_list* datalist;
-} * nmpsappl_t_basectx;
+  nmpsappl_t_data_list *datalist;
+} *nmpsappl_t_basectx;
 
 /*_Global variables______________________________________________________*/
 
@@ -91,26 +91,27 @@ static nmpsappl_t_basectx nmpsappl_basectx = 0;
 
 /*_Local functions________________________________________________________*/
 
-static pwr_tStatus nmpsappl_data_db_create(nmpsappl_t_data_list** data_list,
-    pwr_tObjid objid, int options, nmpsappl_t_data_list** datalist_ptr);
-static pwr_tStatus nmpsappl_data_db_delete(
-    nmpsappl_t_data_list** data_list, nmpsappl_t_data_list* data_ptr);
+static pwr_tStatus nmpsappl_data_db_create(nmpsappl_t_data_list **data_list,
+                                           pwr_tObjid objid, int options,
+                                           nmpsappl_t_data_list **datalist_ptr);
+static pwr_tStatus nmpsappl_data_db_delete(nmpsappl_t_data_list **data_list,
+                                           nmpsappl_t_data_list *data_ptr);
 
 /****************************************************************************
-* Name:		nmpsappl_data_db_create()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Create an entry in the datalist for an objid.
-*
-**************************************************************************/
-static pwr_tStatus nmpsappl_data_db_create(nmpsappl_t_data_list** data_list,
-    pwr_tObjid objid, int options, nmpsappl_t_data_list** datalist_ptr)
-{
-  nmpsappl_t_data_list* next_ptr;
+ * Name:		nmpsappl_data_db_create()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Create an entry in the datalist for an objid.
+ *
+ **************************************************************************/
+static pwr_tStatus
+nmpsappl_data_db_create(nmpsappl_t_data_list **data_list, pwr_tObjid objid,
+                        int options, nmpsappl_t_data_list **datalist_ptr) {
+  nmpsappl_t_data_list *next_ptr;
   pwr_tStatus sts;
   char name[80];
   pwr_sAttrRef attrref;
@@ -151,19 +152,18 @@ static pwr_tStatus nmpsappl_data_db_create(nmpsappl_t_data_list** data_list,
 }
 
 /****************************************************************************
-* Name:		nmpsappl_data_db_delete()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Delete an entry in the datalist.
-*
-**************************************************************************/
-static pwr_tStatus nmpsappl_data_db_delete(
-    nmpsappl_t_data_list** data_list, nmpsappl_t_data_list* data_ptr)
-{
+ * Name:		nmpsappl_data_db_delete()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Delete an entry in the datalist.
+ *
+ **************************************************************************/
+static pwr_tStatus nmpsappl_data_db_delete(nmpsappl_t_data_list **data_list,
+                                           nmpsappl_t_data_list *data_ptr) {
   int sts;
 
   sts = gdh_DLUnrefObjectInfo(data_ptr->subid);
@@ -186,18 +186,18 @@ static pwr_tStatus nmpsappl_data_db_delete(
 }
 
 /****************************************************************************
-* Name:		nmpsappl_cell_init()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*
-**************************************************************************/
-static pwr_tStatus nmpsappl_cell_init(char* cell_name, pwr_tObjid* orig_objid,
-    void** orig_cell, gdh_tSubid* orig_subid, pwr_tClassId* orig_class)
-{
+ * Name:		nmpsappl_cell_init()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *
+ **************************************************************************/
+static pwr_tStatus nmpsappl_cell_init(char *cell_name, pwr_tObjid *orig_objid,
+                                      void **orig_cell, gdh_tSubid *orig_subid,
+                                      pwr_tClassId *orig_class) {
   pwr_sAttrRef attrref;
   pwr_tStatus sts;
   pwr_tObjid cell_objid;
@@ -215,8 +215,8 @@ static pwr_tStatus nmpsappl_cell_init(char* cell_name, pwr_tObjid* orig_objid,
     return sts;
 
   /* Link to object */
-  sts = gdh_DLRefObjectInfoAttrref(
-      &attrref, (pwr_tAddress*)orig_cell, orig_subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress *)orig_cell,
+                                   orig_subid);
   if (EVEN(sts))
     return NMPS__APPLCELL;
 
@@ -242,22 +242,21 @@ static pwr_tStatus nmpsappl_cell_init(char* cell_name, pwr_tObjid* orig_objid,
  * @see nmpsappl_Mirror
  * @return pwr_tStatus
  */
-pwr_tStatus nmpsappl_MirrorInit(pwr_tString80*
-                                    cell_array, /**< A string array with the
-                                                   names of the cells that
-                                                   should be mirrored. The
-                                                   element after the last
-                                                   cellname should be a NULL
-                                                   string. */
+pwr_tStatus nmpsappl_MirrorInit(
+    pwr_tString80 *cell_array, /**< A string array with the
+                                  names of the cells that
+                                  should be mirrored. The
+                                  element after the last
+                                  cellname should be a NULL
+                                  string. */
     unsigned long options, /**< Bitmask specifying options for the mirroring.*/
-    nmpsappl_t_ctx* ctx /**< Context pointer. */
-    )
-{
-  pwr_tString80* cellname;
+    nmpsappl_t_ctx *ctx    /**< Context pointer. */
+) {
+  pwr_tString80 *cellname;
   nmpsappl_t_basectx basectx;
   nmpsappl_t_ctx applctx;
-  nmpsappl_t_cellist* cellist_ptr;
-  nmpsappl_t_cellist* c_ptr;
+  nmpsappl_t_cellist *cellist_ptr;
+  nmpsappl_t_cellist *c_ptr;
   int found;
   int sts;
   int maxsize;
@@ -290,14 +289,14 @@ pwr_tStatus nmpsappl_MirrorInit(pwr_tString80*
 
   /* Add cells to cellist */
   cellname = cell_array;
-  while (!streq((char*)cellname, "")) {
-    str_ToUpper((char*)cellname, (char*)cellname);
+  while (!streq((char *)cellname, "")) {
+    str_ToUpper((char *)cellname, (char *)cellname);
 
     /* Check if cell already is inserted */
     cellist_ptr = basectx->cellist;
     found = 0;
     while (cellist_ptr) {
-      if (streq((char*)cellname, cellist_ptr->name)) {
+      if (streq((char *)cellname, cellist_ptr->name)) {
         found = 1;
         break;
       }
@@ -307,9 +306,10 @@ pwr_tStatus nmpsappl_MirrorInit(pwr_tString80*
       /* Insert cell last position in cellist */
 
       cellist_ptr = calloc(1, sizeof(nmpsappl_t_cellist));
-      strcpy((char*)cellist_ptr->name, (char*)cellname);
+      strcpy((char *)cellist_ptr->name, (char *)cellname);
       sts = nmpsappl_cell_init(cellist_ptr->name, &cellist_ptr->objid,
-          &cellist_ptr->object_ptr, &cellist_ptr->subid, &cellist_ptr->classid);
+                               &cellist_ptr->object_ptr, &cellist_ptr->subid,
+                               &cellist_ptr->classid);
       if (EVEN(sts))
         return sts;
 
@@ -344,29 +344,30 @@ pwr_tStatus nmpsappl_MirrorInit(pwr_tString80*
     case pwr_cClass_NMpsStoreCell:
     case pwr_cClass_NMpsStoreCell60:
     case pwr_cClass_NMpsStoreCell120:
-      maxsize = ((pwr_sClass_NMpsCell*)cellist_ptr->object_ptr)->MaxSize;
+      maxsize = ((pwr_sClass_NMpsCell *)cellist_ptr->object_ptr)->MaxSize;
       applctx->total_cellsize += maxsize;
-      cellist_ptr->tmp_size = sizeof(pwr_sClass_NMpsCell)
-          - sizeof(plc_t_DataInfo) * (30 - maxsize);
+      cellist_ptr->tmp_size =
+          sizeof(pwr_sClass_NMpsCell) - sizeof(plc_t_DataInfo) * (30 - maxsize);
       break;
     case pwr_cClass_NMpsMirrorCell:
-      maxsize = ((pwr_sClass_NMpsMirrorCell*)cellist_ptr->object_ptr)->MaxSize;
+      maxsize = ((pwr_sClass_NMpsMirrorCell *)cellist_ptr->object_ptr)->MaxSize;
       applctx->total_cellsize += maxsize;
-      cellist_ptr->tmp_size = sizeof(pwr_sClass_NMpsMirrorCell)
-          - sizeof(plc_t_DataInfoMirCell) * (NMPS_CELLMIR_SIZE - maxsize)
-          - sizeof(nmps_t_mircell_copyarea);
+      cellist_ptr->tmp_size =
+          sizeof(pwr_sClass_NMpsMirrorCell) -
+          sizeof(plc_t_DataInfoMirCell) * (NMPS_CELLMIR_SIZE - maxsize) -
+          sizeof(nmps_t_mircell_copyarea);
       break;
     }
-    cellist_ptr->tmp_cell = (void*)calloc(1, cellist_ptr->tmp_size);
+    cellist_ptr->tmp_cell = (void *)calloc(1, cellist_ptr->tmp_size);
   }
 
   /* Allocate memory for the data objects array in applctx */
   if (options & nmpsappl_mOption_Remove)
     /* Remove requires the double size */
-    applctx->datainfo = (nmpsappl_t_datainfo*)calloc(
+    applctx->datainfo = (nmpsappl_t_datainfo *)calloc(
         applctx->total_cellsize * 2, sizeof(nmpsappl_t_datainfo));
   else
-    applctx->datainfo = (nmpsappl_t_datainfo*)calloc(
+    applctx->datainfo = (nmpsappl_t_datainfo *)calloc(
         applctx->total_cellsize, sizeof(nmpsappl_t_datainfo));
 
   lck_Create(&sts, lck_eLock_NMps);
@@ -385,8 +386,8 @@ pwr_tStatus nmpsappl_MirrorInit(pwr_tString80*
  * application program.
  *
  * The function handles direct link of cells and dataobjects, and returns a list
- * of data objects to the application together with information about front, back,
- * select properties, and which data objects are new or has disappeard. The 
+ * of data objects to the application together with information about front,
+ *back, select properties, and which data objects are new or has disappeard. The
  * application also receives a pointer to each data object.
  *
  * The mirroring is initiated by calling nmpsappl_MirrorInit. The cells are
@@ -448,16 +449,15 @@ pwr_tStatus nmpsappl_MirrorInit(pwr_tString80*
  */
 pwr_tStatus nmpsappl_Mirror(
     nmpsappl_t_ctx applctx, /**< Context for nmpsappl mirror. */
-    int* data_count, /**< Number or data object in the array. */
-    nmpsappl_t_datainfo**
-        datainfo /**< Data strucure with dataobjects found in the cells. */
-    )
-{
+    int *data_count,        /**< Number or data object in the array. */
+    nmpsappl_t_datainfo *
+        *datainfo /**< Data strucure with dataobjects found in the cells. */
+) {
   int i, j, k;
   int found;
-  nmpsappl_t_cellist* cellist_ptr;
-  nmpsappl_t_data_list* data_ptr;
-  nmpsappl_t_data_list* data_next_ptr;
+  nmpsappl_t_cellist *cellist_ptr;
+  nmpsappl_t_data_list *data_ptr;
+  nmpsappl_t_data_list *data_next_ptr;
   int sts;
 
   /* Copy cell-objects into the temporary buffer, and hope that
@@ -465,8 +465,8 @@ pwr_tStatus nmpsappl_Mirror(
   for (i = 0; i < applctx->cellist_count; i++) {
     cellist_ptr = applctx->cellist[i];
     lck_LockNMps;
-    memcpy(
-        cellist_ptr->tmp_cell, cellist_ptr->object_ptr, cellist_ptr->tmp_size);
+    memcpy(cellist_ptr->tmp_cell, cellist_ptr->object_ptr,
+           cellist_ptr->tmp_size);
     lck_UnlockNMps;
   }
 
@@ -480,14 +480,14 @@ pwr_tStatus nmpsappl_Mirror(
     case pwr_cClass_NMpsStoreCell:
     case pwr_cClass_NMpsStoreCell60:
     case pwr_cClass_NMpsStoreCell120: {
-      pwr_sClass_NMpsCell* object_ptr;
-      plc_t_DataInfo* data_block_ptr;
+      pwr_sClass_NMpsCell *object_ptr;
+      plc_t_DataInfo *data_block_ptr;
 
-      object_ptr = (pwr_sClass_NMpsCell*)cellist_ptr->tmp_cell;
+      object_ptr = (pwr_sClass_NMpsCell *)cellist_ptr->tmp_cell;
       if (!(object_ptr->ReloadDone & NMPS_CELL_INITIALIZED))
         continue;
 
-      data_block_ptr = (plc_t_DataInfo*)&object_ptr->Data1P;
+      data_block_ptr = (plc_t_DataInfo *)&object_ptr->Data1P;
       if (applctx->options & nmpsappl_mOption_ReverseOrder)
         data_block_ptr += object_ptr->LastIndex - 1;
       for (i = 0; i < object_ptr->LastIndex; i++) {
@@ -495,33 +495,33 @@ pwr_tStatus nmpsappl_Mirror(
         found = 0;
         for (j = 0; j < applctx->data_count; j++) {
           if (cdh_ObjidIsEqual(applctx->datainfo[j].objid,
-                  data_block_ptr->DataP.Aref.Objid)) {
+                               data_block_ptr->DataP.Aref.Objid)) {
             found = 1;
             break;
           }
         }
         if (!found) {
-          applctx->datainfo[applctx->data_count].objid
-              = data_block_ptr->DataP.Aref.Objid;
-          applctx->datainfo[applctx->data_count].front
-              = data_block_ptr->Data_Front;
-          applctx->datainfo[applctx->data_count].back
-              = data_block_ptr->Data_Back;
-          applctx->datainfo[applctx->data_count].select
-              = data_block_ptr->Data_Select;
-          applctx->datainfo[applctx->data_count].cell_mask
-              = cellist_ptr->index_mask[applctx->index];
+          applctx->datainfo[applctx->data_count].objid =
+              data_block_ptr->DataP.Aref.Objid;
+          applctx->datainfo[applctx->data_count].front =
+              data_block_ptr->Data_Front;
+          applctx->datainfo[applctx->data_count].back =
+              data_block_ptr->Data_Back;
+          applctx->datainfo[applctx->data_count].select =
+              data_block_ptr->Data_Select;
+          applctx->datainfo[applctx->data_count].cell_mask =
+              cellist_ptr->index_mask[applctx->index];
           applctx->datainfo[applctx->data_count].removed = 0;
           applctx->data_count++;
         } else {
-          applctx->datainfo[applctx->data_count].front
-              |= data_block_ptr->Data_Front;
-          applctx->datainfo[applctx->data_count].back
-              |= data_block_ptr->Data_Back;
+          applctx->datainfo[applctx->data_count].front |=
+              data_block_ptr->Data_Front;
+          applctx->datainfo[applctx->data_count].back |=
+              data_block_ptr->Data_Back;
           if (data_block_ptr->Data_Select)
             applctx->datainfo[applctx->data_count].select = 1;
-          applctx->datainfo[applctx->data_count].cell_mask
-              |= cellist_ptr->index_mask[applctx->index];
+          applctx->datainfo[applctx->data_count].cell_mask |=
+              cellist_ptr->index_mask[applctx->index];
         }
         if (applctx->options & nmpsappl_mOption_ReverseOrder)
           data_block_ptr--;
@@ -531,35 +531,35 @@ pwr_tStatus nmpsappl_Mirror(
       break;
     }
     case pwr_cClass_NMpsMirrorCell: {
-      pwr_sClass_NMpsMirrorCell* object_ptr;
-      plc_t_DataInfoMirCell* data_block_ptr;
+      pwr_sClass_NMpsMirrorCell *object_ptr;
+      plc_t_DataInfoMirCell *data_block_ptr;
 
-      object_ptr = (pwr_sClass_NMpsMirrorCell*)cellist_ptr->tmp_cell;
+      object_ptr = (pwr_sClass_NMpsMirrorCell *)cellist_ptr->tmp_cell;
 
-      data_block_ptr = (plc_t_DataInfoMirCell*)&object_ptr->Data1P;
+      data_block_ptr = (plc_t_DataInfoMirCell *)&object_ptr->Data1P;
       for (i = 0; i < object_ptr->LastIndex; i++) {
         /* Check that objid is not already inserted */
         found = 0;
         for (j = 0; j < i; j++) {
           if (cdh_ObjidIsEqual(applctx->datainfo[j].objid,
-                  data_block_ptr->DataP.Aref.Objid)) {
+                               data_block_ptr->DataP.Aref.Objid)) {
             found = 1;
             break;
           }
         }
         if (!found) {
-          applctx->datainfo[applctx->data_count].objid
-              = data_block_ptr->DataP.Aref.Objid;
+          applctx->datainfo[applctx->data_count].objid =
+              data_block_ptr->DataP.Aref.Objid;
           applctx->datainfo[applctx->data_count].select = 0;
           applctx->datainfo[applctx->data_count].front = 0;
           applctx->datainfo[applctx->data_count].back = 0;
-          applctx->datainfo[applctx->data_count].cell_mask
-              = cellist_ptr->index_mask[applctx->index];
+          applctx->datainfo[applctx->data_count].cell_mask =
+              cellist_ptr->index_mask[applctx->index];
           applctx->datainfo[applctx->data_count].removed = 0;
           applctx->data_count++;
         } else {
-          applctx->datainfo[applctx->data_count].cell_mask
-              |= cellist_ptr->index_mask[applctx->index];
+          applctx->datainfo[applctx->data_count].cell_mask |=
+              cellist_ptr->index_mask[applctx->index];
         }
         data_block_ptr++;
       }
@@ -616,7 +616,8 @@ pwr_tStatus nmpsappl_Mirror(
     if (!found) {
       /* A new object, insert it into the data database */
       sts = nmpsappl_data_db_create(&nmpsappl_basectx->datalist,
-          applctx->datainfo[i].objid, applctx->options, &data_ptr);
+                                    applctx->datainfo[i].objid,
+                                    applctx->options, &data_ptr);
       if (EVEN(sts))
         return sts;
 
@@ -634,8 +635,8 @@ pwr_tStatus nmpsappl_Mirror(
   data_ptr = nmpsappl_basectx->datalist;
   while (data_ptr) {
     if (data_ptr->remove && data_ptr->possession & applctx->index_mask) {
-      if (data_ptr->possession == applctx->index_mask
-          && data_ptr->pending_remove) {
+      if (data_ptr->possession == applctx->index_mask &&
+          data_ptr->pending_remove) {
         /* Remove the object from the database */
         data_next_ptr = data_ptr->next_ptr;
         sts = nmpsappl_data_db_delete(&nmpsappl_basectx->datalist, data_ptr);
@@ -680,11 +681,10 @@ pwr_tStatus nmpsappl_Mirror(
  */
 pwr_tStatus nmpsappl_RemoveData(
     nmpsappl_t_ctx applctx, /**< Context for nmpsappl mirror. */
-    pwr_tObjid objid /**< Objid for dataobject that is to be removed. */
-    )
-{
+    pwr_tObjid objid        /**< Objid for dataobject that is to be removed. */
+) {
   int k;
-  nmpsappl_t_cellist* cellist_ptr;
+  nmpsappl_t_cellist *cellist_ptr;
 
   for (k = 0; k < applctx->cellist_count; k++) {
     cellist_ptr = applctx->cellist[k];
@@ -695,9 +695,9 @@ pwr_tStatus nmpsappl_RemoveData(
     case pwr_cClass_NMpsStoreCell:
     case pwr_cClass_NMpsStoreCell60:
     case pwr_cClass_NMpsStoreCell120: {
-      pwr_sClass_NMpsCell* object_ptr;
+      pwr_sClass_NMpsCell *object_ptr;
 
-      object_ptr = (pwr_sClass_NMpsCell*)cellist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_NMpsCell *)cellist_ptr->object_ptr;
       object_ptr->ExternOpType = NMPS_OPTYPE_EXTDELETE_OBJID;
       object_ptr->ExternObjId = objid;
       object_ptr->ExternFlag = 1;
@@ -720,10 +720,9 @@ pwr_tStatus nmpsappl_RemoveData(
 pwr_tStatus nmpsappl_RemoveAndDeleteData(
     nmpsappl_t_ctx applctx, /**< nmpsappl mirror context. */
     pwr_tObjid objid /**< Objid for the data object that is to be removed. */
-    )
-{
+) {
   int sts, k;
-  nmpsappl_t_cellist* cellist_ptr;
+  nmpsappl_t_cellist *cellist_ptr;
 
   for (k = 0; k < applctx->cellist_count; k++) {
     cellist_ptr = applctx->cellist[k];
@@ -734,9 +733,9 @@ pwr_tStatus nmpsappl_RemoveAndDeleteData(
     case pwr_cClass_NMpsStoreCell:
     case pwr_cClass_NMpsStoreCell60:
     case pwr_cClass_NMpsStoreCell120: {
-      pwr_sClass_NMpsCell* object_ptr;
+      pwr_sClass_NMpsCell *object_ptr;
 
-      object_ptr = (pwr_sClass_NMpsCell*)cellist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_NMpsCell *)cellist_ptr->object_ptr;
       object_ptr->ExternOpType = NMPS_OPTYPE_EXTDELETE_OBJID;
       object_ptr->ExternObjId = objid;
       object_ptr->ExternFlag = 1;
@@ -753,18 +752,17 @@ pwr_tStatus nmpsappl_RemoveAndDeleteData(
   return NMPS__SUCCESS;
 }
 
-pwr_tStatus nmpsappl_SelectData(nmpsappl_t_ctx applctx, pwr_tObjid objid)
-{
+pwr_tStatus nmpsappl_SelectData(nmpsappl_t_ctx applctx, pwr_tObjid objid) {
   int k;
-  nmpsappl_t_cellist* cellist_ptr;
+  nmpsappl_t_cellist *cellist_ptr;
 
   for (k = 0; k < applctx->cellist_count; k++) {
     cellist_ptr = applctx->cellist[k];
     switch (cellist_ptr->classid) {
     case pwr_cClass_NMpsStoreCell: {
-      pwr_sClass_NMpsCell* object_ptr;
+      pwr_sClass_NMpsCell *object_ptr;
 
-      object_ptr = (pwr_sClass_NMpsCell*)cellist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_NMpsCell *)cellist_ptr->object_ptr;
       object_ptr->ExternOpType = NMPS_OPTYPE_EXTSELECT_OBJID;
       object_ptr->ExternObjId = objid;
       object_ptr->ExternFlag = 1;
@@ -779,11 +777,11 @@ pwr_tStatus nmpsappl_SelectData(nmpsappl_t_ctx applctx, pwr_tObjid objid)
 }
 
 pwr_tStatus nmpsappl_TransportData(nmpsappl_t_ctx applctx, pwr_tObjid objid,
-    unsigned int from_cell_mask, unsigned int to_cell_mask)
-{
+                                   unsigned int from_cell_mask,
+                                   unsigned int to_cell_mask) {
   int k;
   unsigned int mask;
-  nmpsappl_t_cellist* cellist_ptr;
+  nmpsappl_t_cellist *cellist_ptr;
 
   /* Check that to cell is not busy or full */
   mask = 1;
@@ -799,9 +797,9 @@ pwr_tStatus nmpsappl_TransportData(nmpsappl_t_ctx applctx, pwr_tObjid objid,
     case pwr_cClass_NMpsStoreCell:
     case pwr_cClass_NMpsStoreCell60:
     case pwr_cClass_NMpsStoreCell120: {
-      pwr_sClass_NMpsCell* object_ptr;
+      pwr_sClass_NMpsCell *object_ptr;
 
-      object_ptr = (pwr_sClass_NMpsCell*)cellist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_NMpsCell *)cellist_ptr->object_ptr;
       if (object_ptr->ExternFlag)
         return NMPS__CELLEXTERNBUSY;
       if (object_ptr->CellFull)
@@ -828,9 +826,9 @@ pwr_tStatus nmpsappl_TransportData(nmpsappl_t_ctx applctx, pwr_tObjid objid,
     case pwr_cClass_NMpsStoreCell:
     case pwr_cClass_NMpsStoreCell60:
     case pwr_cClass_NMpsStoreCell120: {
-      pwr_sClass_NMpsCell* object_ptr;
+      pwr_sClass_NMpsCell *object_ptr;
 
-      object_ptr = (pwr_sClass_NMpsCell*)cellist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_NMpsCell *)cellist_ptr->object_ptr;
       if (object_ptr->ExternFlag)
         return NMPS__CELLEXTERNBUSY;
 
@@ -858,9 +856,9 @@ pwr_tStatus nmpsappl_TransportData(nmpsappl_t_ctx applctx, pwr_tObjid objid,
     case pwr_cClass_NMpsStoreCell:
     case pwr_cClass_NMpsStoreCell60:
     case pwr_cClass_NMpsStoreCell120: {
-      pwr_sClass_NMpsCell* object_ptr;
+      pwr_sClass_NMpsCell *object_ptr;
 
-      object_ptr = (pwr_sClass_NMpsCell*)cellist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_NMpsCell *)cellist_ptr->object_ptr;
       if (object_ptr->ExternFlag)
         return NMPS__CELLEXTERNBUSY;
       if (object_ptr->CellFull)
@@ -880,12 +878,11 @@ pwr_tStatus nmpsappl_TransportData(nmpsappl_t_ctx applctx, pwr_tObjid objid,
   return NMPS__SUCCESS;
 }
 
-pwr_tStatus nmpsappl_InsertData(
-    nmpsappl_t_ctx applctx, pwr_tObjid objid, unsigned int cell_mask)
-{
+pwr_tStatus nmpsappl_InsertData(nmpsappl_t_ctx applctx, pwr_tObjid objid,
+                                unsigned int cell_mask) {
   int k;
   unsigned int mask;
-  nmpsappl_t_cellist* cellist_ptr;
+  nmpsappl_t_cellist *cellist_ptr;
 
   /* Insert data */
   mask = 1;
@@ -901,9 +898,9 @@ pwr_tStatus nmpsappl_InsertData(
     case pwr_cClass_NMpsStoreCell:
     case pwr_cClass_NMpsStoreCell60:
     case pwr_cClass_NMpsStoreCell120: {
-      pwr_sClass_NMpsCell* object_ptr;
+      pwr_sClass_NMpsCell *object_ptr;
 
-      object_ptr = (pwr_sClass_NMpsCell*)cellist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_NMpsCell *)cellist_ptr->object_ptr;
       if (object_ptr->ExternFlag)
         return NMPS__CELLEXTERNBUSY;
 
@@ -921,12 +918,11 @@ pwr_tStatus nmpsappl_InsertData(
   return NMPS__SUCCESS;
 }
 
-pwr_tStatus nmpsappl_RemoveAndKeepData(
-    nmpsappl_t_ctx applctx, pwr_tObjid objid, unsigned int cell_mask)
-{
+pwr_tStatus nmpsappl_RemoveAndKeepData(nmpsappl_t_ctx applctx, pwr_tObjid objid,
+                                       unsigned int cell_mask) {
   int k;
   unsigned int mask;
-  nmpsappl_t_cellist* cellist_ptr;
+  nmpsappl_t_cellist *cellist_ptr;
 
   /* Remove data first */
   mask = 1;
@@ -942,9 +938,9 @@ pwr_tStatus nmpsappl_RemoveAndKeepData(
     case pwr_cClass_NMpsStoreCell:
     case pwr_cClass_NMpsStoreCell60:
     case pwr_cClass_NMpsStoreCell120: {
-      pwr_sClass_NMpsCell* object_ptr;
+      pwr_sClass_NMpsCell *object_ptr;
 
-      object_ptr = (pwr_sClass_NMpsCell*)cellist_ptr->object_ptr;
+      object_ptr = (pwr_sClass_NMpsCell *)cellist_ptr->object_ptr;
       if (object_ptr->ExternFlag)
         return NMPS__CELLEXTERNBUSY;
 

@@ -43,8 +43,7 @@
 #include "glow_grownode.h"
 #include "glow_msg.h"
 
-GlowNodeGroup::GlowNodeGroup(
-    GrowCtx* glow_ctx, const char* name, GlowArray& array)
+GlowNodeGroup::GlowNodeGroup(GrowCtx* glow_ctx, const char* name, GlowArray& array)
     : GlowNodeClass(glow_ctx, name, glow_eNodeGroup_Common)
 {
   a.copy_from_common_objects(array);
@@ -55,27 +54,26 @@ GlowNodeGroup::GlowNodeGroup(GrowCtx* glow_ctx, const char* name)
 {
 }
 
-GlowNodeGroup::GlowNodeGroup(const GlowNodeGroup& nc)
-    : GlowNodeClass((GlowNodeClass&)nc)
+GlowNodeGroup::GlowNodeGroup(const GlowNodeGroup& nc) : GlowNodeClass((GlowNodeClass&)nc)
 {
   // Get unique name
   sprintf(n_name, "Grp%d_", ((GrowCtx*)ctx)->objectname_cnt++);
 }
 
-GlowNodeGroup::~GlowNodeGroup()
-{
-}
+GlowNodeGroup::~GlowNodeGroup() {}
 
 void GlowNodeGroup::ungroup(GlowTransform* t)
 {
   GlowArrayElem *parent, *pp;
   a.set_transform(t);
 
-  for (int i = 0; i < a.size(); i++) {
+  for (int i = 0; i < a.size(); i++)
+  {
     parent = a[i]->get_parent();
     if (parent)
       pp = parent->get_parent();
-    else {
+    else
+    {
       pp = 0;
       a[i]->set_parent(0);
     }
@@ -83,8 +81,7 @@ void GlowNodeGroup::ungroup(GlowTransform* t)
       ((GrowLayer*)pp)->insert(a[i]);
     else
       ctx->insert(a[i]);
-    if (a[i]->type() == glow_eObjectType_GrowNode
-        || a[i]->type() == glow_eObjectType_GrowGroup)
+    if (a[i]->type() == glow_eObjectType_GrowNode || a[i]->type() == glow_eObjectType_GrowGroup)
       ((GrowNode*)a[i])->ungroup();
   }
   a.clear();
@@ -105,15 +102,18 @@ void GlowNodeGroup::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GlowNodeGroup: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_NodeGroup:
       break;
     case glow_eSave_NodeGroup_nodeclass_part:

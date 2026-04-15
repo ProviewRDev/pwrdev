@@ -60,7 +60,8 @@ class GrowCtx;
   when the
   object is clicked on, moved etc.
 */
-class GrowNode : public GlowNode {
+class GrowNode : public GlowNode
+{
 public:
   //! Constuctor
   /*!
@@ -72,20 +73,17 @@ public:
     \param nodraw	Don't draw the object now.
     \param rel_annot_pos Not used.
   */
-  GrowNode(GrowCtx* glow_ctx, const char* name, GlowNodeClass* node_class,
-      double x1, double y1, int nodraw = 0, int rel_annot_pos = 0);
+  GrowNode(GrowCtx* glow_ctx, const char* name, GlowNodeClass* node_class, double x1, double y1,
+           int nodraw = 0, int rel_annot_pos = 0);
 
   //! Noargs constructor
-  GrowNode(){}
+  GrowNode() {}
 
   //! Get the object type
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return object_type;
-  }
+  glow_eObjectType type() { return object_type; }
 
   //! Make this object a copy of another image object.
   /*!
@@ -109,8 +107,7 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(GlowTransform* t, double* x1_right, double* x1_left,
-      double* y1_high, double* y1_low);
+  void get_borders(GlowTransform* t, double* x1_right, double* x1_left, double* y1_high, double* y1_low);
 
   //! Save the content of the object to file.
   /*!
@@ -153,7 +150,7 @@ public:
     \param on	If 1, set highlight. If 0, reset highlight.
   */
   void set_highlight(int on);
-  int get_highlight() {return highlight;}
+  int get_highlight() { return highlight; }
 
   //! Close trace
   /*! Calls the trace disconnect callback.
@@ -191,60 +188,59 @@ public:
     as
     current callback object.
   */
-  int event_handler(
-      GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
 
   //! Set hot
   /*! Increase the linewith to mark that the cursor points at the node.
    */
   void set_hot(int on);
-  virtual int get_hot(){return hot;}
+  virtual int get_hot() { return hot; }
 
-  char* dynamic; //!< Dynamic code.
-  int dynamicsize; //!< Size of dynamic code.
-  glow_eDrawType original_border_drawtype; //!< Original border color.
-  glow_eDrawType original_text_drawtype; //!< Original text color.
-  glow_eDrawType original_fill_drawtype; //!< Original fill color.
+  char* dynamic;                               //!< Dynamic code.
+  int dynamicsize;                             //!< Size of dynamic code.
+  glow_eDrawType original_border_drawtype;     //!< Original border color.
+  glow_eDrawType original_text_drawtype;       //!< Original text color.
+  glow_eDrawType original_fill_drawtype;       //!< Original fill color.
   glow_eDrawType original_background_drawtype; //!< Original background color.
-  glow_eDrawType fill_drawtype; //!< Fill color.
-  glow_eDrawType text_drawtype; //!< Text color.
-  glow_eDrawType draw_type; //!< Border color.
-  glow_eDrawType level_fill_drawtype; //!< Level fill color.
-  glow_eDrawType background_drawtype; //!< Background color.
-  glow_eDrawTone original_color_tone; //!< Original color tone.
-  glow_eDrawTone color_tone; //!< Color tone.
-  glow_eDrawTone level_color_tone; //!< Level color tone.
-  int original_color_lightness; //!< Original color lightness.
-  int color_lightness; //!< Color lightness.
-  int original_color_intensity; //!< Original color lightness.
-  int color_intensity; //!< Color intensity.
-  int original_color_shift; //!< Original color intensity.
-  int color_shift; //!< Color shift.
-  int color_inverse; //!< Color inverse.
-  int line_width; //!< Line width.
-  int invisible; //!< Object is invisible.
-  int dimmed; //!< Object is dimmed.
-  GlowTransform trf; //!< Transformation matrix of object.
-  char* argv[20]; //!< Arguments in dynamic code.
-  int argsize[20]; //!< Size of arguments is dynamic code.
-  glow_eObjectType object_type; //!< Object type.
-  GrowNode* root_node; //!< The root node or group.
-  char last_group[32]; //!< The last group the object was a member of.
-  bool flip_horizontal; //!< The object is flipped horizontally.
-  bool flip_vertical; //!< The object is flipped vertically.
-  double fill_level; //!< The fill level.
-  glow_eDirection level_direction; //!< Direction of fill level.
-  int shadow; //!< Object should be drawn with shadows.
-  int input_position; //!< Cursor position for input annotation.
-  int input_selected; //!< Text in input annotation is selected.
-  glow_eGradient gradient; //!< Type of gradient.
-  glow_eDrawType text_type; //!< Text type, bold or normal.
-  glow_eFont text_font; //!< Text font.
-  int disable_cb; //!< Disable event callbacks
-  int annot_scrollingtext; //!< Annotation number for scrolling text annotation.
-  double annot_offset_x; //!< Offset for annotation text position in x direction.
-  double annot_offset_y; //!< Offset for annotation text position in y direction.
-  double transparency; //!< Border and fill color transparency.
+  glow_eDrawType fill_drawtype;                //!< Fill color.
+  glow_eDrawType text_drawtype;                //!< Text color.
+  glow_eDrawType draw_type;                    //!< Border color.
+  glow_eDrawType level_fill_drawtype;          //!< Level fill color.
+  glow_eDrawType background_drawtype;          //!< Background color.
+  glow_eDrawTone original_color_tone;          //!< Original color tone.
+  glow_eDrawTone color_tone;                   //!< Color tone.
+  glow_eDrawTone level_color_tone;             //!< Level color tone.
+  int original_color_lightness;                //!< Original color lightness.
+  int color_lightness;                         //!< Color lightness.
+  int original_color_intensity;                //!< Original color lightness.
+  int color_intensity;                         //!< Color intensity.
+  int original_color_shift;                    //!< Original color intensity.
+  int color_shift;                             //!< Color shift.
+  int color_inverse;                           //!< Color inverse.
+  int line_width;                              //!< Line width.
+  int invisible;                               //!< Object is invisible.
+  int dimmed;                                  //!< Object is dimmed.
+  GlowTransform trf;                           //!< Transformation matrix of object.
+  char* argv[20];                              //!< Arguments in dynamic code.
+  int argsize[20];                             //!< Size of arguments is dynamic code.
+  glow_eObjectType object_type;                //!< Object type.
+  GrowNode* root_node;                         //!< The root node or group.
+  char last_group[32];                         //!< The last group the object was a member of.
+  bool flip_horizontal;                        //!< The object is flipped horizontally.
+  bool flip_vertical;                          //!< The object is flipped vertically.
+  double fill_level;                           //!< The fill level.
+  glow_eDirection level_direction;             //!< Direction of fill level.
+  int shadow;                                  //!< Object should be drawn with shadows.
+  int input_position;                          //!< Cursor position for input annotation.
+  int input_selected;                          //!< Text in input annotation is selected.
+  glow_eGradient gradient;                     //!< Type of gradient.
+  glow_eDrawType text_type;                    //!< Text type, bold or normal.
+  glow_eFont text_font;                        //!< Text font.
+  int disable_cb;                              //!< Disable event callbacks
+  int annot_scrollingtext;                     //!< Annotation number for scrolling text annotation.
+  double annot_offset_x;                       //!< Offset for annotation text position in x direction.
+  double annot_offset_y;                       //!< Offset for annotation text position in y direction.
+  double transparency;                         //!< Border and fill color transparency.
 
   //! Set dynamic code
   /*!
@@ -623,19 +619,13 @@ public:
   /*!
     \param color 	Level fill color.
   */
-  void set_level_fill_color(glow_eDrawType color)
-  {
-    level_fill_drawtype = color;
-  }
+  void set_level_fill_color(glow_eDrawType color) { level_fill_drawtype = color; }
 
   //! Set the level color tone.
   /*!
     \param tone 	Level color tone.
   */
-  void set_level_color_tone(glow_eDrawTone tone)
-  {
-    level_color_tone = tone;
-  }
+  void set_level_color_tone(glow_eDrawTone tone) { level_color_tone = tone; }
 
   //! Set the fill level.
   /*!
@@ -651,10 +641,7 @@ public:
   /*!
     \param dir 	Level direction.
   */
-  void set_level_direction(glow_eDirection dir)
-  {
-    level_direction = dir;
-  }
+  void set_level_direction(glow_eDirection dir) { level_direction = dir; }
 
   //! Set object visibility.
   /*!
@@ -683,8 +670,8 @@ public:
     \param y0		y coordinate of scale point.
     \param type		Type of scaling.
   */
-  void set_scale_pos(double x, double y, double scale_x, double scale_y,
-      double x0, double y0, glow_eScaleType type);
+  void set_scale_pos(double x, double y, double scale_x, double scale_y, double x0, double y0,
+                     glow_eScaleType type);
 
   //! Set the scale of the object. The scale is made from the last stored
   //! transform.
@@ -695,8 +682,7 @@ public:
     \param y0		y coordinate of scale point.
     \param type		Type of scaling.
   */
-  void set_scale(double scale_x, double scale_y, double x0, double y0,
-      glow_eScaleType type);
+  void set_scale(double scale_x, double scale_y, double x0, double y0, glow_eScaleType type);
 
   //! Rotate the object. The rotation is made from the last stored transform.
   /*!
@@ -705,8 +691,7 @@ public:
     \param y0		y coordinate of rotation point.
     \param type		Type of rotation point.
   */
-  void set_rotation(
-      double angle, double x0, double y0, glow_eRotationPoint type);
+  void set_rotation(double angle, double x0, double y0, glow_eRotationPoint type);
 
   //! Redraw the area inside the objects border.
   virtual void draw();
@@ -747,11 +732,11 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
-  virtual void init_transform(double a11, double a12, double a13, double a21, 
-      double a22, double a23, double rotation);
+  virtual void init_transform(double a11, double a12, double a13, double a21, double a22, double a23,
+                              double rotation);
 
   //! Add a transform to the current transform.
   /*!
@@ -769,10 +754,7 @@ public:
     The transorm is multiplied with the stored transform, to give to new
     transform for the object.
   */
-  void set_transform_from_stored(GlowTransform* t)
-  {
-    trf.set_from_stored(t), get_node_borders();
-  }
+  void set_transform_from_stored(GlowTransform* t) { trf.set_from_stored(t), get_node_borders(); }
 
   //! Get info for a connection point
   /*!
@@ -794,23 +776,15 @@ public:
     not
     the whole area.
   */
-  void set_annotation(
-      int num, const char* text, int size, int nodraw, int brief = 0);
-  void set_annotation_input(
-      int num, const char* text, int size, int nodraw, int brief = 0);
+  void set_annotation(int num, const char* text, int size, int nodraw, int brief = 0);
+  void set_annotation_input(int num, const char* text, int size, int nodraw, int brief = 0);
 
   //! Store the current transform
   /*! The stored transform can be used as starting point for future scaling or
    * rotations.
    */
-  void store_transform()
-  {
-    trf.store();
-  }
-  void transform_store_reset()
-  {
-    trf.store_reset();
-  }
+  void store_transform() { trf.store(); }
+  void transform_store_reset() { trf.store_reset(); }
   void revert_transform()
   {
     trf.revert();
@@ -822,10 +796,7 @@ public:
     \return Returns true if the transform is previously stored with a call to
     store_tranform.
   */
-  bool transform_is_stored()
-  {
-    return trf.is_stored();
-  }
+  bool transform_is_stored() { return trf.is_stored(); }
 
   //! Get dynamic code argument
   /*!
@@ -849,10 +820,7 @@ public:
   */
   void set_linewidth(int linewidth);
 
-  void get_ctx(void** c)
-  {
-    *c = (void*)ctx;
-  } //!< Should be replace by get_ctx() !!
+  void get_ctx(void** c) { *c = (void*)ctx; } //!< Should be replace by get_ctx() !!
 
   //! Redraw an annotation background
   /*!
@@ -893,13 +861,13 @@ public:
     used to generate
     java code for the java bean.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ofstream& fp);
 
   //! Get next page to the current page.
   /*! \return Returns 1 if there is a next page, else 0. */
   int get_next_nodeclass(GlowNodeClass** next);
-  
+
   //! Set next page to the current page.
   /*! \return Returns 1 if there is a next page, else 0. */
   int set_next_nodeclass();
@@ -930,10 +898,7 @@ public:
   /*!
     \param count	The animation count of the nodeclass.
   */
-  void get_animation_count(int* count)
-  {
-    *count = nc->animation_count;
-  }
+  void get_animation_count(int* count) { *count = nc->animation_count; }
 
   //! Check if an node class is used by this node
   /*!
@@ -946,10 +911,7 @@ public:
   /*! This function should be called when a group where the object is a member
    * is dissolved.
    */
-  void ungroup()
-  {
-    root_node = 0;
-  }
+  void ungroup() { root_node = 0; }
 
   //! Register the name of the last group
   /*!
@@ -965,10 +927,7 @@ public:
   /*!
     \return The name of the last group the object was a member of.
   */
-  char* get_last_group()
-  {
-    return last_group;
-  }
+  char* get_last_group() { return last_group; }
 
   //! Determine whether the node is sensitive for any action.
   /*!
@@ -979,7 +938,7 @@ public:
   */
   int is_sensitive();
 
-  int is_click_sensitive(); //!< Obsolete
+  int is_click_sensitive();     //!< Obsolete
   int is_refobject_sensitive(); //!< Obsolete
 
   //! Get the limits for the level dynamics
@@ -1032,9 +991,9 @@ public:
     the node tranformation matrix, and the direction is determined from the
     rotation of the node.
   */
-  int get_background_object_limits(GlowTransform* t, glow_eTraceType type,
-      double x, double y, GlowArrayElem** background, double* min, double* max,
-      glow_eDirection* direction);
+  int get_background_object_limits(GlowTransform* t, glow_eTraceType type, double x, double y,
+                                   GlowArrayElem** background, double* min, double* max,
+                                   glow_eDirection* direction);
 
   //! Get coordinates for the nodeclass origo
   /*!
@@ -1094,19 +1053,13 @@ public:
     draw();
   }
 
-  double get_transparency()
-  {
-    return transparency;
-  }
+  double get_transparency() { return transparency; }
 
   //! Set root node.
   /*!
     \param node		Rootnode.
   */
-  void set_rootnode(void* node)
-  {
-    root_node = (GrowNode*)node;
-  }
+  void set_rootnode(void* node) { root_node = (GrowNode*)node; }
 
   //! Set or reset input focus.
   /*! \param focus	if 1 focus is set, else focus is reset. */
@@ -1145,42 +1098,20 @@ public:
     \param font		Annotation font.
     \return		0 if annotation doesn't exist, else 1.
   */
-  int get_annotation_info(int num, int* t_size, glow_eDrawType* t_drawtype,
-      glow_eDrawType* t_color, glow_eDrawType* bg_color, double* scale,
-      glow_eFont* font, glow_eAnnotType* t_type);
+  int get_annotation_info(int num, int* t_size, glow_eDrawType* t_drawtype, glow_eDrawType* t_color,
+                          glow_eDrawType* bg_color, double* scale, glow_eFont* font, glow_eAnnotType* t_type);
   int get_annotation_text_size(int num, double* tsize);
   void set_annotation_text_offset(int num, double x, double y);
   void get_annotation_text_extent(int num, double* width, double* height);
-  int get_java_name(char* name)
-  {
-    return nc->get_java_name(name);
-  }
+  int get_java_name(char* name) { return nc->get_java_name(name); }
   void set_textbold(int bold);
   void set_textfont(glow_eFont textfont);
-  void disable_callback()
-  {
-    disable_cb = 1;
-  }
-  glow_eDrawType get_fill_color()
-  {
-    return fill_drawtype;
-  }
-  glow_eDrawType get_border_color()
-  {
-    return draw_type;
-  }
-  glow_eDrawType get_text_color()
-  {
-    return text_drawtype;
-  }
-  glow_eGradient get_gradient()
-  {
-    return gradient;
-  }
-  int get_shadow()
-  {
-    return shadow;
-  }
+  void disable_callback() { disable_cb = 1; }
+  glow_eDrawType get_fill_color() { return fill_drawtype; }
+  glow_eDrawType get_border_color() { return draw_type; }
+  glow_eDrawType get_text_color() { return text_drawtype; }
+  glow_eGradient get_gradient() { return gradient; }
+  int get_shadow() { return shadow; }
   void set_colortheme_lightness();
 
   int export_script(GlowExportScript* es, void* o, void* m);

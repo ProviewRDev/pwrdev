@@ -46,9 +46,10 @@
 
 //! Base class for an arrow.
 /*! The GlowArrow class is used by GlowCon, when drawing arrows in connections.
-*/
+ */
 
-class GlowArrow : public GlowArrayElem {
+class GlowArrow : public GlowArrayElem
+{
 public:
   //! Constuctor
   /*!
@@ -61,8 +62,8 @@ public:
     \param l		Arrow length.
     \param d_type 	Color.
   */
-  GlowArrow(GrowCtx* glow_ctx, double x1, double y1, double x2, double y2,
-      double w, double l, glow_eDrawType d_type = glow_eDrawType_Line);
+  GlowArrow(GrowCtx* glow_ctx, double x1, double y1, double x2, double y2, double w, double l,
+            glow_eDrawType d_type = glow_eDrawType_Line);
 
   //! Adjust pixel coordinates to current zoom factor.
   void zoom();
@@ -81,11 +82,10 @@ public:
 
     Detects if the object is hit by the event.
   */
-  int event_handler(
-      GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
+  int event_handler(GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
 
   //! Not implemented
-  void conpoint_select(void* pos, int x, int y, double* distance, void** cp){}
+  void conpoint_select(void* pos, int x, int y, double* distance, void** cp) {}
 
   //! Save the content of the object to file.
   /*!
@@ -132,22 +132,18 @@ public:
     If the borders of the objects exceeds a limit, the limit is adjusted to the
     border of the object.
   */
-  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left,
-      double* y_high, double* y_low, void* node){}
-
-  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir)
+  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,
+                   void* node)
   {
-    return 0;
   }
+
+  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir) { return 0; }
 
   //! Get the object type
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_Arrow;
-  }
+  glow_eObjectType type() { return glow_eObjectType_Arrow; }
 
   //! Move the arrow to the specified coordinates.
   /*!
@@ -162,8 +158,7 @@ public:
     Both endpoints are given new coordinates, so the direction can be entirely
     different.
   */
-  void move(void* pos, double x1, double y1, double x2, double y2,
-      int highlight, int hot);
+  void move(void* pos, double x1, double y1, double x2, double y2, int highlight, int hot);
 
   //! Move the arrow.
   /*!
@@ -179,18 +174,15 @@ public:
   /*!
     \param drawtype	Color.
   */
-  void set_drawtype(glow_eDrawType drawtype)
-  {
-    draw_type = drawtype;
-  }
+  void set_drawtype(glow_eDrawType drawtype) { draw_type = drawtype; }
 
-  GlowPoint p_dest; //!< Point of destination corner of arrow.
-  GlowPoint p1; //!< Point of first corner.
-  GlowPoint p2; //!< Point of second corner.
-  double arrow_width; //!< Arrow width.
-  double arrow_length; //!< Arrow lenght.
+  GlowPoint p_dest;         //!< Point of destination corner of arrow.
+  GlowPoint p1;             //!< Point of first corner.
+  GlowPoint p2;             //!< Point of second corner.
+  double arrow_width;       //!< Arrow width.
+  double arrow_length;      //!< Arrow lenght.
   glow_eDrawType draw_type; //!< Arrow color.
-  int line_width; //!< Line width.
+  int line_width;           //!< Line width.
 };
 
 /*@}*/

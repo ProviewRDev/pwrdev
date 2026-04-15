@@ -55,29 +55,32 @@ int cli$dispatch();
 int* tlog_cld(); /* module name in tlog_cld.cld file */
 
 /*************************************************************************
-*
-* Name:		info_msg()
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	sts		I	error message to print.
-*
-* Description:
-*	If the message is a error, warning or info message it is printed.
-*
-**************************************************************************/
+ *
+ * Name:		info_msg()
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	sts		I	error message to print.
+ *
+ * Description:
+ *	If the message is a error, warning or info message it is printed.
+ *
+ **************************************************************************/
 void sutil_msg(unsigned long sts)
 {
   static int msgsts;
   static int msglen;
   static char msg[256];
   struct dsc$descriptor_s msgdesc = {
-    sizeof(msg) - 1, DSC$K_DTYPE_T, DSC$K_CLASS_S,
+      sizeof(msg) - 1,
+      DSC$K_DTYPE_T,
+      DSC$K_CLASS_S,
   };
 
   msgdesc.dsc$a_pointer = msg;
 
-  if ((EVEN(sts)) || ((sts & 1) && (sts & 2))) {
+  if ((EVEN(sts)) || ((sts & 1) && (sts & 2)))
+  {
     msgsts = sts;
     lib$sys_getmsg(&msgsts, &msglen, &msgdesc, 0, 0);
     msg[msglen] = '\0';
@@ -97,7 +100,9 @@ main(int argc, char* argv[])
   $DESCRIPTOR(outdevice_desc, "sys$output");
   $DESCRIPTOR(prompt_desc, "tlog> ");
   struct dsc$descriptor_s str_desc = {
-    sizeof(str) - 1, DSC$K_DTYPE_T, DSC$K_CLASS_S,
+      sizeof(str) - 1,
+      DSC$K_DTYPE_T,
+      DSC$K_CLASS_S,
   };
 
   str_desc.dsc$a_pointer = str;
@@ -105,9 +110,11 @@ main(int argc, char* argv[])
   /* avanti */
 
   /* If arguments, treat them as a command and then exit */
-  if (argc >= 2) {
+  if (argc >= 2)
+  {
     str[0] = 0;
-    for (i = 1; i < argc; i++) {
+    for (i = 1; i < argc; i++)
+    {
       if (i != 1)
         strcat(str, " ");
       strcat(str, argv[i]);
@@ -124,7 +131,8 @@ main(int argc, char* argv[])
 
   sts = smg$create_virtual_keyboard(&key_id, &device_desc, 0, 0, 0);
 
-  while (1) {
+  while (1)
+  {
     /* get and parse the command */
 
     /* get input */
@@ -140,7 +148,8 @@ main(int argc, char* argv[])
     sts = cli$dcl_parse(&str_desc, tlog_cld, 0, 0, 0);
 
     /* send the command to the rtn associated */
-    if (sts == CLI$_NORMAL) {
+    if (sts == CLI$_NORMAL)
+    {
       sts = cli$dispatch();
       sutil_msg(sts);
     }

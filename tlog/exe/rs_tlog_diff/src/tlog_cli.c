@@ -56,7 +56,8 @@ int cli$present();
 
 static unsigned long userlist = 0;
 
-int sutil_get_qualval(qual, qual_val, sendlen) char* qual;
+int sutil_get_qualval(qual, qual_val, sendlen)
+char* qual;
 char* qual_val;
 int sendlen;
 
@@ -93,18 +94,22 @@ int sendlen;
   sts = cli$present(&q1desc);
   if (sts != CLI$_PRESENT)
     return 0;
-  else {
+  else
+  {
     sts = cli$get_value(&q1desc, &q1strdesc, &len);
     if (sts == CLI$_ABSENT)
       return 0;
-    else if (sts == CLI$_COMMA) {
-      while (sts == CLI$_COMMA) {
+    else if (sts == CLI$_COMMA)
+    {
+      while (sts == CLI$_COMMA)
+      {
         *(q1strdesc.dsc$a_pointer + len) = ',';
         q1strdesc.dsc$a_pointer += len + 1;
         q1strdesc.dsc$w_length -= len + 1;
         sts = cli$get_value(&q1desc, &q1strdesc, &len);
       }
-      if (sts != SS$_NORMAL) {
+      if (sts != SS$_NORMAL)
+      {
         printf("sutil_getqual_val : ERROR no end of list of qual values\n");
         return 0;
       }
@@ -114,7 +119,8 @@ int sendlen;
   return 1;
 }
 
-int sutil_get_qual(qual, condval_ptr) char* qual;
+int sutil_get_qual(qual, condval_ptr)
+char* qual;
 long* condval_ptr;
 
 /*
@@ -211,22 +217,26 @@ int scli_tlog_difference()
   noorder = sutil_get_qual("noorder", &sts);
   exact = sutil_get_qual("exact", &sts);
 
-  if (sutil_get_qual("since", &sts)) {
+  if (sutil_get_qual("since", &sts))
+  {
     if (!sutil_get_qualval("since", sincestr, 80))
       strcpy(sincestr, "");
     sincestr_p = sincestr;
-  } else
+  }
+  else
     sincestr_p = NULL;
 
-  if (sutil_get_qual("before", &sts)) {
+  if (sutil_get_qual("before", &sts))
+  {
     if (!sutil_get_qualval("before", beforestr, 80))
       strcpy(beforestr, "");
     beforestr_p = beforestr;
-  } else
+  }
+  else
     beforestr_p = NULL;
 
-  sts = tlog_diff(filestr, outputstr_p, timestr_p, parallell, attribute, text,
-      ttext, noorder, exact, sincestr_p, beforestr_p);
+  sts = tlog_diff(filestr, outputstr_p, timestr_p, parallell, attribute, text, ttext, noorder, exact,
+                  sincestr_p, beforestr_p);
   return sts;
 }
 

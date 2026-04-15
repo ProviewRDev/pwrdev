@@ -35,47 +35,47 @@
  */
 
 /*************************************************************************
-* 			===============
-* 			P r o v i e w
-* 			===============
-**************************************************************************
-*
-* Filename:             rs_remote_alcm.c
-*
-*                       Date    Pgm.    Read.   Remark
-* Modified              010102  CJ		Första version för Lynx/linux
-*			030227	CJ		Remote I/O infört
-*			040504	CJ		v4.0.0
-*
-* Description:		Remote transport ALCM för plattformarna Lynx och Linux.
-*			ALCM är ett lågnivå ethernetprotokoll. På Linux används
-*			en "raw ethernet socket" för att hantera ethernetpaket
-*			med protokoll-id 60-06 som är DEC's gamla "owner
-*protocol"
-*
-**************************************************************************
-**************************************************************************/
+ * 			===============
+ * 			P r o v i e w
+ * 			===============
+ **************************************************************************
+ *
+ * Filename:             rs_remote_alcm.c
+ *
+ *                       Date    Pgm.    Read.   Remark
+ * Modified              010102  CJ		Första version för Lynx/linux
+ *			030227	CJ		Remote I/O infört
+ *			040504	CJ		v4.0.0
+ *
+ * Description:		Remote transport ALCM för plattformarna Lynx och Linux.
+ *			ALCM är ett lågnivå ethernetprotokoll. På Linux används
+ *			en "raw ethernet socket" för att hantera ethernetpaket
+ *			med protokoll-id 60-06 som är DEC's gamla "owner
+ *protocol"
+ *
+ **************************************************************************
+ **************************************************************************/
 
 #include "rt_gdh.h"
 
-#include <stdio.h>
-#include <string.h>
 #include <errno.h>
 #include <signal.h>
-#include <sys/types.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
 
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <unistd.h>
-#include <sys/socket.h>
-#include <linux/if_packet.h>
+#include <fcntl.h>
+#include <linux/if.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
+#include <linux/if_packet.h>
 #include <linux/sockios.h>
-#include <linux/if.h>
-#include <fcntl.h>
 #include <netinet/in.h>
+#include <sys/resource.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <unistd.h>
 
 #include "pwr_baseclasses.h"
 #include "pwr_remoteclasses.h"
@@ -88,15 +88,15 @@
 #include "rt_pwr_msg.h"
 
 #include "remote.h"
-#include "remote_utils.h"
-#include "remote_remtrans_utils.h"
 #include "remote_remio_utils.h"
+#include "remote_remtrans_utils.h"
+#include "remote_utils.h"
 #include "rs_remote_alcm.h"
 
 #define TIME_INCR 0.005
 
 typedef struct {
-  pwr_sClass_RemnodeALCM* ref;
+  pwr_sClass_RemnodeALCM *ref;
   unsigned char address[6];
   float time_since_scan;
   float time_since_rcv;
@@ -104,9 +104,9 @@ typedef struct {
   float time_since_io;
 } remnode_alcm;
 
-remnode_item* rnl = NULL; // Lista med remnoder
+remnode_item *rnl = NULL; // Lista med remnoder
 
-int my_socket; // Egen socket
+int my_socket;                   // Egen socket
 unsigned char my_mac_address[6]; // Egen nods MAC-adress
 
 typedef struct {
@@ -132,8 +132,7 @@ typedef struct {
 **************************************************************************
 **************************************************************************/
 
-void RemoteSleep(float seconds)
-{
+void RemoteSleep(float seconds) {
   struct timespec rqtp, rmtp;
 
   rqtp.tv_sec = (int)seconds;
@@ -152,13 +151,12 @@ void RemoteSleep(float seconds)
 **************************************************************************
 **************************************************************************/
 
-int CalcAddress(unsigned char* str, unsigned char* address)
-{
+int CalcAddress(unsigned char *str, unsigned char *address) {
   int i1, i2, i3, i4, i5, i6;
   unsigned short int node, area;
 
-  if (strchr((char*)str, '.')) {
-    sscanf((char*)str, "%d.%d", &i1, &i2);
+  if (strchr((char *)str, '.')) {
+    sscanf((char *)str, "%d.%d", &i1, &i2);
     area = (unsigned short int)i1;
     node = (unsigned short int)i2;
 
@@ -176,8 +174,8 @@ int CalcAddress(unsigned char* str, unsigned char* address)
     address[5] = (unsigned char)(node >> 8);
 
     return 1;
-  } else if (strchr((char*)str, ':')) {
-    sscanf((char*)str, "%x:%x:%x:%x:%x:%x", &i1, &i2, &i3, &i4, &i5, &i6);
+  } else if (strchr((char *)str, ':')) {
+    sscanf((char *)str, "%x:%x:%x:%x:%x:%x", &i1, &i2, &i3, &i4, &i5, &i6);
     address[0] = (unsigned char)i1;
     address[1] = (unsigned char)i2;
     address[2] = (unsigned char)i3;
@@ -202,8 +200,7 @@ int CalcAddress(unsigned char* str, unsigned char* address)
 **************************************************************************
 **************************************************************************/
 
-void InitNet()
-{
+void InitNet() {
   struct ifreq ifr;
   struct sockaddr_ll my_addr;
 
@@ -236,7 +233,7 @@ void InitNet()
   my_addr.sll_protocol = htons(ETH_P_CUST);
   my_addr.sll_ifindex = ifr.ifr_ifindex;
 
-  bind(my_socket, (struct sockaddr*)&my_addr, sizeof(my_addr));
+  bind(my_socket, (struct sockaddr *)&my_addr, sizeof(my_addr));
 
   return;
 }
@@ -251,14 +248,13 @@ void InitNet()
 **************************************************************************
 **************************************************************************/
 
-unsigned int SendAck(remnode_item* remnode, unsigned char seqnum)
-{
+unsigned int SendAck(remnode_item *remnode, unsigned char seqnum) {
   struct {
     eth_header eh;
     alcm_header ah;
   } snd;
 
-  remnode_alcm* local = (remnode_alcm*)remnode->local;
+  remnode_alcm *local = (remnode_alcm *)remnode->local;
 
   memcpy(&snd.eh.dst, &local->address, sizeof(snd.eh.dst));
   memcpy(&snd.eh.src, &my_mac_address, sizeof(snd.eh.src));
@@ -283,8 +279,7 @@ unsigned int SendAck(remnode_item* remnode, unsigned char seqnum)
 **************************************************************************
 **************************************************************************/
 
-static void SendPoll(remnode_item* remnode, pssupd_buffer* buf)
-{
+static void SendPoll(remnode_item *remnode, pssupd_buffer *buf) {
   char common_name[] = "   PSS";
 
   struct {
@@ -293,7 +288,7 @@ static void SendPoll(remnode_item* remnode, pssupd_buffer* buf)
     apl_buffer apl;
   } snd;
 
-  remnode_alcm* local = (remnode_alcm*)remnode->local;
+  remnode_alcm *local = (remnode_alcm *)remnode->local;
 
   memcpy(&snd.eh.dst, &local->address, sizeof(snd.eh.dst));
   memcpy(&snd.eh.src, &my_mac_address, sizeof(snd.eh.src));
@@ -311,8 +306,7 @@ static void SendPoll(remnode_item* remnode, pssupd_buffer* buf)
   memcpy(&snd.apl, buf, buf->length);
 
   if (write(my_socket, &snd,
-          sizeof(eth_header) + sizeof(alcm_header) + buf->length)
-      < 0) {
+            sizeof(eth_header) + sizeof(alcm_header) + buf->length) < 0) {
     errh_Error("Send failure");
     local->ref->ErrCount++;
   }
@@ -330,8 +324,8 @@ static void SendPoll(remnode_item* remnode, pssupd_buffer* buf)
 **************************************************************************
 **************************************************************************/
 
-unsigned int SendAppl(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
-    char* buf, int buf_size)
+unsigned int SendAppl(remnode_item *remnode, pwr_sClass_RemTrans *remtrans,
+                      char *buf, int buf_size)
 
 {
   static unsigned char message_counter = 0;
@@ -342,9 +336,9 @@ unsigned int SendAppl(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
     apl_buffer apl;
   } snd;
 
-  csp_buffer* c_buf;
+  csp_buffer *c_buf;
 
-  remnode_alcm* local = (remnode_alcm*)remnode->local;
+  remnode_alcm *local = (remnode_alcm *)remnode->local;
 
   if (message_counter++ >= 255)
     message_counter = 1;
@@ -359,14 +353,14 @@ unsigned int SendAppl(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
 
   memcpy(&snd.apl, buf, buf_size);
 
-  c_buf = (csp_buffer*)&snd.apl;
+  c_buf = (csp_buffer *)&snd.apl;
 
-  if (snd.apl.trans_code == ALCM_TRACO_APLACK
-      || snd.apl.trans_code == ALCM_TRACO_APLNAK
-      || snd.apl.trans_code == ALCM_TRACO_CSPNAK
-      || snd.apl.trans_code == ALCM_TRACO_COFNAK) {
-    if (snd.apl.trans_code == ALCM_TRACO_APLACK
-        || snd.apl.trans_code == ALCM_TRACO_APLNAK) {
+  if (snd.apl.trans_code == ALCM_TRACO_APLACK ||
+      snd.apl.trans_code == ALCM_TRACO_APLNAK ||
+      snd.apl.trans_code == ALCM_TRACO_CSPNAK ||
+      snd.apl.trans_code == ALCM_TRACO_COFNAK) {
+    if (snd.apl.trans_code == ALCM_TRACO_APLACK ||
+        snd.apl.trans_code == ALCM_TRACO_APLNAK) {
       RemUtils_AsciiToR50(remtrans->TransName, snd.apl.receive_task);
       // Lägg tillbaka headern till buf så folk ser vad vi pillat på!
       memcpy(buf, &snd.apl, 10);
@@ -375,8 +369,7 @@ unsigned int SendAppl(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
     }
 
     if (write(my_socket, &snd,
-            sizeof(eth_header) + sizeof(alcm_header) + buf_size)
-        < 0) {
+              sizeof(eth_header) + sizeof(alcm_header) + buf_size) < 0) {
       errh_Error("Send failure");
       return (-1);
     }
@@ -399,11 +392,10 @@ unsigned int SendAppl(remnode_item* remnode, pwr_sClass_RemTrans* remtrans,
 **************************************************************************
 **************************************************************************/
 
-unsigned short int Receive()
-{
-  remnode_item* remnode;
+unsigned short int Receive() {
+  remnode_item *remnode;
   unsigned char search_remnode = true;
-  remtrans_item* remtrans;
+  remtrans_item *remtrans;
   unsigned char search_remtrans = true;
   unsigned char send_response = false;
   int msg_size = 0;
@@ -412,7 +404,7 @@ unsigned short int Receive()
   unsigned int apl_size;
   unsigned char reject;
   int loop_count;
-  remtrans_item* transp;
+  remtrans_item *transp;
 
   struct {
     eth_header eh;
@@ -420,13 +412,13 @@ unsigned short int Receive()
     apl_buffer apl;
   } rcv;
 
-  csp_buffer* csp; // För speglad commonarea
+  csp_buffer *csp; // För speglad commonarea
   int common_offset, common_length;
 
   reject = true;
   loop_count = 0;
 
-  remnode_alcm* local = NULL;
+  remnode_alcm *local = NULL;
 
   // Avvisa multicast- och broadcastpaket
 
@@ -448,18 +440,18 @@ unsigned short int Receive()
   search_remnode = true;
 
   while (remnode && search_remnode) {
-    local = (remnode_alcm*)remnode->local;
+    local = (remnode_alcm *)remnode->local;
     if (memcmp(rcv.eh.src, local->address, 6) == 0)
       search_remnode = false;
     else
-      remnode = (remnode_item*)remnode->next;
+      remnode = (remnode_item *)remnode->next;
   }
 
   if (search_remnode) {
     if (rcv.eh.dst[0] != 0xAB)
       errh_Info("Message from unknown source %02x-%02x-%02x-%02x-%02x-%02x",
-          rcv.eh.src[0], rcv.eh.src[1], rcv.eh.src[2], rcv.eh.src[3],
-          rcv.eh.src[4], rcv.eh.src[5]);
+                rcv.eh.src[0], rcv.eh.src[1], rcv.eh.src[2], rcv.eh.src[3],
+                rcv.eh.src[4], rcv.eh.src[5]);
   }
 
   else
@@ -470,33 +462,33 @@ unsigned short int Receive()
 
       // Applikationstrans
 
-      if (rcv.apl.trans_code == ALCM_TRACO_APLACK
-          || rcv.apl.trans_code == ALCM_TRACO_APLNAK) {
-        RemUtils_R50ToAscii((unsigned short*)&rcv.apl.receive_task, name);
+      if (rcv.apl.trans_code == ALCM_TRACO_APLACK ||
+          rcv.apl.trans_code == ALCM_TRACO_APLNAK) {
+        RemUtils_R50ToAscii((unsigned short *)&rcv.apl.receive_task, name);
         name[6] = '\0';
 
         search_remtrans = true;
 
         remtrans = remnode->remtrans;
         while (remtrans && search_remtrans) {
-          if ((strncmp(name, remtrans->objp->TransName, 6) == 0)
-              && remtrans->objp->Direction == REMTRANS_IN) {
+          if ((strncmp(name, remtrans->objp->TransName, 6) == 0) &&
+              remtrans->objp->Direction == REMTRANS_IN) {
             search_remtrans = false;
-            sts = RemTrans_Receive(remtrans, (char*)&rcv.apl, apl_size);
+            sts = RemTrans_Receive(remtrans, (char *)&rcv.apl, apl_size);
             if ((rcv.apl.trans_code == ALCM_TRACO_APLACK) && ODD(sts))
               send_response = true;
             break;
           }
-          remtrans = (remtrans_item*)remtrans->next;
+          remtrans = (remtrans_item *)remtrans->next;
         }
         if (search_remtrans) {
           local->ref->ErrCount++;
           errh_Info("Unknown message %s from %s", name,
-              ((remnode_alcm*)(remnode->local))->ref->RemoteHostname);
+                    ((remnode_alcm *)(remnode->local))->ref->RemoteHostname);
         } else {
           // Skicka alltid kvittens på DUMMY0 (om APLACK)
-          if (str_StartsWith(name, "DUMMY0")
-              && rcv.apl.trans_code == ALCM_TRACO_APLACK)
+          if (str_StartsWith(name, "DUMMY0") &&
+              rcv.apl.trans_code == ALCM_TRACO_APLACK)
             send_response = true;
         }
       }
@@ -504,17 +496,17 @@ unsigned short int Receive()
       // Spegling av common-area. Behandlas i princip som en remtrans
       // Tyvärr lite special eftersom det finns möjlighet att spegla med offset
 
-      else if (rcv.apl.trans_code == ALCM_TRACO_CSPACK
-          || rcv.apl.trans_code == ALCM_TRACO_CSPNAK
-          || rcv.apl.trans_code == ALCM_TRACO_COFACK
-          || rcv.apl.trans_code == ALCM_TRACO_COFNAK) {
-        csp = (csp_buffer*)&rcv.apl;
+      else if (rcv.apl.trans_code == ALCM_TRACO_CSPACK ||
+               rcv.apl.trans_code == ALCM_TRACO_CSPNAK ||
+               rcv.apl.trans_code == ALCM_TRACO_COFACK ||
+               rcv.apl.trans_code == ALCM_TRACO_COFNAK) {
+        csp = (csp_buffer *)&rcv.apl;
 
-        RemUtils_R50ToAscii((unsigned short*)csp->common_name, name);
+        RemUtils_R50ToAscii((unsigned short *)csp->common_name, name);
         name[6] = '\0';
 
-        if (csp->trans_code == ALCM_TRACO_COFACK
-            || csp->trans_code == ALCM_TRACO_COFNAK)
+        if (csp->trans_code == ALCM_TRACO_COFACK ||
+            csp->trans_code == ALCM_TRACO_COFNAK)
           common_offset = csp->offset;
         else
           common_offset = 0;
@@ -523,42 +515,42 @@ unsigned short int Receive()
 
         remtrans = remnode->remtrans;
         while (remtrans && search_remtrans) {
-          if ((strncmp(name, remtrans->objp->TransName, 6) == 0)
-              && remtrans->objp->Direction == REMTRANS_IN) {
+          if ((strncmp(name, remtrans->objp->TransName, 6) == 0) &&
+              remtrans->objp->Direction == REMTRANS_IN) {
             search_remtrans = false;
-            common_length = msg_size - sizeof(eth_header) - sizeof(alcm_header)
-                + common_offset;
+            common_length = msg_size - sizeof(eth_header) -
+                            sizeof(alcm_header) + common_offset;
             if (common_length > remtrans->objp->MaxLength) {
               remtrans->objp->ErrCount++;
               remtrans->objp->LastSts = STATUS_LENGTH;
             } else {
               memcpy(&remtrans->datap[common_offset], csp,
-                  msg_size - sizeof(eth_header) - sizeof(alcm_header));
+                     msg_size - sizeof(eth_header) - sizeof(alcm_header));
               time_GetTime(&remtrans->objp->TransTime);
               remtrans->objp->TransCount++;
               remtrans->objp->DataValid = true;
               remtrans->objp->LastSts = STATUS_OK;
               if (common_length > remtrans->objp->DataLength)
                 remtrans->objp->DataLength = common_length;
-              if (csp->trans_code == ALCM_TRACO_CSPACK
-                  || csp->trans_code == ALCM_TRACO_COFACK)
+              if (csp->trans_code == ALCM_TRACO_CSPACK ||
+                  csp->trans_code == ALCM_TRACO_COFACK)
                 send_response = true;
             }
           }
-          remtrans = (remtrans_item*)remtrans->next;
+          remtrans = (remtrans_item *)remtrans->next;
         }
         if (search_remtrans) {
           local->ref->ErrCount++;
           errh_Info("Unknown message %s from %s", name,
-              ((remnode_alcm*)(remnode->local))->ref->RemoteHostname);
+                    ((remnode_alcm *)(remnode->local))->ref->RemoteHostname);
         }
       }
 
       // I/O-spegling
 
-      else if (rcv.apl.trans_code == ALCM_TRACO_BSPACK
-          || rcv.apl.trans_code == ALCM_TRACO_BSPNAK) {
-        sts = RemIO_Receive_ALCM(remnode, (bsp_buffer*)&rcv.apl, apl_size);
+      else if (rcv.apl.trans_code == ALCM_TRACO_BSPACK ||
+               rcv.apl.trans_code == ALCM_TRACO_BSPNAK) {
+        sts = RemIO_Receive_ALCM(remnode, (bsp_buffer *)&rcv.apl, apl_size);
         local->time_since_io = 0;
 
         if (rcv.apl.trans_code == ALCM_TRACO_BSPACK)
@@ -570,13 +562,13 @@ unsigned short int Receive()
     else if (rcv.ah.type == ALCM_MTYP_RESP) {
       // Applikationskvittens
 
-      rem_t_transbuff* transbuff;
+      rem_t_transbuff *transbuff;
 
       transbuff = remnode->transbuff;
 
       if (transbuff) {
-        transp = (remtrans_item*)transbuff->remtrans;
-        remnode->transbuff = (rem_t_transbuff*)transbuff->next;
+        transp = (remtrans_item *)transbuff->remtrans;
+        remnode->transbuff = (rem_t_transbuff *)transbuff->next;
         transp->objp->Buffers--;
         free(transbuff);
       }
@@ -610,11 +602,10 @@ unsigned short int Receive()
 **************************************************************************
 **************************************************************************/
 
-int main(int argc, char* argv[])
-{
-  remnode_item* rn = NULL;
-  remnode_alcm* rn_local = NULL;
-  remtrans_item* remtrans;
+int main(int argc, char *argv[]) {
+  remnode_item *rn = NULL;
+  remnode_alcm *rn_local = NULL;
+  remtrans_item *remtrans;
   pwr_tObjid objid; // För loop
   unsigned int sts; // Status från funktionsanrop
   char pname[32];
@@ -667,7 +658,7 @@ int main(int argc, char* argv[])
     rnl = rn;
 
     // Initiera data
-    sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&rn_local->ref);
+    sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&rn_local->ref);
     rn->objid = objid;
     rn->retransmit_time = rn_local->ref->RetransmitTime;
     rn_local->time_since_scan = 0;
@@ -691,8 +682,8 @@ int main(int argc, char* argv[])
 
     // Beräkna ethernet-adress från adress-sträng i objektet
 
-    sts = CalcAddress(
-        (unsigned char*)rn_local->ref->RemoteAddress, rn_local->address);
+    sts = CalcAddress((unsigned char *)rn_local->ref->RemoteAddress,
+                      rn_local->address);
 
     sts = gdh_GetNextObject(objid, &objid);
   }
@@ -710,7 +701,7 @@ int main(int argc, char* argv[])
   time_GetTime(&tmptime);
   rn = rnl;
   while (rn) {
-    rn_local = (remnode_alcm*)rn->local;
+    rn_local = (remnode_alcm *)rn->local;
     rn_local->ref->RestartTime = tmptime;
     rn = rn->next;
   }
@@ -720,14 +711,14 @@ int main(int argc, char* argv[])
   rn = rnl;
   i = 0;
   while (rn) {
-    rn_local = (remnode_alcm*)rn->local;
+    rn_local = (remnode_alcm *)rn->local;
     remtrans = rn->remtrans;
     while (remtrans) {
       rn_local->ref->RemTransObjects[i++] = remtrans->objid;
-      if (i >= (int)(sizeof(rn_local->ref->RemTransObjects)
-                   / sizeof(rn_local->ref->RemTransObjects[0])))
+      if (i >= (int)(sizeof(rn_local->ref->RemTransObjects) /
+                     sizeof(rn_local->ref->RemTransObjects[0])))
         break;
-      remtrans = (remtrans_item*)remtrans->next;
+      remtrans = (remtrans_item *)remtrans->next;
     }
     rn = rn->next;
   }
@@ -746,7 +737,7 @@ int main(int argc, char* argv[])
     rn = rnl;
 
     while (rn) {
-      rn_local = (remnode_alcm*)rn->local;
+      rn_local = (remnode_alcm *)rn->local;
 
       /* Increase time counters in local remnode and prevent big counters */
 
@@ -754,28 +745,28 @@ int main(int argc, char* argv[])
       rn_local->time_since_rcv += TIME_INCR;
       rn_local->time_since_poll += TIME_INCR;
       rn_local->time_since_io += TIME_INCR;
-      rn_local->time_since_scan
-          = MIN(rn_local->time_since_scan, rn_local->ref->ScanTime + 1.0);
-      rn_local->time_since_rcv
-          = MIN(rn_local->time_since_rcv, rn_local->ref->LinkTimeout + 1.0);
-      rn_local->time_since_poll
-          = MIN(rn_local->time_since_poll, rn_local->ref->IOPollTimeSlow + 1.0);
-      rn_local->time_since_io
-          = MIN(rn_local->time_since_io, rn_local->ref->IOStallTime + 1.0);
+      rn_local->time_since_scan =
+          MIN(rn_local->time_since_scan, rn_local->ref->ScanTime + 1.0);
+      rn_local->time_since_rcv =
+          MIN(rn_local->time_since_rcv, rn_local->ref->LinkTimeout + 1.0);
+      rn_local->time_since_poll =
+          MIN(rn_local->time_since_poll, rn_local->ref->IOPollTimeSlow + 1.0);
+      rn_local->time_since_io =
+          MIN(rn_local->time_since_io, rn_local->ref->IOStallTime + 1.0);
 
       /* Increase send timer for every remtrans */
       remtrans = rn->remtrans;
       while (remtrans) {
         remtrans->time_since_send += TIME_INCR;
         /* Prevent big counter */
-        remtrans->time_since_send
-            = MIN(remtrans->time_since_send, rn->retransmit_time + 1.0);
-        remtrans = (remtrans_item*)remtrans->next;
+        remtrans->time_since_send =
+            MIN(remtrans->time_since_send, rn->retransmit_time + 1.0);
+        remtrans = (remtrans_item *)remtrans->next;
       }
 
       // Beräkna ethernet-adress från objektet
-      CalcAddress(
-          (unsigned char*)rn_local->ref->RemoteAddress, rn_local->address);
+      CalcAddress((unsigned char *)rn_local->ref->RemoteAddress,
+                  rn_local->address);
 
       // Update retransmit time, could have been changed
       rn->retransmit_time = rn_local->ref->RetransmitTime;
@@ -784,15 +775,13 @@ int main(int argc, char* argv[])
         // Dags att polla remote I/O ?
 
         if (!rn_local->ref->Disable) {
-          if (((!rn_local->ref->IOStallFlag
-                   || EVEN(rn_local->ref->IOStallAction))
-                  && (rn_local->time_since_poll >= rn_local->ref->IOPollTime))
-              || (rn_local->ref->IOStallFlag
-                     && ODD(rn_local->ref->IOStallAction)
-                     && (rn_local->time_since_poll
-                            >= rn_local->ref->IOPollTimeSlow)
-                     && (rn_local->time_since_poll
-                            >= rn_local->ref->IOPollTime))) {
+          if (((!rn_local->ref->IOStallFlag ||
+                EVEN(rn_local->ref->IOStallAction)) &&
+               (rn_local->time_since_poll >= rn_local->ref->IOPollTime)) ||
+              (rn_local->ref->IOStallFlag &&
+               ODD(rn_local->ref->IOStallAction) &&
+               (rn_local->time_since_poll >= rn_local->ref->IOPollTimeSlow) &&
+               (rn_local->time_since_poll >= rn_local->ref->IOPollTime))) {
             sts = RemIO_Cyclic_ALCM(rn, &SendPoll);
             rn_local->time_since_poll = 0;
           }
@@ -800,8 +789,8 @@ int main(int argc, char* argv[])
 
         // Dags för stall ?
 
-        if ((rn_local->time_since_io >= rn_local->ref->IOStallTime)
-            && (rn_local->ref->IOStallTime > 0)) {
+        if ((rn_local->time_since_io >= rn_local->ref->IOStallTime) &&
+            (rn_local->ref->IOStallTime > 0)) {
           sts = RemIO_Stall_ALCM(rn);
         }
 
@@ -821,12 +810,12 @@ int main(int argc, char* argv[])
 
       // Link up ?
 
-      if (rn_local->time_since_rcv >= rn_local->ref->LinkTimeout
-          && rn_local->ref->LinkTimeout > 0) {
+      if (rn_local->time_since_rcv >= rn_local->ref->LinkTimeout &&
+          rn_local->ref->LinkTimeout > 0) {
         if (rn_local->ref->LinkUp != 0) {
           rn_local->ref->LinkUp = 0;
-          errh_Error(
-              "ALCM link down to node %s", rn_local->ref->RemoteHostname, 0);
+          errh_Error("ALCM link down to node %s", rn_local->ref->RemoteHostname,
+                     0);
         }
       }
 

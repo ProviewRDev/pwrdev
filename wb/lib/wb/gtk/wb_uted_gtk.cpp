@@ -58,21 +58,15 @@
 void WUtedGtk::clock_cursor()
 {
   if (!cursor)
-    cursor = gdk_cursor_new_for_display(
-        gtk_widget_get_display(toplevel), GDK_WATCH);
+    cursor = gdk_cursor_new_for_display(gtk_widget_get_display(toplevel), GDK_WATCH);
 
   gdk_window_set_cursor(gtk_widget_get_window(toplevel), cursor);
   gdk_display_flush(gtk_widget_get_display(toplevel));
 }
 
-void WUtedGtk::reset_cursor()
-{
-  gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL);
-}
+void WUtedGtk::reset_cursor() { gdk_window_set_cursor(gtk_widget_get_window(toplevel), NULL); }
 
-void WUtedGtk::remove_command_window()
-{
-}
+void WUtedGtk::remove_command_window() {}
 
 void WUtedGtk::activate_command(GtkWidget* w, gpointer data)
 {
@@ -81,11 +75,12 @@ void WUtedGtk::activate_command(GtkWidget* w, gpointer data)
 
   uted->message("");
 
-  for (int j = 0; ((WUtedGtk*)uted)->widgets.optmenubuttons[j]; j++) {
-    if (w == ((WUtedGtk*)uted)->widgets.optmenubuttons[j]) {
-      strncpy(label, gtk_label_get_label(GTK_LABEL(
-                         ((WUtedGtk*)uted)->widgets.optmenubuttonslabel[j])),
-          sizeof(label));
+  for (int j = 0; ((WUtedGtk*)uted)->widgets.optmenubuttons[j]; j++)
+  {
+    if (w == ((WUtedGtk*)uted)->widgets.optmenubuttons[j])
+    {
+      strncpy(label, gtk_label_get_label(GTK_LABEL(((WUtedGtk*)uted)->widgets.optmenubuttonslabel[j])),
+              sizeof(label));
       uted->configure_quals(label);
     }
   }
@@ -93,23 +88,17 @@ void WUtedGtk::activate_command(GtkWidget* w, gpointer data)
 
 void WUtedGtk::activate_helputils(GtkWidget* w, gpointer data)
 {
-  CoXHelp::dhelp("utilities_refman", 0, navh_eHelpFile_Other,
-      "$pwr_lang/man_dg.dat", true);
+  CoXHelp::dhelp("utilities_refman", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
 }
 
 void WUtedGtk::activate_helppwr_plc(GtkWidget* w, gpointer data)
 {
-  CoXHelp::dhelp(
-      "help command", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
+  CoXHelp::dhelp("help command", 0, navh_eHelpFile_Other, "$pwr_lang/man_dg.dat", true);
 }
 
-void WUtedGtk::activate_batch(GtkWidget* w, gpointer data)
-{
-}
+void WUtedGtk::activate_batch(GtkWidget* w, gpointer data) {}
 
-void WUtedGtk::activate_currsess(GtkWidget* w, gpointer data)
-{
-}
+void WUtedGtk::activate_currsess(GtkWidget* w, gpointer data) {}
 
 //
 //	Callback from the menu.
@@ -147,13 +136,9 @@ void WUtedGtk::activate_show_cmd(GtkWidget* w, gpointer data)
   uted->reset_cursor();
 }
 
-void WUtedGtk::activate_cmd_wind(GtkWidget* w, gpointer data)
-{
-}
+void WUtedGtk::activate_cmd_wind(GtkWidget* w, gpointer data) {}
 
-void WUtedGtk::commandchanged(GtkWidget* w, gpointer data)
-{
-}
+void WUtedGtk::commandchanged(GtkWidget* w, gpointer data) {}
 
 void WUtedGtk::activate_present(GtkWidget* w, gpointer data)
 {
@@ -200,10 +185,7 @@ void WUtedGtk::qbox_cancel_cb(GtkWidget* w, gpointer data)
   g_object_set(((WUtedGtk*)uted)->widgets.questionbox, "visible", FALSE, NULL);
 }
 
-void WUtedGtk::update_title(int editmode)
-{
-  CoWowGtk::update_title(toplevel, editmode);
-}
+void WUtedGtk::update_title(int editmode) { CoWowGtk::update_title(toplevel, editmode); }
 
 static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer uted)
 {
@@ -212,19 +194,15 @@ static gint delete_event(GtkWidget* w, GdkEvent* event, gpointer uted)
   return TRUE;
 }
 
-static void destroy_event(GtkWidget* w, gpointer data)
-{
-}
+static void destroy_event(GtkWidget* w, gpointer data) {}
 
 //
 //	Create a new ute window
 //
-WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
-    const char* wu_name, const char* wu_iconname, ldh_tWBContext wu_ldhwb,
-    ldh_tSesContext wu_ldhses, int wu_editmode, void (*wu_quit_cb)(void*),
-    pwr_tStatus* status)
-    : WUted(wu_parent_ctx, wu_name, wu_iconname, wu_ldhwb, wu_ldhses,
-          wu_editmode, wu_quit_cb, status),
+WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid, const char* wu_name,
+                   const char* wu_iconname, ldh_tWBContext wu_ldhwb, ldh_tSesContext wu_ldhses,
+                   int wu_editmode, void (*wu_quit_cb)(void*), pwr_tStatus* status)
+    : WUted(wu_parent_ctx, wu_name, wu_iconname, wu_ldhwb, wu_ldhses, wu_editmode, wu_quit_cb, status),
       parent_wid(wu_parent_wid), cursor(0)
 {
   const int window_width = 800;
@@ -233,26 +211,24 @@ WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
 
   memset(&widgets, 0, sizeof(widgets));
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height",
-      window_height, "default-width", window_width, "title", title, NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", window_height, "default-width",
+                                      window_width, "title", title, NULL);
 
   g_signal_connect(toplevel, "delete_event", G_CALLBACK(delete_event), this);
   g_signal_connect(toplevel, "destroy", G_CALLBACK(destroy_event), this);
 
   CoWowGtk::SetWindowIcon(toplevel);
 
-  GtkAccelGroup* accel_g
-      = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
+  GtkAccelGroup* accel_g = (GtkAccelGroup*)g_object_new(GTK_TYPE_ACCEL_GROUP, NULL);
   gtk_window_add_accel_group(GTK_WINDOW(toplevel), accel_g);
 
   GtkMenuBar* menu_bar = (GtkMenuBar*)g_object_new(GTK_TYPE_MENU_BAR, NULL);
 
   // File Entry
-  GtkWidget* file_close
-      = gtk_menu_item_new_with_mnemonic("_Close");
+  GtkWidget* file_close = gtk_menu_item_new_with_mnemonic("_Close");
   g_signal_connect(file_close, "activate", G_CALLBACK(activate_quit), this);
-  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w',
-      GdkModifierType(GDK_CONTROL_MASK), GTK_ACCEL_VISIBLE);
+  gtk_widget_add_accelerator(file_close, "activate", accel_g, 'w', GdkModifierType(GDK_CONTROL_MASK),
+                             GTK_ACCEL_VISIBLE);
 
   GtkMenu* file_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(file_menu), file_close);
@@ -262,10 +238,8 @@ WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(file), GTK_WIDGET(file_menu));
 
   // View Entry
-  GtkWidget* view_show_cmd
-      = gtk_menu_item_new_with_mnemonic("_Show Current Command");
-  g_signal_connect(
-      view_show_cmd, "activate", G_CALLBACK(activate_show_cmd), this);
+  GtkWidget* view_show_cmd = gtk_menu_item_new_with_mnemonic("_Show Current Command");
+  g_signal_connect(view_show_cmd, "activate", G_CALLBACK(activate_show_cmd), this);
 
   GtkMenu* view_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), view_show_cmd);
@@ -281,56 +255,59 @@ WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
   int j = 0;
   int in_submenu = 0;
   uted_sCommand* next_cmd;
-  for (uted_sCommand* command_ptr = commands; command_ptr->command[0];
-       command_ptr++) {
+  for (uted_sCommand* command_ptr = commands; command_ptr->command[0]; command_ptr++)
+  {
     // Build submenu if first command verb is equal to next
     char cmd_verb[5][80];
     int num;
     char next_cmd_verb[5][80];
     int next_num;
-    num = dcli_parse(command_ptr->command, " ", "", (char*)cmd_verb,
-        sizeof(cmd_verb) / sizeof(cmd_verb[0]), sizeof(cmd_verb[0]), 0);
+    num = dcli_parse(command_ptr->command, " ", "", (char*)cmd_verb, sizeof(cmd_verb) / sizeof(cmd_verb[0]),
+                     sizeof(cmd_verb[0]), 0);
 
     next_cmd = command_ptr + 1;
     int close_submenu = 0;
-    if (next_cmd->command[0]) {
+    if (next_cmd->command[0])
+    {
       next_num = dcli_parse(next_cmd->command, " ", "", (char*)next_cmd_verb,
-          sizeof(next_cmd_verb) / sizeof(next_cmd_verb[0]),
-          sizeof(next_cmd_verb[0]), 0);
+                            sizeof(next_cmd_verb) / sizeof(next_cmd_verb[0]), sizeof(next_cmd_verb[0]), 0);
 
-      if (in_submenu) {
+      if (in_submenu)
+      {
         // Check if time to close menu
-        if (!streq(cmd_verb[0], next_cmd_verb[0])) {
+        if (!streq(cmd_verb[0], next_cmd_verb[0]))
+        {
           // Close submenu
           close_submenu = 1;
         }
-      } else if (streq(cmd_verb[0], next_cmd_verb[0])) {
+      }
+      else if (streq(cmd_verb[0], next_cmd_verb[0]))
+      {
         // Open submenu
         GtkWidget* submenu_item = gtk_menu_item_new_with_label(cmd_verb[0]);
         GtkMenu* submenu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
-        gtk_menu_item_set_submenu(
-            GTK_MENU_ITEM(submenu_item), GTK_WIDGET(submenu));
+        gtk_menu_item_set_submenu(GTK_MENU_ITEM(submenu_item), GTK_WIDGET(submenu));
         gtk_menu_shell_append(GTK_MENU_SHELL(commands_menu), submenu_item);
         current_menu = submenu;
         in_submenu = 1;
       }
-    } else if (in_submenu) {
+    }
+    else if (in_submenu)
+    {
       // Last command
       close_submenu = 1;
     }
 
     widgets.optmenubuttons[j] = gtk_menu_item_new();
     widgets.optmenubuttonslabel[j] = gtk_label_new(command_ptr->command);
-    //gtk_misc_set_alignment(GTK_MISC(widgets.optmenubuttonslabel[j]), 0.0, 0.5);
-    gtk_container_add(GTK_CONTAINER(widgets.optmenubuttons[j]),
-        widgets.optmenubuttonslabel[j]);
+    // gtk_misc_set_alignment(GTK_MISC(widgets.optmenubuttonslabel[j]), 0.0, 0.5);
+    gtk_container_add(GTK_CONTAINER(widgets.optmenubuttons[j]), widgets.optmenubuttonslabel[j]);
 
-    g_signal_connect(widgets.optmenubuttons[j], "activate",
-        G_CALLBACK(activate_command), this);
-    gtk_menu_shell_append(
-        GTK_MENU_SHELL(current_menu), widgets.optmenubuttons[j]);
+    g_signal_connect(widgets.optmenubuttons[j], "activate", G_CALLBACK(activate_command), this);
+    gtk_menu_shell_append(GTK_MENU_SHELL(current_menu), widgets.optmenubuttons[j]);
 
-    if (close_submenu) {
+    if (close_submenu)
+    {
       current_menu = commands_menu;
       in_submenu = 0;
     }
@@ -344,14 +321,11 @@ WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
 
   // Menu Help
   GtkWidget* help_utils = gtk_menu_item_new_with_mnemonic("_On Window");
-  g_signal_connect(
-      help_utils, "activate", G_CALLBACK(activate_helputils), this);
-  gtk_widget_add_accelerator(help_utils, "activate", accel_g, 'h',
-      GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+  g_signal_connect(help_utils, "activate", G_CALLBACK(activate_helputils), this);
+  gtk_widget_add_accelerator(help_utils, "activate", accel_g, 'h', GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 
   GtkWidget* help_cmd = gtk_menu_item_new_with_mnemonic("On _Commands");
-  g_signal_connect(
-      help_cmd, "activate", G_CALLBACK(activate_helppwr_plc), this);
+  g_signal_connect(help_cmd, "activate", G_CALLBACK(activate_helppwr_plc), this);
 
   GtkMenu* help_menu = (GtkMenu*)g_object_new(GTK_TYPE_MENU, NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(help_menu), help_utils);
@@ -364,9 +338,10 @@ WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
   // Qualifier labels, entries and checkboxes
   GtkWidget* qual_box_qual = gtk_grid_new();
   gtk_grid_set_row_homogeneous(GTK_GRID(qual_box_qual), TRUE);
-  for (j = 0; j < 10; j++) {
+  for (j = 0; j < 10; j++)
+  {
     widgets.qualifier[j] = gtk_label_new("Qual");
-    gtk_widget_set_halign(widgets.qualifier[j], GTK_ALIGN_START);    
+    gtk_widget_set_halign(widgets.qualifier[j], GTK_ALIGN_START);
     gtk_widget_set_size_request(widgets.qualifier[j], 120, 20);
     gtk_grid_attach(GTK_GRID(qual_box_qual), widgets.qualifier[j], 1, j + 1, 1, 1);
     GtkWidget* box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -379,37 +354,26 @@ WUtedGtk::WUtedGtk(void* wu_parent_ctx, GtkWidget* wu_parent_wid,
     gtk_grid_attach(GTK_GRID(qual_box_qual), box, 2, j + 1, 8, 1);
   }
 
-  g_signal_connect(
-      widgets.present[0], "toggled", G_CALLBACK(activate_present), this);
-  g_signal_connect(
-      widgets.present[1], "toggled", G_CALLBACK(activate_present), this);
-  g_signal_connect(
-      widgets.present[2], "toggled", G_CALLBACK(activate_present), this);
-  g_signal_connect(
-      widgets.present[3], "toggled", G_CALLBACK(activate_present), this);
-  g_signal_connect(
-      widgets.present[4], "toggled", G_CALLBACK(activate_present), this);
-  g_signal_connect(
-      widgets.present[5], "toggled", G_CALLBACK(activate_present), this);
-  g_signal_connect(
-      widgets.present[6], "toggled", G_CALLBACK(activate_present), this);
-  g_signal_connect(
-      widgets.present[7], "toggled", G_CALLBACK(activate_present), this);
-  g_signal_connect(
-      widgets.present[8], "toggled", G_CALLBACK(activate_present), this);
-  g_signal_connect(
-      widgets.present[9], "toggled", G_CALLBACK(activate_present), this);
+  g_signal_connect(widgets.present[0], "toggled", G_CALLBACK(activate_present), this);
+  g_signal_connect(widgets.present[1], "toggled", G_CALLBACK(activate_present), this);
+  g_signal_connect(widgets.present[2], "toggled", G_CALLBACK(activate_present), this);
+  g_signal_connect(widgets.present[3], "toggled", G_CALLBACK(activate_present), this);
+  g_signal_connect(widgets.present[4], "toggled", G_CALLBACK(activate_present), this);
+  g_signal_connect(widgets.present[5], "toggled", G_CALLBACK(activate_present), this);
+  g_signal_connect(widgets.present[6], "toggled", G_CALLBACK(activate_present), this);
+  g_signal_connect(widgets.present[7], "toggled", G_CALLBACK(activate_present), this);
+  g_signal_connect(widgets.present[8], "toggled", G_CALLBACK(activate_present), this);
+  g_signal_connect(widgets.present[9], "toggled", G_CALLBACK(activate_present), this);
 
   // Command label
   GtkWidget* cmdlabel = gtk_label_new("Command");
   widgets.commandlabel = gtk_label_new("No command selected");
-  //gtk_misc_set_alignment(GTK_MISC(widgets.commandlabel), 0.0, 0.5);
+  // gtk_misc_set_alignment(GTK_MISC(widgets.commandlabel), 0.0, 0.5);
   gtk_widget_set_size_request(widgets.commandlabel, 140, -1);
 
   GtkWidget* vbox_command = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox_command), cmdlabel, FALSE, FALSE, 10);
-  gtk_box_pack_start(
-      GTK_BOX(vbox_command), widgets.commandlabel, FALSE, FALSE, 10);
+  gtk_box_pack_start(GTK_BOX(vbox_command), widgets.commandlabel, FALSE, FALSE, 10);
 
   // Apply button
   GtkWidget* applybutton = gtk_button_new_with_label("Apply");
@@ -491,7 +455,8 @@ void WUtedGtk::reset_qual()
 {
   int i;
 
-  for (i = 0; i < UTED_QUALS; i++) {
+  for (i = 0; i < UTED_QUALS; i++)
+  {
     g_object_set(widgets.qualifier[i], "visible", FALSE, NULL);
     g_object_set(widgets.value[i], "visible", FALSE, NULL);
     g_object_set(widgets.present[i], "visible", FALSE, NULL);
@@ -508,14 +473,9 @@ void WUtedGtk::reset_qual()
 //	Displays a message in the ute window.
 //	Changes the label of a label widget which id is stored in the context.
 //
-void WUtedGtk::message(const char* new_label)
-{
-  gtk_label_set_label(GTK_LABEL(widgets.label), new_label);
-}
+void WUtedGtk::message(const char* new_label) { gtk_label_set_label(GTK_LABEL(widgets.label), new_label); }
 
-void WUtedGtk::set_command_window(char* cmd)
-{
-}
+void WUtedGtk::set_command_window(char* cmd) {}
 
 void WUtedGtk::configure_quals(const char* label)
 {
@@ -532,12 +492,15 @@ void WUtedGtk::configure_quals(const char* label)
   /* Check the qualifiers and view the corresponding widgets */
   i = 0;
   qual_ptr = &commands[index].qualifier[0];
-  while (qual_ptr->qual[0] != 0) {
-    if (qual_ptr->type == UTED_QUAL_DEFQUAL) {
-      gtk_label_set_label(
-          GTK_LABEL(widgets.qualifier[i]), "Select an object in the Navigator");
+  while (qual_ptr->qual[0] != 0)
+  {
+    if (qual_ptr->type == UTED_QUAL_DEFQUAL)
+    {
+      gtk_label_set_label(GTK_LABEL(widgets.qualifier[i]), "Select an object in the Navigator");
       g_object_set(widgets.qualifier[i], "visible", TRUE, NULL);
-    } else {
+    }
+    else
+    {
       gtk_label_set_label(GTK_LABEL(widgets.qualifier[i]), qual_ptr->qual);
       g_object_set(widgets.qualifier[i], "visible", TRUE, NULL);
       if (qual_ptr->present)
@@ -563,8 +526,10 @@ void WUtedGtk::enable_entries(int enable)
 
   command_ptr = commands;
   j = 0;
-  while (command_ptr->command[0] != 0) {
-    if (!command_ptr->view_sensitivity) {
+  while (command_ptr->command[0] != 0)
+  {
+    if (!command_ptr->view_sensitivity)
+    {
       gtk_widget_set_sensitive(widgets.optmenubuttons[j], TRUE);
     }
     j++;
@@ -573,47 +538,45 @@ void WUtedGtk::enable_entries(int enable)
 
   /* If view and current command is not sensitiv, change to first
      command */
-  if (!enable) {
-    if (current_index != UTED_INDEX_NOCOMMAND
-        && !commands[current_index].view_sensitivity) {
+  if (!enable)
+  {
+    if (current_index != UTED_INDEX_NOCOMMAND && !commands[current_index].view_sensitivity)
+    {
       reset_qual();
     }
   }
 }
 
 /*************************************************************************
-*
-* Name:		void uted_questionbox()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* uted_ctx	ute		I	ute context.
-* char 		*question_title I	title of the question box.
-* char 		*question_text	I	question to be displayed.
-* voidp         yes_procedure   I       procedure called when yes is activated
-* voidp         no_procedure   	I       procedure called when no is activated
-*
-* Description:
-* 	Displays a question box.
-*	When the yes-button in the box is pressed the yes_procedure is
-*	called. When the no-button is pressed the no_procedure is called.
-*	yes_procedure and no_procedure can be NULL.
-*	Declaration of the yes and no procedures:
-*		void yes_or_no_answer( uted_ctx ute)
-*
-**************************************************************************/
+ *
+ * Name:		void uted_questionbox()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * uted_ctx	ute		I	ute context.
+ * char 		*question_title I	title of the question box.
+ * char 		*question_text	I	question to be displayed.
+ * voidp         yes_procedure   I       procedure called when yes is activated
+ * voidp         no_procedure   	I       procedure called when no is activated
+ *
+ * Description:
+ * 	Displays a question box.
+ *	When the yes-button in the box is pressed the yes_procedure is
+ *	called. When the no-button is pressed the no_procedure is called.
+ *	yes_procedure and no_procedure can be NULL.
+ *	Declaration of the yes and no procedures:
+ *		void yes_or_no_answer( uted_ctx ute)
+ *
+ **************************************************************************/
 
-void WUtedGtk::questionbox(char* question_title, char* question_text,
-    void (*yes_procedure)(WUted*), void (*no_procedure)(WUted*),
-    void (*cancel_procedure)(WUted*), pwr_tBoolean cancel)
+void WUtedGtk::questionbox(char* question_title, char* question_text, void (*yes_procedure)(WUted*),
+                           void (*no_procedure)(WUted*), void (*cancel_procedure)(WUted*),
+                           pwr_tBoolean cancel)
 {
 }
 
 //
 //	Raises window
 //
-void WUtedGtk::raise_window()
-{
-  gtk_window_present(GTK_WINDOW(toplevel));
-}
+void WUtedGtk::raise_window() { gtk_window_present(GTK_WINDOW(toplevel)); }

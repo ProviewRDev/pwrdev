@@ -44,11 +44,10 @@
 //
 // Create the keyboard widget
 //
-XttKeyboard::XttKeyboard(void* xn_parent_ctx, const char* xn_name,
-    keyboard_eKeymap xn_keymap, keyboard_eType xn_type, int xn_color_theme,
-    pwr_tStatus* status)
-    : parent_ctx(xn_parent_ctx), keymap(xn_keymap), type(xn_type),
-      color_theme(xn_color_theme), key_pressed_cb(0), close_cb(0)
+XttKeyboard::XttKeyboard(void* xn_parent_ctx, const char* xn_name, keyboard_eKeymap xn_keymap,
+                         keyboard_eType xn_type, int xn_color_theme, pwr_tStatus* status)
+    : parent_ctx(xn_parent_ctx), keymap(xn_keymap), type(xn_type), color_theme(xn_color_theme),
+      key_pressed_cb(0), close_cb(0)
 {
   strcpy(name, xn_name);
 
@@ -63,9 +62,7 @@ XttKeyboard::XttKeyboard(void* xn_parent_ctx, const char* xn_name,
 //
 //  Delete a keyboard context
 //
-XttKeyboard::~XttKeyboard()
-{
-}
+XttKeyboard::~XttKeyboard() {}
 
 //
 // Backcall routine called at creation of the brow widget
@@ -80,7 +77,8 @@ int XttKeyboard::event_cb(GlowCtx* ctx, glow_tEvent event)
   if (!keyboard)
     return 1;
 
-  switch (event->event) {
+  switch (event->event)
+  {
   case glow_eEvent_Key_Ascii:
 
     if (keyboard->key_pressed_cb)
@@ -98,7 +96,7 @@ int XttKeyboard::init_keyboard_cb(GlowCtx* gctx, void* client_data)
   KeyboardCtx* ctx = (KeyboardCtx*)gctx;
   grow_sAttributes grow_attr;
   unsigned long mask;
-  char path[2][80] = { "$pwrp_exe/", "$pwr_exe/" };
+  char path[2][80] = {"$pwrp_exe/", "$pwr_exe/"};
 
   mask = grow_eAttr_color_theme;
   strcpy(grow_attr.color_theme, "$default");
@@ -106,8 +104,7 @@ int XttKeyboard::init_keyboard_cb(GlowCtx* gctx, void* client_data)
 
   keyboard_SetCtxUserData(ctx, (void*)keyboard);
 
-  keyboard_EnableEvent(
-      ctx, glow_eEvent_Key_Ascii, glow_eEventType_KeyAscii, event_cb);
+  keyboard_EnableEvent(ctx, glow_eEvent_Key_Ascii, glow_eEventType_KeyAscii, event_cb);
 
   grow_SetPath(ctx, 2, (char*)path);
   grow_ReadCustomColorFile(ctx, 0);
@@ -136,7 +133,4 @@ void XttKeyboard::update_color_theme(int ct)
   color_theme = ct;
 }
 
-void XttKeyboard::set_shift(int shift)
-{
-  keyboard_SetShift(keyboardctx, shift);
-}
+void XttKeyboard::set_shift(int shift) { keyboard_SetShift(keyboardctx, shift); }

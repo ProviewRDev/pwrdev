@@ -45,10 +45,11 @@
 
 class WbBckWQtWidget;
 
-class WbBckWQt : public WbBckW {
+class WbBckWQt : public WbBckW
+{
 public:
-  WbBckWQt(void* l_parent_ctx, ldh_tSession l_ldhses, const char* l_name,
-      wb_bck_list* l_list, int l_editmode, pwr_tStatus* status);
+  WbBckWQt(void* l_parent_ctx, ldh_tSession l_ldhses, const char* l_name, wb_bck_list* l_list, int l_editmode,
+           pwr_tStatus* status);
   ~WbBckWQt();
 
   QWidget* nav_widget;
@@ -64,7 +65,8 @@ private:
   WbBckWQtWidget* toplevel;
 };
 
-class WbBckWQtWidget : public QWidget {
+class WbBckWQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

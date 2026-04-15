@@ -44,7 +44,8 @@ class wb_bdrep;
 class wb_adef;
 class wb_name;
 
-class wb_bdef : public wb_status {
+class wb_bdef : public wb_status
+{
   int m_nRef;
   wb_bdrep* m_bdrep;
 
@@ -59,10 +60,7 @@ public:
 
   ~wb_bdef();
 
-  operator bool() const
-  {
-    return (m_bdrep != 0);
-  }
+  operator bool() const { return (m_bdrep != 0); }
   operator wb_bdrep*() const;
   bool operator==(wb_bdef&);
 

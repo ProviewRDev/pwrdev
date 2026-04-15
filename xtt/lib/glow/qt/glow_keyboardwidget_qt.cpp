@@ -47,15 +47,17 @@ static int keyboard_init_proc(QWidget* w, GlowCtx* fctx, void* client_data)
 
   ctx->configure();
 
-  if (key_widget->init_proc) {
+  if (key_widget->init_proc)
+  {
     return (key_widget->init_proc)(ctx, client_data);
-  } else {
+  }
+  else
+  {
     return 1;
   }
 }
 
-QWidget* keyboardwidgetqt_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data)
+QWidget* keyboardwidgetqt_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data)
 {
   QtScrollWidgetGlow* w = new QtScrollWidgetGlow();
   w->init(glow_eCtxType_Keyboard, init_proc, client_data, keyboard_init_proc);

@@ -39,54 +39,35 @@
 
 #include "flow_ctx.h"
 
-class BrowCtx : public FlowCtx {
+class BrowCtx : public FlowCtx
+{
 public:
   BrowCtx(const char* ctx_name, double zoom_fact = 100)
-      : FlowCtx(ctx_name, zoom_fact), indentation(0.8), frame_x_right(0),
-        annotation_space(0.3)
+      : FlowCtx(ctx_name, zoom_fact), indentation(0.8), frame_x_right(0), annotation_space(0.3)
   {
     ctx_type = flow_eCtxType_Brow;
   }
-  int insert(FlowArrayElem* element, FlowArrayElem* destination,
-      flow_eDest destination_code);
+  int insert(FlowArrayElem* element, FlowArrayElem* destination, flow_eDest destination_code);
   void close(FlowArrayElem* element);
   void remove(FlowArrayElem* element);
   void configure(double y_redraw);
   void change_scrollbar();
   void redraw(double y_redraw);
   void zoom(double factor);
-  void unzoom()
-  {
-    zoom(base_zoom_factor / zoom_factor);
-  }
+  void unzoom() { zoom(base_zoom_factor / zoom_factor); }
   int print(char* filename);
-  void print_draw_page(void* context, const char* title, int page,
-      flow_eOrientation orientation, double scale);
+  void print_draw_page(void* context, const char* title, int page, flow_eOrientation orientation,
+                       double scale);
   void print_get_pages(flow_eOrientation orientation, double scale, int* pages);
-  int get_first(FlowArrayElem** first)
-  {
-    return a.get_first(first);
-  }
-  int get_last(FlowArrayElem** last)
-  {
-    return a.get_last(last);
-  }
-  int get_previous(FlowArrayElem* element, FlowArrayElem** prev)
-  {
-    return a.get_previous(element, prev);
-  }
-  int get_next(FlowArrayElem* element, FlowArrayElem** next)
-  {
-    return a.get_next(element, next);
-  }
+  int get_first(FlowArrayElem** first) { return a.get_first(first); }
+  int get_last(FlowArrayElem** last) { return a.get_last(last); }
+  int get_previous(FlowArrayElem* element, FlowArrayElem** prev) { return a.get_previous(element, prev); }
+  int get_next(FlowArrayElem* element, FlowArrayElem** next) { return a.get_next(element, next); }
   int get_parent(FlowArrayElem* element, FlowArrayElem** parent)
   {
     return a.brow_get_parent(element, parent);
   }
-  int get_child(FlowArrayElem* element, FlowArrayElem** child)
-  {
-    return a.brow_get_child(element, child);
-  }
+  int get_child(FlowArrayElem* element, FlowArrayElem** child) { return a.brow_get_child(element, child); }
   int get_next_sibling(FlowArrayElem* element, FlowArrayElem** sibling)
   {
     return a.brow_get_next_sibling(element, sibling);
@@ -95,16 +76,9 @@ public:
   {
     return a.brow_get_previous_sibling(element, sibling);
   }
-  int move_up(FlowArrayElem* element)
-  {
-    return a.move_up(element);
-  }
-  int move_down(FlowArrayElem* element)
-  {
-    return a.move_down(element);
-  }
-  int sort_children(
-      FlowArrayElem* element, int offset, int (*comp)(const void*, const void*))
+  int move_up(FlowArrayElem* element) { return a.move_up(element); }
+  int move_down(FlowArrayElem* element) { return a.move_down(element); }
+  int sort_children(FlowArrayElem* element, int offset, int (*comp)(const void*, const void*))
   {
     return a.sort_children(element, offset, comp);
   }
@@ -116,7 +90,7 @@ public:
   void zoom_absolute(double factor);
   void update_color_theme(int ct);
 
-  ~BrowCtx(){}
+  ~BrowCtx() {}
   double indentation;
   double frame_x_right;
   double annotation_space;

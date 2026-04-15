@@ -39,10 +39,11 @@
 
 #include "glow_growctx.h"
 
-class GlowConPoint : public GlowArrayElem {
+class GlowConPoint : public GlowArrayElem
+{
 public:
   GlowConPoint(GrowCtx* glow_ctx, double x = 0, double y = 0, int cp_num = 0,
-      glow_eDirection d = glow_eDirection_Center);
+               glow_eDirection d = glow_eDirection_Center);
   friend std::ostream& operator<<(std::ostream& o, const GlowConPoint cp);
   void zoom();
   void nav_zoom();
@@ -50,22 +51,20 @@ public:
   void traverse(int x, int y);
   int event_handler(void* pos, glow_eEvent event, int x, int y, void* node);
   void conpoint_select(void* pos, int x, int y, double* distance, void** cp);
-  void conpoint_select(GlowTransform* t, int x, int y, double* distance,
-      void** cp, int* pix_x, int* pix_y);
-  void print(void* pos, void* node){}
+  void conpoint_select(GlowTransform* t, int x, int y, double* distance, void** cp, int* pix_x, int* pix_y);
+  void print(void* pos, void* node) {}
   void save(std::ofstream& fp, glow_eSaveMode mode);
   void open(std::ifstream& fp);
-  void draw(void* pos, int highlight, int hot, void* node){}
-  void erase(void* pos, int hot, void* node){}
-  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left,
-      double* y_high, double* y_low, void* node){}
-  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir);
-  int get_conpoint(GlowTransform* t, int num, bool flip_horizontal,
-      bool flip_vertical, double* x, double* y, glow_eDirection* dir);
-  glow_eObjectType type()
+  void draw(void* pos, int highlight, int hot, void* node) {}
+  void erase(void* pos, int hot, void* node) {}
+  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,
+                   void* node)
   {
-    return glow_eObjectType_ConPoint;
   }
+  int get_conpoint(int num, double* x, double* y, glow_eDirection* dir);
+  int get_conpoint(GlowTransform* t, int num, bool flip_horizontal, bool flip_vertical, double* x, double* y,
+                   glow_eDirection* dir);
+  glow_eObjectType type() { return glow_eObjectType_ConPoint; }
   int number;
   GlowPoint p;
   glow_eDirection direction;

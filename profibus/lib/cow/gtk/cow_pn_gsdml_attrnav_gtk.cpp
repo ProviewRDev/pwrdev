@@ -52,11 +52,9 @@
 //
 // Create the navigator widget
 //
-GsdmlAttrNavGtk::GsdmlAttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-                                 const char* xn_name, pn_gsdml* xn_gsdml,
-                                 std::shared_ptr<ProfinetRuntimeData> pwr_pn_data,
-                                 int xn_edit_mode, GtkWidget** w,
-                                 pwr_tStatus* status)
+GsdmlAttrNavGtk::GsdmlAttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name,
+                                 pn_gsdml* xn_gsdml, std::shared_ptr<ProfinetRuntimeData> pwr_pn_data,
+                                 int xn_edit_mode, GtkWidget** w, pwr_tStatus* status)
     : GsdmlAttrNav(xn_parent_ctx, xn_name, xn_gsdml, xn_edit_mode, pwr_pn_data, status),
       parent_wid(xn_parent_wid)
 {
@@ -66,7 +64,7 @@ GsdmlAttrNavGtk::GsdmlAttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
   *w = form_widget;
 
   m_wow = new CoWowGtk(brow_widget);
-  trace_timerid = m_wow->timer_new();  
+  trace_timerid = m_wow->timer_new();
 
   *status = 1;
 }
@@ -77,7 +75,7 @@ GsdmlAttrNavGtk::GsdmlAttrNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
 GsdmlAttrNavGtk::~GsdmlAttrNavGtk()
 {
   delete trace_timerid;
-  //delete m_wow;
+  // delete m_wow;
   delete brow;
   gtk_widget_destroy(form_widget);
 }
@@ -96,7 +94,7 @@ void GsdmlAttrNavGtk::display_attr_help_text()
 
   brow_GetUserData(node_list[0], (void**)&base_item);
   free(node_list);
-  
+
   if (!base_item->m_infotext.empty())
     ((GsdmlAttrGtk*)parent_ctx)->attr_help_text(base_item->m_infotext.c_str());
   else

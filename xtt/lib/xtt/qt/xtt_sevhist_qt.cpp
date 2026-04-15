@@ -45,25 +45,24 @@
 #include "xtt_otree_qt.h"
 #include "xtt_sevhist_qt.h"
 
-XttSevHistQt::XttSevHistQt(void* parent_ctx, const char* name, QWidget** w,
-    pwr_tOid* xn_oidv, pwr_tOName* xn_anamev, pwr_tOName* xn_onamev,
-    bool* sevhistobjectv, sevcli_tCtx xn_scctx, int xn_width, int xn_height,
-    unsigned int xn_options, int xn_color_theme, time_ePeriod xn_time_range,
-    void* basewidget, int* sts)
-    : XttSevHist(parent_ctx, name, xn_oidv, xn_anamev, xn_onamev,
-        sevhistobjectv, xn_scctx, xn_color_theme, xn_time_range, sts)
+XttSevHistQt::XttSevHistQt(void* parent_ctx, const char* name, QWidget** w, pwr_tOid* xn_oidv,
+                           pwr_tOName* xn_anamev, pwr_tOName* xn_onamev, bool* sevhistobjectv,
+                           sevcli_tCtx xn_scctx, int xn_width, int xn_height, unsigned int xn_options,
+                           int xn_color_theme, time_ePeriod xn_time_range, void* basewidget, int* sts)
+    : XttSevHist(parent_ctx, name, xn_oidv, xn_anamev, xn_onamev, sevhistobjectv, xn_scctx, xn_color_theme,
+                 xn_time_range, sts)
 {
   char title[250];
   strncpy(title, name, sizeof(title));
 
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     // Error from XttSevHist constructor
     return;
   }
   *sts = XNAV__SUCCESS;
 
-  curve = new GeCurveQt(this, title, NULL, gcd, 1, xn_width,
-      xn_height, xn_options, color_theme, basewidget);
+  curve = new GeCurveQt(this, title, NULL, gcd, 1, xn_width, xn_height, xn_options, color_theme, basewidget);
   curve->close_cb = sevhist_close_cb;
   curve->help_cb = sevhist_help_cb;
   curve->increase_period_cb = sevhist_increase_period_cb;
@@ -74,15 +73,16 @@ XttSevHistQt::XttSevHistQt(void* parent_ctx, const char* name, QWidget** w,
   curve->add_cb = sevhist_add_cb;
   curve->remove_cb = sevhist_remove_cb;
   curve->export_cb = sevhist_export_cb;
-  curve->enable(curve_mEnable_Timebox | curve_mEnable_Export
-      | curve_mEnable_ExportTime | curve_mEnable_CurveType
-      | curve_mEnable_CurveTypeSquare | curve_mEnable_FillCurve
-      | curve_mEnable_DigitalSplit);
-  if (initial_period != time_ePeriod_) {
+  curve->enable(curve_mEnable_Timebox | curve_mEnable_Export | curve_mEnable_ExportTime |
+                curve_mEnable_CurveType | curve_mEnable_CurveTypeSquare | curve_mEnable_FillCurve |
+                curve_mEnable_DigitalSplit);
+  if (initial_period != time_ePeriod_)
+  {
     curve->set_period(initial_period, 1);
   }
 
-  if (w) {
+  if (w)
+  {
     *w = (QWidget*)curve->get_widget();
   }
 
@@ -92,21 +92,21 @@ XttSevHistQt::XttSevHistQt(void* parent_ctx, const char* name, QWidget** w,
   timerid->add(1000, sevhist_scan, this);
 }
 
-XttSevHistQt::XttSevHistQt(void* parent_ctx, const char* name, QWidget** w,
-    char* filename, int xn_color_theme, void* basewidget, int* sts)
+XttSevHistQt::XttSevHistQt(void* parent_ctx, const char* name, QWidget** w, char* filename,
+                           int xn_color_theme, void* basewidget, int* sts)
     : XttSevHist(parent_ctx, name, filename, xn_color_theme, sts)
 {
   char title[250];
   strncpy(title, name, sizeof(title));
 
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     // Error from XttSevHist constructor
     return;
   }
   *sts = XNAV__SUCCESS;
 
-  curve = new GeCurveQt(this, title, NULL, gcd, 1, 0, 0, 0, color_theme,
-      basewidget);
+  curve = new GeCurveQt(this, title, NULL, gcd, 1, 0, 0, 0, color_theme, basewidget);
   curve->close_cb = sevhist_close_cb;
   curve->help_cb = sevhist_help_cb;
   curve->enable(0);
@@ -119,26 +119,30 @@ XttSevHistQt::XttSevHistQt(void* parent_ctx, const char* name, QWidget** w,
 
 XttSevHistQt::~XttSevHistQt()
 {
-  if (otree) {
+  if (otree)
+  {
     delete otree;
   }
-  if (timerid) {
+  if (timerid)
+  {
     timerid->remove();
   }
-  if (curve) {
+  if (curve)
+  {
     delete curve;
   }
-  if (gcd) {
+  if (gcd)
+  {
     delete gcd;
   }
-  if (wow) {
+  if (wow)
+  {
     delete wow;
   }
 }
 
-XttOTree* XttSevHistQt::tree_new(const char* title, pwr_tAttrRef* itemlist,
-    int itemcnt, unsigned int layout,
-    pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
+XttOTree* XttSevHistQt::tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt, unsigned int layout,
+                                 pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
 {
   return new XttOTreeQt(this, title, itemlist, itemcnt, layout, action_cb);
 }

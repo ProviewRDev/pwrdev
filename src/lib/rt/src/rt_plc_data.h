@@ -47,7 +47,6 @@ void DpDistribute_exec(plc_sThread* tp, pwr_sClass_DpDistribute* object);
 void ApDistribute_exec(plc_sThread* tp, pwr_sClass_ApDistribute* object);
 void IpDistribute_exec(plc_sThread* tp, pwr_sClass_IpDistribute* object);
 void DataCollect_exec(plc_sThread* tp, pwr_sClass_DataCollect* object);
-void CStoAttrRefP_exec(
-    plc_sThread* tp, pwr_sClass_CStoAttrRefP* object, pwr_sAttrRef* aref);
+void CStoAttrRefP_exec(plc_sThread* tp, pwr_sClass_CStoAttrRefP* object, pwr_sAttrRef* aref);
 
 #endif

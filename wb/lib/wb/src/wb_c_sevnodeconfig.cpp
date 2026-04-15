@@ -47,27 +47,24 @@
 #include "wb_session.h"
 #include "wb_wsx.h"
 
-static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father,
+                              pwr_tClassId Class)
 {
   pwr_tObjid poid;
   pwr_tClassId cid;
   pwr_tStatus sts;
   pwr_tMask comp;
 
-  comp = pwr_mDistrComponentMask_UserDatabase
-      | pwr_mDistrComponentMask_LoadFiles |
-      // pwr_mDistrComponentMask_ApplFile |
-      // pwr_mDistrComponentMask_XttHelpFile |
-      // pwr_mDistrComponentMask_RHostFiles |
-      pwr_mDistrComponentMask_AuthorizedKeysFile;
+  comp = pwr_mDistrComponentMask_UserDatabase | pwr_mDistrComponentMask_LoadFiles |
+         // pwr_mDistrComponentMask_ApplFile |
+         // pwr_mDistrComponentMask_XttHelpFile |
+         // pwr_mDistrComponentMask_RHostFiles |
+         pwr_mDistrComponentMask_AuthorizedKeysFile;
 
   sts = ldh_ClassNameToId(Session, &cid, "Distribute");
-  sts = ldh_CreateObject(
-      Session, &poid, "Distribute", cid, Object, ldh_eDest_IntoLast);
+  sts = ldh_CreateObject(Session, &poid, "Distribute", cid, Object, ldh_eDest_IntoLast);
   if (ODD(sts))
-    sts = ldh_SetObjectPar(
-        Session, poid, "DevBody", "Components", (char*)&comp, sizeof(comp));
+    sts = ldh_SetObjectPar(Session, poid, "DevBody", "Components", (char*)&comp, sizeof(comp));
 
   return PWRS__SUCCESS;
 }
@@ -75,11 +72,10 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
 //
 //  Syntax check method
 //
-static pwr_tStatus SyntaxCheck(
-    ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
-    int* ErrorCount, /* accumulated error count */
-    int* WarningCount /* accumulated waring count */
-    )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated waring count */
+)
 {
   wb_session* sp = (wb_session*)Session;
   pwr_tString80 str;
@@ -87,12 +83,10 @@ static pwr_tStatus SyntaxCheck(
   wb_object o = sp->object(Object.Objid);
   wb_object p = o.parent();
   if (!p || p.cid() != pwr_cClass_BusConfig)
-    wsx_error_msg_str(
-        Session, "Bad parent", Object, 'E', ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Bad parent", Object, 'E', ErrorCount, WarningCount);
 
   if (Object.Objid.vid != ldh_cDirectoryVolume)
-    wsx_error_msg_str(Session, "Not a DirectoryVolume", Object, 'E', ErrorCount,
-        WarningCount);
+    wsx_error_msg_str(Session, "Not a DirectoryVolume", Object, 'E', ErrorCount, WarningCount);
 
   // Check NodeName
   wb_attribute a = sp->attribute(Object.Objid, "RtBody", "NodeName");
@@ -105,8 +99,7 @@ static pwr_tStatus SyntaxCheck(
 
   str_trim(str, str);
   if (streq(str, ""))
-    wsx_error_msg_str(
-        Session, "NodeName is missing", Object, 'E', ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "NodeName is missing", Object, 'E', ErrorCount, WarningCount);
 
   // Check OperatingSystem
   a = sp->attribute(Object.Objid, "RtBody", "OperatingSystem");
@@ -119,8 +112,7 @@ static pwr_tStatus SyntaxCheck(
     return a.sts();
 
   if (opsys <= pwr_mOpSys__ || opsys >= pwr_mOpSys_)
-    wsx_error_msg_str(Session, "Invalid OperatingSystem", Object, 'E',
-        ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Invalid OperatingSystem", Object, 'E', ErrorCount, WarningCount);
 
   // Check Address
   a = sp->attribute(Object.Objid, "RtBody", "Address");
@@ -135,11 +127,9 @@ static pwr_tStatus SyntaxCheck(
   int num;
   num = sscanf(str, "%hhu.%hhu.%hhu.%hhu", &adr1, &adr2, &adr3, &adr4);
   if (num != 4)
-    wsx_error_msg_str(Session, "Syntax error in Address", Object, 'E',
-        ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Syntax error in Address", Object, 'E', ErrorCount, WarningCount);
   else if (adr1 == 0 && adr2 == 0 && adr3 == 0 && adr4 == 0)
-    wsx_error_msg_str(
-        Session, "Address is zero", Object, 'E', ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Address is zero", Object, 'E', ErrorCount, WarningCount);
 
   // Check Volume
   a = sp->attribute(Object.Objid, "RtBody", "Volume");
@@ -152,11 +142,10 @@ static pwr_tStatus SyntaxCheck(
 
   str_trim(str, str);
   if (streq(str, ""))
-    wsx_error_msg_str(
-        Session, "Volume is missing", Object, 'E', ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Volume is missing", Object, 'E', ErrorCount, WarningCount);
 
   return PWRB__SUCCESS;
 }
 
-pwr_dExport pwr_BindMethods(SevNodeConfig) = { pwr_BindMethod(PostCreate),
-  pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(SevNodeConfig) = {pwr_BindMethod(PostCreate), pwr_BindMethod(SyntaxCheck),
+                                              pwr_NullMethod};

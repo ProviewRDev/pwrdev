@@ -56,9 +56,11 @@
 
 */
 
-union vax_f_le {
+union vax_f_le
+{
   unsigned int i;
-  struct {
+  struct
+  {
     unsigned int f22_16 : 7;
     unsigned int exp : 8;
     unsigned int sign : 1;
@@ -86,9 +88,11 @@ union vax_f_le {
 
 */
 
-union vax_f_be {
+union vax_f_be
+{
   unsigned int i;
-  struct {
+  struct
+  {
     unsigned int f0_15 : 16;
     unsigned int sign : 1;
     unsigned int exp : 8;
@@ -108,14 +112,17 @@ union vax_f_be {
 
 */
 
-union i3e_s_le {
+union i3e_s_le
+{
   unsigned int i;
-  struct {
+  struct
+  {
     unsigned int f22_0 : 23;
     unsigned int exp : 8;
     unsigned int sign : 1;
   } b;
-  struct {
+  struct
+  {
     unsigned int f15_0 : 16;
     unsigned int f22_16 : 7;
     unsigned int exp : 8;
@@ -135,14 +142,17 @@ union i3e_s_le {
 
 */
 
-union i3e_s_be {
+union i3e_s_be
+{
   unsigned int i;
-  struct {
+  struct
+  {
     unsigned int sign : 1;
     unsigned int exp : 8;
     unsigned int f0_22 : 23;
   } b;
-  struct {
+  struct
+  {
     unsigned int sign : 1;
     unsigned int exp : 8;
     unsigned int f0_6 : 7;
@@ -158,10 +168,10 @@ union i3e_s_be {
 #define IBYTE2(i) ((i << 0x08) & 0x00ff0000)
 #define IBYTE3(i) ((i << 0x18) & 0xff000000)
 
-#define ENDIAN_SWAP_INT(t, s)                                                  \
-  {                                                                            \
-    int i = *(int*)s;                                                          \
-    *(int*)t = (IBYTE0(i) | IBYTE1(i) | IBYTE2(i) | IBYTE3(i));                \
+#define ENDIAN_SWAP_INT(t, s)                                                                                \
+  {                                                                                                          \
+    int i = *(int*)s;                                                                                        \
+    *(int*)t = (IBYTE0(i) | IBYTE1(i) | IBYTE2(i) | IBYTE3(i));                                              \
   }
 
 void co_vaxf2ieee(co_eBO sbo, co_eBO tbo, const char* sp, char* tp)
@@ -174,9 +184,11 @@ void co_vaxf2ieee(co_eBO sbo, co_eBO tbo, const char* sp, char* tp)
   union i3e_s_be* i3ep;
 #endif
 
-  if (sbo != co_dHostByteOrder) {
+  if (sbo != co_dHostByteOrder)
+  {
     ENDIAN_SWAP_INT(&v.i, (int*)sp);
-  } else
+  }
+  else
     v.i = *(int*)sp;
 
 #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
@@ -185,13 +197,16 @@ void co_vaxf2ieee(co_eBO sbo, co_eBO tbo, const char* sp, char* tp)
   i3ep = (union i3e_s_be*)tp;
 #endif
 
-  if (v.b.f22_16 == 0x7f && v.b.exp == 0xff
-      && v.b.f15_0 == 0xffff) { /* High value.  */
+  if (v.b.f22_16 == 0x7f && v.b.exp == 0xff && v.b.f15_0 == 0xffff)
+  { /* High value.  */
     i3ep->i = 0, i3ep->v.exp = 0xff;
-  } else if (v.b.f22_16 == 0 && v.b.exp == 0
-      && v.b.f15_0 == 0) { /* Low value.  */
+  }
+  else if (v.b.f22_16 == 0 && v.b.exp == 0 && v.b.f15_0 == 0)
+  { /* Low value.  */
     i3ep->i = 0;
-  } else {
+  }
+  else
+  {
     i3ep->v.exp = v.b.exp - VAX_F_BIAS + I3E_S_BIAS;
     i3ep->v.f15_0 = v.b.f15_0;
     i3ep->v.f22_16 = v.b.f22_16;
@@ -199,7 +214,8 @@ void co_vaxf2ieee(co_eBO sbo, co_eBO tbo, const char* sp, char* tp)
 
   i3ep->b.sign = v.b.sign;
 
-  if (tbo != co_dHostByteOrder) {
+  if (tbo != co_dHostByteOrder)
+  {
     ENDIAN_SWAP_INT((int*)tp, (int*)tp);
   }
 }
@@ -214,9 +230,11 @@ void co_ieee2vaxf(co_eBO sbo, co_eBO tbo, const char* sp, char* tp)
   union i3e_s_be i3e;
 #endif
 
-  if (sbo != co_dHostByteOrder) {
+  if (sbo != co_dHostByteOrder)
+  {
     ENDIAN_SWAP_INT(&i3e.i, (int*)sp);
-  } else
+  }
+  else
     i3e.i = *(int*)sp;
 
 #if (pwr_dHost_byteOrder == pwr_dLittleEndian)
@@ -225,20 +243,23 @@ void co_ieee2vaxf(co_eBO sbo, co_eBO tbo, const char* sp, char* tp)
   vp = (union vax_f_be*)tp;
 #endif
 
-  if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0xff) { /* High value.  */
+  if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0xff)
+  { /* High value.  */
     vp->b.f22_16 = 0x7f;
     vp->b.exp = 0xff;
     vp->b.f15_0 = 0xffff;
-
-  } else if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0x00) { /* Low value.  */
+  }
+  else if (i3e.b.f22_0 == 0x0 && i3e.b.exp == 0x00)
+  { /* Low value.  */
     vp->i = 0;
 
     /* -0 is valid for IEEE, this is not the case for VAX.
      * Clear the sign bit
      */
     i3e.i = 0;
-
-  } else {
+  }
+  else
+  {
     vp->b.exp = i3e.v.exp - I3E_S_BIAS + VAX_F_BIAS;
     vp->b.f22_16 = i3e.v.f22_16;
     vp->b.f15_0 = i3e.v.f15_0;
@@ -246,7 +267,8 @@ void co_ieee2vaxf(co_eBO sbo, co_eBO tbo, const char* sp, char* tp)
 
   vp->b.sign = i3e.b.sign;
 
-  if (tbo != co_dHostByteOrder) {
+  if (tbo != co_dHostByteOrder)
+  {
     ENDIAN_SWAP_INT((int*)tp, (int*)tp);
   }
 }

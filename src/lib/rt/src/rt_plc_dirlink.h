@@ -43,7 +43,7 @@
 
 pwr_tStatus plc_rtdbref(struct plc_rtdbref (*LinkArray)[], plc_sThread* tp);
 
-void plc_GetPointerToObject(pwr_tAddress* Pointer, char* Name,
-    pwr_tSubid* Subid, pwr_tObjid* Objid, pwr_tInt32 Type, pwr_tInt32 Size);
+void plc_GetPointerToObject(pwr_tAddress* Pointer, char* Name, pwr_tSubid* Subid, pwr_tObjid* Objid,
+                            pwr_tInt32 Type, pwr_tInt32 Size);
 
 #endif

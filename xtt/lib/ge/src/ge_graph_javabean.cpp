@@ -75,8 +75,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
 
   str_ToLower(low_bean_name, bean_name);
 
-  grow_GetSubGraphDynType(grow->ctx, &trace_type1, &trace_type2,
-      &dyn_action_type1, &dyn_action_type2);
+  grow_GetSubGraphDynType(grow->ctx, &trace_type1, &trace_type2, &dyn_action_type1, &dyn_action_type2);
   grow_GetSubGraphTraceColor(grow->ctx, &trace_color, &trace_color2);
   if (grow_IsSlider(grow->ctx))
     trace_type1 = graph_eTrace_Slider;
@@ -85,13 +84,15 @@ int Graph::export_javabean(char* filename, char* bean_name)
 
   grow_MeasureJavaBean(grow->ctx, &x1, &x0, &y1, &y0);
 
-  if (!strchr(filename, ':') && !strchr(filename, '/')) {
+  if (!strchr(filename, ':') && !strchr(filename, '/'))
+  {
     strcpy(fname, default_path);
     strcat(fname, filename);
   }
   fp.open(fname);
 
-  switch (trace_type1) {
+  switch (trace_type1)
+  {
   case graph_eTrace_SetDig:
   case graph_eTrace_ResetDig:
   case graph_eTrace_ToggleDig:
@@ -100,7 +101,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
   case graph_eTrace_ToggleDigWithTone:
   case graph_eTrace_Command:
   case graph_eTrace_DigWithCommand:
-  case graph_eTrace_DigToneWithCommand: {
+  case graph_eTrace_DigToneWithCommand:
+  {
     if (str_StartsWith(bean_name, "Jop"))
       fp << "package jpwr.beans;\n";
 
@@ -121,7 +123,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "  Dimension size;\n"
        << "  Object root;\n"
        << "  JopEngine en;\n";
-    switch (trace_type1) {
+    switch (trace_type1)
+    {
     case graph_eTrace_SetDig:
     case graph_eTrace_SetDigWithTone:
       fp << "  int clickAction = Jop.BUTTON_ACTION_SET;\n";
@@ -149,8 +152,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << '\n'
        << "  String command = new String();\n"
        << "  public String getCommand() { return command;}\n"
-       << "  public void setCommand( String command) { this.command = command;}"
-       << '\n'
+       << "  public void setCommand( String command) { this.command = command;}" << '\n'
        << "  String confirmText = new String();\n"
        << "  public String getConfirmText() { return confirmText;}\n"
        << "  public void setConfirmText( String confirmText) { "
@@ -174,8 +176,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "  }\n"
        << '\n'
        << "  private void jbInit() throws Exception {\n"
-       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset
-       << ", " << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n"
+       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset << ", "
+       << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n"
        << "    timer.start();\n"
        << "  }\n"
        << "  public void actionPerformed(ActionEvent e) {\n"
@@ -216,33 +218,24 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "          public void mouseClicked(MouseEvent e) {\n"
        << "            PwrtStatus sts;\n"
        << "            if ( confirm) {\n"
-       << "              JopConfirmDialog.open( component, confirmText);"
-       << '\n'
+       << "              JopConfirmDialog.open( component, confirmText);" << '\n'
        << "            }\n"
        << "            else if (clickAction == Jop.BUTTON_ACTION_SET) {\n"
-       << "              sts = en.gdh.setObjectInfo( pwrAttribute, true);"
-       << '\n'
+       << "              sts = en.gdh.setObjectInfo( pwrAttribute, true);" << '\n'
        << "              if ( sts.evenSts())\n"
-       << "                System.out.println( \"setObjectInfoError \" + sts);"
-       << '\n'
+       << "                System.out.println( \"setObjectInfoError \" + sts);" << '\n'
        << "            }\n"
-       << "            else if(clickAction == Jop.BUTTON_ACTION_RESET) {"
-       << '\n'
-       << "              sts = en.gdh.setObjectInfo( pwrAttribute, false);"
-       << '\n'
+       << "            else if(clickAction == Jop.BUTTON_ACTION_RESET) {" << '\n'
+       << "              sts = en.gdh.setObjectInfo( pwrAttribute, false);" << '\n'
        << "              if ( sts.evenSts())\n"
-       << "                System.out.println( \"setObjectInfoError \" + sts);"
-       << '\n'
+       << "                System.out.println( \"setObjectInfoError \" + sts);" << '\n'
        << "            }\n"
-       << "            else if(clickAction == Jop.BUTTON_ACTION_TOGGLE) {"
-       << '\n'
+       << "            else if(clickAction == Jop.BUTTON_ACTION_TOGGLE) {" << '\n'
        << "              sts = en.gdh.toggleObjectInfo(pwrAttribute);\n"
        << "              if ( sts.evenSts())\n"
-       << "                System.out.println( \"setObjectInfoError \" + sts);"
-       << '\n'
+       << "                System.out.println( \"setObjectInfoError \" + sts);" << '\n'
        << "            }\n"
-       << "            else if(clickAction == Jop.BUTTON_ACTION_COMMAND) {"
-       << '\n'
+       << "            else if(clickAction == Jop.BUTTON_ACTION_COMMAND) {" << '\n'
        << "              Jop.executeCommand( root, command);\n"
        << "            }\n"
        << "          }\n"
@@ -264,20 +257,17 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "      case Jop.BUTTON_ACTION_SET:\n"
        << "        sts = en.gdh.setObjectInfo( pwrAttribute, true);\n"
        << "        if ( sts.evenSts())\n"
-       << "          System.out.println( \"setObjectInfoError \" + sts);"
-       << '\n'
+       << "          System.out.println( \"setObjectInfoError \" + sts);" << '\n'
        << "        break;\n"
        << "      case Jop.BUTTON_ACTION_RESET:\n"
        << "        sts = en.gdh.setObjectInfo( pwrAttribute, false);\n"
        << "        if ( sts.evenSts())\n"
-       << "          System.out.println( \"setObjectInfoError \" + sts);"
-       << '\n'
+       << "          System.out.println( \"setObjectInfoError \" + sts);" << '\n'
        << "        break;\n"
        << "      case Jop.BUTTON_ACTION_TOGGLE:\n"
        << "        sts = en.gdh.toggleObjectInfo( pwrAttribute);\n"
        << "        if ( sts.evenSts())\n"
-       << "          System.out.println( \"setObjectInfoError \" + sts);"
-       << '\n'
+       << "          System.out.println( \"setObjectInfoError \" + sts);" << '\n'
        << "        break;\n"
        << "      case Jop.BUTTON_ACTION_COMMAND:\n"
        << "        if ( command.compareTo(\"\") != 0)\n"
@@ -290,7 +280,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
 
     fp << "  public Dimension getPreferredSize() { return size;}\n"
        << "  public Dimension getMinimumSize() { return size;}\n";
-    switch (trace_type1) {
+    switch (trace_type1)
+    {
     case graph_eTrace_SetDig:
     case graph_eTrace_ResetDig:
     case graph_eTrace_ToggleDig:
@@ -310,8 +301,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
       fp <<
 
           "  int lowTone = " << (int)trace_color << ";\n"
-         << "  public void setLowTone( int lowTone) { this.lowTone = lowTone;}"
-         << '\n'
+         << "  public void setLowTone( int lowTone) { this.lowTone = lowTone;}" << '\n'
          << "  public int getLowTone() { return lowTone;}\n";
 
       break;
@@ -323,8 +313,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << '\n'
        << "  public String getPwrAttribute() { return pwrAttribute;}\n"
        << "  private int access = 65532;\n"
-       << "  public void setAccess( int access) { this.access = access;}"
-       << '\n'
+       << "  public void setAccess( int access) { this.access = access;}" << '\n'
        << "  public int getAccess() { return access;}\n"
        << "  String pwrAttrColor = new String();\n"
        << "  public void setPwrAttrColor( String pwrAttrColor) { "
@@ -337,8 +326,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << '\n'
        << "  public String getPwrAttrText() { return pwrAttrText;}\n"
        << "  String textLow = new String();\n"
-       << "  public void setTextLow( String textLow) { this.textLow = textLow;}"
-       << '\n'
+       << "  public void setTextLow( String textLow) { this.textLow = textLow;}" << '\n'
        << "  public String getTextLow() { return textLow;}\n"
        << "  String textHigh = new String();\n"
        << "  public void setTextHigh( String textHigh) { this.textHigh = "
@@ -358,8 +346,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "    if ( pwrAttrColor.compareTo(\"\") != 0) {\n"
        << "      retColor = en.gdh.refObjectInfo( pwrAttrColor);\n"
        << "      if ( retColor.evenSts())\n"
-       << "        System.out.println( \"refObjectInfoError retColor\");"
-       << '\n'
+       << "        System.out.println( \"refObjectInfoError retColor\");" << '\n'
        << "      else\n"
        << "        colorAttrFound = true;\n"
        << "    }\n"
@@ -381,8 +368,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "    if ( animationOnly)\n"
        << "      return;\n"
        << "    if ( textAttrFound) {\n"
-       << "      valueText = en.gdh.getObjectRefInfoBoolean( retText.id);"
-       << '\n'
+       << "      valueText = en.gdh.getObjectRefInfoBoolean( retText.id);" << '\n'
        << "      if ( valueText != valueTextOld || firstScan) {\n"
        << "        if ( valueText) {\n"
        << "          annot1 = textHigh;\n"
@@ -395,15 +381,15 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "      }\n"
        << "      valueTextOld = valueText;\n"
        << "    }\n";
-    switch (trace_type1) {
+    switch (trace_type1)
+    {
     case graph_eTrace_SetDig:
     case graph_eTrace_ResetDig:
     case graph_eTrace_ToggleDig:
     case graph_eTrace_Command:
     case graph_eTrace_DigWithCommand:
       fp << "    if ( colorAttrFound) {\n"
-         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);"
-         << '\n'
+         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);" << '\n'
          << "      if ( valueColorOld != valueColor || firstScan) {\n"
          << "        if ( valueColor) {\n"
          << "          fillColor = originalFillColor;\n"
@@ -423,8 +409,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
     case graph_eTrace_ToggleDigWithTone:
     case graph_eTrace_DigToneWithCommand:
       fp << "    if ( colorAttrFound) {\n"
-         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);"
-         << '\n'
+         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);" << '\n'
          << "      if ( valueColorOld != valueColor || firstScan) {\n"
          << "        if ( valueColor) {\n"
          << "          colorTone = originalColorTone;\n"
@@ -460,7 +445,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
   case graph_eTrace_DigWithText:
   case graph_eTrace_DigBorder:
   case graph_eTrace_Invisible:
-  case graph_eTrace_AnnotWithTone: {
+  case graph_eTrace_AnnotWithTone:
+  {
     if (str_StartsWith(bean_name, "Jop"))
       fp << "package jpwr.beans;\n";
 
@@ -474,8 +460,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "import javax.swing.Timer;\n"
        << "import java.awt.event.*;\n"
        << '\n'
-       << "public class " << bean_name
-       << " extends JComponent implements JopDynamic, ActionListener{\n"
+       << "public class " << bean_name << " extends JComponent implements JopDynamic, ActionListener{\n"
        << "  Dimension size;\n"
        << "  Object root;\n"
        << "  JopEngine en;\n"
@@ -491,8 +476,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "  }\n"
        << '\n'
        << "  private void jbInit() throws Exception {\n"
-       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset
-       << ", " << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n"
+       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset << ", "
+       << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n"
        << "    timer.start();\n"
        << "  }\n"
        << "  public void actionPerformed(ActionEvent e) {\n"
@@ -536,8 +521,10 @@ int Graph::export_javabean(char* filename, char* bean_name)
     fp << "  public Dimension getPreferredSize() { return size;}\n"
        << "  public Dimension getMinimumSize() { return size;}\n";
 
-    switch (trace_type1) {
-    case graph_eTrace_DigWithError: {
+    switch (trace_type1)
+    {
+    case graph_eTrace_DigWithError:
+    {
       fp << "  int lowColor = " << (int)trace_color << ";\n"
          << "  public void setLowColor( int lowColor) { this.lowColor = "
             "lowColor;}"
@@ -566,16 +553,14 @@ int Graph::export_javabean(char* filename, char* bean_name)
          << "    if ( pwrAttribute.compareTo(\"\") != 0) {\n"
          << "      retColor = en.gdh.refObjectInfo( pwrAttribute);\n"
          << "      if ( retColor.evenSts())\n"
-         << "        System.out.println( \"refObjectInfoError retColor\");"
-         << '\n'
+         << "        System.out.println( \"refObjectInfoError retColor\");" << '\n'
          << "      else\n"
          << "        colorAttrFound = true;\n"
          << "    }\n"
          << "    if ( pwrAttrError.compareTo(\"\") != 0) {\n"
          << "      retError = en.gdh.refObjectInfo( pwrAttrError);\n"
          << "      if ( retError.evenSts())\n"
-         << "        System.out.println( \"refObjectInfoError retError\");"
-         << '\n'
+         << "        System.out.println( \"refObjectInfoError retError\");" << '\n'
          << "      else\n"
          << "        errorAttrFound = true;\n"
          << "    }\n"
@@ -590,10 +575,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
          << "    if ( animationOnly)\n"
          << "      return;\n"
          << "    if ( errorAttrFound) {\n"
-         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);"
-         << '\n'
-         << "      valueError = en.gdh.getObjectRefInfoBoolean( retError.id);"
-         << '\n'
+         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);" << '\n'
+         << "      valueError = en.gdh.getObjectRefInfoBoolean( retError.id);" << '\n'
          << "      if ( valueError != valueErrorOld || valueColor != "
             "valueColorOld || firstScan) {"
          << '\n'
@@ -614,8 +597,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
          << "      }\n"
          << "    }\n"
          << "    else if ( colorAttrFound) {\n"
-         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);"
-         << '\n'
+         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);" << '\n'
          << "      if ( valueColorOld != valueColor || firstScan) {\n"
          << "        if ( valueColor) {\n"
          << "          fillColor = originalFillColor;\n"
@@ -635,10 +617,10 @@ int Graph::export_javabean(char* filename, char* bean_name)
       break;
     }
 
-    case graph_eTrace_DigToneWithError: {
+    case graph_eTrace_DigToneWithError:
+    {
       fp << "  int lowTone = " << (int)trace_color << ";\n"
-         << "  public void setLowTone( int lowTone) { this.lowTone = lowTone;}"
-         << '\n'
+         << "  public void setLowTone( int lowTone) { this.lowTone = lowTone;}" << '\n'
          << "  public int getLowTone() { return lowTone;}\n"
          << "  String pwrAttribute = new String();\n"
          << "  public void setPwrAttribute( String pwrAttribute) { "
@@ -663,16 +645,14 @@ int Graph::export_javabean(char* filename, char* bean_name)
          << "    if ( pwrAttribute.compareTo(\"\") != 0) {\n"
          << "      retColor = en.gdh.refObjectInfo( pwrAttribute);\n"
          << "      if ( retColor.evenSts())\n"
-         << "        System.out.println( \"refObjectInfoError retColor\");"
-         << '\n'
+         << "        System.out.println( \"refObjectInfoError retColor\");" << '\n'
          << "      else\n"
          << "        colorAttrFound = true;\n"
          << "    }\n"
          << "    if ( pwrAttrError.compareTo(\"\") != 0) {\n"
          << "      retError = en.gdh.refObjectInfo( pwrAttrError);\n"
          << "      if ( retError.evenSts())\n"
-         << "        System.out.println( \"refObjectInfoError retError\");"
-         << '\n'
+         << "        System.out.println( \"refObjectInfoError retError\");" << '\n'
          << "      else\n"
          << "        errorAttrFound = true;\n"
          << "    }\n"
@@ -687,10 +667,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
          << "    if ( animationOnly)\n"
          << "      return;\n"
          << "    if ( errorAttrFound) {\n"
-         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);"
-         << '\n'
-         << "      valueError = en.gdh.getObjectRefInfoBoolean( retError.id);"
-         << '\n'
+         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);" << '\n'
+         << "      valueError = en.gdh.getObjectRefInfoBoolean( retError.id);" << '\n'
          << "      if ( valueError != valueErrorOld || valueColor != "
             "valueColorOld || firstScan) {"
          << '\n'
@@ -714,8 +692,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
          << "      }\n"
          << "    }\n"
          << "    else if ( colorAttrFound) {\n"
-         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);"
-         << '\n'
+         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);" << '\n'
          << "      if ( valueColorOld != valueColor || firstScan) {\n"
          << "        if ( valueColor) {\n"
          << "          colorTone = originalColorTone;\n"
@@ -738,7 +715,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
       break;
     }
 
-    case graph_eTrace_Dig: {
+    case graph_eTrace_Dig:
+    {
       fp << "  int lowColor = " << (int)trace_color << ";\n"
          << "  public void setLowColor( int lowColor) { this.lowColor = "
             "lowColor;}"
@@ -758,8 +736,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
          << "    if ( pwrAttribute.compareTo(\"\") != 0) {\n"
          << "      retColor = en.gdh.refObjectInfo( pwrAttribute);\n"
          << "      if ( retColor.evenSts())\n"
-         << "        System.out.println( \"refObjectInfoError retColor\");"
-         << '\n'
+         << "        System.out.println( \"refObjectInfoError retColor\");" << '\n'
          << "      else\n"
          << "        colorAttrFound = true;\n"
          << "    }\n"
@@ -772,8 +749,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
          << "    if ( animationOnly)\n"
          << "      return;\n"
          << "    if ( colorAttrFound) {\n"
-         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);"
-         << '\n'
+         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);" << '\n'
          << "      if ( valueColorOld != valueColor || firstScan) {\n"
          << "        if ( valueColor) {\n"
          << "          fillColor = originalFillColor;\n"
@@ -793,10 +769,10 @@ int Graph::export_javabean(char* filename, char* bean_name)
       break;
     }
 
-    case graph_eTrace_DigTone: {
+    case graph_eTrace_DigTone:
+    {
       fp << "  int lowTone = " << (int)trace_color << ";\n"
-         << "  public void setLowTone( int lowTone) { this.lowTone = lowTone;}"
-         << '\n'
+         << "  public void setLowTone( int lowTone) { this.lowTone = lowTone;}" << '\n'
          << "  public int getLowTone() { return lowTone;}\n"
          << "  String pwrAttribute = new String();\n"
          << "  public void setPwrAttribute( String pwrAttribute) { "
@@ -812,8 +788,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
          << "    if ( pwrAttribute.compareTo(\"\") != 0) {\n"
          << "      retColor = en.gdh.refObjectInfo( pwrAttribute);\n"
          << "      if ( retColor.evenSts())\n"
-         << "        System.out.println( \"refObjectInfoError retColor\");"
-         << '\n'
+         << "        System.out.println( \"refObjectInfoError retColor\");" << '\n'
          << "      else\n"
          << "        colorAttrFound = true;\n"
          << "    }\n"
@@ -826,8 +801,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
          << "    if ( animationOnly)\n"
          << "      return;\n"
          << "    if ( colorAttrFound) {\n"
-         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);"
-         << '\n'
+         << "      valueColor = en.gdh.getObjectRefInfoBoolean( retColor.id);" << '\n'
          << "      if ( valueColorOld != valueColor || firstScan) {\n"
          << "        if ( valueColor) {\n"
          << "          colorTone = originalColorTone;\n"
@@ -857,7 +831,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
     fp << "}\n";
     break;
   }
-  case graph_eTrace_Slider: {
+  case graph_eTrace_Slider:
+  {
     if (str_StartsWith(bean_name, "Jop"))
       fp << "package jpwr.beans;\n";
 
@@ -883,8 +858,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "  }\n"
        << '\n'
        << "  private void jbInit() throws Exception {\n"
-       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset
-       << ", " << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n"
+       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset << ", "
+       << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n"
        << "  }\n";
 
     grow_ExportJavaBean(grow->ctx, fp, 0);
@@ -895,7 +870,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
 
     break;
   }
-  default: {
+  default:
+  {
     // Component without dynamics
 
     if (str_StartsWith(bean_name, "Jop"))
@@ -921,8 +897,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "  }\n"
        << '\n'
        << "  private void jbInit() throws Exception {\n"
-       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset
-       << ", " << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n"
+       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset << ", "
+       << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n"
        << "  }\n";
 
     grow_ExportJavaBean(grow->ctx, fp, 0);
@@ -948,13 +924,10 @@ int Graph::export_javabean(char* filename, char* bean_name)
 
   fp << "import jpwr.jop.*;\n"
      << "import java.beans.*;\n"
-     << "public class " << bean_name << "BeanInfo extends SimpleBeanInfo {"
-     << '\n'
+     << "public class " << bean_name << "BeanInfo extends SimpleBeanInfo {" << '\n'
      << "  Class beanClass = " << bean_name << ".class;\n"
-     << "  String iconColor16x16Filename = \"" << low_bean_name << "16.gif\";"
-     << '\n'
-     << "  String iconColor32x32Filename = \"" << low_bean_name << "32.gif\";"
-     << '\n'
+     << "  String iconColor16x16Filename = \"" << low_bean_name << "16.gif\";" << '\n'
+     << "  String iconColor32x32Filename = \"" << low_bean_name << "32.gif\";" << '\n'
      << "  String iconMono16x16Filename;\n"
      << "  String iconMono32x32Filename;\n"
      << "\n"
@@ -981,32 +954,27 @@ int Graph::export_javabean(char* filename, char* bean_name)
      << "        beanClass, \"getBorderColor\", \"setBorderColor\");\n"
      << "      _borderColor.setDisplayName(\"borderColor\");\n"
      << "      _borderColor.setShortDescription(\"borderColor\");\n"
-     << "      _borderColor.setPropertyEditorClass(GeColorEditor.class);"
-     << '\n'
+     << "      _borderColor.setPropertyEditorClass(GeColorEditor.class);" << '\n'
      << "      PropertyDescriptor _colorTone = new "
         "PropertyDescriptor(\"colorTone\","
      << '\n'
      << "        beanClass, \"getColorTone\", \"setColorTone\");\n"
      << "      _colorTone.setDisplayName(\"colorTone\");\n"
      << "      _colorTone.setShortDescription(\"colorTone\");\n"
-     << "      _colorTone.setPropertyEditorClass(GeColorToneEditor.class);"
-     << '\n'
+     << "      _colorTone.setPropertyEditorClass(GeColorToneEditor.class);" << '\n'
      << "      PropertyDescriptor _colorShift = new "
         "PropertyDescriptor(\"colorShift\","
      << '\n'
      << "        beanClass, \"getColorShift\", \"setColorShift\");\n"
      << "      _colorShift.setDisplayName(\"colorShift\");\n"
      << "      _colorShift.setShortDescription(\"colorShift\");\n"
-     << "      _colorShift.setPropertyEditorClass(GeColorShiftEditor.class);"
-     << '\n'
+     << "      _colorShift.setPropertyEditorClass(GeColorShiftEditor.class);" << '\n'
      << "      PropertyDescriptor _colorBrightness = new "
         "PropertyDescriptor(\"colorBrightness\","
      << '\n'
-     << "        beanClass, \"getColorBrightness\", \"setColorBrightness\");"
-     << '\n'
+     << "        beanClass, \"getColorBrightness\", \"setColorBrightness\");" << '\n'
      << "      _colorBrightness.setDisplayName(\"colorBrightness\");\n"
-     << "      _colorBrightness.setShortDescription(\"colorBrightness\");"
-     << '\n'
+     << "      _colorBrightness.setShortDescription(\"colorBrightness\");" << '\n'
      << "      "
         "_colorBrightness.setPropertyEditorClass(GeColorBrightnessEditor.class)"
         ";"
@@ -1014,24 +982,24 @@ int Graph::export_javabean(char* filename, char* bean_name)
      << "      PropertyDescriptor _colorIntensity = new "
         "PropertyDescriptor(\"colorIntensity\","
      << '\n'
-     << "        beanClass, \"getColorIntensity\", \"setColorIntensity\");"
-     << '\n'
+     << "        beanClass, \"getColorIntensity\", \"setColorIntensity\");" << '\n'
      << "      _colorIntensity.setDisplayName(\"colorIntensity\");\n"
      << "      _colorIntensity.setShortDescription(\"colorIntensity\");\n"
      << "      "
         "_colorIntensity.setPropertyEditorClass(GeColorIntensityEditor.class);"
      << '\n'
-     << "      PropertyDescriptor _rotate = new PropertyDescriptor(\"rotate\","
-     << '\n'
+     << "      PropertyDescriptor _rotate = new PropertyDescriptor(\"rotate\"," << '\n'
      << "        beanClass, \"getRotate\", \"setRotate\");\n"
      << "      _rotate.setDisplayName(\"rotate\");\n"
      << "      _rotate.setShortDescription(\"rotate\");\n";
 
-  switch (trace_type1) {
+  switch (trace_type1)
+  {
   case graph_eTrace_SetDig:
   case graph_eTrace_ResetDig:
   case graph_eTrace_ToggleDig:
-  case graph_eTrace_Command: {
+  case graph_eTrace_Command:
+  {
     fp <<
 
         "      PropertyDescriptor _clickAction = new "
@@ -1040,8 +1008,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "        beanClass, \"getClickAction\", \"setClickAction\");\n"
        << "      _clickAction.setDisplayName(\"clickAction\");\n"
        << "      _clickAction.setShortDescription(\"clickAction\");\n"
-       << "      _clickAction.setPropertyEditorClass(ClickActionEditor.class);"
-       << '\n'
+       << "      _clickAction.setPropertyEditorClass(ClickActionEditor.class);" << '\n'
        << "      PropertyDescriptor _command = new "
           "PropertyDescriptor(\"command\","
        << '\n'
@@ -1058,15 +1025,13 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "      PropertyDescriptor _pwrAttribute = new "
           "PropertyDescriptor(\"pwrAttribute\","
        << '\n'
-       << "        beanClass, \"getPwrAttribute\", \"setPwrAttribute\");"
-       << '\n'
+       << "        beanClass, \"getPwrAttribute\", \"setPwrAttribute\");" << '\n'
        << "      _pwrAttribute.setDisplayName(\"pwrAttribute\");\n"
        << "      _pwrAttribute.setShortDescription(\"pwrAttribute\");\n"
        << "      PropertyDescriptor _pwrAttrColor = new "
           "PropertyDescriptor(\"pwrAttrColor\","
        << '\n'
-       << "        beanClass, \"getPwrAttrColor\", \"setPwrAttrColor\");"
-       << '\n'
+       << "        beanClass, \"getPwrAttrColor\", \"setPwrAttrColor\");" << '\n'
        << "      _pwrAttrColor.setDisplayName(\"pwrAttrColor\");\n"
        << "      _pwrAttrColor.setShortDescription(\"pwrAttColor\");\n"
        << "      PropertyDescriptor _pwrAttrText = new "
@@ -1106,24 +1071,19 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "      _confirmText.setDisplayName(\"confirmText\");\n"
        << "      _confirmText.setShortDescription(\"confirmText\");\n";
 
-    for (i = 0; i < annot_cnt; i++) {
-      fp << "      PropertyDescriptor _annot" << numbers[i]
-         << " = new PropertyDescriptor(\"annot" << numbers[i] << "\",\n"
-         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setDisplayName(\"annot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setShortDescription(\"annot"
-         << numbers[i] << "\");\n"
-         << "      PropertyDescriptor _annot" << numbers[i]
-         << "Font = new PropertyDescriptor(\"annot" << numbers[i] << "Font\","
-         << '\n'
-         << "        beanClass, \"getAnnot" << numbers[i]
-         << "Font\", \"setAnnot" << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot"
-         << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot"
-         << numbers[i] << "Font\");\n";
+    for (i = 0; i < annot_cnt; i++)
+    {
+      fp << "      PropertyDescriptor _annot" << numbers[i] << " = new PropertyDescriptor(\"annot"
+         << numbers[i] << "\",\n"
+         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setDisplayName(\"annot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setShortDescription(\"annot" << numbers[i] << "\");\n"
+         << "      PropertyDescriptor _annot" << numbers[i] << "Font = new PropertyDescriptor(\"annot"
+         << numbers[i] << "Font\"," << '\n'
+         << "        beanClass, \"getAnnot" << numbers[i] << "Font\", \"setAnnot" << numbers[i]
+         << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot" << numbers[i] << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot" << numbers[i] << "Font\");\n";
     }
 
     fp << "      PropertyDescriptor[] pds = new PropertyDescriptor[] {\n"
@@ -1136,7 +1096,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << '\n'
        << "	_pwrAttrText, _textLow, _textHigh, _access, _confirm, "
           "confirmText";
-    for (i = 0; i < annot_cnt; i++) {
+    for (i = 0; i < annot_cnt; i++)
+    {
       fp << ", _annot" << numbers[i] << ", _annot" << numbers[i] << "Font";
     }
     fp << "};\n";
@@ -1145,7 +1106,8 @@ int Graph::export_javabean(char* filename, char* bean_name)
   }
   case graph_eTrace_SetDigWithTone:
   case graph_eTrace_ResetDigWithTone:
-  case graph_eTrace_ToggleDigWithTone: {
+  case graph_eTrace_ToggleDigWithTone:
+  {
     fp <<
 
         "      PropertyDescriptor _clickAction = new "
@@ -1154,8 +1116,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "        beanClass, \"getClickAction\", \"setClickAction\");\n"
        << "      _clickAction.setDisplayName(\"clickAction\");\n"
        << "      _clickAction.setShortDescription(\"clickAction\");\n"
-       << "      _clickAction.setPropertyEditorClass(ClickActionEditor.class);"
-       << '\n'
+       << "      _clickAction.setPropertyEditorClass(ClickActionEditor.class);" << '\n'
        << "      PropertyDescriptor _command = new "
           "PropertyDescriptor(\"command\","
        << '\n'
@@ -1168,20 +1129,17 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "        beanClass, \"getLowTone\", \"setLowTone\");\n"
        << "      _lowTone.setDisplayName(\"lowTone\");\n"
        << "      _lowTone.setShortDescription(\"lowTone\");\n"
-       << "      _lowTone.setPropertyEditorClass(GeColorToneEditor.class);"
-       << '\n'
+       << "      _lowTone.setPropertyEditorClass(GeColorToneEditor.class);" << '\n'
        << "      PropertyDescriptor _pwrAttribute = new "
           "PropertyDescriptor(\"pwrAttribute\","
        << '\n'
-       << "        beanClass, \"getPwrAttribute\", \"setPwrAttribute\");"
-       << '\n'
+       << "        beanClass, \"getPwrAttribute\", \"setPwrAttribute\");" << '\n'
        << "      _pwrAttribute.setDisplayName(\"pwrAttribute\");\n"
        << "      _pwrAttribute.setShortDescription(\"pwrAttribute\");\n"
        << "      PropertyDescriptor _pwrAttrColor = new "
           "PropertyDescriptor(\"pwrAttrColor\","
        << '\n'
-       << "        beanClass, \"getPwrAttrColor\", \"setPwrAttrColor\");"
-       << '\n'
+       << "        beanClass, \"getPwrAttrColor\", \"setPwrAttrColor\");" << '\n'
        << "      _pwrAttrColor.setDisplayName(\"pwrAttrColor\");\n"
        << "      _pwrAttrColor.setShortDescription(\"pwrAttColor\");\n"
        << "      PropertyDescriptor _pwrAttrText = new "
@@ -1220,41 +1178,37 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "        beanClass, \"getConfirmText\", \"setConfirmText\");\n"
        << "      _confirmText.setDisplayName(\"confirmText\");\n"
        << "      _confirmText.setShortDescription(\"confirmText\");\n";
-    for (i = 0; i < annot_cnt; i++) {
-      fp << "      PropertyDescriptor _annot" << numbers[i]
-         << " = new PropertyDescriptor(\"annot" << numbers[i] << "\",\n"
-         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setDisplayName(\"annot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setShortDescription(\"annot"
-         << numbers[i] << "\");\n"
-         << "      PropertyDescriptor _annot" << numbers[i]
-         << "Font = new PropertyDescriptor(\"annot" << numbers[i] << "Font\","
-         << '\n'
-         << "        beanClass, \"getAnnot" << numbers[i]
-         << "Font\", \"setAnnot" << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot"
-         << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot"
-         << numbers[i] << "Font\");\n";
+    for (i = 0; i < annot_cnt; i++)
+    {
+      fp << "      PropertyDescriptor _annot" << numbers[i] << " = new PropertyDescriptor(\"annot"
+         << numbers[i] << "\",\n"
+         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setDisplayName(\"annot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setShortDescription(\"annot" << numbers[i] << "\");\n"
+         << "      PropertyDescriptor _annot" << numbers[i] << "Font = new PropertyDescriptor(\"annot"
+         << numbers[i] << "Font\"," << '\n'
+         << "        beanClass, \"getAnnot" << numbers[i] << "Font\", \"setAnnot" << numbers[i]
+         << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot" << numbers[i] << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot" << numbers[i] << "Font\");\n";
     }
     fp << "      PropertyDescriptor[] pds = new PropertyDescriptor[] {\n"
        << "	_toolTipText, _fillColor, _borderColor, _colorTone, "
           "_colorShift,"
        << '\n'
        << "	_colorBrightness, _colorIntensity, _rotate,\n"
-       << "	_clickAction, _command, _lowTone, _pwrAttribute, _pwrAttrColor,"
-       << '\n'
+       << "	_clickAction, _command, _lowTone, _pwrAttribute, _pwrAttrColor," << '\n'
        << "	_pwrAttrText, _textLow, _textHigh, _access, _confirm, "
           "_confirmText";
-    for (i = 0; i < annot_cnt; i++) {
+    for (i = 0; i < annot_cnt; i++)
+    {
       fp << ", _annot" << numbers[i] << ", _annot" << numbers[i] << "Font";
     }
     fp << "};\n";
     break;
   }
-  case graph_eTrace_Dig: {
+  case graph_eTrace_Dig:
+  {
     fp <<
 
         "      PropertyDescriptor _lowColor = new "
@@ -1267,28 +1221,22 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "      PropertyDescriptor _pwrAttribute = new "
           "PropertyDescriptor(\"pwrAttribute\","
        << '\n'
-       << "        beanClass, \"getPwrAttribute\", \"setPwrAttribute\");"
-       << '\n'
+       << "        beanClass, \"getPwrAttribute\", \"setPwrAttribute\");" << '\n'
        << "      _pwrAttribute.setDisplayName(\"pwrAttribute\");\n"
        << "      _pwrAttribute.setShortDescription(\"pwrAttribute\");\n";
-    for (i = 0; i < annot_cnt; i++) {
-      fp << "      PropertyDescriptor _annot" << numbers[i]
-         << " = new PropertyDescriptor(\"annot" << numbers[i] << "\",\n"
-         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setDisplayName(\"annot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setShortDescription(\"annot"
-         << numbers[i] << "\");\n"
-         << "      PropertyDescriptor _annot" << numbers[i]
-         << "Font = new PropertyDescriptor(\"annot" << numbers[i] << "Font\","
-         << '\n'
-         << "        beanClass, \"getAnnot" << numbers[i]
-         << "Font\", \"setAnnot" << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot"
-         << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot"
-         << numbers[i] << "Font\");\n";
+    for (i = 0; i < annot_cnt; i++)
+    {
+      fp << "      PropertyDescriptor _annot" << numbers[i] << " = new PropertyDescriptor(\"annot"
+         << numbers[i] << "\",\n"
+         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setDisplayName(\"annot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setShortDescription(\"annot" << numbers[i] << "\");\n"
+         << "      PropertyDescriptor _annot" << numbers[i] << "Font = new PropertyDescriptor(\"annot"
+         << numbers[i] << "Font\"," << '\n'
+         << "        beanClass, \"getAnnot" << numbers[i] << "Font\", \"setAnnot" << numbers[i]
+         << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot" << numbers[i] << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot" << numbers[i] << "Font\");\n";
     }
     fp << "      PropertyDescriptor[] pds = new PropertyDescriptor[] {\n"
        << "	_toolTipText, _fillColor, _borderColor, _colorTone, "
@@ -1296,13 +1244,15 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << '\n'
        << "	_colorBrightness, _colorIntensity, _rotate,\n"
        << "	_lowColor, _pwrAttribute";
-    for (i = 0; i < annot_cnt; i++) {
+    for (i = 0; i < annot_cnt; i++)
+    {
       fp << ", _annot" << numbers[i] << ", _annot" << numbers[i] << "Font";
     }
     fp << "};\n";
     break;
   }
-  case graph_eTrace_DigWithError: {
+  case graph_eTrace_DigWithError:
+  {
     fp <<
 
         "      PropertyDescriptor _lowColor = new "
@@ -1315,35 +1265,28 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << "      PropertyDescriptor _pwrAttribute = new "
           "PropertyDescriptor(\"pwrAttribute\","
        << '\n'
-       << "        beanClass, \"getPwrAttribute\", \"setPwrAttribute\");"
-       << '\n'
+       << "        beanClass, \"getPwrAttribute\", \"setPwrAttribute\");" << '\n'
        << "      _pwrAttribute.setDisplayName(\"pwrAttribute\");\n"
        << "      _pwrAttribute.setShortDescription(\"pwrAttribute\");\n"
        << "      PropertyDescriptor _pwrAttrError = new "
           "PropertyDescriptor(\"pwrAttrError\","
        << '\n'
-       << "        beanClass, \"getPwrAttrError\", \"setPwrAttrError\");"
-       << '\n'
+       << "        beanClass, \"getPwrAttrError\", \"setPwrAttrError\");" << '\n'
        << "      _pwrAttrError.setDisplayName(\"pwrAttrError\");\n"
        << "      _pwrAttrError.setShortDescription(\"pwrAttError\");\n";
-    for (i = 0; i < annot_cnt; i++) {
-      fp << "      PropertyDescriptor _annot" << numbers[i]
-         << " = new PropertyDescriptor(\"annot" << numbers[i] << "\",\n"
-         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setDisplayName(\"annot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setShortDescription(\"annot"
-         << numbers[i] << "\");\n"
-         << "      PropertyDescriptor _annot" << numbers[i]
-         << "Font = new PropertyDescriptor(\"annot" << numbers[i] << "Font\","
-         << '\n'
-         << "        beanClass, \"getAnnot" << numbers[i]
-         << "Font\", \"setAnnot" << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot"
-         << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot"
-         << numbers[i] << "Font\");\n";
+    for (i = 0; i < annot_cnt; i++)
+    {
+      fp << "      PropertyDescriptor _annot" << numbers[i] << " = new PropertyDescriptor(\"annot"
+         << numbers[i] << "\",\n"
+         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setDisplayName(\"annot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setShortDescription(\"annot" << numbers[i] << "\");\n"
+         << "      PropertyDescriptor _annot" << numbers[i] << "Font = new PropertyDescriptor(\"annot"
+         << numbers[i] << "Font\"," << '\n'
+         << "        beanClass, \"getAnnot" << numbers[i] << "Font\", \"setAnnot" << numbers[i]
+         << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot" << numbers[i] << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot" << numbers[i] << "Font\");\n";
     }
     fp << "      PropertyDescriptor[] pds = new PropertyDescriptor[] {\n"
        << "	_toolTipText, _fillColor, _borderColor, _colorTone, "
@@ -1351,47 +1294,42 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << '\n'
        << "	_colorBrightness, _colorIntensity, _rotate,\n"
        << "	_lowColor, _pwrAttribute, _pwrAttrError";
-    for (i = 0; i < annot_cnt; i++) {
+    for (i = 0; i < annot_cnt; i++)
+    {
       fp << ", _annot" << numbers[i] << ", _annot" << numbers[i] << "Font";
     }
     fp << "};\n";
     break;
   }
 
-  case graph_eTrace_DigTone: {
+  case graph_eTrace_DigTone:
+  {
     fp << "      PropertyDescriptor _lowTone = new "
           "PropertyDescriptor(\"lowTone\","
        << '\n'
        << "        beanClass, \"getLowTone\", \"setLowTone\");\n"
        << "      _lowTone.setDisplayName(\"lowTone\");\n"
        << "      _lowTone.setShortDescription(\"lowTone\");\n"
-       << "      _lowTone.setPropertyEditorClass(GeColorToneEditor.class);"
-       << '\n'
+       << "      _lowTone.setPropertyEditorClass(GeColorToneEditor.class);" << '\n'
        << "      PropertyDescriptor _pwrAttribute = new "
           "PropertyDescriptor(\"pwrAttribute\","
        << '\n'
-       << "        beanClass, \"getPwrAttribute\", \"setPwrAttribute\");"
-       << '\n'
+       << "        beanClass, \"getPwrAttribute\", \"setPwrAttribute\");" << '\n'
        << "      _pwrAttribute.setDisplayName(\"pwrAttribute\");\n"
        << "      _pwrAttribute.setShortDescription(\"pwrAttribute\");\n";
-    for (i = 0; i < annot_cnt; i++) {
-      fp << "      PropertyDescriptor _annot" << numbers[i]
-         << " = new PropertyDescriptor(\"annot" << numbers[i] << "\",\n"
-         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setDisplayName(\"annot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setShortDescription(\"annot"
-         << numbers[i] << "\");\n"
-         << "      PropertyDescriptor _annot" << numbers[i]
-         << "Font = new PropertyDescriptor(\"annot" << numbers[i] << "Font\","
-         << '\n'
-         << "        beanClass, \"getAnnot" << numbers[i]
-         << "Font\", \"setAnnot" << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot"
-         << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot"
-         << numbers[i] << "Font\");\n";
+    for (i = 0; i < annot_cnt; i++)
+    {
+      fp << "      PropertyDescriptor _annot" << numbers[i] << " = new PropertyDescriptor(\"annot"
+         << numbers[i] << "\",\n"
+         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setDisplayName(\"annot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setShortDescription(\"annot" << numbers[i] << "\");\n"
+         << "      PropertyDescriptor _annot" << numbers[i] << "Font = new PropertyDescriptor(\"annot"
+         << numbers[i] << "Font\"," << '\n'
+         << "        beanClass, \"getAnnot" << numbers[i] << "Font\", \"setAnnot" << numbers[i]
+         << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot" << numbers[i] << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot" << numbers[i] << "Font\");\n";
     }
     fp << "      PropertyDescriptor[] pds = new PropertyDescriptor[] {\n"
        << "	_toolTipText, _fillColor, _borderColor, _colorTone, "
@@ -1399,53 +1337,47 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << '\n'
        << "	_colorBrightness, _colorIntensity, _rotate,\n"
        << "	_lowTone, _pwrAttribute";
-    for (i = 0; i < annot_cnt; i++) {
+    for (i = 0; i < annot_cnt; i++)
+    {
       fp << ", _annot" << numbers[i] << ", _annot" << numbers[i] << "Font";
     }
     fp << "};\n";
     break;
   }
-  case graph_eTrace_DigToneWithError: {
+  case graph_eTrace_DigToneWithError:
+  {
     fp << "      PropertyDescriptor _lowTone = new "
           "PropertyDescriptor(\"lowTone\","
        << '\n'
        << "        beanClass, \"getLowTone\", \"setLowTone\");\n"
        << "      _lowTone.setDisplayName(\"lowTone\");\n"
        << "      _lowTone.setShortDescription(\"lowTone\");\n"
-       << "      _lowTone.setPropertyEditorClass(GeColorToneEditor.class);"
-       << '\n'
+       << "      _lowTone.setPropertyEditorClass(GeColorToneEditor.class);" << '\n'
        << "      PropertyDescriptor _pwrAttribute = new "
           "PropertyDescriptor(\"pwrAttribute\","
        << '\n'
-       << "        beanClass, \"getPwrAttribute\", \"setPwrAttribute\");"
-       << '\n'
+       << "        beanClass, \"getPwrAttribute\", \"setPwrAttribute\");" << '\n'
        << "      _pwrAttribute.setDisplayName(\"pwrAttribute\");\n"
        << "      _pwrAttribute.setShortDescription(\"pwrAttribute\");\n"
        << "      PropertyDescriptor _pwrAttrError = new "
           "PropertyDescriptor(\"pwrAttrError\","
        << '\n'
-       << "        beanClass, \"getPwrAttrError\", \"setPwrAttrError\");"
-       << '\n'
+       << "        beanClass, \"getPwrAttrError\", \"setPwrAttrError\");" << '\n'
        << "      _pwrAttrError.setDisplayName(\"pwrAttrError\");\n"
        << "      _pwrAttrError.setShortDescription(\"pwrAttError\");\n";
-    for (i = 0; i < annot_cnt; i++) {
-      fp << "      PropertyDescriptor _annot" << numbers[i]
-         << " = new PropertyDescriptor(\"annot" << numbers[i] << "\",\n"
-         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setDisplayName(\"annot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setShortDescription(\"annot"
-         << numbers[i] << "\");\n"
-         << "      PropertyDescriptor _annot" << numbers[i]
-         << "Font = new PropertyDescriptor(\"annot" << numbers[i] << "Font\","
-         << '\n'
-         << "        beanClass, \"getAnnot" << numbers[i]
-         << "Font\", \"setAnnot" << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot"
-         << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot"
-         << numbers[i] << "Font\");\n";
+    for (i = 0; i < annot_cnt; i++)
+    {
+      fp << "      PropertyDescriptor _annot" << numbers[i] << " = new PropertyDescriptor(\"annot"
+         << numbers[i] << "\",\n"
+         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setDisplayName(\"annot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setShortDescription(\"annot" << numbers[i] << "\");\n"
+         << "      PropertyDescriptor _annot" << numbers[i] << "Font = new PropertyDescriptor(\"annot"
+         << numbers[i] << "Font\"," << '\n'
+         << "        beanClass, \"getAnnot" << numbers[i] << "Font\", \"setAnnot" << numbers[i]
+         << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot" << numbers[i] << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot" << numbers[i] << "Font\");\n";
     }
     fp << "      PropertyDescriptor[] pds = new PropertyDescriptor[] {\n"
        << "	_toolTipText, _fillColor, _borderColor, _colorTone, "
@@ -1453,39 +1385,37 @@ int Graph::export_javabean(char* filename, char* bean_name)
        << '\n'
        << "	_colorBrightness, _colorIntensity, _rotate,\n"
        << "	_lowTone, _pwrAttribute, _pwrAttrError";
-    for (i = 0; i < annot_cnt; i++) {
+    for (i = 0; i < annot_cnt; i++)
+    {
       fp << ", _annot" << numbers[i] << ", _annot" << numbers[i] << "Font";
     }
     fp << "};\n";
     break;
   }
 
-  default: {
-    for (i = 0; i < annot_cnt; i++) {
-      fp << "      PropertyDescriptor _annot" << numbers[i]
-         << " = new PropertyDescriptor(\"annot" << numbers[i] << "\",\n"
-         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setDisplayName(\"annot"
-         << numbers[i] << "\");\n"
-         << "      _annot" << numbers[i] << ".setShortDescription(\"annot"
-         << numbers[i] << "\");\n"
-         << "      PropertyDescriptor _annot" << numbers[i]
-         << "Font = new PropertyDescriptor(\"annot" << numbers[i] << "Font\","
-         << '\n'
-         << "        beanClass, \"getAnnot" << numbers[i]
-         << "Font\", \"setAnnot" << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot"
-         << numbers[i] << "Font\");\n"
-         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot"
-         << numbers[i] << "Font\");\n";
+  default:
+  {
+    for (i = 0; i < annot_cnt; i++)
+    {
+      fp << "      PropertyDescriptor _annot" << numbers[i] << " = new PropertyDescriptor(\"annot"
+         << numbers[i] << "\",\n"
+         << "        beanClass, \"getAnnot" << numbers[i] << "\", \"setAnnot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setDisplayName(\"annot" << numbers[i] << "\");\n"
+         << "      _annot" << numbers[i] << ".setShortDescription(\"annot" << numbers[i] << "\");\n"
+         << "      PropertyDescriptor _annot" << numbers[i] << "Font = new PropertyDescriptor(\"annot"
+         << numbers[i] << "Font\"," << '\n'
+         << "        beanClass, \"getAnnot" << numbers[i] << "Font\", \"setAnnot" << numbers[i]
+         << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setDisplayName(\"annot" << numbers[i] << "Font\");\n"
+         << "      _annot" << numbers[i] << "Font.setShortDescription(\"annot" << numbers[i] << "Font\");\n";
     }
     fp << "      PropertyDescriptor[] pds = new PropertyDescriptor[] {\n"
        << "	_toolTipText, _fillColor, _borderColor, _colorTone, "
           "_colorShift,"
        << '\n'
        << "	_colorBrightness, _colorIntensity, _rotate";
-    for (i = 0; i < annot_cnt; i++) {
+    for (i = 0; i < annot_cnt; i++)
+    {
       fp << ", _annot" << numbers[i] << ", _annot" << numbers[i] << "Font";
     }
     fp << "};\n";
@@ -1524,8 +1454,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
      << "  public BeanInfo[] getAdditionalBeanInfo() {\n"
      << "    Class superclass = beanClass.getSuperclass();\n"
      << "    try {\n"
-     << "      BeanInfo superBeanInfo = Introspector.getBeanInfo(superclass);"
-     << '\n'
+     << "      BeanInfo superBeanInfo = Introspector.getBeanInfo(superclass);" << '\n'
      << "//    return new BeanInfo[] { superBeanInfo };\n"
      << "      return null;\n"
      << "    }\n"
@@ -1556,13 +1485,13 @@ int Graph::export_gejava_nodeclass(std::ofstream& fp, grow_tNodeClass nodeclass)
   int i;
 
   grow_GetNodeClassJavaName(nodeclass, bean_name);
-  grow_GetNodeClassDynType(
-      nodeclass, &dyn_type1, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
+  grow_GetNodeClassDynType(nodeclass, &dyn_type1, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
 
   grow_MeasureNodeClassJavaBean(nodeclass, &x1, &x0, &y1, &y0);
   pages = grow_GetNodeClassPages(nodeclass);
 
-  if (dyn_action_type1 & ge_mActionType1_ValueInput) {
+  if (dyn_action_type1 & ge_mActionType1_ValueInput)
+  {
     glow_eDrawType annot_background = (glow_eDrawType)31;
     grow_GetNodeClassAnnotBackground(nodeclass, &annot_background);
 
@@ -1575,10 +1504,8 @@ int Graph::export_gejava_nodeclass(std::ofstream& fp, grow_tNodeClass nodeclass)
        << "  }\n";
     fp <<
 
-        "  int original_width = " << int(x1 - x0) + 2 * glow_cJBean_Offset
-       << ";\n"
-       << "  int original_height = " << int(y1 - y0) + 2 * glow_cJBean_Offset
-       << ";\n"
+        "  int original_width = " << int(x1 - x0) + 2 * glow_cJBean_Offset << ";\n"
+       << "  int original_height = " << int(y1 - y0) + 2 * glow_cJBean_Offset << ";\n"
        << "  boolean fontSet = false;\n";
 
     grow_ExportNcJavaBeanFont(grow->ctx, nodeclass, fp, 0);
@@ -1595,8 +1522,9 @@ int Graph::export_gejava_nodeclass(std::ofstream& fp, grow_tNodeClass nodeclass)
        << "    super.paintComponent( g1);\n"
        << "  }\n";
     fp << "}\n";
-
-  } else if (streq(bean_name, "pwr_framethin")) {
+  }
+  else if (streq(bean_name, "pwr_framethin"))
+  {
     // Use prefabricated class GeFrameThin
     fp << "protected class " << bean_name << " extends GeFrameThin {\n"
        << "  public " << bean_name << "( JopSession session)\n"
@@ -1604,8 +1532,9 @@ int Graph::export_gejava_nodeclass(std::ofstream& fp, grow_tNodeClass nodeclass)
        << "     super(session);\n"
        << "  }\n"
        << "}\n";
-
-  } else {
+  }
+  else
+  {
     //    if ( grow_IsSliderClass( nodeclass))
     //      fp <<
     //"protected class " << bean_name << " extends GeSlider {\n";
@@ -1620,8 +1549,8 @@ int Graph::export_gejava_nodeclass(std::ofstream& fp, grow_tNodeClass nodeclass)
     fp << "  public " << bean_name << "( JopSession session)\n"
        << "  {\n"
        << "    super( session);\n"
-       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset
-       << ", " << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n";
+       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset << ", "
+       << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n";
 
     // GrowNode attributes of GrowNode objects
     grow_ExportNodeClassJavaBean(grow->ctx, nodeclass, fp, 2);
@@ -1630,10 +1559,11 @@ int Graph::export_gejava_nodeclass(std::ofstream& fp, grow_tNodeClass nodeclass)
     grow_GetNodeClassObjectList(nodeclass, &objectlist, &object_cnt);
 
     object_p = objectlist;
-    for (i = 0; i < object_cnt; i++) {
-      if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode
-          || grow_GetObjectType(*object_p) == glow_eObjectType_GrowGroup
-          || grow_GetObjectType(*object_p) == glow_eObjectType_GrowXYCurve)
+    for (i = 0; i < object_cnt; i++)
+    {
+      if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode ||
+          grow_GetObjectType(*object_p) == glow_eObjectType_GrowGroup ||
+          grow_GetObjectType(*object_p) == glow_eObjectType_GrowXYCurve)
         export_GejavaObjectTraceAttr(fp, *object_p, i);
       else if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowBar)
         export_BarTraceAttr(fp, *object_p, i);
@@ -1664,8 +1594,7 @@ int Graph::export_gejava_nodeclass(std::ofstream& fp, grow_tNodeClass nodeclass)
   return 1;
 }
 
-int Graph::export_javaframe(
-    char* filename, char* bean_name, int applet, int html)
+int Graph::export_javaframe(char* filename, char* bean_name, int applet, int html)
 {
   std::ofstream fp;
   char fname[120];
@@ -1681,22 +1610,25 @@ int Graph::export_javaframe(
   int sts;
 
   grow_GetBackgroundImage(grow->ctx, background_image, &background_tiled);
-  if (!streq(background_image, "")) {
-    sts = grow_GetBackgroundImageSize(
-        grow->ctx, &bg_image_width, &bg_image_height);
+  if (!streq(background_image, ""))
+  {
+    sts = grow_GetBackgroundImageSize(grow->ctx, &bg_image_width, &bg_image_height);
     if (EVEN(sts))
       strcpy(background_image, "");
   }
 
-  if (!strchr(filename, ':') && !strchr(filename, '/')) {
+  if (!strchr(filename, ':') && !strchr(filename, '/'))
+  {
     strcpy(fname, default_path);
     strcat(fname, filename);
-  } else
+  }
+  else
     strcpy(fname, filename);
 
   dcli_translate_filename(fname, fname);
 
-  if (!html) {
+  if (!html)
+  {
     grow_GetObjectList(grow->ctx, &objectlist, &object_cnt);
 
     grow_MeasureJavaBean(grow->ctx, &x1, &x0, &y1, &y0);
@@ -1725,11 +1657,14 @@ int Graph::export_javaframe(
     // Declarations of components
     grow_ExportJavaBean(grow->ctx, fp, 1);
 
-    if (applet) {
+    if (applet)
+    {
       fp << "  public " << bean_name << "() {}\n"
          << "  public void init() {\n"
          << "    super.init();\n";
-    } else {
+    }
+    else
+    {
       fp << "  public " << bean_name << "() {\n";
     }
     fp << "    try {\n"
@@ -1740,8 +1675,8 @@ int Graph::export_javaframe(
        << "    }\n"
        << "  }\n"
        << "  private void jbInit() throws Exception  {\n"
-       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset
-       << ", " << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n"
+       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset << ", "
+       << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n"
        << "    contentPane = (JPanel) this.getContentPane();\n"
        << "    contentPane.setLayout(borderLayout1);\n"
        << "    contentPane.add(localPanel, BorderLayout.CENTER);\n"
@@ -1749,8 +1684,8 @@ int Graph::export_javaframe(
        << "    localPanel.setLayout(null);\n"
        << "    localPanel.setOpaque(true);\n";
     if (background_color != glow_eDrawType_LineErase)
-      fp << "    localPanel.setBackground(GeColor.getColor("
-         << (int)background_color << ", GeColor.NO_COLOR));\n";
+      fp << "    localPanel.setBackground(GeColor.getColor(" << (int)background_color
+         << ", GeColor.NO_COLOR));\n";
     else
       fp << "    localPanel.setBackground(GeColor.getColor(31, "
             "GeColor.NO_COLOR));"
@@ -1763,7 +1698,8 @@ int Graph::export_javaframe(
     grow_ExportJavaBean(grow->ctx, fp, 2);
 
     object_p = objectlist;
-    for (i = 0; i < object_cnt; i++) {
+    for (i = 0; i < object_cnt; i++)
+    {
       if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode)
         export_ObjectTraceAttr(fp, *object_p, i);
       else if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowBar)
@@ -1785,21 +1721,19 @@ int Graph::export_javaframe(
        << "  }\n"
        << "\n"
        << "class LocalPanel extends JPanel {\n";
-    if (!streq(background_image, "")) {
+    if (!streq(background_image, ""))
+    {
       fp << "  GeImage backgroundImage = new GeImage( session);\n"
          << "  public LocalPanel() {\n"
          << "    backgroundImage.setSession( session);\n";
       if (background_tiled)
-        fp << "    backgroundImage.setBounds(0,0, " << bg_image_width << ", "
-           << bg_image_height << ");\n";
+        fp << "    backgroundImage.setBounds(0,0, " << bg_image_width << ", " << bg_image_height << ");\n";
       else
-        fp << "    backgroundImage.setBounds(0,0, "
-           << int(x1 - x0) + 2 * glow_cJBean_Offset << ", "
+        fp << "    backgroundImage.setBounds(0,0, " << int(x1 - x0) + 2 * glow_cJBean_Offset << ", "
            << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n";
-      fp << "    backgroundImage.setImage( \"" << background_image << "\");"
-         << '\n'
-         << "  }\n";
-    } else
+      fp << "    backgroundImage.setImage( \"" << background_image << "\");" << '\n' << "  }\n";
+    }
+    else
       fp << "  public LocalPanel() {}\n";
 
     grow_ExportJavaBean(grow->ctx, fp, 0);
@@ -1812,8 +1746,9 @@ int Graph::export_javaframe(
         "}\n";
 
     fp.close();
-
-  } else {
+  }
+  else
+  {
     char codebase[200];
 
     // Create a html file
@@ -1827,15 +1762,12 @@ int Graph::export_javaframe(
        << "      <title>" << bean_name << "</title>\n"
        << "  </head>\n"
        << "  <body bgcolor=\"#999999\">\n"
-       << "    <object classid=\"clsid:8AD9C840-044E-11D1-B3E9-00805F499D93\""
-       << '\n'
+       << "    <object classid=\"clsid:8AD9C840-044E-11D1-B3E9-00805F499D93\"" << '\n'
        << "      width=" << int(x1 - x0) + 2 * glow_cJBean_Offset << '\n'
        << "      height=" << int(y1 - y0) + 2 * glow_cJBean_Offset << '\n'
        << "      codebase=\"" << codebase << "\">\n"
-       << "      <PARAM NAME = CODE VALUE = " << bean_name << "_A.class >"
-       << '\n'
-       << "      <PARAM NAME =\"archive\" VALUE =\"pwrp_" << systemname
-       << "_web.jar,"
+       << "      <PARAM NAME = CODE VALUE = " << bean_name << "_A.class >" << '\n'
+       << "      <PARAM NAME =\"archive\" VALUE =\"pwrp_" << systemname << "_web.jar,"
        << "pwr_rt_client.jar,pwr_jop.jar,pwr_jopg.jar\">\n"
        << "      <PARAM NAME=\"type\" "
           "VALUE=\"application/x-java-applet;version=1.3\">"
@@ -1847,8 +1779,7 @@ int Graph::export_javaframe(
        << "      archive =\"pwrp_" << systemname << "_web.jar,"
        << "pwr_rt_client.jar,pwr_jop.jar,pwr_jopg.jar\"\n"
        << "      width=" << int(x1 - x0) + 2 * glow_cJBean_Offset << '\n'
-       << "      height=" << int(y1 - y0) + 2 * glow_cJBean_Offset << ">"
-       << '\n'
+       << "      height=" << int(y1 - y0) + 2 * glow_cJBean_Offset << ">" << '\n'
        << "      height=" << int(y1 - y0) + 2 * glow_cJBean_Offset << '\n'
        << "      instance=\"\">\n"
        << "  </body>\n"
@@ -1882,32 +1813,36 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
   baseclass = str_StartsWith(filename, "Jopc");
 
   grow_GetBackgroundImage(grow->ctx, background_image, &background_tiled);
-  if (!streq(background_image, "")) {
-    sts = grow_GetBackgroundImageSize(
-        grow->ctx, &bg_image_width, &bg_image_height);
+  if (!streq(background_image, ""))
+  {
+    sts = grow_GetBackgroundImageSize(grow->ctx, &bg_image_width, &bg_image_height);
     if (EVEN(sts))
       strcpy(background_image, "");
   }
 
-  if (baseclass) {
+  if (baseclass)
+  {
     strcpy(fname, java_path);
     strcat(fname, "/");
     strcat(fname, filename);
-  } else if (!strchr(filename, ':') && !strchr(filename, '/')) {
+  }
+  else if (!strchr(filename, ':') && !strchr(filename, '/'))
+  {
     strcpy(fname, default_path);
     strcat(fname, filename);
-  } else
+  }
+  else
     strcpy(fname, filename);
 
   dcli_translate_filename(fname, fname);
 
-  if (!html) {
+  if (!html)
+  {
     grow_GetObjectList(grow->ctx, &objectlist, &object_cnt);
 
     grow_SetJavaFrame(grow->ctx, &x1, &x0, &y1, &y0);
     grow_GetBackgroundColor(grow->ctx, &background_color);
-    grow_GetScanTime(
-        grow->ctx, &scan_time, &fast_scan_time, &animation_scan_time);
+    grow_GetScanTime(grow->ctx, &scan_time, &fast_scan_time, &animation_scan_time);
 
     fp.open(fname);
 
@@ -1926,8 +1861,7 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
     if (applet)
       fp << "public class " << bean_name << " extends JopApplet {\n";
     else
-      fp << "public class " << bean_name
-         << " extends JopFrame implements JopUtilityIfc {\n";
+      fp << "public class " << bean_name << " extends JopFrame implements JopUtilityIfc {\n";
     fp << "  JPanel contentPane;\n"
        << "  BorderLayout borderLayout1 = new BorderLayout();\n"
        << "  public LocalPanel localPanel = new LocalPanel();\n"
@@ -1937,16 +1871,17 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
     // Declarations of components
     grow_ExportJavaBean(grow->ctx, fp, 1);
 
-    if (applet) {
+    if (applet)
+    {
       fp << "  public " << bean_name << "() {}\n"
          << "  public void init() {\n"
          << "    super.init();\n"
          << "    geInit();\n"
          << "  }\n";
-    } else {
-      fp << "  public " << bean_name
-         << "( JopSession session, String instance, boolean scrollbar) {"
-         << '\n'
+    }
+    else
+    {
+      fp << "  public " << bean_name << "( JopSession session, String instance, boolean scrollbar) {" << '\n'
          << "    super( session, instance);\n"
          << "    this.scrollbar = scrollbar;\n"
          << "    geInit();\n"
@@ -1964,22 +1899,22 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
 
     fp << "  public void geInit() {\n"
        << "    JopSpider.setSystemName( \"" << systemname << "\");\n"
-       << "    engine.setAnimationScanTime( " << int(animation_scan_time * 1000)
-       << ");\n"
+       << "    engine.setAnimationScanTime( " << int(animation_scan_time * 1000) << ");\n"
        << "    engine.setScanTime( " << int(scan_time * 1000) << ");\n"
-       << "    size = new Dimension( "
-       << int(x1 - x0) + 2 * glow_cJBean_Offset + cFrameBorderX << ", "
+       << "    size = new Dimension( " << int(x1 - x0) + 2 * glow_cJBean_Offset + cFrameBorderX << ", "
        << int(y1 - y0) + 2 * glow_cJBean_Offset + cFrameBorderY << ");\n"
        << "    Dimension dsize = new "
           "Dimension(localPanel.original_width,localPanel.original_height);"
        << '\n'
-       << "    this.addComponentListener(new AspectRatioListener(this,size));"
-       << '\n'
+       << "    this.addComponentListener(new AspectRatioListener(this,size));" << '\n'
        << "    contentPane = (JPanel) this.getContentPane();\n"
        << "    contentPane.setLayout(borderLayout1);\n";
-    if (applet) {
+    if (applet)
+    {
       fp << "      contentPane.add(localPanel, BorderLayout.CENTER);\n";
-    } else {
+    }
+    else
+    {
       fp << "    if ( scrollbar)\n"
          << "      contentPane.add( new JScrollPane(localPanel), "
             "BorderLayout.CENTER);"
@@ -1991,8 +1926,8 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
        << "    localPanel.setLayout( new RatioLayout()); // scaletest\n"
        << "    localPanel.setOpaque(true);\n";
     if (background_color != glow_eDrawType_LineErase)
-      fp << "    localPanel.setBackground(GeColor.getColor("
-         << (int)background_color << ", GeColor.NO_COLOR));\n";
+      fp << "    localPanel.setBackground(GeColor.getColor(" << (int)background_color
+         << ", GeColor.NO_COLOR));\n";
     else
       fp << "    localPanel.setBackground(GeColor.getColor(31, "
             "GeColor.NO_COLOR));"
@@ -2010,10 +1945,11 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
     int ocnt = 0;
     int fcnt = 0;
     object_p = objectlist;
-    for (i = 0; i < object_cnt; i++) {
-      if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode
-          || grow_GetObjectType(*object_p) == glow_eObjectType_GrowGroup
-          || grow_GetObjectType(*object_p) == glow_eObjectType_GrowXYCurve)
+    for (i = 0; i < object_cnt; i++)
+    {
+      if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowNode ||
+          grow_GetObjectType(*object_p) == glow_eObjectType_GrowGroup ||
+          grow_GetObjectType(*object_p) == glow_eObjectType_GrowXYCurve)
         export_GejavaObjectTraceAttr(fp, *object_p, i);
       else if (grow_GetObjectType(*object_p) == glow_eObjectType_GrowBar)
         export_BarTraceAttr(fp, *object_p, i);
@@ -2032,7 +1968,8 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
       ocnt++;
 
       // Avoid too large java functions
-      if (ocnt > 150) {
+      if (ocnt > 150)
+      {
         fcnt++;
         ocnt = 0;
         fp << "    geInit" << fcnt << "();\n"
@@ -2045,21 +1982,19 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
        << "  }\n"
        << "\n"
        << "class LocalPanel extends JPanel {\n";
-    if (!streq(background_image, "")) {
+    if (!streq(background_image, ""))
+    {
       fp << "  GeImage backgroundImage = new GeImage( session);\n"
          << "  public LocalPanel() {\n"
          << "    backgroundImage.setSession(session);\n";
       if (background_tiled)
-        fp << "    backgroundImage.setBounds(0,0, " << bg_image_width << ", "
-           << bg_image_height << ");\n";
+        fp << "    backgroundImage.setBounds(0,0, " << bg_image_width << ", " << bg_image_height << ");\n";
       else
-        fp << "    backgroundImage.setBounds(0,0, "
-           << int(x1 - x0) + 2 * glow_cJBean_Offset << ", "
+        fp << "    backgroundImage.setBounds(0,0, " << int(x1 - x0) + 2 * glow_cJBean_Offset << ", "
            << int(y1 - y0) + 2 * glow_cJBean_Offset << ");\n";
-      fp << "    backgroundImage.setImage( \"" << background_image << "\");"
-         << '\n'
-         << "  }\n";
-    } else
+      fp << "    backgroundImage.setImage( \"" << background_image << "\");" << '\n' << "  }\n";
+    }
+    else
       fp << "  public LocalPanel() {}\n";
 
     grow_ExportJavaBean(grow->ctx, fp, 0);
@@ -2069,19 +2004,22 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
        << "}\n";
 
     grow_GetNodeClassList(grow->ctx, &nodeclass_list, &nodeclass_count);
-    for (i = 0; i < nodeclass_count; i++) {
+    for (i = 0; i < nodeclass_count; i++)
+    {
       if (!grow_IsNextNodeClass(nodeclass_list[i]))
         export_gejava_nodeclass(fp, nodeclass_list[i]);
     }
 
     grow_GetNodeGroupList(grow->ctx, &nodeclass_list, &nodeclass_count);
-    for (i = 0; i < nodeclass_count; i++) {
+    for (i = 0; i < nodeclass_count; i++)
+    {
       export_gejava_nodeclass(fp, nodeclass_list[i]);
     }
     if (nodeclass_count > 0)
       free(nodeclass_list);
 
-    if (!applet) {
+    if (!applet)
+    {
       // JopUtility interface
       fp << "  public int getUtilityType() {\n"
          << "    return JopUtility.GRAPH;\n"
@@ -2103,7 +2041,9 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
     fp << "}\n";
 
     fp.close();
-  } else {
+  }
+  else
+  {
     char codebase[200];
 
     // Create a html file
@@ -2117,15 +2057,12 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
        << "      <title>" << bean_name << "</title>\n"
        << "  </head>\n"
        << "  <body bgcolor=\"#999999\">\n"
-       << "    <object classid=\"clsid:8AD9C840-044E-11D1-B3E9-00805F499D93\""
-       << '\n'
+       << "    <object classid=\"clsid:8AD9C840-044E-11D1-B3E9-00805F499D93\"" << '\n'
        << "      width=" << int(x1 - x0) + 2 * glow_cJBean_Offset << '\n'
        << "      height=" << int(y1 - y0) + 2 * glow_cJBean_Offset << '\n'
        << "      codebase=\"" << codebase << "\">\n"
-       << "      <PARAM NAME = CODE VALUE = " << bean_name << "_A.class >"
-       << '\n'
-       << "      <PARAM NAME =\"archive\" VALUE =\"pwrp_" << systemname
-       << "_web.jar,"
+       << "      <PARAM NAME = CODE VALUE = " << bean_name << "_A.class >" << '\n'
+       << "      <PARAM NAME =\"archive\" VALUE =\"pwrp_" << systemname << "_web.jar,"
        << "pwr_rt_client.jar,pwr_jop.jar,pwr_jopg.jar\">\n"
        << "      <PARAM NAME=\"type\" "
           "VALUE=\"application/x-java-applet;version=1.3\">"
@@ -2150,8 +2087,7 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
   return GE__SUCCESS;
 }
 
-int Graph::export_ObjectTraceAttr(
-    std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_ObjectTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
 {
   int dyn_type1;
   int dyn_type2;
@@ -2178,8 +2114,7 @@ int Graph::export_ObjectTraceAttr(
   // todo
   dyn_type1 = (graph_eTrace)trace_data->attr_type;
   if (dyn_type1 == graph_eTrace_Inherit)
-    grow_GetObjectClassDynType(
-        object, &dyn_type1, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
+    grow_GetObjectClassDynType(object, &dyn_type1, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
 
   trace_color = trace_data->color;
   if (trace_color == glow_eDrawType_Inherit)
@@ -2192,115 +2127,97 @@ int Graph::export_ObjectTraceAttr(
   if (dyn_type1 == graph_eTrace_No)
     dyn_type1 = graph_eTrace_Inherit;
 
-  switch (dyn_type1) {
+  switch (dyn_type1)
+  {
   case graph_eTrace_Dig:
   case graph_eTrace_DigWithCommand:
   case graph_eTrace_DigBorder:
   case graph_eTrace_DigWithText:
   case graph_eTrace_Invisible:
-    if (!streq(trace_data->data[0], "")) {
-      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0]
-         << "\");\n"
-         << "    " << var_name << ".setLowColor(" << (int)trace_color << ");"
-         << '\n';
+    if (!streq(trace_data->data[0], ""))
+    {
+      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0] << "\");\n"
+         << "    " << var_name << ".setLowColor(" << (int)trace_color << ");" << '\n';
     }
     break;
   case graph_eTrace_DigWithError:
-    if (!streq(trace_data->data[0], "")) {
-      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0]
-         << "\");\n";
+    if (!streq(trace_data->data[0], ""))
+    {
+      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0] << "\");\n";
       if (!streq(trace_data->data[1], ""))
-        fp << "    " << var_name << ".setPwrAttrError(\"" << trace_data->data[1]
-           << "\");\n";
-      fp << "    " << var_name << ".setLowColor(" << (int)trace_color << ");"
-         << '\n';
+        fp << "    " << var_name << ".setPwrAttrError(\"" << trace_data->data[1] << "\");\n";
+      fp << "    " << var_name << ".setLowColor(" << (int)trace_color << ");" << '\n';
     }
     break;
   case graph_eTrace_DigTone:
-    if (!streq(trace_data->data[0], "")) {
-      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0]
-         << "\");\n"
-         << "    " << var_name << ".setLowTone(" << (int)trace_color << ");"
-         << '\n';
+    if (!streq(trace_data->data[0], ""))
+    {
+      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0] << "\");\n"
+         << "    " << var_name << ".setLowTone(" << (int)trace_color << ");" << '\n';
     }
     break;
   case graph_eTrace_DigToneWithError:
-    if (!streq(trace_data->data[0], "")) {
-      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0]
-         << "\");\n";
+    if (!streq(trace_data->data[0], ""))
+    {
+      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0] << "\");\n";
       if (!streq(trace_data->data[1], ""))
-        fp << "    " << var_name << ".setPwrAttrError(\"" << trace_data->data[1]
-           << "\");\n";
-      fp << "    " << var_name << ".setLowTone(" << (int)trace_color << ");"
-         << '\n';
+        fp << "    " << var_name << ".setPwrAttrError(\"" << trace_data->data[1] << "\");\n";
+      fp << "    " << var_name << ".setLowTone(" << (int)trace_color << ");" << '\n';
     }
     break;
   case graph_eTrace_SetDig:
-    if (!streq(trace_data->data[0], "")) {
-      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0]
-         << "\");\n"
-         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_SET);"
-         << '\n';
+    if (!streq(trace_data->data[0], ""))
+    {
+      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0] << "\");\n"
+         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_SET);" << '\n';
     }
     break;
   case graph_eTrace_ResetDig:
-    if (!streq(trace_data->data[0], "")) {
-      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0]
-         << "\");\n"
-         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_RESET);"
-         << '\n';
+    if (!streq(trace_data->data[0], ""))
+    {
+      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0] << "\");\n"
+         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_RESET);" << '\n';
     }
     break;
   case graph_eTrace_ToggleDig:
-    if (!streq(trace_data->data[0], "")) {
-      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0]
-         << "\");\n"
-         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_TOGGLE);"
-         << '\n';
+    if (!streq(trace_data->data[0], ""))
+    {
+      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0] << "\");\n"
+         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_TOGGLE);" << '\n';
     }
     break;
   case graph_eTrace_Command:
-    if (!streq(trace_data->data[0], "")) {
-      fp << "    " << var_name << ".setCommand(\"" << trace_data->data[0]
-         << "\");\n"
-         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_COMMAND);"
-         << '\n';
+    if (!streq(trace_data->data[0], ""))
+    {
+      fp << "    " << var_name << ".setCommand(\"" << trace_data->data[0] << "\");\n"
+         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_COMMAND);" << '\n';
     }
     break;
   case graph_eTrace_SetDigWithTone:
-    if (!streq(trace_data->data[0], "")) {
-      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0]
-         << "\");\n"
-         << "    " << var_name << ".setPwrAttrTone(\"" << trace_data->data[2]
-         << "\");\n"
-         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_SET);"
-         << '\n'
-         << "    " << var_name << ".setLowTone(" << (int)trace_color << ");"
-         << '\n';
+    if (!streq(trace_data->data[0], ""))
+    {
+      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0] << "\");\n"
+         << "    " << var_name << ".setPwrAttrTone(\"" << trace_data->data[2] << "\");\n"
+         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_SET);" << '\n'
+         << "    " << var_name << ".setLowTone(" << (int)trace_color << ");" << '\n';
     }
     break;
   case graph_eTrace_ResetDigWithTone:
-    if (!streq(trace_data->data[0], "")) {
-      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0]
-         << "\");\n"
-         << "    " << var_name << ".setPwrAttrTone(\"" << trace_data->data[2]
-         << "\");\n"
-         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_RESET);"
-         << '\n'
-         << "    " << var_name << ".setLowTone(" << (int)trace_color << ");"
-         << '\n';
+    if (!streq(trace_data->data[0], ""))
+    {
+      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0] << "\");\n"
+         << "    " << var_name << ".setPwrAttrTone(\"" << trace_data->data[2] << "\");\n"
+         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_RESET);" << '\n'
+         << "    " << var_name << ".setLowTone(" << (int)trace_color << ");" << '\n';
     }
     break;
   case graph_eTrace_ToggleDigWithTone:
-    if (!streq(trace_data->data[0], "")) {
-      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0]
-         << "\");\n"
-         << "    " << var_name << ".setPwrAttrTone(\"" << trace_data->data[2]
-         << "\");\n"
-         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_TOGGLE);"
-         << '\n'
-         << "    " << var_name << ".setLowTone(" << (int)trace_color << ");"
-         << '\n';
+    if (!streq(trace_data->data[0], ""))
+    {
+      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0] << "\");\n"
+         << "    " << var_name << ".setPwrAttrTone(\"" << trace_data->data[2] << "\");\n"
+         << "    " << var_name << ".setClickAction(Jop.BUTTON_ACTION_TOGGLE);" << '\n'
+         << "    " << var_name << ".setLowTone(" << (int)trace_color << ");" << '\n';
     }
     break;
   default:;
@@ -2309,19 +2226,19 @@ int Graph::export_ObjectTraceAttr(
   // Print annotations
   grow_GetObjectAnnotationNumbers(object, &numbers, &annot_cnt);
 
-  for (i = 0; i < annot_cnt; i++) {
+  for (i = 0; i < annot_cnt; i++)
+  {
     grow_GetAnnotation(object, numbers[i], annot_str, sizeof(annot_str));
-    if (!streq(annot_str, "")) {
-      fp << "    " << var_name << ".setAnnot" << numbers[i] << "(\""
-         << annot_str << "\");\n";
+    if (!streq(annot_str, ""))
+    {
+      fp << "    " << var_name << ".setAnnot" << numbers[i] << "(\"" << annot_str << "\");\n";
     }
   }
   free((char*)numbers);
   return 1;
 }
 
-int Graph::export_GejavaObjectTraceAttr(
-    std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_GejavaObjectTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
 {
   char class_name[40];
   char var_name[40];
@@ -2337,8 +2254,7 @@ int Graph::export_GejavaObjectTraceAttr(
 
   grow_GetUserData(object, (void**)&dyn);
   grow_GetObjectClassJavaName(object, class_name);
-  grow_GetObjectClassDynType(
-      object, &dyn_type1, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
+  grow_GetObjectClassDynType(object, &dyn_type1, &dyn_type2, &dyn_action_type1, &dyn_action_type2);
 
   strcpy(var_name, class_name);
   var_name[0] = _tolower(var_name[0]);
@@ -2349,22 +2265,24 @@ int Graph::export_GejavaObjectTraceAttr(
   // Print annotations
   grow_GetObjectAnnotationNumbers(object, &numbers, &annot_cnt);
 
-  for (i = 0; i < annot_cnt; i++) {
+  for (i = 0; i < annot_cnt; i++)
+  {
     grow_GetAnnotation(object, numbers[i], annot_str, sizeof(annot_str));
-    if (!streq(annot_str, "")) {
-      fp << "    " << var_name << ".setAnnot" << numbers[i] << "(\""
-         << annot_str << "\");\n";
+    if (!streq(annot_str, ""))
+    {
+      fp << "    " << var_name << ".setAnnot" << numbers[i] << "(\"" << annot_str << "\");\n";
     }
-    if (dyn_action_type1 & ge_mActionType1_ValueInput) {
+    if (dyn_action_type1 & ge_mActionType1_ValueInput)
+    {
       // Set text size of GeTextField
       double tsize;
       int sts;
 
       sts = grow_GetAnnotationTextSize(object, numbers[i], &tsize);
-      if (ODD(sts)) {
-        fp << "    " << var_name << ".setAnnot" << numbers[i] << "Font("
-           << var_name << ".annotFont.deriveFont((float)" << (float)tsize
-           << "));\n";
+      if (ODD(sts))
+      {
+        fp << "    " << var_name << ".setAnnot" << numbers[i] << "Font(" << var_name
+           << ".annotFont.deriveFont((float)" << (float)tsize << "));\n";
       }
     }
   }
@@ -2373,8 +2291,7 @@ int Graph::export_GejavaObjectTraceAttr(
   return 1;
 }
 
-int Graph::export_TableTraceAttr(
-    std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_TableTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
 {
   GeDyn* dyn;
   char class_name[] = "GeTable";
@@ -2404,24 +2321,21 @@ int Graph::export_BarTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
 
   GeDynElem* elem = dyn->elements;
   // for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-  if (elem->dyn_type1 == ge_mDynType1_Bar) {
+  if (elem->dyn_type1 == ge_mDynType1_Bar)
+  {
     if (!streq(((GeBar*)elem)->attribute, ""))
-      fp << "    " << var_name << ".setPwrAttribute(\""
-         << ((GeBar*)elem)->attribute << "\");\n";
+      fp << "    " << var_name << ".setPwrAttribute(\"" << ((GeBar*)elem)->attribute << "\");\n";
     if (!streq(((GeBar*)elem)->minvalue_attr, ""))
-      fp << "    " << var_name << ".setMinValueAttr(\""
-         << ((GeBar*)elem)->minvalue_attr << "\");\n";
+      fp << "    " << var_name << ".setMinValueAttr(\"" << ((GeBar*)elem)->minvalue_attr << "\");\n";
     if (!streq(((GeBar*)elem)->maxvalue_attr, ""))
-      fp << "    " << var_name << ".setMaxValueAttr(\""
-         << ((GeBar*)elem)->maxvalue_attr << "\");\n";
+      fp << "    " << var_name << ".setMaxValueAttr(\"" << ((GeBar*)elem)->maxvalue_attr << "\");\n";
   }
   // break;
   //}
-  if (dyn->total_action_type1 & ~ge_mActionType1_Inherit) {
-    fp << "    " << var_name << ".dd.setActionType("
-       << (int)dyn->total_action_type1 << ");\n"
-       << "    " << var_name << ".dd.setAccess(" << (int)dyn->access << ");"
-       << '\n';
+  if (dyn->total_action_type1 & ~ge_mActionType1_Inherit)
+  {
+    fp << "    " << var_name << ".dd.setActionType(" << (int)dyn->total_action_type1 << ");\n"
+       << "    " << var_name << ".dd.setAccess(" << (int)dyn->access << ");" << '\n';
 
     dyn->export_java(object, fp, var_name);
   }
@@ -2429,8 +2343,7 @@ int Graph::export_BarTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
   return 1;
 }
 
-int Graph::export_TrendTraceAttr(
-    std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_TrendTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
 {
   GeDyn* dyn;
   char class_name[] = "JopTrend";
@@ -2444,33 +2357,27 @@ int Graph::export_TrendTraceAttr(
 
   GeDynElem* elem = dyn->elements;
   // for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-  if (elem->dyn_type1 == ge_mDynType1_Trend) {
+  if (elem->dyn_type1 == ge_mDynType1_Trend)
+  {
     if (!streq(((GeTrend*)elem)->attribute1, ""))
-      fp << "    " << var_name << ".setPwrAttribute1(\""
-         << ((GeTrend*)elem)->attribute1 << "\");\n";
+      fp << "    " << var_name << ".setPwrAttribute1(\"" << ((GeTrend*)elem)->attribute1 << "\");\n";
     if (!streq(((GeTrend*)elem)->attribute2, ""))
-      fp << "    " << var_name << ".setPwrAttribute2(\""
-         << ((GeTrend*)elem)->attribute2 << "\");\n";
+      fp << "    " << var_name << ".setPwrAttribute2(\"" << ((GeTrend*)elem)->attribute2 << "\");\n";
     if (!streq(((GeTrend*)elem)->minvalue_attr1, ""))
-      fp << "    " << var_name << ".setMinValueAttr1(\""
-         << ((GeTrend*)elem)->minvalue_attr1 << "\");\n";
+      fp << "    " << var_name << ".setMinValueAttr1(\"" << ((GeTrend*)elem)->minvalue_attr1 << "\");\n";
     if (!streq(((GeTrend*)elem)->maxvalue_attr1, ""))
-      fp << "    " << var_name << ".setMaxValueAttr1(\""
-         << ((GeTrend*)elem)->maxvalue_attr1 << "\");\n";
+      fp << "    " << var_name << ".setMaxValueAttr1(\"" << ((GeTrend*)elem)->maxvalue_attr1 << "\");\n";
     if (!streq(((GeTrend*)elem)->minvalue_attr2, ""))
-      fp << "    " << var_name << ".setMinValueAttr2(\""
-         << ((GeTrend*)elem)->minvalue_attr2 << "\");\n";
+      fp << "    " << var_name << ".setMinValueAttr2(\"" << ((GeTrend*)elem)->minvalue_attr2 << "\");\n";
     if (!streq(((GeTrend*)elem)->maxvalue_attr2, ""))
-      fp << "    " << var_name << ".setMaxValueAttr2(\""
-         << ((GeTrend*)elem)->maxvalue_attr2 << "\");\n";
+      fp << "    " << var_name << ".setMaxValueAttr2(\"" << ((GeTrend*)elem)->maxvalue_attr2 << "\");\n";
   }
   // break;
   //}
-  if (dyn->total_action_type1 & ~ge_mActionType1_Inherit) {
-    fp << "    " << var_name << ".dd.setActionType("
-       << (int)dyn->total_action_type1 << ");\n"
-       << "    " << var_name << ".dd.setAccess(" << (int)dyn->access << ");"
-       << '\n';
+  if (dyn->total_action_type1 & ~ge_mActionType1_Inherit)
+  {
+    fp << "    " << var_name << ".dd.setActionType(" << (int)dyn->total_action_type1 << ");\n"
+       << "    " << var_name << ".dd.setAccess(" << (int)dyn->access << ");" << '\n';
 
     dyn->export_java(object, fp, var_name);
   }
@@ -2492,10 +2399,12 @@ int Graph::export_PieTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
 
   GeDynElem* elem = dyn->elements;
   // for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-  if (elem->dyn_type1 == ge_mDynType1_Pie) {
+  if (elem->dyn_type1 == ge_mDynType1_Pie)
+  {
     fp << "    " << var_name << ".setPwrAttribute(new String[]{";
 
-    for (int i = 0; i < PIE_MAX_SECTORS; i++) {
+    for (int i = 0; i < PIE_MAX_SECTORS; i++)
+    {
       if (!streq(((GePie*)elem)->attribute[i], ""))
         fp << "\"" << ((GePie*)elem)->attribute[i] << "\"";
       else
@@ -2504,16 +2413,14 @@ int Graph::export_PieTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
         fp << ",";
     }
     fp << "});\n"
-       << "    " << var_name << ".setFixRange(" << ((GePie*)elem)->fix_range
-       << ");\n";
+       << "    " << var_name << ".setFixRange(" << ((GePie*)elem)->fix_range << ");\n";
   }
   // break;
   //}
-  if (dyn->total_action_type1 & ~ge_mActionType1_Inherit) {
-    fp << "    " << var_name << ".dd.setActionType("
-       << (int)dyn->total_action_type1 << ");\n"
-       << "    " << var_name << ".dd.setAccess(" << (int)dyn->access << ");"
-       << '\n';
+  if (dyn->total_action_type1 & ~ge_mActionType1_Inherit)
+  {
+    fp << "    " << var_name << ".dd.setActionType(" << (int)dyn->total_action_type1 << ");\n"
+       << "    " << var_name << ".dd.setAccess(" << (int)dyn->access << ");" << '\n';
 
     dyn->export_java(object, fp, var_name);
   }
@@ -2521,8 +2428,7 @@ int Graph::export_PieTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
   return 1;
 }
 
-int Graph::export_BarChartTraceAttr(
-    std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_BarChartTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
 {
   GeDyn* dyn;
   char class_name[] = "JopBarChart";
@@ -2536,10 +2442,12 @@ int Graph::export_BarChartTraceAttr(
 
   GeDynElem* elem = dyn->elements;
   // for (GeDynElem* elem = dyn->elements; elem; elem = elem->next) {
-  if (elem->dyn_type1 == ge_mDynType1_BarChart) {
+  if (elem->dyn_type1 == ge_mDynType1_BarChart)
+  {
     fp << "    " << var_name << ".setPwrAttribute(new String[]{";
 
-    for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++) {
+    for (int i = 0; i < BARCHART_MAX_BARSEGMENTS; i++)
+    {
       if (!streq(((GeBarChart*)elem)->attribute[i], ""))
         fp << "\"" << ((GeBarChart*)elem)->attribute[i] << "\"";
       else
@@ -2551,11 +2459,10 @@ int Graph::export_BarChartTraceAttr(
   }
   // break;
   //}
-  if (dyn->total_action_type1 & ~ge_mActionType1_Inherit) {
-    fp << "    " << var_name << ".dd.setActionType("
-       << (int)dyn->total_action_type1 << ");\n"
-       << "    " << var_name << ".dd.setAccess(" << (int)dyn->access << ");"
-       << '\n';
+  if (dyn->total_action_type1 & ~ge_mActionType1_Inherit)
+  {
+    fp << "    " << var_name << ".dd.setActionType(" << (int)dyn->total_action_type1 << ");\n"
+       << "    " << var_name << ".dd.setAccess(" << (int)dyn->access << ");" << '\n';
 
     dyn->export_java(object, fp, var_name);
   }
@@ -2563,8 +2470,7 @@ int Graph::export_BarChartTraceAttr(
   return 1;
 }
 
-int Graph::export_SliderTraceAttr(
-    std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_SliderTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
 {
   glow_sTraceData* trace_data;
   char class_name[40];
@@ -2577,72 +2483,28 @@ int Graph::export_SliderTraceAttr(
   var_name[0] = _tolower(var_name[0]);
   sprintf(&var_name[strlen(var_name)], "%d", cnt);
 
-  if (!streq(trace_data->data[0], "")) {
+  if (!streq(trace_data->data[0], ""))
+  {
     if (!streq(trace_data->data[0], ""))
-      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0]
-         << "\");\n"
-         << "    " << var_name << ".setAccess(" << (int)trace_data->access
-         << ");\n";
+      fp << "    " << var_name << ".setPwrAttribute(\"" << trace_data->data[0] << "\");\n"
+         << "    " << var_name << ".setAccess(" << (int)trace_data->access << ");\n";
   }
   return 1;
 }
 
 #else
 
-int Graph::export_javabean(char* filename, char* bean_name)
-{
-  return 1;
-}
-int Graph::export_gejava_nodeclass(std::ofstream& fp, grow_tNodeClass nodeclass)
-{
-  return 1;
-}
-int Graph::export_javaframe(
-    char* filename, char* bean_name, int applet, int html)
-{
-  return 1;
-}
-int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
-{
-  return 1;
-}
-int Graph::export_ObjectTraceAttr(
-    std::ofstream& fp, grow_tObject object, int cnt)
-{
-  return 1;
-}
-int Graph::export_GejavaObjectTraceAttr(
-    std::ofstream& fp, grow_tObject object, int cnt)
-{
-  return 1;
-}
-int Graph::export_BarTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
-{
-  return 1;
-}
-int Graph::export_TrendTraceAttr(
-    std::ofstream& fp, grow_tObject object, int cnt)
-{
-  return 1;
-}
-int Graph::export_PieTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
-{
-  return 1;
-}
-int Graph::export_BarChartTraceAttr(
-    std::ofstream& fp, grow_tObject object, int cnt)
-{
-  return 1;
-}
-int Graph::export_TableTraceAttr(
-    std::ofstream& fp, grow_tObject object, int cnt)
-{
-  return 1;
-}
-int Graph::export_SliderTraceAttr(
-    std::ofstream& fp, grow_tObject object, int cnt)
-{
-  return 1;
-}
+int Graph::export_javabean(char* filename, char* bean_name) { return 1; }
+int Graph::export_gejava_nodeclass(std::ofstream& fp, grow_tNodeClass nodeclass) { return 1; }
+int Graph::export_javaframe(char* filename, char* bean_name, int applet, int html) { return 1; }
+int Graph::export_gejava(char* filename, char* bean_name, int applet, int html) { return 1; }
+int Graph::export_ObjectTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_GejavaObjectTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_BarTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_TrendTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_PieTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_BarChartTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_TableTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_SliderTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
 
 #endif

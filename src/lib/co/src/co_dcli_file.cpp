@@ -46,7 +46,8 @@
 #include "co_log.h"
 #include "co_string.h"
 
-typedef enum {
+typedef enum
+{
   dcli_eTrans_EnvVar,
   dcli_eTrans_Dir,
   dcli_eTrans_File
@@ -54,10 +55,7 @@ typedef enum {
 
 static char dcli_default_directory[200] = "";
 
-void dcli_set_default_directory(char* dir)
-{
-  strcpy(dcli_default_directory, dir);
-}
+void dcli_set_default_directory(char* dir) { strcpy(dcli_default_directory, dir); }
 
 int dcli_get_defaultfilename(const char* inname, char* outname, const char* ext)
 {
@@ -66,7 +64,8 @@ int dcli_get_defaultfilename(const char* inname, char* outname, const char* ext)
 
   if (strchr(inname, '/'))
     str_Strcpy(outname, inname);
-  else if ((s = strchr(inname, ':'))) {
+  else if ((s = strchr(inname, ':')))
+  {
     /* Replace VMS disp to env variable */
     strcpy(filename, "$");
     strncat(filename, inname, s - inname);
@@ -74,18 +73,25 @@ int dcli_get_defaultfilename(const char* inname, char* outname, const char* ext)
     strcat(filename, "/");
     strcat(filename, s + 1);
     dcli_replace_env(filename, outname);
-  } else {
-    if (streq(dcli_default_directory, "")) {
+  }
+  else
+  {
+    if (streq(dcli_default_directory, ""))
+    {
       char cwd[200];
 
-      if (getcwd(cwd, sizeof(cwd)) != NULL) {
+      if (getcwd(cwd, sizeof(cwd)) != NULL)
+      {
         strcpy(filename, cwd);
         strcat(filename, "/");
-      } else
+      }
+      else
         strcpy(filename, "");
       strcat(filename, inname);
       dcli_replace_env(filename, outname);
-    } else {
+    }
+    else
+    {
       strcpy(filename, dcli_default_directory);
       if ((filename[strlen(filename) - 1] != '/') && (inname[0] != '/'))
         strcat(filename, "/");
@@ -95,20 +101,23 @@ int dcli_get_defaultfilename(const char* inname, char* outname, const char* ext)
   }
 
   /* Look for extention in filename */
-  if (ext != NULL) {
+  if (ext != NULL)
+  {
     s = strrchr(inname, ':');
     if (s == 0)
       s = (char*)inname;
 
     s2 = strrchr(s, '>');
-    if (s2 == 0) {
+    if (s2 == 0)
+    {
       s2 = strrchr(s, ']');
       if (s2 == 0)
         s2 = s;
     }
 
     s = strrchr(s2, '.');
-    if (s == 0 || s == s2) {
+    if (s == 0 || s == s2)
+    {
       /* No extention found, add extention */
       strcat(outname, ext);
     }
@@ -118,20 +127,20 @@ int dcli_get_defaultfilename(const char* inname, char* outname, const char* ext)
 }
 
 /*************************************************************************
-*
-* Name:		dcli_replace_env()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Replace env variables in UNIX filenames.
-*	A string that starts with $ and ends with . or / will replaced
-*	if then string is found by getenv. Only lower case variables
-*	will be detected.
-*
-**************************************************************************/
+ *
+ * Name:		dcli_replace_env()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Replace env variables in UNIX filenames.
+ *	A string that starts with $ and ends with . or / will replaced
+ *	if then string is found by getenv. Only lower case variables
+ *	will be detected.
+ *
+ **************************************************************************/
 int dcli_replace_env(const char* str, char* newstr)
 {
   char* s;
@@ -148,22 +157,29 @@ int dcli_replace_env(const char* str, char* newstr)
   s = (char*)str;
   t = news;
 
-  while (*s != 0) {
-    if (*s == '$') {
-      if (*(s + 1) == '$') {
+  while (*s != 0)
+  {
+    if (*s == '$')
+    {
+      if (*(s + 1) == '$')
+      {
         /* '$$: insert pid */
         char pid[20];
         sprintf(pid, "%d", getpid());
         strncpy(t, pid, strlen(pid));
         t += strlen(pid);
         s++;
-      } else {
+      }
+      else
+      {
         symbolmode = 1;
         u = s + 1;
         *t = *s;
         t++;
       }
-    } else if (symbolmode && (*s == '/' || *s == '.')) {
+    }
+    else if (symbolmode && (*s == '/' || *s == '.'))
+    {
       /* End of potential symbol */
       size = (long int)s - (long int)u;
       strncpy(symbol, u, size);
@@ -172,13 +188,16 @@ int dcli_replace_env(const char* str, char* newstr)
         strcpy(lower_symbol, symbol);
       else
         str_ToLower(lower_symbol, symbol);
-      if ((value = getenv(lower_symbol)) == NULL) {
+      if ((value = getenv(lower_symbol)) == NULL)
+      {
         /* It was no symbol */
-        //if (str_StartsWith(str, "$pwr_"))
-        //  log_debug("Warning! Could not resolve environment variable $%s\n", lower_symbol);
+        // if (str_StartsWith(str, "$pwr_"))
+        //   log_debug("Warning! Could not resolve environment variable $%s\n", lower_symbol);
         *t = *s;
         t++;
-      } else {
+      }
+      else
+      {
         /* Symbol found */
         t -= strlen(symbol) + 1;
         strcpy(t, value);
@@ -187,14 +206,17 @@ int dcli_replace_env(const char* str, char* newstr)
         t++;
       }
       symbolmode = 0;
-    } else {
+    }
+    else
+    {
       *t = *s;
       t++;
     }
     s++;
   }
 
-  if (symbolmode) {
+  if (symbolmode)
+  {
     /* End of potential symbol */
     size = (long int)s - (long int)u;
     strncpy(symbol, u, size);
@@ -203,19 +225,23 @@ int dcli_replace_env(const char* str, char* newstr)
       strcpy(lower_symbol, symbol);
     else
       str_ToLower(lower_symbol, symbol);
-    if ((value = getenv(lower_symbol)) == NULL) {
+    if ((value = getenv(lower_symbol)) == NULL)
+    {
       /* It was no symbol */
-      //if (str_StartsWith(str, "$pwr"))
-      //  log_debug("Warning! Could not resolve environment variable $%s\n", lower_symbol);
+      // if (str_StartsWith(str, "$pwr"))
+      //   log_debug("Warning! Could not resolve environment variable $%s\n", lower_symbol);
       *t = 0;
-    } else {
+    }
+    else
+    {
       /* Symbol found */
       t -= strlen(symbol) + 1;
       strcpy(t, value);
       t += strlen(value);
       *t = 0;
     }
-  } else
+  }
+  else
     *t = 0;
 
   strcpy(newstr, news);
@@ -223,19 +249,19 @@ int dcli_replace_env(const char* str, char* newstr)
 }
 
 /*************************************************************************
-*
-* Name:		dcli_fgetname()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get filename for a filedescriptor.
-*	This function is not implementet on all os, therefor a defaultname
-*	should be supplied which is returned for this os.
-*
-**************************************************************************/
+ *
+ * Name:		dcli_fgetname()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get filename for a filedescriptor.
+ *	This function is not implementet on all os, therefor a defaultname
+ *	should be supplied which is returned for this os.
+ *
+ **************************************************************************/
 char* dcli_fgetname(FILE* fp, char* name, char* def_name)
 {
   dcli_translate_filename(name, def_name);
@@ -243,17 +269,17 @@ char* dcli_fgetname(FILE* fp, char* name, char* def_name)
 }
 
 /*************************************************************************
-*
-* Name:		dcli_translate_filename()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Translate VMS or unix filename to the current platform.
-*
-**************************************************************************/
+ *
+ * Name:		dcli_translate_filename()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Translate VMS or unix filename to the current platform.
+ *
+ **************************************************************************/
 
 int dcli_translate_filename(char* out, const char* in)
 {
@@ -264,45 +290,62 @@ int dcli_translate_filename(char* out, const char* in)
   int state = 0;
   int sts;
 
-  if (strchr(in, ':') != 0 || strchr(in, '[') != 0 || strchr(in, '<') != 0) {
+  if (strchr(in, ':') != 0 || strchr(in, '[') != 0 || strchr(in, '<') != 0)
+  {
     // Convert from VMS to unix
-    for (i = 0, s = in, t = out_name; *s; i++, s++) {
-      if (i == 0) {
-        if (strchr(in, ':') != 0) {
+    for (i = 0, s = in, t = out_name; *s; i++, s++)
+    {
+      if (i == 0)
+      {
+        if (strchr(in, ':') != 0)
+        {
           state = dcli_eTrans_EnvVar;
           *t++ = '$';
           *t++ = *s;
-        } else if (*s == '[' || *s == '<') {
+        }
+        else if (*s == '[' || *s == '<')
+        {
           if (*(s + 1) == '.')
             s++;
           else
             *t++ = '/';
           state = dcli_eTrans_Dir;
-        } else {
+        }
+        else
+        {
           state = dcli_eTrans_File;
           *t++ = *s;
         }
         continue;
       }
-      switch (state) {
+      switch (state)
+      {
       case dcli_eTrans_EnvVar:
-        if (*s == ':') {
+        if (*s == ':')
+        {
           *t++ = '/';
-          if (*(s + 1) == '[' || *(s + 1) == '<') {
+          if (*(s + 1) == '[' || *(s + 1) == '<')
+          {
             state = dcli_eTrans_Dir;
             s++;
-          } else
+          }
+          else
             state = dcli_eTrans_File;
-        } else
+        }
+        else
           *t++ = *s;
         break;
       case dcli_eTrans_Dir:
-        if (*s == '.') {
+        if (*s == '.')
+        {
           *t++ = '/';
-        } else if (*s == ']' || *s == '>') {
+        }
+        else if (*s == ']' || *s == '>')
+        {
           *t++ = '/';
           state = dcli_eTrans_File;
-        } else
+        }
+        else
           *t++ = *s;
         break;
       case dcli_eTrans_File:
@@ -313,12 +356,16 @@ int dcli_translate_filename(char* out, const char* in)
     *t = 0;
     sts = dcli_replace_env(out_name, out);
     return sts;
-  } else {
+  }
+  else
+  {
     // Already unix syntax
-    if (in[0] == '~') {
+    if (in[0] == '~')
+    {
       strcpy(out_name, "$HOME");
       strcat(&out_name[5], &in[1]);
-    } else
+    }
+    else
       strcpy(out_name, in);
 
     sts = dcli_replace_env(out_name, out);
@@ -330,7 +377,8 @@ pwr_tStatus dcli_file_time(char* filename, pwr_tTime* time)
 {
   struct stat info;
 
-  if (stat(filename, &info) != -1) {
+  if (stat(filename, &info) != -1)
+  {
     time->tv_sec = info.st_mtime;
     time->tv_nsec = 0;
     return DCLI__SUCCESS;
@@ -342,7 +390,8 @@ pwr_tStatus dcli_file_ctime(char* filename, pwr_tTime* time)
 {
   struct stat info;
 
-  if (stat(filename, &info) != -1) {
+  if (stat(filename, &info) != -1)
+  {
     time->tv_sec = info.st_ctime;
     time->tv_nsec = 0;
     return DCLI__SUCCESS;
@@ -355,7 +404,8 @@ void dcli_save_file_versions(char* fname)
   pwr_tFileName newname;
   pwr_tFileName oldname;
 
-  for (int i = 9; i >= 0; i--) {
+  for (int i = 9; i >= 0; i--)
+  {
     snprintf(newname, sizeof(newname), "%s.%d", fname, i + 1);
     if (i == 0)
       strncpy(oldname, fname, sizeof(oldname));

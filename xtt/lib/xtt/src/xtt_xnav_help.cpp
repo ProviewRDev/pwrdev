@@ -54,54 +54,58 @@
 static int help_cmp_items(const void* node1, const void* node2);
 
 /*************************************************************************
-*
-* Name:		help()
-*
-**************************************************************************/
+ *
+ * Name:		help()
+ *
+ **************************************************************************/
 
-void* xnav_help_insert_cb(void* ctx, navh_eItemType item_type,
-    const char* text1, const char* text2, const char* text3, const char* link,
-    const char* bookmark, const char* file_name, navh_eHelpFile file_type,
-    int help_index, const char* bm, int coding)
+void* xnav_help_insert_cb(void* ctx, navh_eItemType item_type, const char* text1, const char* text2,
+                          const char* text3, const char* link, const char* bookmark, const char* file_name,
+                          navh_eHelpFile file_type, int help_index, const char* bm, int coding)
 {
   XNav* xnav = (XNav*)ctx;
 
-  if (xnav->init_help == 1) {
+  if (xnav->init_help == 1)
+  {
     xnav->brow_pop();
     brow_SetNodraw(xnav->brow->ctx);
     brow_SetTextCoding(xnav->brow->ctx, (flow_eTextCoding)coding);
     xnav->init_help = 0;
-  } else if (xnav->init_help == 2) {
+  }
+  else if (xnav->init_help == 2)
+  {
     brow_SetTextCoding(xnav->brow->ctx, (flow_eTextCoding)coding);
     xnav->init_help = 0;
   }
 
-  switch (item_type) {
+  switch (item_type)
+  {
   case navh_eItemType_Help:
-  case navh_eItemType_HelpCode: {
-    ItemHelp* item = new ItemHelp(xnav->brow, "help", text1, text2, text3, link,
-        bookmark, file_name, file_type, help_index, NULL, flow_eDest_IntoLast);
+  case navh_eItemType_HelpCode:
+  {
+    ItemHelp* item = new ItemHelp(xnav->brow, "help", text1, text2, text3, link, bookmark, file_name,
+                                  file_type, help_index, NULL, flow_eDest_IntoLast);
     return item->node;
   }
-  case navh_eItemType_HelpBold: {
-    ItemHelpBold* item = new ItemHelpBold(xnav->brow, "help", text1, text2,
-        text3, link, bookmark, file_name, file_type, help_index, NULL,
-        flow_eDest_IntoLast);
+  case navh_eItemType_HelpBold:
+  {
+    ItemHelpBold* item = new ItemHelpBold(xnav->brow, "help", text1, text2, text3, link, bookmark, file_name,
+                                          file_type, help_index, NULL, flow_eDest_IntoLast);
     return item->node;
   }
-  case navh_eItemType_HelpHeader: {
-    ItemHelpHeader* item = new ItemHelpHeader(
-        xnav->brow, "help", text1, NULL, flow_eDest_IntoLast);
+  case navh_eItemType_HelpHeader:
+  {
+    ItemHelpHeader* item = new ItemHelpHeader(xnav->brow, "help", text1, NULL, flow_eDest_IntoLast);
     return item->node;
   }
-  case navh_eItemType_Header: {
-    ItemHeader* item
-        = new ItemHeader(xnav->brow, "help", text1, NULL, flow_eDest_IntoLast);
+  case navh_eItemType_Header:
+  {
+    ItemHeader* item = new ItemHeader(xnav->brow, "help", text1, NULL, flow_eDest_IntoLast);
     return item->node;
   }
-  case navh_eItemType_HeaderLarge: {
-    ItemHeaderLarge* item = new ItemHeaderLarge(
-        xnav->brow, "help", text1, NULL, flow_eDest_IntoLast);
+  case navh_eItemType_HeaderLarge:
+  {
+    ItemHeaderLarge* item = new ItemHeaderLarge(xnav->brow, "help", text1, NULL, flow_eDest_IntoLast);
     return item->node;
   }
   default:
@@ -109,26 +113,26 @@ void* xnav_help_insert_cb(void* ctx, navh_eItemType item_type,
   }
 }
 
-int XNav::help(char* help_key, char* help_bookmark, navh_eHelpFile file_type,
-    char* file_name, int pop)
+int XNav::help(char* help_key, char* help_bookmark, navh_eHelpFile file_type, char* file_name, int pop)
 {
   int sts;
   brow_tNode bookmark_node;
   brow_tNode prev, first;
-  NavHelp* navhelp
-      = new NavHelp((void*)this, pwr_cNameBaseXttHelp, pwr_cNameProjectXttHelp);
+  NavHelp* navhelp = new NavHelp((void*)this, pwr_cNameBaseXttHelp, pwr_cNameProjectXttHelp);
   navhelp->insert_cb = xnav_help_insert_cb;
 
   if (pop)
     init_help = 1;
-  else {
+  else
+  {
     init_help = 2;
     brow_SetNodraw(brow->ctx);
   }
-  sts = navhelp->help(
-      help_key, help_bookmark, file_type, file_name, &bookmark_node, false);
-  if (EVEN(sts)) {
-    if (!pop || init_help != 1) {
+  sts = navhelp->help(help_key, help_bookmark, file_type, file_name, &bookmark_node, false);
+  if (EVEN(sts))
+  {
+    if (!pop || init_help != 1)
+    {
       brow_push();
       brow_ResetNodraw(brow->ctx);
     }
@@ -137,15 +141,19 @@ int XNav::help(char* help_key, char* help_bookmark, navh_eHelpFile file_type,
 
   brow_ResetNodraw(brow->ctx);
   brow_Redraw(brow->ctx, 0);
-  if (bookmark_node) {
+  if (bookmark_node)
+  {
     brow_CenterObject(brow->ctx, bookmark_node, 0.0);
     sts = brow_GetPrevious(brow->ctx, bookmark_node, &prev);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       brow_SelectClear(brow->ctx);
       brow_SetInverse(prev, 1);
       brow_SelectInsert(brow->ctx, prev);
     }
-  } else {
+  }
+  else
+  {
     sts = brow_GetFirst(brow->ctx, &first);
     if (ODD(sts))
       brow_CenterObject(brow->ctx, first, 0.0);
@@ -156,32 +164,30 @@ int XNav::help(char* help_key, char* help_bookmark, navh_eHelpFile file_type,
 }
 
 /*************************************************************************
-*
-* Name:		help_index()
-*
-**************************************************************************/
+ *
+ * Name:		help_index()
+ *
+ **************************************************************************/
 
 int XNav::help_index(navh_eHelpFile file_type, char* file_name, int pop)
 {
   int sts;
   brow_tObject* object_list;
   int object_cnt;
-  NavHelp* navhelp
-      = new NavHelp((void*)this, pwr_cNameBaseXttHelp, pwr_cNameProjectXttHelp);
+  NavHelp* navhelp = new NavHelp((void*)this, pwr_cNameBaseXttHelp, pwr_cNameProjectXttHelp);
   navhelp->insert_cb = xnav_help_insert_cb;
 
   if (pop)
     brow_pop();
   brow_SetNodraw(brow->ctx);
   new ItemHelpHeader(brow, "help_index", "Index", NULL, flow_eDest_IntoLast);
-  new ItemHelp(brow, "help_index", "", "", "", "", "", NULL,
-      navh_eHelpFile_Base, 0, NULL, flow_eDest_IntoLast);
+  new ItemHelp(brow, "help_index", "", "", "", "", "", NULL, navh_eHelpFile_Base, 0, NULL,
+               flow_eDest_IntoLast);
 
   sts = navhelp->help_index(file_type, file_name);
 
   brow_GetObjectList(brow->ctx, &object_list, &object_cnt);
-  qsort(
-      &object_list[2], object_cnt - 2, sizeof(object_list[0]), help_cmp_items);
+  qsort(&object_list[2], object_cnt - 2, sizeof(object_list[0]), help_cmp_items);
 
   brow_ResetNodraw(brow->ctx);
   brow_Redraw(brow->ctx, 0);

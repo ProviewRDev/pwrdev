@@ -47,7 +47,8 @@ typedef void* Widget;
 
 class XttHotkey;
 
-class XttGtk : public Xtt {
+class XttGtk : public Xtt
+{
 public:
   GtkWidget* parent_wid;
   GtkWidget* brow_widget;
@@ -72,8 +73,8 @@ public:
   void message(char severity, const char* msg);
   void xtt_mainloop();
   // int init_hotkey( XtAppContext AppCtx, Widget Top);
-  void open_input_dialog(const char* text, const char* title,
-      const char* init_text, void (*ok_cb)(Xtt*, char*));
+  void open_input_dialog(const char* text, const char* title, const char* init_text,
+                         void (*ok_cb)(Xtt*, char*));
   void set_prompt(const char* prompt);
   void open_change_value();
   void create_input_dialog();
@@ -126,15 +127,14 @@ public:
   static void create_india_text(GtkWidget* w, gpointer data);
   static void activate_india_ok(GtkWidget* w, gpointer data);
   static void activate_india_cancel(GtkWidget* w, gpointer data);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void valchanged_cmd_input(GtkWidget* w, gpointer data);
 
-  static void hotkey_Command(char* arg1, char *arg2, void* userdata);
-  static void hotkey_ToggleDig(char* arg1, char *arg2, void* userdata);
-  static void hotkey_SetDig(char* arg1, char *arg2, void* userdata);
-  static void hotkey_ResetDig(char* arg1, char *arg2, void* userdata);
-  static void hotkey_SetValue(char* arg1, char *arg2, void* userdata);
+  static void hotkey_Command(char* arg1, char* arg2, void* userdata);
+  static void hotkey_ToggleDig(char* arg1, char* arg2, void* userdata);
+  static void hotkey_SetDig(char* arg1, char* arg2, void* userdata);
+  static void hotkey_ResetDig(char* arg1, char* arg2, void* userdata);
+  static void hotkey_SetValue(char* arg1, char* arg2, void* userdata);
 };
 
 #endif

@@ -45,7 +45,6 @@
 
 FILE* mh_LogFileOpen(qcom_sQid* Address);
 
-void mh_LogMessage(FILE* fp, pwr_tStatus sts, mh_eMsg Type, mh_sMsgInfo* Msg,
-    qcom_sQid* Address);
+void mh_LogMessage(FILE* fp, pwr_tStatus sts, mh_eMsg Type, mh_sMsgInfo* Msg, qcom_sQid* Address);
 
 #endif

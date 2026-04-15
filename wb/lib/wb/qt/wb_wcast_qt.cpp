@@ -40,9 +40,8 @@
 
 #include "wb_wcast_qt.h"
 
-WCastQt::WCastQt(void* wc_parent_ctx, QWidget* wc_parent_wid,
-    const char* wc_name, ldh_tSesContext wc_ldhses, pwr_sAttrRef wc_aref,
-    pwr_tStatus* status)
+WCastQt::WCastQt(void* wc_parent_ctx, QWidget* wc_parent_wid, const char* wc_name, ldh_tSesContext wc_ldhses,
+                 pwr_sAttrRef wc_aref, pwr_tStatus* status)
     : WCast(wc_parent_ctx, wc_name, wc_ldhses, wc_aref, status)
 {
   wow = new CoWowQt(wc_parent_wid);
@@ -51,7 +50,4 @@ WCastQt::WCastQt(void* wc_parent_ctx, QWidget* wc_parent_wid,
   *status = 1;
 }
 
-WCastQt::~WCastQt()
-{
-  delete wow;
-}
+WCastQt::~WCastQt() { delete wow; }

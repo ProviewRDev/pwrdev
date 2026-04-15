@@ -58,7 +58,8 @@ void RunningTime_exec(plc_sThread* tp, pwr_sClass_RunningTime* object)
     TimeSince = 0.01;
 
   /* Test if New Trip */
-  if (object->TripReset) {
+  if (object->TripReset)
+  {
     object->OldTripNOfStarts = object->TripNOfStarts;
     object->OldTripRunHours = object->TripRunHours;
     object->OldTripRunSeconds = object->TripRunSeconds;
@@ -77,21 +78,25 @@ void RunningTime_exec(plc_sThread* tp, pwr_sClass_RunningTime* object)
   }
   /* Update Calendar time */
   object->TotalSeconds += TimeSince;
-  if (object->TotalSeconds >= 3600.0) {
+  if (object->TotalSeconds >= 3600.0)
+  {
     object->TotalSeconds -= 3600.0;
     object->TotalHours++;
   }
   object->TripSeconds += TimeSince;
-  if (object->TripSeconds >= 3600.0) {
+  if (object->TripSeconds >= 3600.0)
+  {
     object->TripSeconds -= 3600.0;
     object->TripHours++;
   }
 
   /* Test if running */
   object->Start = 0;
-  if (*object->RunningP) {
+  if (*object->RunningP)
+  {
     /* New start ? */
-    if (!object->Running) {
+    if (!object->Running)
+    {
       object->Start = 1;
       object->TotalNOfStarts++;
       object->TripNOfStarts++;
@@ -99,21 +104,22 @@ void RunningTime_exec(plc_sThread* tp, pwr_sClass_RunningTime* object)
     } /* End if new start */
     /* Update Running Time */
     object->TripRunSeconds += TimeSince;
-    if (object->TripRunSeconds >= 3600.0) {
+    if (object->TripRunSeconds >= 3600.0)
+    {
       object->TripRunSeconds -= 3600.0;
       object->TripRunHours++;
     }
     object->TotalRunSeconds += TimeSince;
-    if (object->TotalRunSeconds >= 3600.0) {
+    if (object->TotalRunSeconds >= 3600.0)
+    {
       object->TotalRunSeconds -= 3600.0;
       object->TotalRunHours++;
     }
   } /* End if Running */
   object->Running = *object->RunningP;
   /* Calculate usage % */
-  object->TotalUsage
-      = (object->TotalRunHours * 3600.0 + object->TotalRunSeconds)
-      / (object->TotalHours * 3600.0 + object->TotalSeconds) * 100.0;
-  object->TripUsage = (object->TripRunHours * 3600.0 + object->TripRunSeconds)
-      / (object->TripHours * 3600.0 + object->TripSeconds) * 100.0;
+  object->TotalUsage = (object->TotalRunHours * 3600.0 + object->TotalRunSeconds) /
+                       (object->TotalHours * 3600.0 + object->TotalSeconds) * 100.0;
+  object->TripUsage = (object->TripRunHours * 3600.0 + object->TripRunSeconds) /
+                      (object->TripHours * 3600.0 + object->TripSeconds) * 100.0;
 }

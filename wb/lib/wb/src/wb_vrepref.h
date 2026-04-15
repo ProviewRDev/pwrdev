@@ -43,7 +43,8 @@
 
 class wb_orepref;
 
-class wb_vrepref : public wb_vrep {
+class wb_vrepref : public wb_vrep
+{
   wb_erep* m_erep;
   wb_merep* m_merep;
   unsigned int m_nRef;
@@ -66,8 +67,7 @@ public:
 
   wb_erep* erep();
   wb_merep* merep() const;
-  virtual bool createSnapshot(
-      const char* fileName, const pwr_tTime* time, const int rtonly);
+  virtual bool createSnapshot(const char* fileName, const pwr_tTime* time, const int rtonly);
   virtual pwr_tStatus updateMeta();
   virtual pwr_tOid oid(pwr_tStatus* sts, const wb_orep* o);
   virtual pwr_tVid vid(pwr_tStatus* sts, const wb_orep* o);
@@ -85,18 +85,16 @@ public:
   virtual pwr_tTime dbTime(pwr_tStatus* sts, const wb_orep* o);
   virtual pwr_mClassDef flags(pwr_tStatus* sts, const wb_orep* o);
   virtual void objectName(const wb_orep* o, char* str);
-  virtual bool isOffspringOf(
-      pwr_tStatus* sts, const wb_orep* child, const wb_orep* parent);
+  virtual bool isOffspringOf(pwr_tStatus* sts, const wb_orep* child, const wb_orep* parent);
 
   wb_orep* object(pwr_tStatus* sts);
   wb_orep* object(pwr_tStatus* sts, pwr_tOid oid);
   wb_orep* object(pwr_tStatus* sts, pwr_tCid cid);
   wb_orep* object(pwr_tStatus* sts, wb_name& name);
   wb_orep* object(pwr_tStatus* sts, const wb_orep* parent, wb_name& name);
-  wb_orep* createObject(pwr_tStatus* sts, wb_cdef cdef, wb_destination& d,
-      wb_name& name, pwr_tOix oix = 0);
-  wb_orep* copyObject(pwr_tStatus* sts, const wb_orep* orep, wb_destination& d,
-      wb_name& name, pwr_tOix oix = 0);
+  wb_orep* createObject(pwr_tStatus* sts, wb_cdef cdef, wb_destination& d, wb_name& name, pwr_tOix oix = 0);
+  wb_orep* copyObject(pwr_tStatus* sts, const wb_orep* orep, wb_destination& d, wb_name& name,
+                      pwr_tOix oix = 0);
   bool copyOset(pwr_tStatus* sts, wb_oset* oset, wb_destination& d);
   bool moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d);
 
@@ -106,13 +104,12 @@ public:
   bool renameObject(pwr_tStatus* sts, wb_orep* orep, wb_name& name);
   bool commit(pwr_tStatus* sts);
   bool abort(pwr_tStatus* sts);
-  virtual bool writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix,
-      size_t offset, size_t size, void* p);
+  virtual bool writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, size_t offset, size_t size,
+                              void* p);
 
-  virtual void* readAttribute(pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix,
-      size_t offset, size_t size, void* p);
-  virtual void* readBody(
-      pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, void* p);
+  virtual void* readAttribute(pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, size_t offset, size_t size,
+                              void* p);
+  virtual void* readBody(pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, void* p);
   virtual bool writeBody(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, void* p);
   wb_orep* ancestor(pwr_tStatus* sts, const wb_orep* o);
   wb_orep* parent(pwr_tStatus* sts, const wb_orep* o);
@@ -137,16 +134,16 @@ public:
   virtual bool exportMeta(wb_import& i);
   virtual bool exportTree(wb_treeimport& i, pwr_tOid oid);
   virtual bool exportTreeIsImplemented();
-  bool exportPaste(wb_treeimport& i, pwr_tOid destination, ldh_eDest destcode,
-      bool keepoid, pwr_tOid** rootlist);
-  virtual bool importTreeObject(wb_merep* merep, pwr_tOid oid, pwr_tCid cid,
-      pwr_tOid poid, pwr_tOid boid, const char* name, pwr_mClassDef flags,
-      size_t rbSize, size_t dbSize, void* rbody, void* dbody);
+  bool exportPaste(wb_treeimport& i, pwr_tOid destination, ldh_eDest destcode, bool keepoid,
+                   pwr_tOid** rootlist);
+  virtual bool importTreeObject(wb_merep* merep, pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid,
+                                const char* name, pwr_mClassDef flags, size_t rbSize, size_t dbSize,
+                                void* rbody, void* dbody);
   virtual bool importTree(bool keepref, bool keepsym);
-  virtual bool importPasteObject(pwr_tOid destination, ldh_eDest destcode,
-      bool keepoid, pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid,
-      const char* name, pwr_mClassDef flags, size_t rbSize, size_t dbSize,
-      void* rbody, void* dbody, pwr_tOid woid, pwr_tOid* roid);
+  virtual bool importPasteObject(pwr_tOid destination, ldh_eDest destcode, bool keepoid, pwr_tOid oid,
+                                 pwr_tCid cid, pwr_tOid poid, pwr_tOid boid, const char* name,
+                                 pwr_mClassDef flags, size_t rbSize, size_t dbSize, void* rbody, void* dbody,
+                                 pwr_tOid woid, pwr_tOid* roid);
   virtual bool importPaste();
   virtual void importIgnoreErrors();
   bool updateObject(wb_orep* o, bool keepref);

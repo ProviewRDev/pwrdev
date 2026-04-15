@@ -57,13 +57,13 @@ static int noclassdef;
 
 typedef int pwr_tStatus;
 
-typedef struct convwbl_s_ctx* convwbl_ctx;
+typedef struct convwbl_s_ctx *convwbl_ctx;
 
 typedef struct {
   char item[20];
   char delim_front[20];
   char delim_back[20];
-  pwr_tStatus (*func)(convwbl_ctx, char*, char*, char*, int*, char*);
+  pwr_tStatus (*func)(convwbl_ctx, char *, char *, char *, int *, char *);
   int hit;
   int hit_count;
 } convwbl_t_item;
@@ -88,51 +88,52 @@ struct convwbl_s_ctx {
 
 /* Local function prototypes. */
 
-static int convwbl_parse(char* string, char* parse_char, char* inc_parse_char,
-    char* outstr, int max_rows, int max_cols);
-static int convwbl_add_item(convwbl_ctx convwblctx, char* item,
-    char* delim_front, char* delim_back, pwr_tStatus (*func)());
+static int convwbl_parse(char *string, char *parse_char, char *inc_parse_char,
+                         char *outstr, int max_rows, int max_cols);
+static int convwbl_add_item(convwbl_ctx convwblctx, char *item,
+                            char *delim_front, char *delim_back,
+                            pwr_tStatus (*func)());
 
 /*************************************************************************
-*
-* Name:		-
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* convwbl_ctx	convwblctx	I	convwbl context
-* char		*line		I	current line
-* char		*pos		I	position in current line
-* char		*out		IO	output buffer
-* char		*var		I	name of pointer to object
-*
-* Description:
-*	Backcall funktions called when an item is found.
-*
-**************************************************************************/
+ *
+ * Name:		-
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * convwbl_ctx	convwblctx	I	convwbl context
+ * char		*line		I	current line
+ * char		*pos		I	position in current line
+ * char		*out		IO	output buffer
+ * char		*var		I	name of pointer to object
+ *
+ * Description:
+ *	Backcall funktions called when an item is found.
+ *
+ **************************************************************************/
 
 /*************************************************************************
-*
-* Name:		convwbl_comment_start
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* convwbl_ctx	convwblctx	I	convwbl context
-* char		*line		I	current line
-* char		*pos		I	position in current line
-* char		*out		IO	output buffer
-* char		*var		I	name of pointer to object
-*
-* Description:
-*	Backcall funktions called when an comment start is found.
-*	Set convwblctx->comment to stop conversion.
-*
-**************************************************************************/
+ *
+ * Name:		convwbl_comment_start
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * convwbl_ctx	convwblctx	I	convwbl context
+ * char		*line		I	current line
+ * char		*pos		I	position in current line
+ * char		*out		IO	output buffer
+ * char		*var		I	name of pointer to object
+ *
+ * Description:
+ *	Backcall funktions called when an comment start is found.
+ *	Set convwblctx->comment to stop conversion.
+ *
+ **************************************************************************/
 
-static pwr_tStatus convwbl_comment_start(convwbl_ctx convwblctx, char* line,
-    char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus convwbl_comment_start(convwbl_ctx convwblctx, char *line,
+                                         char *pos, char *out, int *incr,
+                                         char *var) {
   sprintf(out, "/*");
   *incr = strlen(out);
   convwblctx->comment = 1;
@@ -140,26 +141,26 @@ static pwr_tStatus convwbl_comment_start(convwbl_ctx convwblctx, char* line,
 }
 
 /*************************************************************************
-*
-* Name:		convwbl_comment_end
-*
-* Type		static int
-*
-* Type		Parameter	IOGF	Description
-* convwbl_ctx	convwblctx	I	convwbl context
-* char		*line		I	current line
-* char		*pos		I	position in current line
-* char		*out		IO	output buffer
-* char		*var		I	name of pointer to object
-*
-* Description:
-*	Backcall funktions called when an comment end is found.
-*	Reset convwblctx->comment to start conversion again.
-*
-**************************************************************************/
-static pwr_tStatus convwbl_comment_end(convwbl_ctx convwblctx, char* line,
-    char* pos, char* out, int* incr, char* var)
-{
+ *
+ * Name:		convwbl_comment_end
+ *
+ * Type		static int
+ *
+ * Type		Parameter	IOGF	Description
+ * convwbl_ctx	convwblctx	I	convwbl context
+ * char		*line		I	current line
+ * char		*pos		I	position in current line
+ * char		*out		IO	output buffer
+ * char		*var		I	name of pointer to object
+ *
+ * Description:
+ *	Backcall funktions called when an comment end is found.
+ *	Reset convwblctx->comment to start conversion again.
+ *
+ **************************************************************************/
+static pwr_tStatus convwbl_comment_end(convwbl_ctx convwblctx, char *line,
+                                       char *pos, char *out, int *incr,
+                                       char *var) {
   sprintf(out, "*/");
   *incr = strlen(out);
   convwblctx->comment = 0;
@@ -167,29 +168,29 @@ static pwr_tStatus convwbl_comment_end(convwbl_ctx convwblctx, char* line,
 }
 
 /*************************************************************************
-*
-* Name:		convwbl_Dax
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* convwbl_ctx	convwblctx	I	convwbl context
-* char		*line		I	current line
-* char		*pos		I	position in current line
-* char		*out		IO	output buffer
-* char		*var		I	name of pointer to object
-*
-* Description:
-*	Backcall funktions called when a datapointer 'Da1' is found.
-* 	If a 'ODay = Dax' is detected the 'convwblctx->outdatax_eq_indata' flag
-* 	is set previously by the ODay backcall function, and the code should
-*	be a memcpy.
-*
-**************************************************************************/
+ *
+ * Name:		convwbl_Dax
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * convwbl_ctx	convwblctx	I	convwbl context
+ * char		*line		I	current line
+ * char		*pos		I	position in current line
+ * char		*out		IO	output buffer
+ * char		*var		I	name of pointer to object
+ *
+ * Description:
+ *	Backcall funktions called when a datapointer 'Da1' is found.
+ * 	If a 'ODay = Dax' is detected the 'convwblctx->outdatax_eq_indata' flag
+ * 	is set previously by the ODay backcall function, and the code should
+ *	be a memcpy.
+ *
+ **************************************************************************/
 
-static pwr_tStatus convwbl_ClassDef(convwbl_ctx convwblctx, char* line,
-    char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus convwbl_ClassDef(convwbl_ctx convwblctx, char *line,
+                                    char *pos, char *out, int *incr,
+                                    char *var) {
   int num;
 
   if (noclassdef) {
@@ -211,9 +212,8 @@ static pwr_tStatus convwbl_ClassDef(convwbl_ctx convwblctx, char* line,
 
   return GSX__SUCCESS;
 }
-static pwr_tStatus convwbl_TypeDef(convwbl_ctx convwblctx, char* line,
-    char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus convwbl_TypeDef(convwbl_ctx convwblctx, char *line,
+                                   char *pos, char *out, int *incr, char *var) {
   if (noclassdef) {
     sprintf(out, "$TypeDef");
     *incr = strlen(out);
@@ -232,9 +232,9 @@ static pwr_tStatus convwbl_TypeDef(convwbl_ctx convwblctx, char* line,
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus convwbl_Attribute(convwbl_ctx convwblctx, char* line,
-    char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus convwbl_Attribute(convwbl_ctx convwblctx, char *line,
+                                     char *pos, char *out, int *incr,
+                                     char *var) {
   if (!strstr(line, "Object")) {
     sprintf(out, "$Attribute");
     *incr = strlen(out);
@@ -251,9 +251,8 @@ static pwr_tStatus convwbl_Attribute(convwbl_ctx convwblctx, char* line,
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus convwbl_ObjXRef(convwbl_ctx convwblctx, char* line,
-    char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus convwbl_ObjXRef(convwbl_ctx convwblctx, char *line,
+                                   char *pos, char *out, int *incr, char *var) {
   if (!strstr(line, "Object")) {
     sprintf(out, "$ObjXRef");
     *incr = strlen(out);
@@ -270,9 +269,9 @@ static pwr_tStatus convwbl_ObjXRef(convwbl_ctx convwblctx, char* line,
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus convwbl_AttrXRef(convwbl_ctx convwblctx, char* line,
-    char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus convwbl_AttrXRef(convwbl_ctx convwblctx, char *line,
+                                    char *pos, char *out, int *incr,
+                                    char *var) {
   if (!strstr(line, "Object")) {
     sprintf(out, "$AttrXRef");
     *incr = strlen(out);
@@ -289,9 +288,8 @@ static pwr_tStatus convwbl_AttrXRef(convwbl_ctx convwblctx, char* line,
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus convwbl_Intern(convwbl_ctx convwblctx, char* line, char* pos,
-    char* out, int* incr, char* var)
-{
+static pwr_tStatus convwbl_Intern(convwbl_ctx convwblctx, char *line, char *pos,
+                                  char *out, int *incr, char *var) {
   if (!strstr(line, "Object")) {
     sprintf(out, "$Intern");
     *incr = strlen(out);
@@ -308,9 +306,8 @@ static pwr_tStatus convwbl_Intern(convwbl_ctx convwblctx, char* line, char* pos,
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus convwbl_Input(convwbl_ctx convwblctx, char* line, char* pos,
-    char* out, int* incr, char* var)
-{
+static pwr_tStatus convwbl_Input(convwbl_ctx convwblctx, char *line, char *pos,
+                                 char *out, int *incr, char *var) {
   if (!strstr(line, "Object")) {
     sprintf(out, "$Input");
     *incr = strlen(out);
@@ -327,9 +324,8 @@ static pwr_tStatus convwbl_Input(convwbl_ctx convwblctx, char* line, char* pos,
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus convwbl_Output(convwbl_ctx convwblctx, char* line, char* pos,
-    char* out, int* incr, char* var)
-{
+static pwr_tStatus convwbl_Output(convwbl_ctx convwblctx, char *line, char *pos,
+                                  char *out, int *incr, char *var) {
   if (!strstr(line, "Object")) {
     sprintf(out, "$Output");
     *incr = strlen(out);
@@ -346,9 +342,8 @@ static pwr_tStatus convwbl_Output(convwbl_ctx convwblctx, char* line, char* pos,
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus convwbl_Buffer(convwbl_ctx convwblctx, char* line, char* pos,
-    char* out, int* incr, char* var)
-{
+static pwr_tStatus convwbl_Buffer(convwbl_ctx convwblctx, char *line, char *pos,
+                                  char *out, int *incr, char *var) {
   if (!strstr(line, "Object")) {
     sprintf(out, "$Buffer");
     *incr = strlen(out);
@@ -365,9 +360,9 @@ static pwr_tStatus convwbl_Buffer(convwbl_ctx convwblctx, char* line, char* pos,
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus convwbl_ObjBodyDef(convwbl_ctx convwblctx, char* line,
-    char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus convwbl_ObjBodyDef(convwbl_ctx convwblctx, char *line,
+                                      char *pos, char *out, int *incr,
+                                      char *var) {
   if (!replace_idx) {
     if (strstr(line, "RtBody"))
       sprintf(out, "$ObjBodyDef 1");
@@ -401,49 +396,49 @@ static pwr_tStatus convwbl_ObjBodyDef(convwbl_ctx convwblctx, char* line,
 }
 
 /* Items includes also 32 dynamic items */
-convwbl_t_item template_items[100]
-    = { { "*/", "X", "X", &convwbl_comment_end, 0, 0 },
-        { "/*", "X", "X", &convwbl_comment_start, 0, 0 },
-        { "$ClassDef", "A", "A", &convwbl_ClassDef, 0, 0 },
-        { "$TypeDef", "A", "A", &convwbl_TypeDef, 0, 0 },
-        { "$Attribute", "A", "A", &convwbl_Attribute, 0, 0 },
-        { "$ObjXRef", "A", "A", &convwbl_ObjXRef, 0, 0 },
-        { "$AttrXRef", "A", "A", &convwbl_AttrXRef, 0, 0 },
-        { "$Param", "A", "A", &convwbl_Attribute, 0, 0 },
-        { "$Input", "A", "A", &convwbl_Input, 0, 0 },
-        { "$Output", "A", "A", &convwbl_Output, 0, 0 },
-        { "$Intern", "A", "A", &convwbl_Intern, 0, 0 },
-        { "$Buffer", "A", "A", &convwbl_Buffer, 0, 0 },
-        { "$ObjBodyDef", "A", "A", &convwbl_ObjBodyDef, 0, 0 }, { "" } };
+convwbl_t_item template_items[100] = {
+    {"*/", "X", "X", &convwbl_comment_end, 0, 0},
+    {"/*", "X", "X", &convwbl_comment_start, 0, 0},
+    {"$ClassDef", "A", "A", &convwbl_ClassDef, 0, 0},
+    {"$TypeDef", "A", "A", &convwbl_TypeDef, 0, 0},
+    {"$Attribute", "A", "A", &convwbl_Attribute, 0, 0},
+    {"$ObjXRef", "A", "A", &convwbl_ObjXRef, 0, 0},
+    {"$AttrXRef", "A", "A", &convwbl_AttrXRef, 0, 0},
+    {"$Param", "A", "A", &convwbl_Attribute, 0, 0},
+    {"$Input", "A", "A", &convwbl_Input, 0, 0},
+    {"$Output", "A", "A", &convwbl_Output, 0, 0},
+    {"$Intern", "A", "A", &convwbl_Intern, 0, 0},
+    {"$Buffer", "A", "A", &convwbl_Buffer, 0, 0},
+    {"$ObjBodyDef", "A", "A", &convwbl_ObjBodyDef, 0, 0},
+    {""}};
 
 /*************************************************************************
-*
-* Name:		convwbl_parse()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*string		I	string to be parsed.
-* char		*parse_char	I	parse charachter(s).
-* char		*inc_parse_char	I	parse charachter(s) that will be
-*					included in the parsed string.
-* char		*outstr		O	parsed strings.
-* int		max_rows	I	maximum number of chars in a parsed
-*					string.
-* int 		max_cols	I	maximum number of parsed elements.
-*
-* Description:
-*	Parses a string.
-*
-**************************************************************************/
+ *
+ * Name:		convwbl_parse()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*string		I	string to be parsed.
+ * char		*parse_char	I	parse charachter(s).
+ * char		*inc_parse_char	I	parse charachter(s) that will be
+ *					included in the parsed string.
+ * char		*outstr		O	parsed strings.
+ * int		max_rows	I	maximum number of chars in a parsed
+ *					string.
+ * int 		max_cols	I	maximum number of parsed elements.
+ *
+ * Description:
+ *	Parses a string.
+ *
+ **************************************************************************/
 
-static int convwbl_parse(char* string, char* parse_char, char* inc_parse_char,
-    char* outstr, int max_rows, int max_cols)
-{
+static int convwbl_parse(char *string, char *parse_char, char *inc_parse_char,
+                         char *outstr, int max_rows, int max_cols) {
   int row;
   int col;
-  char* char_ptr;
-  char* inc_char_ptr;
+  char *char_ptr;
+  char *inc_char_ptr;
   int parsechar_found;
   int inc_parsechar_found;
   int next_token;
@@ -524,19 +519,18 @@ static int convwbl_parse(char* string, char* parse_char, char* inc_parse_char,
 }
 
 /*************************************************************************
-*
-* Name:		convwbl_isascii
-*
-* Type		int
-*
-* char		c	I	a character
-*
-* Description:
-*	Returns 1 if c is a ascii-character or digit, else return 0.
-*
-**************************************************************************/
-static int convwbl_isascii(char c)
-{
+ *
+ * Name:		convwbl_isascii
+ *
+ * Type		int
+ *
+ * char		c	I	a character
+ *
+ * Description:
+ *	Returns 1 if c is a ascii-character or digit, else return 0.
+ *
+ **************************************************************************/
+static int convwbl_isascii(char c) {
   if (c >= '0' && c <= '9')
     return 1;
   if (c >= 'a' && c <= 'z')
@@ -552,25 +546,24 @@ static int convwbl_isascii(char c)
 }
 
 /*************************************************************************
-*
-* Name:		convwbl_get_next_line
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*str		I	buffer.
-* char		**pos		IO	position in buffer for next line.
-* char		*line		O	next line.
-* char		size		I	max size of line.
-* int		first		I	first call for this buffer.
-*
-* Description:
-*	Get the next line of a buffer.
-*
-**************************************************************************/
-static int convwbl_get_next_line(
-    char* str, char** pos, char* line, int size, int first)
-{
+ *
+ * Name:		convwbl_get_next_line
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*str		I	buffer.
+ * char		**pos		IO	position in buffer for next line.
+ * char		*line		O	next line.
+ * char		size		I	max size of line.
+ * int		first		I	first call for this buffer.
+ *
+ * Description:
+ *	Get the next line of a buffer.
+ *
+ **************************************************************************/
+static int convwbl_get_next_line(char *str, char **pos, char *line, int size,
+                                 int first) {
   char *s, *t;
   int i;
 
@@ -601,26 +594,26 @@ static int convwbl_get_next_line(
 }
 
 /*************************************************************************
-*
-* Name:		convwbl_add_item
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* convwbl_ctx	convwblctx	I	convwbl context
-* char		*item		I	new item
-* char		*delim_front	I	front delimiter.
-* char		*delim_back	I	back delimiter.
-* int		*func()		I	callback function
-*
-* Description:
-*	Insert a new item in the context's item list.
-*
-**************************************************************************/
-static int convwbl_add_item(convwbl_ctx convwblctx, char* item,
-    char* delim_front, char* delim_back, pwr_tStatus (*func)())
-{
-  convwbl_t_item* item_ptr;
+ *
+ * Name:		convwbl_add_item
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * convwbl_ctx	convwblctx	I	convwbl context
+ * char		*item		I	new item
+ * char		*delim_front	I	front delimiter.
+ * char		*delim_back	I	back delimiter.
+ * int		*func()		I	callback function
+ *
+ * Description:
+ *	Insert a new item in the context's item list.
+ *
+ **************************************************************************/
+static int convwbl_add_item(convwbl_ctx convwblctx, char *item,
+                            char *delim_front, char *delim_back,
+                            pwr_tStatus (*func)()) {
+  convwbl_t_item *item_ptr;
 
   item_ptr = convwblctx->items;
   while (item_ptr->item[0] != 0)
@@ -637,20 +630,19 @@ static int convwbl_add_item(convwbl_ctx convwblctx, char* item,
 }
 
 /*************************************************************************
-*
-* Name:		convwbl_create_ctx
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* convwbl_ctx	*convwblctx	I	convwbl context
-*
-* Description:
-*	Allocate memory and initiziate a new context.
-*
-**************************************************************************/
-static pwr_tStatus convwbl_create_ctx(convwbl_ctx* convwblctx)
-{
+ *
+ * Name:		convwbl_create_ctx
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * convwbl_ctx	*convwblctx	I	convwbl context
+ *
+ * Description:
+ *	Allocate memory and initiziate a new context.
+ *
+ **************************************************************************/
+static pwr_tStatus convwbl_create_ctx(convwbl_ctx *convwblctx) {
   /* Create the context */
   *convwblctx = (convwbl_ctx)calloc(1, sizeof(**convwblctx));
   if (*convwblctx == 0)
@@ -663,61 +655,60 @@ static pwr_tStatus convwbl_create_ctx(convwbl_ctx* convwblctx)
 }
 
 /*************************************************************************
-*
-* Name:		convwbl_delete_ctx()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* convwbl_ctx	convwblctx	I	convwbl context.
-*
-* Description:
-*	Delete a context.
-*	Free's all allocated memory in the convwbl context.
-*
-**************************************************************************/
+ *
+ * Name:		convwbl_delete_ctx()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * convwbl_ctx	convwblctx	I	convwbl context.
+ *
+ * Description:
+ *	Delete a context.
+ *	Free's all allocated memory in the convwbl context.
+ *
+ **************************************************************************/
 
-static pwr_tStatus convwbl_delete_ctx(convwbl_ctx convwblctx)
-{
-  free((char*)convwblctx);
+static pwr_tStatus convwbl_delete_ctx(convwbl_ctx convwblctx) {
+  free((char *)convwblctx);
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		convwbl_convert
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*str		I	buffer to convert.
-* char		*newstr		I	converted code.
-* char		*object		I	name of object pointer.
-* char		*bufsize	I	size of newstr.
-*
-* Description:
-*	Convert a wb_load text.
-*
-**************************************************************************/
-pwr_tStatus convwbl_convert(char* str, char* newstr, char* object, int bufsize,
-    char* error_line, int* error_line_size, int* error_line_num, int* outsize)
-{
+ *
+ * Name:		convwbl_convert
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*str		I	buffer to convert.
+ * char		*newstr		I	converted code.
+ * char		*object		I	name of object pointer.
+ * char		*bufsize	I	size of newstr.
+ *
+ * Description:
+ *	Convert a wb_load text.
+ *
+ **************************************************************************/
+pwr_tStatus convwbl_convert(char *str, char *newstr, char *object, int bufsize,
+                            char *error_line, int *error_line_size,
+                            int *error_line_num, int *outsize) {
   char line[200];
-  char* p;
-  convwbl_t_item* item_ptr;
+  char *p;
+  convwbl_t_item *item_ptr;
   pwr_tStatus sts;
-  char* t;
-  char* delim_p;
+  char *t;
+  char *delim_p;
   int hit, delim_hit;
   char tmpstr[160];
-  char* write_from;
+  char *write_from;
   int first_line;
   int end_of_text;
   int len;
   convwbl_ctx convwblctx;
   int pos;
   int incr;
-  char* l;
+  char *l;
 
   sts = convwbl_create_ctx(&convwblctx);
   if (EVEN(sts))
@@ -728,8 +719,8 @@ pwr_tStatus convwbl_convert(char* str, char* newstr, char* object, int bufsize,
   *newstr = 0;
   first_line = 1;
   while (1) {
-    end_of_text
-        = convwbl_get_next_line(str, &p, line, sizeof(line), first_line);
+    end_of_text =
+        convwbl_get_next_line(str, &p, line, sizeof(line), first_line);
     convwblctx->line_count++;
     first_line = 0;
     item_ptr = convwblctx->items;
@@ -773,16 +764,16 @@ pwr_tStatus convwbl_convert(char* str, char* newstr, char* object, int bufsize,
             /* Check front delimiter */
             delim_p = &item_ptr->delim_front[0];
             while (*delim_p != 0) {
-              if ((*delim_p == 'A' && !convwbl_isascii(*t)) || (*delim_p == 'X')
-                  || (*delim_p == *t && *delim_p != 'A')) {
+              if ((*delim_p == 'A' && !convwbl_isascii(*t)) ||
+                  (*delim_p == 'X') || (*delim_p == *t && *delim_p != 'A')) {
                 item_ptr->hit = 1;
                 item_ptr->hit_count = 1;
               }
               delim_p++;
             }
           } else {
-            if (item_ptr->hit_count >= 1
-                && item_ptr->hit_count < strlen(item_ptr->item) + 1) {
+            if (item_ptr->hit_count >= 1 &&
+                item_ptr->hit_count < strlen(item_ptr->item) + 1) {
               if (item_ptr->item[item_ptr->hit_count - 1] == *t) {
                 /* Still hit */
                 item_ptr->hit_count++;
@@ -792,8 +783,8 @@ pwr_tStatus convwbl_convert(char* str, char* newstr, char* object, int bufsize,
                   /* More delimiter */
                   delim_p = &item_ptr->delim_front[0];
                   while (*delim_p != 0) {
-                    if ((*delim_p == 'A' && !convwbl_isascii(*t))
-                        || (*delim_p == 'X'))
+                    if ((*delim_p == 'A' && !convwbl_isascii(*t)) ||
+                        (*delim_p == 'X'))
                       delim_hit = 1;
                     else if (*delim_p == *t)
                       delim_hit = 1;
@@ -808,8 +799,8 @@ pwr_tStatus convwbl_convert(char* str, char* newstr, char* object, int bufsize,
             } else if (item_ptr->hit_count == strlen(item_ptr->item) + 1) {
               delim_p = &item_ptr->delim_back[0];
               while (*delim_p != 0) {
-                if ((*delim_p == 'A' && !convwbl_isascii(*t))
-                    || (*delim_p == 'X')) {
+                if ((*delim_p == 'A' && !convwbl_isascii(*t)) ||
+                    (*delim_p == 'X')) {
                   hit = 1;
                 } else if (*delim_p == *t) {
                   hit = 1;
@@ -842,8 +833,8 @@ pwr_tStatus convwbl_convert(char* str, char* newstr, char* object, int bufsize,
             tmpstr[t - write_from - strlen(item_ptr->item)] = 0;
             strcpy(newstr + pos, tmpstr);
             pos += strlen(tmpstr);
-            sts = (item_ptr->func)(
-                convwblctx, line, t, newstr + pos, &incr, object);
+            sts = (item_ptr->func)(convwblctx, line, t, newstr + pos, &incr,
+                                   object);
             if (EVEN(sts)) {
               strncpy(error_line, line, *error_line_size);
               *error_line_num = convwblctx->line_count,
@@ -880,16 +871,15 @@ pwr_tStatus convwbl_convert(char* str, char* newstr, char* object, int bufsize,
   return GSX__SUCCESS;
 }
 
-main(int argc, char* argv[])
-{
+main(int argc, char *argv[]) {
   int sts;
-  char* ssts;
+  char *ssts;
   int size;
   char object_var[] = "Z800022";
   char newstr[1000000];
   char str[1000000];
-  FILE* infile;
-  FILE* outfile;
+  FILE *infile;
+  FILE *outfile;
   char error_line[80];
   int error_num;
   char filename[80];
@@ -897,7 +887,7 @@ main(int argc, char* argv[])
   char line[400];
   int arg_classdef_idx;
   int outsize;
-  FILE* idxfile;
+  FILE *idxfile;
 
   if (argc >= 2)
     strcpy(filename, argv[1]);
@@ -947,7 +937,7 @@ main(int argc, char* argv[])
   }
 
   printf("-- Processing %s	 Startindex $ClassDef: %d\n", filename,
-      arg_classdef_idx);
+         arg_classdef_idx);
 
   str[0] = 0;
   pos = 0;
@@ -962,7 +952,7 @@ main(int argc, char* argv[])
 
   size = sizeof(error_line);
   sts = convwbl_convert(str, newstr, object_var, sizeof(newstr), error_line,
-      &size, &error_num, &outsize);
+                        &size, &error_num, &outsize);
   if (EVEN(sts)) {
     printf("Error in line %d,\n  %s\n", error_num, error_line);
     printf("sts : %d\n", sts);
@@ -974,7 +964,7 @@ main(int argc, char* argv[])
     fgetname(outfile, filename);
     fclose(outfile);
     printf("-- File %s created\n	Endindex $ClassDef %d, %d changes\n",
-        filename, classdef_idx, idx_count);
+           filename, classdef_idx, idx_count);
   } else
     printf("-- No changes in file '%s'\n", filename);
 

@@ -42,8 +42,7 @@
 // c-api to co_user
 //
 
-int user_CheckUser(const char* systemgroup, const char* user,
-    const char* password, unsigned int* priv)
+int user_CheckUser(const char* systemgroup, const char* user, const char* password, unsigned int* priv)
 {
   GeUser* gu;
   int sts;
@@ -76,8 +75,7 @@ int user_CheckSystemGroup(const char* systemgroup)
   return sts;
 }
 
-int user_GetUserPriv(
-    const char* systemgroup, const char* user, unsigned int* priv)
+int user_GetUserPriv(const char* systemgroup, const char* user, unsigned int* priv)
 {
   GeUser* gu;
   int sts;
@@ -92,10 +90,7 @@ int user_GetUserPriv(
   return sts;
 }
 
-void user_PrivToString(unsigned int priv, char* str, int size)
-{
-  GeUser::priv_to_string(priv, str, size);
-}
+void user_PrivToString(unsigned int priv, char* str, int size) { GeUser::priv_to_string(priv, str, size); }
 
 void user_RtPrivToString(unsigned int priv, char* str, int size)
 {
@@ -107,7 +102,4 @@ void user_DevPrivToString(unsigned int priv, char* str, int size)
   GeUser::dev_priv_to_string(priv, str, size);
 }
 
-char* user_PwCrypt(char* password)
-{
-  return UserList::pwcrypt(password);
-}
+char* user_PwCrypt(char* password) { return UserList::pwcrypt(password); }

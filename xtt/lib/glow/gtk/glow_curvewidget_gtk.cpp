@@ -41,7 +41,8 @@ typedef struct _CurveWidgetGtk CurveWidgetGtk;
 typedef struct _CurveWidgetGtkClass CurveWidgetGtkClass;
 typedef struct _CurveWidgetGtkPrivate CurveWidgetGtkPrivate;
 
-typedef struct {
+typedef struct
+{
   GtkWidget* curve;
   GtkWidget* form;
   GtkWidget* scroll_h;
@@ -50,13 +51,15 @@ typedef struct {
   int scroll_v_managed;
 } curvewidget_sScroll;
 
-struct _CurveWidgetGtk {
+struct _CurveWidgetGtk
+{
   GtkDrawingArea bin;
-  CurveWidgetGtkPrivate *priv;
+  CurveWidgetGtkPrivate* priv;
 };
 
-struct _CurveWidgetGtkPrivate {
-  GdkWindow *window;
+struct _CurveWidgetGtkPrivate
+{
+  GdkWindow* window;
   void* curve_ctx;
   void* draw_ctx;
   int (*init_proc)(GlowCtx* ctx, void* clien_data);
@@ -87,7 +90,8 @@ struct _CurveWidgetGtkPrivate {
   guint vscroll_policy : 1;
 };
 
-enum {
+enum
+{
   PROP_0,
   PROP_HADJUSTMENT,
   PROP_VADJUSTMENT,
@@ -95,24 +99,23 @@ enum {
   PROP_VSCROLL_POLICY
 };
 
-struct _CurveWidgetGtkClass {
+struct _CurveWidgetGtkClass
+{
   GtkDrawingAreaClass parent_class;
 };
 
 G_DEFINE_TYPE_WITH_CODE(CurveWidgetGtk, curvewidgetgtk, GTK_TYPE_DRAWING_AREA,
-			G_ADD_PRIVATE(CurveWidgetGtk)
-			G_IMPLEMENT_INTERFACE(GTK_TYPE_SCROLLABLE, NULL));
+                        G_ADD_PRIVATE(CurveWidgetGtk) G_IMPLEMENT_INTERFACE(GTK_TYPE_SCROLLABLE, NULL));
 
 static gboolean scroll_callback_cb(void* d);
-static void curvewidgetgtk_get_property(GObject *object, guint prop_id, 
-				       GValue *value, GParamSpec *pspec);
-static void curvewidgetgtk_set_property(GObject *object, guint prop_id, 
-				       const GValue *value, GParamSpec *pspec);
+static void curvewidgetgtk_get_property(GObject* object, guint prop_id, GValue* value, GParamSpec* pspec);
+static void curvewidgetgtk_set_property(GObject* object, guint prop_id, const GValue* value,
+                                        GParamSpec* pspec);
 
 static void scroll_callback(glow_sScroll* data)
 {
   curvewidget_sScroll* scroll_data = (curvewidget_sScroll*)data->scroll_data;
-  CurveWidgetGtkPrivate *curve = (CurveWidgetGtkPrivate *)((CurveWidgetGtk*)scroll_data->curve)->priv;
+  CurveWidgetGtkPrivate* curve = (CurveWidgetGtkPrivate*)((CurveWidgetGtk*)scroll_data->curve)->priv;
 
   if (curve->scroll_timerid)
     g_source_remove(curve->scroll_timerid);
@@ -123,39 +126,51 @@ static void scroll_callback(glow_sScroll* data)
 
 static gboolean scroll_callback_cb(void* d)
 {
-  CurveWidgetGtkPrivate *curve = ((CurveWidgetGtk*)d)->priv;
+  CurveWidgetGtkPrivate* curve = ((CurveWidgetGtk*)d)->priv;
   glow_sScroll* data = &((CurveWidgetGtk*)d)->priv->scroll_data;
   curvewidget_sScroll* scroll_data = (curvewidget_sScroll*)data->scroll_data;
-  GtkAdjustment *adj;
+  GtkAdjustment* adj;
 
-  if (data->total_width <= data->window_width) {
+  if (data->total_width <= data->window_width)
+  {
     if (data->offset_x == 0)
       data->total_width = data->window_width;
-    if (scroll_data->scroll_h_managed) {
+    if (scroll_data->scroll_h_managed)
+    {
       // Remove horizontal scrollbar
     }
-  } else {
-    if (!scroll_data->scroll_h_managed) {
+  }
+  else
+  {
+    if (!scroll_data->scroll_h_managed)
+    {
       // Insert horizontal scrollbar
     }
   }
 
-  if (data->total_height <= data->window_height) {
+  if (data->total_height <= data->window_height)
+  {
     if (data->offset_y == 0)
       data->total_height = data->window_height;
-    if (scroll_data->scroll_v_managed) {
+    if (scroll_data->scroll_v_managed)
+    {
       // Remove vertical scrollbar
     }
-  } else {
-    if (!scroll_data->scroll_v_managed) {
+  }
+  else
+  {
+    if (!scroll_data->scroll_v_managed)
+    {
       // Insert vertical scrollbar
     }
   }
-  if (data->offset_x < 0) {
+  if (data->offset_x < 0)
+  {
     data->total_width += -data->offset_x;
     data->offset_x = 0;
   }
-  if (data->offset_y < 0) {
+  if (data->offset_y < 0)
+  {
     data->total_height += -data->offset_y;
     data->offset_y = 0;
   }
@@ -168,16 +183,19 @@ static gboolean scroll_callback_cb(void* d)
   if (data->window_height < 1)
     data->window_height = 1;
 
-  if (scroll_data->scroll_v_managed) {
+  if (scroll_data->scroll_v_managed)
+  {
     curve->scroll_v_ignore = 1;
-    if (data->window_height != curve->scroll_v_pagesize
-        || data->total_height != curve->scroll_v_upper
-        || curve->scroll_configure) {
+    if (data->window_height != curve->scroll_v_pagesize || data->total_height != curve->scroll_v_upper ||
+        curve->scroll_configure)
+    {
       adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_h));
       gtk_adjustment_set_value(adj, data->offset_x);
       gtk_adjustment_set_upper(adj, data->total_width);
       gtk_adjustment_set_page_size(adj, data->window_width);
-    } else {
+    }
+    else
+    {
       adj = gtk_range_get_adjustment(GTK_RANGE(scroll_data->scroll_h));
       gtk_adjustment_set_value(adj, data->offset_x);
     }
@@ -192,7 +210,8 @@ static gboolean scroll_callback_cb(void* d)
 static void scroll_h_action(GtkWidget* w, gpointer data)
 {
   CurveWidgetGtk* curvew = (CurveWidgetGtk*)data;
-  if (curvew->priv->scroll_h_ignore) {
+  if (curvew->priv->scroll_h_ignore)
+  {
     curvew->priv->scroll_h_ignore = 0;
     return;
   }
@@ -207,7 +226,8 @@ static void scroll_v_action(GtkWidget* w, gpointer data)
 {
   CurveWidgetGtk* curvew = (CurveWidgetGtk*)data;
 
-  if (curvew->priv->scroll_v_ignore) {
+  if (curvew->priv->scroll_v_ignore)
+  {
     curvew->priv->scroll_v_ignore = 0;
     return;
   }
@@ -225,7 +245,8 @@ static int curve_init_proc(GtkWidget* w, GlowCtx* fctx, void* client_data)
 
   ctx = (CurveCtx*)((CurveWidgetGtk*)w)->priv->curve_ctx;
 
-  if (((CurveWidgetGtk*)w)->priv->scroll_h) {
+  if (((CurveWidgetGtk*)w)->priv->scroll_h)
+  {
     scroll_data = (curvewidget_sScroll*)malloc(sizeof(curvewidget_sScroll));
     scroll_data->curve = w;
     scroll_data->scroll_h = ((CurveWidgetGtk*)w)->priv->scroll_h;
@@ -241,38 +262,39 @@ static int curve_init_proc(GtkWidget* w, GlowCtx* fctx, void* client_data)
 
 static gboolean curvewidgetgtk_expose(GtkWidget* widget, cairo_t* cr)
 {
-  CurveWidgetGtk *curve = CURVEWIDGETGTK(widget);
+  CurveWidgetGtk* curve = CURVEWIDGETGTK(widget);
 
   if (!curve->priv->curve_ctx)
     // Navigator not yet created
     return TRUE;
 
-  ((GlowDrawGtk*)((CurveCtx*)curve->priv->curve_ctx)->gdraw)->
-      expose(cr, curve->priv->is_navigator);
+  ((GlowDrawGtk*)((CurveCtx*)curve->priv->curve_ctx)->gdraw)->expose(cr, curve->priv->is_navigator);
   return TRUE;
 }
 
 static void curvewidgetgtk_grab_focus(GtkWidget* curve)
 {
-  if (!((CurveWidgetGtk *)curve)->priv->window)
+  if (!((CurveWidgetGtk*)curve)->priv->window)
     return;
   GTK_WIDGET_CLASS(curvewidgetgtk_parent_class)->grab_focus(curve);
-  gdk_window_focus(((CurveWidgetGtk *)curve)->priv->window, GDK_CURRENT_TIME);
+  gdk_window_focus(((CurveWidgetGtk*)curve)->priv->window, GDK_CURRENT_TIME);
 }
 
 static void curvewidgetgtk_destroy(GtkWidget* widget)
 {
   CurveWidgetGtk* curvew = (CurveWidgetGtk*)widget;
 
-  if (!curvew->priv->destroyed) {
+  if (!curvew->priv->destroyed)
+  {
     curvew->priv->destroyed = 1;
     if (curvew->priv->scroll_timerid)
       g_source_remove(curvew->priv->scroll_timerid);
-    if (curvew->priv->is_navigator) {
-      if (curvew->priv->curve_ctx
-          && !((CurveWidgetGtk*)curvew->priv->main_curve_widget)->priv->destroyed)
+    if (curvew->priv->is_navigator)
+    {
+      if (curvew->priv->curve_ctx && !((CurveWidgetGtk*)curvew->priv->main_curve_widget)->priv->destroyed)
         ((CurveCtx*)curvew->priv->curve_ctx)->no_nav = 1;
-    } else
+    }
+    else
       delete (GlowDrawGtk*)curvew->priv->draw_ctx;
     if (curvew->priv->hadjustment)
       g_object_unref(curvew->priv->hadjustment);
@@ -291,23 +313,25 @@ static gboolean curvewidgetgtk_event(GtkWidget* curve, GdkEvent* event)
     // Navigator not yet created
     return TRUE;
 
-  if (event->type == GDK_MOTION_NOTIFY) {
-    gdk_display_flush(
-        ((GlowDrawGtk*)((CurveCtx*)((CurveWidgetGtk*)curve)->priv->curve_ctx)->gdraw)
-            ->display);
+  if (event->type == GDK_MOTION_NOTIFY)
+  {
+    gdk_display_flush(((GlowDrawGtk*)((CurveCtx*)((CurveWidgetGtk*)curve)->priv->curve_ctx)->gdraw)->display);
     GdkEvent* next = gdk_event_peek();
-    if (next && next->type == GDK_MOTION_NOTIFY) {
+    if (next && next->type == GDK_MOTION_NOTIFY)
+    {
       gdk_event_free(next);
       return TRUE;
-    } else if (next)
+    }
+    else if (next)
       gdk_event_free(next);
-  } else if (event->type == GDK_CONFIGURE) {
+  }
+  else if (event->type == GDK_CONFIGURE)
+  {
     if (((CurveWidgetGtk*)curve)->priv->scroll_h)
       ((CurveWidgetGtk*)curve)->priv->scroll_configure = 1;
   }
 
-  ((GlowDrawGtk*)((CurveCtx*)((CurveWidgetGtk*)curve)->priv->curve_ctx)->gdraw)
-      ->event_handler(*event);
+  ((GlowDrawGtk*)((CurveCtx*)((CurveWidgetGtk*)curve)->priv->curve_ctx)->gdraw)->event_handler(*event);
   return TRUE;
 }
 
@@ -331,41 +355,49 @@ static void curvewidgetgtk_realize(GtkWidget* widget)
   attr.height = allocation.height;
   attr.wclass = GDK_INPUT_OUTPUT;
   attr.window_type = GDK_WINDOW_CHILD;
-  attr.event_mask = gtk_widget_get_events(widget) | GDK_EXPOSURE_MASK
-      | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK
-      | GDK_POINTER_MOTION_MASK | GDK_BUTTON_MOTION_MASK
-      | GDK_POINTER_MOTION_HINT_MASK | GDK_ENTER_NOTIFY_MASK
-      | GDK_LEAVE_NOTIFY_MASK | GDK_STRUCTURE_MASK;
+  attr.event_mask = gtk_widget_get_events(widget) | GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK |
+                    GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_POINTER_MOTION_MASK |
+                    GDK_BUTTON_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_ENTER_NOTIFY_MASK |
+                    GDK_LEAVE_NOTIFY_MASK | GDK_STRUCTURE_MASK;
   attr.visual = gtk_widget_get_visual(widget);
 
   attr_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL;
   curve->priv->window = gdk_window_new(gtk_widget_get_parent_window(widget), &attr, attr_mask);
   gtk_widget_set_window(widget, curve->priv->window);
   gtk_widget_register_window(widget, curve->priv->window);
-  //widget->style = gtk_style_attach(widget->style, widget->window);
-  //gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
+  // widget->style = gtk_style_attach(widget->style, widget->window);
+  // gtk_style_set_background(widget->style, widget->window, GTK_STATE_ACTIVE);
 
   gtk_widget_set_can_focus(widget, TRUE);
 
-  if (curve->priv->is_navigator) {
-    if (!curve->priv->curve_ctx) {
+  if (curve->priv->is_navigator)
+  {
+    if (!curve->priv->curve_ctx)
+    {
       CurveWidgetGtk* main_curve = (CurveWidgetGtk*)curve->priv->main_curve_widget;
 
-      if (!main_curve->priv->is_realized) {
+      if (!main_curve->priv->is_realized)
+      {
         main_curve->priv->realize_navigator = 1;
         main_curve->priv->navigator_widget = widget;
-      } else {
+      }
+      else
+      {
         curve->priv->curve_ctx = main_curve->priv->curve_ctx;
         curve->priv->draw_ctx = main_curve->priv->draw_ctx;
         ((GlowDrawGtk*)curve->priv->draw_ctx)->init_nav(widget);
       }
     }
-  } else {
-    if (!curve->priv->curve_ctx) {
-      curve->priv->draw_ctx = new GlowDrawGtk(widget, &curve->priv->curve_ctx,
-          curve_init_proc, curve->priv->client_data, glow_eCtxType_Curve);
+  }
+  else
+  {
+    if (!curve->priv->curve_ctx)
+    {
+      curve->priv->draw_ctx = new GlowDrawGtk(widget, &curve->priv->curve_ctx, curve_init_proc,
+                                              curve->priv->client_data, glow_eCtxType_Curve);
     }
-    if (curve->priv->realize_navigator) {
+    if (curve->priv->realize_navigator)
+    {
       CurveWidgetGtk* nav_curve = (CurveWidgetGtk*)curve->priv->navigator_widget;
       nav_curve->priv->curve_ctx = curve->priv->curve_ctx;
       nav_curve->priv->draw_ctx = curve->priv->draw_ctx;
@@ -399,11 +431,10 @@ static void curvewidgetgtk_class_init(CurveWidgetGtkClass* klass)
 
 static void curvewidgetgtk_init(CurveWidgetGtk* curve)
 {
-  curve->priv = (CurveWidgetGtkPrivate *)curvewidgetgtk_get_instance_private(curve);
+  curve->priv = (CurveWidgetGtkPrivate*)curvewidgetgtk_get_instance_private(curve);
 }
 
-GtkWidget* curvewidgetgtk_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data)
+GtkWidget* curvewidgetgtk_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data)
 {
   CurveWidgetGtk* w;
   w = (CurveWidgetGtk*)g_object_new(CURVEWIDGETGTK_TYPE, NULL);
@@ -419,9 +450,8 @@ GtkWidget* curvewidgetgtk_new(
   return (GtkWidget*)w;
 }
 
-GtkWidget* scrolledcurvewidgetgtk_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
-    GtkWidget** curvewidget)
+GtkWidget* scrolledcurvewidgetgtk_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
+                                      GtkWidget** curvewidget)
 {
   CurveWidgetGtk* w;
 
@@ -445,10 +475,10 @@ GtkWidget* scrolledcurvewidgetgtk_new(
   w->priv->vadjustment = gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   *curvewidget = GTK_WIDGET(w);
 
-  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_h)),
-      "value-changed", G_CALLBACK(scroll_h_action), w);
-  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_v)),
-      "value-changed", G_CALLBACK(scroll_v_action), w);
+  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_h)), "value-changed",
+                   G_CALLBACK(scroll_h_action), w);
+  g_signal_connect(gtk_range_get_adjustment(GTK_RANGE((GtkScrollbar*)w->priv->scroll_v)), "value-changed",
+                   G_CALLBACK(scroll_v_action), w);
 
   gtk_container_add(GTK_CONTAINER(form), GTK_WIDGET(w));
 
@@ -479,12 +509,13 @@ GtkWidget* curvenavwidgetgtk_new(GtkWidget* main_curve)
   return (GtkWidget*)w;
 }
 
-static void curvewidgetgtk_set_property(GObject *object, guint prop_id, 
-				       const GValue *value, GParamSpec *pspec)
+static void curvewidgetgtk_set_property(GObject* object, guint prop_id, const GValue* value,
+                                        GParamSpec* pspec)
 {
-  //CurveWidgetGtk *curve = (CurveWidgetGtk *)object;
+  // CurveWidgetGtk *curve = (CurveWidgetGtk *)object;
 
-  switch (prop_id) {
+  switch (prop_id)
+  {
   case PROP_HADJUSTMENT:
     break;
   case PROP_VADJUSTMENT:
@@ -496,12 +527,12 @@ static void curvewidgetgtk_set_property(GObject *object, guint prop_id,
   }
 }
 
-static void curvewidgetgtk_get_property(GObject *object, guint prop_id, 
-				       GValue *value, GParamSpec *pspec)
+static void curvewidgetgtk_get_property(GObject* object, guint prop_id, GValue* value, GParamSpec* pspec)
 {
-  CurveWidgetGtk *curve = (CurveWidgetGtk *)object;
+  CurveWidgetGtk* curve = (CurveWidgetGtk*)object;
 
-  switch (prop_id) {
+  switch (prop_id)
+  {
   case PROP_HADJUSTMENT:
     g_value_set_object(value, curve->priv->hadjustment);
     break;

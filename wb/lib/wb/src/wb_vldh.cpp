@@ -53,8 +53,7 @@ static vldh_t_plc plc_root = 0;
 
 static int vldh_get_con_defname(vldh_t_wind wind, char* name);
 
-static int vldh_get_node_defname(
-    vldh_t_wind wind, unsigned long object_typ, char* objname, char* name);
+static int vldh_get_node_defname(vldh_t_wind wind, unsigned long object_typ, char* objname, char* name);
 
 static int vldh_node_load(vldh_t_wind wind, pwr_tObjid objdid);
 
@@ -64,21 +63,21 @@ static void cnv_from_neted(vldh_t_node n);
 /*_Local procedues_______________________________________________________*/
 
 /*************************************************************************
-*
-* Name:		vldh_check_document( )
-*
-* Type		unsigned long
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	ldhses		I	ldh session
-* unsigned long	objdid		I	objdid
-*
-* Description:
-*	Check if an object is a document object.
-*	The criterium f|r a document is that it has graphmethod 6.
-*	If the object is a document, 1 is returned,  else 0.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_check_document( )
+ *
+ * Type		unsigned long
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	ldhses		I	ldh session
+ * unsigned long	objdid		I	objdid
+ *
+ * Description:
+ *	Check if an object is a document object.
+ *	The criterium f|r a document is that it has graphmethod 6.
+ *	If the object is a document, 1 is returned,  else 0.
+ *
+ **************************************************************************/
 
 unsigned long vldh_check_document(ldh_tSesContext ldhses, pwr_tObjid objdid)
 {
@@ -93,8 +92,7 @@ unsigned long vldh_check_document(ldh_tSesContext ldhses, pwr_tObjid objdid)
     return 0;
 
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody(
-      ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return 0;
 
@@ -105,22 +103,22 @@ unsigned long vldh_check_document(ldh_tSesContext ldhses, pwr_tObjid objdid)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_check_plcpgm( )
-*
-* Type		unsigned long
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	ldhses		I	ldh session
-* unsigned long	objdid		I	objdid
-*
-* Description:
-*	Check if an object is a plcpgm.
-*	The criterium f|r a plcpgm is that it has a buffer of
-*	type PlcProgram.
-*	If the object is a plcpgm, 1 is returned,  else 0.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_check_plcpgm( )
+ *
+ * Type		unsigned long
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	ldhses		I	ldh session
+ * unsigned long	objdid		I	objdid
+ *
+ * Description:
+ *	Check if an object is a plcpgm.
+ *	The criterium f|r a plcpgm is that it has a buffer of
+ *	type PlcProgram.
+ *	If the object is a plcpgm, 1 is returned,  else 0.
+ *
+ **************************************************************************/
 
 unsigned long vldh_check_plcpgm(ldh_tSesContext ldhses, pwr_tObjid objdid)
 {
@@ -129,8 +127,7 @@ unsigned long vldh_check_plcpgm(ldh_tSesContext ldhses, pwr_tObjid objdid)
   pwr_eClass cid;
 
   /* This is probably a plcprogram, check that it really is */
-  sts = ldh_GetObjectBuffer(
-      ldhses, objdid, "DevBody", "PlcProgram", &cid, (char**)&plcbuffer, &size);
+  sts = ldh_GetObjectBuffer(ldhses, objdid, "DevBody", "PlcProgram", &cid, (char**)&plcbuffer, &size);
   if (EVEN(sts))
     /* This is not a plcprogram object */
     return 0;
@@ -141,20 +138,20 @@ unsigned long vldh_check_plcpgm(ldh_tSesContext ldhses, pwr_tObjid objdid)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_eclass( )
-*
-* Type		unsigned long
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	ldhses		I	ldh session
-* char*		classname	I	hierarchy name for the class
-*
-* Description:
-*	Converts hierarchy class name to objdid.
-*	Returns 0 if the class is unknown.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_eclass( )
+ *
+ * Type		unsigned long
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	ldhses		I	ldh session
+ * char*		classname	I	hierarchy name for the class
+ *
+ * Description:
+ *	Converts hierarchy class name to objdid.
+ *	Returns 0 if the class is unknown.
+ *
+ **************************************************************************/
 
 pwr_tClassId vldh_eclass(ldh_tSesContext ldhses, const char* classname)
 {
@@ -169,22 +166,22 @@ pwr_tClassId vldh_eclass(ldh_tSesContext ldhses, const char* classname)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_con_defname()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-* char *	name		O	default connection name.
-*
-* Description:
-*	Get the default name for a connection object.
-*	The defaulname is 'CONNECTIONx' where x is a value
-*	from stored in the plcobject and increased for every
-*	new created connection.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_con_defname()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ * char *	name		O	default connection name.
+ *
+ * Description:
+ *	Get the default name for a connection object.
+ *	The defaulname is 'CONNECTIONx' where x is a value
+ *	from stored in the plcobject and increased for every
+ *	new created connection.
+ *
+ **************************************************************************/
 
 static int vldh_get_con_defname(vldh_t_wind wind, char* name)
 {
@@ -200,27 +197,26 @@ static int vldh_get_con_defname(vldh_t_wind wind, char* name)
   return VLDH__SUCCESS;
 }
 /*************************************************************************
-*
-* Name:		vldh_get_node_defname()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* unsigned long	object_type	I	class
-* char *	objname		I	first part of default object name.
-* char *	name		O	default object name.
-*
-* Description:
-*	Get the default name for a object.
-*	The defaulname is objname given as input followed by a value
-*	stored in the plcobject for each class and increased for every
-*	new created object of this class in this plcpgm.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_node_defname()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * unsigned long	object_type	I	class
+ * char *	objname		I	first part of default object name.
+ * char *	name		O	default object name.
+ *
+ * Description:
+ *	Get the default name for a object.
+ *	The defaulname is objname given as input followed by a value
+ *	stored in the plcobject for each class and increased for every
+ *	new created object of this class in this plcpgm.
+ *
+ **************************************************************************/
 
-static int vldh_get_node_defname(
-    vldh_t_wind wind, unsigned long object_type, char* objname, char* name)
+static int vldh_get_node_defname(vldh_t_wind wind, unsigned long object_type, char* objname, char* name)
 {
   vldh_t_plc plc;
 
@@ -236,27 +232,27 @@ static int vldh_get_node_defname(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_node_defname()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* unsigned long	object_type	I	class
-* char *	objname		I	first part of default object name.
-* char *	name		O	default object name.
-*
-* Description:
-*	Get the default name for a object.
-*	The defaulname is objname given as input followed by a value
-*	stored in the plcobject for each class and increased for every
-*	new created object of this class in this plcpgm.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_node_defname()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * unsigned long	object_type	I	class
+ * char *	objname		I	first part of default object name.
+ * char *	name		O	default object name.
+ *
+ * Description:
+ *	Get the default name for a object.
+ *	The defaulname is objname given as input followed by a value
+ *	stored in the plcobject for each class and increased for every
+ *	new created object of this class in this plcpgm.
+ *
+ **************************************************************************/
 
-int vldh_get_object_defname(ldh_tSesContext ldhses, pwr_tObjid Objdid,
-    unsigned long object_type, char* objname, char* name)
+int vldh_get_object_defname(ldh_tSesContext ldhses, pwr_tObjid Objdid, unsigned long object_type,
+                            char* objname, char* name)
 {
   int sts, size;
   pwr_sPlcProgram* plcbuffer;
@@ -277,22 +273,23 @@ int vldh_get_object_defname(ldh_tSesContext ldhses, pwr_tObjid Objdid,
   /* Check if the plcpgm is loaded in vldh */
   plcobjdid = *(parentlist + parent_count - 1);
   sts = vldh_get_plc_objdid(plcobjdid, &plc);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sprintf(name, "%s%d", objname, plc->lp.defnamecount[object_type]);
     (plc->lp.defnamecount[object_type])++;
     vldh_plcmodified(plc);
-  } else {
+  }
+  else
+  {
     /* Get the object i ldh */
-    sts = ldh_GetObjectBuffer(ldhses, plcobjdid, "DevBody", "PlcProgram", &cid,
-        (char**)&plcbuffer, &size);
+    sts = ldh_GetObjectBuffer(ldhses, plcobjdid, "DevBody", "PlcProgram", &cid, (char**)&plcbuffer, &size);
     if (EVEN(sts))
       return sts;
 
     sprintf(name, "%s%d", objname, plcbuffer->defnamecount[object_type]);
     (plcbuffer->defnamecount[object_type])++;
 
-    sts = ldh_SetObjectBuffer(
-        ldhses, plcobjdid, "DevBody", "PlcProgram", (char*)plcbuffer);
+    sts = ldh_SetObjectBuffer(ldhses, plcobjdid, "DevBody", "PlcProgram", (char*)plcbuffer);
     if (EVEN(sts))
       return sts;
 
@@ -307,73 +304,73 @@ int vldh_get_object_defname(ldh_tSesContext ldhses, pwr_tObjid Objdid,
 /*_Methods defined for this module_______________________________________*/
 
 /*************************************************************************
-*
-* Name:		vldh_node_con_insert()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node
-* unsigned long	con_point	I	connection point in the node where
-*					the connection is to be inserted.
-* vldh_t_con	con		I	connection to be inserted.
-* int		type		I 	source or destination part of the
-*					connection, not used.
-*
-* Description:
-*	Insert a connection object in the connectionlist for the specified
-*	nodeobject and connectionpoint.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_node_con_insert()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node
+ * unsigned long	con_point	I	connection point in the node where
+ *					the connection is to be inserted.
+ * vldh_t_con	con		I	connection to be inserted.
+ * int		type		I 	source or destination part of the
+ *					connection, not used.
+ *
+ * Description:
+ *	Insert a connection object in the connectionlist for the specified
+ *	nodeobject and connectionpoint.
+ *
+ **************************************************************************/
 
-int vldh_node_con_insert(
-    vldh_t_node node, unsigned long con_point, vldh_t_con con, int type)
+int vldh_node_con_insert(vldh_t_node node, unsigned long con_point, vldh_t_con con, int type)
 {
   int sts;
 
   if (con_point >= VLDH_MAX_CONPOINTS)
     return VLDH__BADCONPOINT;
 
-  if (node->hn.con_count[con_point] == 0) {
+  if (node->hn.con_count[con_point] == 0)
+  {
     /* First con on this connectionpoint, calloc */
     node->hn.con_list[con_point] = (vldh_t_con*)calloc(1, sizeof(vldh_t_con));
-  } else {
+  }
+  else
+  {
     /* Increase size of conlist */
-    sts = utl_realloc((char**)&node->hn.con_list[con_point],
-        node->hn.con_count[con_point] * sizeof(vldh_t_con),
-        (node->hn.con_count[con_point] + 1) * sizeof(vldh_t_con));
+    sts =
+        utl_realloc((char**)&node->hn.con_list[con_point], node->hn.con_count[con_point] * sizeof(vldh_t_con),
+                    (node->hn.con_count[con_point] + 1) * sizeof(vldh_t_con));
     if (EVEN(sts))
       return sts;
   }
 
   /* Insert new connection object in conlist */
-  *((vldh_t_con*)(node->hn.con_list[con_point]) + node->hn.con_count[con_point])
-      = con;
+  *((vldh_t_con*)(node->hn.con_list[con_point]) + node->hn.con_count[con_point]) = con;
   node->hn.con_count[con_point]++;
 
   return VLDH__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		vldh_node_con_delete()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node
-* unsigned long	con_point	I	connection point in the node where
-*					the connection is to be deleted.
-* vldh_t_con	con		I	connection to be deleted.
-*
-* Description:
-*	Eliminate a connection object in the connectionlist for the specified
-*	nodeobject and connectionpoint.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_node_con_delete()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node
+ * unsigned long	con_point	I	connection point in the node where
+ *					the connection is to be deleted.
+ * vldh_t_con	con		I	connection to be deleted.
+ *
+ * Description:
+ *	Eliminate a connection object in the connectionlist for the specified
+ *	nodeobject and connectionpoint.
+ *
+ **************************************************************************/
 
-int vldh_node_con_delete(
-    vldh_t_node node, unsigned long con_point, vldh_t_con con)
+int vldh_node_con_delete(vldh_t_node node, unsigned long con_point, vldh_t_con con)
 {
   int i;
 
@@ -381,8 +378,10 @@ int vldh_node_con_delete(
     return VLDH__BADCONPOINT;
 
   /* Find the conobject in conlist and insert 0 */
-  for (i = 0; i < (int)node->hn.con_count[con_point]; i++) {
-    if (*((vldh_t_con*)(node->hn.con_list[con_point]) + i) == con) {
+  for (i = 0; i < (int)node->hn.con_count[con_point]; i++)
+  {
+    if (*((vldh_t_con*)(node->hn.con_list[con_point]) + i) == con)
+    {
       /* Connection found */
       *((vldh_t_con*)(node->hn.con_list[con_point]) + i) = 0;
       vldh_nodemodified(node);
@@ -393,23 +392,22 @@ int vldh_node_con_delete(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_node_subwind_created()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node.
-* vldh_t_wind	subwind		I	vldh window for subwindow.
-* unsigned long	windowindex	I	windowindex for subwindow.
-*
-* Description:
-*	Insert information in the parent node when a subwindow is created.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_node_subwind_created()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node.
+ * vldh_t_wind	subwind		I	vldh window for subwindow.
+ * unsigned long	windowindex	I	windowindex for subwindow.
+ *
+ * Description:
+ *	Insert information in the parent node when a subwindow is created.
+ *
+ **************************************************************************/
 
-int vldh_node_subwindow_created(
-    vldh_t_node node, vldh_t_wind subwind, unsigned long windowindex)
+int vldh_node_subwindow_created(vldh_t_node node, vldh_t_wind subwind, unsigned long windowindex)
 {
   /* Store the objdid and wind for the subwindow */
   node->ln.subwind_oid[windowindex] = subwind->lw.oid;
@@ -421,23 +419,23 @@ int vldh_node_subwindow_created(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_node_create()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-* unsigned long	class		I	class of the new object.
-* vldh_t_node * node		O	created vldh node.
-*
-* Description:
-*	Create a node object.
-*	The node is created in vldh and an object of the specified
-*	class is created in ldh. The name of the object is fetched from
-*	objname in graphbody with an index value added.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_node_create()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ * unsigned long	class		I	class of the new object.
+ * vldh_t_node * node		O	created vldh node.
+ *
+ * Description:
+ *	Create a node object.
+ *	The node is created in vldh and an object of the specified
+ *	class is created in ldh. The name of the object is fetched from
+ *	objname in graphbody with an index value added.
+ *
+ **************************************************************************/
 
 int vldh_node_create(vldh_t_wind wind, pwr_tClassId cid, vldh_t_node* node)
 {
@@ -448,21 +446,19 @@ int vldh_node_create(vldh_t_wind wind, pwr_tClassId cid, vldh_t_node* node)
   pwr_sGraphPlcNode* graphbody;
 
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody(wind->hw.ldhses, cid, "GraphPlcNode", &bodyclass,
-      (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(wind->hw.ldhses, cid, "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
   /* Get default segment name */
-  for (;;) {
-    sts = vldh_get_node_defname(
-        wind, graphbody->object_type, graphbody->objname, segment_name);
+  for (;;)
+  {
+    sts = vldh_get_node_defname(wind, graphbody->object_type, graphbody->objname, segment_name);
     if (EVEN(sts))
       return sts;
 
     /* Create the object i ldh */
-    sts = ldh_CreateObject(wind->hw.ldhses, &objdid, segment_name, cid,
-        wind->lw.oid, ldh_eDest_IntoLast);
+    sts = ldh_CreateObject(wind->hw.ldhses, &objdid, segment_name, cid, wind->lw.oid, ldh_eDest_IntoLast);
     if (sts == LDH__NAMALREXI)
       /* Try again with incremented name index */
       continue;
@@ -490,8 +486,7 @@ int vldh_node_create(vldh_t_wind wind, pwr_tClassId cid, vldh_t_node* node)
   wind->hw.node_list_pointer = *node;
 
   /* Set the buffer in ldh so the mask can be accessed by ate */
-  sts = ldh_SetObjectBuffer(wind->hw.ldhses, (*node)->ln.oid, "DevBody",
-      "PlcNode", (char*)&((*node)->ln));
+  sts = ldh_SetObjectBuffer(wind->hw.ldhses, (*node)->ln.oid, "DevBody", "PlcNode", (char*)&((*node)->ln));
   if (EVEN(sts))
     return sts;
 
@@ -502,19 +497,19 @@ int vldh_node_create(vldh_t_wind wind, pwr_tClassId cid, vldh_t_node* node)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_node_load()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-* unsigned long	objdid		I	objdid for the ldh object.
-*
-* Description:
-*	Create a nodeobject in vldh from an ldhobject.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_node_load()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ * unsigned long	objdid		I	objdid for the ldh object.
+ *
+ * Description:
+ *	Create a nodeobject in vldh from an ldhobject.
+ *
+ **************************************************************************/
 
 static int vldh_node_load(vldh_t_wind wind, pwr_tObjid objdid)
 {
@@ -528,15 +523,17 @@ static int vldh_node_load(vldh_t_wind wind, pwr_tObjid objdid)
   node = (vldh_t_node)calloc(1, sizeof(*node));
 
   /* Get the object i ldh */
-  sts = ldh_GetObjectBuffer(wind->hw.ldhses, objdid, "DevBody", "PlcNode",
-      &eclass, (char**)&nodebuffer, &size);
-  if (EVEN(sts)) {
+  sts =
+      ldh_GetObjectBuffer(wind->hw.ldhses, objdid, "DevBody", "PlcNode", &eclass, (char**)&nodebuffer, &size);
+  if (EVEN(sts))
+  {
     free(node);
     return sts;
   }
 
   sts = ldh_GetObjectClass(wind->hw.ldhses, objdid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     free(node);
     return sts;
   }
@@ -545,9 +542,10 @@ static int vldh_node_load(vldh_t_wind wind, pwr_tObjid objdid)
   free((char*)nodebuffer);
 
   /* Get the object name from ldh */
-  sts = ldh_ObjidToName(wind->hw.ldhses, objdid, ldh_eName_Object,
-      node->hn.name, sizeof(node->hn.name), &size);
-  if (EVEN(sts)) {
+  sts =
+      ldh_ObjidToName(wind->hw.ldhses, objdid, ldh_eName_Object, node->hn.name, sizeof(node->hn.name), &size);
+  if (EVEN(sts))
+  {
     free(node);
     return sts;
   }
@@ -572,18 +570,18 @@ static int vldh_node_load(vldh_t_wind wind, pwr_tObjid objdid)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_node_delete()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Delete a node in vldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_node_delete()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Delete a node in vldh.
+ *
+ **************************************************************************/
 
 int vldh_node_delete(vldh_t_node node)
 {
@@ -592,18 +590,18 @@ int vldh_node_delete(vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_node_undelete()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node.
-*
-* Description:
-*	Undelete a node that is deleted in vldh but not yet in ldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_node_undelete()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node.
+ *
+ * Description:
+ *	Undelete a node that is deleted in vldh but not yet in ldh.
+ *
+ **************************************************************************/
 
 int vldh_node_undelete(vldh_t_node node)
 {
@@ -614,32 +612,32 @@ int vldh_node_undelete(vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_con_create()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-* unsigned long	class		I	connection class.
-* unsigned long	drawtype	I	drawtype, reference or line.
-* vldh_t_node	source_node	I	node connected to the source part
-*					of the connection.
-* unsigned long	source_point	I	connection point on the source node.
-* vldh_t_node	dest_node	I	node connected to the destination part
-*					of the connection.
-* unsigned long	dest_point	I	connection point on the destination
-*					node.
-* vldh_t_con *	con		O	create vldh connection.
-*
-* Description:
-*	Create a connection in vldh and an object in ldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_con_create()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ * unsigned long	class		I	connection class.
+ * unsigned long	drawtype	I	drawtype, reference or line.
+ * vldh_t_node	source_node	I	node connected to the source part
+ *					of the connection.
+ * unsigned long	source_point	I	connection point on the source node.
+ * vldh_t_node	dest_node	I	node connected to the destination part
+ *					of the connection.
+ * unsigned long	dest_point	I	connection point on the destination
+ *					node.
+ * vldh_t_con *	con		O	create vldh connection.
+ *
+ * Description:
+ *	Create a connection in vldh and an object in ldh.
+ *
+ **************************************************************************/
 
-int vldh_con_create(vldh_t_wind wind, pwr_tClassId cid, unsigned long drawtype,
-    vldh_t_node source_node, unsigned long source_point, vldh_t_node dest_node,
-    unsigned long dest_point, vldh_t_con* con)
+int vldh_con_create(vldh_t_wind wind, pwr_tClassId cid, unsigned long drawtype, vldh_t_node source_node,
+                    unsigned long source_point, vldh_t_node dest_node, unsigned long dest_point,
+                    vldh_t_con* con)
 {
   char segment_name[32];
   pwr_tObjid objdid;
@@ -648,17 +646,16 @@ int vldh_con_create(vldh_t_wind wind, pwr_tClassId cid, unsigned long drawtype,
   pwr_sGraphPlcConnection* graphbody;
 
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody(wind->hw.ldhses, cid, "GraphPlcCon", &bodyclass,
-      (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(wind->hw.ldhses, cid, "GraphPlcCon", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
-  for (;;) {
+  for (;;)
+  {
     vldh_get_con_defname(wind, segment_name);
 
     /* Create the object i ldh */
-    sts = ldh_CreateObject(wind->hw.ldhses, &objdid, segment_name, cid,
-        wind->lw.oid, ldh_eDest_IntoFirst);
+    sts = ldh_CreateObject(wind->hw.ldhses, &objdid, segment_name, cid, wind->lw.oid, ldh_eDest_IntoFirst);
     if (sts == LDH__NAMALREXI)
       /* Try again with incremented name index */
       continue;
@@ -698,21 +695,21 @@ int vldh_con_create(vldh_t_wind wind, pwr_tClassId cid, unsigned long drawtype,
 }
 
 /*************************************************************************
-*
-* Name:		vldh_con_load()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-* unsigned long	objdid		I	objdid of connection object.
-*
-* Description:
-*	Load a connection object in vldh.
-*	Create a connection in vldh and load info from
-*	the ldhobject into the connection.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_con_load()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ * unsigned long	objdid		I	objdid of connection object.
+ *
+ * Description:
+ *	Load a connection object in vldh.
+ *	Create a connection in vldh and load info from
+ *	the ldhobject into the connection.
+ *
+ **************************************************************************/
 
 int vldh_con_load(vldh_t_wind wind, pwr_tObjid objdid)
 {
@@ -726,15 +723,17 @@ int vldh_con_load(vldh_t_wind wind, pwr_tObjid objdid)
   con = (vldh_t_con)calloc(1, sizeof(*con));
 
   /* Get the object i ldh */
-  sts = ldh_GetObjectBuffer(wind->hw.ldhses, objdid, "DevBody", "PlcConnection",
-      &eclass, (char**)&conbuffer, &size);
-  if (EVEN(sts)) {
+  sts = ldh_GetObjectBuffer(wind->hw.ldhses, objdid, "DevBody", "PlcConnection", &eclass, (char**)&conbuffer,
+                            &size);
+  if (EVEN(sts))
+  {
     free(con);
     return sts;
   }
 
   sts = ldh_GetObjectClass(wind->hw.ldhses, objdid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     free(con);
     return sts;
   }
@@ -758,18 +757,18 @@ int vldh_con_load(vldh_t_wind wind, pwr_tObjid objdid)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_con_delete()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_con	con		I	vldh connection
-*
-* Description:
-*	Delete a connection in vldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_con_delete()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_con	con		I	vldh connection
+ *
+ * Description:
+ *	Delete a connection in vldh.
+ *
+ **************************************************************************/
 
 int vldh_con_delete(vldh_t_con con)
 {
@@ -781,52 +780,49 @@ int vldh_con_delete(vldh_t_con con)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_con_undelete()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_con	con		I	vldh connection
-*
-* Description:
-*	Undelete a connectionobject that is preiously deleted in
-*	vldh but not yet in ldh.
-*	Resets the delete bit in the statusword and inserts the connection
-*	in the connected nodes conlists.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_con_undelete()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_con	con		I	vldh connection
+ *
+ * Description:
+ *	Undelete a connectionobject that is preiously deleted in
+ *	vldh but not yet in ldh.
+ *	Resets the delete bit in the statusword and inserts the connection
+ *	in the connected nodes conlists.
+ *
+ **************************************************************************/
 
 int vldh_con_undelete(vldh_t_con con)
 {
   if (con->hc.status & VLDH_DELETE)
     con->hc.status -= VLDH_DELETE;
-  vldh_node_con_insert(
-      con->hc.source_node, con->lc.source_point, con, VLDH_NODE_SOURCE);
-  vldh_node_con_insert(
-      con->hc.dest_node, con->lc.dest_point, con, VLDH_NODE_DESTINATION);
+  vldh_node_con_insert(con->hc.source_node, con->lc.source_point, con, VLDH_NODE_SOURCE);
+  vldh_node_con_insert(con->hc.dest_node, con->lc.dest_point, con, VLDH_NODE_DESTINATION);
 
   return VLDH__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_con_nodes()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_con	con		I	vldh connection.
-* vldh_t_node * source_node	O	source node
-* vldh_t_node *	dest_node	O	destination node.
-*
-* Description:
-*	Returns the source and destination nodes for a connection.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_con_nodes()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_con	con		I	vldh connection.
+ * vldh_t_node * source_node	O	source node
+ * vldh_t_node *	dest_node	O	destination node.
+ *
+ * Description:
+ *	Returns the source and destination nodes for a connection.
+ *
+ **************************************************************************/
 
-int vldh_get_con_nodes(
-    vldh_t_con con, vldh_t_node* source_node, vldh_t_node* dest_node)
+int vldh_get_con_nodes(vldh_t_con con, vldh_t_node* source_node, vldh_t_node* dest_node)
 {
   *source_node = con->hc.source_node;
   *dest_node = con->hc.dest_node;
@@ -835,20 +831,20 @@ int vldh_get_con_nodes(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_con_getrefnr()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_con	con		I	vldh connection.
-*
-* Description:
-*	Get a number for the annotation in a reference connection.
-*	The number is fetched from the window object which contains
-*	a counter that increments for every new reference connection.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_con_getrefnr()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_con	con		I	vldh connection.
+ *
+ * Description:
+ *	Get a number for the annotation in a reference connection.
+ *	The number is fetched from the window object which contains
+ *	a counter that increments for every new reference connection.
+ *
+ **************************************************************************/
 
 int vldh_con_getrefnr(vldh_t_con con)
 {
@@ -862,22 +858,22 @@ int vldh_con_getrefnr(vldh_t_con con)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_wind_quit()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-*
-* Description:
-*	Routine that removes a window and all nodes and connections
-*	in the window in vldh.
-*	Frees all memory allocated in a window and sets zero in the
-*	subwindowpointer in the parent object. The application should
-*	make sure that no subwindows to this window exists in vldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_wind_quit()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ *
+ * Description:
+ *	Routine that removes a window and all nodes and connections
+ *	in the window in vldh.
+ *	Frees all memory allocated in a window and sets zero in the
+ *	subwindowpointer in the parent object. The application should
+ *	make sure that no subwindows to this window exists in vldh.
+ *
+ **************************************************************************/
 
 int vldh_wind_quit(vldh_t_wind wind)
 {
@@ -897,9 +893,12 @@ int vldh_wind_quit(vldh_t_wind wind)
   if (EVEN(sts))
     return sts;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
-    for (j = 0; j < VLDH_MAX_CONPOINTS; j++) {
-      if ((*node_ptr)->hn.con_count[j] > 0) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    for (j = 0; j < VLDH_MAX_CONPOINTS; j++)
+    {
+      if ((*node_ptr)->hn.con_count[j] > 0)
+      {
         free((char*)(*node_ptr)->hn.con_list[j]);
       }
     }
@@ -914,13 +913,15 @@ int vldh_wind_quit(vldh_t_wind wind)
   if (EVEN(sts))
     return sts;
   con_ptr = conlist;
-  for (i = 0; i < (int)con_count; i++) {
+  for (i = 0; i < (int)con_count; i++)
+  {
     free((char*)*con_ptr);
     con_ptr++;
   }
   if (con_count > 0)
     free((char*)conlist);
-  if (wind->hw.parent_node_pointer == 0) {
+  if (wind->hw.parent_node_pointer == 0)
+  {
     /* Parent is a plc, remove the plc */
     plc = wind->hw.plc;
 
@@ -929,8 +930,10 @@ int vldh_wind_quit(vldh_t_wind wind)
 
     /* Delete from the plc list */
     plc_pointer = &plc_root;
-    while (*plc_pointer != 0) {
-      if (*plc_pointer == plc) {
+    while (*plc_pointer != 0)
+    {
+      if (*plc_pointer == plc)
+      {
         /* This is it */
         *plc_pointer = (*plc_pointer)->hp.next;
         break;
@@ -950,19 +953,19 @@ int vldh_wind_quit(vldh_t_wind wind)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_wind_quit_all()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-*
-* Description:
-*	Removes a window from vldh
-*	and reverts the ldhsession of the window.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_wind_quit_all()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ *
+ * Description:
+ *	Removes a window from vldh
+ *	and reverts the ldhsession of the window.
+ *
+ **************************************************************************/
 
 int vldh_wind_quit_all(vldh_t_wind wind)
 {
@@ -976,7 +979,8 @@ int vldh_wind_quit_all(vldh_t_wind wind)
   // Created windows already have an LDH object from vldh_wind_create().
   // Always revert those sessions on quit so the transient subwindow object
   // is removed even if the session doesn't report pending changes.
-  if ((wind->hw.status & VLDH_CREATE) != 0 || !info.Empty) {
+  if ((wind->hw.status & VLDH_CREATE) != 0 || !info.Empty)
+  {
     sts = ldh_RevertSession(wind->hw.ldhses);
     if (EVEN(sts))
       return sts;
@@ -988,23 +992,23 @@ int vldh_wind_quit_all(vldh_t_wind wind)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_wind_save()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-*
-* Description:
-*	Saves all modifications done in a window in ldh.
-*	The plc of the window is always saved in the navigator session.
-*	Dependent of the statusword in the vldhobjects the window,
-*	nodes and connections are saved, deleted or ignored.
-*	If the window is created the subwindowmark in the parent node
-*	is saved.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_wind_save()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ *
+ * Description:
+ *	Saves all modifications done in a window in ldh.
+ *	The plc of the window is always saved in the navigator session.
+ *	Dependent of the statusword in the vldhobjects the window,
+ *	nodes and connections are saved, deleted or ignored.
+ *	If the window is created the subwindowmark in the parent node
+ *	is saved.
+ *
+ **************************************************************************/
 
 int vldh_wind_save(vldh_t_wind wind)
 {
@@ -1032,8 +1036,7 @@ int vldh_wind_save(vldh_t_wind wind)
   // 		ldh_eAccess_ReadWrite);
   // if ( EVEN(sts)) return sts;
 
-  sts = ldh_SetObjectBuffer(
-      wind->hw.ldhses, plc->lp.oid, "DevBody", "PlcProgram", (char*)&(plc->lp));
+  sts = ldh_SetObjectBuffer(wind->hw.ldhses, plc->lp.oid, "DevBody", "PlcProgram", (char*)&(plc->lp));
   if (sts == LDH__NOSUCHOBJ)
     return VLDH__PLCNOTSAVED;
   if (EVEN(sts))
@@ -1048,22 +1051,23 @@ int vldh_wind_save(vldh_t_wind wind)
   // if ( EVEN(sts)) return sts;
 
   /* If window is created, save the subwindowmark in the parent node */
-  if (wind->hw.parent_node_pointer != 0) {
+  if (wind->hw.parent_node_pointer != 0)
+  {
     /* Check if the window is created and not saved */
-    if ((wind->hw.status & VLDH_CREATE) != 0) {
+    if ((wind->hw.status & VLDH_CREATE) != 0)
+    {
       /* The parentnode is saved but without subwindowdata because
          the subwindow was not saved, add subwindowdata to the
          object in ldh */
 
-      sts = ldh_GetObjectBuffer(wind->hw.ldhses, wind->lw.poid, "DevBody",
-          "PlcNode", &eclass, (char**)&nodebuffer, &size);
+      sts = ldh_GetObjectBuffer(wind->hw.ldhses, wind->lw.poid, "DevBody", "PlcNode", &eclass,
+                                (char**)&nodebuffer, &size);
       if (EVEN(sts))
         return sts;
       nodebuffer->subwind_oid[wind->lw.subwindowindex] = wind->lw.oid;
       nodebuffer->subwindow |= (wind->lw.subwindowindex + 1);
 
-      sts = ldh_SetObjectBuffer(wind->hw.ldhses, wind->lw.poid, "DevBody",
-          "PlcNode", (char*)nodebuffer);
+      sts = ldh_SetObjectBuffer(wind->hw.ldhses, wind->lw.poid, "DevBody", "PlcNode", (char*)nodebuffer);
       if (EVEN(sts))
         return sts;
       free((char*)nodebuffer);
@@ -1071,26 +1075,27 @@ int vldh_wind_save(vldh_t_wind wind)
   }
 
   /* Save the wind */
-  if ((wind->hw.status & VLDH_DELETE) != 0) {
+  if ((wind->hw.status & VLDH_DELETE) != 0)
+  {
     /* Window deleted during this session */
     sts = ldh_DeleteObject(wind->hw.ldhses, wind->lw.oid);
     if (EVEN(sts))
       return sts;
     wind->hw.status = VLDH_DELETE | VLDH_LDHDELETE;
-  } else {
+  }
+  else
+  {
     /* Wind modified or created during this session */
-    sts = ldh_SetObjectBuffer(wind->hw.ldhses, wind->lw.oid, "DevBody",
-        "PlcWindow", (char*)&(wind->lw));
+    sts = ldh_SetObjectBuffer(wind->hw.ldhses, wind->lw.oid, "DevBody", "PlcWindow", (char*)&(wind->lw));
     if (EVEN(sts))
       return sts;
     wind->hw.status = VLDH_LOAD;
 
     /* Store the modification time */
     time_GetTime(&time);
-    sts = ldh_SetObjectPar(wind->hw.ldhses, wind->lw.oid, "DevBody", "Modified",
-        (char*)&time, sizeof(time));
-    sts = ldh_SetObjectPar(wind->hw.ldhses, wind->lw.oid, "RtBody", "Version",
-        (char*)&time.tv_sec, sizeof(time.tv_sec));
+    sts = ldh_SetObjectPar(wind->hw.ldhses, wind->lw.oid, "DevBody", "Modified", (char*)&time, sizeof(time));
+    sts = ldh_SetObjectPar(wind->hw.ldhses, wind->lw.oid, "RtBody", "Version", (char*)&time.tv_sec,
+                           sizeof(time.tv_sec));
   }
 
   /* Save the nodes that is created or modified */
@@ -1098,9 +1103,10 @@ int vldh_wind_save(vldh_t_wind wind)
   if (EVEN(sts))
     return sts;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
-    if ((((*node_ptr)->hn.status & VLDH_MODIFY) != 0)
-        || (((*node_ptr)->hn.status & VLDH_CREATE) != 0)) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    if ((((*node_ptr)->hn.status & VLDH_MODIFY) != 0) || (((*node_ptr)->hn.status & VLDH_CREATE) != 0))
+    {
       /* Node modified or created during this session */
       /* Look for any created and not saved subwindows,
          these should not be saved until the subwindow is saved
@@ -1108,10 +1114,13 @@ int vldh_wind_save(vldh_t_wind wind)
       for (j = 0; j < VLDH_MAX_SUBWINDOWS; j++)
         ln_subwind_oid[j] = (*node_ptr)->ln.subwind_oid[j];
       ln_subwindow = (*node_ptr)->ln.subwindow;
-      for (j = 0; j < VLDH_MAX_SUBWINDOWS; j++) {
-        if ((*node_ptr)->hn.subwindowobject[j] != 0) {
+      for (j = 0; j < VLDH_MAX_SUBWINDOWS; j++)
+      {
+        if ((*node_ptr)->hn.subwindowobject[j] != 0)
+        {
           subwindow = (*node_ptr)->hn.subwindowobject[j];
-          if ((subwindow->hw.status & VLDH_CREATE) != 0) {
+          if ((subwindow->hw.status & VLDH_CREATE) != 0)
+          {
             /* Created not saved subwindow found */
             (*node_ptr)->ln.subwind_oid[j] = pwr_cNObjid;
             if (((*node_ptr)->ln.subwindow & (1 << j)) != 0)
@@ -1122,8 +1131,8 @@ int vldh_wind_save(vldh_t_wind wind)
 
       cnv_to_neted(*node_ptr);
 
-      sts = ldh_SetObjectBuffer(wind->hw.ldhses, (*node_ptr)->ln.oid, "DevBody",
-          "PlcNode", (char*)&((*node_ptr)->ln));
+      sts = ldh_SetObjectBuffer(wind->hw.ldhses, (*node_ptr)->ln.oid, "DevBody", "PlcNode",
+                                (char*)&((*node_ptr)->ln));
       if (EVEN(sts))
         return sts;
 
@@ -1145,7 +1154,8 @@ int vldh_wind_save(vldh_t_wind wind)
   if (EVEN(sts))
     return sts;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     /* Node deleted during this session */
     sts = vldh_node_ldhdel_spec(*node_ptr);
     if (EVEN(sts))
@@ -1162,12 +1172,13 @@ int vldh_wind_save(vldh_t_wind wind)
   /* Save the cons that is created or modified */
   vldh_get_cons(wind, &con_count, &conlist);
   con_ptr = conlist;
-  for (i = 0; i < (int)con_count; i++) {
-    if ((((*con_ptr)->hc.status & VLDH_MODIFY) != 0)
-        || (((*con_ptr)->hc.status & VLDH_CREATE) != 0)) {
+  for (i = 0; i < (int)con_count; i++)
+  {
+    if ((((*con_ptr)->hc.status & VLDH_MODIFY) != 0) || (((*con_ptr)->hc.status & VLDH_CREATE) != 0))
+    {
       /* Con modified or created during this session */
-      sts = ldh_SetObjectBuffer(wind->hw.ldhses, (*con_ptr)->lc.oid, "DevBody",
-          "PlcConnection", (char*)&((*con_ptr)->lc));
+      sts = ldh_SetObjectBuffer(wind->hw.ldhses, (*con_ptr)->lc.oid, "DevBody", "PlcConnection",
+                                (char*)&((*con_ptr)->lc));
       if (EVEN(sts))
         return sts;
       (*con_ptr)->hc.status = VLDH_LOAD;
@@ -1182,7 +1193,8 @@ int vldh_wind_save(vldh_t_wind wind)
   if (EVEN(sts))
     return sts;
   con_ptr = conlist;
-  for (i = 0; i < (int)con_count; i++) {
+  for (i = 0; i < (int)con_count; i++)
+  {
     /* Con deleted during this session */
     sts = ldh_DeleteObject(wind->hw.ldhses, (*con_ptr)->lc.oid);
     if (EVEN(sts))
@@ -1201,19 +1213,19 @@ int vldh_wind_save(vldh_t_wind wind)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_wind_delete_all()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-*
-* Description:
-*	Deletes the window, all nodes and connections in vldh and
-*	in ldh and saves the ldh session.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_wind_delete_all()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ *
+ * Description:
+ *	Deletes the window, all nodes and connections in vldh and
+ *	in ldh and saves the ldh session.
+ *
+ **************************************************************************/
 
 int vldh_wind_delete_all(vldh_t_wind wind)
 {
@@ -1234,7 +1246,8 @@ int vldh_wind_delete_all(vldh_t_wind wind)
   if (EVEN(sts))
     return sts;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     sts = vldh_node_ldhdel_spec(*node_ptr);
     if (EVEN(sts))
       return sts;
@@ -1251,7 +1264,8 @@ int vldh_wind_delete_all(vldh_t_wind wind)
   if (EVEN(sts))
     return sts;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
+  for (i = 0; i < (int)node_count; i++)
+  {
     sts = vldh_node_ldhdel_spec(*node_ptr);
     if (EVEN(sts))
       return sts;
@@ -1268,7 +1282,8 @@ int vldh_wind_delete_all(vldh_t_wind wind)
   if (EVEN(sts))
     return sts;
   con_ptr = conlist;
-  for (i = 0; i < (int)con_count; i++) {
+  for (i = 0; i < (int)con_count; i++)
+  {
     sts = ldh_DeleteObject(wind->hw.ldhses, (*con_ptr)->lc.oid);
     if (EVEN(sts))
       return sts;
@@ -1282,7 +1297,8 @@ int vldh_wind_delete_all(vldh_t_wind wind)
   if (EVEN(sts))
     return sts;
   con_ptr = conlist;
-  for (i = 0; i < (int)con_count; i++) {
+  for (i = 0; i < (int)con_count; i++)
+  {
     sts = ldh_DeleteObject(wind->hw.ldhses, (*con_ptr)->lc.oid);
     if (EVEN(sts))
       return sts;
@@ -1308,18 +1324,18 @@ int vldh_wind_delete_all(vldh_t_wind wind)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_wind_load_all()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	wind		I	vldh window.
-*
-* Description:
-*	Loads a nodes and connections in a window from ldh to vldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_wind_load_all()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	wind		I	vldh window.
+ *
+ * Description:
+ *	Loads a nodes and connections in a window from ldh to vldh.
+ *
+ **************************************************************************/
 
 int vldh_wind_load_all(vldh_t_wind wind)
 {
@@ -1343,19 +1359,22 @@ int vldh_wind_load_all(vldh_t_wind wind)
   /* Get the first child to the window */
   sts = ldh_GetChild(wind->hw.ldhses, wind->lw.oid, &next_objdid);
 
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     /* Check if node or connection */
-    sts = ldh_GetObjectBuffer(wind->hw.ldhses, next_objdid, "DevBody",
-        "PlcNode", &eclass, (char**)&nodebuffer, &size);
+    sts = ldh_GetObjectBuffer(wind->hw.ldhses, next_objdid, "DevBody", "PlcNode", &eclass,
+                              (char**)&nodebuffer, &size);
 
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       /* This is a node */
       free((char*)nodebuffer);
       sts = vldh_node_load(wind, next_objdid);
       if (EVEN(sts))
         return sts;
-
-    } else {
+    }
+    else
+    {
       /* This is a connection */
       sts = vldh_con_load(wind, next_objdid);
       if (EVEN(sts))
@@ -1371,25 +1390,27 @@ int vldh_wind_load_all(vldh_t_wind wind)
   if (EVEN(sts))
     return sts;
   con_ptr = conlist;
-  for (i = 0; i < (int)con_count; i++) {
+  for (i = 0; i < (int)con_count; i++)
+  {
     source_found = 0;
     dest_found = 0;
     node = nodelist;
-    for (j = 0; j < (int)node_count; j++) {
-      if (cdh_ObjidIsEqual((*con_ptr)->lc.source_oid, (*node)->ln.oid)) {
+    for (j = 0; j < (int)node_count; j++)
+    {
+      if (cdh_ObjidIsEqual((*con_ptr)->lc.source_oid, (*node)->ln.oid))
+      {
         /* Sourcenode found */
         (*con_ptr)->hc.source_node = *node;
-        vldh_node_con_insert(
-            *node, (*con_ptr)->lc.source_point, *con_ptr, VLDH_NODE_SOURCE);
+        vldh_node_con_insert(*node, (*con_ptr)->lc.source_point, *con_ptr, VLDH_NODE_SOURCE);
         source_found = 1;
         if (dest_found)
           break;
       }
-      if (cdh_ObjidIsEqual((*con_ptr)->lc.dest_oid, (*node)->ln.oid)) {
+      if (cdh_ObjidIsEqual((*con_ptr)->lc.dest_oid, (*node)->ln.oid))
+      {
         /* Destinationnode found */
         (*con_ptr)->hc.dest_node = *node;
-        vldh_node_con_insert(
-            *node, (*con_ptr)->lc.dest_point, *con_ptr, VLDH_NODE_DESTINATION);
+        vldh_node_con_insert(*node, (*con_ptr)->lc.dest_point, *con_ptr, VLDH_NODE_DESTINATION);
         dest_found = 1;
         if (source_found)
           break;
@@ -1398,7 +1419,8 @@ int vldh_wind_load_all(vldh_t_wind wind)
     }
 
     /* LOOK FOR A BUGG!!! */
-    if (!(source_found && dest_found)) {
+    if (!(source_found && dest_found))
+    {
       pwr_tOName name;
 
       rsts = VLDH__WINDCORRUPT;
@@ -1406,25 +1428,22 @@ int vldh_wind_load_all(vldh_t_wind wind)
       /* Source or destination is missing, delete the connection */
       (*con_ptr)->hc.status |= VLDH_DELETE;
       if (source_found)
-        vldh_node_con_delete(
-            (*con_ptr)->hc.source_node, (*con_ptr)->lc.source_point, *con_ptr);
+        vldh_node_con_delete((*con_ptr)->hc.source_node, (*con_ptr)->lc.source_point, *con_ptr);
       if (dest_found)
-        vldh_node_con_delete(
-            (*con_ptr)->hc.dest_node, (*con_ptr)->lc.dest_point, *con_ptr);
+        vldh_node_con_delete((*con_ptr)->hc.dest_node, (*con_ptr)->lc.dest_point, *con_ptr);
 
-      sts = ldh_ObjidToName(wind->hw.ldhses, (*con_ptr)->lc.oid,
-          ldh_eName_Object, name, sizeof(name), &size);
+      sts = ldh_ObjidToName(wind->hw.ldhses, (*con_ptr)->lc.oid, ldh_eName_Object, name, sizeof(name), &size);
       if (EVEN(sts))
         return sts;
 
       if (!source_found)
         printf("** Error connection source node is missing: %s soix: %d doix: "
                "%d \n",
-            name, (*con_ptr)->lc.source_oid.oix, (*con_ptr)->lc.dest_oid.oix);
+               name, (*con_ptr)->lc.source_oid.oix, (*con_ptr)->lc.dest_oid.oix);
       if (!dest_found)
         printf("** Error connection destination node is missing: %s soix: %d "
                "doix: %d \n",
-            name, (*con_ptr)->lc.source_oid.oix, (*con_ptr)->lc.dest_oid.oix);
+               name, (*con_ptr)->lc.source_oid.oix, (*con_ptr)->lc.dest_oid.oix);
     }
     /* END LOOK FOR A BUGG!!! */
 
@@ -1438,29 +1457,28 @@ int vldh_wind_load_all(vldh_t_wind wind)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_wind_create()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_plc	plc		I	the plc of the window
-* vldh_t_node	parentnode	I	the node that has this window as a
-*					subwindow, = 0 if parent is a plc.
-* void		*foe		I	foe context
-* unsigned long	class		I	window class
-* unsigned long	subwindowindex	I	windowindex
-* vldh_t_wind	* wind		O	created vldh window
-*
-* Description:
-*	Create a window in vldh and a windowobject of specified
-*	class in ldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_wind_create()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_plc	plc		I	the plc of the window
+ * vldh_t_node	parentnode	I	the node that has this window as a
+ *					subwindow, = 0 if parent is a plc.
+ * void		*foe		I	foe context
+ * unsigned long	class		I	window class
+ * unsigned long	subwindowindex	I	windowindex
+ * vldh_t_wind	* wind		O	created vldh window
+ *
+ * Description:
+ *	Create a window in vldh and a windowobject of specified
+ *	class in ldh.
+ *
+ **************************************************************************/
 
-int vldh_wind_create(vldh_t_plc plc, vldh_t_node parentnode, void* foe,
-    pwr_tClassId cid, unsigned long subwindowindex, vldh_t_wind* wind,
-    ldh_eAccess access)
+int vldh_wind_create(vldh_t_plc plc, vldh_t_node parentnode, void* foe, pwr_tClassId cid,
+                     unsigned long subwindowindex, vldh_t_wind* wind, ldh_eAccess access)
 {
   char* segment_name;
   pwr_tObjid objdid;
@@ -1471,14 +1489,12 @@ int vldh_wind_create(vldh_t_plc plc, vldh_t_node parentnode, void* foe,
   pwr_tObjid parent_objdid;
 
   /* Open a session for this window */
-  sts = ldh_OpenSession(&ldhsession, ldh_SessionToVol(plc->hp.ldhsesctx),
-      access, ldh_eUtility_PlcEditor);
+  sts = ldh_OpenSession(&ldhsession, ldh_SessionToVol(plc->hp.ldhsesctx), access, ldh_eUtility_PlcEditor);
   if (EVEN(sts))
     return sts;
 
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody(
-      ldhsession, cid, "GraphPlcWindow", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhsession, cid, "GraphPlcWindow", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
@@ -1492,8 +1508,7 @@ int vldh_wind_create(vldh_t_plc plc, vldh_t_node parentnode, void* foe,
     parent_objdid = parentnode->ln.oid;
 
   /* Create the object i ldh */
-  sts = ldh_CreateObject(ldhsession, &objdid, segment_name, cid, parent_objdid,
-      ldh_eDest_IntoFirst);
+  sts = ldh_CreateObject(ldhsession, &objdid, segment_name, cid, parent_objdid, ldh_eDest_IntoFirst);
   if (EVEN(sts))
     return sts;
 
@@ -1526,26 +1541,26 @@ int vldh_wind_create(vldh_t_plc plc, vldh_t_node parentnode, void* foe,
 }
 
 /*************************************************************************
-*
-* Name:		vldh_wind_load()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_plc	plc		I	the plc of the window
-* vldh_t_node	parentnode	I	the node that has this window as a
-*					subwindow, = 0 if parent is a plc.
-* unsigned long	objdid		I 	objdid of the windowobject.
-* void	      *foe		I	foe context
-* vldh_t_wind	* wind		O	created vldh window
-*
-* Description:
-*	Load a window object from ldh to vldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_wind_load()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_plc	plc		I	the plc of the window
+ * vldh_t_node	parentnode	I	the node that has this window as a
+ *					subwindow, = 0 if parent is a plc.
+ * unsigned long	objdid		I 	objdid of the windowobject.
+ * void	      *foe		I	foe context
+ * vldh_t_wind	* wind		O	created vldh window
+ *
+ * Description:
+ *	Load a window object from ldh to vldh.
+ *
+ **************************************************************************/
 
-int vldh_wind_load(vldh_t_plc plc, vldh_t_node parentnode, pwr_tObjid objdid,
-    void* foe, vldh_t_wind* wind, ldh_eAccess access)
+int vldh_wind_load(vldh_t_plc plc, vldh_t_node parentnode, pwr_tObjid objdid, void* foe, vldh_t_wind* wind,
+                   ldh_eAccess access)
 {
   ldh_tSesContext ldhsession;
   int sts, size;
@@ -1557,14 +1572,12 @@ int vldh_wind_load(vldh_t_plc plc, vldh_t_node parentnode, pwr_tObjid objdid,
   *wind = (vldh_t_wind)calloc(1, sizeof(**wind));
 
   /* Open a session for plcobjects only */
-  sts = ldh_OpenSession(&ldhsession, ldh_SessionToVol(plc->hp.ldhsesctx),
-      access, ldh_eUtility_PlcEditor);
+  sts = ldh_OpenSession(&ldhsession, ldh_SessionToVol(plc->hp.ldhsesctx), access, ldh_eUtility_PlcEditor);
   if (EVEN(sts))
     return sts;
 
   /* Get the object i ldh */
-  sts = ldh_GetObjectBuffer(ldhsession, objdid, "DevBody", "PlcWindow", &eclass,
-      (char**)&windbuffer, &size);
+  sts = ldh_GetObjectBuffer(ldhsession, objdid, "DevBody", "PlcWindow", &eclass, (char**)&windbuffer, &size);
   if (EVEN(sts))
     return sts;
 
@@ -1572,8 +1585,8 @@ int vldh_wind_load(vldh_t_plc plc, vldh_t_node parentnode, pwr_tObjid objdid,
   free((char*)windbuffer);
 
   /* Get the object name from ldh */
-  sts = ldh_ObjidToName(ldhsession, objdid, ldh_eName_Object,
-      (*wind)->hw.object_name, sizeof((*wind)->hw.object_name), &size);
+  sts = ldh_ObjidToName(ldhsession, objdid, ldh_eName_Object, (*wind)->hw.object_name,
+                        sizeof((*wind)->hw.object_name), &size);
   if (EVEN(sts))
     return sts;
 
@@ -1599,18 +1612,18 @@ int vldh_wind_load(vldh_t_plc plc, vldh_t_node parentnode, pwr_tObjid objdid,
 }
 
 /*************************************************************************
-*
-* Name:		vldh_wind_delete()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-*
-* Description:
-*	Delete a window in vldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_wind_delete()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ *
+ * Description:
+ *	Delete a window in vldh.
+ *
+ **************************************************************************/
 
 int vldh_wind_delete(vldh_t_wind wind)
 {
@@ -1620,24 +1633,23 @@ int vldh_wind_delete(vldh_t_wind wind)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_plc_create()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	objdid		I	objdid of the plcpgm object.
-* ldh_tWBContext ldhwbctx	I	ldh workbench.
-* ldh_tSesContext ldhses; ldhsesctx	I	ldh session.
-* vldh_t_plc	*plc		O	created plc.
-*
-* Description:
-*	Create a plcobject in vldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_plc_create()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	objdid		I	objdid of the plcpgm object.
+ * ldh_tWBContext ldhwbctx	I	ldh workbench.
+ * ldh_tSesContext ldhses; ldhsesctx	I	ldh session.
+ * vldh_t_plc	*plc		O	created plc.
+ *
+ * Description:
+ *	Create a plcobject in vldh.
+ *
+ **************************************************************************/
 
-int vldh_plc_create(pwr_tObjid objdid, ldh_tWBContext ldhwbctx,
-    ldh_tSesContext ldhsesctx, vldh_t_plc* plc)
+int vldh_plc_create(pwr_tObjid objdid, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, vldh_t_plc* plc)
 {
   int i, sts, size;
   pwr_tClassId bodyclass;
@@ -1647,8 +1659,8 @@ int vldh_plc_create(pwr_tObjid objdid, ldh_tWBContext ldhwbctx,
   *plc = (vldh_t_plc)calloc(1, sizeof(**plc));
 
   /* Open a session for the plc */
-  sts = ldh_OpenSession(&ldhsession, ldh_SessionToVol(ldhsesctx),
-      ldh_eAccess_ReadOnly, ldh_eUtility_PlcEditor);
+  sts =
+      ldh_OpenSession(&ldhsession, ldh_SessionToVol(ldhsesctx), ldh_eAccess_ReadOnly, ldh_eUtility_PlcEditor);
 
   if (EVEN(sts))
     return sts;
@@ -1656,12 +1668,11 @@ int vldh_plc_create(pwr_tObjid objdid, ldh_tWBContext ldhwbctx,
   sts = ldh_GetObjectClass(ldhsesctx, objdid, &(*plc)->lp.cid);
   if (EVEN(sts))
     return sts;
-  sts = ldh_ObjidToName(ldhsesctx, objdid, ldh_eName_Hierarchy,
-      (*plc)->hp.object_name, sizeof((*plc)->hp.object_name), &size);
+  sts = ldh_ObjidToName(ldhsesctx, objdid, ldh_eName_Hierarchy, (*plc)->hp.object_name,
+                        sizeof((*plc)->hp.object_name), &size);
   if (EVEN(sts))
     return sts;
-  sts = ldh_GetClassBody(ldhsesctx, (*plc)->lp.cid, "GraphPlcPgm", &bodyclass,
-      (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(ldhsesctx, (*plc)->lp.cid, "GraphPlcPgm", &bodyclass, (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
@@ -1682,24 +1693,23 @@ int vldh_plc_create(pwr_tObjid objdid, ldh_tWBContext ldhwbctx,
 }
 
 /*************************************************************************
-*
-* Name:		vldh_plc_load()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	objdid		I	objdid of the plcpgm object.
-* ldh_tWBContext ldhwbctx	I	ldh workbench.
-* ldh_tSesContext ldhses; ldhsesctx	I	ldh session.
-* vldh_t_plc	*plc		O	create plc.
-*
-* Description:
-*	Load a plc in vldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_plc_load()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	objdid		I	objdid of the plcpgm object.
+ * ldh_tWBContext ldhwbctx	I	ldh workbench.
+ * ldh_tSesContext ldhses; ldhsesctx	I	ldh session.
+ * vldh_t_plc	*plc		O	create plc.
+ *
+ * Description:
+ *	Load a plc in vldh.
+ *
+ **************************************************************************/
 
-int vldh_plc_load(pwr_tObjid objdid, ldh_tWBContext ldhwbctx,
-    ldh_tSesContext ldhsesctx, vldh_t_plc* plc)
+int vldh_plc_load(pwr_tObjid objdid, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, vldh_t_plc* plc)
 {
   int sts, size;
   pwr_sPlcProgram* plcbuffer;
@@ -1707,14 +1717,13 @@ int vldh_plc_load(pwr_tObjid objdid, ldh_tWBContext ldhwbctx,
   ldh_tSesContext ldhsession;
 
   /* Open a session for the plc */
-  sts = ldh_OpenSession(&ldhsession, ldh_SessionToVol(ldhsesctx),
-      ldh_eAccess_ReadOnly, ldh_eUtility_PlcEditor);
+  sts =
+      ldh_OpenSession(&ldhsession, ldh_SessionToVol(ldhsesctx), ldh_eAccess_ReadOnly, ldh_eUtility_PlcEditor);
 
   *plc = (vldh_t_plc)calloc(1, sizeof(**plc));
 
   /* Get the object i ldh */
-  sts = ldh_GetObjectBuffer(ldhsesctx, objdid, "DevBody", "PlcProgram", &eclass,
-      (char**)&plcbuffer, &size);
+  sts = ldh_GetObjectBuffer(ldhsesctx, objdid, "DevBody", "PlcProgram", &eclass, (char**)&plcbuffer, &size);
   if (EVEN(sts))
     return sts;
 
@@ -1722,8 +1731,8 @@ int vldh_plc_load(pwr_tObjid objdid, ldh_tWBContext ldhwbctx,
   free((char*)plcbuffer);
 
   /* Get the object name from ldh */
-  sts = ldh_ObjidToName(ldhsesctx, objdid, ldh_eName_Hierarchy,
-      (*plc)->hp.object_name, sizeof((*plc)->hp.object_name), &size);
+  sts = ldh_ObjidToName(ldhsesctx, objdid, ldh_eName_Hierarchy, (*plc)->hp.object_name,
+                        sizeof((*plc)->hp.object_name), &size);
   if (EVEN(sts))
     return sts;
 
@@ -1739,18 +1748,18 @@ int vldh_plc_load(pwr_tObjid objdid, ldh_tWBContext ldhwbctx,
 }
 
 /*************************************************************************
-*
-* Name:		vldh_plc_delete()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_plc	plc		I	vldh plc.
-*
-* Description:
-*	Delete a plc in vldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_plc_delete()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_plc	plc		I	vldh plc.
+ *
+ * Description:
+ *	Delete a plc in vldh.
+ *
+ **************************************************************************/
 
 int vldh_plc_delete(vldh_t_plc plc)
 {
@@ -1760,27 +1769,26 @@ int vldh_plc_delete(vldh_t_plc plc)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_subwindows_all()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* unsigned long * wind_count	O	number of windowsin windlist
-* void **	intern_windlist	O	list of subwindows
-*
-* Description:
-*	Returns subwindows to a window at one level, that is
-*	subwindows that are children of nodes in the windows.
-*	Only windows loaded in vldh is returned.
-*	When the caller is finished with the windowlist
-*	the space should be freed by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_subwindows_all()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * unsigned long * wind_count	O	number of windowsin windlist
+ * void **	intern_windlist	O	list of subwindows
+ *
+ * Description:
+ *	Returns subwindows to a window at one level, that is
+ *	subwindows that are children of nodes in the windows.
+ *	Only windows loaded in vldh is returned.
+ *	When the caller is finished with the windowlist
+ *	the space should be freed by a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_wind_subwindows(
-    vldh_t_wind wind, unsigned long* wind_count, vldh_t_wind** intern_windlist)
+int vldh_get_wind_subwindows(vldh_t_wind wind, unsigned long* wind_count, vldh_t_wind** intern_windlist)
 {
   vldh_t_wind* windlist_pointer;
   vldh_t_wind wind_pointer;
@@ -1797,15 +1805,18 @@ int vldh_get_wind_subwindows(
   if (EVEN(sts))
     return sts;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
-    for (j = 0; j < VLDH_MAX_SUBWINDOWS; j++) {
-      if ((*node_ptr)->hn.subwindowobject[j] != 0) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    for (j = 0; j < VLDH_MAX_SUBWINDOWS; j++)
+    {
+      if ((*node_ptr)->hn.subwindowobject[j] != 0)
+      {
         wind_pointer = (*node_ptr)->hn.subwindowobject[j];
-        if ((wind_pointer->hw.status & VLDH_DELETE) == 0) {
+        if ((wind_pointer->hw.status & VLDH_DELETE) == 0)
+        {
           wind_pointer = (*node_ptr)->hn.subwindowobject[j];
-          sts = utl_realloc((char**)intern_windlist,
-              *wind_count * sizeof(*intern_windlist),
-              (*wind_count + 1) * sizeof(*intern_windlist));
+          sts = utl_realloc((char**)intern_windlist, *wind_count * sizeof(*intern_windlist),
+                            (*wind_count + 1) * sizeof(*intern_windlist));
           if (EVEN(sts))
             return sts;
           windlist_pointer = *intern_windlist;
@@ -1826,25 +1837,24 @@ int vldh_get_wind_subwindows(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_subwindows_all()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* unsigned long * wind_count	O	number of windowsin windlist
-* void **	intern_windlist	O	list of subwindows
-*
-* Description:
-*	Recursive routine used by vldh_get_wind_windows.
-*	Searches trough vldh for subwindows and accumulates them
-*	in std::vector.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_subwindows_all()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * unsigned long * wind_count	O	number of windowsin windlist
+ * void **	intern_windlist	O	list of subwindows
+ *
+ * Description:
+ *	Recursive routine used by vldh_get_wind_windows.
+ *	Searches trough vldh for subwindows and accumulates them
+ *	in std::vector.
+ *
+ **************************************************************************/
 
-int vldh_get_subwindows_all(
-    vldh_t_wind wind, unsigned long* wind_count, vldh_t_wind** intern_windlist)
+int vldh_get_subwindows_all(vldh_t_wind wind, unsigned long* wind_count, vldh_t_wind** intern_windlist)
 {
   vldh_t_wind* windlist_pointer;
   vldh_t_wind wind_pointer;
@@ -1858,22 +1868,24 @@ int vldh_get_subwindows_all(
   if (EVEN(sts))
     return sts;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
-    for (j = 0; j < VLDH_MAX_SUBWINDOWS; j++) {
-      if ((*node_ptr)->hn.subwindowobject[j] != 0) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    for (j = 0; j < VLDH_MAX_SUBWINDOWS; j++)
+    {
+      if ((*node_ptr)->hn.subwindowobject[j] != 0)
+      {
         wind_pointer = (*node_ptr)->hn.subwindowobject[j];
-        if ((wind_pointer->hw.status & VLDH_DELETE) == 0) {
+        if ((wind_pointer->hw.status & VLDH_DELETE) == 0)
+        {
           wind_pointer = (*node_ptr)->hn.subwindowobject[j];
-          sts = utl_realloc((char**)intern_windlist,
-              *wind_count * sizeof(*intern_windlist),
-              (*wind_count + 1) * sizeof(*intern_windlist));
+          sts = utl_realloc((char**)intern_windlist, *wind_count * sizeof(*intern_windlist),
+                            (*wind_count + 1) * sizeof(*intern_windlist));
           if (EVEN(sts))
             return sts;
           windlist_pointer = *intern_windlist;
           *(windlist_pointer + *wind_count) = wind_pointer;
           (*wind_count)++;
-          sts = vldh_get_subwindows_all(
-              wind_pointer, wind_count, intern_windlist);
+          sts = vldh_get_subwindows_all(wind_pointer, wind_count, intern_windlist);
           if (EVEN(sts))
             return sts;
         }
@@ -1891,27 +1903,26 @@ int vldh_get_subwindows_all(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_wind_windows()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* unsigned long * wind_count	O	number of windowsin windlist
-* void **	intern_windlist	O	list of subwindows
-*
-* Description:
-*	Returns all subwindows at all levels to a window.
-*	The parent window is returnd first in the windowlist.
-*	Only subwindows loaded in vldh is returned.
-*	When the caller is finished with the windowlist
-*	the space should be freed by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_wind_windows()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * unsigned long * wind_count	O	number of windowsin windlist
+ * void **	intern_windlist	O	list of subwindows
+ *
+ * Description:
+ *	Returns all subwindows at all levels to a window.
+ *	The parent window is returnd first in the windowlist.
+ *	Only subwindows loaded in vldh is returned.
+ *	When the caller is finished with the windowlist
+ *	the space should be freed by a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_wind_windows(
-    vldh_t_wind wind, unsigned long* wind_count, vldh_t_wind** intern_windlist)
+int vldh_get_wind_windows(vldh_t_wind wind, unsigned long* wind_count, vldh_t_wind** intern_windlist)
 {
   vldh_t_wind* windlist_pointer;
   vldh_t_wind wind_pointer;
@@ -1920,11 +1931,12 @@ int vldh_get_wind_windows(
   *wind_count = 0;
 
   wind_pointer = wind;
-  if (wind_pointer != 0) {
-    if ((wind_pointer->hw.status & VLDH_DELETE) == 0) {
-      sts = utl_realloc((char**)intern_windlist,
-          *wind_count * sizeof(*intern_windlist),
-          (*wind_count + 1) * sizeof(*intern_windlist));
+  if (wind_pointer != 0)
+  {
+    if ((wind_pointer->hw.status & VLDH_DELETE) == 0)
+    {
+      sts = utl_realloc((char**)intern_windlist, *wind_count * sizeof(*intern_windlist),
+                        (*wind_count + 1) * sizeof(*intern_windlist));
       windlist_pointer = *intern_windlist;
       *(windlist_pointer + *wind_count) = wind_pointer;
       (*wind_count)++;
@@ -1940,25 +1952,24 @@ int vldh_get_wind_windows(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_plc_windows()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* unsigned long * wind_count	O	number of windowsin windlist
-* void **	intern_windlist	O	list of subwindows
-*
-* Description:
-*	Returns all windows loaded in vldh in a plc.
-*	When the caller is finished with the windowlist
-*	the space should be freed by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_plc_windows()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * unsigned long * wind_count	O	number of windowsin windlist
+ * void **	intern_windlist	O	list of subwindows
+ *
+ * Description:
+ *	Returns all windows loaded in vldh in a plc.
+ *	When the caller is finished with the windowlist
+ *	the space should be freed by a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_plc_windows(
-    vldh_t_plc plc, unsigned long* wind_count, vldh_t_wind** intern_windlist)
+int vldh_get_plc_windows(vldh_t_plc plc, unsigned long* wind_count, vldh_t_wind** intern_windlist)
 {
   int sts;
   sts = vldh_get_wind_windows(plc->hp.wind, wind_count, intern_windlist);
@@ -1966,25 +1977,24 @@ int vldh_get_plc_windows(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_nodes()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* unsigned long * node_count	O	number of nodes in the nodelist
-* void **	intern_nodelist	O	list of nodes in the window
-*
-* Description:
-*	Returns all nodes in a window.
-*	When the caller is finished with the nodelist
-*	the space should be freed by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_nodes()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * unsigned long * node_count	O	number of nodes in the nodelist
+ * void **	intern_nodelist	O	list of nodes in the window
+ *
+ * Description:
+ *	Returns all nodes in a window.
+ *	When the caller is finished with the nodelist
+ *	the space should be freed by a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_nodes(
-    vldh_t_wind wind, unsigned long* node_count, vldh_t_node** intern_nodelist)
+int vldh_get_nodes(vldh_t_wind wind, unsigned long* node_count, vldh_t_node** intern_nodelist)
 {
   vldh_t_node* nodelist_pointer;
   vldh_t_node node_pointer;
@@ -1994,7 +2004,8 @@ int vldh_get_nodes(
   /* Count the nodes */
   count = 0;
   node_pointer = wind->hw.node_list_pointer;
-  while (node_pointer != 0) {
+  while (node_pointer != 0)
+  {
     /* Put node in array if not deleted */
     if ((node_pointer->hn.status & VLDH_DELETE) == 0)
       count++;
@@ -2009,12 +2020,13 @@ int vldh_get_nodes(
 
   *node_count = 0;
   node_pointer = wind->hw.node_list_pointer;
-  while (node_pointer != 0) {
+  while (node_pointer != 0)
+  {
     /* Put node in array if not deleted */
-    if ((node_pointer->hn.status & VLDH_DELETE) == 0) {
-      sts = utl_realloc((char**)intern_nodelist,
-          count * sizeof(*intern_nodelist),
-          (*node_count + 1) * sizeof(*intern_nodelist));
+    if ((node_pointer->hn.status & VLDH_DELETE) == 0)
+    {
+      sts = utl_realloc((char**)intern_nodelist, count * sizeof(*intern_nodelist),
+                        (*node_count + 1) * sizeof(*intern_nodelist));
       if (EVEN(sts))
         return sts;
       nodelist_pointer = *intern_nodelist;
@@ -2032,26 +2044,25 @@ int vldh_get_nodes(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_nodes_del()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* unsigned long * node_count	O	number of nodes in the nodelist
-* void **	intern_nodelist	O	list of nodes in the window
-*
-* Description:
-*	Returns all nodes in a window that are deleted in vldh
-*	but not yet in ldh.
-*	When the caller is finished with the nodelist
-*	the space should be freed by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_nodes_del()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * unsigned long * node_count	O	number of nodes in the nodelist
+ * void **	intern_nodelist	O	list of nodes in the window
+ *
+ * Description:
+ *	Returns all nodes in a window that are deleted in vldh
+ *	but not yet in ldh.
+ *	When the caller is finished with the nodelist
+ *	the space should be freed by a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_nodes_del(
-    vldh_t_wind wind, unsigned long* node_count, vldh_t_node** intern_nodelist)
+int vldh_get_nodes_del(vldh_t_wind wind, unsigned long* node_count, vldh_t_node** intern_nodelist)
 {
   vldh_t_node* nodelist_pointer;
   vldh_t_node node_pointer;
@@ -2061,10 +2072,10 @@ int vldh_get_nodes_del(
   /* Count the nodes */
   count = 0;
   node_pointer = wind->hw.node_list_pointer;
-  while (node_pointer != 0) {
+  while (node_pointer != 0)
+  {
     /* Put node in array if not deleted */
-    if (((node_pointer->hn.status & VLDH_DELETE) != 0)
-        && ((node_pointer->hn.status & VLDH_LDHDELETE) == 0))
+    if (((node_pointer->hn.status & VLDH_DELETE) != 0) && ((node_pointer->hn.status & VLDH_LDHDELETE) == 0))
       count++;
 
     /* Next node */
@@ -2077,13 +2088,13 @@ int vldh_get_nodes_del(
   *node_count = 0;
 
   node_pointer = wind->hw.node_list_pointer;
-  while (node_pointer != 0) {
+  while (node_pointer != 0)
+  {
     /* Put node in array deleted */
-    if (((node_pointer->hn.status & VLDH_DELETE) != 0)
-        && ((node_pointer->hn.status & VLDH_LDHDELETE) == 0)) {
-      sts = utl_realloc((char**)intern_nodelist,
-          count * sizeof(*intern_nodelist),
-          (*node_count + 1) * sizeof(*intern_nodelist));
+    if (((node_pointer->hn.status & VLDH_DELETE) != 0) && ((node_pointer->hn.status & VLDH_LDHDELETE) == 0))
+    {
+      sts = utl_realloc((char**)intern_nodelist, count * sizeof(*intern_nodelist),
+                        (*node_count + 1) * sizeof(*intern_nodelist));
       if (EVEN(sts))
         return sts;
       nodelist_pointer = *intern_nodelist;
@@ -2101,26 +2112,26 @@ int vldh_get_nodes_del(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_nodes_class()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* unsigned long	object_type	I	object type
-* unsigned long * node_count	O	number of nodes in the nodelist
-* void **	intern_nodelist	O	list of nodes in the window
-*
-* Description:
-*	Returns all nodes of a specific object type in a window.
-*	When the caller is finished with the nodelist
-*	the space should be freed by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_nodes_class()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * unsigned long	object_type	I	object type
+ * unsigned long * node_count	O	number of nodes in the nodelist
+ * void **	intern_nodelist	O	list of nodes in the window
+ *
+ * Description:
+ *	Returns all nodes of a specific object type in a window.
+ *	When the caller is finished with the nodelist
+ *	the space should be freed by a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_nodes_class(vldh_t_wind wind, unsigned long object_type,
-    unsigned long* node_count, vldh_t_node** intern_nodelist)
+int vldh_get_nodes_class(vldh_t_wind wind, unsigned long object_type, unsigned long* node_count,
+                         vldh_t_node** intern_nodelist)
 {
   vldh_t_node* nodelist_pointer;
   vldh_t_node node_pointer;
@@ -2130,10 +2141,10 @@ int vldh_get_nodes_class(vldh_t_wind wind, unsigned long object_type,
   /* Count the nodes */
   count = 0;
   node_pointer = wind->hw.node_list_pointer;
-  while (node_pointer != 0) {
+  while (node_pointer != 0)
+  {
     /* Put node in array if not deleted */
-    if ((node_pointer->ln.object_type == object_type)
-        && (node_pointer->hn.status & VLDH_DELETE) == 0)
+    if ((node_pointer->ln.object_type == object_type) && (node_pointer->hn.status & VLDH_DELETE) == 0)
       count++;
 
     /* Next node */
@@ -2148,13 +2159,13 @@ int vldh_get_nodes_class(vldh_t_wind wind, unsigned long object_type,
   nodelist_pointer = *intern_nodelist;
 
   node_pointer = wind->hw.node_list_pointer;
-  while (node_pointer != 0) {
+  while (node_pointer != 0)
+  {
     /* Put node in array if not deleted and if specified class */
-    if ((node_pointer->ln.object_type == object_type)
-        && (node_pointer->hn.status & VLDH_DELETE) == 0) {
-      sts = utl_realloc((char**)intern_nodelist,
-          count * sizeof(*intern_nodelist),
-          (*node_count + 1) * sizeof(*intern_nodelist));
+    if ((node_pointer->ln.object_type == object_type) && (node_pointer->hn.status & VLDH_DELETE) == 0)
+    {
+      sts = utl_realloc((char**)intern_nodelist, count * sizeof(*intern_nodelist),
+                        (*node_count + 1) * sizeof(*intern_nodelist));
       if (EVEN(sts))
         return sts;
       nodelist_pointer = *intern_nodelist;
@@ -2172,25 +2183,24 @@ int vldh_get_nodes_class(vldh_t_wind wind, unsigned long object_type,
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_cons()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* unsigned long * con_count	O	number of cons in the conlist
-* void **	intern_conlist	O	list of cons in the window
-*
-* Description:
-*	Returns all connections in a window.
-*	When the caller is finished with the connectionslist
-*	the space should be freed by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_cons()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * unsigned long * con_count	O	number of cons in the conlist
+ * void **	intern_conlist	O	list of cons in the window
+ *
+ * Description:
+ *	Returns all connections in a window.
+ *	When the caller is finished with the connectionslist
+ *	the space should be freed by a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_cons(
-    vldh_t_wind wind, unsigned long* con_count, vldh_t_con** intern_conlist)
+int vldh_get_cons(vldh_t_wind wind, unsigned long* con_count, vldh_t_con** intern_conlist)
 {
   vldh_t_con* conlist_pointer;
   vldh_t_con con_pointer;
@@ -2200,7 +2210,8 @@ int vldh_get_cons(
   /* Start to count the cons */
   count = 0;
   con_pointer = wind->hw.con_list_pointer;
-  while (con_pointer != 0) {
+  while (con_pointer != 0)
+  {
     /* Put con in array if not deleted */
     if ((con_pointer->hc.status & VLDH_DELETE) == 0)
       count++;
@@ -2216,11 +2227,13 @@ int vldh_get_cons(
   *con_count = 0;
 
   con_pointer = wind->hw.con_list_pointer;
-  while (con_pointer != 0) {
+  while (con_pointer != 0)
+  {
     /* Put con in array if not deleted */
-    if ((con_pointer->hc.status & VLDH_DELETE) == 0) {
+    if ((con_pointer->hc.status & VLDH_DELETE) == 0)
+    {
       sts = utl_realloc((char**)intern_conlist, count * sizeof(*intern_conlist),
-          (*con_count + 1) * sizeof(*intern_conlist));
+                        (*con_count + 1) * sizeof(*intern_conlist));
       if (EVEN(sts))
         return sts;
       conlist_pointer = *intern_conlist;
@@ -2238,26 +2251,25 @@ int vldh_get_cons(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_cons_del()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* unsigned long * con_count	O	number of cons in the conlist
-* void **	intern_conlist	O	list of cons in the window
-*
-* Description:
-*	Returns all connections in a window that is deleted in vldh
-*	but not yet in ldh.
-*	When the caller is finished with the connectionslist
-*	the space should be freed by a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_cons_del()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * unsigned long * con_count	O	number of cons in the conlist
+ * void **	intern_conlist	O	list of cons in the window
+ *
+ * Description:
+ *	Returns all connections in a window that is deleted in vldh
+ *	but not yet in ldh.
+ *	When the caller is finished with the connectionslist
+ *	the space should be freed by a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_cons_del(
-    vldh_t_wind wind, unsigned long* con_count, vldh_t_con** intern_conlist)
+int vldh_get_cons_del(vldh_t_wind wind, unsigned long* con_count, vldh_t_con** intern_conlist)
 {
   vldh_t_con* conlist_pointer;
   vldh_t_con con_pointer;
@@ -2267,10 +2279,10 @@ int vldh_get_cons_del(
   /* Start to count the cons */
   count = 0;
   con_pointer = wind->hw.con_list_pointer;
-  while (con_pointer != 0) {
+  while (con_pointer != 0)
+  {
     /* Put con in array if not deleted */
-    if (((con_pointer->hc.status & VLDH_DELETE) != 0)
-        && ((con_pointer->hc.status & VLDH_LDHDELETE) == 0))
+    if (((con_pointer->hc.status & VLDH_DELETE) != 0) && ((con_pointer->hc.status & VLDH_LDHDELETE) == 0))
       count++;
 
     /* Next con */
@@ -2284,12 +2296,13 @@ int vldh_get_cons_del(
   *con_count = 0;
 
   con_pointer = wind->hw.con_list_pointer;
-  while (con_pointer != 0) {
+  while (con_pointer != 0)
+  {
     /* Put con in array if not deleted */
-    if (((con_pointer->hc.status & VLDH_DELETE) != 0)
-        && ((con_pointer->hc.status & VLDH_LDHDELETE) == 0)) {
+    if (((con_pointer->hc.status & VLDH_DELETE) != 0) && ((con_pointer->hc.status & VLDH_LDHDELETE) == 0))
+    {
       sts = utl_realloc((char**)intern_conlist, count * sizeof(*intern_conlist),
-          (*con_count + 1) * sizeof(*intern_conlist));
+                        (*con_count + 1) * sizeof(*intern_conlist));
       if (EVEN(sts))
         return sts;
       conlist_pointer = *intern_conlist;
@@ -2307,27 +2320,26 @@ int vldh_get_cons_del(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_conpoints_next()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node
-* unsigned long	point		I	connection point in the node
-* unsigned long	* point_count	O	number of nodes in pointlist
-* vldh_t_conpoint ** pointlist	O	list of nodes and connectonspoints
-*					connected to the point.
-*
-* Description:
-*	Recursiv function uset by vldh_get_conpoint_nodes
-*	to find all nodes connected to a connectionpoint.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_conpoints_next()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node
+ * unsigned long	point		I	connection point in the node
+ * unsigned long	* point_count	O	number of nodes in pointlist
+ * vldh_t_conpoint ** pointlist	O	list of nodes and connectonspoints
+ *					connected to the point.
+ *
+ * Description:
+ *	Recursiv function uset by vldh_get_conpoint_nodes
+ *	to find all nodes connected to a connectionpoint.
+ *
+ **************************************************************************/
 
-int vldh_get_conpoints_next(vldh_t_node node, unsigned long point,
-    unsigned long* point_count, vldh_t_conpoint** pointlist,
-    unsigned long attributemask)
+int vldh_get_conpoints_next(vldh_t_node node, unsigned long point, unsigned long* point_count,
+                            vldh_t_conpoint** pointlist, unsigned long attributemask)
 {
   int i, j, found, sts;
   vldh_t_node next_node;
@@ -2335,33 +2347,39 @@ int vldh_get_conpoints_next(vldh_t_node node, unsigned long point,
   vldh_t_con next_con;
 
   /* Get all connected connectionobjects */
-  for (i = 0; i < (int)node->hn.con_count[point]; i++) {
+  for (i = 0; i < (int)node->hn.con_count[point]; i++)
+  {
     next_con = *((node->hn.con_list[point]) + i);
-    if (next_con != 0) {
-      if ((next_con->hc.status & VLDH_DELETE) == 0) {
-        if ((next_con->lc.attributes & attributemask) == attributemask) {
+    if (next_con != 0)
+    {
+      if ((next_con->hc.status & VLDH_DELETE) == 0)
+      {
+        if ((next_con->lc.attributes & attributemask) == attributemask)
+        {
           /* Get the node and point in the other end */
           next_node = next_con->hc.source_node;
           next_point = next_con->lc.source_point;
-          if ((next_node == node) && (next_point == point)) {
+          if ((next_node == node) && (next_point == point))
+          {
             /* We are looking for the destination node */
             next_node = next_con->hc.dest_node;
             next_point = next_con->lc.dest_point;
           }
           /* Check that node and point not already registered in pointlist */
           found = 0;
-          for (j = 0; j < (int)*point_count; j++) {
-            if ((((*pointlist) + j)->node == next_node)
-                && (((*pointlist) + j)->conpoint == next_point)) {
+          for (j = 0; j < (int)*point_count; j++)
+          {
+            if ((((*pointlist) + j)->node == next_node) && (((*pointlist) + j)->conpoint == next_point))
+            {
               found = 1;
               break;
             }
           }
-          if (found == 0) {
+          if (found == 0)
+          {
             /* Put node in pointlist if not a pointnode */
-            sts = utl_realloc((char**)pointlist,
-                *point_count * sizeof(vldh_t_conpoint),
-                (*point_count + 1) * sizeof(vldh_t_conpoint));
+            sts = utl_realloc((char**)pointlist, *point_count * sizeof(vldh_t_conpoint),
+                              (*point_count + 1) * sizeof(vldh_t_conpoint));
             if (EVEN(sts))
               return sts;
 
@@ -2370,8 +2388,7 @@ int vldh_get_conpoints_next(vldh_t_node node, unsigned long point,
             (*point_count)++;
 
             /* Get connected nodes to this point */
-            sts = vldh_get_conpoints_next(
-                next_node, next_point, point_count, pointlist, attributemask);
+            sts = vldh_get_conpoints_next(next_node, next_point, point_count, pointlist, attributemask);
             if (EVEN(sts))
               return sts;
           }
@@ -2384,71 +2401,68 @@ int vldh_get_conpoints_next(vldh_t_node node, unsigned long point,
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_conpoint_nodes()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node
-* unsigned long	point		I	connection point in the node
-* unsigned long	* point_count	O	number of nodes in pointlist
-* vldh_t_conpoint ** pointlist	O	list of nodes and connectonspoints
-*					connected to the point.
-*
-* Description:
-*	Returns all nodeobjects connected to a connectionpoint and the
-*	connectionpoints on the found nodes. The input node and
-*	connectionpoint is place first in the list.
-*	The list should be freed by the user with a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_conpoint_nodes()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node
+ * unsigned long	point		I	connection point in the node
+ * unsigned long	* point_count	O	number of nodes in pointlist
+ * vldh_t_conpoint ** pointlist	O	list of nodes and connectonspoints
+ *					connected to the point.
+ *
+ * Description:
+ *	Returns all nodeobjects connected to a connectionpoint and the
+ *	connectionpoints on the found nodes. The input node and
+ *	connectionpoint is place first in the list.
+ *	The list should be freed by the user with a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_conpoint_nodes(vldh_t_node node, unsigned long point,
-    unsigned long* point_count, vldh_t_conpoint** pointlist,
-    unsigned long attributemask)
+int vldh_get_conpoint_nodes(vldh_t_node node, unsigned long point, unsigned long* point_count,
+                            vldh_t_conpoint** pointlist, unsigned long attributemask)
 {
   int sts;
 
   *point_count = 0;
   sts = utl_realloc((char**)pointlist, *point_count * sizeof(vldh_t_conpoint),
-      (*point_count + 1) * sizeof(vldh_t_conpoint));
+                    (*point_count + 1) * sizeof(vldh_t_conpoint));
   if (EVEN(sts))
     return sts;
   (*pointlist)->node = node;
   (*pointlist)->conpoint = point;
   (*point_count)++;
-  sts = vldh_get_conpoints_next(
-      node, point, point_count, pointlist, attributemask);
+  sts = vldh_get_conpoints_next(node, point, point_count, pointlist, attributemask);
   if (EVEN(sts))
     return sts;
   return VLDH__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_close_conpoint_nodes()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node
-* unsigned long	point		I	connection point in the node
-* unsigned long	* point_count	O	number of nodes in pointlist
-* vldh_t_conpoint ** pointlist	O	list of nodes and connectonspoints
-*					connected to the point.
-*
-* Description:
-*	Returns all the closests nodeobjects connected to a connectionpoint
-*	and the connectionpoints on the found nodes. The input node and
-*	connectionpoint is place first in the list.
-*	The list should be freed by the user with a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_close_conpoint_nodes()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node
+ * unsigned long	point		I	connection point in the node
+ * unsigned long	* point_count	O	number of nodes in pointlist
+ * vldh_t_conpoint ** pointlist	O	list of nodes and connectonspoints
+ *					connected to the point.
+ *
+ * Description:
+ *	Returns all the closests nodeobjects connected to a connectionpoint
+ *	and the connectionpoints on the found nodes. The input node and
+ *	connectionpoint is place first in the list.
+ *	The list should be freed by the user with a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_conpoint_nodes_close(vldh_t_node node, unsigned long point,
-    unsigned long* point_count, vldh_t_conpoint** pointlist,
-    unsigned long attributemask)
+int vldh_get_conpoint_nodes_close(vldh_t_node node, unsigned long point, unsigned long* point_count,
+                                  vldh_t_conpoint** pointlist, unsigned long attributemask)
 {
   int i, j, found = 0, sts;
   vldh_t_node next_node = NULL;
@@ -2457,7 +2471,7 @@ int vldh_get_conpoint_nodes_close(vldh_t_node node, unsigned long point,
 
   *point_count = 0;
   sts = utl_realloc((char**)pointlist, *point_count * sizeof(vldh_t_conpoint),
-      (*point_count + 1) * sizeof(vldh_t_conpoint));
+                    (*point_count + 1) * sizeof(vldh_t_conpoint));
   if (EVEN(sts))
     return sts;
   (*pointlist)->node = node;
@@ -2465,35 +2479,41 @@ int vldh_get_conpoint_nodes_close(vldh_t_node node, unsigned long point,
   (*point_count)++;
 
   /* Get all connected connectionobjects */
-  for (i = 0; i < (int)node->hn.con_count[point]; i++) {
+  for (i = 0; i < (int)node->hn.con_count[point]; i++)
+  {
     next_con = *((node->hn.con_list[point]) + i);
-    if (next_con != 0) {
-      if ((next_con->hc.status & VLDH_DELETE) == 0) {
-        if ((next_con->lc.attributes & attributemask) == attributemask) {
+    if (next_con != 0)
+    {
+      if ((next_con->hc.status & VLDH_DELETE) == 0)
+      {
+        if ((next_con->lc.attributes & attributemask) == attributemask)
+        {
           /* Get the node and point in the other end */
           next_node = next_con->hc.source_node;
           next_point = next_con->lc.source_point;
-          if ((next_node == node) && (next_point == point)) {
+          if ((next_node == node) && (next_point == point))
+          {
             /* We are looking for the destination node */
             next_node = next_con->hc.dest_node;
             next_point = next_con->lc.dest_point;
           }
           /* Check that node and point not already registered in pointlist */
           found = 0;
-          for (j = 0; j < (int)*point_count; j++) {
-            if ((((*pointlist) + j)->node == next_node)
-                && (((*pointlist) + j)->conpoint == next_point)) {
+          for (j = 0; j < (int)*point_count; j++)
+          {
+            if ((((*pointlist) + j)->node == next_node) && (((*pointlist) + j)->conpoint == next_point))
+            {
               found = 1;
               break;
             }
           }
         }
       }
-      if (found == 0) {
+      if (found == 0)
+      {
         /* Put node in pointlist if not a pointnode */
-        sts = utl_realloc((char**)pointlist,
-            *point_count * sizeof(vldh_t_conpoint),
-            (*point_count + 1) * sizeof(vldh_t_conpoint));
+        sts = utl_realloc((char**)pointlist, *point_count * sizeof(vldh_t_conpoint),
+                          (*point_count + 1) * sizeof(vldh_t_conpoint));
         if (EVEN(sts))
           return sts;
 
@@ -2508,25 +2528,25 @@ int vldh_get_conpoint_nodes_close(vldh_t_node node, unsigned long point,
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_conpoint_cons()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node
-* unsigned long	point		I	connection point in the node
-* unsigned long	* con_count	O	number of connections in conlist
-* vldh_t_conpoint ** conlist	O	list of connections
-*					connected to the point.
-*
-* Description:
-*	Returns a list of all connections connected to a connectionpoint.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_conpoint_cons()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node
+ * unsigned long	point		I	connection point in the node
+ * unsigned long	* con_count	O	number of connections in conlist
+ * vldh_t_conpoint ** conlist	O	list of connections
+ *					connected to the point.
+ *
+ * Description:
+ *	Returns a list of all connections connected to a connectionpoint.
+ *
+ **************************************************************************/
 
-int vldh_get_conpoint_cons(vldh_t_node node, unsigned long point,
-    unsigned long* con_count, vldh_t_con** intern_conlist)
+int vldh_get_conpoint_cons(vldh_t_node node, unsigned long point, unsigned long* con_count,
+                           vldh_t_con** intern_conlist)
 {
   vldh_t_con* conlist_pointer;
   int i;
@@ -2536,13 +2556,15 @@ int vldh_get_conpoint_cons(vldh_t_node node, unsigned long point,
   *con_count = 0;
 
   /* Get all connected connectionobjects */
-  for (i = 0; i < (int)node->hn.con_count[point]; i++) {
+  for (i = 0; i < (int)node->hn.con_count[point]; i++)
+  {
     con = *((node->hn.con_list[point]) + i);
-    if (con != 0) {
-      if ((con->hc.status & VLDH_DELETE) == 0) {
-        sts = utl_realloc((char**)intern_conlist,
-            *con_count * sizeof(*intern_conlist),
-            (*con_count + 1) * sizeof(*intern_conlist));
+    if (con != 0)
+    {
+      if ((con->hc.status & VLDH_DELETE) == 0)
+      {
+        sts = utl_realloc((char**)intern_conlist, *con_count * sizeof(*intern_conlist),
+                          (*con_count + 1) * sizeof(*intern_conlist));
         if (EVEN(sts))
           return sts;
         conlist_pointer = *intern_conlist;
@@ -2559,30 +2581,30 @@ int vldh_get_conpoint_cons(vldh_t_node node, unsigned long point,
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_nodes_direction()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window.
-* unsigned long	* node_count_horizontal O number of nodes in horizontal nodelist
-* void **	nodelist_horizontal O	list of nodes with horizontal
-*					compdirection.
-* unsigned long	* node_count_vertical O number of nodes in vertical nodelist
-* void **	nodelist_vertical O	list of nodes with vertical
-*					compdirection.
-*
-* Description:
-*	Returns two lists containing the nodes with horizontal compdirection
-*	and the nodes with vertical compdirection in the window.
-*	Both lists should be freed by the user with a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_nodes_direction()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window.
+ * unsigned long	* node_count_horizontal O number of nodes in horizontal nodelist
+ * void **	nodelist_horizontal O	list of nodes with horizontal
+ *					compdirection.
+ * unsigned long	* node_count_vertical O number of nodes in vertical nodelist
+ * void **	nodelist_vertical O	list of nodes with vertical
+ *					compdirection.
+ *
+ * Description:
+ *	Returns two lists containing the nodes with horizontal compdirection
+ *	and the nodes with vertical compdirection in the window.
+ *	Both lists should be freed by the user with a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_nodes_direction(vldh_t_wind wind,
-    unsigned long* node_count_horizontal, vldh_t_node** nodelist_horizontal,
-    unsigned long* node_count_vertical, vldh_t_node** nodelist_vertical)
+int vldh_get_nodes_direction(vldh_t_wind wind, unsigned long* node_count_horizontal,
+                             vldh_t_node** nodelist_horizontal, unsigned long* node_count_vertical,
+                             vldh_t_node** nodelist_vertical)
 {
   vldh_t_node* node_pointer;
   unsigned long node_count;
@@ -2605,16 +2627,20 @@ int vldh_get_nodes_direction(vldh_t_wind wind,
   listpointer_horizontal = *nodelist_horizontal;
   listpointer_vertical = *nodelist_vertical;
 
-  for (i = 0; i < (int)node_count; i++) {
-    if ((*node_pointer)->ln.compdirection == VLDH_HORIZONTAL) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    if ((*node_pointer)->ln.compdirection == VLDH_HORIZONTAL)
+    {
       /* Put in list for horizontal nodes */
       found = 0;
       pointer = listpointer_horizontal;
-      for (k = 0; k < (int)*node_count_horizontal; k++) {
-        if ((*node_pointer)->ln.x + (*node_pointer)->ln.width
-            < (*pointer)->ln.x + (*pointer)->ln.width) {
+      for (k = 0; k < (int)*node_count_horizontal; k++)
+      {
+        if ((*node_pointer)->ln.x + (*node_pointer)->ln.width < (*pointer)->ln.x + (*pointer)->ln.width)
+        {
           found = 1;
-          for (l = *node_count_horizontal; l > k; l--) {
+          for (l = *node_count_horizontal; l > k; l--)
+          {
             *(listpointer_horizontal + l) = *(listpointer_horizontal + l - 1);
           }
           *(listpointer_horizontal + k) = *node_pointer;
@@ -2622,19 +2648,24 @@ int vldh_get_nodes_direction(vldh_t_wind wind,
         }
         pointer++;
       }
-      if (!found) {
+      if (!found)
+      {
         *(listpointer_horizontal + *node_count_horizontal) = *node_pointer;
       }
       (*node_count_horizontal)++;
-    } else {
+    }
+    else
+    {
       /* Put in list for vertical nodes */
       found = 0;
       pointer = listpointer_vertical;
-      for (k = 0; k < (int)*node_count_vertical; k++) {
-        if ((*node_pointer)->ln.y + (*node_pointer)->ln.height
-            > (*pointer)->ln.y + (*pointer)->ln.height) {
+      for (k = 0; k < (int)*node_count_vertical; k++)
+      {
+        if ((*node_pointer)->ln.y + (*node_pointer)->ln.height > (*pointer)->ln.y + (*pointer)->ln.height)
+        {
           found = 1;
-          for (l = *node_count_vertical; l > k; l--) {
+          for (l = *node_count_vertical; l > k; l--)
+          {
             *(listpointer_vertical + l) = *(listpointer_vertical + l - 1);
           }
           *(listpointer_vertical + k) = *node_pointer;
@@ -2642,7 +2673,8 @@ int vldh_get_nodes_direction(vldh_t_wind wind,
         }
         pointer++;
       }
-      if (!found) {
+      if (!found)
+      {
         *(listpointer_vertical + *node_count_vertical) = *node_pointer;
       }
       (*node_count_vertical)++;
@@ -2657,24 +2689,23 @@ int vldh_get_nodes_direction(vldh_t_wind wind,
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_cons_node()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node
-* unsigned long	* con_count	O	number of cons in conlist
-* vldh_t_con * 	intern_conlist	O	connections connected to a node.
-*
-* Description:
-*	Return a list of all connections connected to a node.
-*	The list should be freed by the caller with a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_cons_node()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node
+ * unsigned long	* con_count	O	number of cons in conlist
+ * vldh_t_con * 	intern_conlist	O	connections connected to a node.
+ *
+ * Description:
+ *	Return a list of all connections connected to a node.
+ *	The list should be freed by the caller with a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_cons_node(
-    vldh_t_node node, unsigned long* con_count, vldh_t_con** intern_conlist)
+int vldh_get_cons_node(vldh_t_node node, unsigned long* con_count, vldh_t_con** intern_conlist)
 {
   int con_point;
   vldh_t_con* conlist_pointer;
@@ -2684,17 +2715,23 @@ int vldh_get_cons_node(
   int found;
 
   *con_count = 0;
-  for (con_point = 0; con_point < VLDH_MAX_CONPOINTS; con_point++) {
+  for (con_point = 0; con_point < VLDH_MAX_CONPOINTS; con_point++)
+  {
     /* Find the conobject in conlist and insert 0 */
-    for (i = 0; i < (int)node->hn.con_count[con_point]; i++) {
+    for (i = 0; i < (int)node->hn.con_count[con_point]; i++)
+    {
       con = *((node->hn.con_list[con_point]) + i);
-      if (con != 0) {
-        if ((con->hc.status & VLDH_DELETE) == 0) {
+      if (con != 0)
+      {
+        if ((con->hc.status & VLDH_DELETE) == 0)
+        {
           /* Check that it's not already inserted */
           con_p = *intern_conlist;
           found = 0;
-          for (j = 0; j < (int)*con_count; j++) {
-            if (*con_p == con) {
+          for (j = 0; j < (int)*con_count; j++)
+          {
+            if (*con_p == con)
+            {
               found = 1;
               break;
             }
@@ -2703,9 +2740,8 @@ int vldh_get_cons_node(
           if (found)
             continue;
 
-          sts = utl_realloc((char**)intern_conlist,
-              *con_count * sizeof(*intern_conlist),
-              (*con_count + 1) * sizeof(*intern_conlist));
+          sts = utl_realloc((char**)intern_conlist, *con_count * sizeof(*intern_conlist),
+                            (*con_count + 1) * sizeof(*intern_conlist));
           if (EVEN(sts))
             return sts;
           conlist_pointer = *intern_conlist;
@@ -2722,26 +2758,25 @@ int vldh_get_cons_node(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_nodes_node()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node
-* unsigned long	* con_count	O	number of cons in conlist
-* vldh_t_con * 	intern_conlist	O	connections connected to a node.
-*
-* Description:
-*	Return a list of all nodes connected to a node with a connection
-*	with the specified attributes.
-*	The list should be freed by the caller with a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_nodes_node()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node
+ * unsigned long	* con_count	O	number of cons in conlist
+ * vldh_t_con * 	intern_conlist	O	connections connected to a node.
+ *
+ * Description:
+ *	Return a list of all nodes connected to a node with a connection
+ *	with the specified attributes.
+ *	The list should be freed by the caller with a free call.
+ *
+ **************************************************************************/
 
-int vldh_get_nodes_node(vldh_t_node node, unsigned long* node_count,
-    vldh_t_node** intern_nodelist, unsigned long conmask,
-    unsigned long nodemask)
+int vldh_get_nodes_node(vldh_t_node node, unsigned long* node_count, vldh_t_node** intern_nodelist,
+                        unsigned long conmask, unsigned long nodemask)
 {
   vldh_t_node* nodelist_pointer;
   int i;
@@ -2757,16 +2792,19 @@ int vldh_get_nodes_node(vldh_t_node node, unsigned long* node_count,
     return sts;
   con_ptr = con_list;
 
-  for (i = 0; i < (int)con_count; i++) {
-    if (((*con_ptr)->lc.attributes & conmask) == conmask) {
+  for (i = 0; i < (int)con_count; i++)
+  {
+    if (((*con_ptr)->lc.attributes & conmask) == conmask)
+    {
       /* Connections with the correct attributes */
-      if (nodemask & VLDH_NODE_DESTINATION) {
+      if (nodemask & VLDH_NODE_DESTINATION)
+      {
         /* We want the nodes that are destination */
-        if ((*con_ptr)->hc.source_node == node) {
+        if ((*con_ptr)->hc.source_node == node)
+        {
           /* Insert the destination node in the nodelist */
-          sts = utl_realloc((char**)intern_nodelist,
-              *node_count * sizeof(*intern_nodelist),
-              (*node_count + 1) * sizeof(*intern_nodelist));
+          sts = utl_realloc((char**)intern_nodelist, *node_count * sizeof(*intern_nodelist),
+                            (*node_count + 1) * sizeof(*intern_nodelist));
           if (EVEN(sts))
             return sts;
           nodelist_pointer = *intern_nodelist;
@@ -2774,13 +2812,14 @@ int vldh_get_nodes_node(vldh_t_node node, unsigned long* node_count,
           (*node_count)++;
         }
       }
-      if (nodemask & VLDH_NODE_SOURCE) {
+      if (nodemask & VLDH_NODE_SOURCE)
+      {
         /* We want the nodes that are source */
-        if ((*con_ptr)->hc.dest_node == node) {
+        if ((*con_ptr)->hc.dest_node == node)
+        {
           /* Insert the source node in the nodelist */
-          sts = utl_realloc((char**)intern_nodelist,
-              *node_count * sizeof(*intern_nodelist),
-              (*node_count + 1) * sizeof(*intern_nodelist));
+          sts = utl_realloc((char**)intern_nodelist, *node_count * sizeof(*intern_nodelist),
+                            (*node_count + 1) * sizeof(*intern_nodelist));
           if (EVEN(sts))
             return sts;
           nodelist_pointer = *intern_nodelist;
@@ -2798,28 +2837,29 @@ int vldh_get_nodes_node(vldh_t_node node, unsigned long* node_count,
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_plc_objdid()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	objdid		I	objdid of a Plcpgm.
-* vldh_t_plc * 	plc		O	vldh plc of the Plcpgm.
-*
-* Description:
-*	Get a plc with a specified objdid.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_plc_objdid()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	objdid		I	objdid of a Plcpgm.
+ * vldh_t_plc * 	plc		O	vldh plc of the Plcpgm.
+ *
+ * Description:
+ *	Get a plc with a specified objdid.
+ *
+ **************************************************************************/
 
 int vldh_get_plc_objdid(pwr_tObjid objdid, vldh_t_plc* plc)
 {
   vldh_t_plc obj_pointer;
 
   obj_pointer = plc_root;
-  while (obj_pointer != 0) {
-    if (cdh_ObjidIsEqual(objdid, obj_pointer->lp.oid)
-        && !(obj_pointer->hp.status & VLDH_DELETE)) {
+  while (obj_pointer != 0)
+  {
+    if (cdh_ObjidIsEqual(objdid, obj_pointer->lp.oid) && !(obj_pointer->hp.status & VLDH_DELETE))
+    {
       /* This is it */
       *plc = obj_pointer;
       return VLDH__SUCCESS;
@@ -2832,20 +2872,20 @@ int vldh_get_plc_objdid(pwr_tObjid objdid, vldh_t_plc* plc)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_plcs()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	* plc_count	O	number of plc's in plclist.
-* void **	plclist		O	list of all plc's in vldh.
-*
-* Description:
-*	Returns a list of all plc's in vldh.
-*	The list should be freed with a free call.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_plcs()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	* plc_count	O	number of plc's in plclist.
+ * void **	plclist		O	list of all plc's in vldh.
+ *
+ * Description:
+ *	Returns a list of all plc's in vldh.
+ *	The list should be freed with a free call.
+ *
+ **************************************************************************/
 
 int vldh_get_plcs(unsigned long* plc_count, vldh_t_plc** plclist)
 {
@@ -2856,9 +2896,10 @@ int vldh_get_plcs(unsigned long* plc_count, vldh_t_plc** plclist)
   *plc_count = 0;
 
   obj_pointer = plc_root;
-  while (obj_pointer != 0) {
-    sts = utl_realloc((char**)plclist, *plc_count * sizeof(vldh_t_plc),
-        (*plc_count + 1) * sizeof(vldh_t_plc));
+  while (obj_pointer != 0)
+  {
+    sts =
+        utl_realloc((char**)plclist, *plc_count * sizeof(vldh_t_plc), (*plc_count + 1) * sizeof(vldh_t_plc));
     if (EVEN(sts))
       return sts;
     plclist_pointer = *plclist;
@@ -2873,20 +2914,20 @@ int vldh_get_plcs(unsigned long* plc_count, vldh_t_plc** plclist)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_node_objdid()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	objdid		I	objdid of the node
-* vldh_t_wind	wind		I	vldh window of the node
-* vldh_t_node * node		O	found vldh node.
-*
-* Description:
-*	Get a node with a specified objdid.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_node_objdid()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	objdid		I	objdid of the node
+ * vldh_t_wind	wind		I	vldh window of the node
+ * vldh_t_node * node		O	found vldh node.
+ *
+ * Description:
+ *	Get a node with a specified objdid.
+ *
+ **************************************************************************/
 
 int vldh_get_node_objdid(pwr_tObjid objdid, vldh_t_wind wind, vldh_t_node* node)
 {
@@ -2901,8 +2942,10 @@ int vldh_get_node_objdid(pwr_tObjid objdid, vldh_t_wind wind, vldh_t_node* node)
 
   node_found = 0;
   nodelist_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
-    if (cdh_ObjidIsEqual((*nodelist_ptr)->ln.oid, objdid)) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    if (cdh_ObjidIsEqual((*nodelist_ptr)->ln.oid, objdid))
+    {
       *node = *nodelist_ptr;
       node_found = 1;
       break;
@@ -2919,19 +2962,19 @@ int vldh_get_node_objdid(pwr_tObjid objdid, vldh_t_wind wind, vldh_t_node* node)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_wind_objdid()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* unsigned long	objdid		I	objdid of the window.
-* vldh_t_wind * wind		O	vldh window.
-*
-* Description:
-*	Get a window with a specific objdid.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_wind_objdid()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * unsigned long	objdid		I	objdid of the window.
+ * vldh_t_wind * wind		O	vldh window.
+ *
+ * Description:
+ *	Get a window with a specific objdid.
+ *
+ **************************************************************************/
 
 int vldh_get_wind_objdid(pwr_tObjid objdid, vldh_t_wind* wind)
 {
@@ -2950,15 +2993,18 @@ int vldh_get_wind_objdid(pwr_tObjid objdid, vldh_t_wind* wind)
 
   window_found = 0;
   plclist_ptr = plclist;
-  for (i = 0; i < (int)plc_count; i++) {
+  for (i = 0; i < (int)plc_count; i++)
+  {
     /* Get all windows in this plc */
     sts = vldh_get_plc_windows(*plclist_ptr, &wind_count, &windlist);
     if (EVEN(sts))
       return sts;
 
     windlist_ptr = windlist;
-    for (j = 0; j < (int)wind_count; j++) {
-      if (cdh_ObjidIsEqual((*windlist_ptr)->lw.oid, objdid)) {
+    for (j = 0; j < (int)wind_count; j++)
+    {
+      if (cdh_ObjidIsEqual((*windlist_ptr)->lw.oid, objdid))
+      {
         window_found = 1;
         *wind = *windlist_ptr;
         break;
@@ -2981,15 +3027,15 @@ int vldh_get_wind_objdid(pwr_tObjid objdid, vldh_t_wind* wind)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_paste...
-*
-* Description:
-*	Handles the paste buffer. The node_id and con_id is not
-*	used for displaying neted nodes but used temporary to
-*	solve connections between nodes.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_paste...
+ *
+ * Description:
+ *	Handles the paste buffer. The node_id and con_id is not
+ *	used for displaying neted nodes but used temporary to
+ *	solve connections between nodes.
+ *
+ **************************************************************************/
 
 /*_Local variables_______________________________________________________*/
 
@@ -3004,50 +3050,46 @@ void* paste_ctx;
 static int paste_mode = 0;
 
 /*************************************************************************
-*
-* Name:		vldh_paste_setmode()
-* Name:		vldh_paste_getmode()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Set or set the last paste operation.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_paste_setmode()
+ * Name:		vldh_paste_getmode()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Set or set the last paste operation.
+ *
+ **************************************************************************/
 
 int vldh_paste_setmode(int mode)
 {
   paste_mode = mode;
   return VLDH__SUCCESS;
 }
-int vldh_paste_getmode()
-{
-  return paste_mode;
-}
+int vldh_paste_getmode() { return paste_mode; }
 
 /*************************************************************************
-*
-* Name:		vldh_paste_selrectinfo()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* void *	ctx		I	foe of the cut operation
-* float		x		I	x-koordinate of selection rectangel.
-* float		y		I	y-koordinate of selection rectangel.
-* float		width		I	width of selection rectangel.
-* float		height		I	height of selection rectangel.
-*
-* Description:
-*	Inserts the koordinates for the selection rectangle at a
-*	cut operation.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_paste_selrectinfo()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * void *	ctx		I	foe of the cut operation
+ * float		x		I	x-koordinate of selection rectangel.
+ * float		y		I	y-koordinate of selection rectangel.
+ * float		width		I	width of selection rectangel.
+ * float		height		I	height of selection rectangel.
+ *
+ * Description:
+ *	Inserts the koordinates for the selection rectangle at a
+ *	cut operation.
+ *
+ **************************************************************************/
 
-int vldh_paste_setrectinfo(
-    void* ctx, float x, float y, float width, float height)
+int vldh_paste_setrectinfo(void* ctx, float x, float y, float width, float height)
 {
   paste_x = x;
   paste_y = y;
@@ -3059,27 +3101,26 @@ int vldh_paste_setrectinfo(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_paste_getrectinfo()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* void **	ctx		I	foe of the cut operation
-* float	*	x		I	x-koordinate of selection rectangel.
-* float	*	y		I	y-koordinate of selection rectangel.
-* float	*	width		I	width of selection rectangel.
-* float	*	height		I	height of selection rectangel.
-*
-*
-* Description:
-*	Returns the selectrectangle koordinates stored at the
-*	last cut-operation.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_paste_getrectinfo()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * void **	ctx		I	foe of the cut operation
+ * float	*	x		I	x-koordinate of selection rectangel.
+ * float	*	y		I	y-koordinate of selection rectangel.
+ * float	*	width		I	width of selection rectangel.
+ * float	*	height		I	height of selection rectangel.
+ *
+ *
+ * Description:
+ *	Returns the selectrectangle koordinates stored at the
+ *	last cut-operation.
+ *
+ **************************************************************************/
 
-int vldh_paste_getrectinfo(
-    void** ctx, float* x, float* y, float* width, float* height)
+int vldh_paste_getrectinfo(void** ctx, float* x, float* y, float* width, float* height)
 {
   *x = paste_x;
   *y = paste_y;
@@ -3091,19 +3132,19 @@ int vldh_paste_getrectinfo(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_paste_singlenode_insert()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	send_window	I	vldh window of the inserted node.
-* vldh_t_node	send_node	I	node to insert in the paste buffer.
-*
-* Description:
-*	Inserts a node in the singlenode paste buffer.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_paste_singlenode_insert()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	send_window	I	vldh window of the inserted node.
+ * vldh_t_node	send_node	I	node to insert in the paste buffer.
+ *
+ * Description:
+ *	Inserts a node in the singlenode paste buffer.
+ *
+ **************************************************************************/
 
 int vldh_paste_singlenode_insert(vldh_t_wind send_window, vldh_t_node send_node)
 {
@@ -3125,19 +3166,19 @@ int vldh_paste_singlenode_insert(vldh_t_wind send_window, vldh_t_node send_node)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_paste_node_insert()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	send_window	I	vldh window of the inserted node.
-* vldh_t_node	send_node	I	node to insert in the paste buffer.
-*
-* Description:
-*	Inserts a nodeobject in the paste nodelist.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_paste_node_insert()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	send_window	I	vldh window of the inserted node.
+ * vldh_t_node	send_node	I	node to insert in the paste buffer.
+ *
+ * Description:
+ *	Inserts a nodeobject in the paste nodelist.
+ *
+ **************************************************************************/
 
 int vldh_paste_node_insert(vldh_t_wind send_window, vldh_t_node send_node)
 {
@@ -3165,19 +3206,19 @@ int vldh_paste_node_insert(vldh_t_wind send_window, vldh_t_node send_node)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_paste_con_insert()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	send_window	I	vldh window of the inserted connection.
-* vldh_t_con	send_con	I	con to insert in the paste buffer.
-*
-* Description:
-*	Inserts a connectionobject in the paste connectionlist.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_paste_con_insert()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	send_window	I	vldh window of the inserted connection.
+ * vldh_t_con	send_con	I	con to insert in the paste buffer.
+ *
+ * Description:
+ *	Inserts a connectionobject in the paste connectionlist.
+ *
+ **************************************************************************/
 
 int vldh_paste_con_insert(vldh_t_wind send_window, vldh_t_con send_con)
 {
@@ -3193,19 +3234,23 @@ int vldh_paste_con_insert(vldh_t_wind send_window, vldh_t_con send_con)
   source_found = 0;
   dest_found = 0;
   node_pointer = paste_window.hw.node_list_pointer;
-  while (node_pointer != 0) {
-    if (node_pointer->hn.node_id == send_con->hc.source_node) {
+  while (node_pointer != 0)
+  {
+    if (node_pointer->hn.node_id == send_con->hc.source_node)
+    {
       source_node_pointer = node_pointer;
       source_found = 1;
     }
-    if (node_pointer->hn.node_id == send_con->hc.dest_node) {
+    if (node_pointer->hn.node_id == send_con->hc.dest_node)
+    {
       dest_node_pointer = node_pointer;
       dest_found = 1;
     }
     node_pointer = node_pointer->hn.next;
   }
 
-  if (source_found && dest_found) {
+  if (source_found && dest_found)
+  {
     /* Create a pastebuffer node */
     con = (vldh_t_con)calloc(1, sizeof(*con));
     memcpy(con, send_con, sizeof(*con));
@@ -3227,17 +3272,17 @@ int vldh_paste_con_insert(vldh_t_wind send_window, vldh_t_con send_con)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_paste_init()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Intitiates paste.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_paste_init()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Intitiates paste.
+ *
+ **************************************************************************/
 
 int vldh_paste_init()
 {
@@ -3256,9 +3301,12 @@ int vldh_paste_init()
   if (EVEN(sts))
     return sts;
   node_ptr = nodelist;
-  for (i = 0; i < (int)node_count; i++) {
-    for (j = 0; j < VLDH_MAX_CONPOINTS; j++) {
-      if ((*node_ptr)->hn.con_count[j] > 0) {
+  for (i = 0; i < (int)node_count; i++)
+  {
+    for (j = 0; j < VLDH_MAX_CONPOINTS; j++)
+    {
+      if ((*node_ptr)->hn.con_count[j] > 0)
+      {
         free((char*)(*node_ptr)->hn.con_list[j]);
       }
     }
@@ -3273,7 +3321,8 @@ int vldh_paste_init()
   if (EVEN(sts))
     return sts;
   con_ptr = conlist;
-  for (i = 0; i < (int)con_count; i++) {
+  for (i = 0; i < (int)con_count; i++)
+  {
     free((char*)*con_ptr);
     con_ptr++;
   }
@@ -3287,21 +3336,21 @@ int vldh_paste_init()
 }
 
 /*************************************************************************
-*
-* Name:		vldh_paste_signlenode_copy()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	window		I	vldh window where the node should
-*					be copied.
-* vldh_t_node	node		O	the created copy of the node.
-*
-* Description:
-*	Copies the paste singlenode into the specified
-*	window and calculates the new koordinates for the node.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_paste_signlenode_copy()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	window		I	vldh window where the node should
+ *					be copied.
+ * vldh_t_node	node		O	the created copy of the node.
+ *
+ * Description:
+ *	Copies the paste singlenode into the specified
+ *	window and calculates the new koordinates for the node.
+ *
+ **************************************************************************/
 
 int vldh_paste_singlenode_copy(vldh_t_wind wind, vldh_t_node* node)
 {
@@ -3315,28 +3364,29 @@ int vldh_paste_singlenode_copy(vldh_t_wind wind, vldh_t_node* node)
     return VLDH__OBJNOTFOUND;
 
   /* Get graphbody for the class */
-  sts = ldh_GetClassBody(wind->hw.ldhses, paste_singlenode.ln.cid,
-      "GraphPlcNode", &bodyclass, (char**)&graphbody, &size);
+  sts = ldh_GetClassBody(wind->hw.ldhses, paste_singlenode.ln.cid, "GraphPlcNode", &bodyclass,
+                         (char**)&graphbody, &size);
   if (EVEN(sts))
     return sts;
 
-  for (;;) {
+  for (;;)
+  {
     /* Get default segment name */
-    sts = vldh_get_node_defname(
-        wind, graphbody->object_type, graphbody->objname, segment_name);
+    sts = vldh_get_node_defname(wind, graphbody->object_type, graphbody->objname, segment_name);
     if (EVEN(sts))
       return sts;
 
     /* Create the object i ldh */
-    sts = ldh_CopyObject(wind->hw.ldhses, &objdid, segment_name,
-        paste_singlenode.ln.oid, wind->lw.oid, ldh_eDest_IntoLast);
+    sts = ldh_CopyObject(wind->hw.ldhses, &objdid, segment_name, paste_singlenode.ln.oid, wind->lw.oid,
+                         ldh_eDest_IntoLast);
     if (sts == LDH__NAMALREXI)
       /* Try again with incremented name index */
       continue;
-    else if (EVEN(sts)) {
+    else if (EVEN(sts))
+    {
       /* Create a new node without source */
-      sts = ldh_CreateObject(wind->hw.ldhses, &objdid, segment_name,
-          paste_singlenode.ln.cid, wind->lw.oid, ldh_eDest_IntoLast);
+      sts = ldh_CreateObject(wind->hw.ldhses, &objdid, segment_name, paste_singlenode.ln.cid, wind->lw.oid,
+                             ldh_eDest_IntoLast);
       if (EVEN(sts))
         return sts;
     }
@@ -3366,8 +3416,7 @@ int vldh_paste_singlenode_copy(vldh_t_wind wind, vldh_t_node* node)
   vldh_node_create_spec(*node);
 
   /* Set the buffer in ldh so the mask can be accessed by ate */
-  sts = ldh_SetObjectBuffer(wind->hw.ldhses, (*node)->ln.oid, "DevBody",
-      "PlcNode", (char*)&((*node)->ln));
+  sts = ldh_SetObjectBuffer(wind->hw.ldhses, (*node)->ln.oid, "DevBody", "PlcNode", (char*)&((*node)->ln));
   if (EVEN(sts))
     return sts;
 
@@ -3375,29 +3424,28 @@ int vldh_paste_singlenode_copy(vldh_t_wind wind, vldh_t_node* node)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_paste_copy()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	window to paste in.
-* float		x		I	x-koordinate of paste operation.
-* float		y		I	y-koordinate of paste operation.
-* unsigned long	*node_count	O	number of nodes in the nodelist.
-* char **	intern_nodelist O	list of  created nodes.
-* unsigned long	* con_count	O	number of cons in the conlist.
-* char **	intern_conlist	O	list of create connections.
-*
-* Description:
-*	Copies the paste nodelist and connectionlist into the specified
-*	windowobject and calculates the new koordinates for the node.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_paste_copy()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	window to paste in.
+ * float		x		I	x-koordinate of paste operation.
+ * float		y		I	y-koordinate of paste operation.
+ * unsigned long	*node_count	O	number of nodes in the nodelist.
+ * char **	intern_nodelist O	list of  created nodes.
+ * unsigned long	* con_count	O	number of cons in the conlist.
+ * char **	intern_conlist	O	list of create connections.
+ *
+ * Description:
+ *	Copies the paste nodelist and connectionlist into the specified
+ *	windowobject and calculates the new koordinates for the node.
+ *
+ **************************************************************************/
 
-int vldh_paste_copy(vldh_t_wind wind, float x, float y,
-    unsigned long* node_count, vldh_t_node** intern_nodelist,
-    unsigned long* con_count, vldh_t_con** intern_conlist)
+int vldh_paste_copy(vldh_t_wind wind, float x, float y, unsigned long* node_count,
+                    vldh_t_node** intern_nodelist, unsigned long* con_count, vldh_t_con** intern_conlist)
 {
   vldh_t_con con;
   vldh_t_node node;
@@ -3416,30 +3464,32 @@ int vldh_paste_copy(vldh_t_wind wind, float x, float y,
   *con_count = 0;
 
   paste_node = paste_window.hw.node_list_pointer;
-  while (paste_node != 0) {
+  while (paste_node != 0)
+  {
     /* Get graphbody for the class and fetch the defaultname */
-    sts = ldh_GetClassBody(wind->hw.ldhses, paste_node->ln.cid, "GraphPlcNode",
-        &bodyclass, (char**)&graphbody, &size);
+    sts = ldh_GetClassBody(wind->hw.ldhses, paste_node->ln.cid, "GraphPlcNode", &bodyclass,
+                           (char**)&graphbody, &size);
     if (EVEN(sts))
       return sts;
 
-    for (;;) {
+    for (;;)
+    {
       /* Get default segment name */
-      sts = vldh_get_node_defname(
-          wind, graphbody->object_type, graphbody->objname, segment_name);
+      sts = vldh_get_node_defname(wind, graphbody->object_type, graphbody->objname, segment_name);
       if (EVEN(sts))
         return sts;
 
       /* Create the object i ldh */
-      sts = ldh_CopyObject(wind->hw.ldhses, &objdid, segment_name,
-          paste_node->ln.oid, wind->lw.oid, ldh_eDest_IntoLast);
+      sts = ldh_CopyObject(wind->hw.ldhses, &objdid, segment_name, paste_node->ln.oid, wind->lw.oid,
+                           ldh_eDest_IntoLast);
       if (sts == LDH__NAMALREXI)
         /* Try again with incremented name index */
         continue;
-      else if (EVEN(sts)) {
+      else if (EVEN(sts))
+      {
         /* Create a new object without source */
-        sts = ldh_CreateObject(wind->hw.ldhses, &objdid, segment_name,
-            paste_node->ln.cid, wind->lw.oid, ldh_eDest_IntoLast);
+        sts = ldh_CreateObject(wind->hw.ldhses, &objdid, segment_name, paste_node->ln.cid, wind->lw.oid,
+                               ldh_eDest_IntoLast);
         if (EVEN(sts))
           return sts;
       }
@@ -3475,15 +3525,13 @@ int vldh_paste_copy(vldh_t_wind wind, float x, float y,
     vldh_node_create_spec(node);
 
     /* Set the buffer in ldh so the mask can be accessed by ate */
-    sts = ldh_SetObjectBuffer(wind->hw.ldhses, node->ln.oid, "DevBody",
-        "PlcNode", (char*)&(node->ln));
+    sts = ldh_SetObjectBuffer(wind->hw.ldhses, node->ln.oid, "DevBody", "PlcNode", (char*)&(node->ln));
     if (EVEN(sts))
       return sts;
 
     /* Insert in intern nodelist */
-    sts = utl_realloc((char**)intern_nodelist,
-        *node_count * sizeof(*intern_nodelist),
-        (*node_count + 1) * sizeof(*intern_nodelist));
+    sts = utl_realloc((char**)intern_nodelist, *node_count * sizeof(*intern_nodelist),
+                      (*node_count + 1) * sizeof(*intern_nodelist));
     if (EVEN(sts))
       return sts;
     nodelist_pointer = *intern_nodelist;
@@ -3497,14 +3545,16 @@ int vldh_paste_copy(vldh_t_wind wind, float x, float y,
     return VLDH__NONODES;
 
   paste_con = paste_window.hw.con_list_pointer;
-  while (paste_con != 0) {
-    for (;;) {
+  while (paste_con != 0)
+  {
+    for (;;)
+    {
       /* Get default segment name */
       vldh_get_con_defname(wind, segment_name);
 
       /* Create the object i ldh */
-      sts = ldh_CreateObject(wind->hw.ldhses, &objdid, segment_name,
-          paste_con->lc.cid, wind->lw.oid, ldh_eDest_IntoFirst);
+      sts = ldh_CreateObject(wind->hw.ldhses, &objdid, segment_name, paste_con->lc.cid, wind->lw.oid,
+                             ldh_eDest_IntoFirst);
       if (sts == LDH__NAMALREXI)
         /* Try again with incremented name index */
         continue;
@@ -3529,31 +3579,31 @@ int vldh_paste_copy(vldh_t_wind wind, float x, float y,
 
     /* Find the new source and destination node pointers */
     /* They must be inserted in the internal nodelist */
-    for (i = 0; i < (int)*node_count; i++) {
+    for (i = 0; i < (int)*node_count; i++)
+    {
       node = *(nodelist_pointer + i);
-      if (node->hn.node_id == paste_con->hc.source_node) {
+      if (node->hn.node_id == paste_con->hc.source_node)
+      {
         con->hc.source_node = node;
         con->lc.source_oid = node->ln.oid;
       }
-      if (node->hn.node_id == paste_con->hc.dest_node) {
+      if (node->hn.node_id == paste_con->hc.dest_node)
+      {
         con->hc.dest_node = node;
         con->lc.dest_oid = node->ln.oid;
       }
     }
     /* Insert in the node connection pointer */
-    vldh_node_con_insert(
-        con->hc.source_node, con->lc.source_point, con, VLDH_NODE_SOURCE);
-    vldh_node_con_insert(
-        con->hc.dest_node, con->lc.dest_point, con, VLDH_NODE_DESTINATION);
+    vldh_node_con_insert(con->hc.source_node, con->lc.source_point, con, VLDH_NODE_SOURCE);
+    vldh_node_con_insert(con->hc.dest_node, con->lc.dest_point, con, VLDH_NODE_DESTINATION);
 
     /* Insert in windowobjects conlist */
     con->hc.next = wind->hw.con_list_pointer;
     wind->hw.con_list_pointer = con;
 
     /* Insert in intern conlist */
-    sts = utl_realloc((char**)intern_conlist,
-        *con_count * sizeof(*intern_conlist),
-        (*con_count + 1) * sizeof(*intern_conlist));
+    sts = utl_realloc((char**)intern_conlist, *con_count * sizeof(*intern_conlist),
+                      (*con_count + 1) * sizeof(*intern_conlist));
     if (EVEN(sts))
       return sts;
     conlist_pointer = *intern_conlist;
@@ -3568,18 +3618,18 @@ int vldh_paste_copy(vldh_t_wind wind, float x, float y,
 }
 
 /*************************************************************************
-*
-* Name:		vldh_node_update_spec()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node that is updated.
-*
-* Description:
-*	Apply class specific elements when the node is updated.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_node_update_spec()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node that is updated.
+ *
+ * Description:
+ *	Apply class specific elements when the node is updated.
+ *
+ **************************************************************************/
 
 int vldh_node_update_spec(vldh_t_node node)
 {
@@ -3596,16 +3646,18 @@ int vldh_node_update_spec(vldh_t_node node)
 
   /* Updates that are not vldh specific */
   sts = vldh_object_update_spec(ldhses, node->ln.oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     return sts;
   }
   /**********************************************************
    *	ORDERACT
    *	Put window objdid in the ldhobject.
    **********************************************************/
-  else if (node->ln.cid == pwr_cClass_OrderAct) {
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "OrderObject",
-        (char*)&wind->lw.poid, sizeof(wind->lw.poid));
+  else if (node->ln.cid == pwr_cClass_OrderAct)
+  {
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "OrderObject", (char*)&wind->lw.poid,
+                           sizeof(wind->lw.poid));
     if (EVEN(sts))
       return sts;
   }
@@ -3613,10 +3665,11 @@ int vldh_node_update_spec(vldh_t_node node)
    *	CurrentData and CurrentIndex
    *	Put cell objdid in the ldhobject.
    **********************************************************/
-  else if ((node->ln.cid == vldh_eclass(ldhses, "CurrentData"))
-      || (node->ln.cid == vldh_eclass(ldhses, "CurrentIndex"))) {
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "CellObject",
-        (char*)&wind->lw.poid, sizeof(wind->lw.poid));
+  else if ((node->ln.cid == vldh_eclass(ldhses, "CurrentData")) ||
+           (node->ln.cid == vldh_eclass(ldhses, "CurrentIndex")))
+  {
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "CellObject", (char*)&wind->lw.poid,
+                           sizeof(wind->lw.poid));
     if (EVEN(sts))
       return sts;
   }
@@ -3624,11 +3677,12 @@ int vldh_node_update_spec(vldh_t_node node)
    *	DataQCurrent and DataQCurrentIdx
    *	Put cell objdid in the ldhobject.
    **********************************************************/
-  else if ((node->ln.cid == vldh_eclass(ldhses, "DataQCurrentData"))
-      || (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentIdx"))
-      || (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentBus"))) {
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DataQFoObject",
-        (char*)&wind->lw.poid, sizeof(wind->lw.poid));
+  else if ((node->ln.cid == vldh_eclass(ldhses, "DataQCurrentData")) ||
+           (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentIdx")) ||
+           (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentBus")))
+  {
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DataQFoObject", (char*)&wind->lw.poid,
+                           sizeof(wind->lw.poid));
     if (EVEN(sts))
       return sts;
   }
@@ -3636,39 +3690,37 @@ int vldh_node_update_spec(vldh_t_node node)
    *	SHOWPLCATTR
    *	Put plc attributes in the ldhobject.
    **********************************************************/
-  else if (node->ln.cid == pwr_cClass_ShowPlcAttr) {
+  else if (node->ln.cid == pwr_cClass_ShowPlcAttr)
+  {
     pwr_tObjid volume_objid;
     pwr_tObjid* thread_objid;
 
     volume_objid.oix = 0;
     volume_objid.vid = node->ln.oid.vid;
 
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "Node",
-        (char*)&volume_objid, sizeof(volume_objid));
+    sts =
+        ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "Node", (char*)&volume_objid, sizeof(volume_objid));
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_GetObjectPar(ldhses, plc->lp.oid, "RtBody", "ThreadObject",
-        (char**)&thread_objid, &size);
+    sts = ldh_GetObjectPar(ldhses, plc->lp.oid, "RtBody", "ThreadObject", (char**)&thread_objid, &size);
     if (EVEN(sts))
       return sts;
-    if (cdh_ObjidIsNotNull(*thread_objid)) {
-      sts = ldh_GetObjectPar(ldhses, *thread_objid, "RtBody", "ScanTime",
-          (char**)&time_ptr, &size);
+    if (cdh_ObjidIsNotNull(*thread_objid))
+    {
+      sts = ldh_GetObjectPar(ldhses, *thread_objid, "RtBody", "ScanTime", (char**)&time_ptr, &size);
     }
     free((char*)thread_objid);
-    if (ODD(sts)) {
-      sts = ldh_SetObjectPar(
-          ldhses, node->ln.oid, "DevBody", "ScanTime", (char*)time_ptr, size);
+    if (ODD(sts))
+    {
+      sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "ScanTime", (char*)time_ptr, size);
       if (EVEN(sts))
         return sts;
       free((char*)time_ptr);
     }
 
-    sts = ldh_GetObjectPar(ldhses, plc->lp.oid, "DevBody", "ResetObject",
-        (char**)&objdid_ptr, &size);
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "ResetObject",
-        (char*)objdid_ptr, size);
+    sts = ldh_GetObjectPar(ldhses, plc->lp.oid, "DevBody", "ResetObject", (char**)&objdid_ptr, &size);
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "ResetObject", (char*)objdid_ptr, size);
     if (EVEN(sts))
       return sts;
     free((char*)objdid_ptr);
@@ -3678,18 +3730,18 @@ int vldh_node_update_spec(vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_node_update_spec()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	vldh node that is updated.
-*
-* Description:
-*	Apply class specific elements when the node is updated.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_node_update_spec()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	vldh node that is updated.
+ *
+ * Description:
+ *	Apply class specific elements when the node is updated.
+ *
+ **************************************************************************/
 
 int vldh_object_update_spec(ldh_tSesContext ldhses, pwr_tObjid Objdid)
 {
@@ -3723,21 +3775,22 @@ int vldh_object_update_spec(ldh_tSesContext ldhses, pwr_tObjid Objdid)
   if (EVEN(sts))
     return sts;
 
-  if (cid == pwr_cClass_order) {
+  if (cid == pwr_cClass_order)
+  {
     /* Check the present suborder objects and compare them with
        the attributes in the order object */
 
     oldsubordercount = 0;
     sts = ldh_GetChild(ldhses, Objdid, &next_objdid);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       /* Find out if this is a suborder and wich class */
       sts = ldh_GetObjectClass(ldhses, next_objdid, &suborderclass);
 
-      if ((suborderclass == pwr_cClass_sorder)
-          || (suborderclass == pwr_cClass_lorder)
-          || (suborderclass == pwr_cClass_dorder)
-          || (suborderclass == pwr_cClass_porder)
-          || (suborderclass == pwr_cClass_corder)) {
+      if ((suborderclass == pwr_cClass_sorder) || (suborderclass == pwr_cClass_lorder) ||
+          (suborderclass == pwr_cClass_dorder) || (suborderclass == pwr_cClass_porder) ||
+          (suborderclass == pwr_cClass_corder))
+      {
         oldsuborderclass[oldsubordercount] = suborderclass;
         oldsuborderobjdid[oldsubordercount] = next_objdid;
         oldsubordercount++;
@@ -3753,34 +3806,43 @@ int vldh_object_update_spec(ldh_tSesContext ldhses, pwr_tObjid Objdid)
       return sts;
 
     newsubordercount = 0;
-    for (i = 0; i < rows - 2; i += 2) {
+    for (i = 0; i < rows - 2; i += 2)
+    {
       /* Get the parameter value */
-      sts = ldh_GetObjectPar(
-          ldhses, Objdid, "DevBody", bodydef[i].ParName, &parvalue, &size);
+      sts = ldh_GetObjectPar(ldhses, Objdid, "DevBody", bodydef[i].ParName, &parvalue, &size);
       if (EVEN(sts))
         return sts;
 
-      if (*parvalue == 'S' || *parvalue == 's') {
+      if (*parvalue == 'S' || *parvalue == 's')
+      {
         newsuborderclass[newsubordercount] = pwr_cClass_sorder;
         newsuborderchar[newsubordercount] = *parvalue;
         newsuborderindex[newsubordercount] = i;
         newsubordercount++;
-      } else if (*parvalue == 'L' || *parvalue == 'l') {
+      }
+      else if (*parvalue == 'L' || *parvalue == 'l')
+      {
         newsuborderclass[newsubordercount] = pwr_cClass_lorder;
         newsuborderchar[newsubordercount] = *parvalue;
         newsuborderindex[newsubordercount] = i;
         newsubordercount++;
-      } else if (*parvalue == 'C' || *parvalue == 'c') {
+      }
+      else if (*parvalue == 'C' || *parvalue == 'c')
+      {
         newsuborderclass[newsubordercount] = pwr_cClass_corder;
         newsuborderchar[newsubordercount] = *parvalue;
         newsuborderindex[newsubordercount] = i;
         newsubordercount++;
-      } else if (*parvalue == 'D' || *parvalue == 'd') {
+      }
+      else if (*parvalue == 'D' || *parvalue == 'd')
+      {
         newsuborderclass[newsubordercount] = pwr_cClass_dorder;
         newsuborderchar[newsubordercount] = *parvalue;
         newsuborderindex[newsubordercount] = i;
         newsubordercount++;
-      } else if (*parvalue == 'P' || *parvalue == 'p') {
+      }
+      else if (*parvalue == 'P' || *parvalue == 'p')
+      {
         newsuborderclass[newsubordercount] = pwr_cClass_porder;
         newsuborderchar[newsubordercount] = *parvalue;
         newsuborderindex[newsubordercount] = i;
@@ -3797,36 +3859,41 @@ int vldh_object_update_spec(ldh_tSesContext ldhses, pwr_tObjid Objdid)
 
     classdiff_ok = 1;
     diffcount = 0;
-    for (i = 0; i < (int)oldsubordercount; i++) {
-      if (newsuborderclass[i] != oldsuborderclass[i]) {
+    for (i = 0; i < (int)oldsubordercount; i++)
+    {
+      if (newsuborderclass[i] != oldsuborderclass[i])
+      {
         classdiff_ok = 0;
         diffcount = i;
         break;
-      } else
+      }
+      else
         newsuborderobjdid[i] = oldsuborderobjdid[i];
     }
 
-    if (!(classdiff_ok && count_ok)) {
+    if (!(classdiff_ok && count_ok))
+    {
       /* Delete suborderobjects after the first difference */
-      for (i = diffcount; i < (int)oldsubordercount; i++) {
+      for (i = diffcount; i < (int)oldsubordercount; i++)
+      {
         sts = ldh_DeleteObject(ldhses, oldsuborderobjdid[i]);
         if (EVEN(sts))
           return sts;
       }
       /* Create new suborderobjects starting with the first found
          difference */
-      for (i = diffcount; i < (int)newsubordercount; i++) {
+      for (i = diffcount; i < (int)newsubordercount; i++)
+      {
         /* Get default segment name */
         graphname[0] = newsuborderchar[i];
         graphname[1] = '\0';
-        sts = vldh_get_object_defname(
-            ldhses, Objdid, OT_SUBORDER, graphname, segment_name);
+        sts = vldh_get_object_defname(ldhses, Objdid, OT_SUBORDER, graphname, segment_name);
         if (EVEN(sts))
           return sts;
 
         /* Create the object i ldh */
-        sts = ldh_CreateObject(ldhses, &suborderobjdid, segment_name,
-            newsuborderclass[i], Objdid, ldh_eDest_IntoLast);
+        sts = ldh_CreateObject(ldhses, &suborderobjdid, segment_name, newsuborderclass[i], Objdid,
+                               ldh_eDest_IntoLast);
         if (EVEN(sts))
           return sts;
         newsuborderobjdid[i] = suborderobjdid;
@@ -3834,16 +3901,16 @@ int vldh_object_update_spec(ldh_tSesContext ldhses, pwr_tObjid Objdid)
     }
 
     /* Move the time from parent to the children */
-    for (i = 0; i < (int)newsubordercount; i++) {
-      if (newsuborderclass[i] == pwr_cClass_dorder
-          || newsuborderclass[i] == pwr_cClass_lorder) {
+    for (i = 0; i < (int)newsubordercount; i++)
+    {
+      if (newsuborderclass[i] == pwr_cClass_dorder || newsuborderclass[i] == pwr_cClass_lorder)
+      {
         /* Move the time from the parent to the child */
-        sts = ldh_GetObjectPar(ldhses, Objdid, "DevBody",
-            bodydef[newsuborderindex[i] + 1].ParName, (char**)&time_ptr, &size);
+        sts = ldh_GetObjectPar(ldhses, Objdid, "DevBody", bodydef[newsuborderindex[i] + 1].ParName,
+                               (char**)&time_ptr, &size);
         if (EVEN(sts))
           return sts;
-        sts = ldh_SetObjectPar(ldhses, newsuborderobjdid[i], "RtBody",
-            "TimerTime", (char*)time_ptr, size);
+        sts = ldh_SetObjectPar(ldhses, newsuborderobjdid[i], "RtBody", "TimerTime", (char*)time_ptr, size);
         if (EVEN(sts))
           return sts;
         free((char*)time_ptr);
@@ -3855,18 +3922,18 @@ int vldh_object_update_spec(ldh_tSesContext ldhses, pwr_tObjid Objdid)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_node_create_spec()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	node that is created.
-*
-* Description:
-*	Apply class specific elements in the creation of a node.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_node_create_spec()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	node that is created.
+ *
+ * Description:
+ *	Apply class specific elements in the creation of a node.
+ *
+ **************************************************************************/
 
 int vldh_node_create_spec(vldh_t_node node)
 {
@@ -3894,20 +3961,21 @@ int vldh_node_create_spec(vldh_t_node node)
    *	Create objects for the orderattribues.
    **********************************************************/
 
-  if (node->ln.cid == pwr_cClass_order) {
+  if (node->ln.cid == pwr_cClass_order)
+  {
     /* Order : Create one object for every attibute with the
        orderobject as parent */
 
-    sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid,
-        "DevBody", 1, &bodydef, &rows);
+    sts = ldh_GetObjectBodyDef((node->hn.wind)->hw.ldhses, node->ln.cid, "DevBody", 1, &bodydef, &rows);
 
     if (EVEN(sts))
       return sts;
 
-    for (i = 0; i < rows - 2; i += 2) {
+    for (i = 0; i < rows - 2; i += 2)
+    {
       /* Get the parameter value */
-      sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid,
-          "DevBody", bodydef[i].ParName, (char**)&parvalue, &size);
+      sts = ldh_GetObjectPar((node->hn.wind)->hw.ldhses, node->ln.oid, "DevBody", bodydef[i].ParName,
+                             (char**)&parvalue, &size);
       if (EVEN(sts))
         return sts;
 
@@ -3925,7 +3993,8 @@ int vldh_node_create_spec(vldh_t_node node)
       else
         noclass = 1;
 
-      if (!noclass) {
+      if (!noclass)
+      {
         /* Get a suitable name for the object and create it */
 
         /* Get default segment name */
@@ -3936,19 +4005,18 @@ int vldh_node_create_spec(vldh_t_node node)
           return sts;
 
         /* Create the object i ldh */
-        sts = ldh_CreateObject(ldhses, &objdid, segment_name, cid, node->ln.oid,
-            ldh_eDest_IntoLast);
+        sts = ldh_CreateObject(ldhses, &objdid, segment_name, cid, node->ln.oid, ldh_eDest_IntoLast);
         if (EVEN(sts))
           return sts;
 
-        if ((cid == pwr_cClass_dorder) || (cid == pwr_cClass_lorder)) {
+        if ((cid == pwr_cClass_dorder) || (cid == pwr_cClass_lorder))
+        {
           /* Move the time from the parent to the child */
-          sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody",
-              bodydef[i + 1].ParName, (char**)&time_ptr, &size);
+          sts = ldh_GetObjectPar(ldhses, node->ln.oid, "DevBody", bodydef[i + 1].ParName, (char**)&time_ptr,
+                                 &size);
           if (EVEN(sts))
             return sts;
-          sts = ldh_SetObjectPar(
-              ldhses, objdid, "RtBody", "TimerTime", (char*)time_ptr, size);
+          sts = ldh_SetObjectPar(ldhses, objdid, "RtBody", "TimerTime", (char*)time_ptr, size);
           if (EVEN(sts))
             return sts;
           free((char*)time_ptr);
@@ -3962,9 +4030,10 @@ int vldh_node_create_spec(vldh_t_node node)
    *	ORDERACT
    *	Put window objdid in the ldhobject.
    **********************************************************/
-  else if (node->ln.cid == pwr_cClass_OrderAct) {
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "OrderObject",
-        (char*)&wind->lw.poid, sizeof(wind->lw.poid));
+  else if (node->ln.cid == pwr_cClass_OrderAct)
+  {
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "OrderObject", (char*)&wind->lw.poid,
+                           sizeof(wind->lw.poid));
     if (EVEN(sts))
       return sts;
   }
@@ -3972,10 +4041,11 @@ int vldh_node_create_spec(vldh_t_node node)
    *	CurrentData and CurrentIndex
    *	Put cell objdid in the ldhobject.
    **********************************************************/
-  else if ((node->ln.cid == vldh_eclass(ldhses, "CurrentData"))
-       || (node->ln.cid == vldh_eclass(ldhses, "CurrentIndex"))) {
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "CellObject",
-        (char*)&wind->lw.poid, sizeof(wind->lw.poid));
+  else if ((node->ln.cid == vldh_eclass(ldhses, "CurrentData")) ||
+           (node->ln.cid == vldh_eclass(ldhses, "CurrentIndex")))
+  {
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "CellObject", (char*)&wind->lw.poid,
+                           sizeof(wind->lw.poid));
     if (EVEN(sts))
       return sts;
   }
@@ -3983,11 +4053,12 @@ int vldh_node_create_spec(vldh_t_node node)
    *	DataQCurrentData and DataQCurrentIdx
    *	Put cell objdid in the ldhobject.
    **********************************************************/
-  else if ((node->ln.cid == vldh_eclass(ldhses, "DataQCurrentData"))
-       || (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentIdx"))
-       || (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentBus"))) {
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DataQFoObject",
-        (char*)&wind->lw.poid, sizeof(wind->lw.poid));
+  else if ((node->ln.cid == vldh_eclass(ldhses, "DataQCurrentData")) ||
+           (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentIdx")) ||
+           (node->ln.cid == vldh_eclass(ldhses, "DataQCurrentBus")))
+  {
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "DataQFoObject", (char*)&wind->lw.poid,
+                           sizeof(wind->lw.poid));
     if (EVEN(sts))
       return sts;
   }
@@ -3996,39 +4067,37 @@ int vldh_node_create_spec(vldh_t_node node)
    *	SHOWPLCATTR
    *	Put plc attributes in the ldhobject.
    **********************************************************/
-  else if (node->ln.cid == pwr_cClass_ShowPlcAttr) {
+  else if (node->ln.cid == pwr_cClass_ShowPlcAttr)
+  {
     pwr_tObjid volume_objid;
     pwr_tObjid* thread_objid;
 
     volume_objid.oix = 0;
     volume_objid.vid = node->ln.oid.vid;
 
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "Node",
-        (char*)&volume_objid, sizeof(volume_objid));
+    sts =
+        ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "Node", (char*)&volume_objid, sizeof(volume_objid));
     if (EVEN(sts))
       return sts;
 
-    sts = ldh_GetObjectPar(ldhses, plc->lp.oid, "RtBody", "ThreadObject",
-        (char**)&thread_objid, &size);
+    sts = ldh_GetObjectPar(ldhses, plc->lp.oid, "RtBody", "ThreadObject", (char**)&thread_objid, &size);
     if (EVEN(sts))
       return sts;
-    if (cdh_ObjidIsNotNull(*thread_objid)) {
-      sts = ldh_GetObjectPar(ldhses, *thread_objid, "RtBody", "ScanTime",
-          (char**)&time_ptr, &size);
+    if (cdh_ObjidIsNotNull(*thread_objid))
+    {
+      sts = ldh_GetObjectPar(ldhses, *thread_objid, "RtBody", "ScanTime", (char**)&time_ptr, &size);
     }
     free((char*)thread_objid);
-    if (ODD(sts)) {
-      sts = ldh_SetObjectPar(
-          ldhses, node->ln.oid, "DevBody", "ScanTime", (char*)time_ptr, size);
+    if (ODD(sts))
+    {
+      sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "ScanTime", (char*)time_ptr, size);
       if (EVEN(sts))
         return sts;
       free((char*)time_ptr);
     }
 
-    sts = ldh_GetObjectPar(ldhses, plc->lp.oid, "DevBody", "ResetObject",
-        (char**)&objdid_ptr, &size);
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "ResetObject",
-        (char*)objdid_ptr, size);
+    sts = ldh_GetObjectPar(ldhses, plc->lp.oid, "DevBody", "ResetObject", (char**)&objdid_ptr, &size);
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "ResetObject", (char*)objdid_ptr, size);
     if (EVEN(sts))
       return sts;
     free((char*)objdid_ptr);
@@ -4039,11 +4108,12 @@ int vldh_node_create_spec(vldh_t_node node)
    *	Reset sorder object to avoid unwanted sorder at
    *	paste operation.
    **********************************************************/
-  else if (node->ln.cid == pwr_cClass_reset_so) {
+  else if (node->ln.cid == pwr_cClass_reset_so)
+  {
     pwr_tOid order_objdid = pwr_cNOid;
 
-    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "OrderObject",
-        (char*)&order_objdid, sizeof(order_objdid));
+    sts = ldh_SetObjectPar(ldhses, node->ln.oid, "DevBody", "OrderObject", (char*)&order_objdid,
+                           sizeof(order_objdid));
     if (EVEN(sts))
       return sts;
   }
@@ -4052,18 +4122,18 @@ int vldh_node_create_spec(vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_node_ldhdel_spec()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_node	node		I	node that is deleted.
-*
-* Description:
-*	Apply class specific elements when the node deleted in ldh.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_node_ldhdel_spec()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_node	node		I	node that is deleted.
+ *
+ * Description:
+ *	Apply class specific elements when the node deleted in ldh.
+ *
+ **************************************************************************/
 
 int vldh_node_ldhdel_spec(vldh_t_node node)
 {
@@ -4086,19 +4156,21 @@ int vldh_node_ldhdel_spec(vldh_t_node node)
    **********************************************************/
 
   wind = node->hn.wind;
-  if (node->ln.cid == pwr_cClass_order) {
+  if (node->ln.cid == pwr_cClass_order)
+  {
     /* Check the present suborder objects and compare them with
        the attributes in the order object */
 
     subordercount = 0;
     sts = ldh_GetChild(ldhses, node->ln.oid, &next_objdid);
-    while (ODD(sts)) {
+    while (ODD(sts))
+    {
       /* Find out if this is a suborder and */
       sts = ldh_GetObjectClass(ldhses, next_objdid, &cid);
 
-      if ((cid == pwr_cClass_sorder) || (cid == pwr_cClass_lorder)
-          || (cid == pwr_cClass_dorder) || (cid == pwr_cClass_porder)
-          || (cid == pwr_cClass_corder)) {
+      if ((cid == pwr_cClass_sorder) || (cid == pwr_cClass_lorder) || (cid == pwr_cClass_dorder) ||
+          (cid == pwr_cClass_porder) || (cid == pwr_cClass_corder))
+      {
         suborderobjdid[subordercount] = next_objdid;
         subordercount++;
       }
@@ -4106,7 +4178,8 @@ int vldh_node_ldhdel_spec(vldh_t_node node)
       sts = ldh_GetNextSibling(ldhses, next_objdid, &next_objdid);
     }
 
-    for (i = 0; i < (int)subordercount; i++) {
+    for (i = 0; i < (int)subordercount; i++)
+    {
       /* delete the object */
       sts = ldh_DeleteObject(ldhses, suborderobjdid[i]);
       if (EVEN(sts))
@@ -4118,40 +4191,41 @@ int vldh_node_ldhdel_spec(vldh_t_node node)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_node_coordinates()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* unsigned long * node_count	O	number of nodes in the nodelist
-* void **	intern_nodelist	O	list of nodes in the window
-*
-* Description:
-*	Returns a node that covers the specified coordinates.
-*	Excludes the document nodes.
-*	If no covering node is found VLDH__NONODES i returned
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_node_coordinates()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * unsigned long * node_count	O	number of nodes in the nodelist
+ * void **	intern_nodelist	O	list of nodes in the window
+ *
+ * Description:
+ *	Returns a node that covers the specified coordinates.
+ *	Excludes the document nodes.
+ *	If no covering node is found VLDH__NONODES i returned
+ *
+ **************************************************************************/
 
-int vldh_get_node_coordinates(
-    vldh_t_wind wind, float x, float y, vldh_t_node* node)
+int vldh_get_node_coordinates(vldh_t_wind wind, float x, float y, vldh_t_node* node)
 {
   vldh_t_node node_pointer;
   int found;
 
   found = 0;
   node_pointer = wind->hw.node_list_pointer;
-  while (node_pointer != 0) {
+  while (node_pointer != 0)
+  {
     /* Put node in array if not deleted */
-    if ((node_pointer->hn.status & VLDH_DELETE) == 0) {
-      if (!vldh_check_document(wind->hw.ldhses, node_pointer->ln.oid)) {
+    if ((node_pointer->hn.status & VLDH_DELETE) == 0)
+    {
+      if (!vldh_check_document(wind->hw.ldhses, node_pointer->ln.oid))
+      {
         /* This is not a document, check coordinates */
-        if ((x >= node_pointer->ln.x)
-            && (x <= node_pointer->ln.x + node_pointer->ln.width)
-            && (y >= node_pointer->ln.y)
-            && (y <= node_pointer->ln.y + node_pointer->ln.height)) {
+        if ((x >= node_pointer->ln.x) && (x <= node_pointer->ln.x + node_pointer->ln.width) &&
+            (y >= node_pointer->ln.y) && (y <= node_pointer->ln.y + node_pointer->ln.height))
+        {
           *node = node_pointer;
           found = 1;
           break;
@@ -4169,35 +4243,39 @@ int vldh_get_node_coordinates(
 }
 
 /*************************************************************************
-*
-* Name:		vldh_get_modification()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* vldh_t_wind	wind		I	vldh window
-* int		*modified	O	1 if modifications found, else 0.
-*
-* Description:
-*	Examines if any object is created, deleted or modified since last
-*	save.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_get_modification()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * vldh_t_wind	wind		I	vldh window
+ * int		*modified	O	1 if modifications found, else 0.
+ *
+ * Description:
+ *	Examines if any object is created, deleted or modified since last
+ *	save.
+ *
+ **************************************************************************/
 
 int vldh_get_wind_modification(vldh_t_wind wind, int* modified)
 {
   vldh_t_node node_pointer;
   vldh_t_con con_pointer;
 
-  if (wind->hw.status & (VLDH_DELETE | VLDH_MODIFY | VLDH_CREATE)) {
+  if (wind->hw.status & (VLDH_DELETE | VLDH_MODIFY | VLDH_CREATE))
+  {
     *modified = 1;
     return VLDH__SUCCESS;
   }
 
   node_pointer = wind->hw.node_list_pointer;
-  while (node_pointer != 0) {
-    if (node_pointer->hn.status & (VLDH_DELETE | VLDH_MODIFY | VLDH_CREATE)) {
-      if (!(node_pointer->hn.status & VLDH_LDHDELETE)) {
+  while (node_pointer != 0)
+  {
+    if (node_pointer->hn.status & (VLDH_DELETE | VLDH_MODIFY | VLDH_CREATE))
+    {
+      if (!(node_pointer->hn.status & VLDH_LDHDELETE))
+      {
         *modified = 1;
         return VLDH__SUCCESS;
       }
@@ -4207,9 +4285,12 @@ int vldh_get_wind_modification(vldh_t_wind wind, int* modified)
   }
 
   con_pointer = wind->hw.con_list_pointer;
-  while (con_pointer != 0) {
-    if (con_pointer->hc.status & (VLDH_DELETE | VLDH_MODIFY | VLDH_CREATE)) {
-      if (!(con_pointer->hc.status & VLDH_LDHDELETE)) {
+  while (con_pointer != 0)
+  {
+    if (con_pointer->hc.status & (VLDH_DELETE | VLDH_MODIFY | VLDH_CREATE))
+    {
+      if (!(con_pointer->hc.status & VLDH_LDHDELETE))
+      {
         *modified = 1;
         return VLDH__SUCCESS;
       }
@@ -4223,19 +4304,19 @@ int vldh_get_wind_modification(vldh_t_wind wind, int* modified)
 }
 
 /*************************************************************************
-*
-* Name:		vldh_IdToStr()
-*
-* Type		* char
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Converts an objid to a string.
-*	The returned string is static and must be used befor next call
-*	of the function.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_IdToStr()
+ *
+ * Type		* char
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Converts an objid to a string.
+ *	The returned string is static and must be used befor next call
+ *	of the function.
+ *
+ **************************************************************************/
 
 char* vldh_IdToStr(int idx, pwr_tObjid objid)
 {
@@ -4249,7 +4330,8 @@ char* vldh_IdToStr(int idx, pwr_tObjid objid)
   char* str;
 
   memcpy(&volid, &objid.vid, sizeof(volid));
-  switch (idx) {
+  switch (idx)
+  {
   case 0:
     str = str0;
     break;
@@ -4272,25 +4354,24 @@ char* vldh_IdToStr(int idx, pwr_tObjid objid)
     printf("** Error, vldh_IdToStr, Invalid index!!\n");
     str = str0;
   }
-  sprintf(str, "%3.3u_%3.3u_%3.3u_%3.3u_%8.8x", volid[3], volid[2], volid[1],
-      volid[0], objid.oix);
+  sprintf(str, "%3.3u_%3.3u_%3.3u_%3.3u_%8.8x", volid[3], volid[2], volid[1], volid[0], objid.oix);
   return str;
 }
 
 /*************************************************************************
-*
-* Name:		vldh_AttrRefToStr()
-*
-* Type		* char
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Converts an attrref to a string.
-*	The returned string is static and must be used befor next call
-*	of the function.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_AttrRefToStr()
+ *
+ * Type		* char
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Converts an attrref to a string.
+ *	The returned string is static and must be used befor next call
+ *	of the function.
+ *
+ **************************************************************************/
 
 char* vldh_AttrRefToStr(int idx, pwr_sAttrRef ar)
 {
@@ -4304,7 +4385,8 @@ char* vldh_AttrRefToStr(int idx, pwr_sAttrRef ar)
   char* str;
 
   memcpy(&volid, &ar.Objid.vid, sizeof(volid));
-  switch (idx) {
+  switch (idx)
+  {
   case 0:
     str = str0;
     break;
@@ -4327,24 +4409,24 @@ char* vldh_AttrRefToStr(int idx, pwr_sAttrRef ar)
     printf("** Error, vldh_AttrRefToStr, Invalid index!!\n");
     str = str0;
   }
-  sprintf(str, "%3.3u_%3.3u_%3.3u_%3.3u_%8.8x_%5.5d_%5.5d", volid[3], volid[2],
-      volid[1], volid[0], ar.Objid.oix, ar.Offset, ar.Size);
+  sprintf(str, "%3.3u_%3.3u_%3.3u_%3.3u_%8.8x_%5.5d_%5.5d", volid[3], volid[2], volid[1], volid[0],
+          ar.Objid.oix, ar.Offset, ar.Size);
   return str;
 }
 
 /*************************************************************************
-*
-* Name:		vldh_StrToId()
-*
-* Type		* char
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Converts a string to objid. String can be of normal objid
-*	of plc module format (with underscore and hexadecimal objid).
-*
-**************************************************************************/
+ *
+ * Name:		vldh_StrToId()
+ *
+ * Type		* char
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Converts a string to objid. String can be of normal objid
+ *	of plc module format (with underscore and hexadecimal objid).
+ *
+ **************************************************************************/
 pwr_tStatus vldh_StrToId(char* instr, pwr_tObjid* objid)
 {
   char outstr[40];
@@ -4364,48 +4446,55 @@ pwr_tStatus vldh_StrToId(char* instr, pwr_tObjid* objid)
     plc_m = 0;
 
   i = 0;
-  while (*s) {
-    if (*s == '_') {
+  while (*s)
+  {
+    if (*s == '_')
+    {
       i++;
-      if (i == 4) {
+      if (i == 4)
+      {
         *t = ':';
         if (plc_m)
           break;
-      } else
+      }
+      else
         *t = '.';
-    } else
+    }
+    else
       *t = *s;
     s++;
     t++;
   }
 
-  if (plc_m) {
+  if (plc_m)
+  {
     s++;
     t++;
     if (sscanf(s, "%x", &i) == 1)
       sprintf(t, "%d", i);
     else
       sprintf(t, "%s", s);
-  } else
+  }
+  else
     *t = 0;
 
   return cdh_StringToObjid(outstr, objid);
 }
 
 /*************************************************************************
-*
-* Name:		vldh_VolumeIdToStr()
-*
-* Type		* char
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Converts an VolumeId to a string.
-*	The returned string is static and must be used befor next call
-*	of the function.
-*
-**************************************************************************/
+ *
+ * Name:		vldh_VolumeIdToStr()
+ *
+ * Type		* char
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Converts an VolumeId to a string.
+ *	The returned string is static and must be used befor next call
+ *	of the function.
+ *
+ **************************************************************************/
 
 char* vldh_VolumeIdToStr(pwr_tVolumeId volumeid)
 {
@@ -4413,8 +4502,7 @@ char* vldh_VolumeIdToStr(pwr_tVolumeId volumeid)
   unsigned char volid[4];
 
   memcpy(&volid, &volumeid, sizeof(volid));
-  sprintf(
-      str, "%3.3u_%3.3u_%3.3u_%3.3u", volid[3], volid[2], volid[1], volid[0]);
+  sprintf(str, "%3.3u_%3.3u_%3.3u_%3.3u", volid[3], volid[2], volid[1], volid[0]);
   return str;
 }
 
@@ -4432,8 +4520,10 @@ int vldh_check_node(vldh_t_wind wind, vldh_t_node node)
     return 0;
 
   node_found = 0;
-  for (unsigned int i = 0; i < node_count; i++) {
-    if (node == nodelist[i]) {
+  for (unsigned int i = 0; i < node_count; i++)
+  {
+    if (node == nodelist[i])
+    {
       node_found = 1;
       break;
     }
@@ -4449,7 +4539,8 @@ static void cnv_from_neted(vldh_t_node n)
   const float pin = 0.05;
   const float grid = 0.05;
 
-  switch (n->ln.cid) {
+  switch (n->ln.cid)
+  {
   case pwr_cClass_order:
   case pwr_cClass_OrderAct:
   case pwr_cClass_reset_so:
@@ -4522,7 +4613,8 @@ static void cnv_from_neted(vldh_t_node n)
     n->ln.y = 1 - n->ln.y - n->ln.height + 1.5 * grid;
   }
 
-  switch (n->ln.cid) {
+  switch (n->ln.cid)
+  {
   case pwr_cClass_trans:
     n->ln.x = n->ln.x + n->ln.width / 2;
     break;
@@ -4566,7 +4658,8 @@ static void cnv_to_neted(vldh_t_node n)
   const float pin = 0.05;
   const float grid = 0.05;
 
-  switch (n->ln.cid) {
+  switch (n->ln.cid)
+  {
   case pwr_cClass_order:
   case pwr_cClass_OrderAct:
   case pwr_cClass_reset_so:
@@ -4639,7 +4732,8 @@ static void cnv_to_neted(vldh_t_node n)
     n->ln.y = 1 - n->ln.y - n->ln.height + 1.5 * grid;
   }
 
-  switch (n->ln.cid) {
+  switch (n->ln.cid)
+  {
   case pwr_cClass_trans:
     n->ln.x = n->ln.x - n->ln.width / 2;
     break;

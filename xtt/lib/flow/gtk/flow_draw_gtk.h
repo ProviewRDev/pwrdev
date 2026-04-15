@@ -43,7 +43,8 @@
 
 #include "flow_draw.h"
 
-class FlowDrawGtk : public FlowDraw {
+class FlowDrawGtk : public FlowDraw
+{
 public:
   GtkWidget* toplevel;
   GtkWidget* nav_shell;
@@ -52,35 +53,35 @@ public:
   GdkWindow* window;
   GdkWindow* nav_window;
   GdkScreen* screen;
-  cairo_pattern_t *gc_black;
-  cairo_pattern_t *gc_gray;
-  cairo_pattern_t *gc_darkgray;
-  cairo_pattern_t *gc_red;
-  cairo_pattern_t *gc_yellow;
-  cairo_pattern_t *gc_green;
-  cairo_pattern_t *gc_erase;
-  cairo_pattern_t *gc_inverse;
+  cairo_pattern_t* gc_black;
+  cairo_pattern_t* gc_gray;
+  cairo_pattern_t* gc_darkgray;
+  cairo_pattern_t* gc_red;
+  cairo_pattern_t* gc_yellow;
+  cairo_pattern_t* gc_green;
+  cairo_pattern_t* gc_erase;
+  cairo_pattern_t* gc_inverse;
   GdkCursor* cursors[draw_eCursor__];
   guint timer_id;
   int closing_down;
-  cairo_t *cairo_cr;
+  cairo_t* cairo_cr;
   int cairo_cr_refcnt;
-  cairo_region_t *cairo_region;
-  GdkDrawingContext *cairo_context;
-  cairo_t *cairo_nav_cr;
+  cairo_region_t* cairo_region;
+  GdkDrawingContext* cairo_context;
+  cairo_t* cairo_nav_cr;
   int cairo_nav_cr_refcnt;
-  cairo_region_t *cairo_nav_region;
-  GdkDrawingContext *cairo_nav_context;
+  cairo_region_t* cairo_nav_region;
+  GdkDrawingContext* cairo_nav_context;
   cairo_antialias_t antialias;
   cairo_antialias_t nav_antialias;
-  GtkStyleContext *style_context;
-  cairo_font_face_t *font_face_bold;
-  cairo_font_face_t *font_face_normal;
+  GtkStyleContext* style_context;
+  cairo_font_face_t* font_face_bold;
+  cairo_font_face_t* font_face_normal;
   static char font_name[40];
 
   FlowDrawGtk(GtkWidget* toplevel, void** flow_ctx,
-      int (*init_proc)(GtkWidget* w, FlowCtx* ctx, void* client_data),
-      void* client_data, flow_eCtxType type);
+              int (*init_proc)(GtkWidget* w, FlowCtx* ctx, void* client_data), void* client_data,
+              flow_eCtxType type);
   ~FlowDrawGtk();
   int init_nav(GtkWidget* nav_widget, void* flow_ctx);
   void invalidate(int x, int y, int width, int height);
@@ -88,7 +89,7 @@ public:
   int expose(FlowCtx* ctx, cairo_t* cr, int is_navigator);
   int event_handler(FlowCtx* ctx, GdkEvent event);
   void enable_event(FlowCtx* ctx, flow_eEvent event, flow_eEventType event_type,
-      int (*event_cb)(FlowCtx* ctx, flow_tEvent event));
+                    int (*event_cb)(FlowCtx* ctx, flow_tEvent event));
   void clear(FlowCtx* ctx);
   void nav_clear(FlowCtx* ctx);
 
@@ -97,112 +98,87 @@ public:
   void set_nav_window_size(FlowCtx* ctx, int width, int height);
 
   cairo_t* get_cairo(int create = 0);
-  void end_cairo(cairo_t *cr);
+  void end_cairo(cairo_t* cr);
   cairo_t* get_cairo_nav();
-  void end_cairo_nav(cairo_t *cr);
-  int rect(FlowCtx* ctx, int x, int y, int width, int height,
-      flow_eDrawType gc_type, int idx, int highlight, int dimmed);
+  void end_cairo_nav(cairo_t* cr);
+  int rect(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type, int idx, int highlight,
+           int dimmed);
   int rect_erase(FlowCtx* ctx, int x, int y, int width, int height, int idx);
-  int nav_rect(FlowCtx* ctx, int x, int y, int width, int height,
-      flow_eDrawType gc_type, int idx, int highlight);
-  int nav_rect_erase(
-      FlowCtx* ctx, int x, int y, int width, int height, int idx);
-  int triangle(FlowCtx* ctx, int x, int y, int width, int height,
-      flow_eDrawType gc_type, int idx, int highlight, int dimmed);
-  int triangle_erase(
-      FlowCtx* ctx, int x, int y, int width, int height, int idx);
-  int nav_triangle(FlowCtx* ctx, int x, int y, int width, int height,
-      flow_eDrawType gc_type, int idx, int highlight);
-  int nav_fill_triangle(FlowCtx* ctx, int x, int y, int width, int height,
-      flow_eDrawType gc_type);
-  int nav_triangle_erase(
-      FlowCtx* ctx, int x, int y, int width, int height, int idx);
-  int arrow(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3,
-      flow_eDrawType gc_type, int idx, int highlight);
-  int arrow_erase(
-      FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, int idx);
-  int nav_arrow(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3,
-      flow_eDrawType gc_type, int idx, int highlight);
-  int nav_arrow_erase(
-      FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, int idx);
-  int arc(FlowCtx* ctx, int x, int y, int width, int height, int angle1,
-      int angle2, flow_eDrawType gc_type, int idx, int highlight, int dimmed);
-  int arc_erase(FlowCtx* ctx, int x, int y, int width, int height, int angle1,
-      int angle2, int idx);
-  int nav_arc(FlowCtx* ctx, int x, int y, int width, int height, int angle1,
-      int angle2, flow_eDrawType gc_type, int idx, int highlight);
-  int nav_arc_erase(FlowCtx* ctx, int x, int y, int width, int height,
-      int angle1, int angle2, int idx);
-  int line(FlowCtx* ctx, int x1, int y1, int x2, int y2, flow_eDrawType gc_type,
-      int idx, int highlight, int dimmed);
+  int nav_rect(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type, int idx,
+               int highlight);
+  int nav_rect_erase(FlowCtx* ctx, int x, int y, int width, int height, int idx);
+  int triangle(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type, int idx,
+               int highlight, int dimmed);
+  int triangle_erase(FlowCtx* ctx, int x, int y, int width, int height, int idx);
+  int nav_triangle(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type, int idx,
+                   int highlight);
+  int nav_fill_triangle(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type);
+  int nav_triangle_erase(FlowCtx* ctx, int x, int y, int width, int height, int idx);
+  int arrow(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, flow_eDrawType gc_type, int idx,
+            int highlight);
+  int arrow_erase(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, int idx);
+  int nav_arrow(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, flow_eDrawType gc_type, int idx,
+                int highlight);
+  int nav_arrow_erase(FlowCtx* ctx, int x1, int y1, int x2, int y2, int x3, int y3, int idx);
+  int arc(FlowCtx* ctx, int x, int y, int width, int height, int angle1, int angle2, flow_eDrawType gc_type,
+          int idx, int highlight, int dimmed);
+  int arc_erase(FlowCtx* ctx, int x, int y, int width, int height, int angle1, int angle2, int idx);
+  int nav_arc(FlowCtx* ctx, int x, int y, int width, int height, int angle1, int angle2,
+              flow_eDrawType gc_type, int idx, int highlight);
+  int nav_arc_erase(FlowCtx* ctx, int x, int y, int width, int height, int angle1, int angle2, int idx);
+  int line(FlowCtx* ctx, int x1, int y1, int x2, int y2, flow_eDrawType gc_type, int idx, int highlight,
+           int dimmed);
   int line_erase(FlowCtx* ctx, int x1, int y1, int x2, int y2, int idx);
-  int nav_line(FlowCtx* ctx, int x1, int y1, int x2, int y2,
-      flow_eDrawType gc_type, int idx, int highlight);
+  int nav_line(FlowCtx* ctx, int x1, int y1, int x2, int y2, flow_eDrawType gc_type, int idx, int highlight);
   int nav_line_erase(FlowCtx* ctx, int x1, int y1, int x2, int y2, int idx);
-  int text(FlowCtx* ctx, int x, int y, char* text, int len,
-      flow_eDrawType gc_type, int idx, int highlight, int dimmed, int line,
-      double size);
-  int text_inverse(FlowCtx* ctx, int x, int y, char* text, int len,
-      flow_eDrawType gc_type, int idx, int line, double size);
-  int text_erase(FlowCtx* ctx, int x, int y, char* text, int len,
-      flow_eDrawType gc_type, int idx, int line, double size);
-  int nav_text(FlowCtx* ctx, int x, int y, char* text, int len,
-      flow_eDrawType gc_type, int idx, int highlight, int line, double size);
-  int nav_text_erase(FlowCtx* ctx, int x, int y, char* text, int len,
-      flow_eDrawType gc_type, int idx, int line, double size);
-  int fill_rect(FlowCtx* ctx, int x, int y, int width, int height,
-      flow_eDrawType gc_type);
-  int nav_fill_rect(FlowCtx* ctx, int x, int y, int width, int height,
-      flow_eDrawType gc_type);
-  int fill_triangle(FlowCtx* ctx, int x, int y, int width, int height,
-      flow_eDrawType gc_type);
-  int image(FlowCtx* ctx, int x, int y, int width, int height,
-      flow_tImImage image, flow_tPixmap pixmap, flow_tPixmap clip_mask);
-  int pixmaps_create(
-      FlowCtx* ctx, flow_sPixmapData* pixmap_data, void** pixmaps);
+  int text(FlowCtx* ctx, int x, int y, char* text, int len, flow_eDrawType gc_type, int idx, int highlight,
+           int dimmed, int line, double size);
+  int text_inverse(FlowCtx* ctx, int x, int y, char* text, int len, flow_eDrawType gc_type, int idx, int line,
+                   double size);
+  int text_erase(FlowCtx* ctx, int x, int y, char* text, int len, flow_eDrawType gc_type, int idx, int line,
+                 double size);
+  int nav_text(FlowCtx* ctx, int x, int y, char* text, int len, flow_eDrawType gc_type, int idx,
+               int highlight, int line, double size);
+  int nav_text_erase(FlowCtx* ctx, int x, int y, char* text, int len, flow_eDrawType gc_type, int idx,
+                     int line, double size);
+  int fill_rect(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type);
+  int nav_fill_rect(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type);
+  int fill_triangle(FlowCtx* ctx, int x, int y, int width, int height, flow_eDrawType gc_type);
+  int image(FlowCtx* ctx, int x, int y, int width, int height, flow_tImImage image, flow_tPixmap pixmap,
+            flow_tPixmap clip_mask);
+  int pixmaps_create(FlowCtx* ctx, flow_sPixmapData* pixmap_data, void** pixmaps);
   void pixmaps_delete(FlowCtx* ctx, void* pixmaps);
-  int pixmap(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data,
-      void* pixmaps, flow_eDrawType gc_type, int idx, int highlight, int line);
-  int pixmap_inverse(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data,
-      void* pixmaps, flow_eDrawType gc_type, int idx, int line);
-  int pixmap_erase(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data,
-      void* pixmaps, flow_eDrawType gc_type, int idx, int line);
-  int nav_pixmap(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data,
-      void* pixmaps, flow_eDrawType gc_type, int idx, int highlight, int line);
-  int nav_pixmap_erase(FlowCtx* ctx, int x, int y,
-      flow_sPixmapData* pixmap_data, void* pixmaps, flow_eDrawType gc_type,
-      int idx, int line);
+  int pixmap(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data, void* pixmaps, flow_eDrawType gc_type,
+             int idx, int highlight, int line);
+  int pixmap_inverse(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data, void* pixmaps,
+                     flow_eDrawType gc_type, int idx, int line);
+  int pixmap_erase(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data, void* pixmaps,
+                   flow_eDrawType gc_type, int idx, int line);
+  int nav_pixmap(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data, void* pixmaps,
+                 flow_eDrawType gc_type, int idx, int highlight, int line);
+  int nav_pixmap_erase(FlowCtx* ctx, int x, int y, flow_sPixmapData* pixmap_data, void* pixmaps,
+                       flow_eDrawType gc_type, int idx, int line);
 
   cairo_font_face_t* get_font_face(flow_eDrawType gc_type);
-  void set_timer(FlowCtx* ctx, int time_ms, void (*callback_func)(FlowCtx* ctx),
-      void** id);
+  void set_timer(FlowCtx* ctx, int time_ms, void (*callback_func)(FlowCtx* ctx), void** id);
   void cancel_timer(FlowCtx* ctx, void* id);
   void set_cursor(FlowCtx* ctx, draw_eCursor cursor);
   void set_nav_cursor(FlowCtx* ctx, draw_eCursor cursor);
-  int get_text_extent(FlowCtx* ctx, const char* text, int len,
-      flow_eDrawType gc_type, int idx, double* width, double* height, double size);
+  int get_text_extent(FlowCtx* ctx, const char* text, int len, flow_eDrawType gc_type, int idx, double* width,
+                      double* height, double size);
   void copy_area(FlowCtx* ctx, int x, int y);
   void clear_area(FlowCtx* ctx, int ll_x, int ur_x, int ll_y, int ur_y);
-  int create_input(FlowCtx* ctx, int x, int y, char* text, int len, int idx,
-      int width, int height, void* node, int number, void** data)
+  int create_input(FlowCtx* ctx, int x, int y, char* text, int len, int idx, int width, int height,
+                   void* node, int number, void** data)
   {
     return 1;
   }
-  int close_input(FlowCtx* ctx, void* data)
-  {
-    return 1;
-  }
-  int get_input(FlowCtx* ctx, void* data, char** text)
-  {
-    return 1;
-  }
-  void move_input(
-      FlowCtx* ctx, void* data, int x, int y, flow_ePosition pos_type)
-  {
-  }
+  int close_input(FlowCtx* ctx, void* data) { return 1; }
+  int get_input(FlowCtx* ctx, void* data, char** text) { return 1; }
+  void move_input(FlowCtx* ctx, void* data, int x, int y, flow_ePosition pos_type) {}
   void delete_secondary_ctx(FlowCtx* ctx);
-  int create_secondary_ctx(FlowCtx* flow_ctx, void** secondary_flow_ctx,
-      int (*init_proc)(FlowCtx*, void*), void* client_data, flow_eCtxType type);
+  int create_secondary_ctx(FlowCtx* flow_ctx, void** secondary_flow_ctx, int (*init_proc)(FlowCtx*, void*),
+                           void* client_data, flow_eCtxType type);
   int change_ctx(FlowCtx* from_ctx, FlowCtx* to_ctx);
   void set_inputfocus(FlowCtx* ctx);
   void set_click_sensitivity(FlowCtx* ctx, int value);
@@ -212,14 +188,13 @@ public:
   int get_font_idx(int gc_type);
   int image_get_width(flow_tImImage image);
   int image_get_height(flow_tImImage image);
-  void image_scale(float scale, flow_tImImage orig_im, flow_tImImage* im,
-      flow_tPixmap* im_pixmap, flow_tPixmap* im_mask);
-  int image_load(const char* imagefile, float scale, float nav_scale,
-      flow_tImImage* orig_im, flow_tImImage* im, flow_tPixmap* im_pixmap,
-      flow_tPixmap* im_mask, flow_tPixmap* im_nav_pixmap,
-      flow_tPixmap* im_nav_mask);
-  FlowPrintDraw* print_draw_new(void* context, const char* title, int page,
-      void* flow_ctx, int page_border, int* sts);
+  void image_scale(float scale, flow_tImImage orig_im, flow_tImImage* im, flow_tPixmap* im_pixmap,
+                   flow_tPixmap* im_mask);
+  int image_load(const char* imagefile, float scale, float nav_scale, flow_tImImage* orig_im,
+                 flow_tImImage* im, flow_tPixmap* im_pixmap, flow_tPixmap* im_mask,
+                 flow_tPixmap* im_nav_pixmap, flow_tPixmap* im_nav_mask);
+  FlowPrintDraw* print_draw_new(void* context, const char* title, int page, void* flow_ctx, int page_border,
+                                int* sts);
   void update_color_theme(int ct);
 };
 

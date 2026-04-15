@@ -54,23 +54,17 @@
 #include "rt_io_mqtt_client.h"
 #include "rs_remote_msg.h"
 
-static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard *cp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp) { return IO__SUCCESS; }
 
-static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard *cp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp) { return IO__SUCCESS; }
 
 #else
-static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard *cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   return IO__RELEASEBUILD;
 }
 
-static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard *cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   return IO__RELEASEBUILD;
 }
@@ -78,5 +72,5 @@ static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCar
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(MQTT_Device) = { pwr_BindIoMethod(IoCardInit),
-    pwr_BindIoMethod(IoCardClose), pwr_NullMethod};
+pwr_dExport pwr_BindIoMethods(MQTT_Device) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                              pwr_NullMethod};

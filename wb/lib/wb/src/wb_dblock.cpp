@@ -70,8 +70,10 @@ char* wb_dblock::lockvname(char* fname)
 bool wb_dblock::is_locked(char* name, char* user)
 {
   struct stat info;
-  if (stat(lockname(name), &info) != -1) {
-    if (user) {
+  if (stat(lockname(name), &info) != -1)
+  {
+    if (user)
+    {
       std::ifstream fp(lockname(name));
       fp.getline(user, 80);
       fp.close();
@@ -113,8 +115,10 @@ bool wb_dblock::check(char* name)
 {
   pwr_tTime t;
 
-  for (int i = 0; i < (int)m_lockfiles.size(); i++) {
-    if (streq(m_lockfiles[i].fname, lockname(name))) {
+  for (int i = 0; i < (int)m_lockfiles.size(); i++)
+  {
+    if (streq(m_lockfiles[i].fname, lockname(name)))
+    {
       if (EVEN(dcli_file_time(lockname(name), &t)))
         return false;
 
@@ -130,9 +134,12 @@ void wb_dblock::dbunlock(char* name)
   pwr_tCmd cmd;
   sprintf(cmd, "rm %s", lockname(name));
 
-  for (int i = 0; i < (int)m_lockfiles.size(); i++) {
-    if (streq(m_lockfiles[i].fname, lockname(name))) {
-      if (check(name)) {
+  for (int i = 0; i < (int)m_lockfiles.size(); i++)
+  {
+    if (streq(m_lockfiles[i].fname, lockname(name)))
+    {
+      if (check(name))
+      {
         system(cmd);
         m_lockfiles[i].removed = true;
       }
@@ -144,9 +151,12 @@ void wb_dblock::dbunlock(char* name)
 void wb_dblock::dbunlock_all()
 {
   pwr_tCmd cmd;
-  for (int i = 0; i < (int)m_lockfiles.size(); i++) {
-    if (!m_lockfiles[i].removed) {
-      if (check(lockvname(m_lockfiles[i].fname))) {
+  for (int i = 0; i < (int)m_lockfiles.size(); i++)
+  {
+    if (!m_lockfiles[i].removed)
+    {
+      if (check(lockvname(m_lockfiles[i].fname)))
+      {
         sprintf(cmd, "rm %s", m_lockfiles[i].fname);
         system(cmd);
       }

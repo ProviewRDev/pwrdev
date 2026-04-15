@@ -53,15 +53,9 @@
 #include "flow_browctx.h"
 #include "flow_msg.h"
 
-void TreeNav::message(char sev, const char* text)
-{
-  (message_cb)(parent_ctx, sev, text);
-}
+void TreeNav::message(char sev, const char* text) { (message_cb)(parent_ctx, sev, text); }
 
-void TreeNav::print(char* filename)
-{
-  brow_Print(brow->ctx, filename);
-}
+void TreeNav::print(char* filename) { brow_Print(brow->ctx, filename); }
 
 //
 //  Free pixmaps
@@ -86,14 +80,11 @@ void TreeNavBrow::allocate_pixmaps()
 //
 // Create the navigator widget
 //
-TreeNav::TreeNav(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist,
-    int xn_item_cnt, unsigned int xn_options,
-    pwr_tStatus (*xn_get_object_info)(
-        void*, pwr_tAttrRef*, char*, int, char*, char*, int),
-    pwr_tStatus (*xn_get_node_info)(void*, char*, char*, int),
-    pwr_tStatus* status)
-    : parent_ctx(xn_parent_ctx), itemlist(xn_itemlist), item_cnt(xn_item_cnt),
-      message_cb(NULL), options(xn_options)
+TreeNav::TreeNav(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist, int xn_item_cnt, unsigned int xn_options,
+                 pwr_tStatus (*xn_get_object_info)(void*, pwr_tAttrRef*, char*, int, char*, char*, int),
+                 pwr_tStatus (*xn_get_node_info)(void*, char*, char*, int), pwr_tStatus* status)
+    : parent_ctx(xn_parent_ctx), itemlist(xn_itemlist), item_cnt(xn_item_cnt), message_cb(NULL),
+      options(xn_options)
 {
   get_object_info = xn_get_object_info;
   get_node_info = xn_get_node_info;
@@ -104,14 +95,9 @@ TreeNav::TreeNav(void* xn_parent_ctx, pwr_tAttrRef* xn_itemlist,
 //
 //  Delete a nav context
 //
-TreeNav::~TreeNav()
-{
-}
+TreeNav::~TreeNav() {}
 
-TreeNavBrow::~TreeNavBrow()
-{
-  free_pixmaps();
-}
+TreeNavBrow::~TreeNavBrow() { free_pixmaps(); }
 
 //
 // Callbacks from brow
@@ -121,7 +107,8 @@ static int treenav_brow_cb(FlowCtx* ctx, flow_tEvent event)
   TreeNav* treenav;
   TrItemBase* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
@@ -130,43 +117,55 @@ static int treenav_brow_cb(FlowCtx* ctx, flow_tEvent event)
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&treenav);
 
   treenav->message(' ', "");
-  switch (event->event) {
-  case flow_eEvent_Key_PageDown: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(treenav->brow->ctx, 0.8);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(treenav->brow->ctx, -0.8);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(treenav->brow->ctx, 0.1);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(treenav->brow->ctx, -0.1);
     break;
   }
-  case flow_eEvent_Key_Up: {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(treenav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLastVisible(treenav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              treenav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(treenav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetLastVisible(treenav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(treenav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -182,26 +181,33 @@ static int treenav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(treenav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirstVisible(treenav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              treenav->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(treenav->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetFirstVisible(treenav->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(treenav->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -220,15 +226,18 @@ static int treenav_brow_cb(FlowCtx* ctx, flow_tEvent event)
   case flow_eEvent_SelectClear:
     brow_ResetSelectInverse(treenav->brow->ctx);
     break;
-  case flow_eEvent_MB1Click: {
+  case flow_eEvent_MB1Click:
+  {
     // Select
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -240,9 +249,12 @@ static int treenav_brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(treenav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(treenav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(treenav->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(treenav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(treenav->brow->ctx, event->object.object);
@@ -253,7 +265,8 @@ static int treenav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
@@ -266,10 +279,12 @@ static int treenav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (brow_IsOpen(node_list[0]))
       // Close this node
       object = node_list[0];
-    else {
+    else
+    {
       // Close parent
       sts = brow_GetParent(treenav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(node_list);
         return 1;
       }
@@ -285,7 +300,8 @@ static int treenav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     int node_count;
 
@@ -294,7 +310,8 @@ static int treenav_brow_cb(FlowCtx* ctx, flow_tEvent event)
       return 1;
 
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case treenav_eItemType_TreeNode:
       ((TrItemNode*)item)->open_children(treenav, 0, 0);
       break;
@@ -302,13 +319,14 @@ static int treenav_brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
   }
   case flow_eEvent_MB1DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case treenav_eItemType_TreeNode:
-        ((TrItemNode*)item)
-            ->open_children(treenav, event->object.x, event->object.y);
+        ((TrItemNode*)item)->open_children(treenav, event->object.x, event->object.y);
         break;
       default:;
       }
@@ -330,25 +348,19 @@ void TreeNavBrow::create_nodeclasses()
 
   // Create common-class
 
-  brow_CreateNodeClass(
-      ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
+  brow_CreateNodeClass(ctx, "NavigatorDefault", flow_eNodeGroup_Common, &nc_object);
   brow_AddAnnotPixmap(nc_object, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_object, 12, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
-  brow_AddAnnot(nc_object, 15, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_object, 12, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_object, 15, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_object, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Create attribute nodeclass
 
   brow_CreateNodeClass(ctx, "NavigatorAttr", flow_eNodeGroup_Common, &nc_node);
   brow_AddAnnotPixmap(nc_node, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_node, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_node, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 1);
+  brow_AddAnnot(nc_node, 2, 0.6, 0, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_node, 8, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 1);
   brow_AddFrame(nc_node, 0, 0, 20, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 
@@ -374,18 +386,21 @@ int TreeNav::create_items()
 
   brow_SetNodraw(brow->ctx);
 
-  if (options & tree_mOptions_LayoutList) {
-    for (i = 0; i < (int)objectlist.size(); i++) {
+  if (options & tree_mOptions_LayoutList)
+  {
+    for (i = 0; i < (int)objectlist.size(); i++)
+    {
       new TrItemObject(this, &objectlist[i], NULL, flow_eDest_IntoLast);
     }
-  } else {
-    for (int idx = 1; idx; idx = tree[idx].fws) {
+  }
+  else
+  {
+    for (int idx = 1; idx; idx = tree[idx].fws)
+    {
       if (tree[idx].type == treenav_eTreeItemType_Object)
-        new TrItemTreeObject(
-            this, &objectlist[tree[idx].idx], idx, NULL, flow_eDest_IntoLast);
+        new TrItemTreeObject(this, &objectlist[tree[idx].idx], idx, NULL, flow_eDest_IntoLast);
       else
-        new TrItemNode(this, tree[idx].sname, tree[idx].descr, idx, NULL,
-            flow_eDest_IntoLast);
+        new TrItemNode(this, tree[idx].sname, tree[idx].descr, idx, NULL, flow_eDest_IntoLast);
     }
   }
   brow_ResetNodraw(brow->ctx);
@@ -406,34 +421,20 @@ void TreeNavBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, treenav);
 
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, treenav_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-      treenav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, treenav_brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack,
-      treenav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, treenav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, treenav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, treenav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, treenav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, treenav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, treenav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, treenav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, treenav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, treenav_brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, treenav_brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, treenav_brow_cb);
 }
 
 //
@@ -474,8 +475,10 @@ int TreeNav::get_select(TrItemBase** item)
 
 int TreeNav::get_item(char* name, TreeNav_object** hi)
 {
-  for (int i = 0; i < (int)objectlist.size(); i++) {
-    if (str_NoCaseStrcmp(objectlist[i].name, name) == 0) {
+  for (int i = 0; i < (int)objectlist.size(); i++)
+  {
+    if (str_NoCaseStrcmp(objectlist[i].name, name) == 0)
+    {
       *hi = &objectlist[i];
       return 1;
     }
@@ -486,49 +489,32 @@ int TreeNav::get_item(char* name, TreeNav_object** hi)
 //
 //  Get zoom
 //
-void TreeNav::get_zoom(double* zoom_factor)
-{
-  brow_GetZoom(brow->ctx, zoom_factor);
-}
+void TreeNav::get_zoom(double* zoom_factor) { brow_GetZoom(brow->ctx, zoom_factor); }
 
 //
 //  Zoom
 //
-void TreeNav::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void TreeNav::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void TreeNav::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void TreeNav::unzoom() { brow_UnZoom(brow->ctx); }
 
-TrItemBase::TrItemBase(treenav_eItemType t) : type(t)
-{
-}
+TrItemBase::TrItemBase(treenav_eItemType t) : type(t) {}
 
-TrItemBase::~TrItemBase()
-{
-}
+TrItemBase::~TrItemBase() {}
 
-int TrItemBase::close(TreeNav* treenav, double x, double y)
-{
-  return 1;
-}
+int TrItemBase::close(TreeNav* treenav, double x, double y) { return 1; }
 
-TrItemObject::TrItemObject(TreeNav* treenav, TreeNav_object* xitem,
-    brow_tNode dest, flow_eDest dest_code)
+TrItemObject::TrItemObject(TreeNav* treenav, TreeNav_object* xitem, brow_tNode dest, flow_eDest dest_code)
     : TrItemBase(treenav_eItemType_Object), item(*xitem)
 {
   type = treenav_eItemType_Object;
   pwr_tAName aname;
 
-  brow_CreateNode(treenav->brow->ctx, "LocalItem", treenav->brow->nc_object,
-      dest, dest_code, (void*)this, 1, &node);
+  brow_CreateNode(treenav->brow->ctx, "LocalItem", treenav->brow->nc_object, dest, dest_code, (void*)this, 1,
+                  &node);
 
   brow_SetAnnotPixmap(node, 0, treenav->brow->pixmap_leaf);
 
@@ -544,7 +530,8 @@ int TrItemObject::close(TreeNav* treenav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node)) {
+  if (brow_IsOpen(node))
+  {
     // Close
     brow_SetNodraw(treenav->brow->ctx);
     brow_CloseNode(treenav->brow->ctx, node);
@@ -556,12 +543,10 @@ int TrItemObject::close(TreeNav* treenav, double x, double y)
   return 1;
 }
 
-TrItemObject::~TrItemObject()
-{
-}
+TrItemObject::~TrItemObject() {}
 
-TrItemTreeObject::TrItemTreeObject(TreeNav* treenav, TreeNav_object* xitem,
-    int index, brow_tNode dest, flow_eDest dest_code)
+TrItemTreeObject::TrItemTreeObject(TreeNav* treenav, TreeNav_object* xitem, int index, brow_tNode dest,
+                                   flow_eDest dest_code)
     : TrItemObject(treenav, xitem, dest, dest_code), idx(index)
 {
   pwr_tAName aname;
@@ -576,16 +561,14 @@ TrItemTreeObject::TrItemTreeObject(TreeNav* treenav, TreeNav_object* xitem,
   brow_SetAnnotation(node, 0, aname, strlen(aname));
 }
 
-TrItemTreeObject::~TrItemTreeObject()
-{
-}
+TrItemTreeObject::~TrItemTreeObject() {}
 
-TrItemNode::TrItemNode(TreeNav* treenav, char* name, char* descr, int index,
-    brow_tNode dest, flow_eDest dest_code)
+TrItemNode::TrItemNode(TreeNav* treenav, char* name, char* descr, int index, brow_tNode dest,
+                       flow_eDest dest_code)
     : TrItemBase(treenav_eItemType_TreeNode), idx(index)
 {
-  brow_CreateNode(treenav->brow->ctx, "TreeNode", treenav->brow->nc_node, dest,
-      dest_code, (void*)this, 1, &node);
+  brow_CreateNode(treenav->brow->ctx, "TreeNode", treenav->brow->nc_node, dest, dest_code, (void*)this, 1,
+                  &node);
 
   if (treenav->tree[idx].fch)
     brow_SetAnnotPixmap(node, 0, treenav->brow->pixmap_map);
@@ -603,7 +586,8 @@ int TrItemNode::open_children(TreeNav* treenav, double x, double y)
 
   brow_GetNodePosition(node, &node_x, &node_y);
 
-  if (brow_IsOpen(node) & treenav_mOpen_Children) {
+  if (brow_IsOpen(node) & treenav_mOpen_Children)
+  {
     // Attributes is open, close
     brow_SetNodraw(treenav->brow->ctx);
     brow_CloseNode(treenav->brow->ctx, node);
@@ -612,19 +596,20 @@ int TrItemNode::open_children(TreeNav* treenav, double x, double y)
     // brow_RemoveAnnotPixmap( node, 1);
     brow_ResetNodraw(treenav->brow->ctx);
     brow_Redraw(treenav->brow->ctx, node_y);
-  } else {
+  }
+  else
+  {
     brow_SetNodraw(treenav->brow->ctx);
-    for (int i = treenav->tree[idx].fch; i; i = treenav->tree[i].fws) {
+    for (int i = treenav->tree[idx].fch; i; i = treenav->tree[i].fws)
+    {
       if (treenav->tree[i].deleted)
         continue;
 
       if (treenav->tree[i].type == treenav_eTreeItemType_Object)
-        new TrItemTreeObject(treenav,
-            &treenav->objectlist[treenav->tree[i].idx], i, node,
-            flow_eDest_IntoLast);
+        new TrItemTreeObject(treenav, &treenav->objectlist[treenav->tree[i].idx], i, node,
+                             flow_eDest_IntoLast);
       else
-        new TrItemNode(treenav, treenav->tree[i].sname, treenav->tree[i].descr,
-            i, node, flow_eDest_IntoLast);
+        new TrItemNode(treenav, treenav->tree[i].sname, treenav->tree[i].descr, i, node, flow_eDest_IntoLast);
     }
     brow_SetOpen(node, treenav_mOpen_Children);
     brow_SetAnnotPixmap(node, 0, treenav->brow->pixmap_openmap);
@@ -638,7 +623,8 @@ int TrItemNode::close(TreeNav* treenav, double x, double y)
 {
   double node_x, node_y;
 
-  if (brow_IsOpen(node) & treenav_mOpen_Children) {
+  if (brow_IsOpen(node) & treenav_mOpen_Children)
+  {
     // Children is open, close
     brow_GetNodePosition(node, &node_x, &node_y);
     brow_SetNodraw(treenav->brow->ctx);
@@ -651,15 +637,14 @@ int TrItemNode::close(TreeNav* treenav, double x, double y)
   return 1;
 }
 
-TrItemNode::~TrItemNode()
-{
-}
+TrItemNode::~TrItemNode() {}
 
 void TreeNav::build_tree()
 {
   pwr_tAName aname;
 
-  for (int i = 0; i < (int)objectlist.size(); i++) {
+  for (int i = 0; i < (int)objectlist.size(); i++)
+  {
     TreeNode n;
 
     strcpy(aname, objectlist[i].name);
@@ -673,55 +658,66 @@ void TreeNav::tree_add(char* name, int list_index, treenav_eTreeItemType type)
   pwr_tObjName name_array[24];
   int seg;
 
-  seg = dcli_parse(name, "-.", "", (char*)name_array,
-      sizeof(name_array) / sizeof(name_array[0]), sizeof(name_array[0]), 0);
+  seg = dcli_parse(name, "-.", "", (char*)name_array, sizeof(name_array) / sizeof(name_array[0]),
+                   sizeof(name_array[0]), 0);
 
-  if (tree.size() == 0) {
+  if (tree.size() == 0)
+  {
     // First item
     TreeNode n0;
     strcpy(n0.sname, "nonode");
     tree.push_back(n0);
 
-    for (int j = 0; j < seg; j++) {
+    for (int j = 0; j < seg; j++)
+    {
       TreeNode n;
 
       n.fth = j;
       tree[j].fch = j + 1;
       strcpy(n.sname, name_array[j]);
       get_descr(name, seg, j, n.descr);
-      if (j == seg - 1) {
+      if (j == seg - 1)
+      {
         n.idx = list_index;
         n.type = type;
       }
       tree.push_back(n);
     }
-  } else {
+  }
+  else
+  {
     int idx = 1;
     int last = idx;
-    for (int j = 0; j < seg; j++) {
+    for (int j = 0; j < seg; j++)
+    {
       int found = 0;
-      while (idx) {
+      while (idx)
+      {
         last = idx;
-        if (streq(tree[idx].sname, name_array[j])) {
+        if (streq(tree[idx].sname, name_array[j]))
+        {
           found = 1;
           break;
         }
         idx = tree[idx].fws;
       }
-      if (!found) {
+      if (!found)
+      {
         TreeNode n;
         strcpy(n.sname, name_array[j]);
         get_descr(name, seg, j, n.descr);
         n.fth = tree[last].fth;
         n.bws = last;
         tree[last].fws = tree.size();
-        if (j == seg - 1) {
+        if (j == seg - 1)
+        {
           n.idx = list_index;
           n.type = type;
         }
         tree.push_back(n);
 
-        for (int k = j + 1; k < seg; k++) {
+        for (int k = j + 1; k < seg; k++)
+        {
           TreeNode n;
 
           n.fth = tree.size() - 1;
@@ -729,7 +725,8 @@ void TreeNav::tree_add(char* name, int list_index, treenav_eTreeItemType type)
             tree[n.fth].fch = tree.size();
           strcpy(n.sname, name_array[k]);
           get_descr(name, seg, k, n.descr);
-          if (k == seg - 1) {
+          if (k == seg - 1)
+          {
             n.idx = list_index;
             n.type = type;
           }
@@ -737,18 +734,21 @@ void TreeNav::tree_add(char* name, int list_index, treenav_eTreeItemType type)
         }
         break;
       }
-      if (tree[idx].fch == 0) {
+      if (tree[idx].fch == 0)
+      {
         TreeNode n;
         strcpy(n.sname, name_array[j]);
         n.fth = tree[last].fth;
         n.bws = last;
         tree[last].fws = tree.size();
-        if (j == seg - 1) {
+        if (j == seg - 1)
+        {
           n.idx = list_index;
           n.type = type;
         }
         tree.push_back(n);
-        for (int k = j + 1; k < seg; k++) {
+        for (int k = j + 1; k < seg; k++)
+        {
           TreeNode n;
 
           n.fth = tree.size() - 1;
@@ -756,7 +756,8 @@ void TreeNav::tree_add(char* name, int list_index, treenav_eTreeItemType type)
             tree[n.fth].fch = tree.size();
           strcpy(n.sname, name_array[k]);
           get_descr(name, seg, k, n.descr);
-          if (k == seg - 1) {
+          if (k == seg - 1)
+          {
             n.idx = list_index;
             n.type = type;
           }
@@ -770,17 +771,16 @@ void TreeNav::tree_add(char* name, int list_index, treenav_eTreeItemType type)
   }
 }
 
-void TreeNav::create_objectlist(
-    pwr_tAttrRef* xn_itemlist, int xn_item_cnt, pwr_tStatus* status)
+void TreeNav::create_objectlist(pwr_tAttrRef* xn_itemlist, int xn_item_cnt, pwr_tStatus* status)
 {
-  for (int i = 0; i < xn_item_cnt; i++) {
+  for (int i = 0; i < xn_item_cnt; i++)
+  {
     TreeNav_object object;
     pwr_tStatus sts;
 
     object.aref = xn_itemlist[i];
-    sts = (get_object_info)(parent_ctx, &object.aref, object.name,
-        sizeof(object.name), object.cname, object.description,
-        sizeof(object.description));
+    sts = (get_object_info)(parent_ctx, &object.aref, object.name, sizeof(object.name), object.cname,
+                            object.description, sizeof(object.description));
     if (EVEN(sts))
       continue;
 
@@ -788,11 +788,15 @@ void TreeNav::create_objectlist(
   }
 
   // Sort
-  if (options & tree_mOptions_AlphaOrder) {
+  if (options & tree_mOptions_AlphaOrder)
+  {
     TreeNav_object tmp;
-    for (unsigned int i = objectlist.size() - 1; i > 0; i--) {
-      for (unsigned int j = 0; j < i; j++) {
-        if (strcmp(objectlist[j].name, objectlist[j + 1].name) > 0) {
+    for (unsigned int i = objectlist.size() - 1; i > 0; i--)
+    {
+      for (unsigned int j = 0; j < i; j++)
+      {
+        if (strcmp(objectlist[j].name, objectlist[j + 1].name) > 0)
+        {
           tmp = objectlist[j + 1];
           objectlist[j + 1] = objectlist[j];
           objectlist[j] = tmp;
@@ -811,14 +815,17 @@ int TreeNav::get_descr(char* name, int seg, int idx, char* descr)
 
   strncpy(n, name, sizeof(n));
   s = n;
-  for (int m = 0; m <= idx; m++) {
-    if ((s1 = strchr(s, '-')) || (s1 = strchr(s, '.'))) {
+  for (int m = 0; m <= idx; m++)
+  {
+    if ((s1 = strchr(s, '-')) || (s1 = strchr(s, '.')))
+    {
       if (m == idx)
         *s1 = 0;
       else
         s1++;
       s = s1;
-    } else
+    }
+    else
       break;
   }
 

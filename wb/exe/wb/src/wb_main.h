@@ -42,7 +42,8 @@
 #include "wb_vsel.h"
 #include "wb_wtt.h"
 
-class Wb {
+class Wb
+{
 public:
   typedef std::map<pwr_tVid, Wtt*>::iterator wttlist_iterator;
 
@@ -55,14 +56,12 @@ public:
 
   Wb();
   virtual ~Wb();
-  virtual Wtt* wtt_new(const char* name, const char* iconname,
-      ldh_tWBContext wbctx, pwr_tVolumeId volid, ldh_tVolume volctx,
-      wnav_sStartMenu* root_menu, pwr_tStatus* status);
+  virtual Wtt* wtt_new(const char* name, const char* iconname, ldh_tWBContext wbctx, pwr_tVolumeId volid,
+                       ldh_tVolume volctx, wnav_sStartMenu* root_menu, pwr_tStatus* status);
 
-  virtual WVsel* vsel_new(pwr_tStatus* status, const char* name,
-      ldh_tWBContext wbctx, char* volumename,
-      int (*bc_success)(void*, pwr_tVolumeId*, int), void (*bc_cancel)(),
-      int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wb_type);
+  virtual WVsel* vsel_new(pwr_tStatus* status, const char* name, ldh_tWBContext wbctx, char* volumename,
+                          int (*bc_success)(void*, pwr_tVolumeId*, int), void (*bc_cancel)(),
+                          int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wb_type);
 
   void wttlist_add(pwr_tStatus* sts, Wtt* wtt, pwr_tVid vid);
   void wttlist_remove(pwr_tStatus* sts, Wtt* wtt);
@@ -75,10 +74,8 @@ public:
   static void login_cancel(void* ctx);
   static void wtt_close(void* wttctx);
   static int time_to_exit(void* wttctx);
-  static void wtt_open_volume(void* wttctx, wb_eType type, const char* filename,
-      wow_eFileSelType file_type);
-  static int vsel_success(
-      void* vselctx, pwr_tVolumeId* volumelist, int volume_count);
+  static void wtt_open_volume(void* wttctx, wb_eType type, const char* filename, wow_eFileSelType file_type);
+  static int vsel_success(void* vselctx, pwr_tVolumeId* volumelist, int volume_count);
   static void vsel_cancel();
   static void usage();
   static int psts(unsigned long int sts, FILE* logfile);

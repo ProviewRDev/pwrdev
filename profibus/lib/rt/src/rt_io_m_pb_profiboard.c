@@ -82,8 +82,7 @@ static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap);
 /*----------------------------------------------------------------------------*\
   Sends request to Profiboard for setting FMB parameters
 \*----------------------------------------------------------------------------*/
-static short try_profi_rcv_con_ind(T_PROFI_SERVICE_DESCR* con_ind_sdb,
-                                   USIGN8* con_ind_buffer,
+static short try_profi_rcv_con_ind(T_PROFI_SERVICE_DESCR* con_ind_sdb, USIGN8* con_ind_buffer,
                                    USIGN16* con_ind_buffer_len, INT16* result)
 {
   int retry_counter;
@@ -93,8 +92,7 @@ static short try_profi_rcv_con_ind(T_PROFI_SERVICE_DESCR* con_ind_sdb,
   do
   {
     nanosleep(&rqtp, NULL);
-    *result =
-        profi_rcv_con_ind(con_ind_sdb, con_ind_buffer, con_ind_buffer_len);
+    *result = profi_rcv_con_ind(con_ind_sdb, con_ind_buffer, con_ind_buffer_len);
   } while ((*result == NO_CON_IND_RECEIVED) && (retry_counter-- > 0));
 
   if (*result == E_IF_FATAL_ERROR)
@@ -124,8 +122,7 @@ static short fmb_set_configuration(io_sAgent* ap)
   memset(&data, 0, sizeof(T_FMB_SET_CONFIGURATION_REQ));
 
   /* Iterate over the slaves.  */
-  for (slave_list = ap->racklist; slave_list != NULL;
-       slave_list = slave_list->next)
+  for (slave_list = ap->racklist; slave_list != NULL; slave_list = slave_list->next)
   {
     cid = slave_list->Class;
 
@@ -169,11 +166,10 @@ static short fmb_set_configuration(io_sAgent* ap)
 
   profi_snd_req_res(&sdb, &data, PB_FALSE);
 
-  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len,
-                        &result);
+  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len, &result);
 
-  if ((con_ind_sdb.service == FMB_SET_CONFIGURATION) &&
-      (con_ind_sdb.primitive == CON) && (con_ind_sdb.result == POS))
+  if ((con_ind_sdb.service == FMB_SET_CONFIGURATION) && (con_ind_sdb.primitive == CON) &&
+      (con_ind_sdb.result == POS))
   {
     return (PB_TRUE);
   }
@@ -204,19 +200,17 @@ static short dp_init_master()
   data.master_default_address = 0;
   data.master_class2 = PB_FALSE;
   data.lowest_slave_address = 2;
-  data.slave_io_address_mode =
-      DP_AAM_IO_BLOCKS; // only mode possible with Linux-driver DP_AAM_ARRAY;
+  data.slave_io_address_mode = DP_AAM_IO_BLOCKS; // only mode possible with Linux-driver DP_AAM_ARRAY;
   data.clear_outputs = PB_TRUE;
   data.auto_remote_services = DP_AUTO_REMOTE_SERVICES;
   data.cyclic_data_transfer = PB_TRUE;
 
   profi_snd_req_res(&sdb, &data, PB_FALSE);
 
-  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len,
-                        &result);
+  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len, &result);
 
-  if ((con_ind_sdb.service == DP_INIT_MASTER) &&
-      (con_ind_sdb.primitive == CON) && (con_ind_sdb.result == POS))
+  if ((con_ind_sdb.service == DP_INIT_MASTER) && (con_ind_sdb.primitive == CON) &&
+      (con_ind_sdb.result == POS))
   {
     return (PB_TRUE);
   }
@@ -303,11 +297,10 @@ static short dp_download_bus(pwr_sClass_Pb_Profiboard* op)
 
   profi_snd_req_res(&sdb, &data, PB_FALSE);
 
-  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len,
-                        &result);
+  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len, &result);
 
-  if ((con_ind_sdb.service == DP_DOWNLOAD_LOC) &&
-      (con_ind_sdb.primitive == CON) && (con_ind_sdb.result == POS))
+  if ((con_ind_sdb.service == DP_DOWNLOAD_LOC) && (con_ind_sdb.primitive == CON) &&
+      (con_ind_sdb.result == POS))
   {
     return (PB_TRUE);
   }
@@ -387,11 +380,10 @@ static short fmb_set_busparameter(pwr_sClass_Pb_Profiboard* op)
 
   profi_snd_req_res(&sdb, &bus_par_req, PB_FALSE);
 
-  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len,
-                        &result);
+  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len, &result);
 
-  if ((con_ind_sdb.service == FMB_SET_BUSPARAMETER) &&
-      (con_ind_sdb.primitive == CON) && (con_ind_sdb.result == POS))
+  if ((con_ind_sdb.service == FMB_SET_BUSPARAMETER) && (con_ind_sdb.primitive == CON) &&
+      (con_ind_sdb.result == POS))
   {
     return (PB_TRUE);
   }
@@ -440,11 +432,10 @@ static short dp_set_busparameter(pwr_sClass_Pb_Profiboard* op)
 
   con_ind_sdb.service = 0;
   while (con_ind_sdb.service != DP_SET_BUSPARAMETER)
-    try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len,
-                          &result);
+    try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len, &result);
 
-  if ((con_ind_sdb.service == DP_SET_BUSPARAMETER) &&
-      (con_ind_sdb.primitive == CON) && (con_ind_sdb.result == POS))
+  if ((con_ind_sdb.service == DP_SET_BUSPARAMETER) && (con_ind_sdb.primitive == CON) &&
+      (con_ind_sdb.result == POS))
   {
     return (PB_TRUE);
   }
@@ -507,11 +498,10 @@ possible return values:
   con_ind_sdb.service = 0;
 
   while (con_ind_sdb.service != FDLIF_SAP_ACTIVATE)
-    try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len,
-                          &result);
+    try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len, &result);
 
-  if ((con_ind_sdb.service == FDLIF_SAP_ACTIVATE) &&
-      (con_ind_sdb.primitive == CON) && (con_ind_sdb.result == POS))
+  if ((con_ind_sdb.service == FDLIF_SAP_ACTIVATE) && (con_ind_sdb.primitive == CON) &&
+      (con_ind_sdb.result == POS))
   {
     return (PB_TRUE);
   }
@@ -569,11 +559,10 @@ possible return values:
   con_ind_sdb.service = 0;
 
   while (con_ind_sdb.service != FDLIF_RSAP_ACTIVATE)
-    try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len,
-                          &result);
+    try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len, &result);
 
-  if ((con_ind_sdb.service == FDLIF_RSAP_ACTIVATE) &&
-      (con_ind_sdb.primitive == CON) && (con_ind_sdb.result == POS))
+  if ((con_ind_sdb.service == FDLIF_RSAP_ACTIVATE) && (con_ind_sdb.primitive == CON) &&
+      (con_ind_sdb.result == POS))
   {
     return (PB_TRUE);
   }
@@ -632,9 +621,8 @@ static pwr_tBoolean dp_get_slave_diag()
 /*----------------------------------------------------------------------------*\
   Get slave diagnostics
 \*----------------------------------------------------------------------------*/
-static void
-dp_get_slave_diag_con(T_DP_GET_SLAVE_DIAG_CON* get_slave_diag_con_ptr,
-                      io_sRack* slave_list, char log)
+static void dp_get_slave_diag_con(T_DP_GET_SLAVE_DIAG_CON* get_slave_diag_con_ptr, io_sRack* slave_list,
+                                  char log)
 {
   T_DP_DIAG_DATA FAR* diag_data_ptr;
   char s[128];
@@ -654,20 +642,16 @@ dp_get_slave_diag_con(T_DP_GET_SLAVE_DIAG_CON* get_slave_diag_con_ptr,
         sp->StationStatus2 = diag_data_ptr->station_status_2;
         sp->StationStatus3 = diag_data_ptr->station_status_3;
 
-        sp->BytesOfDiag =
-            get_slave_diag_con_ptr->diag_data_len - DP_MIN_SLAVE_DIAG_LEN;
+        sp->BytesOfDiag = get_slave_diag_con_ptr->diag_data_len - DP_MIN_SLAVE_DIAG_LEN;
 
-        memcpy(
-            sp->Diag, diag_data_ptr + 1,
-            MIN(get_slave_diag_con_ptr->diag_data_len - DP_MIN_SLAVE_DIAG_LEN,
-                DP_MAX_EXT_DIAG_DATA_LEN));
+        memcpy(sp->Diag, diag_data_ptr + 1,
+               MIN(get_slave_diag_con_ptr->diag_data_len - DP_MIN_SLAVE_DIAG_LEN, DP_MAX_EXT_DIAG_DATA_LEN));
 
         /* Update slave status */
 
         if (!(sp->StationStatus1 & ~pwr_mPbStationStatus1Mask_ExternalDiag) &&
             !(sp->StationStatus2 &
-              ~(pwr_mPbStationStatus2Mask_Default |
-                pwr_mPbStationStatus2Mask_ResponseMonitoringOn)))
+              ~(pwr_mPbStationStatus2Mask_Default | pwr_mPbStationStatus2Mask_ResponseMonitoringOn)))
         {
           sp->Status = PB__NORMAL;
         }
@@ -676,10 +660,8 @@ dp_get_slave_diag_con(T_DP_GET_SLAVE_DIAG_CON* get_slave_diag_con_ptr,
           sp->Status = PB__NOCONN;
         }
         else if ((sp->StationStatus1 &
-                  (pwr_mPbStationStatus1Mask_ConfigFault |
-                   pwr_mPbStationStatus1Mask_ParamFault)) ||
-                 (sp->StationStatus2 &
-                  pwr_mPbStationStatus2Mask_NewParamsRequested))
+                  (pwr_mPbStationStatus1Mask_ConfigFault | pwr_mPbStationStatus1Mask_ParamFault)) ||
+                 (sp->StationStatus2 & pwr_mPbStationStatus2Mask_NewParamsRequested))
         {
           sp->Status = PB__CONFIGERR;
         }
@@ -700,14 +682,14 @@ dp_get_slave_diag_con(T_DP_GET_SLAVE_DIAG_CON* get_slave_diag_con_ptr,
 
     if (log)
     {
-      sprintf(
-          s, "Slave [%3hhu] [0x%04hX]: Status = 0x%02hhX 0x%02hhX 0x%02hhX, "
-             "Master = %3hhu, Ext = %u, Diags = %hu",
-          get_slave_diag_con_ptr->rem_add, swap16(diag_data_ptr->ident_number),
-          diag_data_ptr->station_status_1, diag_data_ptr->station_status_2,
-          diag_data_ptr->station_status_3, diag_data_ptr->master_add,
-          get_slave_diag_con_ptr->diag_data_len - DP_MIN_SLAVE_DIAG_LEN,
-          get_slave_diag_con_ptr->diag_entries);
+      sprintf(s,
+              "Slave [%3hhu] [0x%04hX]: Status = 0x%02hhX 0x%02hhX 0x%02hhX, "
+              "Master = %3hhu, Ext = %u, Diags = %hu",
+              get_slave_diag_con_ptr->rem_add, swap16(diag_data_ptr->ident_number),
+              diag_data_ptr->station_status_1, diag_data_ptr->station_status_2,
+              diag_data_ptr->station_status_3, diag_data_ptr->master_add,
+              get_slave_diag_con_ptr->diag_data_len - DP_MIN_SLAVE_DIAG_LEN,
+              get_slave_diag_con_ptr->diag_entries);
 
       errh_Info("PROFIBUS: DP slave diag - %s", s);
     }
@@ -715,9 +697,7 @@ dp_get_slave_diag_con(T_DP_GET_SLAVE_DIAG_CON* get_slave_diag_con_ptr,
   } /* diag_data_len */
 }
 
-static void fdlif_sda_sdn_srd_ind(INT8 invoke_id,
-                                  T_FDLIF_SDN_SDA_SRD_REQ* ind_ptr,
-                                  io_sRack* slave_list)
+static void fdlif_sda_sdn_srd_ind(INT8 invoke_id, T_FDLIF_SDN_SDA_SRD_REQ* ind_ptr, io_sRack* slave_list)
 
 /*-----------------------------------------------------------------------------
     FUNCTIONAL_DESCRIPTION
@@ -745,16 +725,15 @@ possible return values:
 
         if (sp->SAP_Nr == ind_ptr->ssap)
         {
-          io_sCard* card_list = slave_list->cardlist;          
+          io_sCard* card_list = slave_list->cardlist;
           io_sFDLCardLocal* local_card;
 
           if (card_list != NULL)
-          {            
+          {
             local_card = (io_sFDLCardLocal*)card_list->Local;
 
             if (local_card->input_area_size > 0)
-              memcpy(local_card->input_area, data_ptr,
-                     MIN(local_card->input_area_size, ind_ptr->length));
+              memcpy(local_card->input_area, data_ptr, MIN(local_card->input_area_size, ind_ptr->length));
           }
 
           break;
@@ -767,8 +746,7 @@ possible return values:
   return;
 }
 
-static void fdlif_srd_con(INT16 result, INT8 invoke_id,
-                          T_FDLIF_SRD_CNF* cnf_ptr, io_sRack* slave_list)
+static void fdlif_srd_con(INT16 result, INT8 invoke_id, T_FDLIF_SRD_CNF* cnf_ptr, io_sRack* slave_list)
 
 /*-----------------------------------------------------------------------------
     FUNCTIONAL_DESCRIPTION
@@ -814,13 +792,11 @@ possible return values:
           cp = (pwr_sClass_Pb_FDL_DataTransfer*)card_list->op;
           local_card = (io_sFDLCardLocal*)card_list->Local;
 
-          if ((local_card->invoke_id == invoke_id) &&
-              (cp->Type == pwr_ePbFDLDataTransferTypeEnum_FDLIF_SRD))
+          if ((local_card->invoke_id == invoke_id) && (cp->Type == pwr_ePbFDLDataTransferTypeEnum_FDLIF_SRD))
           {
             cp->Result = res;
             if (cnf_ptr->length > 0)
-              memcpy(local_card->input_area, data_ptr,
-                     MIN(local_card->input_area_size, cnf_ptr->length));
+              memcpy(local_card->input_area, data_ptr, MIN(local_card->input_area_size, cnf_ptr->length));
             break;
           }
           card_list = card_list->next;
@@ -836,8 +812,7 @@ possible return values:
   return;
 }
 
-static void fdlif_sda_sdn_con(INT8 invoke_id, INT16 result,
-                              T_FDLIF_ERROR* err_ptr, io_sRack* slave_list)
+static void fdlif_sda_sdn_con(INT8 invoke_id, INT16 result, T_FDLIF_ERROR* err_ptr, io_sRack* slave_list)
 {
   pwr_sClass_Pb_FDL_SAP* sp;
   USIGN8 res;
@@ -914,11 +889,10 @@ static pwr_tStatus start_download_seq(pwr_sClass_Pb_DP_Slave* op)
 
   profi_snd_req_res(&sdb, &ssrp, PB_FALSE);
 
-  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len,
-                        &result);
+  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len, &result);
 
-  if ((con_ind_sdb.service == DP_START_SEQ_LOC) &&
-      (con_ind_sdb.primitive == CON) && (con_ind_sdb.result == POS))
+  if ((con_ind_sdb.service == DP_START_SEQ_LOC) && (con_ind_sdb.primitive == CON) &&
+      (con_ind_sdb.result == POS))
   {
     op->Status = PB__NOCONN;
     return (PB_TRUE);
@@ -954,11 +928,10 @@ static pwr_tStatus end_download_seq(pwr_sClass_Pb_DP_Slave* op)
 
   profi_snd_req_res(&sdb, &esrp, PB_FALSE);
 
-  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len,
-                        &result);
+  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len, &result);
 
-  if ((con_ind_sdb.service == DP_END_SEQ_LOC) &&
-      (con_ind_sdb.primitive == CON) && (con_ind_sdb.result == POS))
+  if ((con_ind_sdb.service == DP_END_SEQ_LOC) && (con_ind_sdb.primitive == CON) &&
+      (con_ind_sdb.result == POS))
   {
     op->Status = PB__NOCONN;
     return (PB_TRUE);
@@ -999,8 +972,7 @@ static pwr_tStatus dp_download_slave(pwr_sClass_Pb_DP_Slave* op)
 
   op->Status = PB__NOTINIT;
 
-  download_data_size = sizeof(prm_head) + sizeof(prm_data) +
-                       op->PrmUserDataLen + op->ConfigDataLen +
+  download_data_size = sizeof(prm_head) + sizeof(prm_data) + op->PrmUserDataLen + op->ConfigDataLen +
                        sizeof(aat_data) + sizeof(user_data);
 
   data_len = download_data_size;
@@ -1073,8 +1045,7 @@ static pwr_tStatus dp_download_slave(pwr_sClass_Pb_DP_Slave* op)
 
     profi_snd_req_res(&sdb, &slave_data, PB_FALSE);
 
-    try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len,
-                          &result);
+    try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len, &result);
 
     if (con_ind_sdb.service == DP_DOWNLOAD_LOC)
     {
@@ -1095,8 +1066,7 @@ static pwr_tStatus dp_download_slave(pwr_sClass_Pb_DP_Slave* op)
       download_data_size -= DP_MAX_DOWNLOAD_DATA_LEN;
       slave_data.drp.add_offset += DP_MAX_DOWNLOAD_DATA_LEN;
       send_buf += DP_MAX_DOWNLOAD_DATA_LEN;
-      memcpy(slave_data.param, send_buf,
-             MIN(download_data_size, DP_MAX_DOWNLOAD_DATA_LEN));
+      memcpy(slave_data.param, send_buf, MIN(download_data_size, DP_MAX_DOWNLOAD_DATA_LEN));
     }
     else
       download_data_size = 0;
@@ -1147,16 +1117,14 @@ static pwr_tStatus dp_io_offsets(pwr_sClass_Pb_DP_Slave* op)
   if (result != E_OK)
     return (result);
 
-  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len,
-                        &result);
+  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len, &result);
 
   get_slave_param_con_ptr = (T_DP_GET_SLAVE_PARAM_CON FAR*)con_ind_buffer;
 
-  if ((con_ind_sdb.service == DP_GET_SLAVE_PARAM) &&
-      (con_ind_sdb.primitive == CON) && (con_ind_sdb.result == POS))
+  if ((con_ind_sdb.service == DP_GET_SLAVE_PARAM) && (con_ind_sdb.primitive == CON) &&
+      (con_ind_sdb.result == POS))
   {
-    slave_info_ptr =
-        (T_DP_SLAVE_PARAM_SLAVE_INFO FAR*)(get_slave_param_con_ptr + 1);
+    slave_info_ptr = (T_DP_SLAVE_PARAM_SLAVE_INFO FAR*)(get_slave_param_con_ptr + 1);
 
     op->BytesOfInput = slave_info_ptr->number_inputs;
     op->BytesOfOutput = slave_info_ptr->number_outputs;
@@ -1219,7 +1187,7 @@ void* handle_events(void* ptr)
           {
             switch (con_ind_sdb.service)
             {
-            /*--------------------------------------------------------------*/
+              /*--------------------------------------------------------------*/
 
             case DP_ACT_PARAM_LOC:
             {
@@ -1253,15 +1221,13 @@ void* handle_events(void* ptr)
               break;
             } /* case DP_ACT_PARAM_LOC */
 
-            /*--------------------------------------------------------------*/
+              /*--------------------------------------------------------------*/
 
             case DP_GET_SLAVE_DIAG:
             {
-              get_slave_diag_con_ptr =
-                  (T_DP_GET_SLAVE_DIAG_CON FAR*)con_ind_buffer;
+              get_slave_diag_con_ptr = (T_DP_GET_SLAVE_DIAG_CON FAR*)con_ind_buffer;
 
-              dp_get_slave_diag_con(get_slave_diag_con_ptr, ap->racklist,
-                                    op->Diag[1]);
+              dp_get_slave_diag_con(get_slave_diag_con_ptr, ap->racklist, op->Diag[1]);
               op->Diag[2]++;
 
               local->slave_diag_requested = op->Diag[3] = PB_FALSE;
@@ -1279,28 +1245,28 @@ void* handle_events(void* ptr)
               break;
             } /* case DP_GET_SLAVE_DIAG */
 
-            /*--------------------------------------------------------------*/
+              /*--------------------------------------------------------------*/
 
             default:
             {
               break;
             } /* deafult service */
             } /* switch */
-          }   /* if POS */
+          } /* if POS */
           else
           {
             op->Status = PB__NOTINIT;
             errh_Error("PROFIBUS: DP Master %s - %x neg con rec", ap->Name,
                        *((unsigned short*)con_ind_buffer));
           } /* else POS */
-        }   /* if CON */
+        } /* if CON */
         else if (con_ind_sdb.primitive == IND)
         {
           if (con_ind_sdb.result == POS)
           {
             switch (con_ind_sdb.service)
             {
-            /*--------------------------------------------------------------*/
+              /*--------------------------------------------------------------*/
 
             case DP_ACT_PARAM_LOC:
             {
@@ -1347,15 +1313,13 @@ void* handle_events(void* ptr)
               break;
             } /* case DP_ACT_PARAM_LOC */
 
-            /*--------------------------------------------------------------*/
+              /*--------------------------------------------------------------*/
 
             case DP_GET_SLAVE_DIAG:
             {
-              get_slave_diag_con_ptr =
-                  (T_DP_GET_SLAVE_DIAG_CON FAR*)con_ind_buffer;
+              get_slave_diag_con_ptr = (T_DP_GET_SLAVE_DIAG_CON FAR*)con_ind_buffer;
 
-              dp_get_slave_diag_con(get_slave_diag_con_ptr, ap->racklist,
-                                    op->Diag[1]);
+              dp_get_slave_diag_con(get_slave_diag_con_ptr, ap->racklist, op->Diag[1]);
 
               op->Diag[0]++;
 
@@ -1364,8 +1328,7 @@ void* handle_events(void* ptr)
                 errh_Warning("PROFIBUS: Diagnostic circular buffer owerflow");
               }
 
-              if ((get_slave_diag_con_ptr->diag_entries) &&
-                  (!local->slave_diag_requested))
+              if ((get_slave_diag_con_ptr->diag_entries) && (!local->slave_diag_requested))
               {
                 if (op->Status == PB__NORMAL)
                 {
@@ -1387,21 +1350,21 @@ void* handle_events(void* ptr)
               break;
             } /* case DP_GET_SLAVE_DIAG */
 
-            /*--------------------------------------------------------------*/
+              /*--------------------------------------------------------------*/
 
             default:
             {
               break;
             } /* deafult service */
             } /* switch */
-          }   /* if POS */
+          } /* if POS */
           else
           {
             op->Status = PB__NOTINIT;
             errh_Error("PROPFIBUS: DP Master %s - %x neg ind rec", ap->Name,
                        *((unsigned short*)con_ind_buffer));
           } /* else POS */
-        }   /* if IND */
+        } /* if IND */
         break;
       }
 
@@ -1453,8 +1416,7 @@ void* handle_events(void* ptr)
         default:
         {
           printf("\nnot supported FMB service received\n");
-          printf("service: %d primitive: %d\n", con_ind_sdb.service,
-                 con_ind_sdb.primitive);
+          printf("service: %d primitive: %d\n", con_ind_sdb.service, con_ind_sdb.primitive);
           break;
         } /* deafult service */
         } /* switch */
@@ -1479,57 +1441,53 @@ void* handle_events(void* ptr)
         case FDLIF_SDN:
           if (con_ind_sdb.primitive == IND)
           {
-            fdlif_sda_sdn_srd_ind(con_ind_sdb.invoke_id,
-                                  (T_FDLIF_SDN_SDA_SRD_REQ FAR*)con_ind_buffer,
+            fdlif_sda_sdn_srd_ind(con_ind_sdb.invoke_id, (T_FDLIF_SDN_SDA_SRD_REQ FAR*)con_ind_buffer,
                                   ap->racklist);
           }
           else
           {
-            fdlif_sda_sdn_con(con_ind_sdb.invoke_id, con_ind_sdb.result,
-                              (T_FDLIF_ERROR*)con_ind_buffer, ap->racklist);
+            fdlif_sda_sdn_con(con_ind_sdb.invoke_id, con_ind_sdb.result, (T_FDLIF_ERROR*)con_ind_buffer,
+                              ap->racklist);
           }
           break;
 
         case FDLIF_SDA:
           if (con_ind_sdb.primitive == IND)
           {
-            fdlif_sda_sdn_srd_ind(con_ind_sdb.invoke_id,
-                                  (T_FDLIF_SDN_SDA_SRD_REQ FAR*)con_ind_buffer,
+            fdlif_sda_sdn_srd_ind(con_ind_sdb.invoke_id, (T_FDLIF_SDN_SDA_SRD_REQ FAR*)con_ind_buffer,
                                   ap->racklist);
           }
           else
           {
-            fdlif_sda_sdn_con(con_ind_sdb.invoke_id, con_ind_sdb.result,
-                              (T_FDLIF_ERROR*)con_ind_buffer, ap->racklist);
+            fdlif_sda_sdn_con(con_ind_sdb.invoke_id, con_ind_sdb.result, (T_FDLIF_ERROR*)con_ind_buffer,
+                              ap->racklist);
           }
           break;
 
         case FDLIF_SRD:
           if (con_ind_sdb.primitive == IND)
           {
-            fdlif_sda_sdn_srd_ind(con_ind_sdb.invoke_id,
-                                  (T_FDLIF_SDN_SDA_SRD_REQ FAR*)con_ind_buffer,
+            fdlif_sda_sdn_srd_ind(con_ind_sdb.invoke_id, (T_FDLIF_SDN_SDA_SRD_REQ FAR*)con_ind_buffer,
                                   ap->racklist);
           }
           else
           {
-            fdlif_srd_con(con_ind_sdb.result, con_ind_sdb.invoke_id,
-                          (T_FDLIF_SRD_CNF*)con_ind_buffer, ap->racklist);
+            fdlif_srd_con(con_ind_sdb.result, con_ind_sdb.invoke_id, (T_FDLIF_SRD_CNF*)con_ind_buffer,
+                          ap->racklist);
           }
           break;
 
         default:
           printf("\nnot supported FDLIF service received\n");
-          printf("service: %d primitive: %d\n", con_ind_sdb.service,
-                 con_ind_sdb.primitive);
+          printf("service: %d primitive: %d\n", con_ind_sdb.service, con_ind_sdb.primitive);
         }
         break;
       }
 
       default:
         printf("\nnot supported layer service received\n");
-        printf("layer: %d service: %d primitive: %d\n", con_ind_sdb.layer,
-               con_ind_sdb.service, con_ind_sdb.primitive);
+        printf("layer: %d service: %d primitive: %d\n", con_ind_sdb.layer, con_ind_sdb.service,
+               con_ind_sdb.primitive);
         break;
       }
     }
@@ -1605,27 +1563,23 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
   {
     /* Can't open driver */
     op->Status = PB__INITFAIL;
-    errh_Error("PROFIBUS: ERROR config DP Master %s - %s", ap->Name,
-               "open device");
+    errh_Error("PROFIBUS: ERROR config DP Master %s - %s", ap->Name, "open device");
     ctx->Node->EmergBreakTrue = 1;
     return IO__ERRDEVICE;
   }
 
   /* If this is not the Profibus I/O process, return */
 
-  if ((op->Process & io_mProcess_Profibus) &&
-      (ctx->Process != io_mProcess_Profibus))
+  if ((op->Process & io_mProcess_Profibus) && (ctx->Process != io_mProcess_Profibus))
   {
     op->Status = PB__NOTINIT;
-    errh_Info("PROFIBUS: Init template I/O agent for DP Master %s, %d",
-              ap->Name, ctx->Process);
+    errh_Info("PROFIBUS: Init template I/O agent for DP Master %s, %d", ap->Name, ctx->Process);
     return IO__SUCCESS;
   }
 
   if (ctx->Node->Restarts > 0)
   {
-    errh_Info("PROFIBUS: Warm restart - Skipping config of DP Master %s",
-              ap->Name);
+    errh_Info("PROFIBUS: Warm restart - Skipping config of DP Master %s", ap->Name);
     op->Status = PB__NORMAL;
     //    return IO__SUCCESS;
   }
@@ -1649,8 +1603,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
         if (!sts)
         {
           op->Status = PB__INITFAIL;
-          errh_Error("PROFIBUS: ERROR config DP Master %s - %s", ap->Name,
-                     "fmb set configuration");
+          errh_Error("PROFIBUS: ERROR config DP Master %s - %s", ap->Name, "fmb set configuration");
           retry++;
           if (retry < 2)
           {
@@ -1668,8 +1621,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
           if (!sts)
           {
             op->Status = PB__INITFAIL;
-            errh_Error("PROFIBUS: ERROR config DP Master %s - %s", ap->Name,
-                       "dp init master");
+            errh_Error("PROFIBUS: ERROR config DP Master %s - %s", ap->Name, "dp init master");
             return IO__ERRINIDEVICE;
           }
         }
@@ -1682,8 +1634,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
           if (!sts)
           {
             op->Status = PB__INITFAIL;
-            errh_Error("PROFIBUS: ERROR config DP Master %s - %s", ap->Name,
-                       "dp download bus");
+            errh_Error("PROFIBUS: ERROR config DP Master %s - %s", ap->Name, "dp download bus");
             return IO__ERRINIDEVICE;
           }
         }
@@ -1693,8 +1644,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
           if (!sts)
           {
             op->Status = PB__INITFAIL;
-            errh_Error("PROFIBUS: ERROR config FDL Master %s - %s", ap->Name,
-                       "fmb set busparam");
+            errh_Error("PROFIBUS: ERROR config FDL Master %s - %s", ap->Name, "fmb set busparam");
             return IO__ERRINIDEVICE;
           }
           else
@@ -1706,16 +1656,14 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
           if (!sts)
           {
             op->Status = PB__INITFAIL;
-            errh_Error("PROFIBUS: ERROR config Master %s - %s", ap->Name,
-                       "fmb set busparam");
+            errh_Error("PROFIBUS: ERROR config Master %s - %s", ap->Name, "fmb set busparam");
             return IO__ERRINIDEVICE;
           }
           sts = dp_set_busparameter(op);
           if (!sts)
           {
             op->Status = PB__INITFAIL;
-            errh_Error("PROFIBUS: ERROR config DP Master %s - %s", ap->Name,
-                       "dp set busparam");
+            errh_Error("PROFIBUS: ERROR config DP Master %s - %s", ap->Name, "dp set busparam");
             return IO__ERRINIDEVICE;
           }
         }
@@ -1736,8 +1684,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
             ;
 
           status = gdh_ObjidToPointer(slave_objid, (pwr_tAddress*)&sop);
-          status = gdh_ObjidToName(slave_objid, (char*)&name, sizeof(name),
-                                   cdh_mNName);
+          status = gdh_ObjidToName(slave_objid, (char*)&name, sizeof(name), cdh_mNName);
 
           if (cid == pwr_cClass_Pb_DP_Slave)
           {
@@ -1803,8 +1750,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
           if (sts != E_OK)
           {
             op->Status = PB__INITFAIL;
-            errh_Error("PROFIBUS: ERROR config DP Master %s - %s", ap->Name,
-                       "act param loc to STOPPED");
+            errh_Error("PROFIBUS: ERROR config DP Master %s - %s", ap->Name, "act param loc to STOPPED");
             return IO__ERRINIDEVICE;
           }
         }
@@ -1812,7 +1758,7 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
         ok = TRUE;
 
       } /* End - While !ok */
-    }   /* End - Initialization only if not restart   */
+    } /* End - Initialization only if not restart   */
     /*    else {
            Move to STOP mode, this will fix the DPRAM layout
 
@@ -1836,14 +1782,14 @@ static pwr_tStatus IoAgentInit(io_tCtx ctx, io_sAgent* ap)
 \*----------------------------------------------------------------------------*/
 static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
 {
-  io_sAgentLocal* local;  
+  io_sAgentLocal* local;
 
   pwr_sClass_Pb_Profiboard* mp;
   pwr_sClass_Pb_DP_Slave* sp;
   pwr_tUInt16 data_len;
   io_sRack* slave_list;
 
-  local = (io_sAgentLocal*)ap->Local;  
+  local = (io_sAgentLocal*)ap->Local;
 
   /* Activate supervision thread, first cycle */
 
@@ -1867,8 +1813,7 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
   pthread_mutex_lock(&local->mutex);
 
   /* Iterate over the slaves.  */
-  for (slave_list = ap->racklist; slave_list != NULL;
-       slave_list = slave_list->next)
+  for (slave_list = ap->racklist; slave_list != NULL; slave_list = slave_list->next)
   {
     if (((io_sRackLocal*)slave_list->Local)->dp)
     {
@@ -1876,12 +1821,11 @@ static pwr_tStatus IoAgentRead(io_tCtx ctx, io_sAgent* ap)
       mp = (pwr_sClass_Pb_Profiboard*)ap->op;
 
       /* Read process data.  */
-      if (sp->Status == PB__NORMAL && mp->Status == PB__NORMAL &&
-          sp->DisableSlave != 1 && mp->DisableBus != 1)
+      if (sp->Status == PB__NORMAL && mp->Status == PB__NORMAL && sp->DisableSlave != 1 &&
+          mp->DisableBus != 1)
       {
         data_len = sp->BytesOfInput;
-        profi_get_data(ID_DP_SLAVE_IO_IMAGE, sp->OffsetInputs, &data_len,
-                             &sp->Inputs);
+        profi_get_data(ID_DP_SLAVE_IO_IMAGE, sp->OffsetInputs, &data_len, &sp->Inputs);
       }
     }
   }
@@ -1908,8 +1852,7 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
   pthread_mutex_lock(&local->mutex);
 
   /* Iterate over the slaves.  */
-  for (slave_list = ap->racklist; slave_list != NULL;
-       slave_list = slave_list->next)
+  for (slave_list = ap->racklist; slave_list != NULL; slave_list = slave_list->next)
   {
     if (((io_sRackLocal*)slave_list->Local)->dp)
     {
@@ -1918,14 +1861,12 @@ static pwr_tStatus IoAgentWrite(io_tCtx ctx, io_sAgent* ap)
 
       // Write the whole I/O output area from local area
 
-      if ((sp->Status == PB__NORMAL || sp->Status == PB__NOCONN) &&
-          mp->Status == PB__NORMAL && (sp->DisableSlave != 1) &&
-          (mp->DisableBus != 1))
+      if ((sp->Status == PB__NORMAL || sp->Status == PB__NOCONN) && mp->Status == PB__NORMAL &&
+          (sp->DisableSlave != 1) && (mp->DisableBus != 1))
       {
         if (sp->BytesOfOutput > 0)
         {
-          sts = profi_set_data(ID_DP_SLAVE_IO_IMAGE, sp->OffsetOutputs,
-                               sp->BytesOfOutput, &sp->Outputs);
+          sts = profi_set_data(ID_DP_SLAVE_IO_IMAGE, sp->OffsetOutputs, sp->BytesOfOutput, &sp->Outputs);
 
           if (sts != E_OK)
             sp->ErrorCount++;
@@ -1974,11 +1915,10 @@ static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap)
 
   profi_snd_req_res(&sdb, &sdb, PB_FALSE);
 
-  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len,
-                        &result);
+  try_profi_rcv_con_ind(&con_ind_sdb, con_ind_buffer, &con_ind_buffer_len, &result);
 
-  if ((con_ind_sdb.service == DP_EXIT_MASTER) &&
-      (con_ind_sdb.primitive == CON) && (con_ind_sdb.result == POS))
+  if ((con_ind_sdb.service == DP_EXIT_MASTER) && (con_ind_sdb.primitive == CON) &&
+      (con_ind_sdb.result == POS))
   {
     sts = PB_TRUE;
   }
@@ -2013,7 +1953,8 @@ static pwr_tStatus IoAgentClose(io_tCtx ctx, io_sAgent* ap)
 
 static pwr_tStatus IoAgentSwap(io_tCtx ctx, io_sAgent* ap, io_eEvent event)
 {
-  switch (event) {
+  switch (event)
+  {
   case io_eEvent_EmergencyBreak:
     IoAgentClose(ctx, ap);
     break;
@@ -2021,7 +1962,6 @@ static pwr_tStatus IoAgentSwap(io_tCtx ctx, io_sAgent* ap, io_eEvent event)
   default:
     break;
   }
-
 
   return IO__SUCCESS;
 }
@@ -2031,6 +1971,5 @@ static pwr_tStatus IoAgentSwap(io_tCtx ctx, io_sAgent* ap, io_eEvent event)
 \*----------------------------------------------------------------------------*/
 
 pwr_dExport pwr_BindIoMethods(Pb_Profiboard) = {
-    pwr_BindIoMethod(IoAgentInit), pwr_BindIoMethod(IoAgentRead),
-    pwr_BindIoMethod(IoAgentWrite), pwr_BindIoMethod(IoAgentClose),
-    pwr_BindIoMethod(IoAgentSwap), pwr_NullMethod};
+    pwr_BindIoMethod(IoAgentInit),  pwr_BindIoMethod(IoAgentRead), pwr_BindIoMethod(IoAgentWrite),
+    pwr_BindIoMethod(IoAgentClose), pwr_BindIoMethod(IoAgentSwap), pwr_NullMethod};

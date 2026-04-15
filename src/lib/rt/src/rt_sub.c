@@ -52,16 +52,17 @@ void sub_UnlinkObject(gdb_sObject* op)
   sub_sServer* sp;
   pool_sQlink* sl;
 
-  for (sl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->subs_lh);
-       sl != &gdbroot->db->subs_lh; sl = pool_Qsucc(NULL, gdbroot->pool, sl)) {
+  for (sl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->subs_lh); sl != &gdbroot->db->subs_lh;
+       sl = pool_Qsucc(NULL, gdbroot->pool, sl))
+  {
     sp = pool_Qitem(sl, sub_sServer, subs_ll);
-    if (cdh_ObjidIsEqual(sp->aref.Objid, op->g.oid)) {
+    if (cdh_ObjidIsEqual(sp->aref.Objid, op->g.oid))
+    {
       sp->data = pool_cNRef;
       sp->sts = GDH__NOSUCHOBJ;
 
-      if (op->u.n.subcount
-          > 0) /* Subscriptions on invalid offset will allocate buffer without
-                  increasing count */
+      if (op->u.n.subcount > 0) /* Subscriptions on invalid offset will allocate buffer without
+                                   increasing count */
         op->u.n.subcount--;
     }
   }

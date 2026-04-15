@@ -83,26 +83,19 @@ Usage: wb [-a][-q][-s][-c][-p] [-l language] [username] [password] [volume]\n\
 \n");
 }
 
-Wb::Wb() : announce(0), appl_count(0)
-{
-  CoWow::SetIconType(wow_eIconType_Wb);
-}
+Wb::Wb() : announce(0), appl_count(0) { CoWow::SetIconType(wow_eIconType_Wb); }
 
-Wb::~Wb()
-{
-}
+Wb::~Wb() {}
 
-Wtt* Wb::wtt_new(const char* name, const char* iconname, ldh_tWBContext wbctx,
-    pwr_tVolumeId volid, ldh_tVolume volctx, wnav_sStartMenu* root_menu,
-    pwr_tStatus* status)
+Wtt* Wb::wtt_new(const char* name, const char* iconname, ldh_tWBContext wbctx, pwr_tVolumeId volid,
+                 ldh_tVolume volctx, wnav_sStartMenu* root_menu, pwr_tStatus* status)
 {
   return 0;
 }
 
-WVsel* Wb::vsel_new(pwr_tStatus* status, const char* name, ldh_tWBContext wbctx,
-    char* volumename, int (*bc_success)(void*, pwr_tVolumeId*, int),
-    void (*bc_cancel)(), int (*bc_time_to_exit)(void*), int show_volumes,
-    wb_eType wb_type)
+WVsel* Wb::vsel_new(pwr_tStatus* status, const char* name, ldh_tWBContext wbctx, char* volumename,
+                    int (*bc_success)(void*, pwr_tVolumeId*, int), void (*bc_cancel)(),
+                    int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wb_type)
 {
   return 0;
 }
@@ -110,17 +103,21 @@ WVsel* Wb::vsel_new(pwr_tStatus* status, const char* name, ldh_tWBContext wbctx,
 void Wb::wttlist_add(pwr_tStatus* sts, Wtt* wtt, pwr_tVid vid)
 {
   wttlist_iterator it = wttlist.find(vid);
-  if (it == wttlist.end()) {
+  if (it == wttlist.end())
+  {
     wttlist[vid] = wtt;
     *sts = LDH__SUCCESS;
-  } else
+  }
+  else
     *sts = LDH__VOLIDALREXI;
 }
 
 void Wb::wttlist_remove(pwr_tStatus* sts, Wtt* wtt)
 {
-  for (wttlist_iterator it = wttlist.begin(); it != wttlist.end(); it++) {
-    if (it->second == wtt) {
+  for (wttlist_iterator it = wttlist.begin(); it != wttlist.end(); it++)
+  {
+    if (it->second == wtt)
+    {
       wttlist.erase(it);
       *sts = LDH__SUCCESS;
       return;
@@ -132,7 +129,8 @@ void Wb::wttlist_remove(pwr_tStatus* sts, Wtt* wtt)
 void Wb::wttlist_find(pwr_tStatus* sts, pwr_tVid vid, Wtt** wtt)
 {
   wttlist_iterator it = wttlist.find(vid);
-  if (it == wttlist.end()) {
+  if (it == wttlist.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return;
   }
@@ -144,7 +142,8 @@ int Wb::psts(unsigned long int sts, FILE* logfile)
 {
   char msg[200];
 
-  if (!(sts & 1)) {
+  if (!(sts & 1))
+  {
     msg_GetMsg(sts, msg, sizeof(msg));
 
     if (logfile != NULL)
@@ -164,17 +163,21 @@ void Wb::find_wnav_cb(void* ctx, pwr_tOid oid)
   Wtt* wtt;
 
   wb->wttlist_find(&sts, oid.vid, &wtt);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = wtt->find(oid);
     wtt->pop();
-  } else {
+  }
+  else
+  {
     utl_get_projectname(projectname);
     strcpy(title, CoLogin::username());
     strcat(title, " on ");
     strcat(title, projectname);
 
     wtt = wb->wtt_new(title, "Navigator", wb->wbctx, oid.vid, 0, 0, &sts);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       wb->appl_count++;
       wtt->close_cb = Wb::wtt_close;
       wtt->open_volume_cb = Wb::wtt_open_volume;
@@ -194,16 +197,20 @@ void Wb::find_plc_cb(void* ctx, pwr_tOid oid)
   Wtt* wtt;
 
   wb->wttlist_find(&sts, oid.vid, &wtt);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     sts = wtt->find_plc(oid);
-  } else {
+  }
+  else
+  {
     utl_get_projectname(projectname);
     strcpy(title, CoLogin::username());
     strcat(title, " on ");
     strcat(title, projectname);
 
     wtt = wb->wtt_new(title, "Navigator", wb->wbctx, oid.vid, 0, 0, &sts);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       wb->appl_count++;
       wtt->close_cb = Wb::wtt_close;
       wtt->open_volume_cb = Wb::wtt_open_volume;
@@ -220,11 +227,12 @@ void Wb::find_ge_cb(void* ctx, char* object, void* utility)
   pwr_tStatus sts;
   Wtt* wtt;
 
-  for (wttlist_iterator it = wb->wttlist.begin(); it != wb->wttlist.end();
-       it++) {
+  for (wttlist_iterator it = wb->wttlist.begin(); it != wb->wttlist.end(); it++)
+  {
     wtt = it->second;
     sts = wtt->appl.find(wb_eUtility_Ge, utility);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       ((Ge*)utility)->select_object(object);
       ((Ge*)utility)->pop();
       break;
@@ -247,16 +255,19 @@ void Wb::login_success(void* ctx)
 
   /* Successful login, start the volume selection */
 
-  if (CoLogin::privilege() & pwr_mPrv_DevRead) {
+  if (CoLogin::privilege() & pwr_mPrv_DevRead)
+  {
     utl_get_systemname(systemname, systemgroup);
     strcpy(title, "PwR Navigator: ");
     strcat(title, CoLogin::username());
     strcat(title, " on ");
     strcat(title, systemname);
     wb->appl_count++;
-    wb->vsel_new(&sts, "PwR Volumes", wb->wbctx, NULL, &Wb::vsel_success,
-        &Wb::vsel_cancel, &Wb::time_to_exit, 0, wb_eType_Volume);
-  } else {
+    wb->vsel_new(&sts, "PwR Volumes", wb->wbctx, NULL, &Wb::vsel_success, &Wb::vsel_cancel, &Wb::time_to_exit,
+                 0, wb_eType_Volume);
+  }
+  else
+  {
     printf("** Not authorized for development\n");
     exit(LOGIN__NOPRIV);
   }
@@ -269,7 +280,8 @@ void Wb::wtt_close(void* wttctx)
 
   wb->wttlist_remove(&sts, (Wtt*)wttctx);
   wb->appl_count--;
-  if (wb->appl_count == 0) {
+  if (wb->appl_count == 0)
+  {
     exit(0);
   }
 }
@@ -283,8 +295,7 @@ int Wb::time_to_exit(void* wttctx)
   return 0;
 }
 
-void Wb::wtt_open_volume(void* wttctx, wb_eType type, const char* filename,
-    wow_eFileSelType file_type)
+void Wb::wtt_open_volume(void* wttctx, wb_eType type, const char* filename, wow_eFileSelType file_type)
 {
   Wb* wb = main_wb;
   char title[80];
@@ -292,27 +303,32 @@ void Wb::wtt_open_volume(void* wttctx, wb_eType type, const char* filename,
   char systemgroup[80];
   pwr_tStatus sts;
 
-  if (CoLogin::privilege() & pwr_mPrv_DevRead
-      || CoLogin::privilege() & pwr_mPrv_Administrator) {
-    if (!filename) {
+  if (CoLogin::privilege() & pwr_mPrv_DevRead || CoLogin::privilege() & pwr_mPrv_Administrator)
+  {
+    if (!filename)
+    {
       utl_get_systemname(systemname, systemgroup);
       strcpy(title, "PwR Navigator: ");
       strcat(title, CoLogin::username());
       strcat(title, " on ");
       strcat(title, systemname);
       wb->appl_count++;
-      wb->vsel_new(&sts, "PwR Volumes", wb->wbctx, NULL, &Wb::vsel_success,
-          &Wb::vsel_cancel, &Wb::time_to_exit, 1, type);
-    } else {
+      wb->vsel_new(&sts, "PwR Volumes", wb->wbctx, NULL, &Wb::vsel_success, &Wb::vsel_cancel,
+                   &Wb::time_to_exit, 1, type);
+    }
+    else
+    {
       // Open the file
-      if (file_type == wow_eFileSelType_Wbl) {
+      if (file_type == wow_eFileSelType_Wbl)
+      {
         printf("Wb opening wb_load-file %s...\n", filename);
 
         // Load volume as extern
         wb_erep* erep = (wb_erep*)(*(wb_env*)wb->wbctx);
         wb_vrepwbl* vrep = new wb_vrepwbl(erep);
         sts = vrep->load(filename);
-        if (vrep->vid() == 0) {
+        if (vrep->vid() == 0)
+        {
           delete vrep;
           return;
         }
@@ -322,24 +338,29 @@ void Wb::wtt_open_volume(void* wttctx, wb_eType type, const char* filename,
         wb_volume* vol = new wb_volume(vrep);
         pwr_tVid volume = vrep->vid();
 
-        Wtt* wtt = wb->wtt_new(
-            filename, "Navigator", wb->wbctx, volume, vol, 0, &sts);
-        if (ODD(sts)) {
+        Wtt* wtt = wb->wtt_new(filename, "Navigator", wb->wbctx, volume, vol, 0, &sts);
+        if (ODD(sts))
+        {
           wb->appl_count++;
           wtt->close_cb = Wb::wtt_close;
           wtt->open_volume_cb = Wb::wtt_open_volume;
           wtt->time_to_exit_cb = Wb::time_to_exit;
         }
-      } else if (file_type == wow_eFileSelType_Dbs) {
+      }
+      else if (file_type == wow_eFileSelType_Dbs)
+      {
         printf("Wb opening loadfile %s...\n", filename);
 
         // Load volume as extern
         wb_erep* erep = (wb_erep*)(*(wb_env*)wb->wbctx);
         wb_vrepdbs* vrep = new wb_vrepdbs(erep, filename);
-        try {
+        try
+        {
           vrep->load();
           erep->addExtern(&sts, vrep);
-        } catch (wb_error& e) {
+        }
+        catch (wb_error& e)
+        {
           std::cout << "** Error opening volume, " << e.what() << '\n';
           return;
         }
@@ -348,19 +369,22 @@ void Wb::wtt_open_volume(void* wttctx, wb_eType type, const char* filename,
         wb_volume* vol = new wb_volume(vrep);
         pwr_tVid volume = vrep->vid();
 
-        Wtt* wtt = wb->wtt_new(
-            filename, "Navigator", wb->wbctx, volume, vol, 0, &sts);
-        if (ODD(sts)) {
+        Wtt* wtt = wb->wtt_new(filename, "Navigator", wb->wbctx, volume, vol, 0, &sts);
+        if (ODD(sts))
+        {
           wb->appl_count++;
           wtt->close_cb = Wb::wtt_close;
           wtt->open_volume_cb = Wb::wtt_open_volume;
           wtt->time_to_exit_cb = Wb::time_to_exit;
         }
-      } else if (file_type == wow_eFileSelType_WblClass) {
+      }
+      else if (file_type == wow_eFileSelType_WblClass)
+      {
         printf("Wb opening wb_load-file %s...\n", filename);
 
         char uname[80];
-        if (wb_dblock::is_locked((char*)filename, uname)) {
+        if (wb_dblock::is_locked((char*)filename, uname))
+        {
           char msg[120];
 
           sprintf(msg, "Classvolume %s is locked by user %s", filename, uname);
@@ -370,9 +394,10 @@ void Wb::wtt_open_volume(void* wttctx, wb_eType type, const char* filename,
             return;
 
           CoWow* wow = MsgWindow::get_wow();
-          int res = wow->CreateModalDialog("Classvolume Locked", msg, "Cancel",
-              "Remove lock", 0, "$pwr_exe/wtt_padlock.png");
-          switch (res) {
+          int res = wow->CreateModalDialog("Classvolume Locked", msg, "Cancel", "Remove lock", 0,
+                                           "$pwr_exe/wtt_padlock.png");
+          switch (res)
+          {
           case wow_eModalDialogReturn_Button1:
           case wow_eModalDialogReturn_Deleted:
             return;
@@ -390,11 +415,11 @@ void Wb::wtt_open_volume(void* wttctx, wb_eType type, const char* filename,
         wb_erep* erep = (wb_erep*)(*(wb_env*)wb->wbctx);
         wb_vrepmem* mem = new wb_vrepmem(erep, 0);
         mem->loadWbl(filename, &sts);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           delete mem;
           if (sts == LDH__OTHERSESS)
-            MsgWindow::message(
-                'E', "Other class volume is open", msgw_ePop_Yes);
+            MsgWindow::message('E', "Other class volume is open", msgw_ePop_Yes);
           return;
         }
         erep->addExtern(&sts, mem);
@@ -409,78 +434,84 @@ void Wb::wtt_open_volume(void* wttctx, wb_eType type, const char* filename,
         else
           name_p = (char*)filename;
 
-        Wtt* wtt = wb->wtt_new(
-            name_p, "Navigator", wb->wbctx, mem->vid(), vol, 0, &sts);
-        if (ODD(sts)) {
+        Wtt* wtt = wb->wtt_new(name_p, "Navigator", wb->wbctx, mem->vid(), vol, 0, &sts);
+        if (ODD(sts))
+        {
           wb->appl_count++;
           wtt->close_cb = Wb::wtt_close;
           wtt->open_volume_cb = Wb::wtt_open_volume;
           wtt->time_to_exit_cb = Wb::time_to_exit;
         }
-      } else {
-        if (streq(filename, "ProjectList")) {
+      }
+      else
+      {
+        if (streq(filename, "ProjectList"))
+        {
           // Load ProjectList
 
           wb_erep* erep = (wb_erep*)(*(wb_env*)wb->wbctx);
-          wb_vrepext* ext = new wb_vrepext(
-              erep, ldh_cProjectListVolume, filename, filename);
+          wb_vrepext* ext = new wb_vrepext(erep, ldh_cProjectListVolume, filename, filename);
           erep->addExtern(&sts, ext);
 
           // Display buffer
           wb_volume* vol = new wb_volume(ext);
 
-          Wtt* wtt = wb->wtt_new(
-              filename, "Navigator", wb->wbctx, ext->vid(), vol, 0, &sts);
-          if (ODD(sts)) {
+          Wtt* wtt = wb->wtt_new(filename, "Navigator", wb->wbctx, ext->vid(), vol, 0, &sts);
+          if (ODD(sts))
+          {
             wb->appl_count++;
             wtt->close_cb = Wb::wtt_close;
             wtt->open_volume_cb = Wb::wtt_open_volume;
             wtt->time_to_exit_cb = Wb::time_to_exit;
           }
-        } else if (streq(filename, "GlobalVolumeList")) {
+        }
+        else if (streq(filename, "GlobalVolumeList"))
+        {
           // Load GlobalVolumeList
 
           wb_erep* erep = (wb_erep*)(*(wb_env*)wb->wbctx);
-          wb_vrepext* ext = new wb_vrepext(
-              erep, ldh_cGlobalVolumeListVolume, filename, filename);
+          wb_vrepext* ext = new wb_vrepext(erep, ldh_cGlobalVolumeListVolume, filename, filename);
           erep->addExtern(&sts, ext);
 
           // Display buffer
           wb_volume* vol = new wb_volume(ext);
 
-          Wtt* wtt = wb->wtt_new(
-              filename, "Navigator", wb->wbctx, ext->vid(), vol, 0, &sts);
-          if (ODD(sts)) {
+          Wtt* wtt = wb->wtt_new(filename, "Navigator", wb->wbctx, ext->vid(), vol, 0, &sts);
+          if (ODD(sts))
+          {
             wb->appl_count++;
             wtt->close_cb = Wb::wtt_close;
             wtt->open_volume_cb = Wb::wtt_open_volume;
             wtt->time_to_exit_cb = Wb::time_to_exit;
           }
-        } else if (streq(filename, "UserDatabase")) {
+        }
+        else if (streq(filename, "UserDatabase"))
+        {
           // Load UserDatabase
 
           wb_erep* erep = (wb_erep*)(*(wb_env*)wb->wbctx);
-          wb_vrepext* ext = new wb_vrepext(
-              erep, ldh_cUserDatabaseVolume, filename, filename);
+          wb_vrepext* ext = new wb_vrepext(erep, ldh_cUserDatabaseVolume, filename, filename);
           erep->addExtern(&sts, ext);
 
           // Display buffer
           wb_volume* vol = new wb_volume(ext);
 
-          Wtt* wtt = wb->wtt_new(
-              filename, "Navigator", wb->wbctx, ext->vid(), vol, 0, &sts);
-          if (ODD(sts)) {
+          Wtt* wtt = wb->wtt_new(filename, "Navigator", wb->wbctx, ext->vid(), vol, 0, &sts);
+          if (ODD(sts))
+          {
             wb->appl_count++;
             wtt->close_cb = Wb::wtt_close;
             wtt->open_volume_cb = Wb::wtt_open_volume;
             wtt->time_to_exit_cb = Wb::time_to_exit;
           }
-        } else
+        }
+        else
           printf("Unknown file\n");
       }
     }
-
-  } else {
+  }
+  else
+  {
     printf("No privileges to enter development environment");
     if (wb->appl_count == 0)
       exit(LOGIN__NOPRIV);
@@ -499,24 +530,30 @@ int Wb::vsel_success(void* vselctx, pwr_tVolumeId* volumelist, int volume_count)
   pwr_tStatus status;
 
   sts = 1;
-  if (CoLogin::privilege() & pwr_mPrv_DevRead) {
-    for (i = 0; i < volume_count; i++) {
+  if (CoLogin::privilege() & pwr_mPrv_DevRead)
+  {
+    for (i = 0; i < volume_count; i++)
+    {
       volume = *volumelist++;
       utl_get_projectname(projectname);
       strcpy(title, CoLogin::username());
       strcat(title, " on ");
       strcat(title, projectname);
       wtt = wb->wtt_new(title, "Navigator", wb->wbctx, volume, 0, 0, &status);
-      if (ODD(status)) {
+      if (ODD(status))
+      {
         wb->appl_count++;
         wtt->close_cb = Wb::wtt_close;
         wtt->open_volume_cb = Wb::wtt_open_volume;
         wtt->time_to_exit_cb = Wb::time_to_exit;
         wb->wttlist_add(&sts, wtt, volume);
-      } else
+      }
+      else
         sts = status;
     }
-  } else {
+  }
+  else
+  {
     exit(LOGIN__NOPRIV);
   }
   if (ODD(sts) && wb->appl_count == 0)
@@ -530,7 +567,8 @@ void Wb::vsel_cancel()
   Wb* wb = main_wb;
 
   wb->appl_count--;
-  if (wb->appl_count == 0) {
+  if (wb->appl_count == 0)
+  {
     exit(0);
   }
 }

@@ -48,7 +48,8 @@
 
 /* Buffer used to request supervisor data from the server */
 
-typedef struct {
+typedef struct
+{
   pwr_sAttrRef Attribute;
   pwr_tBoolean AllAttr; /* All attributes for this object ? */
 } rs_mh_sAlimRequest;
@@ -56,7 +57,8 @@ typedef struct {
 /* Primary data for an Asup object, more (Text data ) must be requested using
    gdh_GetObjectInfo */
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 EvType;
   pwr_tUInt32 EvPrio;
   pwr_tFloat32 Limit;
@@ -68,7 +70,8 @@ typedef struct {
 /* Primary data for a Dsup object, more (Text data ) must be requested using
    gdh_GetObjectInfo */
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 EvType;
   pwr_tUInt32 EvPrio;
   pwr_tBoolean CtrlPos;
@@ -76,7 +79,8 @@ typedef struct {
 
 /* Union containing the two sup types */
 
-typedef union {
+typedef union
+{
   rs_mh_sASupAlim A;
   rs_mh_sDSupAlim D;
 } rs_mh_uSupAlim;
@@ -84,14 +88,16 @@ typedef union {
 /* This structure contains the objid of the supervisor object and the associated
    data */
 
-typedef struct {
+typedef struct
+{
   pwr_tObjid SupObjid;
   rs_mh_uSupAlim SupData;
 } rs_mh_sSupObjEntry;
 
 /* This structure contains descriptions of the supervised object attribute */
 
-typedef struct {
+typedef struct
+{
   pwr_sAttrRef SupAttr;
   pwr_tInt32 NoOfSupObjs;
   pwr_tUInt32 SupClass;
@@ -100,7 +106,8 @@ typedef struct {
 
 /* This is the buffer transmitted from the alarm limit server to the client */
 
-typedef struct {
+typedef struct
+{
   pwr_tUInt32 NoOfSupAttr; /* Number of supervised attibutes*/
   rs_mh_sAttrSupList AttrSupList[1];
 } rs_mh_sSupDataBuf;

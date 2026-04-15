@@ -48,28 +48,28 @@
 //  Syntax check.
 //
 
-static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
-    int* ErrorCount, int* WarningCount)
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, int* ErrorCount,
+                               int* WarningCount)
 {
   pwr_tStatus sts;
-  pwr_tCid plcconnect_class[] = { pwr_cClass_ABB_ACC800Fo, 0 };
-  pwr_tCid simconnect_class[] = { pwr_cClass_ABB_ACC800Sim, 0 };
-  pwr_tCid ioconnect_class[] = { pwr_cClass_ABB_ACC_PPO5_IoModule, 0 };
+  pwr_tCid plcconnect_class[] = {pwr_cClass_ABB_ACC800Fo, 0};
+  pwr_tCid simconnect_class[] = {pwr_cClass_ABB_ACC800Sim, 0};
+  pwr_tCid ioconnect_class[] = {pwr_cClass_ABB_ACC_PPO5_IoModule, 0};
 
-  if (Object.Offset == 0) {
-    sts = wsx_CheckXAttrRef(Session, Object, "PlcConnect", "PlcConnect",
-        plcconnect_class, 0, ErrorCount, WarningCount);
+  if (Object.Offset == 0)
+  {
+    sts = wsx_CheckXAttrRef(Session, Object, "PlcConnect", "PlcConnect", plcconnect_class, 0, ErrorCount,
+                            WarningCount);
     if (EVEN(sts))
       return sts;
 
-    sts = wsx_CheckXAttrRef(Session, Object, "SimConnect", "PlcConnect",
-        simconnect_class, 1, ErrorCount, WarningCount);
+    sts = wsx_CheckXAttrRef(Session, Object, "SimConnect", "PlcConnect", simconnect_class, 1, ErrorCount,
+                            WarningCount);
     if (EVEN(sts))
       return sts;
   }
 
-  sts = wsx_CheckAttrRef(Session, Object, "IOConnect", ioconnect_class, 0,
-      ErrorCount, WarningCount);
+  sts = wsx_CheckAttrRef(Session, Object, "IOConnect", ioconnect_class, 0, ErrorCount, WarningCount);
   if (EVEN(sts))
     return sts;
 
@@ -80,5 +80,4 @@ static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object,
 //  Every method to be exported to the workbench should be registred here.
 //
 
-pwr_dExport pwr_BindMethods(ABB_ACC800)
-    = { pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(ABB_ACC800) = {pwr_BindMethod(SyntaxCheck), pwr_NullMethod};

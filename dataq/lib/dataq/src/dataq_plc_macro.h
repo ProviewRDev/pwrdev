@@ -41,52 +41,61 @@
 
 #include "pwr_dataqclasses.h"
 
-#define DataQBusSplit_exec(tp, o) { \
-  o->Data = o->InP->Data; \
-  o->Front = o->InP->Front; \
-  o->Back = o->InP->Back; \
-}
+#define DataQBusSplit_exec(tp, o)                                                                            \
+  {                                                                                                          \
+    o->Data = o->InP->Data;                                                                                  \
+    o->Front = o->InP->Front;                                                                                \
+    o->Back = o->InP->Back;                                                                                  \
+  }
 
-#define DataQBusJoin_exec(tp, o) { \
-  o->Out.Data = *o->DataP; \
-  o->Out.Front = *o->FrontP; \
-  o->Out.Back = *o->BackP; \
-}
+#define DataQBusJoin_exec(tp, o)                                                                             \
+  {                                                                                                          \
+    o->Out.Data = *o->DataP;                                                                                 \
+    o->Out.Front = *o->FrontP;                                                                               \
+    o->Out.Back = *o->BackP;                                                                                 \
+  }
 
-#define QOrderBusSplit_exec(tp, o) { \
-  o->Status = o->InP->Status; \
-  o->New = o->InP->New; \
-  o->Data = o->InP->Data; \
-  o->Front = o->InP->Front; \
-  o->Back = o->InP->Back; \
-}
+#define QOrderBusSplit_exec(tp, o)                                                                           \
+  {                                                                                                          \
+    o->Status = o->InP->Status;                                                                              \
+    o->New = o->InP->New;                                                                                    \
+    o->Data = o->InP->Data;                                                                                  \
+    o->Front = o->InP->Front;                                                                                \
+    o->Back = o->InP->Back;                                                                                  \
+  }
 
-#define QOrderBusJoin_exec(tp, o) { \
-  o->Out.Status = *o->StatusP; \
-  o->Out.New = *o->NewP; \
-  o->Out.Data = *o->DataP; \
-  o->Out.Front = *o->FrontP; \
-  o->Out.Back = *o->BackP; \
-}
+#define QOrderBusJoin_exec(tp, o)                                                                            \
+  {                                                                                                          \
+    o->Out.Status = *o->StatusP;                                                                             \
+    o->Out.New = *o->NewP;                                                                                   \
+    o->Out.Data = *o->DataP;                                                                                 \
+    o->Out.Front = *o->FrontP;                                                                               \
+    o->Out.Back = *o->BackP;                                                                                 \
+  }
 
 /*_*
   QDOrder
   @aref qdorder QDOrder
 */
 
-#define QDOrder_exec(o, qo)\
-  timer2_scan(tp, o);\
-  if (qo->Status) {\
-    if (!o->StatusOld) {\
-      timer2_in(tp, o);\
-    }\
-    o->Status = (o->TimerFlag) ? false : true;\
-  } else {\
-    if (o->Status) {\
-      o->TimerCount = 0;\
-      o->Status = false;\
-    }\
-  }\
+#define QDOrder_exec(o, qo)                                                                                  \
+  timer2_scan(tp, o);                                                                                        \
+  if (qo->Status)                                                                                            \
+  {                                                                                                          \
+    if (!o->StatusOld)                                                                                       \
+    {                                                                                                        \
+      timer2_in(tp, o);                                                                                      \
+    }                                                                                                        \
+    o->Status = (o->TimerFlag) ? false : true;                                                               \
+  }                                                                                                          \
+  else                                                                                                       \
+  {                                                                                                          \
+    if (o->Status)                                                                                           \
+    {                                                                                                        \
+      o->TimerCount = 0;                                                                                     \
+      o->Status = false;                                                                                     \
+    }                                                                                                        \
+  }                                                                                                          \
   o->StatusOld = qo->Status;
 
 /*_*
@@ -94,20 +103,26 @@
    @aref qlorder QLOrder
 */
 
-#define QLOrder_exec(o, qo)\
-  timer2_scan(tp, o);\
-  if (qo->Status) {\
-    if (!o->StatusOld) {\
-      timer2_in(tp, o);\
-      o->Status = true;\
-    } else\
-      o->Status = o->TimerFlag;\
-  } else {\
-    if (o->Status) {\
-      o->TimerCount = 0;\
-      o->Status = false;\
-    }\
-  }\
+#define QLOrder_exec(o, qo)                                                                                  \
+  timer2_scan(tp, o);                                                                                        \
+  if (qo->Status)                                                                                            \
+  {                                                                                                          \
+    if (!o->StatusOld)                                                                                       \
+    {                                                                                                        \
+      timer2_in(tp, o);                                                                                      \
+      o->Status = true;                                                                                      \
+    }                                                                                                        \
+    else                                                                                                     \
+      o->Status = o->TimerFlag;                                                                              \
+  }                                                                                                          \
+  else                                                                                                       \
+  {                                                                                                          \
+    if (o->Status)                                                                                           \
+    {                                                                                                        \
+      o->TimerCount = 0;                                                                                     \
+      o->Status = false;                                                                                     \
+    }                                                                                                        \
+  }                                                                                                          \
   o->StatusOld = qo->Status;
 
 /*_*
@@ -115,8 +130,8 @@
    @aref qporder QPOrder
 */
 
-#define QPOrder_exec(o, qo)\
-  o->Status = (qo->Status && !o->StatusOld);\
+#define QPOrder_exec(o, qo)                                                                                  \
+  o->Status = (qo->Status && !o->StatusOld);                                                                 \
   o->StatusOld = qo->Status;
 
 /*_*
@@ -124,20 +139,19 @@
    @aref qcorder QCOrder
 */
 
-#define QCOrder_exec(o, qo, cond)\
-  o->Status = qo->Status && (cond);
+#define QCOrder_exec(o, qo, cond) o->Status = qo->Status && (cond);
 
 /*_*
    SOrder
    @aref sorder SOrder
 */
 
-#define QSOrder_exec(o, qo, reset)\
-  if (o->Reset || reset)\
-    o->Status = false;\
-  if (qo->Status && !o->StatusOld)\
-    o->Status = true;\
-  o->StatusOld = qo->Status;\
+#define QSOrder_exec(o, qo, reset)                                                                           \
+  if (o->Reset || reset)                                                                                     \
+    o->Status = false;                                                                                       \
+  if (qo->Status && !o->StatusOld)                                                                           \
+    o->Status = true;                                                                                        \
+  o->StatusOld = qo->Status;                                                                                 \
   o->Reset = false;
 
 /*_*
@@ -145,8 +159,8 @@
   @aref reset_qso Reset_QSO
 */
 
-#define Reset_QSO_exec(o, in)\
-  if (in)\
+#define Reset_QSO_exec(o, in)                                                                                \
+  if (in)                                                                                                    \
     o->Reset = true;
 
 /*_*
@@ -154,21 +168,19 @@
 
   @aref dataqsubwind DataQSubWind
 */
-#define DataQFoSubWind_exec(o, subwindow)\
-  if (o->PlcConnectP &&\
-      !(((pwr_sClass_DataQ*)o->PlcConnectP)->Intern.InitTime && \
-	!((pwr_sClass_DataQ*)o->PlcConnectP)->Intern.ReloadDone)) {\
-    o->DataCurrentIdx = 0;\
-    memset(&o->DataCurrent, 0, sizeof(pwr_sClass_DataQBus));\
-    subwindow;\
-    for (o->DataCurrentIdx = 1;\
-	 o->DataCurrentIdx <= ((pwr_sClass_DataQ1*)o->PlcConnectP)->DataSize;\
-	 o->DataCurrentIdx++) {\
-      o->DataCurrent = ((pwr_sClass_DataQ1*)o->PlcConnectP)->Data[o->DataCurrentIdx-1];\
-      subwindow;\
-    }\
+#define DataQFoSubWind_exec(o, subwindow)                                                                    \
+  if (o->PlcConnectP && !(((pwr_sClass_DataQ*)o->PlcConnectP)->Intern.InitTime &&                            \
+                          !((pwr_sClass_DataQ*)o->PlcConnectP)->Intern.ReloadDone))                          \
+  {                                                                                                          \
+    o->DataCurrentIdx = 0;                                                                                   \
+    memset(&o->DataCurrent, 0, sizeof(pwr_sClass_DataQBus));                                                 \
+    subwindow;                                                                                               \
+    for (o->DataCurrentIdx = 1; o->DataCurrentIdx <= ((pwr_sClass_DataQ1*)o->PlcConnectP)->DataSize;         \
+         o->DataCurrentIdx++)                                                                                \
+    {                                                                                                        \
+      o->DataCurrent = ((pwr_sClass_DataQ1*)o->PlcConnectP)->Data[o->DataCurrentIdx - 1];                    \
+      subwindow;                                                                                             \
+    }                                                                                                        \
   }
 
-
 #endif
-

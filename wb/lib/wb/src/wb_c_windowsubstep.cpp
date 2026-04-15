@@ -40,36 +40,30 @@
 #include "wb_pwrs.h"
 #include "wb_pwrb_msg.h"
 
-static pwr_tStatus PostCopy(
-    ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
+static pwr_tStatus PostCopy(ldh_tSesContext Session, pwr_tOid Object, pwr_tOid Father, pwr_tCid Class)
 {
   pwr_tStatus sts;
   pwr_tTime time = pwr_cNTime;
   pwr_tUInt32 version = 0;
 
   // Reset time for modified and compile
-  sts = ldh_SetObjectPar(
-        Session, Object, "RtBody", "Version", (char*)&version, sizeof(version));
+  sts = ldh_SetObjectPar(Session, Object, "RtBody", "Version", (char*)&version, sizeof(version));
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_SetObjectPar(
-        Session, Object, "DevBody", "Modified", (char*)&time, sizeof(time));
+  sts = ldh_SetObjectPar(Session, Object, "DevBody", "Modified", (char*)&time, sizeof(time));
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_SetObjectPar(
-        Session, Object, "DevBody", "Compiled", (char*)&time, sizeof(time));
+  sts = ldh_SetObjectPar(Session, Object, "DevBody", "Compiled", (char*)&time, sizeof(time));
   if (EVEN(sts))
     return sts;
 
   return PWRB__SUCCESS;
 }
 
-
 /*----------------------------------------------------------------------------*\
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(WindowSubstep) = { pwr_BindMethod(PostCopy),
-  pwr_NullMethod };
+pwr_dExport pwr_BindMethods(WindowSubstep) = {pwr_BindMethod(PostCopy), pwr_NullMethod};

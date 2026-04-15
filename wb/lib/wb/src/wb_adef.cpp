@@ -37,9 +37,7 @@
 #include "wb_adef.h"
 #include "wb_adrep.h"
 
-wb_adef::wb_adef() : wb_status(LDH__NOSUCHATTR), m_adrep(0)
-{
-}
+wb_adef::wb_adef() : wb_status(LDH__NOSUCHATTR), m_adrep(0) {}
 
 wb_adef::wb_adef(wb_adrep* adrep) : wb_status(LDH__SUCCESS), m_adrep(adrep)
 {

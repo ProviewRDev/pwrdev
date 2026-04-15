@@ -36,7 +36,6 @@
 
 /* DataQ functions */
 
-
 #ifndef dataq_h
 #define dataq_h
 
@@ -64,6 +63,4 @@ void QRemoteOrder_exec2(plc_sThread* tp, pwr_sClass_QRemoteOrder* o, pwr_tBoolea
 void QTargetOrder_exec(plc_sThread* tp, pwr_sClass_QTargetOrder* o);
 void QCreateData_exec(plc_sThread* tp, pwr_sClass_QCreateData* o);
 
-
 #endif
-

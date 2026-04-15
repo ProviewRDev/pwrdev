@@ -54,25 +54,27 @@ void XttFileviewGtk::execute(char* file)
   strcat(fname, file);
 
   sts = gdh_SetObjectInfo(target_attr, fname, 80);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("** Fileview: unable to set target %s\n", target_attr);
     return;
   }
 
   pwr_tBoolean b = 1;
   sts = gdh_SetObjectInfo(trigger_attr, &b, sizeof(b));
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     printf("** Fileview: unable to set trigger %s\n", trigger_attr);
     return;
   }
 }
 
-void XttFileviewGtk::list_cursor_changed_cb(
-    GtkTreeView* tree_view, gpointer data)
+void XttFileviewGtk::list_cursor_changed_cb(GtkTreeView* tree_view, gpointer data)
 {
   XttFileviewGtk* fileview = (XttFileviewGtk*)data;
 
-  if (fileview->type == fileview_eType_Save) {
+  if (fileview->type == fileview_eType_Save)
+  {
     char* text;
     static char selected_text[80];
     GtkTreeIter iter;
@@ -80,38 +82,35 @@ void XttFileviewGtk::list_cursor_changed_cb(
 
     g_object_get(fileview->list, "model", &store, NULL);
 
-    GtkTreeSelection* selection
-        = gtk_tree_view_get_selection(GTK_TREE_VIEW(fileview->list));
-    if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
+    GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(fileview->list));
+    if (gtk_tree_selection_get_selected(selection, NULL, &iter))
+    {
       gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, 0, &text, -1);
       strcpy(selected_text, text);
     }
     gint pos = 0;
     gtk_editable_delete_text(GTK_EDITABLE(fileview->input_text), 0, -1);
-    gtk_editable_insert_text(GTK_EDITABLE(fileview->input_text), selected_text,
-        strlen(selected_text), &pos);
+    gtk_editable_insert_text(GTK_EDITABLE(fileview->input_text), selected_text, strlen(selected_text), &pos);
     // Select the text
     gtk_editable_set_position(GTK_EDITABLE(fileview->input_text), -1);
     gtk_editable_select_region(GTK_EDITABLE(fileview->input_text), 0, -1);
   }
 }
 
-void XttFileviewGtk::list_row_activated_cb(GtkTreeView* tree_view,
-    GtkTreePath* path, GtkTreeViewColumn* column, gpointer data)
+void XttFileviewGtk::list_row_activated_cb(GtkTreeView* tree_view, GtkTreePath* path,
+                                           GtkTreeViewColumn* column, gpointer data)
 {
   list_ok_cb(0, data);
 }
 
-void XttFileviewGtk::list_input_cb(GtkWidget* w, gpointer data)
-{
-  list_ok_cb(0, data);
-}
+void XttFileviewGtk::list_input_cb(GtkWidget* w, gpointer data) { list_ok_cb(0, data); }
 
 void XttFileviewGtk::list_ok_cb(GtkWidget* w, gpointer data)
 {
   XttFileviewGtk* fileview = (XttFileviewGtk*)data;
 
-  if (fileview->type == fileview_eType_Open) {
+  if (fileview->type == fileview_eType_Open)
+  {
     char* text;
     static char selected_text[80];
     GtkTreeIter iter;
@@ -120,53 +119,55 @@ void XttFileviewGtk::list_ok_cb(GtkWidget* w, gpointer data)
     // Get selected tree entry
     g_object_get(fileview->list, "model", &store, NULL);
 
-    GtkTreeSelection* selection
-        = gtk_tree_view_get_selection(GTK_TREE_VIEW(fileview->list));
-    if (gtk_tree_selection_get_selected(selection, NULL, &iter)) {
+    GtkTreeSelection* selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(fileview->list));
+    if (gtk_tree_selection_get_selected(selection, NULL, &iter))
+    {
       gtk_tree_model_get(GTK_TREE_MODEL(store), &iter, 0, &text, -1);
       strcpy(selected_text, text);
     }
 
-    char* textiso
-        = g_convert(selected_text, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
+    char* textiso = g_convert(selected_text, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
     strcpy(selected_text, textiso);
     g_free(textiso);
 
     fileview->execute(selected_text);
-  } else {
+  }
+  else
+  {
     // Get value from text entry
     char *text, *textutf8;
     bool file_exist = false;
     char input_text[200];
 
-    textutf8
-        = gtk_editable_get_chars(GTK_EDITABLE(fileview->input_text), 0, -1);
+    textutf8 = gtk_editable_get_chars(GTK_EDITABLE(fileview->input_text), 0, -1);
     text = g_convert(textutf8, -1, "ISO8859-1", "UTF-8", NULL, NULL, NULL);
     g_free(textutf8);
     strncpy(input_text, text, sizeof(input_text));
     g_free(text);
 
-    if (!streq(fileview->filetype, "")) {
+    if (!streq(fileview->filetype, ""))
+    {
       if (strchr(input_text, '.') == 0)
         strcat(input_text, fileview->filetype);
     }
 
-    for (int i = 0; i < fileview->filecnt; i++) {
-      if (streq(fileview->filelist[i], input_text)) {
+    for (int i = 0; i < fileview->filecnt; i++)
+    {
+      if (streq(fileview->filelist[i], input_text))
+      {
         file_exist = true;
         break;
       }
     }
-    if (file_exist) {
+    if (file_exist)
+    {
       char msg[sizeof(input_text) + 1 + sizeof(Lng::translate("already exists")) + 1 + 1];
 
       strcpy(fileview->selected_file, input_text);
       sprintf(msg, "%s %s\n", input_text, Lng::translate("already exists"));
-      sprintf(
-          &msg[strlen(msg)], "%s", Lng::translate("Do you want to replace it"));
+      sprintf(&msg[strlen(msg)], "%s", Lng::translate("Do you want to replace it"));
       ((XNav*)fileview->parent_ctx)
-          ->wow->DisplayQuestion(fileview,
-              Lng::translate("File already exists"), msg, list_save_cb, 0, 0);
+          ->wow->DisplayQuestion(fileview, Lng::translate("File already exists"), msg, list_save_cb, 0, 0);
       return;
     }
     fileview->execute(input_text);
@@ -196,16 +197,15 @@ void XttFileviewGtk::list_cancel_cb(GtkWidget* w, gpointer data)
   delete fileview;
 }
 
-static gboolean list_action_inputfocus(
-    GtkWidget* w, GdkEvent* event, gpointer data)
+static gboolean list_action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data)
 {
   gtk_window_present(GTK_WINDOW(w));
   return FALSE;
 }
 
-XttFileviewGtk::XttFileviewGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-    pwr_tOid xn_oid, char* xn_title, char* xn_dir, char* xn_pattern,
-    int xn_type, char* xn_target_attr, char* xn_trigger_attr, char* xn_filetype)
+XttFileviewGtk::XttFileviewGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, pwr_tOid xn_oid, char* xn_title,
+                               char* xn_dir, char* xn_pattern, int xn_type, char* xn_target_attr,
+                               char* xn_trigger_attr, char* xn_filetype)
     : filelist(0), parent_ctx(xn_parent_ctx), oid(xn_oid), type(xn_type)
 {
   pwr_tStatus sts;
@@ -219,10 +219,12 @@ XttFileviewGtk::XttFileviewGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
   strncpy(pattern, xn_pattern, sizeof(pattern));
   strncpy(target_attr, xn_target_attr, sizeof(target_attr));
   strncpy(trigger_attr, xn_trigger_attr, sizeof(trigger_attr));
-  if (xn_filetype) {
+  if (xn_filetype)
+  {
     strcpy(filetype, ".");
     strncat(filetype, xn_filetype, sizeof(filetype) - 1);
-  } else
+  }
+  else
     strcpy(filetype, "");
   strcpy(selected_file, "");
 
@@ -230,60 +232,50 @@ XttFileviewGtk::XttFileviewGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
   if (type == fileview_eType_Open && (EVEN(sts) || filecnt == 0))
     return;
 
-  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 500,
-      "default-width", 500, "title", CoWowGtk::translate_utf8(xn_title),
-      "window-position", GTK_WIN_POS_CENTER, NULL);
+  toplevel = (GtkWidget*)g_object_new(GTK_TYPE_WINDOW, "default-height", 500, "default-width", 500, "title",
+                                      CoWowGtk::translate_utf8(xn_title), "window-position",
+                                      GTK_WIN_POS_CENTER, NULL);
 
-  g_signal_connect(
-      toplevel, "focus-in-event", G_CALLBACK(list_action_inputfocus), this);
+  g_signal_connect(toplevel, "focus-in-event", G_CALLBACK(list_action_inputfocus), this);
 
   store = gtk_list_store_new(1, G_TYPE_STRING);
 
-  for (int i = 0; i < filecnt; i++) {
-    char* nameutf8
-        = g_convert(filelist[i], -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
+  for (int i = 0; i < filecnt; i++)
+  {
+    char* nameutf8 = g_convert(filelist[i], -1, "UTF-8", "ISO8859-1", NULL, NULL, NULL);
 
     gtk_list_store_append(store, &iter);
     gtk_list_store_set(store, &iter, 0, nameutf8, -1);
     g_free(nameutf8);
   }
 
-  list = (GtkWidget*)g_object_new(GTK_TYPE_TREE_VIEW, "model", store,
-      "rules-hint", TRUE, "headers-clickable", TRUE, "reorderable", TRUE,
-      "enable-search", TRUE, "search-column", 0, "headers-visible", FALSE,
-      NULL);
+  list = (GtkWidget*)g_object_new(GTK_TYPE_TREE_VIEW, "model", store, "rules-hint", TRUE, "headers-clickable",
+                                  TRUE, "reorderable", TRUE, "enable-search", TRUE, "search-column", 0,
+                                  "headers-visible", FALSE, NULL);
 
   text_renderer = gtk_cell_renderer_text_new();
-  name_column = gtk_tree_view_column_new_with_attributes(
-      "", text_renderer, "text", 0, NULL);
+  name_column = gtk_tree_view_column_new_with_attributes("", text_renderer, "text", 0, NULL);
   g_object_set(name_column, "resizable", TRUE, "clickable", TRUE, NULL);
 
   gtk_tree_view_append_column(GTK_TREE_VIEW(list), name_column);
-  g_signal_connect(list, "row-activated",
-      G_CALLBACK(XttFileviewGtk::list_row_activated_cb), this);
-  g_signal_connect(list, "cursor-changed",
-      G_CALLBACK(XttFileviewGtk::list_cursor_changed_cb), this);
+  g_signal_connect(list, "row-activated", G_CALLBACK(XttFileviewGtk::list_row_activated_cb), this);
+  g_signal_connect(list, "cursor-changed", G_CALLBACK(XttFileviewGtk::list_cursor_changed_cb), this);
 
   if (type == fileview_eType_Save)
     strcpy(ok_text, "Save");
   else
     strcpy(ok_text, "Open");
 
-  GtkWidget* ok_button
-      = gtk_button_new_with_label(CoWowGtk::translate_utf8(ok_text));
+  GtkWidget* ok_button = gtk_button_new_with_label(CoWowGtk::translate_utf8(ok_text));
   gtk_widget_set_size_request(ok_button, 70, 28);
-  g_signal_connect(
-      ok_button, "clicked", G_CALLBACK(XttFileviewGtk::list_ok_cb), this);
+  g_signal_connect(ok_button, "clicked", G_CALLBACK(XttFileviewGtk::list_ok_cb), this);
 
-  GtkWidget* cancel_button
-      = gtk_button_new_with_label(CoWowGtk::translate_utf8("Cancel"));
+  GtkWidget* cancel_button = gtk_button_new_with_label(CoWowGtk::translate_utf8("Cancel"));
   gtk_widget_set_size_request(cancel_button, 70, 28);
-  g_signal_connect(cancel_button, "clicked",
-      G_CALLBACK(XttFileviewGtk::list_cancel_cb), this);
+  g_signal_connect(cancel_button, "clicked", G_CALLBACK(XttFileviewGtk::list_cancel_cb), this);
 
   input_text = gtk_entry_new();
-  g_signal_connect(
-      input_text, "activate", G_CALLBACK(XttFileviewGtk::list_input_cb), this);
+  g_signal_connect(input_text, "activate", G_CALLBACK(XttFileviewGtk::list_input_cb), this);
   GtkWidget* input_label = gtk_label_new(CoWowGtk::translate_utf8("Save as"));
 
   GtkWidget* hboxentry = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 40);
@@ -299,7 +291,8 @@ XttFileviewGtk::XttFileviewGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
 
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
   gtk_box_pack_start(GTK_BOX(vbox), scrolled_window, TRUE, TRUE, 30);
-  if (type == fileview_eType_Save) {
+  if (type == fileview_eType_Save)
+  {
     gtk_box_pack_start(GTK_BOX(vbox), hboxentry, FALSE, FALSE, 10);
     gtk_box_pack_start(GTK_BOX(vbox), gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), FALSE, FALSE, 0);
   }

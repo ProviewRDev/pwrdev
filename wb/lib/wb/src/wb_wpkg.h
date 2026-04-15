@@ -45,7 +45,8 @@
 class WPkgNav;
 class CoWow;
 
-class WPkg {
+class WPkg
+{
 public:
   WPkg(void* wa_parent_ctx);
   virtual ~WPkg();
@@ -67,21 +68,11 @@ public:
   void activate_zoom_out();
   void activate_zoom_reset();
 
-  virtual void message(char severity, const char* message)
-  {
-  }
-  virtual void pop()
-  {
-  }
-  virtual void set_clock_cursor()
-  {
-  }
-  virtual void reset_cursor()
-  {
-  }
-  virtual void flush()
-  {
-  }
+  virtual void message(char severity, const char* message) {}
+  virtual void pop() {}
+  virtual void set_clock_cursor() {}
+  virtual void reset_cursor() {}
+  virtual void flush() {}
 
   static void message_cb(void* wpkg, char severity, const char* message);
   static void set_clock_cursor_cb(void* wpkg);

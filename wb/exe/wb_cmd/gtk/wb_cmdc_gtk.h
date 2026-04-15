@@ -39,7 +39,8 @@
 
 #include "wb_cmdc.h"
 
-class CmdGtk : public Cmd {
+class CmdGtk : public Cmd
+{
 public:
   CmdGtk(int argc, char* argv[]);
 };

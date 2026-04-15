@@ -62,8 +62,7 @@ public:
   GtkWidget* menubutton_changevalue;
   CoWowFocusTimerGtk focustimer;
 
-  GsdAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, void* a_object,
-             pb_gsd* a_gsd, int a_edit_mode);
+  GsdAttrGtk(GtkWidget* a_parent_wid, void* a_parent_ctx, void* a_object, pb_gsd* a_gsd, int a_edit_mode);
   ~GsdAttrGtk();
 
   void message(char severity, const char* message);
@@ -88,8 +87,7 @@ public:
   static void cmd_close_apply_cb(void* ctx, void* data);
   static void cmd_close_no_cb(void* ctx, void* data);
   static void activate_cmd_ca(GtkWidget* w, gpointer dataxo);
-  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event,
-                                    gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   // static void valchanged_cmd_input( GtkWidget *w, gpointer data);
 };
 

@@ -40,31 +40,33 @@
 /* xtt_jop.h -- Handling of java processe in xtt. */
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "rt_qcom.h"
 
-class Jop {
-public:
-  Jop(void* op_parent_ctx);
-  ~Jop();
+  class Jop
+  {
+  public:
+    Jop(void* op_parent_ctx);
+    ~Jop();
 
-  void* parent_ctx;
-  qcom_sQid qcom_qid;
-  qcom_sQid jop_qcom_qid;
-  void (*command_cb)(void*, char*);
+    void* parent_ctx;
+    qcom_sQid qcom_qid;
+    qcom_sQid jop_qcom_qid;
+    void (*command_cb)(void*, char*);
 
-  void scan();
-  int create_que();
-  void que_free(char* data);
-  int que_get(char** data);
-  int que_put(const char* data);
-  void set_jop_qid(int qix);
-  int command(char* command);
-  void close();
-  void create_process();
-};
+    void scan();
+    int create_que();
+    void que_free(char* data);
+    int que_get(char** data);
+    int que_put(const char* data);
+    void set_jop_qid(int qix);
+    int command(char* command);
+    void close();
+    void create_process();
+  };
 
 #if defined __cplusplus
 }

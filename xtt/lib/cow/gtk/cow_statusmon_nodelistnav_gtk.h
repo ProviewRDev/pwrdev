@@ -45,12 +45,12 @@
 
 #include "cow_statusmon_nodelistnav.h"
 
-class NodelistNavGtk : public NodelistNav {
+class NodelistNavGtk : public NodelistNav
+{
 public:
-  NodelistNavGtk(void* ev_parent_ctx, GtkWidget* nodelistnav_parent_wid,
-      MsgWindow* nodelistnav_msg_window, char* nodelistnav_msg_nodename,
-      int nodelistnav_mode, nl_mLayout nodelistnav_layout,
-      int nodelist_msgw_pop, char *nodelist_conf_file, GtkWidget** w);
+  NodelistNavGtk(void* ev_parent_ctx, GtkWidget* nodelistnav_parent_wid, MsgWindow* nodelistnav_msg_window,
+                 char* nodelistnav_msg_nodename, int nodelistnav_mode, nl_mLayout nodelistnav_layout,
+                 int nodelist_msgw_pop, char* nodelist_conf_file, GtkWidget** w);
   ~NodelistNavGtk();
 
   GtkWidget* parent_wid;

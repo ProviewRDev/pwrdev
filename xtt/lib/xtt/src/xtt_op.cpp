@@ -49,9 +49,8 @@
 #include "rt_xnav_msg.h"
 
 Op::Op(void* op_parent_ctx, char* opplace, pwr_tStatus* status)
-    : parent_ctx(op_parent_ctx), start_jop(0), jop(NULL), command_cb(NULL),
-      map_cb(NULL), help_cb(NULL), close_cb(NULL), get_alarm_info_cb(NULL),
-      ack_last_cb(NULL), is_authorized_cb(0), wow(0), sup_timerid(0)
+    : parent_ctx(op_parent_ctx), start_jop(0), jop(NULL), command_cb(NULL), map_cb(NULL), help_cb(NULL),
+      close_cb(NULL), get_alarm_info_cb(NULL), ack_last_cb(NULL), is_authorized_cb(0), wow(0), sup_timerid(0)
 {
   sup_init();
 }
@@ -85,9 +84,9 @@ int Op::appl_action(int idx)
   int sts;
   pwr_tCid cid;
 
-  if (command_cb) {
-    sts = gdh_AttrrefToName(
-        &button_aref[idx], name, sizeof(name), cdh_mName_volumeStrict);
+  if (command_cb)
+  {
+    sts = gdh_AttrrefToName(&button_aref[idx], name, sizeof(name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
@@ -95,7 +94,8 @@ int Op::appl_action(int idx)
     if (EVEN(sts))
       return sts;
 
-    switch (cid) {
+    switch (cid)
+    {
     case pwr_cClass_XttGraph:
       strcpy(cmd, "ope gra/obj=");
       strcat(cmd, name);
@@ -201,9 +201,11 @@ void Op::activate_history()
   int sts;
   char cmd[200] = "show objecttree/class=sevhist,sevhistobject/title=\"Process "
                   "History List\"/alpha/global";
-  if (command_cb) {
+  if (command_cb)
+  {
     sts = command_cb(parent_ctx, cmd);
-    if (sts == XNAV__EMPTYLIST) {
+    if (sts == XNAV__EMPTYLIST)
+    {
       strcpy(cmd, "show "
                   "objecttree/class=sevitemfloat,sevitemint,sevitemboolean/"
                   "title=\"Process History List\"/alpha");
@@ -214,8 +216,7 @@ void Op::activate_history()
 
 void Op::activate_graph()
 {
-  char cmd[200]
-      = "show objecttree/class=xttgraph/title=\"Process Graphic List\"";
+  char cmd[200] = "show objecttree/class=xttgraph/title=\"Process Graphic List\"";
 
   if (command_cb)
     command_cb(parent_ctx, cmd);
@@ -223,9 +224,7 @@ void Op::activate_graph()
 
 void Op::activate_navigator()
 {
-  if (is_authorized_cb
-      && !is_authorized_cb(
-             parent_ctx, pwr_mAccess_RtNavigator | pwr_mAccess_System))
+  if (is_authorized_cb && !is_authorized_cb(parent_ctx, pwr_mAccess_RtNavigator | pwr_mAccess_System))
     return;
 
   if (map_cb)
@@ -263,8 +262,10 @@ void Op::activate_sup_node(void* id)
 {
   pwr_tCmd cmd;
 
-  for (unsigned int i = 0; i < sup_vect.size(); i++) {
-    if (sup_vect[i].buttonw == id) {
+  for (unsigned int i = 0; i < sup_vect.size(); i++)
+  {
+    if (sup_vect[i].buttonw == id)
+    {
       sprintf(cmd, "open graph/class/inst=%s", sup_vect[i].object_name);
       if (command_cb)
         command_cb(parent_ctx, cmd);
@@ -287,14 +288,12 @@ void Op::activate_help_overview()
 
 void Op::activate_help_opwin()
 {
-  CoXHelp::dhelp(
-      "opg_opwindow", "", navh_eHelpFile_Other, "$pwr_lang/man_opg.dat", 0);
+  CoXHelp::dhelp("opg_opwindow", "", navh_eHelpFile_Other, "$pwr_lang/man_opg.dat", 0);
 }
 
 void Op::activate_help_proview()
 {
-  CoXHelp::dhelp(
-      "version", "", navh_eHelpFile_Other, "$pwr_load/xtt_version_help.dat", 0);
+  CoXHelp::dhelp("version", "", navh_eHelpFile_Other, "$pwr_load/xtt_version_help.dat", 0);
 }
 
 void Op::jop_command_cb(void* op, char* command)
@@ -317,15 +316,13 @@ int Op::sup_init()
 
   OpSup sup;
   sup.node_oid = node_oid;
-  sts = gdh_ObjidToName(node_oid, sup.object_name, sizeof(sup.object_name),
-      cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(node_oid, sup.object_name, sizeof(sup.object_name), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
   strcpy(aname, sup.object_name);
   strcat(aname, ".SystemStatus");
-  sts = gdh_RefObjectInfo(
-      aname, (void**)&sup.p, &sup.refid, sizeof(pwr_tStatus));
+  sts = gdh_RefObjectInfo(aname, (void**)&sup.p, &sup.refid, sizeof(pwr_tStatus));
   if (EVEN(sts))
     return sts;
 
@@ -335,7 +332,8 @@ int Op::sup_init()
 
   // Add nodes in NodeLinkSup objects
   for (sts = gdh_GetClassList(pwr_cClass_NodeLinkSup, &sup_oid); ODD(sts);
-       sts = gdh_GetNextObject(sup_oid, &sup_oid)) {
+       sts = gdh_GetNextObject(sup_oid, &sup_oid))
+  {
     pwr_sClass_NodeLinkSup* sup_p;
     qcom_sNode qnode;
     pwr_tNid nid;
@@ -346,25 +344,24 @@ int Op::sup_init()
 
     nsup.node_oid = sup_p->Node;
 
-    sts = gdh_ObjidToName(nsup.node_oid, nsup.object_name,
-        sizeof(nsup.object_name), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(nsup.node_oid, nsup.object_name, sizeof(nsup.object_name), cdh_mName_volumeStrict);
     if (EVEN(sts))
       strcpy(nsup.object_name, "");
 
-    sts = gdh_ObjidToName(
-        sup_oid, aname, sizeof(aname), cdh_mName_volumeStrict);
+    sts = gdh_ObjidToName(sup_oid, aname, sizeof(aname), cdh_mName_volumeStrict);
     if (EVEN(sts))
       return sts;
 
     strcat(aname, ".SystemStatus");
-    sts = gdh_RefObjectInfo(
-        aname, (void**)&nsup.p, &sup.refid, sizeof(pwr_tStatus));
+    sts = gdh_RefObjectInfo(aname, (void**)&nsup.p, &sup.refid, sizeof(pwr_tStatus));
     if (EVEN(sts))
       return sts;
 
     int found = 0;
-    for (nid = qcom_cNNid; qcom_NextNode(&sts, &qnode, nid); nid = qnode.nid) {
-      if (qnode.nid == nsup.node_oid.vid) {
+    for (nid = qcom_cNNid; qcom_NextNode(&sts, &qnode, nid); nid = qnode.nid)
+    {
+      if (qnode.nid == nsup.node_oid.vid)
+      {
         strcpy(nsup.node_name, qnode.name);
         found = 1;
         break;
@@ -383,7 +380,8 @@ void Op::sup_scan(void* data)
   Op* op = (Op*)data;
   int time = 1000;
 
-  for (unsigned int i = 0; i < op->sup_vect.size(); i++) {
+  for (unsigned int i = 0; i < op->sup_vect.size(); i++)
+  {
     op_eSupColor color = op_eSupColor_Black;
     pwr_tStatus status = *op->sup_vect[i].p;
 
@@ -395,14 +393,16 @@ void Op::sup_scan(void* data)
       color = op_eSupColor_Yellow;
     else if (errh_SeverityError(status))
       color = op_eSupColor_Red;
-    else if (errh_SeverityFatal(status)) {
+    else if (errh_SeverityFatal(status))
+    {
       if (op->sup_vect[i].old_color == op_eSupColor_Red)
         color = op_eSupColor_Black;
       else
         color = op_eSupColor_Red;
     }
 
-    if (color != op->sup_vect[i].old_color) {
+    if (color != op->sup_vect[i].old_color)
+    {
       op->sup_vect[i].old_color = color;
       op->change_sup_color(op->sup_vect[i].indw, color);
     }

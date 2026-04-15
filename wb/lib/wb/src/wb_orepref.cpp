@@ -37,64 +37,33 @@
 #include "wb_orepref.h"
 #include "wb_vrepref.h"
 
-wb_orepref::wb_orepref(wb_vrepref* vrep, int oix) : m_vrep(vrep), m_cid(oix)
-{
-}
+wb_orepref::wb_orepref(wb_vrepref* vrep, int oix) : m_vrep(vrep), m_cid(oix) {}
 
-wb_orepref::~wb_orepref()
-{
-}
+wb_orepref::~wb_orepref() {}
 
 pwr_tOid wb_orepref::oid() const
 {
-  pwr_tOid oid = { m_cid, m_vrep->vid() };
+  pwr_tOid oid = {m_cid, m_vrep->vid()};
   return oid;
 }
 
-pwr_tVid wb_orepref::vid() const
-{
-  return m_vrep->vid();
-}
+pwr_tVid wb_orepref::vid() const { return m_vrep->vid(); }
 
-pwr_tOix wb_orepref::oix() const
-{
-  return m_cid;
-}
+pwr_tOix wb_orepref::oix() const { return m_cid; }
 
-pwr_tCid wb_orepref::cid() const
-{
-  return m_cid;
-}
+pwr_tCid wb_orepref::cid() const { return m_cid; }
 
-pwr_tOid wb_orepref::poid() const
-{
-  return pwr_cNObjid;
-}
+pwr_tOid wb_orepref::poid() const { return pwr_cNObjid; }
 
-pwr_tOid wb_orepref::foid() const
-{
-  return pwr_cNObjid;
-}
+pwr_tOid wb_orepref::foid() const { return pwr_cNObjid; }
 
-pwr_tOid wb_orepref::loid() const
-{
-  return pwr_cNObjid;
-}
+pwr_tOid wb_orepref::loid() const { return pwr_cNObjid; }
 
-pwr_tOid wb_orepref::boid() const
-{
-  return pwr_cNObjid;
-}
+pwr_tOid wb_orepref::boid() const { return pwr_cNObjid; }
 
-pwr_tOid wb_orepref::aoid() const
-{
-  return pwr_cNObjid;
-}
+pwr_tOid wb_orepref::aoid() const { return pwr_cNObjid; }
 
-const char* wb_orepref::name() const
-{
-  return m_vrep->name();
-}
+const char* wb_orepref::name() const { return m_vrep->name(); }
 
 wb_name wb_orepref::longName()
 {
@@ -106,19 +75,19 @@ wb_name wb_orepref::longName()
 
 pwr_tTime wb_orepref::ohTime() const
 {
-  pwr_tTime t = { 0, 0 };
+  pwr_tTime t = {0, 0};
   return t;
 }
 
 pwr_tTime wb_orepref::rbTime() const
 {
-  pwr_tTime t = { 0, 0 };
+  pwr_tTime t = {0, 0};
   return t;
 }
 
 pwr_tTime wb_orepref::dbTime() const
 {
-  pwr_tTime t = { 0, 0 };
+  pwr_tTime t = {0, 0};
   return t;
 }
 
@@ -129,10 +98,7 @@ pwr_mClassDef wb_orepref::flags() const
   return m;
 }
 
-bool wb_orepref::isOffspringOf(const wb_orep* o) const
-{
-  return false;
-}
+bool wb_orepref::isOffspringOf(const wb_orep* o) const { return false; }
 
 wb_orep* wb_orepref::ancestor(pwr_tStatus* sts)
 {
@@ -200,27 +166,12 @@ wb_adrep* wb_orepref::attribute(pwr_tStatus* sts)
   return 0;
 }
 
-wb_erep* wb_orepref::erep() const
-{
-  return m_vrep->erep();
-}
+wb_erep* wb_orepref::erep() const { return m_vrep->erep(); }
 
-wb_vrep* wb_orepref::vrep() const
-{
-  return m_vrep;
-}
+wb_vrep* wb_orepref::vrep() const { return m_vrep; }
 
-ldh_eVolRep wb_orepref::vtype() const
-{
-  return ldh_eVolRep_Ref;
-}
+ldh_eVolRep wb_orepref::vtype() const { return ldh_eVolRep_Ref; }
 
-bool wb_orepref::docBlock(char** block, int* size) const
-{
-  return false;
-}
+bool wb_orepref::docBlock(char** block, int* size) const { return false; }
 
-bool wb_orepref::docBlock(char* block)
-{
-  return false;
-}
+bool wb_orepref::docBlock(char* block) { return false; }

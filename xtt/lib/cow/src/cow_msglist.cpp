@@ -46,18 +46,12 @@
 //
 //  Free pixmaps
 //
-void MsgListBrow::free_pixmaps()
-{
-  brow_FreeAnnotPixmap(ctx, pixmap_morehelp);
-}
+void MsgListBrow::free_pixmaps() { brow_FreeAnnotPixmap(ctx, pixmap_morehelp); }
 
 //
 //  Create pixmaps for leaf, closed map and open map
 //
-void MsgListBrow::allocate_pixmaps()
-{
-  brow_LoadPBM(ctx, "xnav_bitmap_morehelp", &pixmap_morehelp);
-}
+void MsgListBrow::allocate_pixmaps() { brow_LoadPBM(ctx, "xnav_bitmap_morehelp", &pixmap_morehelp); }
 
 //
 // Create nodeclasses
@@ -68,15 +62,11 @@ void MsgListBrow::create_nodeclasses()
 
   // Create common-class
 
-  brow_CreateNodeClass(
-      ctx, "EventDefault", flow_eNodeGroup_Common, &nc_default);
+  brow_CreateNodeClass(ctx, "EventDefault", flow_eNodeGroup_Common, &nc_default);
   brow_AddAnnotPixmap(nc_default, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_default, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_default, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_default, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_default, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_default, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_default, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_default, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Error
@@ -84,12 +74,9 @@ void MsgListBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_error, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_error, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_LineRed);
   brow_AddRect(nc_error, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_error, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_error, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_error, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_error, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_error, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_error, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_error, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Fatal
@@ -97,12 +84,9 @@ void MsgListBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_fatal, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_fatal, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_LineRed);
   brow_AddRect(nc_fatal, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Line, 2, 0);
-  brow_AddAnnot(nc_fatal, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_fatal, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_fatal, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_fatal, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_fatal, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_fatal, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_fatal, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Warning
@@ -110,12 +94,9 @@ void MsgListBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_warning, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_warning, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Yellow);
   brow_AddRect(nc_warning, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_warning, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_warning, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_warning, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_warning, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_warning, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_warning, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_warning, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Info
@@ -123,12 +104,9 @@ void MsgListBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_info, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   brow_AddFilledRect(nc_info, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Green);
   brow_AddRect(nc_info, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_info, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_info, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_info, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_info, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_info, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_info, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_info, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 
   // Nodeclass for Success
@@ -136,12 +114,9 @@ void MsgListBrow::create_nodeclasses()
   brow_AddAnnotPixmap(nc_success, 0, 0.2, 0.1, flow_eDrawType_Line, 2, 0);
   // brow_AddFilledRect( nc_success, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Green);
   brow_AddRect(nc_success, 0.8, 0.15, 0.4, 0.4, flow_eDrawType_Line, 0, 0);
-  brow_AddAnnot(nc_success, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_success, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
-  brow_AddAnnot(nc_success, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2,
-      flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_success, 1.4, 0.6, 0, flow_eDrawType_TextRobotoBold, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_success, 2.2, 0.6, 1, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
+  brow_AddAnnot(nc_success, 9, 0.6, 2, flow_eDrawType_TextRoboto, 2, flow_eAnnotType_OneLine, 0);
   brow_AddFrame(nc_success, 0, 0, 35, 0.83, flow_eDrawType_LineGray, -1, 1);
 }
 
@@ -158,36 +133,21 @@ void MsgListBrow::brow_setup()
   brow_SetAttributes(ctx, &brow_attr, mask);
   brow_SetCtxUserData(ctx, msglist);
 
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, MsgList::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack,
-      MsgList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, MsgList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, MsgList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, MsgList::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack,
-      MsgList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, MsgList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, MsgList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, MsgList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, MsgList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, MsgList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, MsgList::brow_cb);
-  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack,
-      MsgList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, MsgList::brow_cb);
-  brow_EnableEvent(
-      ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Press, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_MB3Down, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, MsgList::brow_cb);
+  brow_EnableEvent(ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, MsgList::brow_cb);
 }
 
 //
@@ -215,35 +175,21 @@ MsgList::MsgList(void* ev_parent_ctx)
 //
 //  Delete ev
 //
-MsgList::~MsgList()
-{
-}
+MsgList::~MsgList() {}
 
-MsgListBrow::~MsgListBrow()
-{
-  free_pixmaps();
-}
+MsgListBrow::~MsgListBrow() { free_pixmaps(); }
 
 //
 //  Zoom
 //
-void MsgList::zoom(double zoom_factor)
-{
-  brow_Zoom(brow->ctx, zoom_factor);
-}
+void MsgList::zoom(double zoom_factor) { brow_Zoom(brow->ctx, zoom_factor); }
 
 //
 //  Return to base zoom factor
 //
-void MsgList::unzoom()
-{
-  brow_UnZoom(brow->ctx);
-}
+void MsgList::unzoom() { brow_UnZoom(brow->ctx); }
 
-void MsgList::set_nodraw()
-{
-  brow_SetNodraw(brow->ctx);
-}
+void MsgList::set_nodraw() { brow_SetNodraw(brow->ctx); }
 
 void MsgList::reset_nodraw()
 {
@@ -259,10 +205,7 @@ void MsgList::remove_oldest()
   brow_DeleteNode(brow->ctx, last);
 }
 
-void MsgList::clear()
-{
-  brow_DeleteAll(brow->ctx);
-}
+void MsgList::clear() { brow_DeleteAll(brow->ctx); }
 
 //
 // Callbacks from brow
@@ -272,34 +215,43 @@ int MsgList::brow_cb(FlowCtx* ctx, flow_tEvent event)
   MsgList* msglist;
   ItemMsg* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
   }
 
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&msglist);
-  switch (event->event) {
-  case flow_eEvent_Key_Up: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(msglist->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLastVisible(msglist->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              msglist->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(msglist->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetLastVisible(msglist->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetPrevious(msglist->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -315,26 +267,33 @@ int MsgList::brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(msglist->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirstVisible(msglist->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
-      if (!brow_IsVisible(
-              msglist->brow->ctx, node_list[0], flow_eVisible_Partial)) {
+    }
+    else
+    {
+      if (!brow_IsVisible(msglist->brow->ctx, node_list[0], flow_eVisible_Partial))
+      {
         sts = brow_GetFirstVisible(msglist->brow->ctx, &object);
         if (EVEN(sts))
           return 1;
-      } else {
+      }
+      else
+      {
         sts = brow_GetNext(msglist->brow->ctx, node_list[0], &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -358,10 +317,12 @@ int MsgList::brow_cb(FlowCtx* ctx, flow_tEvent event)
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -373,9 +334,12 @@ int MsgList::brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(msglist->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(msglist->brow->ctx, event->object.object))
+      {
         brow_SelectClear(msglist->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(msglist->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(msglist->brow->ctx, event->object.object);
@@ -385,23 +349,28 @@ int MsgList::brow_cb(FlowCtx* ctx, flow_tEvent event)
       brow_SelectClear(msglist->brow->ctx);
     }
     break;
-  case flow_eEvent_Key_PageDown: {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(msglist->brow->ctx, 0.95);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(msglist->brow->ctx, -0.95);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(msglist->brow->ctx, 0.10);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(msglist->brow->ctx, -0.10);
     break;
   }
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
@@ -414,16 +383,19 @@ int MsgList::brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (brow_IsOpen(node_list[0]))
       // Close this node
       object = node_list[0];
-    else {
+    else
+    {
       // Close parent
       sts = brow_GetParent(msglist->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(node_list);
         return 1;
       }
     }
     brow_GetUserData(object, (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case msglist_eItemType_Msg:
       //	  ((ItemLocal *)item)->close( msglist, 0, 0);
       break;
@@ -437,7 +409,8 @@ int MsgList::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     int node_count;
 
@@ -450,7 +423,8 @@ int MsgList::brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_MB1DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
       item->find();
@@ -463,8 +437,8 @@ int MsgList::brow_cb(FlowCtx* ctx, flow_tEvent event)
   return 1;
 }
 
-ItemMsg::ItemMsg(MsgList* item_msglist, const char* item_name, char* item_text,
-    int item_severity, brow_tNode dest, flow_eDest dest_code)
+ItemMsg::ItemMsg(MsgList* item_msglist, const char* item_name, char* item_text, int item_severity,
+                 brow_tNode dest, flow_eDest dest_code)
     : msglist(item_msglist), severity(item_severity)
 {
   char type_str[8];
@@ -479,42 +453,42 @@ ItemMsg::ItemMsg(MsgList* item_msglist, const char* item_name, char* item_text,
   if (text[strlen(text) - 1] == '\n')
     text[strlen(text) - 1] = 0;
 
-  switch (severity) {
+  switch (severity)
+  {
   case 'S':
-    brow_CreateNode(msglist->brow->ctx, (char*)"Success",
-        msglist->brow->nc_success, dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(msglist->brow->ctx, (char*)"Success", msglist->brow->nc_success, dest, dest_code,
+                    (void*)this, 1, &node);
     strcpy(type_str, "S");
     break;
   case 'I':
-    brow_CreateNode(msglist->brow->ctx, (char*)"Info", msglist->brow->nc_info,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(msglist->brow->ctx, (char*)"Info", msglist->brow->nc_info, dest, dest_code, (void*)this,
+                    1, &node);
     strcpy(type_str, "I");
     break;
   case 'E':
-    brow_CreateNode(msglist->brow->ctx, (char*)"Error", msglist->brow->nc_error,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(msglist->brow->ctx, (char*)"Error", msglist->brow->nc_error, dest, dest_code, (void*)this,
+                    1, &node);
     strcpy(type_str, "E");
     break;
   case 'W':
-    brow_CreateNode(msglist->brow->ctx, (char*)"Warning",
-        msglist->brow->nc_warning, dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(msglist->brow->ctx, (char*)"Warning", msglist->brow->nc_warning, dest, dest_code,
+                    (void*)this, 1, &node);
     strcpy(type_str, "W");
     break;
   case 'F':
-    brow_CreateNode(msglist->brow->ctx, (char*)"Fatal", msglist->brow->nc_fatal,
-        dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(msglist->brow->ctx, (char*)"Fatal", msglist->brow->nc_fatal, dest, dest_code, (void*)this,
+                    1, &node);
     strcpy(type_str, "F");
     break;
   default:
-    brow_CreateNode(msglist->brow->ctx, (char*)"Default",
-        msglist->brow->nc_default, dest, dest_code, (void*)this, 1, &node);
+    brow_CreateNode(msglist->brow->ctx, (char*)"Default", msglist->brow->nc_default, dest, dest_code,
+                    (void*)this, 1, &node);
     strcpy(type_str, "");
   }
 
   brow_SetAnnotation(node, 0, type_str, strlen(type_str));
   time_GetTime(&time);
-  time_AtoAscii(
-      &time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
+  time_AtoAscii(&time, time_eFormat_ComprDateAndTime, time_str, sizeof(time_str));
   time_str[17] = 0;
   brow_SetAnnotation(node, 1, time_str, strlen(time_str));
   brow_SetAnnotation(node, 2, text, strlen(text));
@@ -522,20 +496,13 @@ ItemMsg::ItemMsg(MsgList* item_msglist, const char* item_name, char* item_text,
   //  brow_SetAnnotPixmap( node, 0, msglist->brow->pixmap_leaf);
 }
 
-ItemMsg::~ItemMsg()
-{
-}
+ItemMsg::~ItemMsg() {}
 
-void ItemMsg::find()
-{
-}
+void ItemMsg::find() {}
 
-ItemMsgObject::ItemMsgObject(MsgList* item_msglist, const char* item_name,
-    char* item_text, int item_severity, pwr_tOid item_oid, brow_tNode dest,
-    flow_eDest dest_code)
-    : ItemMsg(
-          item_msglist, item_name, item_text, item_severity, dest, dest_code),
-      oid(item_oid)
+ItemMsgObject::ItemMsgObject(MsgList* item_msglist, const char* item_name, char* item_text, int item_severity,
+                             pwr_tOid item_oid, brow_tNode dest, flow_eDest dest_code)
+    : ItemMsg(item_msglist, item_name, item_text, item_severity, dest, dest_code), oid(item_oid)
 {
   brow_SetAnnotPixmap(node, 0, msglist->brow->pixmap_morehelp);
 }
@@ -546,12 +513,10 @@ void ItemMsgObject::find()
     (msglist->find_wnav_cb)(msglist->parent_ctx, oid);
 }
 
-ItemMsgObjectPlc::ItemMsgObjectPlc(MsgList* item_msglist, const char* item_name,
-    char* item_text, int item_severity, pwr_tOid item_oid, brow_tNode dest,
-    flow_eDest dest_code)
-    : ItemMsg(
-          item_msglist, item_name, item_text, item_severity, dest, dest_code),
-      oid(item_oid)
+ItemMsgObjectPlc::ItemMsgObjectPlc(MsgList* item_msglist, const char* item_name, char* item_text,
+                                   int item_severity, pwr_tOid item_oid, brow_tNode dest,
+                                   flow_eDest dest_code)
+    : ItemMsg(item_msglist, item_name, item_text, item_severity, dest, dest_code), oid(item_oid)
 {
   brow_SetAnnotPixmap(node, 0, msglist->brow->pixmap_morehelp);
 }
@@ -562,12 +527,10 @@ void ItemMsgObjectPlc::find()
     (msglist->find_plc_cb)(msglist->parent_ctx, oid);
 }
 
-ItemMsgObjectGe::ItemMsgObjectGe(MsgList* item_msglist, const char* item_name,
-    char* item_text, int item_severity, char* item_object, void* item_utility,
-    brow_tNode dest, flow_eDest dest_code)
-    : ItemMsg(
-          item_msglist, item_name, item_text, item_severity, dest, dest_code),
-      utility(item_utility)
+ItemMsgObjectGe::ItemMsgObjectGe(MsgList* item_msglist, const char* item_name, char* item_text,
+                                 int item_severity, char* item_object, void* item_utility, brow_tNode dest,
+                                 flow_eDest dest_code)
+    : ItemMsg(item_msglist, item_name, item_text, item_severity, dest, dest_code), utility(item_utility)
 {
   strncpy(object, item_object, sizeof(object));
   brow_SetAnnotPixmap(node, 0, msglist->brow->pixmap_morehelp);

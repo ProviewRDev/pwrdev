@@ -50,7 +50,8 @@
   with x and y coordinates. The curves are drawn filled or unfilled.
 */
 
-class GrowXYCurve : public GrowTrend {
+class GrowXYCurve : public GrowTrend
+{
 public:
   //! Constuctor
   /*!
@@ -68,37 +69,30 @@ public:
     \param fill_d_type	Fill color.
     \param nodraw	Don't draw the object now.
   */
-  GrowXYCurve(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0,
-      double w = 0, double h = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int fill_rect = 0,
-      int display_border = 1, glow_eDrawType fill_d_type = glow_eDrawType_Line,
-      int nodraw = 0);
+  GrowXYCurve(GrowCtx* glow_ctx, const char* name, double x = 0, double y = 0, double w = 0, double h = 0,
+              glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
+              glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int fill_rect = 0,
+              int display_border = 1, glow_eDrawType fill_d_type = glow_eDrawType_Line, int nodraw = 0);
 
   //! Get the object type
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowXYCurve;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowXYCurve; }
 
   void save(std::ofstream& fp, glow_eSaveMode mode);
   void open(std::ifstream& fp);
 
   void set_xy_range_x(int curve, double min, double max);
   void set_xy_range_y(int curve, double min, double max);
-  void get_xy_range_x(int curve, double *min, double *max);
-  void get_xy_range_y(int curve, double *min, double *max);
+  void get_xy_range_x(int curve, double* min, double* max);
+  void get_xy_range_y(int curve, double* min, double* max);
   void set_xy_noofcurves(int noofcurves);
-  int get_xy_noofpoints() {return no_of_points;}
-  void set_xy_curve_color(
-      int curve, glow_eDrawType curve_color, glow_eDrawType fill_color);
-  void set_xy_data(
-      double* y_data, double* x_data, int curve_idx, int data_points);
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  int get_xy_noofpoints() { return no_of_points; }
+  void set_xy_curve_color(int curve, glow_eDrawType curve_color, glow_eDrawType fill_color);
+  void set_xy_data(double* y_data, double* x_data, int curve_idx, int data_points);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ofstream& fp);
   int get_java_name(char* name);
 };
 

@@ -40,7 +40,8 @@
 /* rt_io_bus.h -- includefile for io bus. */
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "rt_io_supervise.h"
@@ -58,36 +59,37 @@ extern "C" {
 #endif
 #endif
 
-typedef enum { io_eAlignment_Packed, io_eAlignment_Powerlink } io_eAlignment;
+  typedef enum
+  {
+    io_eAlignment_Packed,
+    io_eAlignment_Powerlink
+  } io_eAlignment;
 
-/*----------------------------------------------------------------------------*\
-  Io functions
-\*----------------------------------------------------------------------------*/
+  /*----------------------------------------------------------------------------*\
+    Io functions
+  \*----------------------------------------------------------------------------*/
 
-int is_diag(pwr_tAttrRef* aref);
+  int is_diag(pwr_tAttrRef* aref);
 
-pwr_tInt32 GetChanSize(pwr_eDataRepEnum rep);
+  pwr_tInt32 GetChanSize(pwr_eDataRepEnum rep);
 
-unsigned short swap16(unsigned short in);
+  unsigned short swap16(unsigned short in);
 
-unsigned int swap32(unsigned int in);
+  unsigned int swap32(unsigned int in);
 
-pwr_tStatus io_bus_card_init(io_tCtx ctx, io_sCard* cp,
-    unsigned int* input_area_offset, unsigned int* input_area_chansize,
-    unsigned int* output_area_offset, unsigned int* output_area_chansize,
-    pwr_tByteOrderingEnum byte_order, io_eAlignment alignment);
+  pwr_tStatus io_bus_card_init(io_tCtx ctx, io_sCard* cp, unsigned int* input_area_offset,
+                               unsigned int* input_area_chansize, unsigned int* output_area_offset,
+                               unsigned int* output_area_chansize, pwr_tByteOrderingEnum byte_order,
+                               io_eAlignment alignment);
 
-void io_bus_card_area_size( io_tCtx ctx,
-    io_sCard *cp, 
-    unsigned int *input_area_size, 
-    unsigned int *output_area_size);
+  void io_bus_card_area_size(io_tCtx ctx, io_sCard* cp, unsigned int* input_area_size,
+                             unsigned int* output_area_size);
 
-void io_bus_card_read(io_tCtx ctx, io_sRack* rp, io_sCard* cp, void* input_area,
-    void* diag_area, pwr_tByteOrderingEnum byte_order,
-    pwr_tFloatRepEnum float_rep);
+  void io_bus_card_read(io_tCtx ctx, io_sRack* rp, io_sCard* cp, void* input_area, void* diag_area,
+                        pwr_tByteOrderingEnum byte_order, pwr_tFloatRepEnum float_rep);
 
-void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area,
-    pwr_tByteOrderingEnum byte_order, pwr_tFloatRepEnum float_rep);
+  void io_bus_card_write(io_tCtx ctx, io_sCard* cp, void* output_area, pwr_tByteOrderingEnum byte_order,
+                         pwr_tFloatRepEnum float_rep);
 
 #ifdef __cplusplus
 }

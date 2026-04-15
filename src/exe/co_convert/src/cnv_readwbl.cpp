@@ -34,7 +34,8 @@
  * General Public License plus this exception.
  */
 
-extern "C" {
+extern "C"
+{
 #include "co_time.h"
 #include "co_dcli.h"
 #include "co_cdh.h"
@@ -85,26 +86,30 @@ int CnvReadWbl::read_wbl(char* filename)
   state = 0;
   doc_fresh = 0;
 
-  while (1) {
+  while (1)
+  {
     sts = CnvCtx::read_line(line, sizeof(line), fp);
     if (!sts)
       linetype = cread_eLine_EOF;
-    else {
+    else
+    {
       line_cnt++;
       str_trim(line, line);
       if (streq(line, ""))
         continue;
 
-      if (line[0] == '!' && !str_StartsWith(line, "!/**")
-          && !(state & cread_mState_Doc))
+      if (line[0] == '!' && !str_StartsWith(line, "!/**") && !(state & cread_mState_Doc))
         continue;
 
-      if (state & cread_mState_StringAttr) {
+      if (state & cread_mState_StringAttr)
+      {
         // Look for termination of string
         int terminated = 0;
         char* s = line;
-        while (*s) {
-          if (*s == '\"' && *(s - 1) != '\\') {
+        while (*s)
+        {
+          if (*s == '\"' && *(s - 1) != '\\')
+          {
             terminated = 1;
             break;
           }
@@ -115,33 +120,27 @@ int CnvReadWbl::read_wbl(char* filename)
         continue;
       }
 
-      nr = dcli_parse(line, " 	=", "", (char*)line_part,
-          sizeof(line_part) / sizeof(line_part[0]), sizeof(line_part[0]), 0);
+      nr = dcli_parse(line, " 	=", "", (char*)line_part, sizeof(line_part) / sizeof(line_part[0]),
+                      sizeof(line_part[0]), 0);
 
       if (streq(low(line_part[0]), "sobject"))
         linetype = cread_eLine_SObject;
       else if (streq(low(line_part[0]), "endsobject"))
         linetype = cread_eLine_EndSObject;
-      else if (streq(low(line_part[0]), "object") && nr > 1
-          && streq(low(line_part[1]), "template"))
+      else if (streq(low(line_part[0]), "object") && nr > 1 && streq(low(line_part[1]), "template"))
         linetype = cread_eLine_Template;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$classdef"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$classdef"))
         linetype = cread_eLine_ClassDef;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "pwr_eclass_classdef"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 &&
+               streq(low(line_part[2]), "pwr_eclass_classdef"))
         linetype = cread_eLine_ClassDef;
-      else if (streq(low(line_part[0]), "body") && nr > 1
-          && streq(low(line_part[1]), "sysbody"))
+      else if (streq(low(line_part[0]), "body") && nr > 1 && streq(low(line_part[1]), "sysbody"))
         linetype = cread_eLine_SysBody;
-      else if (streq(low(line_part[0]), "dbody") && nr > 1
-          && streq(low(line_part[1]), "sysbody"))
+      else if (streq(low(line_part[0]), "dbody") && nr > 1 && streq(low(line_part[1]), "sysbody"))
         linetype = cread_eLine_SysBody;
-      else if (streq(low(line_part[0]), "body") && nr > 1
-          && streq(low(line_part[1]), "rtbody"))
+      else if (streq(low(line_part[0]), "body") && nr > 1 && streq(low(line_part[1]), "rtbody"))
         linetype = cread_eLine_RtBody;
-      else if (streq(low(line_part[0]), "body") && nr > 1
-          && streq(low(line_part[1]), "devbody"))
+      else if (streq(low(line_part[0]), "body") && nr > 1 && streq(low(line_part[1]), "devbody"))
         linetype = cread_eLine_DevBody;
       else if (streq(low(line_part[0]), "endbody"))
         linetype = cread_eLine_EndBody;
@@ -155,59 +154,43 @@ int CnvReadWbl::read_wbl(char* filename)
         linetype = cread_eLine_Attr;
       else if (streq(low(line_part[0]), "dattr"))
         linetype = cread_eLine_DAttr;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "pwr_eclass_param"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "pwr_eclass_param"))
         linetype = cread_eLine_Attribute;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "pwr_eclass_typedef"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "pwr_eclass_typedef"))
         linetype = cread_eLine_TypeDef;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$typedef"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$typedef"))
         linetype = cread_eLine_TypeDef;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "pwr_eclass_type"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "pwr_eclass_type"))
         linetype = cread_eLine_Type;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$objbodydef"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$objbodydef"))
         linetype = cread_eLine_ObjBodyDef;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "pwr_eclass_objbodydef"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 &&
+               streq(low(line_part[2]), "pwr_eclass_objbodydef"))
         linetype = cread_eLine_ObjBodyDef;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$input"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$input"))
         linetype = cread_eLine_Input;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$output"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$output"))
         linetype = cread_eLine_Output;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$intern"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$intern"))
         linetype = cread_eLine_Intern;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$attribute"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$attribute"))
         linetype = cread_eLine_Attribute;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$param"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$param"))
         linetype = cread_eLine_Attribute;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$targetattribute"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$targetattribute"))
         linetype = cread_eLine_TargetAttribute;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$objxref"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$objxref"))
         linetype = cread_eLine_ObjXRef;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$graphplcnode"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$graphplcnode"))
         linetype = cread_eLine_GraphPlcNode;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$graphplcconnection"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 &&
+               streq(low(line_part[2]), "$graphplcconnection"))
         linetype = cread_eLine_GraphPlcCon;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$buffer"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$buffer"))
         linetype = cread_eLine_Buffer;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$bit"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$bit"))
         linetype = cread_eLine_Bit;
-      else if (streq(low(line_part[0]), "object") && nr > 2
-          && streq(low(line_part[2]), "$value"))
+      else if (streq(low(line_part[0]), "object") && nr > 2 && streq(low(line_part[2]), "$value"))
         linetype = cread_eLine_Value;
       else if (streq(low(line_part[0]), "object"))
         linetype = cread_eLine_Object;
@@ -233,7 +216,8 @@ int CnvReadWbl::read_wbl(char* filename)
         linetype = cread_eLine_Unknown;
 
       sts = 1;
-      switch (linetype) {
+      switch (linetype)
+      {
       case cread_eLine_Doc:
         state |= cread_mState_Doc;
         sts = object_close();
@@ -264,12 +248,12 @@ int CnvReadWbl::read_wbl(char* filename)
           strcpy(class_id, line_part[3]);
         if (nr > 5)
           sprintf(class_version, "%s %s", line_part[4], line_part[5]);
-        else {
+        else
+        {
           pwr_tTime t;
           sts = dcli_file_time(filename, &t);
           if (ODD(sts))
-            time_AtoAscii(&t, time_eFormat_DateAndTime, class_version,
-                sizeof(class_version));
+            time_AtoAscii(&t, time_eFormat_DateAndTime, class_version, sizeof(class_version));
           else
             strcpy(class_version, "");
         }
@@ -416,76 +400,92 @@ int CnvReadWbl::read_wbl(char* filename)
           state &= ~cread_mState_ObjXRef;
         else if (state & cread_mState_Buffer)
           state &= ~cread_mState_Buffer;
-        else if (state & cread_mState_ObjBodyDef) {
+        else if (state & cread_mState_ObjBodyDef)
+        {
           state &= ~cread_mState_ObjBodyDef;
-          if (wblto->type() == Cnv_eWblToType_Html
-              || wblto->type() == Cnv_eWblToType_H)
+          if (wblto->type() == Cnv_eWblToType_Html || wblto->type() == Cnv_eWblToType_H)
             wblto->body_close();
-        } else if (state & cread_mState_GraphPlcNode) {
+        }
+        else if (state & cread_mState_GraphPlcNode)
+        {
           state &= ~cread_mState_GraphPlcNode;
           if (wblto->type() == Cnv_eWblToType_Html)
             wblto->body_close();
-        } else if (state & cread_mState_GraphPlcCon) {
+        }
+        else if (state & cread_mState_GraphPlcCon)
+        {
           state &= ~cread_mState_GraphPlcCon;
           if (wblto->type() == Cnv_eWblToType_Html)
             wblto->body_close();
-        } else if (state & cread_mState_Template) {
+        }
+        else if (state & cread_mState_Template)
+        {
           state &= ~cread_mState_Template;
           if (wblto->type() == Cnv_eWblToType_Html)
             wblto->body_close();
-        } else if (state & cread_mState_ClassDef
-            && classdef_level == object_level) {
+        }
+        else if (state & cread_mState_ClassDef && classdef_level == object_level)
+        {
           if (tlog)
             printf("Cd %7d %3d %s\n", line_cnt, object_level, line);
           state &= ~cread_mState_ClassDef;
-          if (wblto->type() == Cnv_eWblToType_Html && wblto->class_open()
-              && classdef_level == object_level)
+          if (wblto->type() == Cnv_eWblToType_Html && wblto->class_open() && classdef_level == object_level)
             wblto->class_close();
-          if (wblto->type() == Cnv_eWblToType_H && wblto->class_open()
-              && classdef_level == object_level)
+          if (wblto->type() == Cnv_eWblToType_H && wblto->class_open() && classdef_level == object_level)
             wblto->class_close();
-        } else if (state & cread_mState_Bit) {
+        }
+        else if (state & cread_mState_Bit)
+        {
           state &= ~cread_mState_Bit;
           // object_state = cread_mState_TypeDef;
           object_level--;
-        } else if (state & cread_mState_Value) {
+        }
+        else if (state & cread_mState_Value)
+        {
           state &= ~cread_mState_Value;
           // object_state = cread_mState_TypeDef;
           object_level--;
-        } else if (state & cread_mState_TypeDef
-            && classdef_level == object_level) {
+        }
+        else if (state & cread_mState_TypeDef && classdef_level == object_level)
+        {
           state &= ~cread_mState_TypeDef;
-          if ((wblto->type() == Cnv_eWblToType_Html
-                  || wblto->type() == Cnv_eWblToType_Xtthelp)
-              && wblto->class_open())
+          if ((wblto->type() == Cnv_eWblToType_Html || wblto->type() == Cnv_eWblToType_Xtthelp) &&
+              wblto->class_open())
             wblto->typedef_close();
           if (wblto->type() == Cnv_eWblToType_H && wblto->class_open())
             wblto->typedef_close();
-        } else if (state & cread_mState_Type) {
+        }
+        else if (state & cread_mState_Type)
+        {
           state &= ~cread_mState_Type;
-        } else if (state & cread_mState_Object) {
+        }
+        else if (state & cread_mState_Object)
+        {
           object_level--;
           if (object_level <= 0)
             state &= ~cread_mState_Object;
           if (tlog)
             printf("Oo %7d %3d %s\n", line_cnt, object_level, line);
-        } else
-          printf("Error: mismatch in Object-Endobject nesting, at line %d\n",
-              line_cnt);
+        }
+        else
+          printf("Error: mismatch in Object-Endobject nesting, at line %d\n", line_cnt);
         break;
-      case cread_eLine_Attr: {
+      case cread_eLine_Attr:
+      {
         char attr_name[80];
         char attr_value[100];
         int oreq = 0;
 
-        if (streq(line_part[2], "|")) {
+        if (streq(line_part[2], "|"))
+        {
           strcpy(line_part[2], line_part[3]);
           oreq = 1;
         }
 
         strcpy(attr_name, line_part[1]);
         strcpy(attr_value, line_part[2]);
-        switch (object_state) {
+        switch (object_state)
+        {
         case cread_mState_Input:
         case cread_mState_Output:
         case cread_mState_Intern:
@@ -524,7 +524,8 @@ int CnvReadWbl::read_wbl(char* filename)
         // Check if unterminated string
         int terminated = 1;
         char* s = line;
-        while (*s) {
+        while (*s)
+        {
           if (*s == '\"' && *(s - 1) != '\\')
             terminated = !terminated;
           s++;
@@ -534,19 +535,22 @@ int CnvReadWbl::read_wbl(char* filename)
 
         break;
       }
-      case cread_eLine_DAttr: {
+      case cread_eLine_DAttr:
+      {
         char attr_name[80];
         char attr_value[100];
         int oreq = 0;
 
-        if (streq(line_part[3], "|")) {
+        if (streq(line_part[3], "|"))
+        {
           strcpy(line_part[3], line_part[4]);
           oreq = 1;
         }
 
         strcpy(attr_name, line_part[1]);
         strcpy(attr_value, line_part[3]);
-        switch (object_state) {
+        switch (object_state)
+        {
         case cread_mState_DParam:
         case cread_mState_Input:
         case cread_mState_Output:
@@ -579,7 +583,8 @@ int CnvReadWbl::read_wbl(char* filename)
         }
         break;
       }
-      case cread_eLine_Buffer: {
+      case cread_eLine_Buffer:
+      {
         sts = object_close();
         state |= cread_mState_Buffer;
         object_state = cread_mState_Buffer;
@@ -588,7 +593,8 @@ int CnvReadWbl::read_wbl(char* filename)
         attribute_init();
         break;
       }
-      case cread_eLine_GraphPlcNode: {
+      case cread_eLine_GraphPlcNode:
+      {
         sts = object_close();
         state |= cread_mState_GraphPlcNode;
         object_state = cread_mState_GraphPlcNode;
@@ -596,7 +602,8 @@ int CnvReadWbl::read_wbl(char* filename)
         strcpy(graphplcnode_name, line_part[1]);
         break;
       }
-      case cread_eLine_GraphPlcCon: {
+      case cread_eLine_GraphPlcCon:
+      {
         sts = object_close();
         state |= cread_mState_GraphPlcCon;
         object_state = cread_mState_GraphPlcCon;
@@ -604,7 +611,8 @@ int CnvReadWbl::read_wbl(char* filename)
         strcpy(graphplccon_name, line_part[1]);
         break;
       }
-      case cread_eLine_Object: {
+      case cread_eLine_Object:
+      {
         sts = object_close();
         state |= cread_mState_Object;
         object_state = cread_mState_Object;
@@ -613,12 +621,14 @@ int CnvReadWbl::read_wbl(char* filename)
           printf("Oo %7d %3d %s\n", line_cnt, object_level, line);
         break;
       }
-      case cread_eLine_Volume: {
+      case cread_eLine_Volume:
+      {
         state |= cread_mState_Volume;
         strcpy(volume_name, line_part[1]);
         break;
       }
-      case cread_eLine_EndVolume: {
+      case cread_eLine_EndVolume:
+      {
         if (state & cread_mState_Volume)
           state &= ~cread_mState_Volume;
         break;
@@ -635,7 +645,8 @@ int CnvReadWbl::read_wbl(char* filename)
         printf("Error, unknown linetype, %s, at line %d\n", filename, line_cnt);
         return sts = CNV__UNKNOWN_LINETYPE;
       }
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         printf(", at line %d\n", line_cnt);
         return_sts = sts;
       }
@@ -677,8 +688,10 @@ int CnvReadWbl::attribute_attr(char* name, char* value)
   char* s;
   int nr;
 
-  if (streq(low(name), "typeref")) {
-    if ((s = strrchr(value, '-'))) {
+  if (streq(low(name), "typeref"))
+  {
+    if ((s = strrchr(value, '-')))
+    {
       s++;
       if (*s == '$')
         s++;
@@ -688,10 +701,14 @@ int CnvReadWbl::attribute_attr(char* name, char* value)
         *s = 0;
       else
         strcpy(attr_typeref_volume, "");
-    } else
+    }
+    else
       strcpy(attr_typeref, value);
-  } else if (streq(low(name), "flags")) {
-    if (str_StartsWith(value, "PWR_MASK_")) {
+  }
+  else if (streq(low(name), "flags"))
+  {
+    if (str_StartsWith(value, "PWR_MASK_"))
+    {
       if (!streq(attr_flags, ""))
         strcat(attr_flags, " | ");
       strcat(attr_flags, &value[9]);
@@ -702,11 +719,14 @@ int CnvReadWbl::attribute_attr(char* name, char* value)
         attr_array = 1;
       if (streq(value, "PWR_MASK_CLASS"))
         attr_isclass = 1;
-    } else {
+    }
+    else
+    {
       int flags_value;
 
       nr = sscanf(value, "%d", &flags_value);
-      if (nr != 1) {
+      if (nr != 1)
+      {
         return 1;
       }
       if (!streq(attr_flags, ""))
@@ -720,16 +740,24 @@ int CnvReadWbl::attribute_attr(char* name, char* value)
       if (flags_value & pwr_mAdef_class)
         attr_isclass = 1;
     }
-  } else if (streq(low(name), "elements")) {
+  }
+  else if (streq(low(name), "elements"))
+  {
     strcpy(attr_elements, value);
     nr = sscanf(attr_elements, "%d", &attr_elem);
     if (nr == 0)
       attr_elem = 0;
-  } else if (streq(low(name), "class")) {
+  }
+  else if (streq(low(name), "class"))
+  {
     strcpy(attr_typeref, value);
-  } else if (streq(low(name), "pgmname")) {
+  }
+  else if (streq(low(name), "pgmname"))
+  {
     strcpy(attr_pgmname, value);
-  } else if (streq(low(name), "graphname")) {
+  }
+  else if (streq(low(name), "graphname"))
+  {
     strcpy(attr_graphname, value);
   }
   return 1;
@@ -767,21 +795,26 @@ void CnvReadWbl::class_init()
 
 int CnvReadWbl::class_attr(char* name, char* value)
 {
-  if (streq(low(name), "editor")) {
+  if (streq(low(name), "editor"))
+  {
     if (str_StartsWith(value, "pwr_eEditor_"))
       strcpy(class_editor, &value[12]);
     else
       strcpy(class_editor, value);
-
-  } else if (streq(low(name), "method")) {
+  }
+  else if (streq(low(name), "method"))
+  {
     if (str_StartsWith(value, "pwr_eMethod_"))
       strcpy(class_method, &value[12]);
     else
       strcpy(class_method, value);
-
-  } else if (streq(low(name), "popeditor")) {
+  }
+  else if (streq(low(name), "popeditor"))
+  {
     strcpy(class_method, value);
-  } else if (streq(low(name), "flags")) {
+  }
+  else if (streq(low(name), "flags"))
+  {
     if (!streq(class_flags, ""))
       strcat(class_flags, " | ");
     if (str_StartsWith(value, "pwr_mClassDef_"))
@@ -797,7 +830,8 @@ int CnvReadWbl::class_attr(char* name, char* value)
 
 int CnvReadWbl::class_close()
 {
-  if (ctx->first_class) {
+  if (ctx->first_class)
+  {
     wblto->init(class_name);
 
     ctx->first_class = 0;
@@ -819,9 +853,12 @@ void CnvReadWbl::body_init()
 
 int CnvReadWbl::body_attr(char* name, char* value)
 {
-  if (streq(low(name), "structname")) {
+  if (streq(low(name), "structname"))
+  {
     strcpy(body_structname, value);
-  } else if (streq(low(name), "flags")) {
+  }
+  else if (streq(low(name), "flags"))
+  {
     if (!streq(body_flags, ""))
       strcat(body_flags, " | ");
     if (str_StartsWith(value, "pwr_mObjBodyDef_"))
@@ -836,21 +873,20 @@ int CnvReadWbl::body_close()
 {
   int sts;
 
-  if (wblto->type() == Cnv_eWblToType_H) {
+  if (wblto->type() == Cnv_eWblToType_H)
+  {
     sts = wblto->body_exec();
     if (EVEN(sts))
       return sts;
-  } else
+  }
+  else
     wblto->body_exec();
 
   doc_fresh = 0;
   return 1;
 }
 
-void CnvReadWbl::graphplcnode_init()
-{
-  doc_cnt = 0;
-}
+void CnvReadWbl::graphplcnode_init() { doc_cnt = 0; }
 
 int CnvReadWbl::graphplcnode_attr(char* name, char* value)
 {
@@ -858,7 +894,8 @@ int CnvReadWbl::graphplcnode_attr(char* name, char* value)
   strcpy(doc_text[doc_cnt++], value);
 
   // Description of methods
-  if (streq(low(name), "graphmethod")) {
+  if (streq(low(name), "graphmethod"))
+  {
     if (streq(value, "0"))
       strcat(doc_text[doc_cnt - 1], " (standard, individual attributes)");
     else if (streq(value, "1"))
@@ -891,10 +928,7 @@ int CnvReadWbl::graphplcnode_close()
   doc_fresh = 0;
   return 1;
 }
-void CnvReadWbl::graphplccon_init()
-{
-  doc_cnt = 0;
-}
+void CnvReadWbl::graphplccon_init() { doc_cnt = 0; }
 
 int CnvReadWbl::graphplccon_attr(char* name, char* value)
 {
@@ -922,15 +956,13 @@ int CnvReadWbl::graphplccon_close()
   doc_fresh = 0;
   return 1;
 }
-void CnvReadWbl::template_init()
-{
-  doc_cnt = 0;
-}
+void CnvReadWbl::template_init() { doc_cnt = 0; }
 
 int CnvReadWbl::template_attr(char* name, char* value)
 {
   int doc_size = (int)sizeof(doc_text) / sizeof(doc_text[0]);
-  if (doc_cnt >= doc_size) {
+  if (doc_cnt >= doc_size)
+  {
     strcpy(doc_text[doc_size - 2], "Template buffer size exceeded");
     strcpy(doc_text[doc_size - 1], "");
     return 1;
@@ -987,94 +1019,124 @@ int CnvReadWbl::doc_add(char* line)
   int nr;
   int i;
 
-  nr = dcli_parse(line, " 	=", "", (char*)line_part,
-      sizeof(line_part) / sizeof(line_part[0]), sizeof(line_part[0]), 0);
+  nr = dcli_parse(line, " 	=", "", (char*)line_part, sizeof(line_part) / sizeof(line_part[0]),
+                  sizeof(line_part[0]), 0);
 
-  if (streq(low(line_part[1]), "@author")) {
-    for (i = 2; i < nr; i++) {
+  if (streq(low(line_part[1]), "@author"))
+  {
+    for (i = 2; i < nr; i++)
+    {
       if (i != 2)
         strcat(doc_author, " ");
       strcat(doc_author, line_part[i]);
     }
-  } else if (streq(low(line_part[1]), "@creator")) {
-    for (i = 2; i < nr; i++) {
+  }
+  else if (streq(low(line_part[1]), "@creator"))
+  {
+    for (i = 2; i < nr; i++)
+    {
       if (i != 2)
         strcat(doc_creator, " ");
       strcat(doc_creator, line_part[i]);
     }
-  } else if (streq(low(line_part[1]), "@version")) {
-    for (i = 2; i < nr; i++) {
+  }
+  else if (streq(low(line_part[1]), "@version"))
+  {
+    for (i = 2; i < nr; i++)
+    {
       if (i != 2)
         strcat(doc_version, " ");
       strcat(doc_version, line_part[i]);
     }
-  } else if (streq(low(line_part[1]), "@group")) {
+  }
+  else if (streq(low(line_part[1]), "@group"))
+  {
     char str[400];
 
     str_trim(str, line);
     str_trim(str, &str[6]);
-    doc_group_cnt = dcli_parse(str, " 	,", "", (char*)doc_groups,
-        sizeof(doc_groups) / sizeof(doc_groups[0]), sizeof(doc_groups[0]), 0);
-  } else if (streq(low(line_part[1]), "@link")) {
-    if (doc_link_cnt >= (int)(sizeof(doc_link_ref) / sizeof(doc_link_ref[0]))) {
+    doc_group_cnt = dcli_parse(str, " 	,", "", (char*)doc_groups, sizeof(doc_groups) / sizeof(doc_groups[0]),
+                               sizeof(doc_groups[0]), 0);
+  }
+  else if (streq(low(line_part[1]), "@link"))
+  {
+    if (doc_link_cnt >= (int)(sizeof(doc_link_ref) / sizeof(doc_link_ref[0])))
+    {
       printf("Error: max number of links exceeded\n");
       return 1;
     }
-    for (i = 2; i < nr; i++) {
+    for (i = 2; i < nr; i++)
+    {
       if (i == nr - 1)
         strcpy(doc_link_ref[doc_link_cnt], line_part[i]);
-      else {
+      else
+      {
         if (i == 2)
           strcpy(doc_link_text[doc_link_cnt], line_part[i]);
-        else {
+        else
+        {
           strcat(doc_link_text[doc_link_cnt], " ");
           strcat(doc_link_text[doc_link_cnt], line_part[i]);
         }
       }
     }
     doc_link_cnt++;
-  } else if (streq(low(line_part[1]), "@classlink")) {
-    if (doc_clink_cnt
-        >= (int)(sizeof(doc_clink_ref) / sizeof(doc_clink_ref[0]))) {
+  }
+  else if (streq(low(line_part[1]), "@classlink"))
+  {
+    if (doc_clink_cnt >= (int)(sizeof(doc_clink_ref) / sizeof(doc_clink_ref[0])))
+    {
       printf("Error: max number of classlinks exceeded\n");
       return 1;
     }
-    for (i = 2; i < nr; i++) {
+    for (i = 2; i < nr; i++)
+    {
       if (i == nr - 1)
         strcpy(doc_clink_ref[doc_clink_cnt], line_part[i]);
-      else {
+      else
+      {
         if (i == 2)
           strcpy(doc_clink_text[doc_clink_cnt], line_part[i]);
-        else {
+        else
+        {
           strcat(doc_clink_text[doc_clink_cnt], " ");
           strcat(doc_clink_text[doc_clink_cnt], line_part[i]);
         }
       }
     }
     doc_clink_cnt++;
-  } else if (streq(low(line_part[1]), "@exliblink")) {
-    if (doc_xlink_cnt
-        >= (int)(sizeof(doc_xlink_ref) / sizeof(doc_xlink_ref[0]))) {
+  }
+  else if (streq(low(line_part[1]), "@exliblink"))
+  {
+    if (doc_xlink_cnt >= (int)(sizeof(doc_xlink_ref) / sizeof(doc_xlink_ref[0])))
+    {
       printf("Error: max number of classlinks exceeded\n");
       return 1;
     }
-    for (i = 2; i < nr; i++) {
+    for (i = 2; i < nr; i++)
+    {
       if (i == nr - 1)
         strcpy(doc_xlink_ref[doc_xlink_cnt], line_part[i]);
-      else {
+      else
+      {
         if (i == 2)
           strcpy(doc_xlink_text[doc_xlink_cnt], line_part[i]);
-        else {
+        else
+        {
           strcat(doc_xlink_text[doc_xlink_cnt], " ");
           strcat(doc_xlink_text[doc_xlink_cnt], line_part[i]);
         }
       }
     }
     doc_xlink_cnt++;
-  } else if (streq(low(line_part[1]), "@code")) {
+  }
+  else if (streq(low(line_part[1]), "@code"))
+  {
     if (nr > 2)
       strcpy(doc_code, line_part[2]);
-  } else if (streq(low(line_part[1]), "@summary")) {
+  }
+  else if (streq(low(line_part[1]), "@summary"))
+  {
     char low_line[400];
     char* s;
 
@@ -1084,7 +1146,9 @@ int CnvReadWbl::doc_add(char* line)
       return 0;
 
     strcpy(doc_summary, &line[s - low_line + 9]);
-  } else {
+  }
+  else
+  {
     if (doc_cnt > int(sizeof(doc_text) / sizeof(doc_text[0]) - 1))
       return 0;
     if (strlen(line) > 2)
@@ -1106,7 +1170,8 @@ int CnvReadWbl::object_close()
 {
   int sts;
 
-  switch (object_state) {
+  switch (object_state)
+  {
   case 0:
     break;
   case cread_mState_Input:
@@ -1171,15 +1236,19 @@ void CnvReadWbl::bit_init()
 
 int CnvReadWbl::typedef_attr(char* name, char* value)
 {
-  if (streq(low(name), "typeref")) {
+  if (streq(low(name), "typeref"))
+  {
     if (str_StartsWith(value, "pwrs:Type-$"))
       strcpy(typedef_typeref, &value[11]);
     else
       strcpy(typedef_typeref, value);
   }
-  if (streq(low(name), "pgmname")) {
+  if (streq(low(name), "pgmname"))
+  {
     strcpy(typedef_pgmname, value);
-  } else if (streq(low(name), "elements")) {
+  }
+  else if (streq(low(name), "elements"))
+  {
     sscanf(value, "%d", &typedef_elements);
   }
   return 1;
@@ -1187,11 +1256,16 @@ int CnvReadWbl::typedef_attr(char* name, char* value)
 
 int CnvReadWbl::bit_attr(char* name, char* value)
 {
-  if (streq(low(name), "text")) {
+  if (streq(low(name), "text"))
+  {
     strcpy(bit_text, value);
-  } else if (streq(low(name), "pgmname")) {
+  }
+  else if (streq(low(name), "pgmname"))
+  {
     strcpy(bit_pgmname, value);
-  } else if (streq(low(name), "value")) {
+  }
+  else if (streq(low(name), "value"))
+  {
     sscanf(value, "%u", &bit_value);
   }
   return 1;
@@ -1199,14 +1273,15 @@ int CnvReadWbl::bit_attr(char* name, char* value)
 
 int CnvReadWbl::typedef_close()
 {
-  if (ctx->first_class) {
+  if (ctx->first_class)
+  {
     wblto->init(typedef_name);
 
     ctx->first_class = 0;
   }
 
-  if (wblto->type() == Cnv_eWblToType_Html || wblto->type() == Cnv_eWblToType_Ps
-      || wblto->type() == Cnv_eWblToType_Xtthelp)
+  if (wblto->type() == Cnv_eWblToType_Html || wblto->type() == Cnv_eWblToType_Ps ||
+      wblto->type() == Cnv_eWblToType_Xtthelp)
     wblto->typedef_exec();
   if (wblto->type() == Cnv_eWblToType_H && object_state == cread_mState_TypeDef)
     wblto->typedef_exec();
@@ -1315,11 +1390,11 @@ int CnvReadWbl::read_lng(char* cname, char* aname)
   FILE* fp;
   pwr_tFileName filename = "pwrb_sv_se.txt";
 
-  sprintf(filename, "%s/%s_%s.txt", source_dir, CnvCtx::low(volume_name),
-      Lng::get_language_str());
+  sprintf(filename, "%s/%s_%s.txt", source_dir, CnvCtx::low(volume_name), Lng::get_language_str());
 
   strcpy(key, cname);
-  if (aname && !streq(aname, "")) {
+  if (aname && !streq(aname, ""))
+  {
     strcat(key, "-");
     strcat(key, aname);
   }
@@ -1331,7 +1406,8 @@ int CnvReadWbl::read_lng(char* cname, char* aname)
 
   in_class = 0;
   in_doc = 0;
-  while (1) {
+  while (1)
+  {
     sts = CnvCtx::read_line(line, sizeof(line), fp);
     if (!sts)
       break;
@@ -1346,25 +1422,31 @@ int CnvReadWbl::read_lng(char* cname, char* aname)
     else
       len = 0;
 
-    if (len) {
+    if (len)
+    {
       str_trim(found_key, &str[len]);
-      if (str_NoCaseStrcmp(cname, found_key) == 0) {
-        if (aname && !streq(aname, "")) {
+      if (str_NoCaseStrcmp(cname, found_key) == 0)
+      {
+        if (aname && !streq(aname, ""))
+        {
           in_class = 1;
-        } else {
+        }
+        else
+        {
           in_doc = 1;
           in_class = 1;
           doc_init_keep();
         }
       }
       continue;
-    } else if (in_class
-        && (str_NoCaseStrncmp(str, "</class>", 8) == 0
-               || str_NoCaseStrncmp(str, "</type>", 7) == 0
-               || str_NoCaseStrncmp(str, "</typedef>", 10) == 0))
+    }
+    else if (in_class &&
+             (str_NoCaseStrncmp(str, "</class>", 8) == 0 || str_NoCaseStrncmp(str, "</type>", 7) == 0 ||
+              str_NoCaseStrncmp(str, "</typedef>", 10) == 0))
       break;
-    else if (in_class && (str_NoCaseStrncmp(str, "<attr>", 6) == 0
-                             || str_NoCaseStrncmp(str, "<value>", 7) == 0)) {
+    else if (in_class &&
+             (str_NoCaseStrncmp(str, "<attr>", 6) == 0 || str_NoCaseStrncmp(str, "<value>", 7) == 0))
+    {
       if (str_NoCaseStrncmp(str, "<attr>", 6) == 0)
         len = 6;
       else
@@ -1376,23 +1458,29 @@ int CnvReadWbl::read_lng(char* cname, char* aname)
         break;
 
       str_trim(found_key, &str[len]);
-      if (str_NoCaseStrcmp(aname, found_key) == 0) {
+      if (str_NoCaseStrcmp(aname, found_key) == 0)
+      {
         in_doc = 1;
         doc_init_keep();
       }
-    } else if (in_doc && (str_NoCaseStrncmp(str, "</attr>", 8) == 0
-                             || str_NoCaseStrncmp(str, "</value>", 9) == 0)) {
+    }
+    else if (in_doc &&
+             (str_NoCaseStrncmp(str, "</attr>", 8) == 0 || str_NoCaseStrncmp(str, "</value>", 9) == 0))
+    {
       if (!in_class)
         continue;
       break;
-    } else if (in_doc) {
+    }
+    else if (in_doc)
+    {
       strcpy(str, "! ");
       strcat(str, line);
       doc_add(str);
     }
   }
   fclose(fp);
-  if (in_doc) {
+  if (in_doc)
+  {
     doc_close();
     return 1;
   }

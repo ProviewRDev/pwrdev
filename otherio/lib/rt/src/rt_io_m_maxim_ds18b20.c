@@ -46,8 +46,7 @@
 #include "rt_io_msg.h"
 #include "rt_io_m_onewire.h"
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   pwr_sClass_Maxim_DS18B20* op = (pwr_sClass_Maxim_DS18B20*)cp->op;
   io_sLocalDS18B20* local;
@@ -55,16 +54,17 @@ static pwr_tStatus IoCardInit(
   char name[40];
   pwr_tFileName fname;
 
-  if (cp->chanlist[0].cop) {
+  if (cp->chanlist[0].cop)
+  {
     local = (io_sLocalDS18B20*)calloc(1, sizeof(io_sLocalDS18B20));
     cp->Local = local;
 
     sprintf(name, "%x-%012x", op->Family, op->Super.Address);
     sprintf(fname, "/sys/bus/w1/devices/w1 bus master/%s/w1_slave", name);
     local->value_fp = fopen(fname, "r");
-    if (!local->value_fp) {
-      errh_Error(
-          "Maxim_DS18B20 Unable op open %s, '%x'", cp->Name, op->Super.Address);
+    if (!local->value_fp)
+    {
+      errh_Error("Maxim_DS18B20 Unable op open %s, '%x'", cp->Name, op->Super.Address);
       sts = IO__INITFAIL;
       op->Status = sts;
       return sts;
@@ -77,20 +77,19 @@ static pwr_tStatus IoCardInit(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalDS18B20* local = (io_sLocalDS18B20*)cp->Local;
 
-  if (cp->chanlist[0].cop) {
+  if (cp->chanlist[0].cop)
+  {
     fclose(local->value_fp);
   }
   free(cp->Local);
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalDS18B20* local = (io_sLocalDS18B20*)cp->Local;
   pwr_sClass_Maxim_DS18B20* op = (pwr_sClass_Maxim_DS18B20*)cp->op;
@@ -98,8 +97,10 @@ static pwr_tStatus IoCardRead(
   char* s;
   pwr_tUInt32 error_count = op->Super.ErrorCount;
 
-  if (op->ScanInterval > 1) {
-    if (local->interval_cnt != 0) {
+  if (op->ScanInterval > 1)
+  {
+    if (local->interval_cnt != 0)
+    {
       local->interval_cnt++;
       if (local->interval_cnt >= op->ScanInterval)
         local->interval_cnt = 0;
@@ -108,7 +109,8 @@ static pwr_tStatus IoCardRead(
     local->interval_cnt++;
   }
 
-  if (cp->chanlist[0].cop) {
+  if (cp->chanlist[0].cop)
+  {
     io_sChannel* chanp = &cp->chanlist[0];
     pwr_sClass_ChanAi* cop = (pwr_sClass_ChanAi*)chanp->cop;
     pwr_sClass_Ai* sop = (pwr_sClass_Ai*)chanp->sop;
@@ -125,9 +127,11 @@ static pwr_tStatus IoCardRead(
     rewind(local->value_fp);
 
     s = strstr(str, "t=");
-    if (s) {
+    if (s)
+    {
       sscanf(s + 2, "%d", &ivalue);
-      if (ivalue == 85000) {
+      if (ivalue == 85000)
+      {
         /* TODO Check CRC Probably power loss...
            op->Super.ErrorCount++; */
       }
@@ -135,26 +139,28 @@ static pwr_tStatus IoCardRead(
       io_ConvertAi32(cop, ivalue, &actvalue);
 
       // Filter
-      if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0
-          && sop->FilterAttribute[0] > ctx->ScanTime) {
-        actvalue = *(pwr_tFloat32*)chanp->vbp
-            + ctx->ScanTime / sop->FilterAttribute[0]
-                * (actvalue - *(pwr_tFloat32*)chanp->vbp);
+      if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0 && sop->FilterAttribute[0] > ctx->ScanTime)
+      {
+        actvalue = *(pwr_tFloat32*)chanp->vbp +
+                   ctx->ScanTime / sop->FilterAttribute[0] * (actvalue - *(pwr_tFloat32*)chanp->vbp);
       }
 
       *(pwr_tFloat32*)chanp->vbp = actvalue;
       sop->SigValue = cop->SigValPolyCoef1 * ivalue + cop->SigValPolyCoef0;
       sop->RawValue = ivalue;
-    } else {
+    }
+    else
+    {
       op->Super.ErrorCount++;
     }
   }
 
-  if (op->Super.ErrorCount >= op->Super.ErrorSoftLimit
-      && error_count < op->Super.ErrorSoftLimit) {
+  if (op->Super.ErrorCount >= op->Super.ErrorSoftLimit && error_count < op->Super.ErrorSoftLimit)
+  {
     errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
   }
-  if (op->Super.ErrorCount >= op->Super.ErrorHardLimit) {
+  if (op->Super.ErrorCount >= op->Super.ErrorHardLimit)
+  {
     errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
     ctx->Node->EmergBreakTrue = 1;
     return IO__ERRDEVICE;
@@ -165,5 +171,5 @@ static pwr_tStatus IoCardRead(
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(Maxim_DS18B20) = { pwr_BindIoMethod(IoCardInit),
-  pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Maxim_DS18B20) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                                pwr_BindIoMethod(IoCardRead), pwr_NullMethod};

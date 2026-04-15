@@ -45,14 +45,14 @@
 
 class wb_vrepext;
 
-class ext_object {
+class ext_object
+{
   friend class wb_vrepext;
 
 public:
   ext_object()
-      : rbody_size(0), dbody_size(0), rbody(0), dbody(0), m_cid(0), m_tid(0),
-        fthoid(pwr_cNOid), bwsoid(pwr_cNOid), fwsoid(pwr_cNOid),
-        fchoid(pwr_cNOid), lchoid(pwr_cNOid)
+      : rbody_size(0), dbody_size(0), rbody(0), dbody(0), m_cid(0), m_tid(0), fthoid(pwr_cNOid),
+        bwsoid(pwr_cNOid), fwsoid(pwr_cNOid), fchoid(pwr_cNOid), lchoid(pwr_cNOid)
   {
     strcpy(m_name, "");
     strcpy(m_longname, "");
@@ -95,11 +95,13 @@ public:
   ext_object(const ext_object& x)
   {
     memcpy(this, &x, sizeof(x));
-    if (rbody_size) {
+    if (rbody_size)
+    {
       rbody = calloc(1, rbody_size);
       memcpy(rbody, x.rbody, rbody_size);
     }
-    if (dbody_size) {
+    if (dbody_size)
+    {
       dbody = calloc(1, dbody_size);
       memcpy(dbody, x.dbody, dbody_size);
     }
@@ -107,47 +109,28 @@ public:
   ext_object& operator=(const ext_object& x)
   {
     memcpy(this, &x, sizeof(x));
-    if (rbody_size) {
+    if (rbody_size)
+    {
       rbody = calloc(1, rbody_size);
       memcpy(rbody, x.rbody, rbody_size);
     }
-    if (dbody_size) {
+    if (dbody_size)
+    {
       dbody = calloc(1, dbody_size);
       memcpy(dbody, x.dbody, dbody_size);
     }
     return *this;
   }
 
-  const char* name() const
-  {
-    return m_name;
-  }
-  const char* longname() const
-  {
-    return m_longname;
-  }
-  bool exportHead(wb_import& i)
-  {
-    return false;
-  }
-  bool exportDbody(wb_import& i)
-  {
-    return false;
-  }
-  bool exportRbody(wb_import& i)
-  {
-    return false;
-  }
-  bool exportDocBlock(wb_import& i)
-  {
-    return false;
-  }
-  bool exportTree(wb_treeimport& i, bool isRoot)
-  {
-    return false;
-  }
-  bool exportPaste(wb_treeimport& i, pwr_tOid destination, bool isRoot,
-      ldh_eDest destcode, bool keepoid, pwr_tOid* rootlist)
+  const char* name() const { return m_name; }
+  const char* longname() const { return m_longname; }
+  bool exportHead(wb_import& i) { return false; }
+  bool exportDbody(wb_import& i) { return false; }
+  bool exportRbody(wb_import& i) { return false; }
+  bool exportDocBlock(wb_import& i) { return false; }
+  bool exportTree(wb_treeimport& i, bool isRoot) { return false; }
+  bool exportPaste(wb_treeimport& i, pwr_tOid destination, bool isRoot, ldh_eDest destcode, bool keepoid,
+                   pwr_tOid* rootlist)
   {
     return false;
   }
@@ -173,7 +156,8 @@ public:
 
 class wb_orepext;
 
-class wb_vrepext : public wb_vrep {
+class wb_vrepext : public wb_vrep
+{
   wb_erep* m_erep;
   wb_merep* m_merep;
   unsigned int m_nRef;
@@ -188,39 +172,20 @@ class wb_vrepext : public wb_vrep {
   procom_eType m_ptype;
 
 public:
-  wb_vrepext(wb_erep* erep) : m_erep(erep), m_merep(erep->merep()), m_nRef(0)
-  {
-  }
+  wb_vrepext(wb_erep* erep) : m_erep(erep), m_merep(erep->merep()), m_nRef(0) {}
 
   wb_vrepext(wb_erep* erep, pwr_tVid vid);
-  wb_vrepext(
-      wb_erep* erep, pwr_tVid vid, const char* name, const char* provider);
+  wb_vrepext(wb_erep* erep, pwr_tVid vid, const char* name, const char* provider);
   ~wb_vrepext();
 
-  virtual ldh_eVolRep type() const
-  {
-    return ldh_eVolRep_Ext;
-  }
-  pwr_tVid vid() const
-  {
-    return m_vid;
-  }
-  pwr_tCid cid() const
-  {
-    return m_cid;
-  }
+  virtual ldh_eVolRep type() const { return ldh_eVolRep_Ext; }
+  pwr_tVid vid() const { return m_vid; }
+  pwr_tCid cid() const { return m_cid; }
 
   wb_vrep* next();
 
-  virtual bool createSnapshot(
-      const char* fileName, const pwr_tTime* time, const int rtonly)
-  {
-    return false;
-  }
-  virtual pwr_tStatus updateMeta()
-  {
-    return 0;
-  }
+  virtual bool createSnapshot(const char* fileName, const pwr_tTime* time, const int rtonly) { return false; }
+  virtual pwr_tStatus updateMeta() { return 0; }
 
   char volume_class[32];
   char volume_name[32];
@@ -228,81 +193,33 @@ public:
   virtual void unref();
   virtual wb_vrep* ref();
 
-  wb_erep* erep()
-  {
-    return m_erep;
-  }
-  wb_merep* merep() const
-  {
-    return m_merep;
-  }
+  wb_erep* erep() { return m_erep; }
+  wb_merep* merep() const { return m_merep; }
 
   void info();
   bool createVolumeObject(const char* name);
 
-  virtual pwr_tOid oid(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return pwr_cNOid;
-  }
+  virtual pwr_tOid oid(pwr_tStatus* sts, const wb_orep* o) { return pwr_cNOid; }
 
-  virtual pwr_tVid vid(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return pwr_cNVid;
-  }
+  virtual pwr_tVid vid(pwr_tStatus* sts, const wb_orep* o) { return pwr_cNVid; }
 
-  virtual pwr_tOix oix(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return pwr_cNOix;
-  }
+  virtual pwr_tOix oix(pwr_tStatus* sts, const wb_orep* o) { return pwr_cNOix; }
 
-  virtual pwr_tCid cid(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return pwr_cNCid;
-  }
+  virtual pwr_tCid cid(pwr_tStatus* sts, const wb_orep* o) { return pwr_cNCid; }
 
-  virtual pwr_tOid poid(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return pwr_cNOid;
-  }
-  virtual pwr_tOid foid(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return pwr_cNOid;
-  }
-  virtual pwr_tOid loid(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return pwr_cNOid;
-  }
-  virtual pwr_tOid boid(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return pwr_cNOid;
-  }
-  virtual pwr_tOid aoid(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return pwr_cNOid;
-  }
+  virtual pwr_tOid poid(pwr_tStatus* sts, const wb_orep* o) { return pwr_cNOid; }
+  virtual pwr_tOid foid(pwr_tStatus* sts, const wb_orep* o) { return pwr_cNOid; }
+  virtual pwr_tOid loid(pwr_tStatus* sts, const wb_orep* o) { return pwr_cNOid; }
+  virtual pwr_tOid boid(pwr_tStatus* sts, const wb_orep* o) { return pwr_cNOid; }
+  virtual pwr_tOid aoid(pwr_tStatus* sts, const wb_orep* o) { return pwr_cNOid; }
 
-  virtual const char* objectName(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return "";
-  }
+  virtual const char* objectName(pwr_tStatus* sts, const wb_orep* o) { return ""; }
 
-  virtual wb_name longName(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return wb_name();
-  }
+  virtual wb_name longName(pwr_tStatus* sts, const wb_orep* o) { return wb_name(); }
 
-  virtual pwr_tTime ohTime(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return o->ohTime();
-  }
-  virtual pwr_tTime rbTime(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return o->rbTime();
-  }
-  virtual pwr_tTime dbTime(pwr_tStatus* sts, const wb_orep* o)
-  {
-    return o->dbTime();
-  }
+  virtual pwr_tTime ohTime(pwr_tStatus* sts, const wb_orep* o) { return o->ohTime(); }
+  virtual pwr_tTime rbTime(pwr_tStatus* sts, const wb_orep* o) { return o->rbTime(); }
+  virtual pwr_tTime dbTime(pwr_tStatus* sts, const wb_orep* o) { return o->dbTime(); }
   virtual pwr_mClassDef flags(pwr_tStatus* sts, const wb_orep* o)
   {
     pwr_mClassDef f;
@@ -310,53 +227,38 @@ public:
     return f;
   }
 
-  virtual bool isOffspringOf(
-      pwr_tStatus* sts, const wb_orep* child, const wb_orep* parent)
-  {
-    return false;
-  }
+  virtual bool isOffspringOf(pwr_tStatus* sts, const wb_orep* child, const wb_orep* parent) { return false; }
 
   wb_orep* object(pwr_tStatus* sts);
   wb_orep* object(pwr_tStatus* sts, pwr_tOid oid);
   wb_orep* object(pwr_tStatus* sts, pwr_tCid cid);
   wb_orep* object(pwr_tStatus* sts, wb_name& name);
-  wb_orep* object(pwr_tStatus* sts, const wb_orep* parent, wb_name& name)
-  {
-    return 0;
-  }
+  wb_orep* object(pwr_tStatus* sts, const wb_orep* parent, wb_name& name) { return 0; }
 
-  wb_orep* createObject(pwr_tStatus* sts, wb_cdef cdef, wb_destination& d,
-      wb_name& name, pwr_tOix oix = 0);
+  wb_orep* createObject(pwr_tStatus* sts, wb_cdef cdef, wb_destination& d, wb_name& name, pwr_tOix oix = 0);
 
-  wb_orep* copyObject(pwr_tStatus* sts, const wb_orep* orep, wb_destination& d,
-      wb_name& name, pwr_tOix oix = 0);
-  bool copyOset(pwr_tStatus* sts, wb_oset* oset, wb_destination& d)
-  {
-    return false;
-  }
+  wb_orep* copyObject(pwr_tStatus* sts, const wb_orep* orep, wb_destination& d, wb_name& name,
+                      pwr_tOix oix = 0);
+  bool copyOset(pwr_tStatus* sts, wb_oset* oset, wb_destination& d) { return false; }
 
   bool moveObject(pwr_tStatus* sts, wb_orep* orep, wb_destination& d);
 
   bool deleteObject(pwr_tStatus* sts, wb_orep* orep);
   bool deleteFamily(pwr_tStatus* sts, wb_orep* orep);
-  bool deleteOset(pwr_tStatus* sts, wb_oset* oset)
-  {
-    return false;
-  }
+  bool deleteOset(pwr_tStatus* sts, wb_oset* oset) { return false; }
 
   bool renameObject(pwr_tStatus* sts, wb_orep* orep, wb_name& name);
 
   bool commit(pwr_tStatus* sts);
   bool abort(pwr_tStatus* sts);
 
-  virtual bool writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix,
-      size_t offset, size_t size, void* p);
+  virtual bool writeAttribute(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, size_t offset, size_t size,
+                              void* p);
 
-  virtual void* readAttribute(pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix,
-      size_t offset, size_t size, void* p);
+  virtual void* readAttribute(pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, size_t offset, size_t size,
+                              void* p);
 
-  virtual void* readBody(
-      pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, void* p);
+  virtual void* readBody(pwr_tStatus* sts, const wb_orep* o, pwr_eBix bix, void* p);
 
   virtual bool writeBody(pwr_tStatus* sts, wb_orep* o, pwr_eBix bix, void* p);
 
@@ -378,116 +280,56 @@ public:
 
   wb_orep* previous(pwr_tStatus* sts, const wb_orep* o);
 
-  wb_srep* newSession()
-  {
-    return 0;
-  }
+  wb_srep* newSession() { return 0; }
 
-  bool isLocal(const wb_orep* o)
-  {
-    return o->oid().vid == vid();
-  }
+  bool isLocal(const wb_orep* o) { return o->oid().vid == vid(); }
 
   void objectName(const wb_orep* o, char* str);
 
-  virtual bool exportVolume(wb_import& i)
+  virtual bool exportVolume(wb_import& i) { return false; }
+  virtual bool exportHead(wb_import& i) { return false; }
+  virtual bool exportRbody(wb_import& i) { return false; }
+  virtual bool exportDbody(wb_import& i) { return false; }
+  virtual bool exportDocBlock(wb_import& i) { return false; }
+  virtual bool exportMeta(wb_import& i) { return false; }
+  virtual bool exportTree(wb_treeimport& i, pwr_tOid oid) { return false; }
+  virtual bool exportTreeIsImplemented() { return false; }
+  bool exportPaste(wb_treeimport& i, pwr_tOid destination, ldh_eDest destcode, bool keepoid,
+                   pwr_tOid** rootlist)
   {
     return false;
   }
-  virtual bool exportHead(wb_import& i)
+  virtual bool importTree(bool keepref, bool keepsym) { return false; }
+  virtual bool importTreeObject(wb_merep* merep, pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid,
+                                const char* name, pwr_mClassDef flags, size_t rbSize, size_t dbSize,
+                                void* rbody, void* dbody)
   {
     return false;
   }
-  virtual bool exportRbody(wb_import& i)
+  virtual bool importPaste() { return false; }
+  virtual bool importPasteObject(pwr_tOid destination, ldh_eDest destcode, bool keepoid, pwr_tOid oid,
+                                 pwr_tCid cid, pwr_tOid poid, pwr_tOid boid, const char* name,
+                                 pwr_mClassDef flags, size_t rbSize, size_t dbSize, void* rbody, void* dbody,
+                                 pwr_tOid woid, pwr_tOid* roid)
   {
     return false;
   }
-  virtual bool exportDbody(wb_import& i)
-  {
-    return false;
-  }
-  virtual bool exportDocBlock(wb_import& i)
-  {
-    return false;
-  }
-  virtual bool exportMeta(wb_import& i)
-  {
-    return false;
-  }
-  virtual bool exportTree(wb_treeimport& i, pwr_tOid oid)
-  {
-    return false;
-  }
-  virtual bool exportTreeIsImplemented()
-  {
-    return false;
-  }
-  bool exportPaste(wb_treeimport& i, pwr_tOid destination, ldh_eDest destcode,
-      bool keepoid, pwr_tOid** rootlist)
-  {
-    return false;
-  }
-  virtual bool importTree(bool keepref, bool keepsym)
-  {
-    return false;
-  }
-  virtual bool importTreeObject(wb_merep* merep, pwr_tOid oid, pwr_tCid cid,
-      pwr_tOid poid, pwr_tOid boid, const char* name, pwr_mClassDef flags,
-      size_t rbSize, size_t dbSize, void* rbody, void* dbody)
-  {
-    return false;
-  }
-  virtual bool importPaste()
-  {
-    return false;
-  }
-  virtual bool importPasteObject(pwr_tOid destination, ldh_eDest destcode,
-      bool keepoid, pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid,
-      const char* name, pwr_mClassDef flags, size_t rbSize, size_t dbSize,
-      void* rbody, void* dbody, pwr_tOid woid, pwr_tOid* roid)
-  {
-    return false;
-  }
-  virtual void importIgnoreErrors()
-  {
-  }
-  virtual bool accessSupported(ldh_eAccess access)
-  {
-    return true;
-  }
-  virtual const char* fileName()
-  {
-    return "";
-  }
+  virtual void importIgnoreErrors() {}
+  virtual bool accessSupported(ldh_eAccess access) { return true; }
+  virtual const char* fileName() { return ""; }
 
-  virtual bool importVolume(wb_export& e)
+  virtual bool importVolume(wb_export& e) { return false; }
+  virtual bool importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid, pwr_tOid boid, pwr_tOid aoid,
+                          pwr_tOid foid, pwr_tOid loid, const char* name, const char* normname,
+                          pwr_mClassDef flags, pwr_tTime ohTime, pwr_tTime rbTime, pwr_tTime dbTime,
+                          size_t rbSize, size_t dbSize)
   {
     return false;
   }
-  virtual bool importHead(pwr_tOid oid, pwr_tCid cid, pwr_tOid poid,
-      pwr_tOid boid, pwr_tOid aoid, pwr_tOid foid, pwr_tOid loid,
-      const char* name, const char* normname, pwr_mClassDef flags,
-      pwr_tTime ohTime, pwr_tTime rbTime, pwr_tTime dbTime, size_t rbSize,
-      size_t dbSize)
-  {
-    return false;
-  }
-  virtual bool importRbody(pwr_tOid oid, size_t size, void* body)
-  {
-    return false;
-  }
-  virtual bool importDbody(pwr_tOid oid, size_t size, void* body)
-  {
-    return false;
-  }
-  virtual bool importDocBlock(pwr_tOid oid, size_t size, char* block)
-  {
-    return false;
-  }
-  virtual bool importMeta(dbs_sMenv* mep)
-  {
-    return true;
-  }
+  virtual bool importRbody(pwr_tOid oid, size_t size, void* body) { return false; }
+  virtual bool importDbody(pwr_tOid oid, size_t size, void* body) { return false; }
+  virtual bool importDocBlock(pwr_tOid oid, size_t size, char* block) { return false; }
+  virtual bool importMeta(dbs_sMenv* mep) { return true; }
 
 private:
   void put(vext_sQMsg* msg, int size, pwr_tStatus* sts);

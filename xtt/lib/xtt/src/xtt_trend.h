@@ -50,7 +50,8 @@
 class CoWow;
 class CoWowTimer;
 
-class XttTrend {
+class XttTrend
+{
 public:
   void* xnav;
   int trend_cnt;
@@ -76,26 +77,20 @@ public:
   void (*close_cb)(void*, XttTrend*);
   void (*help_cb)(void*, const char*);
   void (*command_cb)(void*, const char*);
-  int (*get_select_cb)(
-      void*, pwr_tAttrRef*, int*); //!< Get selected trend object.
+  int (*get_select_cb)(void*, pwr_tAttrRef*, int*); //!< Get selected trend object.
   CoWow* wow;
   int color_theme;
   XttOTree* otree;
 
-  XttTrend(void* xn_parent_ctx, char* xn_name, pwr_sAttrRef* objid,
-      pwr_sAttrRef* plotgroup, unsigned int options, int xn_color_theme,
-      int* sts);
+  XttTrend(void* xn_parent_ctx, char* xn_name, pwr_sAttrRef* objid, pwr_sAttrRef* plotgroup,
+           unsigned int options, int xn_color_theme, int* sts);
   virtual ~XttTrend();
   void pop();
   void setup();
   void curve_add(pwr_tAttrRef* arp, pwr_tAttrRef* trend_arp, pwr_tStatus* sts);
-  void update_color_theme(int ct)
-  {
-    curve->update_color_theme(ct);
-  }
-  virtual XttOTree* tree_new(const char* title, pwr_tAttrRef* itemlist,
-      int itemcnt, unsigned int layout,
-      pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
+  void update_color_theme(int ct) { curve->update_color_theme(ct); }
+  virtual XttOTree* tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt, unsigned int layout,
+                             pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
   {
     return 0;
   }

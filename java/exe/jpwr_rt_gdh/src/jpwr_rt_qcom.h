@@ -5,47 +5,43 @@
 #ifndef _Included_jpwr_rt_Qcom
 #define _Included_jpwr_rt_Qcom
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-/*
- * Class:     jpwr_rt_Qcom
- * Method:    createQ
- * Signature: (IILjava/lang/String;)Ljpwr/rt/QcomrCreateQ;
- */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Qcom_createQ
-  (JNIEnv *, jobject, jint, jint, jstring);
+  /*
+   * Class:     jpwr_rt_Qcom
+   * Method:    createQ
+   * Signature: (IILjava/lang/String;)Ljpwr/rt/QcomrCreateQ;
+   */
+  JNIEXPORT jobject JNICALL Java_jpwr_rt_Qcom_createQ(JNIEnv*, jobject, jint, jint, jstring);
 
-/*
- * Class:     jpwr_rt_Qcom
- * Method:    createIniEventQ
- * Signature: (Ljava/lang/String;)Ljpwr/rt/QcomrCreateQ;
- */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Qcom_createIniEventQ
-  (JNIEnv *, jobject, jstring);
+  /*
+   * Class:     jpwr_rt_Qcom
+   * Method:    createIniEventQ
+   * Signature: (Ljava/lang/String;)Ljpwr/rt/QcomrCreateQ;
+   */
+  JNIEXPORT jobject JNICALL Java_jpwr_rt_Qcom_createIniEventQ(JNIEnv*, jobject, jstring);
 
-/*
- * Class:     jpwr_rt_Qcom
- * Method:    getIniEvent
- * Signature: (III)Ljpwr/rt/QcomrGetIniEvent;
- */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Qcom_getIniEvent
-  (JNIEnv *, jobject, jint, jint, jint);
+  /*
+   * Class:     jpwr_rt_Qcom
+   * Method:    getIniEvent
+   * Signature: (III)Ljpwr/rt/QcomrGetIniEvent;
+   */
+  JNIEXPORT jobject JNICALL Java_jpwr_rt_Qcom_getIniEvent(JNIEnv*, jobject, jint, jint, jint);
 
-/*
- * Class:     jpwr_rt_Qcom
- * Method:    putString
- * Signature: (IILjava/lang/String;)Ljpwr/rt/PwrtStatus;
- */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Qcom_putString
-  (JNIEnv *, jobject, jint, jint, jstring);
+  /*
+   * Class:     jpwr_rt_Qcom
+   * Method:    putString
+   * Signature: (IILjava/lang/String;)Ljpwr/rt/PwrtStatus;
+   */
+  JNIEXPORT jobject JNICALL Java_jpwr_rt_Qcom_putString(JNIEnv*, jobject, jint, jint, jstring);
 
-/*
- * Class:     jpwr_rt_Qcom
- * Method:    getString
- * Signature: (II)Ljpwr/rt/CdhrString;
- */
-JNIEXPORT jobject JNICALL Java_jpwr_rt_Qcom_getString
-  (JNIEnv *, jobject, jint, jint);
+  /*
+   * Class:     jpwr_rt_Qcom
+   * Method:    getString
+   * Signature: (II)Ljpwr/rt/CdhrString;
+   */
+  JNIEXPORT jobject JNICALL Java_jpwr_rt_Qcom_getString(JNIEnv*, jobject, jint, jint);
 
 #ifdef __cplusplus
 }

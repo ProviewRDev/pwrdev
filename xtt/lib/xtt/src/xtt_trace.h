@@ -46,12 +46,14 @@ class CoWowTimer;
 
 typedef struct trace_sNode trace_tNode;
 
-struct trace_sNode {
+struct trace_sNode
+{
   trace_tNode* Next;
   RtTrace* tractx;
 };
 
-class RtTrace {
+class RtTrace
+{
 public:
   void* parent_ctx;
   pwr_tOName name;
@@ -69,11 +71,10 @@ public:
   void (*display_object_cb)(void* parent_ctx, pwr_tObjid objid);
   void (*collect_insert_cb)(void* parent_ctx, pwr_tObjid objid);
   int (*is_authorized_cb)(void* parent_ctx, unsigned int access);
-  void (*popup_menu_cb)(void* parent_ctx, pwr_sAttrRef attrref,
-      unsigned long item_type, unsigned long utility, char* arg, int x, int y);
-  int (*call_method_cb)(void* parent_ctx, const char* method,
-      const char* filter, pwr_sAttrRef attrref, unsigned long item_type,
-      unsigned long utility, char* arg);
+  void (*popup_menu_cb)(void* parent_ctx, pwr_sAttrRef attrref, unsigned long item_type,
+                        unsigned long utility, char* arg, int x, int y);
+  int (*call_method_cb)(void* parent_ctx, const char* method, const char* filter, pwr_sAttrRef attrref,
+                        unsigned long item_type, unsigned long utility, char* arg);
   trace_tNode* trace_list;
   pwr_tFileName filename;
   int version;
@@ -85,16 +86,9 @@ public:
   RtTrace(void* parent_ctx, pwr_tObjid objid, pwr_tStatus* status);
   virtual ~RtTrace();
 
-  virtual void pop()
-  {
-  }
-  virtual RtTrace* subwindow_new(void* ctx, pwr_tObjid oid, pwr_tStatus* sts)
-  {
-    return 0;
-  }
-  virtual void popup_menu_position(int event_x, int event_y, int* x, int* y)
-  {
-  }
+  virtual void pop() {}
+  virtual RtTrace* subwindow_new(void* ctx, pwr_tObjid oid, pwr_tStatus* sts) { return 0; }
+  virtual void popup_menu_position(int event_x, int event_y, int* x, int* y) {}
   int search_object(char* object_str);
   void swap(int mode);
 
@@ -131,10 +125,9 @@ protected:
   void changevalue(flow_tNode fnode);
 
   static void get_save_filename(pwr_tObjid window_objid, char* filename);
-  static int get_filename(pwr_tObjid window_objid, char* filename,
-      int* has_host, char* hostname, char* plcconnect);
-  static int connect_bc(flow_tObject object, char* name, char* attr,
-      flow_eTraceType type, void** p);
+  static int get_filename(pwr_tObjid window_objid, char* filename, int* has_host, char* hostname,
+                          char* plcconnect);
+  static int connect_bc(flow_tObject object, char* name, char* attr, flow_eTraceType type, void** p);
   static int disconnect_bc(flow_tObject object);
   static int scan_bc(flow_tObject object, void* p);
   static void trace_scan(void* data);

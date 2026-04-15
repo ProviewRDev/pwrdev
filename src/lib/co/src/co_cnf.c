@@ -45,17 +45,23 @@
 #define cnf_cFile "/etc/proview.cnf"
 
 char default_values[][2][200] = {
-  { "mysqlSocket", "/var/run/mysqld/mysqld.sock" },
-  { "defaultProjectRoot", "/usr/local/pwrp" },
-  { "appletCodebase", "http://java.sun.com/update/1.4.2/"
-                      "jinstall-1_4-windows-i586.cab#Version=1,4,0,0" },
-  { "defaultSystemGroup", "Common" }, { "defaultProductionQbus", "1" },
-  { "defaultSimulationQbus", "999" }, { "defaultNodeHierRoot", "Nodes" },
-  { "defaultSecurity", "Security" }, { "defaultOpPlaces", "OpPlaces" },
-  { "defaultServers", "Servers" }, { "defaultIO", "IO" },
-  { "defaultApplications", "Applications" }, { "defaultOpOp", "Op" },
-  { "defaultOpMaintenance", "Maintenance" },
-  { "defaultOpDefault", "OpDefault" }, { "defaultWebBrowser", "WebBrowser" },
+    {"mysqlSocket", "/var/run/mysqld/mysqld.sock"},
+    {"defaultProjectRoot", "/usr/local/pwrp"},
+    {"appletCodebase", "http://java.sun.com/update/1.4.2/"
+                       "jinstall-1_4-windows-i586.cab#Version=1,4,0,0"},
+    {"defaultSystemGroup", "Common"},
+    {"defaultProductionQbus", "1"},
+    {"defaultSimulationQbus", "999"},
+    {"defaultNodeHierRoot", "Nodes"},
+    {"defaultSecurity", "Security"},
+    {"defaultOpPlaces", "OpPlaces"},
+    {"defaultServers", "Servers"},
+    {"defaultIO", "IO"},
+    {"defaultApplications", "Applications"},
+    {"defaultOpOp", "Op"},
+    {"defaultOpMaintenance", "Maintenance"},
+    {"defaultOpDefault", "OpDefault"},
+    {"defaultWebBrowser", "WebBrowser"},
 };
 
 char* cnf_get_value(const char* name, char* value, int size)
@@ -69,17 +75,20 @@ char* cnf_get_value(const char* name, char* value, int size)
 
   fp = fopen(cnf_cFile, "r");
 
-  if (fp) {
-    while (dcli_read_line(line, sizeof(line), fp)) {
+  if (fp)
+  {
+    while (dcli_read_line(line, sizeof(line), fp))
+    {
       if (line[0] == '#')
         continue;
 
-      nr = dcli_parse(line, " 	", "", (char*)item_str,
-          sizeof(item_str) / sizeof(item_str[0]), sizeof(item_str[0]), 0);
+      nr = dcli_parse(line, " 	", "", (char*)item_str, sizeof(item_str) / sizeof(item_str[0]),
+                      sizeof(item_str[0]), 0);
       if (nr < 2)
         continue;
 
-      if (str_NoCaseStrcmp(name, item_str[0]) == 0) {
+      if (str_NoCaseStrcmp(name, item_str[0]) == 0)
+      {
         strcpy(ret_value, item_str[1]);
         if (value)
           strncpy(value, ret_value, size);
@@ -91,8 +100,10 @@ char* cnf_get_value(const char* name, char* value, int size)
   }
 
   /* Find default value */
-  for (i = 0; i < sizeof(default_values) / sizeof(default_values[0]); i++) {
-    if (streq(name, default_values[i][0])) {
+  for (i = 0; i < sizeof(default_values) / sizeof(default_values[0]); i++)
+  {
+    if (streq(name, default_values[i][0]))
+    {
       strcpy(ret_value, default_values[i][1]);
       if (value)
         strncpy(value, ret_value, size);

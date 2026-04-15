@@ -43,9 +43,7 @@
 
 pthread_mutex_t timer_mutex;
 
-void plc_inittimer(plc_sThread* tp)
-{
-}
+void plc_inittimer(plc_sThread* tp) {}
 
 void plc_timerhandler(plc_sThread* tp)
 {
@@ -56,8 +54,10 @@ void plc_timerhandler(plc_sThread* tp)
 
   cp = RELPTR(tp->PlcThread->TimerStart);
 
-  while (cp != NULL) {
-    if ((cp->TimerCount <= 1) || !cp->TimerFlag) {
+  while (cp != NULL)
+  {
+    if ((cp->TimerCount <= 1) || !cp->TimerFlag)
+    {
       cp->TimerCount = 0;
       cp->TimerFlag = 0;
       *cp->TimerDO = FALSE;
@@ -65,7 +65,9 @@ void plc_timerhandler(plc_sThread* tp)
         prev->TimerNext = cp->TimerNext;
       else
         tp->PlcThread->TimerStart = cp->TimerNext;
-    } else {
+    }
+    else
+    {
       cp->TimerCount--;
       prev = cp;
     }

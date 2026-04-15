@@ -35,9 +35,9 @@
  */
 
 /************************************************************************
-* Description:
-*	Application functions in rtt.
-**************************************************************************/
+ * Description:
+ *	Application functions in rtt.
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 #include "pwr_inc:rt_rtt_menu.h"
@@ -51,55 +51,57 @@ RTT_DB_CONTINUE
 RTT_DB_END
 
 /*************************************************************************
-*
-* Name:		RTTSYS_SHOW_NODES
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* menu_ctx	ctx		I	context of the picture.
-* int		event		I 	type of event.
-* char		*parameter_ptr	I	pointer to the parameter which value
-*					has been changed.
-*
-* Description:
-*	Application function of a picture.
-*
-**************************************************************************/
+ *
+ * Name:		RTTSYS_SHOW_NODES
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * menu_ctx	ctx		I	context of the picture.
+ * int		event		I 	type of event.
+ * char		*parameter_ptr	I	pointer to the parameter which value
+ *					has been changed.
+ *
+ * Description:
+ *	Application function of a picture.
+ *
+ **************************************************************************/
 
-int RTTSYS_SHOW_NODES(ctx, event, parameter_ptr) menu_ctx ctx;
+int RTTSYS_SHOW_NODES(ctx, event, parameter_ptr)
+menu_ctx ctx;
 int event;
 char* parameter_ptr;
 {
-  switch (event) {
+  switch (event)
+  {
   /**********************************************************
-  *	Initialization of the picture
-  ***********************************************************/
+   *	Initialization of the picture
+   ***********************************************************/
   case RTT_APPL_INIT:
     break;
   /**********************************************************
-  *	Udate of the picture
-  ***********************************************************/
+   *	Udate of the picture
+   ***********************************************************/
   case RTT_APPL_UPDATE:
     break;
   /**********************************************************
-  *	Exit of the picture
-  ***********************************************************/
+   *	Exit of the picture
+   ***********************************************************/
   case RTT_APPL_EXIT:
     break;
   /**********************************************************
-  *	The value of a parameter is changed.
-  ***********************************************************/
+   *	The value of a parameter is changed.
+   ***********************************************************/
   case RTT_APPL_VALUECHANGED:
     break;
   /**********************************************************
-  *	Next page key activated.
-  ***********************************************************/
+   *	Next page key activated.
+   ***********************************************************/
   case RTT_APPL_NEXTPAGE:
     break;
   /**********************************************************
-  *	Pevious page key activated.
-  ***********************************************************/
+   *	Pevious page key activated.
+   ***********************************************************/
   case RTT_APPL_PREVPAGE:
     break;
   }

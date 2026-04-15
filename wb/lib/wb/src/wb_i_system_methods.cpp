@@ -56,11 +56,10 @@ pwr_dImport pwr_BindMethods($Security);
 pwr_dImport pwr_BindMethods($System);
 pwr_dImport pwr_BindMethods($MountObject);
 
-pwr_dExport pwr_BindClasses(System) = { pwr_BindClass($AttrXRef),
-  pwr_BindClass($Node), pwr_BindClass($Object), pwr_BindClass($ObjXRef),
-  pwr_BindClass($Objid), pwr_BindClass($RootVolume), pwr_BindClass($SubVolume),
-  pwr_BindClass($ClassDef), pwr_BindClass($ClassHier),
-  pwr_BindClass($Attribute), pwr_BindClass($ObjBodyDef),
-  pwr_BindClass($AttrRef), pwr_BindClass($PlantHier), pwr_BindClass($NodeHier),
-  pwr_BindClass($Security), pwr_BindClass($System), pwr_BindClass($MountObject),
-  pwr_NullClass };
+pwr_dExport pwr_BindClasses(System) = {
+    pwr_BindClass($AttrXRef),  pwr_BindClass($Node),        pwr_BindClass($Object),
+    pwr_BindClass($ObjXRef),   pwr_BindClass($Objid),       pwr_BindClass($RootVolume),
+    pwr_BindClass($SubVolume), pwr_BindClass($ClassDef),    pwr_BindClass($ClassHier),
+    pwr_BindClass($Attribute), pwr_BindClass($ObjBodyDef),  pwr_BindClass($AttrRef),
+    pwr_BindClass($PlantHier), pwr_BindClass($NodeHier),    pwr_BindClass($Security),
+    pwr_BindClass($System),    pwr_BindClass($MountObject), pwr_NullClass};

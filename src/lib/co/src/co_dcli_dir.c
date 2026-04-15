@@ -52,18 +52,18 @@
 #include "co_string.h"
 
 /* Search for one or several files.
-*  The file name can contain wildcard, *.
-*  Should be called for the first time with new = DCLI_DIR_SEARCH_INIT.
-*  If more then one file is searched for, the next files are found with
-*  calls where new = DCLI_DIR_SEARCH_NEXT. When the search is finished,
-*  one call with DCLI_DIR_SEARCH_END should be made.
-*  Two parallell searches are not allowed as data is stored internally.
-*
-*  file_name	File name, can contain wildcard.
-*  found_file	Found file.
-*  new		DCLI_DIR_SEARCH_INIT, DCLI_DIR_SEARCH_NEXT or
-* DCLI_DIR_SEARCH_END.
-*/
+ *  The file name can contain wildcard, *.
+ *  Should be called for the first time with new = DCLI_DIR_SEARCH_INIT.
+ *  If more then one file is searched for, the next files are found with
+ *  calls where new = DCLI_DIR_SEARCH_NEXT. When the search is finished,
+ *  one call with DCLI_DIR_SEARCH_END should be made.
+ *  Two parallell searches are not allowed as data is stored internally.
+ *
+ *  file_name	File name, can contain wildcard.
+ *  found_file	Found file.
+ *  new		DCLI_DIR_SEARCH_INIT, DCLI_DIR_SEARCH_NEXT or
+ * DCLI_DIR_SEARCH_END.
+ */
 
 int dcli_search_file(const char* name, char* found_file, int new)
 {
@@ -77,10 +77,12 @@ int dcli_search_file(const char* name, char* found_file, int new)
   static int wildcard;
   struct dirent* dir_entry;
 
-  if (new == DCLI_DIR_SEARCH_INIT) {
+  if (new == DCLI_DIR_SEARCH_INIT)
+  {
     dcli_parse_filename(name, dev, dir, file, type, &version);
     dcli_replace_env(dir, dir2);
-    if (dir2[0] != '/') {
+    if (dir2[0] != '/')
+    {
       /* Add cwd to the path */
       if (getcwd(cwd, sizeof(cwd)) == NULL)
         return DCLI__NOFILE;
@@ -88,7 +90,8 @@ int dcli_search_file(const char* name, char* found_file, int new)
       if (dir[strlen(dir) - 1] != '/')
         strcat(dir, "/");
       strcat(dir, dir2);
-    } else
+    }
+    else
       strcpy(dir, dir2);
 
     directory = opendir(dir);
@@ -105,21 +108,27 @@ int dcli_search_file(const char* name, char* found_file, int new)
     //   dcli_toupper( pattern, pattern);
   }
 
-  if (new == DCLI_DIR_SEARCH_INIT || new == DCLI_DIR_SEARCH_NEXT) {
+  if (new == DCLI_DIR_SEARCH_INIT || new == DCLI_DIR_SEARCH_NEXT)
+  {
     found = 0;
-    while ((dir_entry = readdir(directory)) != NULL) {
-      if (streq(dir_entry->d_name, ".")
-          || streq(dir_entry->d_name, ".."))
+    while ((dir_entry = readdir(directory)) != NULL)
+    {
+      if (streq(dir_entry->d_name, ".") || streq(dir_entry->d_name, ".."))
         continue;
 
-      if (wildcard) {
-        if (dcli_wildcard(pattern, dir_entry->d_name) == 0) {
+      if (wildcard)
+      {
+        if (dcli_wildcard(pattern, dir_entry->d_name) == 0)
+        {
           strcpy(found_file, dir);
           strcat(found_file, dir_entry->d_name);
           found = 1;
         }
-      } else {
-        if (streq(pattern, dir_entry->d_name)) {
+      }
+      else
+      {
+        if (streq(pattern, dir_entry->d_name))
+        {
           strcpy(found_file, dir);
           strcat(found_file, dir_entry->d_name);
           found = 1;
@@ -134,7 +143,8 @@ int dcli_search_file(const char* name, char* found_file, int new)
       return DCLI__SUCCESS;
   }
 
-  if (new == DCLI_DIR_SEARCH_END) {
+  if (new == DCLI_DIR_SEARCH_END)
+  {
     if (directory)
       closedir(directory);
   }
@@ -143,18 +153,18 @@ int dcli_search_file(const char* name, char* found_file, int new)
 }
 
 /* Search for one or several directories.
-*  The file name can contain wildcard, *.
-*  Should be called for the first time with new = DCLI_DIR_SEARCH_INIT.
-*  If more then one file is searched for, the next files are found with
-*  calls where new = DCLI_DIR_SEARCH_NEXT. When the search is finished,
-*  one call with DCLI_DIR_SEARCH_END should be made.
-*  Two parallell searches are not allowed as data is stored internally.
-*
-*  file_name	File name, can contain wildcard.
-*  found_file	Found file.
-*  new		DCLI_DIR_SEARCH_INIT, DCLI_DIR_SEARCH_NEXT or
-* DCLI_DIR_SEARCH_END.
-*/
+ *  The file name can contain wildcard, *.
+ *  Should be called for the first time with new = DCLI_DIR_SEARCH_INIT.
+ *  If more then one file is searched for, the next files are found with
+ *  calls where new = DCLI_DIR_SEARCH_NEXT. When the search is finished,
+ *  one call with DCLI_DIR_SEARCH_END should be made.
+ *  Two parallell searches are not allowed as data is stored internally.
+ *
+ *  file_name	File name, can contain wildcard.
+ *  found_file	Found file.
+ *  new		DCLI_DIR_SEARCH_INIT, DCLI_DIR_SEARCH_NEXT or
+ * DCLI_DIR_SEARCH_END.
+ */
 
 int dcli_search_directory(const char* name, char* found_file, int new)
 {
@@ -168,10 +178,12 @@ int dcli_search_directory(const char* name, char* found_file, int new)
   static int wildcard;
   struct dirent* dir_entry;
 
-  if (new == DCLI_DIR_SEARCH_INIT) {
+  if (new == DCLI_DIR_SEARCH_INIT)
+  {
     dcli_parse_filename(name, dev, dir, file, type, &version);
     dcli_replace_env(dir, dir2);
-    if (dir2[0] != '/') {
+    if (dir2[0] != '/')
+    {
       /* Add cwd to the path */
       if (getcwd(cwd, sizeof(cwd)) == NULL)
         return DCLI__NOFILE;
@@ -179,7 +191,8 @@ int dcli_search_directory(const char* name, char* found_file, int new)
       if (dir[strlen(dir) - 1] != '/')
         strcat(dir, "/");
       strcat(dir, dir2);
-    } else
+    }
+    else
       strcpy(dir, dir2);
 
     directory = opendir(dir);
@@ -196,13 +209,14 @@ int dcli_search_directory(const char* name, char* found_file, int new)
     //   dcli_toupper( pattern, pattern);
   }
 
-  if (new == DCLI_DIR_SEARCH_INIT || new == DCLI_DIR_SEARCH_NEXT) {
+  if (new == DCLI_DIR_SEARCH_INIT || new == DCLI_DIR_SEARCH_NEXT)
+  {
     found = 0;
-    while ((dir_entry = readdir(directory)) != NULL) {
+    while ((dir_entry = readdir(directory)) != NULL)
+    {
       struct stat st;
 
-      if (streq(dir_entry->d_name, ".")
-          || streq(dir_entry->d_name, ".."))
+      if (streq(dir_entry->d_name, ".") || streq(dir_entry->d_name, ".."))
         continue;
 
       if (fstatat(dirfd(directory), dir_entry->d_name, &st, 0) < 0)
@@ -211,14 +225,19 @@ int dcli_search_directory(const char* name, char* found_file, int new)
       if (!S_ISDIR(st.st_mode))
         continue;
 
-      if (wildcard) {
-        if (dcli_wildcard(pattern, dir_entry->d_name) == 0) {
+      if (wildcard)
+      {
+        if (dcli_wildcard(pattern, dir_entry->d_name) == 0)
+        {
           strcpy(found_file, dir);
           strcat(found_file, dir_entry->d_name);
           found = 1;
         }
-      } else {
-        if (streq(pattern, dir_entry->d_name)) {
+      }
+      else
+      {
+        if (streq(pattern, dir_entry->d_name))
+        {
           strcpy(found_file, dir);
           strcat(found_file, dir_entry->d_name);
           found = 1;
@@ -233,7 +252,8 @@ int dcli_search_directory(const char* name, char* found_file, int new)
       return DCLI__SUCCESS;
   }
 
-  if (new == DCLI_DIR_SEARCH_END) {
+  if (new == DCLI_DIR_SEARCH_END)
+  {
     if (directory)
       closedir(directory);
   }
@@ -242,14 +262,13 @@ int dcli_search_directory(const char* name, char* found_file, int new)
 }
 
 /*************************************************************************
-*
-* Name:		dcli_get_files
-*
-*
-**************************************************************************/
+ *
+ * Name:		dcli_get_files
+ *
+ *
+ **************************************************************************/
 
-int dcli_get_files(
-    char* dir, char* pattern, pwr_tString40* filelist[], int* filecnt)
+int dcli_get_files(char* dir, char* pattern, pwr_tString40* filelist[], int* filecnt)
 {
   pwr_tStatus sts;
   pwr_tFileName file_spec, found_file;
@@ -262,13 +281,15 @@ int dcli_get_files(
   strcat(file_spec, pattern);
   dcli_translate_filename(file_spec, file_spec);
   sts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_INIT);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     cnt++;
     sts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_NEXT);
   }
   dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_END);
 
-  if (!cnt) {
+  if (!cnt)
+  {
     *filecnt = 0;
     return 0;
   }
@@ -276,11 +297,15 @@ int dcli_get_files(
   *filelist = calloc(cnt, sizeof(pwr_tString40));
 
   sts = dcli_search_file(file_spec, found_file, DCLI_DIR_SEARCH_INIT);
-  while (ODD(sts)) {
-    if ((s = strrchr(found_file, '/'))) {
+  while (ODD(sts))
+  {
+    if ((s = strrchr(found_file, '/')))
+    {
       strncpy((*filelist)[idx], s + 1, sizeof(pwr_tString40));
       (*filelist)[idx][sizeof(pwr_tString40) - 1] = 0;
-    } else {
+    }
+    else
+    {
       strncpy((*filelist)[idx], found_file, sizeof(pwr_tString40));
       (*filelist)[idx][sizeof(pwr_tString40) - 1] = 0;
     }
@@ -295,28 +320,27 @@ int dcli_get_files(
 }
 
 /*************************************************************************
-*
-* Name:		dcli_parse_filename
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Delar upp ett filnamn i device, directory, namn, typ och version.
-*
-* Parameterar
-*	filenam		*char	I  Filnamn som ska delas.
-*	dev		*char	O  device.
-*	dir		*char	O  directory.
-*	file		*char	O  filnamn.
-*	type		*char	O  typ.
-*	version		*int	O  version.
-*
-**************************************************************************/
+ *
+ * Name:		dcli_parse_filename
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Delar upp ett filnamn i device, directory, namn, typ och version.
+ *
+ * Parameterar
+ *	filenam		*char	I  Filnamn som ska delas.
+ *	dev		*char	O  device.
+ *	dir		*char	O  directory.
+ *	file		*char	O  filnamn.
+ *	type		*char	O  typ.
+ *	version		*int	O  version.
+ *
+ **************************************************************************/
 
-int dcli_parse_filename(const char* filename, char* dev, char* dir, char* file,
-    char* type, int* version)
+int dcli_parse_filename(const char* filename, char* dev, char* dir, char* file, char* type, int* version)
 {
   char* s;
   char ldev[200];
@@ -376,10 +400,12 @@ int dcli_delete_directory(char* path, int force)
   pwr_tFileName fname;
 
   dcli_translate_filename(fname, path);
-  if (rmdir(fname) != 0) {
+  if (rmdir(fname) != 0)
+  {
     if (!force)
       return 0;
-    if (errno == ENOTEMPTY) {
+    if (errno == ENOTEMPTY)
+    {
       pwr_tCmd cmd;
       sprintf(cmd, "rm -r %s", path);
       system(cmd);

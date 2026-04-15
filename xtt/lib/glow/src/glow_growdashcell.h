@@ -51,9 +51,10 @@
   events when the
   object is clicked on, moved etc.
 */
-class GrowDashCell : public GrowGroup {
+class GrowDashCell : public GrowGroup
+{
 public:
-  GrowRect *frame;
+  GrowRect* frame;
   int cell_rows;
   int cell_columns;
   int cell_rows_old;
@@ -66,12 +67,11 @@ public:
     \param array	Array with group member objects.
     \param nodraw	Don't draw the object now.
   */
-  GrowDashCell(
-      GrowCtx* glow_ctx, const char* name, double x, double y, double w, double h, 
-      glow_eDrawType border_d_type, int nodraw = 0);
+  GrowDashCell(GrowCtx* glow_ctx, const char* name, double x, double y, double w, double h,
+               glow_eDrawType border_d_type, int nodraw = 0);
 
   //! Noargs constructor.
-  GrowDashCell(){}
+  GrowDashCell() {}
 
   GrowDashCell(GrowCtx* glow_ctx, const char* name);
   ~GrowDashCell();
@@ -109,12 +109,11 @@ public:
   void update_attributes();
 
   void get_node_borders();
-  
-  void get_borders(GlowTransform* t, double* x1_right, double* x1_left,
-      double* y1_high, double* y1_low);
 
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-      void* node, void* colornode, void *transpnode);
+  void get_borders(GlowTransform* t, double* x1_right, double* x1_left, double* y1_high, double* y1_low);
+
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   int local_event_handler(glow_eEvent event, double x, double y);
 
@@ -122,12 +121,11 @@ public:
 
   int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
 
-  void get_info(int *rows, int *columns);
+  void get_info(int* rows, int* columns);
 
   int trace_init();
 
   int insert(GlowArrayElem* element);
-
 };
 
 /*@}*/

@@ -50,11 +50,9 @@
 /* Macros for debugging */
 #undef DBG_PRN /* undef it, just in case */
 #ifdef CIF_DEBUG
-#define CIF_PRN(function, lineno, fmt, args...)                                \
-  printk(fmt, function, lineno, ##args)
-#define DBG_PRN(fmt, args...)                                                  \
-  CIF_PRN((__FUNCTION__), (__LINE__), KERN_INFO __FILE__ "::%s(L%.4d): " fmt,  \
-          ##args)
+#define CIF_PRN(function, lineno, fmt, args...) printk(fmt, function, lineno, ##args)
+#define DBG_PRN(fmt, args...)                                                                                \
+  CIF_PRN((__FUNCTION__), (__LINE__), KERN_INFO __FILE__ "::%s(L%.4d): " fmt, ##args)
 #else
 #define DBG_PRN(fmt, args...) /* not debugging: nothing */
 #endif

@@ -54,13 +54,15 @@ void dl_Cancel(pwr_tStatus* sts, pwr_tDlid dlid)
   gdb_AssumeLocked;
 
   rid.pwr = dlid;
-  if (rid.r.vid_3 != cdh_eVid3_dlid) {
+  if (rid.r.vid_3 != cdh_eVid3_dlid)
+  {
     pwr_Status(sts, GDH__DLID);
     return;
   }
 
   dp = hash_Search(sts, gdbroot->subc_ht, &dlid);
-  if (dp == NULL) {
+  if (dp == NULL)
+  {
     pwr_Status(sts, GDH__DLID);
     return;
   }
@@ -93,8 +95,8 @@ void dl_CancelUser(pid_t user)
 
   gdb_AssumeLocked;
 
-  for (dl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->dl_lh);
-       dl != &gdbroot->db->dl_lh;) {
+  for (dl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->dl_lh); dl != &gdbroot->db->dl_lh;)
+  {
     dp = pool_Qitem(dl, dl_sLink, dl_ll);
     dl = pool_Qsucc(NULL, gdbroot->pool, dl);
 
@@ -120,7 +122,8 @@ dl_sLink* dl_Create(pwr_tStatus* sts, mvol_sAttribute* ap, pwr_sAttrRef* arp)
 
   dp = pool_Alloc(NULL, gdbroot->pool, sizeof(dl_sLink));
 
-  do {
+  do
+  {
     gdbroot->db->dlid.rix++;
     dp->dlid = gdbroot->db->dlid;
 

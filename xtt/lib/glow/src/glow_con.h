@@ -52,19 +52,21 @@
 /*@{*/
 
 //! Element in list of vertical lines.
-typedef struct {
-  double x; //!< x coordinate of line
+typedef struct
+{
+  double x;   //!< x coordinate of line
   double l_y; //!< y coordinate for lower endpoint of line.
   double u_y; //!< y coordinate for upper endpoint of line.
-  int dest; //!< Line for destination point.
+  int dest;   //!< Line for destination point.
 } con_tVertLines;
 
 //! Element i list of horizontal lines.
-typedef struct {
-  double y; //!< y coordinate of line.
+typedef struct
+{
+  double y;   //!< y coordinate of line.
   double l_x; //!< x coordinate for left endpoint of line.
   double u_x; //!< x coordinate for right endpoint of line.
-  int dest; //!< Line for destination point.
+  int dest;   //!< Line for destination point.
 } con_tHorizLines;
 
 //! Class for a connection between two nodes.
@@ -72,7 +74,8 @@ typedef struct {
   objects contains
   connection points which gives the start end end point for the connection.
 */
-class GlowCon : public GlowArrayElem {
+class GlowCon : public GlowArrayElem
+{
 public:
   //! Constructor.
   /*!
@@ -90,16 +93,15 @@ public:
     \param cborder	Draw with border.
     \param cshadow	Draw width shadow.
   */
-  GlowCon(GrowCtx* glow_ctx, const char* name, GlowConClass* con_class,
-      GlowNode* source, GlowNode* dest, int source_cp, int dest_cp,
-      int nodraw = 0, int point_num = 0, double* x_vect = 0, double* y_vect = 0,
-      int cborder = 0, int cshadow = 0);
+  GlowCon(GrowCtx* glow_ctx, const char* name, GlowConClass* con_class, GlowNode* source, GlowNode* dest,
+          int source_cp, int dest_cp, int nodraw = 0, int point_num = 0, double* x_vect = 0,
+          double* y_vect = 0, int cborder = 0, int cshadow = 0);
 
   //! Destructor.
   ~GlowCon();
 
   //! Noargs constructor.
-  GlowCon(){}
+  GlowCon() {}
 
   //! Copyconstructor with new source and destination nodes.
   /*!
@@ -113,12 +115,10 @@ public:
 
   void zoom();
   void nav_zoom();
-  void get_borders(
-      double* x1_right, double* x1_left, double* y1_high, double* y1_low){}
+  void get_borders(double* x1_right, double* x1_left, double* y1_high, double* y1_low) {}
   void get_con_borders();
   int event_handler(GlowWind* w, glow_eEvent event, int x, int y);
-  int event_handler(
-      GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
   {
     return event_handler(w, event, x, y);
   }
@@ -138,47 +138,34 @@ public:
   void draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
   void draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y);
   void draw();
-  void erase(){}
+  void erase() {}
   void move(double delta_x, double delta_y, int grid);
   void move_noerase(int delta_x, int delta_y, int move);
   void reconfigure();
-  void store_position(){}
-  void restore_position(){}
+  void store_position() {}
+  void restore_position() {}
   void redraw_node_cons(void* node);
   int delete_node_cons(void* node);
-  int con_route(double src_x, double src_y, glow_eDirection src_dir,
-      double dest_x, double dest_y, glow_eDirection dest_dir);
-  int con_route_noobstacle(double src_x, double src_y, glow_eDirection src_dir,
-      double dest_x, double dest_y, glow_eDirection dest_dir);
-  int con_route_grafcet(glow_eConType con_type, double src_x, double src_y,
-      double dest_x, double dest_y);
+  int con_route(double src_x, double src_y, glow_eDirection src_dir, double dest_x, double dest_y,
+                glow_eDirection dest_dir);
+  int con_route_noobstacle(double src_x, double src_y, glow_eDirection src_dir, double dest_x, double dest_y,
+                           glow_eDirection dest_dir);
+  int con_route_grafcet(glow_eConType con_type, double src_x, double src_y, double dest_x, double dest_y);
   void draw_routed_roundcorner(int points, double* x, double* y);
   void draw_routed(int points, double* x, double* y);
   void draw_routed_trans(int points, double* x, double* y);
   void set_highlight(int on);
-  int get_highlight()
-  {
-    return highlight;
-  }
+  int get_highlight() { return highlight; }
   void set_hot(int on);
   void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y);
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_Con;
-  }
+  glow_eObjectType type() { return glow_eObjectType_Con; }
   double x_right;
   double x_left;
   double y_high;
   double y_low;
   GlowConClass* cc;
-  GlowNode* destination()
-  {
-    return dest_node;
-  }
-  GlowNode* source()
-  {
-    return source_node;
-  }
+  GlowNode* destination() { return dest_node; }
+  GlowNode* source() { return source_node; }
   GlowNode* dest_node;
   GlowNode* source_node;
   int dest_conpoint;
@@ -207,29 +194,27 @@ public:
   glow_eTraceType trace_attr_type;
   void* trace_p;
   GlowCon* link;
-  int con_route_area(
-      double wind_ll_x, double wind_ll_y, double wind_ur_x, double wind_ur_y);
-  int find_horiz_line_up(double check_y, double check_l_x, double check_u_x,
-      GlowNode* nodelist, GlowNode* next_node, GlowCon* conlist,
-      GlowCon* next_con, double wind_ll_x, double wind_ur_x);
-  int find_horiz_line_down(double check_y, double check_l_x, double check_u_x,
-      GlowNode* nodelist, GlowNode* next_node, GlowCon* conlist,
-      GlowCon* next_con, double wind_ll_x, double wind_ur_x);
-  int find_vert_line_right(double check_x, double check_l_y, double check_u_y,
-      GlowNode* nodelist, GlowNode* next_node, GlowCon* conlist,
-      GlowCon* next_con, double wind_ll_y, double wind_ur_y);
-  int find_vert_line_left(double check_x, double check_l_y, double check_u_y,
-      GlowNode* nodelist, GlowNode* next_node, GlowCon* conlist,
-      GlowCon* next_con, double wind_ll_y, double wind_ur_y);
-  void find_horiz_line_right_border(double y, double start_x,
-      double start_x_con, double* border_x, GlowNode* nodelist,
-      GlowCon* conlist);
-  void find_horiz_line_left_border(double y, double start_x, double start_x_con,
-      double* border_x, GlowNode* nodelist, GlowCon* conlist);
-  void find_vert_line_high_border(double x, double start_y, double start_x_con,
-      double* border_y, GlowNode* nodelist, GlowCon* conlist);
-  void find_vert_line_low_border(double x, double start_y, double start_x_con,
-      double* border_y, GlowNode* nodelist, GlowCon* conlist);
+  int con_route_area(double wind_ll_x, double wind_ll_y, double wind_ur_x, double wind_ur_y);
+  int find_horiz_line_up(double check_y, double check_l_x, double check_u_x, GlowNode* nodelist,
+                         GlowNode* next_node, GlowCon* conlist, GlowCon* next_con, double wind_ll_x,
+                         double wind_ur_x);
+  int find_horiz_line_down(double check_y, double check_l_x, double check_u_x, GlowNode* nodelist,
+                           GlowNode* next_node, GlowCon* conlist, GlowCon* next_con, double wind_ll_x,
+                           double wind_ur_x);
+  int find_vert_line_right(double check_x, double check_l_y, double check_u_y, GlowNode* nodelist,
+                           GlowNode* next_node, GlowCon* conlist, GlowCon* next_con, double wind_ll_y,
+                           double wind_ur_y);
+  int find_vert_line_left(double check_x, double check_l_y, double check_u_y, GlowNode* nodelist,
+                          GlowNode* next_node, GlowCon* conlist, GlowCon* next_con, double wind_ll_y,
+                          double wind_ur_y);
+  void find_horiz_line_right_border(double y, double start_x, double start_x_con, double* border_x,
+                                    GlowNode* nodelist, GlowCon* conlist);
+  void find_horiz_line_left_border(double y, double start_x, double start_x_con, double* border_x,
+                                   GlowNode* nodelist, GlowCon* conlist);
+  void find_vert_line_high_border(double x, double start_y, double start_x_con, double* border_y,
+                                  GlowNode* nodelist, GlowCon* conlist);
+  void find_vert_line_low_border(double x, double start_y, double start_x_con, double* border_y,
+                                 GlowNode* nodelist, GlowCon* conlist);
   void link_insert(void** start)
   {
     link = *(GlowCon**)start;
@@ -237,27 +222,19 @@ public:
   }
   int in_area(double ll_x, double ll_y, double ur_x, double ur_y)
   {
-    return ((x_left + ctx->draw_delta) < ur_x
-        && (x_right + ctx->draw_delta) > ll_x
-        && (y_low + ctx->draw_delta) < ur_y
-        && (y_high + ctx->draw_delta) > ll_y);
+    return ((x_left + ctx->draw_delta) < ur_x && (x_right + ctx->draw_delta) > ll_x &&
+            (y_low + ctx->draw_delta) < ur_y && (y_high + ctx->draw_delta) > ll_y);
   }
   int in_area_exact(double ll_x, double ll_y, double ur_x, double ur_y)
   {
     return (x_left < ur_x && x_right > ll_x && y_low < ur_y && y_high > ll_y);
   }
-  int in_vert_line(double x, double l_y, double u_y)
-  {
-    return 0;
-  }
-  int in_horiz_line(double y, double l_x, double u_x)
-  {
-    return 0;
-  }
+  int in_vert_line(double x, double l_y, double u_y) { return 0; }
+  int in_horiz_line(double y, double l_x, double u_x) { return 0; }
   int find_horiz_line_next_line(con_tHorizLines* horiz_line);
   int find_vert_line_next_line(con_tVertLines* vert_line);
-  int sort_lines(double dest_x, double dest_y, glow_eDirection dest_dir,
-      double src_x, double src_y, glow_eDirection src_dir);
+  int sort_lines(double dest_x, double dest_y, glow_eDirection dest_dir, double src_x, double src_y,
+                 glow_eDirection src_dir);
   void move_ref(double x1, double y1, double x2, double y2);
   void conpoint_refcon_redraw(void* node, int conpoint);
   void conpoint_refcon_erase(void* node, int conpoint);
@@ -269,43 +246,25 @@ public:
   int border;
   int shadow;
 
-  void set_user_data(void* data)
-  {
-    user_data = data;
-  }
-  void get_user_data(void** data)
-  {
-    *data = user_data;
-  }
+  void set_user_data(void* data) { user_data = data; }
+  void get_user_data(void** data) { *data = user_data; }
   int trace_scan();
   int trace_init();
   void trace_close();
-  void* get_ctx()
-  {
-    return this->ctx;
-  }
+  void* get_ctx() { return this->ctx; }
   void get_con_position(double* x_arr[], double* y_arr[], int* num)
   {
     *x_arr = point_x;
     *y_arr = point_y;
     *num = p_num;
   }
-  glow_eConGroup get_group()
-  {
-    return cc->group;
-  }
+  glow_eConGroup get_group() { return cc->group; }
   void set_movement_type(GlowArrayElem** a, int a_size);
-  void set_movement_type(glow_eMoveType move_type)
-  {
-    movement_type = move_type;
-  }
-  int is_connected_to(GlowNode* node)
-  {
-    return source_node == node || dest_node == node;
-  }
+  void set_movement_type(glow_eMoveType move_type) { movement_type = move_type; }
+  int is_connected_to(GlowNode* node) { return source_node == node || dest_node == node; }
   void change_conclass(GlowConClass* conclass);
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ofstream& fp);
   void convert(glow_eConvert version);
   void set_border(int borderval);
   void set_shadow(int shadowval);

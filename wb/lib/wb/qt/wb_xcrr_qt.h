@@ -45,10 +45,11 @@
 
 class WCrrQtWidget;
 
-class WCrrQt : public WCrr {
+class WCrrQt : public WCrr
+{
 public:
-  WCrrQt(void* xa_parent_ctx, ldh_tSesContext xa_ldhses, pwr_sAttrRef* xa_objar,
-      int xa_advanced_user, int* xa_sts);
+  WCrrQt(void* xa_parent_ctx, ldh_tSesContext xa_ldhses, pwr_sAttrRef* xa_objar, int xa_advanced_user,
+         int* xa_sts);
   ~WCrrQt();
   QWidget* brow_widget;
   QWidget* form_widget;
@@ -61,7 +62,8 @@ private:
   WCrrQtWidget* toplevel;
 };
 
-class WCrrQtWidget : public QWidget {
+class WCrrQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

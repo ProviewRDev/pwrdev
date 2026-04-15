@@ -54,7 +54,8 @@
 #define DA0_CHANNEL 14
 #define DA1_CHANNEL 15
 
-typedef struct {
+typedef struct
+{
   FILE* value_fp[GPIO_CHANNELS];
   unsigned int number[GPIO_CHANNELS];
   unsigned int mask[GPIO_CHANNELS];
@@ -65,8 +66,7 @@ typedef struct {
   int has_read_method;
 } io_sLocalGertboard;
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   int i;
   pwr_sClass_Gertboard* op = (pwr_sClass_Gertboard*)cp->op;
@@ -78,10 +78,11 @@ static pwr_tStatus IoCardInit(
 
   setup_io();
 
-  if ((cp->chanlist[AD0_CHANNEL].cop && cp->chanlist[AD0_CHANNEL].sop)
-      || (cp->chanlist[AD1_CHANNEL].cop && cp->chanlist[AD1_CHANNEL].sop)
-      || (cp->chanlist[DA0_CHANNEL].cop && cp->chanlist[DA0_CHANNEL].sop)
-      || (cp->chanlist[DA1_CHANNEL].cop && cp->chanlist[DA1_CHANNEL].sop)) {
+  if ((cp->chanlist[AD0_CHANNEL].cop && cp->chanlist[AD0_CHANNEL].sop) ||
+      (cp->chanlist[AD1_CHANNEL].cop && cp->chanlist[AD1_CHANNEL].sop) ||
+      (cp->chanlist[DA0_CHANNEL].cop && cp->chanlist[DA0_CHANNEL].sop) ||
+      (cp->chanlist[DA1_CHANNEL].cop && cp->chanlist[DA1_CHANNEL].sop))
+  {
     // Init SPI
     INP_GPIO(7);
     SET_GPIO_ALT(7, 0);
@@ -98,11 +99,15 @@ static pwr_tStatus IoCardInit(
     spi_init = 1;
   }
 
-  for (i = 0; i < GPIO_CHANNELS; i++) {
-    if (cp->chanlist[i].cop && cp->chanlist[i].sop) {
-      switch (cp->chanlist[i].ChanClass) {
+  for (i = 0; i < GPIO_CHANNELS; i++)
+  {
+    if (cp->chanlist[i].cop && cp->chanlist[i].sop)
+    {
+      switch (cp->chanlist[i].ChanClass)
+      {
       case pwr_cClass_ChanD:
-        if (local->number[i] > 32) {
+        if (local->number[i] > 32)
+        {
           errh_Error("Gertboard channel number error, Buf%d", i + 1);
           op->Status = IO__INITFAIL;
           return IO__INITFAIL;
@@ -110,19 +115,22 @@ static pwr_tStatus IoCardInit(
         local->type[i] = ((pwr_sClass_ChanD*)cp->chanlist[i].cop)->Type;
         local->number[i] = ((pwr_sClass_ChanD*)cp->chanlist[i].cop)->Number;
 
-        if (spi_init && (local->number[i] == 7 || local->number[i] == 8
-                            || local->number[i] == 9 || local->number[i] == 10
-                            || local->number[i] == 11)) {
+        if (spi_init && (local->number[i] == 7 || local->number[i] == 8 || local->number[i] == 9 ||
+                         local->number[i] == 10 || local->number[i] == 11))
+        {
           errh_Warning("GPIO Buf and SPI overlap, %d", local->number[i]);
           break;
         }
 
         local->mask[i] = 1 << local->number[i];
 
-        if (local->type[i] == pwr_eDChanTypeEnum_Di) {
+        if (local->type[i] == pwr_eDChanTypeEnum_Di)
+        {
           local->in_mask |= local->mask[i];
           INP_GPIO(local->number[i]);
-        } else {
+        }
+        else
+        {
           local->out_mask |= local->mask[i];
           INP_GPIO(local->number[i]);
           OUT_GPIO(local->number[i]);
@@ -133,7 +141,8 @@ static pwr_tStatus IoCardInit(
     }
   }
 
-  if (local->in_mask) {
+  if (local->in_mask)
+  {
     GPIO_PULL = 2;
     short_wait();
     GPIO_PULLCLK0 = local->in_mask;
@@ -142,17 +151,21 @@ static pwr_tStatus IoCardInit(
     GPIO_PULLCLK0 = 0;
   }
 
-  if (cp->chanlist[DA0_CHANNEL].cop && cp->chanlist[AD0_CHANNEL].sop) {
+  if (cp->chanlist[DA0_CHANNEL].cop && cp->chanlist[AD0_CHANNEL].sop)
+  {
     io_AiRangeToCoef(&cp->chanlist[AD0_CHANNEL]);
   }
-  if (cp->chanlist[DA1_CHANNEL].cop && cp->chanlist[AD1_CHANNEL].sop) {
+  if (cp->chanlist[DA1_CHANNEL].cop && cp->chanlist[AD1_CHANNEL].sop)
+  {
     io_AiRangeToCoef(&cp->chanlist[AD1_CHANNEL]);
   }
 
-  if (cp->chanlist[DA0_CHANNEL].cop && cp->chanlist[DA0_CHANNEL].sop) {
+  if (cp->chanlist[DA0_CHANNEL].cop && cp->chanlist[DA0_CHANNEL].sop)
+  {
     io_AoRangeToCoef(&cp->chanlist[DA0_CHANNEL]);
   }
-  if (cp->chanlist[DA1_CHANNEL].cop && cp->chanlist[DA1_CHANNEL].sop) {
+  if (cp->chanlist[DA1_CHANNEL].cop && cp->chanlist[DA1_CHANNEL].sop)
+  {
     io_AoRangeToCoef(&cp->chanlist[DA1_CHANNEL]);
   }
 
@@ -162,13 +175,13 @@ static pwr_tStatus IoCardInit(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalGertboard* local = (io_sLocalGertboard*)cp->Local;
   pwr_sClass_Gertboard* op = (pwr_sClass_Gertboard*)cp->op;
 
-  if (local->in_mask) {
+  if (local->in_mask)
+  {
     GPIO_PULL = 0;
     short_wait();
     GPIO_PULLCLK0 = local->in_mask;
@@ -183,8 +196,7 @@ static pwr_tStatus IoCardClose(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalGertboard* local = (io_sLocalGertboard*)cp->Local;
   int i;
@@ -193,18 +205,20 @@ static pwr_tStatus IoCardRead(
 
   value_mask = GPIO_IN0;
 
-  for (i = 0; i < GPIO_CHANNELS; i++) {
-    if (local->mask[i] & local->in_mask && cp->chanlist[i].cop
-        && cp->chanlist[i].vbp) {
+  for (i = 0; i < GPIO_CHANNELS; i++)
+  {
+    if (local->mask[i] & local->in_mask && cp->chanlist[i].cop && cp->chanlist[i].vbp)
+    {
       if (value_mask & local->mask[i])
         *(pwr_tBoolean*)cp->chanlist[i].vbp = 1;
       else
         *(pwr_tBoolean*)cp->chanlist[i].vbp = 0;
     }
   }
-  for (i = 0; i < 2; i++) {
-    if (cp->chanlist[AD0_CHANNEL + i].cop
-        && cp->chanlist[AD0_CHANNEL + i].sop) {
+  for (i = 0; i < 2; i++)
+  {
+    if (cp->chanlist[AD0_CHANNEL + i].cop && cp->chanlist[AD0_CHANNEL + i].sop)
+    {
       io_sChannel* chanp = &cp->chanlist[AD0_CHANNEL + i];
       pwr_sClass_ChanAi* cop = (pwr_sClass_ChanAi*)chanp->cop;
       pwr_sClass_Ai* sop = (pwr_sClass_Ai*)chanp->sop;
@@ -218,11 +232,10 @@ static pwr_tStatus IoCardRead(
       io_ConvertAi(cop, ivalue, &actvalue);
 
       // Filter
-      if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0
-          && sop->FilterAttribute[0] > ctx->ScanTime) {
-        actvalue = *(pwr_tFloat32*)chanp->vbp
-            + ctx->ScanTime / sop->FilterAttribute[0]
-                * (actvalue - *(pwr_tFloat32*)chanp->vbp);
+      if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0 && sop->FilterAttribute[0] > ctx->ScanTime)
+      {
+        actvalue = *(pwr_tFloat32*)chanp->vbp +
+                   ctx->ScanTime / sop->FilterAttribute[0] * (actvalue - *(pwr_tFloat32*)chanp->vbp);
       }
 
       *(pwr_tFloat32*)chanp->vbp = actvalue;
@@ -234,8 +247,7 @@ static pwr_tStatus IoCardRead(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocalGertboard* local = (io_sLocalGertboard*)cp->Local;
   int i;
@@ -243,9 +255,10 @@ static pwr_tStatus IoCardWrite(
   unsigned int set_mask = 0;
   int ivalue;
 
-  for (i = 0; i < GPIO_CHANNELS; i++) {
-    if (local->mask[i] & local->out_mask && cp->chanlist[i].cop
-        && cp->chanlist[i].vbp) {
+  for (i = 0; i < GPIO_CHANNELS; i++)
+  {
+    if (local->mask[i] & local->out_mask && cp->chanlist[i].cop && cp->chanlist[i].vbp)
+    {
       if (*(pwr_tBoolean*)cp->chanlist[i].vbp)
         set_mask |= local->mask[i];
       else
@@ -255,28 +268,26 @@ static pwr_tStatus IoCardWrite(
   GPIO_CLR0 = clear_mask;
   GPIO_SET0 = set_mask;
 
-  for (i = 0; i < 2; i++) {
-    if (cp->chanlist[DA0_CHANNEL + i].cop
-        && cp->chanlist[DA0_CHANNEL + i].sop) {
-      pwr_sClass_ChanAo* cop
-          = (pwr_sClass_ChanAo*)cp->chanlist[DA0_CHANNEL + i].cop;
+  for (i = 0; i < 2; i++)
+  {
+    if (cp->chanlist[DA0_CHANNEL + i].cop && cp->chanlist[DA0_CHANNEL + i].sop)
+    {
+      pwr_sClass_ChanAo* cop = (pwr_sClass_ChanAo*)cp->chanlist[DA0_CHANNEL + i].cop;
       pwr_sClass_Ao* sop = (pwr_sClass_Ao*)cp->chanlist[DA0_CHANNEL + i].sop;
 
       if (cop->CalculateNewCoef)
         // Request to calculate new coefficients
         io_AoRangeToCoef(&cp->chanlist[DA0_CHANNEL + i]);
 
-      ivalue = (int)(*(pwr_tFloat32*)cp->chanlist[DA0_CHANNEL + i].vbp
-              * cop->OutPolyCoef1
-          + cop->OutPolyCoef0 + 0.5);
+      ivalue = (int)(*(pwr_tFloat32*)cp->chanlist[DA0_CHANNEL + i].vbp * cop->OutPolyCoef1 +
+                     cop->OutPolyCoef0 + 0.5);
       if (ivalue < 0)
         ivalue = 0;
       else if (ivalue > 4095)
         ivalue = 4095;
       sop->RawValue = ivalue;
-      sop->SigValue = *(pwr_tFloat32*)cp->chanlist[DA0_CHANNEL + i].vbp
-              * cop->SigValPolyCoef1
-          + cop->SigValPolyCoef0;
+      sop->SigValue =
+          *(pwr_tFloat32*)cp->chanlist[DA0_CHANNEL + i].vbp * cop->SigValPolyCoef1 + cop->SigValPolyCoef0;
 
       write_dac(i, ivalue);
     }
@@ -287,6 +298,6 @@ static pwr_tStatus IoCardWrite(
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(Gertboard) = { pwr_BindIoMethod(IoCardInit),
-  pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead),
-  pwr_BindIoMethod(IoCardWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Gertboard) = {pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
+                                            pwr_BindIoMethod(IoCardRead), pwr_BindIoMethod(IoCardWrite),
+                                            pwr_NullMethod};

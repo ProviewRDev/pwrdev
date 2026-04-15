@@ -49,7 +49,8 @@ class wb_volume;
 class wb_recix;
 class wb_vrepmem;
 
-class wb_session : public wb_volume {
+class wb_session : public wb_volume
+{
 protected:
   wb_srep* m_srep;
 
@@ -62,22 +63,10 @@ public:
 
   // Calls redirected to srep.
 
-  ldh_eAccess access()
-  {
-    return m_srep->access(&m_sts);
-  }
-  bool access(ldh_eAccess access)
-  {
-    return m_srep->access(&m_sts, access);
-  }
-  ldh_eUtility utility()
-  {
-    return m_srep->utility(&m_sts);
-  }
-  bool utility(ldh_eUtility utility)
-  {
-    return m_srep->utility(&m_sts, utility);
-  }
+  ldh_eAccess access() { return m_srep->access(&m_sts); }
+  bool access(ldh_eAccess access) { return m_srep->access(&m_sts, access); }
+  ldh_eUtility utility() { return m_srep->utility(&m_sts); }
+  bool utility(ldh_eUtility utility) { return m_srep->utility(&m_sts, utility); }
 
   //
 
@@ -98,72 +87,42 @@ public:
 
   bool writeAttribute(wb_attribute& a, void* p, size_t size);
   bool writeAttribute(wb_attribute& a, void* p);
-  bool writeBody()
-  {
-    return false;
-  } // Fix
+  bool writeBody() { return false; } // Fix
 
-  bool copyOset(pwr_sAttrRef* arp, bool keepref, bool keepsym,
-      bool ignore_errors, pwr_tVid vid = 0, const char* vname = 0,
-      wb_vrepmem** vmem = 0);
+  bool copyOset(pwr_sAttrRef* arp, bool keepref, bool keepsym, bool ignore_errors, pwr_tVid vid = 0,
+                const char* vname = 0, wb_vrepmem** vmem = 0);
   bool cutOset(pwr_sAttrRef* arp, bool keepref);
-  bool pasteOset(pwr_tOid doid, ldh_eDest dest, bool keepoid, bool recycleix,
-      char* buffer);
+  bool pasteOset(pwr_tOid doid, ldh_eDest dest, bool keepoid, bool recycleix, char* buffer);
 
   bool clone(const char* vname, pwr_tVid vid, wb_vrepmem** vmem);
 
-  void getAllMenuItems(ldh_sMenuCall* ip, ldh_sMenuItem** Item, wb_cdrep* cdrep,
-      wb_orep* o, void* o_body, pwr_tUInt32 Level, int* nItems,
-      int AddSeparator);
+  void getAllMenuItems(ldh_sMenuCall* ip, ldh_sMenuItem** Item, wb_cdrep* cdrep, wb_orep* o, void* o_body,
+                       pwr_tUInt32 Level, int* nItems, int AddSeparator);
 
   pwr_tStatus getMenu(ldh_sMenuCall* ip);
   pwr_tStatus callMenuMethod(ldh_sMenuCall* mcp, int Index);
 
-  void editorContext(void* ctx)
-  {
-    m_srep->editorContext(ctx);
-  }
-  void sendThisSession(ldh_tSessionCb thisSessionCb)
-  {
-    m_srep->sendThisSession(thisSessionCb);
-  }
-  void sendOtherSession(ldh_tSessionCb otherSessionCb)
-  {
-    m_srep->sendOtherSession(otherSessionCb);
-  }
+  void editorContext(void* ctx) { m_srep->editorContext(ctx); }
+  void sendThisSession(ldh_tSessionCb thisSessionCb) { m_srep->sendThisSession(thisSessionCb); }
+  void sendOtherSession(ldh_tSessionCb otherSessionCb) { m_srep->sendOtherSession(otherSessionCb); }
 
   bool validateDestination(wb_destination d, pwr_tCid cid);
   bool castAttribute(pwr_sAttrRef* arp, pwr_tCid cid);
   bool disableAttribute(pwr_sAttrRef* arp, pwr_tDisableAttr disable);
-  void recix_set_destination(const char* d)
-  {
-    m_srep->recix_set_destination(d);
-  }
-  void resetSts()
-  {
-    m_sts = LDH__SUCCESS;
-  }
-  static void import_cb(wb_orep *o, wb_orep *os, void *data);
+  void recix_set_destination(const char* d) { m_srep->recix_set_destination(d); }
+  void resetSts() { m_sts = LDH__SUCCESS; }
+  static void import_cb(wb_orep* o, wb_orep* os, void* data);
 };
 
-inline bool wb_session::isEmpty()
-{
-  return m_srep->isEmpty(&m_sts);
-}
+inline bool wb_session::isEmpty() { return m_srep->isEmpty(&m_sts); }
 
-inline bool wb_session::isReadonly()
-{
-  return m_srep->isReadonly(&m_sts);
-}
+inline bool wb_session::isReadonly() { return m_srep->isReadonly(&m_sts); }
 
 // inline bool wb_session::commit()
 // {
 //   return m_srep->commit(&m_sts);
 // }
 
-inline bool wb_session::abort()
-{
-  return m_srep->abort(&m_sts);
-}
+inline bool wb_session::abort() { return m_srep->abort(&m_sts); }
 
 #endif

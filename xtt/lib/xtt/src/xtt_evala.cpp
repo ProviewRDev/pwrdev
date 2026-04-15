@@ -50,15 +50,14 @@
 #include "xtt_methodtoolbar.h"
 #include "rt_xnav_msg.h"
 
-EvAla::EvAla(void* ev_parent_ctx, char* ala_name, pwr_tObjid ev_user,
-    int ev_eventname_seg, int ev_width, int ev_height, int ev_x, int ev_y,
-    pwr_tObjid ev_view, unsigned int ev_options, pwr_tStatus* status)
-    : parent_ctx(ev_parent_ctx), user(ev_user), eventname_seg(ev_eventname_seg),
-      width(ev_width), height(ev_height), x(ev_x), y(ev_y), view(ev_view),
-      options(ev_options), start_trace_cb(0), display_in_xnav_cb(0), help_cb(0),
-      popup_menu_cb(0), sound_cb(0), pop_cb(0), is_authorized_cb(0),
-      acknowledge_cb(0), name_to_alias_cb(0), copy_list_cb(0), close_cb(0),
-      ala(NULL), ala_displayed(0), list_copied(0)
+EvAla::EvAla(void* ev_parent_ctx, char* ala_name, pwr_tObjid ev_user, int ev_eventname_seg, int ev_width,
+             int ev_height, int ev_x, int ev_y, pwr_tObjid ev_view, unsigned int ev_options,
+             pwr_tStatus* status)
+    : parent_ctx(ev_parent_ctx), user(ev_user), eventname_seg(ev_eventname_seg), width(ev_width),
+      height(ev_height), x(ev_x), y(ev_y), view(ev_view), options(ev_options), start_trace_cb(0),
+      display_in_xnav_cb(0), help_cb(0), popup_menu_cb(0), sound_cb(0), pop_cb(0), is_authorized_cb(0),
+      acknowledge_cb(0), name_to_alias_cb(0), copy_list_cb(0), close_cb(0), ala(NULL), ala_displayed(0),
+      list_copied(0)
 {
 }
 
@@ -73,7 +72,8 @@ EvAla::~EvAla()
 
 void EvAla::init()
 {
-  if (!list_copied && ala->browbase && copy_list_cb) {
+  if (!list_copied && ala->browbase && copy_list_cb)
+  {
     list_copied = 1;
     ala->set_nodraw();
     (copy_list_cb)(parent_ctx, ala);
@@ -87,7 +87,8 @@ void EvAla::ala_init_cb(void* ctx)
 {
   EvAla* ev = (EvAla*)ctx;
 
-  if (!ev->list_copied && ev->copy_list_cb) {
+  if (!ev->list_copied && ev->copy_list_cb)
+  {
     ev->list_copied = 1;
     ev->ala->set_nodraw();
     (ev->copy_list_cb)(ev->parent_ctx, ev->ala);
@@ -103,12 +104,11 @@ void EvAla::ala_start_trace_cb(void* ctx, pwr_tObjid objid, char* name)
     ((EvAla*)ctx)->start_trace_cb(((EvAla*)ctx)->parent_ctx, objid, name);
 }
 
-void EvAla::ala_popup_menu_cb(void* ctx, pwr_tAttrRef attrref,
-    unsigned long item_type, unsigned long utility, char* arg, int x, int y)
+void EvAla::ala_popup_menu_cb(void* ctx, pwr_tAttrRef attrref, unsigned long item_type, unsigned long utility,
+                              char* arg, int x, int y)
 {
   if (((EvAla*)ctx)->popup_menu_cb)
-    (((EvAla*)ctx)->popup_menu_cb)(
-        ((EvAla*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
+    (((EvAla*)ctx)->popup_menu_cb)(((EvAla*)ctx)->parent_ctx, attrref, item_type, utility, arg, x, y);
 }
 
 int EvAla::ala_sound_cb(void* ctx, pwr_tAttrRef* attrref)
@@ -139,7 +139,8 @@ void EvAla::help_event_cb(void* ctx, void* item)
 {
   ItemAlarm* aitem = (ItemAlarm*)item;
 
-  switch (aitem->type) {
+  switch (aitem->type)
+  {
   case evlist_eItemType_Alarm:
     ((EvAla*)ctx)->wow->DisplayText("Event MoreText", aitem->eventmoretext);
     break;
@@ -161,17 +162,18 @@ void EvAla::ala_activate_ack_last()
   mh_sEventId* id;
   int sts;
 
-  if (is_authorized_cb
-      && !is_authorized_cb(
-             parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
+  if (is_authorized_cb && !is_authorized_cb(parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
     return;
 
-  if (ala->brow == ala->browbase) {
+  if (ala->brow == ala->browbase)
+  {
     // Flat view, acknowledge last
     sts = ala->get_last_not_acked(&id);
     if (EVEN(sts))
       return;
-  } else {
+  }
+  else
+  {
     // Tree view, acknowledge selected
     ItemAlarm* item;
     pwr_tAName eventname;
@@ -180,7 +182,8 @@ void EvAla::ala_activate_ack_last()
     if (EVEN(sts))
       return;
 
-    switch (item->type) {
+    switch (item->type)
+    {
     case evlist_eItemType_Alarm:
       id = &item->eventid;
       break;
@@ -196,9 +199,7 @@ void EvAla::ala_activate_ack_last()
 
 void EvAla::ala_activate_ack_all()
 {
-  if (is_authorized_cb
-      && !is_authorized_cb(
-             parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
+  if (is_authorized_cb && !is_authorized_cb(parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
     return;
 
   ack_all();
@@ -216,9 +217,11 @@ void EvAla::ala_activate_helpevent()
   int sts;
   ItemAlarm* item;
 
-  if (help_cb) {
+  if (help_cb)
+  {
     sts = ala->get_selected_event(eventname, &item);
-    if (ODD(sts)) {
+    if (ODD(sts))
+    {
       wow->DisplayText(eventname, item->eventmoretext);
     }
   }
@@ -230,23 +233,19 @@ void EvAla::update()
     ala->flash();
 }
 
-int EvAla::event_delete(mh_sEventId* id)
-{
-  return ala->event_delete(id);
-}
+int EvAla::event_delete(mh_sEventId* id) { return ala->event_delete(id); }
 
 void EvAla::ack_last_prio(unsigned long type, unsigned long prio)
 {
   mh_sEventId* id;
   int sts;
 
-  if (is_authorized_cb
-      && !is_authorized_cb(
-             parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
+  if (is_authorized_cb && !is_authorized_cb(parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
     return;
 
   sts = ala->get_last_not_acked_prio(&id, type, prio, 0, 0);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     mh_sEventId lid = *id;
 
     ala->ack(id);
@@ -259,13 +258,12 @@ void EvAla::ack_all()
   mh_sEventId* id;
   int sts;
 
-  if (is_authorized_cb
-      && !is_authorized_cb(
-             parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
+  if (is_authorized_cb && !is_authorized_cb(parent_ctx, pwr_mAccess_RtEventsAck | pwr_mAccess_System))
     return;
 
   sts = ala->get_last_not_acked(&id);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     mh_sEventId lid = *id;
     ala->ack(id);
     acknowledge_cb(parent_ctx, &lid);
@@ -274,8 +272,7 @@ void EvAla::ack_all()
   }
 }
 
-int EvAla::get_last_not_acked_prio(
-    mh_sEventId** id, unsigned long type, unsigned long prio)
+int EvAla::get_last_not_acked_prio(mh_sEventId** id, unsigned long type, unsigned long prio)
 {
   return ala->get_last_not_acked_prio(id, type, prio, 0, 0);
 }
@@ -321,12 +318,16 @@ pwr_tStatus EvAla::set_view(pwr_tOid view)
   pwr_tStatus sts;
 
   sts = ala->set_view(view);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     pwr_tString80 name;
 
-    if (cdh_ObjidIsNull(view)) {
+    if (cdh_ObjidIsNull(view))
+    {
       strcpy(name, "Alarm List");
-    } else {
+    }
+    else
+    {
       pwr_tAttrRef name_ar, ar;
 
       ar = cdh_ObjidToAref(view);
@@ -352,12 +353,16 @@ void EvAla::view_shift()
   if (EVEN(sts))
     return;
 
-  if (cdh_ObjidIsNull(ala->current_view)) {
+  if (cdh_ObjidIsNull(ala->current_view))
+  {
     set_view(opp->AlarmViews[0]);
-  } else {
-    for (unsigned int i = 0;
-         i < sizeof(opp->AlarmViews) / sizeof(opp->AlarmViews[0]); i++) {
-      if (cdh_ObjidIsEqual(ala->current_view, opp->AlarmViews[i])) {
+  }
+  else
+  {
+    for (unsigned int i = 0; i < sizeof(opp->AlarmViews) / sizeof(opp->AlarmViews[0]); i++)
+    {
+      if (cdh_ObjidIsEqual(ala->current_view, opp->AlarmViews[i]))
+      {
         if (i == sizeof(opp->AlarmViews) / sizeof(opp->AlarmViews[0]) - 1)
           set_view(pwr_cNObjid);
         else

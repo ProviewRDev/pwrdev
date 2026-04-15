@@ -39,7 +39,8 @@
 
 #include "rt_xtt_cmd.h"
 
-class XttCmdQt : public XttCmd {
+class XttCmdQt : public XttCmd
+{
 public:
   XttCmdQt();
   QWidget* brow_widget;

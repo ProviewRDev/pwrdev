@@ -42,37 +42,23 @@
 
 #include "sev_valuecache.h"
 
-sev_valuecache::sev_valuecache(sev_eCvType type)
-    : m_type(type), m_userdata(0), m_useridx(0), m_write_cb(0)
-{
-}
+sev_valuecache::sev_valuecache(sev_eCvType type) : m_type(type), m_userdata(0), m_useridx(0), m_write_cb(0) {}
 
 sev_valuecache::sev_valuecache(const sev_valuecache& x)
-    : m_type(x.m_type), m_userdata(x.m_userdata), m_useridx(x.m_useridx),
-      m_write_cb(x.m_write_cb)
+    : m_type(x.m_type), m_userdata(x.m_userdata), m_useridx(x.m_useridx), m_write_cb(x.m_write_cb)
 {
 }
 
-sev_valuecache::~sev_valuecache()
-{
-}
+sev_valuecache::~sev_valuecache() {}
 
-void sev_valuecache::add(void* value, pwr_tTime* time, void* thread)
-{
-}
+void sev_valuecache::add(void* value, pwr_tTime* time, void* thread) {}
 
-int sev_valuecache::evaluate(double maxtime, void* thread)
-{
-  return SEV__NOWRITE;
-}
+int sev_valuecache::evaluate(double maxtime, void* thread) { return SEV__NOWRITE; }
 
-void sev_valuecache::write(int index, void* thread)
-{
-}
+void sev_valuecache::write(int index, void* thread) {}
 
-void sev_valuecache::set_write_cb(
-    void (*write_cb)(void*, int, void*, pwr_tTime*, void*), void* userdata,
-    int idx)
+void sev_valuecache::set_write_cb(void (*write_cb)(void*, int, void*, pwr_tTime*, void*), void* userdata,
+                                  int idx)
 {
   m_write_cb = write_cb;
   m_userdata = userdata;
@@ -81,8 +67,7 @@ void sev_valuecache::set_write_cb(
 
 const int sev_valuecache_double::m_size = VALUECACHE_SIZE;
 
-sev_valuecache_double::sev_valuecache_double(
-    sev_eCvType type, double deadband_value, double deadband_time)
+sev_valuecache_double::sev_valuecache_double(sev_eCvType type, double deadband_value, double deadband_time)
     : sev_valuecache(type), m_length(0), m_first(0), m_last(0), m_inited(false),
       m_deadband_value(deadband_value), m_deadband_time(deadband_time)
 {
@@ -91,24 +76,18 @@ sev_valuecache_double::sev_valuecache_double(
 }
 
 sev_valuecache_double::sev_valuecache_double(const sev_valuecache_double& x)
-    : sev_valuecache(x), m_length(x.m_length), m_first(x.m_first),
-      m_last(x.m_last), m_inited(x.m_inited), m_k(x.m_k),
-      m_deadband(x.m_deadband), m_deadband_value(x.m_deadband_value),
-      m_deadband_time(x.m_deadband_time), m_last_opt_write(x.m_last_opt_write),
-      m_start_time(x.m_start_time), m_last_k(x.m_last_k)
+    : sev_valuecache(x), m_length(x.m_length), m_first(x.m_first), m_last(x.m_last), m_inited(x.m_inited),
+      m_k(x.m_k), m_deadband(x.m_deadband), m_deadband_value(x.m_deadband_value),
+      m_deadband_time(x.m_deadband_time), m_last_opt_write(x.m_last_opt_write), m_start_time(x.m_start_time),
+      m_last_k(x.m_last_k)
 {
   memcpy(m_val, x.m_val, sizeof(m_val));
   memcpy(&m_wval, &x.m_wval, sizeof(m_wval));
 }
 
-sev_valuecache_double::~sev_valuecache_double()
-{
-}
+sev_valuecache_double::~sev_valuecache_double() {}
 
-int sev_valuecache_double::length()
-{
-  return m_length;
-}
+int sev_valuecache_double::length() { return m_length; }
 
 int sev_valuecache_double::idx(int index)
 {
@@ -122,15 +101,9 @@ int sev_valuecache_double::idx(int index)
   return i;
 }
 
-sev_sCacheValueDouble& sev_valuecache_double::operator[](const int index)
-{
-  return m_val[idx(index)];
-}
+sev_sCacheValueDouble& sev_valuecache_double::operator[](const int index) { return m_val[idx(index)]; }
 
-sev_sCacheValueDouble& sev_valuecache_double::wval()
-{
-  return m_wval;
-}
+sev_sCacheValueDouble& sev_valuecache_double::wval() { return m_wval; }
 
 void sev_valuecache_double::add(void* value, pwr_tTime* t, void* thread)
 {
@@ -145,34 +118,41 @@ void sev_valuecache_double::add(void* value, pwr_tTime* t, void* thread)
   m_last_opt_write = get_optimal_write();
 
   bool update_k = m_length < m_size;
-  if (!m_length) {
+  if (!m_length)
+  {
     m_val[0].val = val;
     m_val[0].time = time;
     m_length++;
-  } else {
+  }
+  else
+  {
     if (++m_last >= m_size)
       m_last -= m_size;
     m_val[m_last].val = val;
     m_val[m_last].time = time;
     m_length++;
-    if (m_last == m_first) {
+    if (m_last == m_first)
+    {
       m_first++;
       if (m_first >= m_size)
         m_first -= m_size;
       m_length--;
     }
   }
-  if (!m_inited) {
+  if (!m_inited)
+  {
     write(0, thread);
     m_inited = true;
     return;
   }
 
-  if (update_k) {
+  if (update_k)
+  {
     calculate_k();
     // Update epsilon for all data
     calculate_epsilon();
-  } else
+  }
+  else
     calculate_epsilon(0);
 }
 
@@ -181,13 +161,15 @@ int sev_valuecache_double::evaluate(double maxtime, void* thread)
   int value_added = 1;
   int sts = SEV__NOWRITE;
 
-  while (1) {
-    if ((!feq(maxtime, 0.0) && (m_val[m_last].time - m_wval.time) > maxtime)
-        || !check_deadband()) {
+  while (1)
+  {
+    if ((!feq(maxtime, 0.0) && (m_val[m_last].time - m_wval.time) > maxtime) || !check_deadband())
+    {
       // Store optimal value
       write(m_last_opt_write + value_added, thread);
       sts = SEV__SUCCESS;
-    } else
+    }
+    else
       break;
 
     calculate_k();
@@ -203,24 +185,29 @@ void sev_valuecache_double::calculate_k()
   double xysum = 0;
   double x2sum = 0;
 
-  for (int i = 0; i < length(); i++) {
+  for (int i = 0; i < length(); i++)
+  {
     int ii = idx(i);
     xysum += (m_val[ii].val - m_wval.val) * (m_val[ii].time - m_wval.time);
     x2sum += (m_val[ii].val - m_wval.val) * (m_val[ii].val - m_wval.val);
   }
-  if (x2sum < DBL_EPSILON) {
+  if (x2sum < DBL_EPSILON)
+  {
     m_k = 0;
     m_m = m_wval.val;
     m_deadband = m_deadband_value;
-  } else if (ABS(xysum) < DBL_EPSILON) {
+  }
+  else if (ABS(xysum) < DBL_EPSILON)
+  {
     m_k = 1E32;
     m_m = m_wval.time;
     m_deadband = m_deadband_time;
-  } else {
+  }
+  else
+  {
     m_k = x2sum / xysum;
     m_m = m_wval.val - m_wval.time * m_k;
-    m_deadband = m_deadband_value
-        + ABS(atan(m_k)) / (M_PI / 2) * (m_deadband_time - m_deadband_value);
+    m_deadband = m_deadband_value + ABS(atan(m_k)) / (M_PI / 2) * (m_deadband_time - m_deadband_value);
   }
 }
 
@@ -229,26 +216,35 @@ void sev_valuecache_double::write(int index, void* thread)
   int ii = idx(index);
   double wval, wtime;
 
-  if (m_type == sev_eCvType_Mean) {
-    if (ABS(m_last_k) < 1) {
+  if (m_type == sev_eCvType_Mean)
+  {
+    if (ABS(m_last_k) < 1)
+    {
       m_wval.val = m_wval.val + m_last_k * (m_val[ii].time - m_wval.time);
       m_wval.time = m_val[ii].time;
-    } else {
+    }
+    else
+    {
       m_wval.time = m_wval.time + (m_val[ii].val - m_wval.val) / m_last_k;
       m_wval.val = m_val[ii].val;
     }
     wval = m_wval.val;
     wtime = m_wval.time;
-  } else {
+  }
+  else
+  {
     wval = m_val[ii].val;
     wtime = m_val[ii].time;
     m_wval = m_val[ii];
   }
 
-  if (index == 0) {
+  if (index == 0)
+  {
     m_last = m_first = 0;
     m_length = 0;
-  } else {
+  }
+  else
+  {
     m_first = ii + 1;
     if (m_first >= m_size)
       m_first -= m_size;
@@ -256,7 +252,8 @@ void sev_valuecache_double::write(int index, void* thread)
     if (m_length < 0)
       m_length += m_size;
   }
-  if (m_write_cb) {
+  if (m_write_cb)
+  {
     pwr_tTime time;
     pwr_tDeltaTime dt;
     time_Float64ToD(&dt, wtime);
@@ -268,7 +265,8 @@ void sev_valuecache_double::write(int index, void* thread)
 // Calculate epsilon for all
 void sev_valuecache_double::calculate_epsilon()
 {
-  if (m_length == 1) {
+  if (m_length == 1)
+  {
     m_val[m_first].epsilon = 0;
     return;
   }
@@ -281,11 +279,13 @@ void sev_valuecache_double::calculate_epsilon()
 void sev_valuecache_double::calculate_epsilon(int index)
 {
   int ii = idx(index);
-  if (m_k >= 1E32) {
+  if (m_k >= 1E32)
+  {
     m_val[ii].epsilon = ABS(m_val[ii].time - m_wval.time);
-  } else {
-    m_val[ii].epsilon
-        = ABS(m_val[ii].val - m_k * m_val[ii].time - m_m) / sqrt(1 + m_k * m_k);
+  }
+  else
+  {
+    m_val[ii].epsilon = ABS(m_val[ii].val - m_k * m_val[ii].time - m_m) / sqrt(1 + m_k * m_k);
   }
 }
 
@@ -302,7 +302,8 @@ bool sev_valuecache_double::check_deadband(int index)
 // Returns true if all values inside deadband.
 bool sev_valuecache_double::check_deadband()
 {
-  for (int i = 0; i < m_length; i++) {
+  for (int i = 0; i < m_length; i++)
+  {
     int ii = idx(i);
     if (m_val[ii].epsilon > m_deadband)
       return false;
@@ -312,7 +313,8 @@ bool sev_valuecache_double::check_deadband()
 
 int sev_valuecache_double::get_optimal_write()
 {
-  if (m_type == sev_eCvType_Mean) {
+  if (m_type == sev_eCvType_Mean)
+  {
     m_last_k = m_k;
     return 0;
   }
@@ -323,15 +325,17 @@ int sev_valuecache_double::get_optimal_write()
   double weight;
   int min_idx = 0;
 
-  for (int i = 0; i < m_length; i++) {
+  for (int i = 0; i < m_length; i++)
+  {
     if (m_length == m_size && i == m_length - 1)
       continue;
 
     ii = idx(i);
-    dist = sqrt((m_val[ii].val - m_wval.val) * (m_val[ii].val - m_wval.val)
-        + (m_val[ii].time - m_wval.time) * (m_val[ii].time - m_wval.time));
+    dist = sqrt((m_val[ii].val - m_wval.val) * (m_val[ii].val - m_wval.val) +
+                (m_val[ii].time - m_wval.time) * (m_val[ii].time - m_wval.time));
     weight = m_val[ii].epsilon / dist;
-    if (weight < min_weight) {
+    if (weight < min_weight)
+    {
       min_weight = weight;
       min_idx = i;
     }
@@ -339,18 +343,11 @@ int sev_valuecache_double::get_optimal_write()
   return min_idx;
 }
 
-double sev_valuecache_double::epsilon(int index)
-{
-  return m_val[idx(index)].epsilon;
-}
+double sev_valuecache_double::epsilon(int index) { return m_val[idx(index)].epsilon; }
 
-double sev_valuecache_double::get_k()
-{
-  return m_k;
-}
+double sev_valuecache_double::get_k() { return m_k; }
 
-sev_valuecache_bool::sev_valuecache_bool(sev_eCvType type)
-    : sev_valuecache(type), m_inited(false)
+sev_valuecache_bool::sev_valuecache_bool(sev_eCvType type) : sev_valuecache(type), m_inited(false)
 {
   memset(&m_wval, 0, sizeof(m_wval));
 }
@@ -361,21 +358,17 @@ sev_valuecache_bool::sev_valuecache_bool(const sev_valuecache_bool& x)
   memcpy(&m_wval, &x.m_wval, sizeof(m_wval));
 }
 
-sev_valuecache_bool::~sev_valuecache_bool()
-{
-}
+sev_valuecache_bool::~sev_valuecache_bool() {}
 
-sev_sCacheValueBool& sev_valuecache_bool::wval()
-{
-  return m_wval;
-}
+sev_sCacheValueBool& sev_valuecache_bool::wval() { return m_wval; }
 
 void sev_valuecache_bool::add(void* value, pwr_tTime* t, void* thread)
 {
   m_val.val = *(pwr_tBoolean*)value;
   m_val.time = *t;
 
-  if (!m_inited) {
+  if (!m_inited)
+  {
     // Store value
     write(0, thread);
     m_inited = true;
@@ -384,7 +377,8 @@ void sev_valuecache_bool::add(void* value, pwr_tTime* t, void* thread)
 
 int sev_valuecache_bool::evaluate(double maxtime, void* thread)
 {
-  if (m_val.val != m_wval.val) {
+  if (m_val.val != m_wval.val)
+  {
     write(0, thread);
     return SEV__SUCCESS;
   }

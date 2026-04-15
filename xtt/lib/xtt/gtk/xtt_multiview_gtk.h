@@ -47,7 +47,8 @@ class XttTrendGtk;
 class XttSevHistGtk;
 class XttStreamGtk;
 
-class XttMultiViewGtk : public XttMultiView {
+class XttMultiViewGtk : public XttMultiView
+{
 public:
   GtkWidget* parent_wid;
   GtkWidget* comp_widget[MV_SIZE];
@@ -70,13 +71,12 @@ public:
   int orig_height;
   CoWowFocusTimerGtk focustimer;
 
-  XttMultiViewGtk(GtkWidget* parent_wid, void* parent_ctx, const char* name,
-      pwr_tAttrRef* aref, int width, int height, int x, int y,
-      unsigned int options, void* basewidget, int color_theme, pwr_tStatus* sts,
-      int (*mv_command_cb)(void*, char*, char*, char *, void*),
-      int (*mv_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-      int (*mv_is_authorized_cb)(void*, unsigned int),
-      void (*mv_keyboard_cb)(void*, void*, int, int));
+  XttMultiViewGtk(GtkWidget* parent_wid, void* parent_ctx, const char* name, pwr_tAttrRef* aref, int width,
+                  int height, int x, int y, unsigned int options, void* basewidget, int color_theme,
+                  pwr_tStatus* sts, int (*mv_command_cb)(void*, char*, char*, char*, void*),
+                  int (*mv_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+                  int (*mv_is_authorized_cb)(void*, unsigned int),
+                  void (*mv_keyboard_cb)(void*, void*, int, int));
   ~XttMultiViewGtk();
 
   void pop();
@@ -84,8 +84,8 @@ public:
   void create_confirm_dialog();
   void confirm_reply(int ok);
   void* get_widget();
-  int set_subwindow_source(const char* name, char* source, char* object,
-      double* borders, int insert = 1, int more = 0);
+  int set_subwindow_source(const char* name, char* source, char* object, double* borders, int insert = 1,
+                           int more = 0);
   int key_pressed(int key);
   void close_input_all();
   void signal_send(char* signalname);
@@ -95,8 +95,7 @@ public:
   static void confirm_cb(void* ge_ctx, void* confirm_object, char* text);
   static void message_dialog_cb(void* ge_ctx, const char* text);
 
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void activate_value_input(GtkWidget* w, gpointer data);
   static void activate_confirm_ok(GtkWidget* w, gpointer data);
   static void activate_confirm_cancel(GtkWidget* w, gpointer data);
@@ -109,8 +108,7 @@ public:
   static void create_message_dia(GtkWidget* w, gpointer data);
   static void create_menu(GtkWidget* w, gpointer data);
   static void create_value_input(GtkWidget* w, gpointer data);
-  static void action_resize(
-      GtkWidget* w, GtkAllocation* allocation, gpointer data);
+  static void action_resize(GtkWidget* w, GtkAllocation* allocation, gpointer data);
 };
 
 #endif

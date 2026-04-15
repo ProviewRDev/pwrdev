@@ -52,7 +52,8 @@
   object is clicked on, moved etc.
 */
 
-class GrowMenu : public GrowRect {
+class GrowMenu : public GrowRect
+{
 public:
   //! Constuctor
   /*!
@@ -75,28 +76,21 @@ public:
     \param parent	Parent menu.
     \param nodraw	Don't draw the object now.
   */
-  GrowMenu(GrowCtx* glow_ctx, const char* name, glow_sMenuInfo* menu_info,
-      double x = 0, double y = 0, double min_w = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      int fill_rect = 0, int display_border = 1,
-      glow_eDrawType fill_d_type = glow_eDrawType_Line, int t_size = 2,
-      glow_eDrawType t_drawtype = glow_eDrawType_TextHelvetica,
-      glow_eDrawType t_color = glow_eDrawType_Line,
-      glow_eDrawType t_color_disabled = glow_eDrawType_Line,
-      glow_eFont t_font = glow_eFont_Helvetica, GlowArrayElem* parent = 0,
-      int nodraw = 0);
+  GrowMenu(GrowCtx* glow_ctx, const char* name, glow_sMenuInfo* menu_info, double x = 0, double y = 0,
+           double min_w = 0, glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
+           int fill_rect = 0, int display_border = 1, glow_eDrawType fill_d_type = glow_eDrawType_Line,
+           int t_size = 2, glow_eDrawType t_drawtype = glow_eDrawType_TextHelvetica,
+           glow_eDrawType t_color = glow_eDrawType_Line,
+           glow_eDrawType t_color_disabled = glow_eDrawType_Line, glow_eFont t_font = glow_eFont_Helvetica,
+           GlowArrayElem* parent = 0, int nodraw = 0);
 
   //! Destructor
   /*! Remove the object from context, and erase it from the screen.
    */
   ~GrowMenu();
 
-  void save(std::ofstream& fp, glow_eSaveMode mode)
-  {
-  }
-  void open(std::ifstream& fp)
-  {
-  }
+  void save(std::ofstream& fp, glow_eSaveMode mode) {}
+  void open(std::ifstream& fp) {}
 
   //! Draw the objects if any part is inside the drawing area.
   /*!
@@ -122,30 +116,25 @@ public:
   void draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y);
 
   //! Drawing in the navigation window. See the corresponding draw function.
-  void nav_draw(int ll_x, int ll_y, int ur_x, int ur_y)
-  {
-  }
+  void nav_draw(int ll_x, int ll_y, int ur_x, int ur_y) {}
 
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowMenu;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowMenu; }
 
-  glow_sMenuInfo info; //!< Button text and types.
-  int text_size; //!< Button text size.
-  glow_eDrawType text_drawtype; //!< Drawtype  for button text.
-  glow_eDrawType text_color; //!< Color for button text.
+  glow_sMenuInfo info;                //!< Button text and types.
+  int text_size;                      //!< Button text size.
+  glow_eDrawType text_drawtype;       //!< Drawtype  for button text.
+  glow_eDrawType text_color;          //!< Color for button text.
   glow_eDrawType text_color_disabled; //!< Color for disabled button text.
-  int item_cnt; //!< Number of menu items.
-  double item_height; //!< Menu item height in pixel.
-  int current_item; //!< Hot item.
-  int current_idx; //!< Current index.
-  int new_item; //!< New current item.
-  int old_item; //!< Current item in previous event.
-  GlowArrayElem* parent_menu; //!< Parent menu.
-  double min_width; //!< Minimum width of menu.
-  int input_focus; //!< This menu has input focus.
-  glow_eFont font; //!< Text font.
+  int item_cnt;                       //!< Number of menu items.
+  double item_height;                 //!< Menu item height in pixel.
+  int current_item;                   //!< Hot item.
+  int current_idx;                    //!< Current index.
+  int new_item;                       //!< New current item.
+  int old_item;                       //!< Current item in previous event.
+  GlowArrayElem* parent_menu;         //!< Parent menu.
+  double min_width;                   //!< Minimum width of menu.
+  int input_focus;                    //!< This menu has input focus.
+  glow_eFont font;                    //!< Text font.
 
   //! Draw the object.
   /*!
@@ -161,19 +150,18 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();
 
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp)
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ofstream& fp)
   {
   }
 
-  int event_handler(
-      GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
   int event_handler(GlowWind* w, glow_eEvent event, double fx, double fy);
   int local_event_handler(GlowWind* w, glow_eEvent event, double x, double y);
 
@@ -190,20 +178,13 @@ public:
     \param t_color	Text color.
     \param t_color_disabled Text color for disabled button.
   */
-  void get_menu_char(int* t_size, glow_eDrawType* fill_color,
-      glow_eDrawType* t_drawtype, glow_eDrawType* t_color,
-      glow_eDrawType* t_color_disabled, glow_eFont* t_font);
+  void get_menu_char(int* t_size, glow_eDrawType* fill_color, glow_eDrawType* t_drawtype,
+                     glow_eDrawType* t_color, glow_eDrawType* t_color_disabled, glow_eFont* t_font);
 
   void shift_current_item(int shift);
   int get_current_item(int* item);
-  void set_input_focus(int focus, glow_eEvent event)
-  {
-    input_focus = focus;
-  }
-  int get_input_focus()
-  {
-    return input_focus;
-  }
+  void set_input_focus(int focus, glow_eEvent event) { input_focus = focus; }
+  int get_input_focus() { return input_focus; }
   void get_submenu_position(int item, double* x, double* y);
   int get_parent(GlowArrayElem** parent);
 };

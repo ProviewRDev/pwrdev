@@ -35,23 +35,23 @@
  */
 
 /*************************************************************************
-*
-*                       M O D B U S
-*                       ===========
-**************************************************************************
-*
-* Filename:             remote_modbus.c
-*
-*                       Date    Pgm.    Read.   Remark
-* Modified              970317	CJu	-	-
-*			030908	UL		For Linux
-*			040505	UL		Fixed timeout for recieve to
-*34 chartimes
-*
-* Description:          Implements remote transport process for MODBUS
-*
-**************************************************************************
-**************************************************************************/
+ *
+ *                       M O D B U S
+ *                       ===========
+ **************************************************************************
+ *
+ * Filename:             remote_modbus.c
+ *
+ *                       Date    Pgm.    Read.   Remark
+ * Modified              970317	CJu	-	-
+ *			030908	UL		For Linux
+ *			040505	UL		Fixed timeout for recieve to
+ *34 chartimes
+ *
+ * Description:          Implements remote transport process for MODBUS
+ *
+ **************************************************************************
+ **************************************************************************/
 
 /*_Include files_________________________________________________________*/
 
@@ -96,8 +96,8 @@
 
 /*_functions_______________________________________________________________*/
 
-static unsigned int remnode_send(remnode_item* remnode,
-    pwr_sClass_RemTrans* remtrans, char* buf, int buffer_size);
+static unsigned int remnode_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans, char* buf,
+                                 int buffer_size);
 
 void generate_crc(unsigned char* buf, int size, unsigned char* result);
 
@@ -142,10 +142,12 @@ void generate_crc(unsigned char* buf, int size, unsigned char* result)
 
   crc = 0xFFFF;
 
-  for (i = 0; i < size; i++) {
+  for (i = 0; i < size; i++)
+  {
     crc = crc ^ buf[i];
 
-    for (j = 0; j < 8; j++) {
+    for (j = 0; j < 8; j++)
+    {
       flag = crc & flag_mask;
       crc = crc >> 1;
       if (flag)
@@ -173,8 +175,8 @@ void generate_crc(unsigned char* buf, int size, unsigned char* result)
 **************************************************************************
 **************************************************************************/
 
-static unsigned int remnode_send(remnode_item* remnode,
-    pwr_sClass_RemTrans* remtrans, char* buf, int buffer_size)
+static unsigned int remnode_send(remnode_item* remnode, pwr_sClass_RemTrans* remtrans, char* buf,
+                                 int buffer_size)
 {
   int sts;
   //  int			size_of_telegram;
@@ -182,7 +184,8 @@ static unsigned int remnode_send(remnode_item* remnode,
   //  unsigned char         ch;
   unsigned char telegram[516];
 
-  if (buffer_size > sizeof(telegram) - 4) {
+  if (buffer_size > sizeof(telegram) - 4)
+  {
     errh_Info("Remote modbus send failed, telegram to big");
     return (1);
   }
@@ -207,10 +210,13 @@ static unsigned int remnode_send(remnode_item* remnode,
   /**  Check final status.                                                **/
   /*************************************************************************/
 
-  if (sts > 0) {
+  if (sts > 0)
+  {
     /* Send OK, receive answer */
     sts = Receive();
-  } else {
+  }
+  else
+  {
     /* The send procedure has failed */
     errh_Info("Remote modbus send failed, write() failed");
   }
@@ -262,8 +268,10 @@ static unsigned int Receive()
   sts = select(ser_fd + 1, &read_fd, NULL, NULL, &tv);
   sts = read(ser_fd, telegram, 1);
 
-  if (sts > 0) {
-    while (sts > 0) {
+  if (sts > 0)
+  {
+    while (sts > 0)
+    {
       data_size++;
 
       load_timeval(&tv, rn_modbus->ReadTimeout);
@@ -279,35 +287,39 @@ static unsigned int Receive()
     }
 
     generate_crc(telegram, data_size - 2, crc);
-    if (crc[0] != telegram[data_size - 2]
-        || crc[1] != telegram[data_size - 1]) {
+    if (crc[0] != telegram[data_size - 2] || crc[1] != telegram[data_size - 1])
+    {
       rn_modbus->ErrCount++;
-      errh_Info(
-          "Modbus remote CRC error, calc CRC:%02x%02x telegram CRC:%02x%02x",
-          crc[0], crc[1], telegram[data_size - 1], telegram[data_size]);
+      errh_Info("Modbus remote CRC error, calc CRC:%02x%02x telegram CRC:%02x%02x", crc[0], crc[1],
+                telegram[data_size - 1], telegram[data_size]);
       return false;
-    } else {
+    }
+    else
+    {
       search_remtrans = true;
       remtrans = rn.remtrans;
 
-      while (remtrans && search_remtrans) {
-        if (remtrans->objp->Address[0] == telegram[0]
-            && remtrans->objp->Address[1] == telegram[1]
-            && remtrans->objp->Direction == REMTRANS_IN)
+      while (remtrans && search_remtrans)
+      {
+        if (remtrans->objp->Address[0] == telegram[0] && remtrans->objp->Address[1] == telegram[1] &&
+            remtrans->objp->Direction == REMTRANS_IN)
           search_remtrans = false;
         if (search_remtrans)
           remtrans = (remtrans_item*)remtrans->next;
       } /* endwhile */
 
-      if (!search_remtrans) {
+      if (!search_remtrans)
+      {
         sts = RemTrans_Receive(remtrans, (char*)&telegram[2], data_size - 4);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           remtrans->objp->ErrCount++;
           return false;
         }
       }
 
-      if (search_remtrans) {
+      if (search_remtrans)
+      {
         /* No corresponding RemTrans object found */
         rn_modbus->ErrCount++;
         errh_Info("Modbus remote error, no corresponding RemTrans address "
@@ -350,7 +362,8 @@ int main(int argc, char* argv[])
   /* Init of gdh */
 
   sts = gdh_Init(pname);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -362,7 +375,8 @@ int main(int argc, char* argv[])
   sts = 0;
   if (argc >= 3)
     sts = cdh_StringToObjid(argv[2], &rn.objid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("cdh_StringToObjid, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -371,7 +385,8 @@ int main(int argc, char* argv[])
   /* Get pointer to RemnodeModbus object and store locally */
 
   sts = gdh_ObjidToPointer(rn.objid, (pwr_tAddress*)&rn_modbus);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("cdh_ObjidToPointer, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -380,13 +395,14 @@ int main(int argc, char* argv[])
   /* Initialize some internal data and make standard remtrans init */
 
   rn.next = NULL;
-  rn.local = NULL; // We dont use local structure since we only have one remnode
+  rn.local = NULL;           // We dont use local structure since we only have one remnode
   rn.retransmit_time = 10.0; // Not used, but initialize anyway
   rn_modbus->ErrCount = 0;
 
   sts = RemTrans_Init(&rn);
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Error("RemTrans_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -398,20 +414,21 @@ int main(int argc, char* argv[])
   /* Store remtrans objects objid in remnode_modbus object */
   remtrans = rn.remtrans;
   i = 0;
-  while (remtrans) {
+  while (remtrans)
+  {
     rn_modbus->RemTransObjects[i++] = remtrans->objid;
-    if (i >= (int)(sizeof(rn_modbus->RemTransObjects)
-                 / sizeof(rn_modbus->RemTransObjects[0])))
+    if (i >= (int)(sizeof(rn_modbus->RemTransObjects) / sizeof(rn_modbus->RemTransObjects[0])))
       break;
     remtrans = (remtrans_item*)remtrans->next;
   }
 
   /* Initialize device */
 
-  ser_fd = RemUtils_InitSerialDev(rn_modbus->DevName, rn_modbus->Speed,
-      rn_modbus->DataBits, rn_modbus->StopBits, rn_modbus->Parity);
+  ser_fd = RemUtils_InitSerialDev(rn_modbus->DevName, rn_modbus->Speed, rn_modbus->DataBits,
+                                  rn_modbus->StopBits, rn_modbus->Parity);
 
-  if (!ser_fd) {
+  if (!ser_fd)
+  {
     errh_Error("InitDev, %d", ser_fd);
     errh_SetStatus(PWR__SRVTERM);
     exit(0);
@@ -419,8 +436,10 @@ int main(int argc, char* argv[])
 
   /* Loop forever */
 
-  while (!doomsday) {
-    if (rn_modbus->Disable == 1) {
+  while (!doomsday)
+  {
+    if (rn_modbus->Disable == 1)
+    {
       errh_Fatal("Disabled, exiting");
       errh_SetStatus(PWR__SRVTERM);
       exit(0);

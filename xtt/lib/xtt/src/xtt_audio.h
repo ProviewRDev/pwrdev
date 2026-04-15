@@ -38,7 +38,7 @@
 #define xtt_audio_h
 
 /* xtt_audio.h -- soundcard bell routines.
-*/
+ */
 #if defined PWRE_CONF_ALSA
 
 #include <alsa/asoundlib.h>
@@ -59,11 +59,11 @@
 class CoWow;
 class CoWowTimer;
 
-class XttAudio {
+class XttAudio
+{
 public:
   static int audio_ok;
-  XttAudio(
-      CoWow* a_wow, const char* OSS_device = 0, const char* ALSA_device = 0);
+  XttAudio(CoWow* a_wow, const char* OSS_device = 0, const char* ALSA_device = 0);
   ~XttAudio();
   int init(char* OSS_device = 0, char* ALSA_device = 0);
   int beep(pwr_tAttrRef* arp);
@@ -91,16 +91,13 @@ private:
 
   int Init_ALSA(char*, unsigned int);
   int Init_OSS(char*, int);
-  double envelope(double time, double endtime, double attack, double decay,
-      double sustain, double release);
-  void MakeSine(short* buffer, int buffersize, double time, double starttime,
-      double endtime, int tone, double volume_ch1, double volume_ch2,
-      double attack, double decay, double sustain, double release,
-      double tremolo);
-  void MakeSquare(short* buffer, int buffersize, double time, double starttime,
-      double endtime, int tone, double volume_ch1, double volume_ch2,
-      double attack, double decay, double sustain, double release,
-      double tremolo);
+  double envelope(double time, double endtime, double attack, double decay, double sustain, double release);
+  void MakeSine(short* buffer, int buffersize, double time, double starttime, double endtime, int tone,
+                double volume_ch1, double volume_ch2, double attack, double decay, double sustain,
+                double release, double tremolo);
+  void MakeSquare(short* buffer, int buffersize, double time, double starttime, double endtime, int tone,
+                  double volume_ch1, double volume_ch2, double attack, double decay, double sustain,
+                  double release, double tremolo);
   static void audio_write(void* data);
   static void audio_stop(void* data);
   static void audio_write_buff(void* data);
@@ -110,24 +107,14 @@ private:
 // Dummy for platforms without ALSA
 class CoWow;
 
-class XttAudio {
+class XttAudio
+{
 public:
   static int audio_ok;
-  XttAudio(CoWow* a_wow, const char* OSS_device = "/dev/dsp",
-      const char* ALSA_device = "plughw:0,0")
-  {
-  }
-  ~XttAudio()
-  {
-  }
-  int init(char* OSS_device = "/dev/dsp", char* ALSA_device = "plughw:0,0")
-  {
-    return 1;
-  }
-  int beep(pwr_tAttrRef* arp)
-  {
-    return 1;
-  }
+  XttAudio(CoWow* a_wow, const char* OSS_device = "/dev/dsp", const char* ALSA_device = "plughw:0,0") {}
+  ~XttAudio() {}
+  int init(char* OSS_device = "/dev/dsp", char* ALSA_device = "plughw:0,0") { return 1; }
+  int beep(pwr_tAttrRef* arp) { return 1; }
 };
 
 #endif

@@ -43,85 +43,103 @@
 #include "co_pdr.h"
 #include "co_float.h"
 
-#define PWR_PDR_BYTES(pdrs, addr, len)                                         \
-  {                                                                            \
-    if (((pdrs)->x_handy -= len) < 0)                                          \
-      return (FALSE);                                                          \
-                                                                               \
-    if ((caddr_t)addr != (pdrs)->x_private) {                                  \
-      if ((pdrs)->x_op == PDR_DECODE)                                          \
-        memmove((caddr_t)addr, (pdrs)->x_private, len);                        \
-      else                                                                     \
-        memmove((pdrs)->x_private, (caddr_t)addr, len);                        \
-    }                                                                          \
-    (pdrs)->x_private += len;                                                  \
+#define PWR_PDR_BYTES(pdrs, addr, len)                                                                       \
+  {                                                                                                          \
+    if (((pdrs)->x_handy -= len) < 0)                                                                        \
+      return (FALSE);                                                                                        \
+                                                                                                             \
+    if ((caddr_t)addr != (pdrs)->x_private)                                                                  \
+    {                                                                                                        \
+      if ((pdrs)->x_op == PDR_DECODE)                                                                        \
+        memmove((caddr_t)addr, (pdrs)->x_private, len);                                                      \
+      else                                                                                                   \
+        memmove((pdrs)->x_private, (caddr_t)addr, len);                                                      \
+    }                                                                                                        \
+    (pdrs)->x_private += len;                                                                                \
   }
 
 #define PWR_PDR_STRING(pdrs, addr, len) PWR_PDR_BYTES(pdrs, addr, len)
 
-#define PWR_PDR_INT(pdrs, objp)                                                \
-  {                                                                            \
-    if (((pdrs)->x_handy -= sizeof(int)) < 0)                                  \
-      return (FALSE);                                                          \
-                                                                               \
-    if ((pdrs)->x_op == PDR_DECODE) {                                          \
-      if ((pdrs)->trg.b.bo != (pdrs)->src.b.bo) {                              \
-        ENDIAN_SWAP_INT(objp, (int*)(pdrs)->x_private);                        \
-      } else {                                                                 \
-        *objp = *(int*)(pdrs)->x_private;                                      \
-      }                                                                        \
-    } else {                                                                   \
-      if ((pdrs)->trg.b.bo != (pdrs)->src.b.bo) {                              \
-        ENDIAN_SWAP_INT((int*)(pdrs)->x_private, objp);                        \
-      } else {                                                                 \
-        *(int*)(pdrs)->x_private = *(objp);                                    \
-      }                                                                        \
-    }                                                                          \
-                                                                               \
-    (pdrs)->x_private += sizeof(int);                                          \
+#define PWR_PDR_INT(pdrs, objp)                                                                              \
+  {                                                                                                          \
+    if (((pdrs)->x_handy -= sizeof(int)) < 0)                                                                \
+      return (FALSE);                                                                                        \
+                                                                                                             \
+    if ((pdrs)->x_op == PDR_DECODE)                                                                          \
+    {                                                                                                        \
+      if ((pdrs)->trg.b.bo != (pdrs)->src.b.bo)                                                              \
+      {                                                                                                      \
+        ENDIAN_SWAP_INT(objp, (int*)(pdrs)->x_private);                                                      \
+      }                                                                                                      \
+      else                                                                                                   \
+      {                                                                                                      \
+        *objp = *(int*)(pdrs)->x_private;                                                                    \
+      }                                                                                                      \
+    }                                                                                                        \
+    else                                                                                                     \
+    {                                                                                                        \
+      if ((pdrs)->trg.b.bo != (pdrs)->src.b.bo)                                                              \
+      {                                                                                                      \
+        ENDIAN_SWAP_INT((int*)(pdrs)->x_private, objp);                                                      \
+      }                                                                                                      \
+      else                                                                                                   \
+      {                                                                                                      \
+        *(int*)(pdrs)->x_private = *(objp);                                                                  \
+      }                                                                                                      \
+    }                                                                                                        \
+                                                                                                             \
+    (pdrs)->x_private += sizeof(int);                                                                        \
   }
 
-#define PWR_PDR_SHORT(pdrs, objp)                                              \
-  {                                                                            \
-    if (((pdrs)->x_handy -= sizeof(short)) < 0)                                \
-      return (FALSE);                                                          \
-                                                                               \
-    if ((pdrs)->x_op == PDR_DECODE) {                                          \
-      if ((pdrs)->trg.b.bo != (pdrs)->src.b.bo) {                              \
-        ENDIAN_SWAP_SHORT(objp, (short*)(pdrs)->x_private);                    \
-      } else {                                                                 \
-        *objp = *(short*)(pdrs)->x_private;                                    \
-      }                                                                        \
-    } else {                                                                   \
-      if ((pdrs)->trg.b.bo != (pdrs)->src.b.bo) {                              \
-        ENDIAN_SWAP_INT((short*)(pdrs)->x_private, objp);                      \
-      } else {                                                                 \
-        *(short*)(pdrs)->x_private = *(objp);                                  \
-      }                                                                        \
-    }                                                                          \
-                                                                               \
-    (pdrs)->x_private += sizeof(short);                                        \
+#define PWR_PDR_SHORT(pdrs, objp)                                                                            \
+  {                                                                                                          \
+    if (((pdrs)->x_handy -= sizeof(short)) < 0)                                                              \
+      return (FALSE);                                                                                        \
+                                                                                                             \
+    if ((pdrs)->x_op == PDR_DECODE)                                                                          \
+    {                                                                                                        \
+      if ((pdrs)->trg.b.bo != (pdrs)->src.b.bo)                                                              \
+      {                                                                                                      \
+        ENDIAN_SWAP_SHORT(objp, (short*)(pdrs)->x_private);                                                  \
+      }                                                                                                      \
+      else                                                                                                   \
+      {                                                                                                      \
+        *objp = *(short*)(pdrs)->x_private;                                                                  \
+      }                                                                                                      \
+    }                                                                                                        \
+    else                                                                                                     \
+    {                                                                                                        \
+      if ((pdrs)->trg.b.bo != (pdrs)->src.b.bo)                                                              \
+      {                                                                                                      \
+        ENDIAN_SWAP_INT((short*)(pdrs)->x_private, objp);                                                    \
+      }                                                                                                      \
+      else                                                                                                   \
+      {                                                                                                      \
+        *(short*)(pdrs)->x_private = *(objp);                                                                \
+      }                                                                                                      \
+    }                                                                                                        \
+                                                                                                             \
+    (pdrs)->x_private += sizeof(short);                                                                      \
   }
 
-#define PWR_PDR_CHAR(pdrs, objp)                                               \
-  {                                                                            \
-    if (((pdrs)->x_handy -= sizeof(char)) < 0)                                 \
-      return (FALSE);                                                          \
-                                                                               \
-    if ((pdrs)->x_op == PDR_DECODE)                                            \
-      *objp = *(char*)(pdrs)->x_private;                                       \
-    else                                                                       \
-      *(char*)(pdrs)->x_private = *(objp);                                     \
-                                                                               \
-    (pdrs)->x_private += sizeof(char);                                         \
+#define PWR_PDR_CHAR(pdrs, objp)                                                                             \
+  {                                                                                                          \
+    if (((pdrs)->x_handy -= sizeof(char)) < 0)                                                               \
+      return (FALSE);                                                                                        \
+                                                                                                             \
+    if ((pdrs)->x_op == PDR_DECODE)                                                                          \
+      *objp = *(char*)(pdrs)->x_private;                                                                     \
+    else                                                                                                     \
+      *(char*)(pdrs)->x_private = *(objp);                                                                   \
+                                                                                                             \
+    (pdrs)->x_private += sizeof(char);                                                                       \
   }
 
 /*
  * The procedure pdrmem_create initializes a stream descriptor for a
  * memory buffer.
  */
-void pdrmem_create(PDR* pdrs, void* addr, u_int size, enum pdr_op op,
-    co_mFormat src, co_mFormat trg)
+void pdrmem_create(PDR* pdrs, void* addr, u_int size, enum pdr_op op, co_mFormat src, co_mFormat trg)
 
 {
   pdrs->x_op = op;
@@ -148,35 +166,41 @@ pwr_tBoolean pdr_float(PDR* pdrs, float* fp)
   if ((pdrs->x_handy -= sizeof(float)) < 0)
     return FALSE;
 
-  if (pdrs->x_op == PDR_DECODE) {
-    if (pdrs->src.b.ft != pdrs->trg.b.ft) {
+  if (pdrs->x_op == PDR_DECODE)
+  {
+    if (pdrs->src.b.ft != pdrs->trg.b.ft)
+    {
       if (pdrs->src.b.ft == co_eFT_ieeeS)
-        co_vaxf2ieee(
-            pdrs->src.b.bo, pdrs->trg.b.bo, pdrs->x_private, (char*)fp);
+        co_vaxf2ieee(pdrs->src.b.bo, pdrs->trg.b.bo, pdrs->x_private, (char*)fp);
       else
-        co_ieee2vaxf(
-            pdrs->src.b.bo, pdrs->trg.b.bo, pdrs->x_private, (char*)fp);
-
-    } else if (pdrs->trg.b.bo != pdrs->src.b.bo) {
+        co_ieee2vaxf(pdrs->src.b.bo, pdrs->trg.b.bo, pdrs->x_private, (char*)fp);
+    }
+    else if (pdrs->trg.b.bo != pdrs->src.b.bo)
+    {
       ENDIAN_SWAP_INT((int*)fp, (int*)pdrs->x_private);
-    } else {
+    }
+    else
+    {
       *(int*)fp = *(int*)pdrs->x_private;
     }
   }
 
   /* Encode */
-  else {
-    if (pdrs->src.b.ft != pdrs->trg.b.ft) {
+  else
+  {
+    if (pdrs->src.b.ft != pdrs->trg.b.ft)
+    {
       if (pdrs->src.b.ft == co_eFT_ieeeS)
-        co_vaxf2ieee(
-            pdrs->src.b.bo, pdrs->trg.b.bo, (const char*)fp, pdrs->x_private);
+        co_vaxf2ieee(pdrs->src.b.bo, pdrs->trg.b.bo, (const char*)fp, pdrs->x_private);
       else
-        co_ieee2vaxf(
-            pdrs->src.b.bo, pdrs->trg.b.bo, (const char*)fp, pdrs->x_private);
-
-    } else if (pdrs->trg.b.bo != pdrs->src.b.bo) {
+        co_ieee2vaxf(pdrs->src.b.bo, pdrs->trg.b.bo, (const char*)fp, pdrs->x_private);
+    }
+    else if (pdrs->trg.b.bo != pdrs->src.b.bo)
+    {
       ENDIAN_SWAP_INT((int*)pdrs->x_private, (int*)fp);
-    } else {
+    }
+    else
+    {
       *(int*)pdrs->x_private = *(int*)fp;
     }
   }
@@ -195,15 +219,16 @@ pwr_tBoolean pdr_float(PDR* pdrs, float* fp)
  * > elemsize: size of each element
  * > pdr_elem: routine to PDR each element
  */
-pwr_tBoolean pdr_vector(
-    PDR* pdrs, char* basep, u_int nelem, u_int elemsize, pdrproc_t pdr_elem)
+pwr_tBoolean pdr_vector(PDR* pdrs, char* basep, u_int nelem, u_int elemsize, pdrproc_t pdr_elem)
 {
   u_int i;
   char* elptr;
 
   elptr = basep;
-  for (i = 0; i < nelem; i++) {
-    if (!(*pdr_elem)(pdrs, elptr, LASTUNSIGNED)) {
+  for (i = 0; i < nelem; i++)
+  {
+    if (!(*pdr_elem)(pdrs, elptr, LASTUNSIGNED))
+    {
       return FALSE;
     }
     elptr += elemsize;
@@ -221,16 +246,25 @@ pwr_tBoolean pdr_co_mFormat(PDR* pdrs, co_mFormat* objp)
   if ((pdrs->x_handy -= sizeof(int)) < 0)
     return (FALSE);
 
-  if (pdrs->x_op == PDR_DECODE) {
-    if (pdrs->trg.b.bo != co_eBO_little) {
+  if (pdrs->x_op == PDR_DECODE)
+  {
+    if (pdrs->trg.b.bo != co_eBO_little)
+    {
       ENDIAN_SWAP_INT(objp, (int*)pdrs->x_private);
-    } else {
+    }
+    else
+    {
       *(int*)objp = *(int*)pdrs->x_private;
     }
-  } else {
-    if (pdrs->src.b.bo != co_eBO_big) {
+  }
+  else
+  {
+    if (pdrs->src.b.bo != co_eBO_big)
+    {
       ENDIAN_SWAP_INT((int*)pdrs->x_private, objp);
-    } else {
+    }
+    else
+    {
       *(int*)pdrs->x_private = *(int*)(objp);
     }
   }
@@ -241,18 +275,21 @@ pwr_tBoolean pdr_co_mFormat(PDR* pdrs, co_mFormat* objp)
 }
 
 /*
-* PDR Routines
-*/
+ * PDR Routines
+ */
 
 pwr_tBoolean pdr_cdh_sObjName(PDR* pdrs, cdh_sObjName* objp)
 {
-  if (!pdr_pwr_tObjName(pdrs, &objp->orig)) {
+  if (!pdr_pwr_tObjName(pdrs, &objp->orig))
+  {
     return (FALSE);
   }
-  if (!pdr_pwr_tObjName(pdrs, &objp->norm)) {
+  if (!pdr_pwr_tObjName(pdrs, &objp->norm))
+  {
     return (FALSE);
   }
-  if (!pdr_pwr_tUInt32(pdrs, &objp->pack.key)) {
+  if (!pdr_pwr_tUInt32(pdrs, &objp->pack.key))
+  {
     return (FALSE);
   }
   return TRUE;
@@ -260,10 +297,12 @@ pwr_tBoolean pdr_cdh_sObjName(PDR* pdrs, cdh_sObjName* objp)
 
 pwr_tBoolean pdr_cdh_sFamily(PDR* pdrs, cdh_sFamily* objp)
 {
-  if (!pdr_cdh_sObjName(pdrs, &objp->name)) {
+  if (!pdr_cdh_sObjName(pdrs, &objp->name))
+  {
     return (FALSE);
   }
-  if (!pdr_pwr_tObjid(pdrs, &objp->poid)) {
+  if (!pdr_pwr_tObjid(pdrs, &objp->poid))
+  {
     return (FALSE);
   }
   return TRUE;

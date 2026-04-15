@@ -75,27 +75,25 @@ static int xttlog_open_func(void* client_data, void* client_flag);
 static int xttlog_show_func(void* client_data, void* client_flag);
 
 dcli_tCmdTable xttlog_command_table[] = {
-  { "OPEN", &xttlog_open_func, { "dcli_arg1", "dcli_arg2", "/NAME", "" } },
-  { "SHOW", &xttlog_show_func, { "dcli_arg1", "" } },
-  { "EXIT", &xttlog_exit_func,
-      {
-          "",
-      } },
-  { "QUIT", &xttlog_exit_func,
-      {
-          "",
-      } },
-  { "HELP", &xttlog_help_func,
-      { "dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", "/HELPFILE",
-          "/POPNAVIGATOR", "/BOOKMARK", "/INDEX", "/BASE", "/RETURNCOMMAND",
-          "/WIDTH", "/HEIGHT", "/VERSION", "" } },
-  { "", NULL, { "" } }
-};
+    {"OPEN", &xttlog_open_func, {"dcli_arg1", "dcli_arg2", "/NAME", ""}},
+    {"SHOW", &xttlog_show_func, {"dcli_arg1", ""}},
+    {"EXIT",
+     &xttlog_exit_func,
+     {
+         "",
+     }},
+    {"QUIT",
+     &xttlog_exit_func,
+     {
+         "",
+     }},
+    {"HELP",
+     &xttlog_help_func,
+     {"dcli_arg1", "dcli_arg2", "dcli_arg3", "dcli_arg4", "/HELPFILE", "/POPNAVIGATOR", "/BOOKMARK", "/INDEX",
+      "/BASE", "/RETURNCOMMAND", "/WIDTH", "/HEIGHT", "/VERSION", ""}},
+    {"", NULL, {""}}};
 
-static void xttlog_store_xttlog(XttLog* xttlog)
-{
-  current_xttlog = xttlog;
-}
+static void xttlog_store_xttlog(XttLog* xttlog) { current_xttlog = xttlog; }
 
 static int xttlog_help_func(void* client_data, void* client_flag)
 {
@@ -110,12 +108,16 @@ static int xttlog_help_func(void* client_data, void* client_flag)
   int width, height;
   int nr;
 
-  if (ODD(dcli_get_qualifier("/INDEX", file_str, sizeof(file_str)))) {
-    if (ODD(dcli_get_qualifier("/HELPFILE", file_str, sizeof(file_str)))) {
+  if (ODD(dcli_get_qualifier("/INDEX", file_str, sizeof(file_str))))
+  {
+    if (ODD(dcli_get_qualifier("/HELPFILE", file_str, sizeof(file_str))))
+    {
       sts = CoXHelp::dhelp_index(navh_eHelpFile_Other, file_str);
       if (EVEN(sts))
         xttlog->message('E', "Unable to find file");
-    } else {
+    }
+    else
+    {
       if (ODD(dcli_get_qualifier("/BASE", 0, 0)))
         sts = CoXHelp::dhelp_index(navh_eHelpFile_Base, NULL);
       else
@@ -124,12 +126,12 @@ static int xttlog_help_func(void* client_data, void* client_flag)
     return 1;
   }
 
-  if (ODD(dcli_get_qualifier("/VERSION", 0, 0))) {
-    sts = CoXHelp::dhelp("version", "", navh_eHelpFile_Other,
-        "$pwr_load/xtt_version_help.dat", 0);
-    if (EVEN(sts)) {
-      sts = CoXHelp::dhelp("version", "", navh_eHelpFile_Other,
-          "$pwr_load/sev_xtt_version_help.dat", 0);
+  if (ODD(dcli_get_qualifier("/VERSION", 0, 0)))
+  {
+    sts = CoXHelp::dhelp("version", "", navh_eHelpFile_Other, "$pwr_load/xtt_version_help.dat", 0);
+    if (EVEN(sts))
+    {
+      sts = CoXHelp::dhelp("version", "", navh_eHelpFile_Other, "$pwr_load/sev_xtt_version_help.dat", 0);
       if (EVEN(sts))
         xttlog->message('E', "No help on this subject");
     }
@@ -137,7 +139,8 @@ static int xttlog_help_func(void* client_data, void* client_flag)
   }
 
   int strict = 0;
-  if (EVEN(dcli_get_qualifier("dcli_arg1", arg_str, sizeof(arg_str)))) {
+  if (EVEN(dcli_get_qualifier("dcli_arg1", arg_str, sizeof(arg_str))))
+  {
     sts = CoXHelp::dhelp("help command", "", navh_eHelpFile_Base, NULL, strict);
     return 1;
   }
@@ -145,62 +148,75 @@ static int xttlog_help_func(void* client_data, void* client_flag)
     strcpy(bookmark_str, "");
 
   strcpy(key, arg_str);
-  if (ODD(dcli_get_qualifier("dcli_arg2", arg_str, sizeof(arg_str)))) {
+  if (ODD(dcli_get_qualifier("dcli_arg2", arg_str, sizeof(arg_str))))
+  {
     strcat(key, " ");
     strcat(key, arg_str);
-    if (ODD(dcli_get_qualifier("dcli_arg3", arg_str, sizeof(arg_str)))) {
+    if (ODD(dcli_get_qualifier("dcli_arg3", arg_str, sizeof(arg_str))))
+    {
       strcat(key, " ");
       strcat(key, arg_str);
-      if (ODD(dcli_get_qualifier("dcli_arg3", arg_str, sizeof(arg_str)))) {
+      if (ODD(dcli_get_qualifier("dcli_arg3", arg_str, sizeof(arg_str))))
+      {
         strcat(key, " ");
         strcat(key, arg_str);
-        if (ODD(dcli_get_qualifier("dcli_arg4", arg_str, sizeof(arg_str)))) {
+        if (ODD(dcli_get_qualifier("dcli_arg4", arg_str, sizeof(arg_str))))
+        {
           strcat(key, " ");
           strcat(key, arg_str);
         }
       }
     }
   }
-  if (!ODD(
-          dcli_get_qualifier("/RETURNCOMMAND", return_str, sizeof(return_str))))
+  if (!ODD(dcli_get_qualifier("/RETURNCOMMAND", return_str, sizeof(return_str))))
     strcpy(return_str, "");
 
-  if (ODD(dcli_get_qualifier("/WIDTH", arg_str, sizeof(arg_str)))) {
+  if (ODD(dcli_get_qualifier("/WIDTH", arg_str, sizeof(arg_str))))
+  {
     // convert to integer
     nr = sscanf(arg_str, "%d", &width);
-    if (nr != 1) {
+    if (nr != 1)
+    {
       xttlog->message('E', "Width syntax error");
       return XTTLOG__HOLDCOMMAND;
     }
-  } else
+  }
+  else
     width = 0;
 
-  if (ODD(dcli_get_qualifier("/HEIGHT", arg_str, sizeof(arg_str)))) {
+  if (ODD(dcli_get_qualifier("/HEIGHT", arg_str, sizeof(arg_str))))
+  {
     // convert to integer
     nr = sscanf(arg_str, "%d", &height);
-    if (nr != 1) {
+    if (nr != 1)
+    {
       xttlog->message('E', "Height syntax error");
       return XTTLOG__HOLDCOMMAND;
     }
-  } else
+  }
+  else
     height = 0;
 
   pop = ODD(dcli_get_qualifier("/POPNAVIGATOR", 0, 0));
 
-  if (ODD(dcli_get_qualifier("/HELPFILE", file_str, sizeof(file_str)))) {
-    sts = CoXHelp::dhelp(
-        key, bookmark_str, navh_eHelpFile_Other, file_str, strict);
+  if (ODD(dcli_get_qualifier("/HELPFILE", file_str, sizeof(file_str))))
+  {
+    sts = CoXHelp::dhelp(key, bookmark_str, navh_eHelpFile_Other, file_str, strict);
     if (EVEN(sts))
       xttlog->message('E', "No help on this subject");
-  } else if (ODD(dcli_get_qualifier("/BASE", 0, 0))) {
+  }
+  else if (ODD(dcli_get_qualifier("/BASE", 0, 0)))
+  {
     sts = CoXHelp::dhelp(key, bookmark_str, navh_eHelpFile_Base, 0, strict);
     if (EVEN(sts))
       xttlog->message('E', "No help on this subject");
-  } else {
+  }
+  else
+  {
     sts = CoXHelp::dhelp(key, bookmark_str, navh_eHelpFile_Base, 0, strict);
-    if (EVEN(sts)) {
-      sts = CoXHelp::dhelp(
-          key, bookmark_str, navh_eHelpFile_Project, 0, strict);
+    if (EVEN(sts))
+    {
+      sts = CoXHelp::dhelp(key, bookmark_str, navh_eHelpFile_Project, 0, strict);
       if (EVEN(sts))
         xttlog->message('E', "No help on this subject");
     }
@@ -229,8 +245,10 @@ static int xttlog_open_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_StartsWith(arg1_str, "GRAPH")) {
-  } else
+  if (str_StartsWith(arg1_str, "GRAPH"))
+  {
+  }
+  else
     xttlog->message('E', "Syntax error");
 
   return XTTLOG__SUCCESS;
@@ -245,8 +263,10 @@ static int xttlog_show_func(void* client_data, void* client_flag)
 
   arg1_sts = dcli_get_qualifier("dcli_arg1", arg1_str, sizeof(arg1_str));
 
-  if (str_StartsWith(arg1_str, "USER")) {
-  } else
+  if (str_StartsWith(arg1_str, "USER"))
+  {
+  }
+  else
     xttlog->message('E', "Syntax error");
 
   return 1;
@@ -258,19 +278,22 @@ int XttLog::command(char* input_str)
   int sts, sym_sts;
   char symbol_value[DCLI_SYM_VALUE_SIZE];
 
-  if (input_str[0] == '@') {
+  if (input_str[0] == '@')
+  {
     sts = dcli_replace_symbol(input_str, command, sizeof(command));
     if (EVEN(sts))
       return sts;
 
     /* Read command file */
     sts = readcmdfile(&command[1]);
-    if (sts == DCLI__NOFILE) {
+    if (sts == DCLI__NOFILE)
+    {
       char tmp[1030];
       snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", &command[1]);
       message('E', tmp);
       return DCLI__SUCCESS;
-    } else if (EVEN(sts))
+    }
+    else if (EVEN(sts))
       return sts;
     return DCLI__SUCCESS;
   }
@@ -279,27 +302,31 @@ int XttLog::command(char* input_str)
   if (EVEN(sts))
     return sts;
 
-  sts = dcli_cli(
-      (dcli_tCmdTable*)&xttlog_command_table, command, (void*)this, 0);
-  if (sts == DCLI__COM_NODEF) {
+  sts = dcli_cli((dcli_tCmdTable*)&xttlog_command_table, command, (void*)this, 0);
+  if (sts == DCLI__COM_NODEF)
+  {
     /* Try to find a matching symbol */
     sym_sts = dcli_get_symbol_cmd(command, symbol_value);
-    if (ODD(sym_sts)) {
-      if (symbol_value[0] == '@') {
+    if (ODD(sym_sts))
+    {
+      if (symbol_value[0] == '@')
+      {
         /* Read command file */
         sts = readcmdfile(&symbol_value[1]);
-        if (sts == DCLI__NOFILE) {
+        if (sts == DCLI__NOFILE)
+        {
           char tmp[230];
           snprintf(tmp, sizeof(tmp), "Unable to open file \"%s\"", &symbol_value[1]);
           message('E', tmp);
           return DCLI__SUCCESS;
-        } else if (EVEN(sts))
+        }
+        else if (EVEN(sts))
           return sts;
         return DCLI__SUCCESS;
       }
-      sts = dcli_cli(
-          (dcli_tCmdTable*)&xttlog_command_table, symbol_value, (void*)this, 0);
-    } else if (sym_sts == DCLI__SYMBOL_AMBIG)
+      sts = dcli_cli((dcli_tCmdTable*)&xttlog_command_table, symbol_value, (void*)this, 0);
+    }
+    else if (sym_sts == DCLI__SYMBOL_AMBIG)
       sts = sym_sts;
   }
   if (sts == DCLI__COM_AMBIG)
@@ -317,8 +344,7 @@ int XttLog::command(char* input_str)
   return DCLI__SUCCESS;
 }
 
-static int xttlog_ccm_errormessage_func(
-    char* msg, int severity, void* client_data)
+static int xttlog_ccm_errormessage_func(char* msg, int severity, void* client_data)
 {
   XttLog* xttlog = (XttLog*)client_data;
 
@@ -329,8 +355,7 @@ static int xttlog_ccm_errormessage_func(
   return 1;
 }
 
-static int xttlog_ccm_deffilename_func(
-    char* outfile, char* infile, void* client_data)
+static int xttlog_ccm_deffilename_func(char* outfile, char* infile, void* client_data)
 {
   pwr_tFileName fname;
 
@@ -352,7 +377,8 @@ int XttLog::readcmdfile(char* incommand)
   int sts;
   int appl_sts;
 
-  if (!ccm_func_registred) {
+  if (!ccm_func_registred)
+  {
     ccm_func_registred = 1;
   }
 
@@ -361,12 +387,10 @@ int XttLog::readcmdfile(char* incommand)
   xttlog_store_xttlog(this);
 
   /* Read and execute the command file */
-  sts = ccm_file_exec(input_str, xttlog_externcmd_func,
-      xttlog_ccm_deffilename_func, xttlog_ccm_errormessage_func, &appl_sts,
-      verify, 0, NULL, 0, 0, NULL, (void*)this);
+  sts = ccm_file_exec(input_str, xttlog_externcmd_func, xttlog_ccm_deffilename_func,
+                      xttlog_ccm_errormessage_func, &appl_sts, verify, 0, NULL, 0, 0, NULL, (void*)this);
   if (EVEN(sts))
     return sts;
 
   return 1;
 }
-

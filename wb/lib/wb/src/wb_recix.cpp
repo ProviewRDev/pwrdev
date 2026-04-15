@@ -98,18 +98,23 @@ bool wb_recix::get(char* str, pwr_tOix* ix)
   if ((int)strlen(str) <= m_destroot_len)
     return false;
 
-  if (!streq(m_srcroot, "")) {
+  if (!streq(m_srcroot, ""))
+  {
     strcpy(keystr, m_srcroot);
     if (m_destroot_len)
       strcat(keystr, &str[m_destroot_len]);
-    else {
+    else
+    {
       strcat(keystr, "-");
       strcat(keystr, str);
     }
-  } else {
+  }
+  else
+  {
     if (m_destroot_len)
       strcat(keystr, &str[m_destroot_len + 1]);
-    else {
+    else
+    {
       strcat(keystr, str);
     }
   }
@@ -123,7 +128,4 @@ bool wb_recix::get(char* str, pwr_tOix* ix)
   return true;
 }
 
-void wb_recix::clear()
-{
-  m_ix.clear();
-}
+void wb_recix::clear() { m_ix.clear(); }

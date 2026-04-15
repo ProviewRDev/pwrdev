@@ -46,13 +46,13 @@
 #include "wb_foe_dataarithm.h"
 #include "wb_foe_msg.h"
 
-typedef struct dataa_s_ctx* dataa_ctx;
+typedef struct dataa_s_ctx *dataa_ctx;
 
 typedef struct {
   char item[80];
   char delim_front[20];
   char delim_back[20];
-  pwr_tStatus (*func)(dataa_ctx, char*, char*, char*, int*, char*);
+  pwr_tStatus (*func)(dataa_ctx, char *, char *, char *, int *, char *);
   int hit;
   int hit_count;
 } dataa_t_item;
@@ -81,51 +81,51 @@ struct dataa_s_ctx {
 
 /* Local function prototypes. */
 
-static int dataa_parse(char* string, char* parse_char, char* inc_parse_char,
-    char* outstr, int max_rows, int max_cols);
-static int dataa_add_item(dataa_ctx dataactx, char* item, char* delim_front,
-    char* delim_back, pwr_tStatus (*func)());
+static int dataa_parse(char *string, char *parse_char, char *inc_parse_char,
+                       char *outstr, int max_rows, int max_cols);
+static int dataa_add_item(dataa_ctx dataactx, char *item, char *delim_front,
+                          char *delim_back, pwr_tStatus (*func)());
 
 /*************************************************************************
-*
-* Name:		-
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* dataa_ctx	dataactx	I	dataa context
-* char		*line		I	current line
-* char		*pos		I	position in current line
-* char		*out		IO	output buffer
-* char		*var		I	name of pointer to dataarithm object
-*
-* Description:
-*	Backcall funktions called when an item is found.
-*
-**************************************************************************/
+ *
+ * Name:		-
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * dataa_ctx	dataactx	I	dataa context
+ * char		*line		I	current line
+ * char		*pos		I	position in current line
+ * char		*out		IO	output buffer
+ * char		*var		I	name of pointer to dataarithm object
+ *
+ * Description:
+ *	Backcall funktions called when an item is found.
+ *
+ **************************************************************************/
 
 /*************************************************************************
-*
-* Name:		dataa_comment_start
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* dataa_ctx	dataactx	I	dataa context
-* char		*line		I	current line
-* char		*pos		I	position in current line
-* char		*out		IO	output buffer
-* char		*var		I	name of pointer to dataarithm object
-*
-* Description:
-*	Backcall funktions called when an comment start is found.
-*	Set dataactx->comment to stop conversion.
-*
-**************************************************************************/
+ *
+ * Name:		dataa_comment_start
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * dataa_ctx	dataactx	I	dataa context
+ * char		*line		I	current line
+ * char		*pos		I	position in current line
+ * char		*out		IO	output buffer
+ * char		*var		I	name of pointer to dataarithm object
+ *
+ * Description:
+ *	Backcall funktions called when an comment start is found.
+ *	Set dataactx->comment to stop conversion.
+ *
+ **************************************************************************/
 
-static pwr_tStatus dataa_comment_start(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_comment_start(dataa_ctx dataactx, char *line,
+                                       char *pos, char *out, int *incr,
+                                       char *var) {
   sprintf(out, "/*");
   *incr = strlen(out);
   dataactx->comment = 1;
@@ -133,26 +133,25 @@ static pwr_tStatus dataa_comment_start(
 }
 
 /*************************************************************************
-*
-* Name:		dataa_comment_end
-*
-* Type		static int
-*
-* Type		Parameter	IOGF	Description
-* dataa_ctx	dataactx	I	dataa context
-* char		*line		I	current line
-* char		*pos		I	position in current line
-* char		*out		IO	output buffer
-* char		*var		I	name of pointer to dataarithm object
-*
-* Description:
-*	Backcall funktions called when an comment end is found.
-*	Reset dataactx->comment to start conversion again.
-*
-**************************************************************************/
-static pwr_tStatus dataa_comment_end(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+ *
+ * Name:		dataa_comment_end
+ *
+ * Type		static int
+ *
+ * Type		Parameter	IOGF	Description
+ * dataa_ctx	dataactx	I	dataa context
+ * char		*line		I	current line
+ * char		*pos		I	position in current line
+ * char		*out		IO	output buffer
+ * char		*var		I	name of pointer to dataarithm object
+ *
+ * Description:
+ *	Backcall funktions called when an comment end is found.
+ *	Reset dataactx->comment to start conversion again.
+ *
+ **************************************************************************/
+static pwr_tStatus dataa_comment_end(dataa_ctx dataactx, char *line, char *pos,
+                                     char *out, int *incr, char *var) {
   sprintf(out, "*/");
   *incr = strlen(out);
   dataactx->comment = 0;
@@ -160,56 +159,55 @@ static pwr_tStatus dataa_comment_end(
 }
 
 /*************************************************************************
-*
-* Name:		dataa_Dax
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* dataa_ctx	dataactx	I	dataa context
-* char		*line		I	current line
-* char		*pos		I	position in current line
-* char		*out		IO	output buffer
-* char		*var		I	name of pointer to dataarithm object
-*
-* Description:
-*	Backcall funktions called when a datapointer 'Da1' is found.
-* 	If a 'ODay = Dax' is detected the 'dataactx->outdatax_eq_indata' flag
-* 	is set previously by the ODay backcall function, and the code should
-*	be a memcpy.
-*
-**************************************************************************/
-static pwr_tStatus dataa_Da1(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+ *
+ * Name:		dataa_Dax
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * dataa_ctx	dataactx	I	dataa context
+ * char		*line		I	current line
+ * char		*pos		I	position in current line
+ * char		*out		IO	output buffer
+ * char		*var		I	name of pointer to dataarithm object
+ *
+ * Description:
+ *	Backcall funktions called when a datapointer 'Da1' is found.
+ * 	If a 'ODay = Dax' is detected the 'dataactx->outdatax_eq_indata' flag
+ * 	is set previously by the ODay backcall function, and the code should
+ *	be a memcpy.
+ *
+ **************************************************************************/
+static pwr_tStatus dataa_Da1(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   if (dataactx->outdata1_eq_indata) {
     sprintf(out,
-        "Da1 */ memcpy( &%s->OutData1, %s->DataIn1P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da1 */ memcpy( &%s->OutData1, %s->DataIn1P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata1_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
   }
   if (dataactx->outdata2_eq_indata) {
     sprintf(out,
-        "Da1 */ memcpy( &%s->OutData2, %s->DataIn1P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da1 */ memcpy( &%s->OutData2, %s->DataIn1P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata2_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
   }
   if (dataactx->outdata3_eq_indata) {
     sprintf(out,
-        "Da1 */ memcpy( &%s->OutData3, %s->DataIn1P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da1 */ memcpy( &%s->OutData3, %s->DataIn1P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata3_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
   }
   if (dataactx->outdata4_eq_indata) {
     sprintf(out,
-        "Da1 */ memcpy( &%s->OutData4, %s->DataIn1P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da1 */ memcpy( &%s->OutData4, %s->DataIn1P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata4_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
@@ -217,7 +215,7 @@ static pwr_tStatus dataa_Da1(
   if (str_StartsWith(pos, "->") || str_StartsWith(pos, " ->")) {
     if (!streq(dataactx->classdef_Da1, ""))
       sprintf(out, "((pwr_sClass_%s *)(*(%s->DataIn1P)))",
-          dataactx->classdef_Da1, var);
+              dataactx->classdef_Da1, var);
     else if (!streq(dataactx->structdef_Da1, ""))
       sprintf(out, "((%s *)(*(%s->DataIn1P)))", dataactx->structdef_Da1, var);
     else
@@ -228,37 +226,36 @@ static pwr_tStatus dataa_Da1(
   return GSX__SUCCESS;
 }
 
-static pwr_tStatus dataa_Da2(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_Da2(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   if (dataactx->outdata1_eq_indata) {
     sprintf(out,
-        "Da2 */ memcpy( &%s->OutData1, %s->DataIn2P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da2 */ memcpy( &%s->OutData1, %s->DataIn2P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata1_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
   }
   if (dataactx->outdata2_eq_indata) {
     sprintf(out,
-        "Da2 */ memcpy( &%s->OutData2, %s->DataIn2P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da2 */ memcpy( &%s->OutData2, %s->DataIn2P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata2_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
   }
   if (dataactx->outdata3_eq_indata) {
     sprintf(out,
-        "Da2 */ memcpy( &%s->OutData3, %s->DataIn2P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da2 */ memcpy( &%s->OutData3, %s->DataIn2P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata3_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
   }
   if (dataactx->outdata4_eq_indata) {
     sprintf(out,
-        "Da2 */ memcpy( &%s->OutData4, %s->DataIn2P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da2 */ memcpy( &%s->OutData4, %s->DataIn2P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata4_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
@@ -266,7 +263,7 @@ static pwr_tStatus dataa_Da2(
   if (str_StartsWith(pos, "->") || str_StartsWith(pos, " ->")) {
     if (!streq(dataactx->classdef_Da2, ""))
       sprintf(out, "((pwr_sClass_%s *)(*(%s->DataIn2P)))",
-          dataactx->classdef_Da2, var);
+              dataactx->classdef_Da2, var);
     else if (!streq(dataactx->structdef_Da2, ""))
       sprintf(out, "((%s *)(*(%s->DataIn2P)))", dataactx->structdef_Da2, var);
     else
@@ -277,37 +274,36 @@ static pwr_tStatus dataa_Da2(
   return GSX__SUCCESS;
 }
 
-static pwr_tStatus dataa_Da3(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_Da3(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   if (dataactx->outdata1_eq_indata) {
     sprintf(out,
-        "Da3 */ memcpy( &%s->OutData1, %s->DataIn3P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da3 */ memcpy( &%s->OutData1, %s->DataIn3P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata1_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
   }
   if (dataactx->outdata2_eq_indata) {
     sprintf(out,
-        "Da3 */ memcpy( &%s->OutData2, %s->DataIn3P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da3 */ memcpy( &%s->OutData2, %s->DataIn3P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata2_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
   }
   if (dataactx->outdata3_eq_indata) {
     sprintf(out,
-        "Da3 */ memcpy( &%s->OutData3, %s->DataIn3P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da3 */ memcpy( &%s->OutData3, %s->DataIn3P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata3_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
   }
   if (dataactx->outdata4_eq_indata) {
     sprintf(out,
-        "Da3 */ memcpy( &%s->OutData4, %s->DataIn3P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da3 */ memcpy( &%s->OutData4, %s->DataIn3P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata4_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
@@ -315,7 +311,7 @@ static pwr_tStatus dataa_Da3(
   if (str_StartsWith(pos, "->") || str_StartsWith(pos, " ->")) {
     if (!streq(dataactx->classdef_Da3, ""))
       sprintf(out, "((pwr_sClass_%s *)(*(%s->DataIn3P)))",
-          dataactx->classdef_Da3, var);
+              dataactx->classdef_Da3, var);
     else if (!streq(dataactx->structdef_Da3, ""))
       sprintf(out, "((%s *)(*(%s->DataIn3P)))", dataactx->structdef_Da3, var);
     else
@@ -326,37 +322,36 @@ static pwr_tStatus dataa_Da3(
   return GSX__SUCCESS;
 }
 
-static pwr_tStatus dataa_Da4(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_Da4(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   if (dataactx->outdata1_eq_indata) {
     sprintf(out,
-        "Da4 */ memcpy( &%s->OutData1, %s->DataIn4P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da4 */ memcpy( &%s->OutData1, %s->DataIn4P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata1_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
   }
   if (dataactx->outdata2_eq_indata) {
     sprintf(out,
-        "Da4 */ memcpy( &%s->OutData2, %s->DataIn4P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da4 */ memcpy( &%s->OutData2, %s->DataIn4P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata2_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
   }
   if (dataactx->outdata3_eq_indata) {
     sprintf(out,
-        "Da4 */ memcpy( &%s->OutData3, %s->DataIn4P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da4 */ memcpy( &%s->OutData3, %s->DataIn4P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata3_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
   }
   if (dataactx->outdata4_eq_indata) {
     sprintf(out,
-        "Da4 */ memcpy( &%s->OutData4, %s->DataIn4P, sizeof(pwr_tDataRef))",
-        var, var);
+            "Da4 */ memcpy( &%s->OutData4, %s->DataIn4P, sizeof(pwr_tDataRef))",
+            var, var);
     dataactx->outdata4_eq_indata = 0;
     *incr = strlen(out);
     return GSX__SUCCESS;
@@ -364,7 +359,7 @@ static pwr_tStatus dataa_Da4(
   if (str_StartsWith(pos, "->") || str_StartsWith(pos, " ->")) {
     if (!streq(dataactx->classdef_Da4, ""))
       sprintf(out, "((pwr_sClass_%s *)(*(%s->DataIn4P)))",
-          dataactx->classdef_Da4, var);
+              dataactx->classdef_Da4, var);
     else if (!streq(dataactx->structdef_Da4, ""))
       sprintf(out, "((%s *)(*(%s->DataIn4P)))", dataactx->structdef_Da4, var);
     else
@@ -375,23 +370,22 @@ static pwr_tStatus dataa_Da4(
   return GSX__SUCCESS;
 }
 
-static pwr_tStatus dataa_ODa1(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_ODa1(dataa_ctx dataactx, char *line, char *pos,
+                              char *out, int *incr, char *var) {
   char out_str[5][80];
   int nr;
 
   nr = dataa_parse(pos, "	 =;,", "", out_str[0],
-      sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
+                   sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
   if (nr > 0) {
-    if (!strcmp(out_str[0], "Da1")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da1)
-        || !strcmp(out_str[0], "Da2")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da2)
-        || !strcmp(out_str[0], "Da3")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da3)
-        || !strcmp(out_str[0], "Da4")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da4)) {
+    if (!strcmp(out_str[0], "Da1") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da1) ||
+        !strcmp(out_str[0], "Da2") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da2) ||
+        !strcmp(out_str[0], "Da3") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da3) ||
+        !strcmp(out_str[0], "Da4") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da4)) {
       dataactx->outdata1_eq_indata = 1;
       sprintf(out, "/* ODa1");
     }
@@ -402,23 +396,22 @@ static pwr_tStatus dataa_ODa1(
   return GSX__SUCCESS;
 }
 
-static pwr_tStatus dataa_ODa2(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_ODa2(dataa_ctx dataactx, char *line, char *pos,
+                              char *out, int *incr, char *var) {
   char out_str[5][80];
   int nr;
 
   nr = dataa_parse(pos, "	 =;,", "", out_str[0],
-      sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
+                   sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
   if (nr > 0) {
-    if (!strcmp(out_str[0], "Da1")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da1)
-        || !strcmp(out_str[0], "Da2")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da2)
-        || !strcmp(out_str[0], "Da3")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da3)
-        || !strcmp(out_str[0], "Da4")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da4)) {
+    if (!strcmp(out_str[0], "Da1") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da1) ||
+        !strcmp(out_str[0], "Da2") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da2) ||
+        !strcmp(out_str[0], "Da3") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da3) ||
+        !strcmp(out_str[0], "Da4") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da4)) {
       dataactx->outdata2_eq_indata = 1;
       sprintf(out, "/* ODa2");
     }
@@ -429,23 +422,22 @@ static pwr_tStatus dataa_ODa2(
   return GSX__SUCCESS;
 }
 
-static pwr_tStatus dataa_ODa3(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_ODa3(dataa_ctx dataactx, char *line, char *pos,
+                              char *out, int *incr, char *var) {
   char out_str[5][80];
   int nr;
 
   nr = dataa_parse(pos, "	 =;,", "", out_str[0],
-      sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
+                   sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
   if (nr > 0) {
-    if (!strcmp(out_str[0], "Da1")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da1)
-        || !strcmp(out_str[0], "Da2")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da2)
-        || !strcmp(out_str[0], "Da3")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da3)
-        || !strcmp(out_str[0], "Da4")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da4)) {
+    if (!strcmp(out_str[0], "Da1") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da1) ||
+        !strcmp(out_str[0], "Da2") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da2) ||
+        !strcmp(out_str[0], "Da3") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da3) ||
+        !strcmp(out_str[0], "Da4") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da4)) {
       dataactx->outdata3_eq_indata = 1;
       sprintf(out, "/* ODa3");
     }
@@ -456,23 +448,22 @@ static pwr_tStatus dataa_ODa3(
   return GSX__SUCCESS;
 }
 
-static pwr_tStatus dataa_ODa4(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_ODa4(dataa_ctx dataactx, char *line, char *pos,
+                              char *out, int *incr, char *var) {
   char out_str[5][80];
   int nr;
 
   nr = dataa_parse(pos, "	 =;,", "", out_str[0],
-      sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
+                   sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
   if (nr > 0) {
-    if (!strcmp(out_str[0], "Da1")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da1)
-        || !strcmp(out_str[0], "Da2")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da2)
-        || !strcmp(out_str[0], "Da3")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da3)
-        || !strcmp(out_str[0], "Da4")
-        || !strcmp(out_str[0], dataactx->aliasdef_Da4)) {
+    if (!strcmp(out_str[0], "Da1") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da1) ||
+        !strcmp(out_str[0], "Da2") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da2) ||
+        !strcmp(out_str[0], "Da3") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da3) ||
+        !strcmp(out_str[0], "Da4") ||
+        !strcmp(out_str[0], dataactx->aliasdef_Da4)) {
       dataactx->outdata4_eq_indata = 1;
       sprintf(out, "/* ODa4");
     }
@@ -482,459 +473,402 @@ static pwr_tStatus dataa_ODa4(
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_Da1front(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
-  sprintf(
-      out, "( *(char *)((char *)(%s->DataIn1P) + sizeof(pwr_tDataRef)))", var);
+static pwr_tStatus dataa_Da1front(dataa_ctx dataactx, char *line, char *pos,
+                                  char *out, int *incr, char *var) {
+  sprintf(out, "( *(char *)((char *)(%s->DataIn1P) + sizeof(pwr_tDataRef)))",
+          var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_Da2front(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
-  sprintf(
-      out, "( *(char *)((char *)(%s->DataIn2P) + sizeof(pwr_tDataRef)))", var);
+static pwr_tStatus dataa_Da2front(dataa_ctx dataactx, char *line, char *pos,
+                                  char *out, int *incr, char *var) {
+  sprintf(out, "( *(char *)((char *)(%s->DataIn2P) + sizeof(pwr_tDataRef)))",
+          var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_Da3front(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
-  sprintf(
-      out, "( *(char *)((char *)(%s->DataIn3P) + sizeof(pwr_tDataRef)))", var);
+static pwr_tStatus dataa_Da3front(dataa_ctx dataactx, char *line, char *pos,
+                                  char *out, int *incr, char *var) {
+  sprintf(out, "( *(char *)((char *)(%s->DataIn3P) + sizeof(pwr_tDataRef)))",
+          var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_Da4front(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
-  sprintf(
-      out, "( *(char *)((char *)(%s->DataIn4P) + sizeof(pwr_tDataRef)))", var);
+static pwr_tStatus dataa_Da4front(dataa_ctx dataactx, char *line, char *pos,
+                                  char *out, int *incr, char *var) {
+  sprintf(out, "( *(char *)((char *)(%s->DataIn4P) + sizeof(pwr_tDataRef)))",
+          var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_Da1back(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
-  sprintf(out,
+static pwr_tStatus dataa_Da1back(dataa_ctx dataactx, char *line, char *pos,
+                                 char *out, int *incr, char *var) {
+  sprintf(
+      out,
       "( *(char *)((char *)(%s->DataIn1P) + sizeof(pwr_tDataRef)+pwr_cAlignW))",
       var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_Da2back(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
-  sprintf(out,
+static pwr_tStatus dataa_Da2back(dataa_ctx dataactx, char *line, char *pos,
+                                 char *out, int *incr, char *var) {
+  sprintf(
+      out,
       "( *(char *)((char *)(%s->DataIn2P) + sizeof(pwr_tDataRef)+pwr_cAlignW))",
       var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_Da3back(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
-  sprintf(out,
+static pwr_tStatus dataa_Da3back(dataa_ctx dataactx, char *line, char *pos,
+                                 char *out, int *incr, char *var) {
+  sprintf(
+      out,
       "( *(char *)((char *)(%s->DataIn3P) + sizeof(pwr_tDataRef)+pwr_cAlignW))",
       var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_Da4back(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
-  sprintf(out,
+static pwr_tStatus dataa_Da4back(dataa_ctx dataactx, char *line, char *pos,
+                                 char *out, int *incr, char *var) {
+  sprintf(
+      out,
       "( *(char *)((char *)(%s->DataIn4P) + sizeof(pwr_tDataRef)+pwr_cAlignW))",
       var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_Da1objid(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
-  sprintf(
-      out, "( *(pwr_tObjid *)((char *)(%s->DataIn1P) + pwr_cAlignLW))", var);
+static pwr_tStatus dataa_Da1objid(dataa_ctx dataactx, char *line, char *pos,
+                                  char *out, int *incr, char *var) {
+  sprintf(out, "( *(pwr_tObjid *)((char *)(%s->DataIn1P) + pwr_cAlignLW))",
+          var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_Da2objid(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
-  sprintf(
-      out, "( *(pwr_tObjid *)((char *)(%s->DataIn2P) + pwr_cAlignLW))", var);
+static pwr_tStatus dataa_Da2objid(dataa_ctx dataactx, char *line, char *pos,
+                                  char *out, int *incr, char *var) {
+  sprintf(out, "( *(pwr_tObjid *)((char *)(%s->DataIn2P) + pwr_cAlignLW))",
+          var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_Da3objid(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
-  sprintf(
-      out, "( *(pwr_tObjid *)((char *)(%s->DataIn3P) + pwr_cAlignLW))", var);
+static pwr_tStatus dataa_Da3objid(dataa_ctx dataactx, char *line, char *pos,
+                                  char *out, int *incr, char *var) {
+  sprintf(out, "( *(pwr_tObjid *)((char *)(%s->DataIn3P) + pwr_cAlignLW))",
+          var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_Da4objid(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
-  sprintf(
-      out, "( *(pwr_tObjid *)((char *)(%s->DataIn4P) + pwr_cAlignLW))", var);
+static pwr_tStatus dataa_Da4objid(dataa_ctx dataactx, char *line, char *pos,
+                                  char *out, int *incr, char *var) {
+  sprintf(out, "( *(pwr_tObjid *)((char *)(%s->DataIn4P) + pwr_cAlignLW))",
+          var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_d1(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_d1(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->DIn1P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_d2(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_d2(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->DIn2P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_d3(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_d3(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->DIn3P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_d4(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_d4(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->DIn4P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_d5(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_d5(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->DIn5P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_d6(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_d6(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->DIn6P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_d7(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_d7(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->DIn7P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_d8(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_d8(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->DIn8P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_A1(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_A1(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->AIn1P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_A2(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_A2(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->AIn2P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_A3(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_A3(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->AIn3P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_A4(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_A4(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->AIn4P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_A5(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_A5(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->AIn5P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_A6(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_A6(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->AIn6P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_A7(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_A7(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->AIn7P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_A8(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_A8(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->AIn8P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_I1(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_I1(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->IIn1P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_I2(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_I2(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->IIn2P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_I3(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_I3(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->IIn3P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_I4(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_I4(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->IIn4P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_I5(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_I5(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->IIn5P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_I6(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_I6(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->IIn6P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_I7(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_I7(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->IIn7P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_I8(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_I8(dataa_ctx dataactx, char *line, char *pos,
+                            char *out, int *incr, char *var) {
   sprintf(out, "(*(%s->IIn8P))", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_od1(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_od1(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutD1)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_od2(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_od2(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutD2)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_od3(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_od3(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutD3)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_od4(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_od4(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutD4)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_od5(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_od5(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutD5)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_od6(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_od6(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutD6)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_od7(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_od7(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutD7)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_od8(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_od8(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutD8)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OA1(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OA1(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutA1)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OA2(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OA2(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutA2)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OA3(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OA3(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutA3)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OA4(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OA4(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutA4)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OA5(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OA5(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutA5)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OA6(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OA6(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutA6)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OA7(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OA7(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutA7)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OA8(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OA8(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutA8)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OI1(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OI1(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutI1)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OI2(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OI2(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutI2)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OI3(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OI3(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutI3)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OI4(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OI4(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutI4)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OI5(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OI5(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutI5)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OI6(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OI6(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutI6)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OI7(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OI7(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutI7)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
-static pwr_tStatus dataa_OI8(
-    dataa_ctx dataactx, char* line, char* pos, char* out, int* incr, char* var)
-{
+static pwr_tStatus dataa_OI8(dataa_ctx dataactx, char *line, char *pos,
+                             char *out, int *incr, char *var) {
   sprintf(out, "(%s->OutI8)", var);
   *incr = strlen(out);
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		dataa_classdef
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* dataa_ctx	dataactx	I	dataa context
-* char		*line		I	current line
-*
-* Description:
-*	Backcall function called when a classdef command is detected.
-*
-**************************************************************************/
-static pwr_tStatus dataa_classdef(dataa_ctx dataactx, char* line)
-{
+ *
+ * Name:		dataa_classdef
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * dataa_ctx	dataactx	I	dataa context
+ * char		*line		I	current line
+ *
+ * Description:
+ *	Backcall function called when a classdef command is detected.
+ *
+ **************************************************************************/
+static pwr_tStatus dataa_classdef(dataa_ctx dataactx, char *line) {
   char out_str[5][80];
   char comm_str[20][80];
   int nr;
@@ -945,15 +879,16 @@ static pwr_tStatus dataa_classdef(dataa_ctx dataactx, char* line)
   *(line + strlen(line) - 1) = 0;
 
   /* Parse the command string */
-  comm_nr = dataa_parse(line, ",;", "", comm_str[0],
-      sizeof(comm_str) / sizeof(comm_str[0]), sizeof(comm_str[0]));
+  comm_nr =
+      dataa_parse(line, ",;", "", comm_str[0],
+                  sizeof(comm_str) / sizeof(comm_str[0]), sizeof(comm_str[0]));
 
   for (i = 0; i < comm_nr; i++) {
     if (!strcmp(comm_str[i], ""))
       break;
 
     nr = dataa_parse(comm_str[i], "	 ", "", out_str[0],
-        sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
+                     sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
     if (nr == 0)
       continue;
 
@@ -1013,21 +948,20 @@ static pwr_tStatus dataa_classdef(dataa_ctx dataactx, char* line)
 }
 
 /*************************************************************************
-*
-* Name:		dataa_structdef
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* dataa_ctx	dataactx	I	dataa context
-* char		*line		I	current line
-*
-* Description:
-*	Backcall function called when a structdef command is detected.
-*
-**************************************************************************/
-static pwr_tStatus dataa_structdef(dataa_ctx dataactx, char* line)
-{
+ *
+ * Name:		dataa_structdef
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * dataa_ctx	dataactx	I	dataa context
+ * char		*line		I	current line
+ *
+ * Description:
+ *	Backcall function called when a structdef command is detected.
+ *
+ **************************************************************************/
+static pwr_tStatus dataa_structdef(dataa_ctx dataactx, char *line) {
   char out_str[5][80];
   char comm_str[20][80];
   int nr;
@@ -1038,15 +972,16 @@ static pwr_tStatus dataa_structdef(dataa_ctx dataactx, char* line)
   *(line + strlen(line) - 1) = 0;
 
   /* Parse the command string */
-  comm_nr = dataa_parse(line, ",;", "", comm_str[0],
-      sizeof(comm_str) / sizeof(comm_str[0]), sizeof(comm_str[0]));
+  comm_nr =
+      dataa_parse(line, ",;", "", comm_str[0],
+                  sizeof(comm_str) / sizeof(comm_str[0]), sizeof(comm_str[0]));
 
   for (i = 0; i < comm_nr; i++) {
     if (!strcmp(comm_str[i], ""))
       break;
 
     nr = dataa_parse(comm_str[i], "	 ", "", out_str[0],
-        sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
+                     sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
     if (nr == 0)
       continue;
 
@@ -1106,21 +1041,20 @@ static pwr_tStatus dataa_structdef(dataa_ctx dataactx, char* line)
 }
 
 /*************************************************************************
-*
-* Name:		dataa_aliasdef
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* dataa_ctx	dataactx	I	dataa context
-* char		*line		I	current line
-*
-* Description:
-*	Backcall function called when a aliasdef command is detected.
-*
-**************************************************************************/
-static int dataa_aliasdef(dataa_ctx dataactx, char* line)
-{
+ *
+ * Name:		dataa_aliasdef
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * dataa_ctx	dataactx	I	dataa context
+ * char		*line		I	current line
+ *
+ * Description:
+ *	Backcall function called when a aliasdef command is detected.
+ *
+ **************************************************************************/
+static int dataa_aliasdef(dataa_ctx dataactx, char *line) {
   char out_str[5][80];
   char comm_str[20][80];
   int nr;
@@ -1131,15 +1065,16 @@ static int dataa_aliasdef(dataa_ctx dataactx, char* line)
   *(line + strlen(line) - 1) = 0;
 
   /* Parse the command string */
-  comm_nr = dataa_parse(line, ",;", "", comm_str[0],
-      sizeof(comm_str) / sizeof(comm_str[0]), sizeof(comm_str[0]));
+  comm_nr =
+      dataa_parse(line, ",;", "", comm_str[0],
+                  sizeof(comm_str) / sizeof(comm_str[0]), sizeof(comm_str[0]));
 
   for (i = 0; i < comm_nr; i++) {
     if (!strcmp(comm_str[i], ""))
       break;
 
     nr = dataa_parse(comm_str[i], "	 ", "", out_str[0],
-        sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
+                     sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]));
     if (i == 0) {
       if (nr != 3)
         return GSX__DATAASYNTAX;
@@ -1265,82 +1200,106 @@ static int dataa_aliasdef(dataa_ctx dataactx, char* line)
 }
 
 /* Items includes also 32 dynamic items */
-dataa_t_item template_items[100] = { { "*/", "X", "X", &dataa_comment_end, 0,
-                                         0 },
-  { "/*", "X", "X", &dataa_comment_start, 0, 0 },
-  { "Da1", "A", "A", &dataa_Da1, 0, 0 }, { "Da2", "A", "A", &dataa_Da2, 0, 0 },
-  { "Da3", "A", "A", &dataa_Da3, 0, 0 }, { "Da4", "A", "A", &dataa_Da4, 0, 0 },
-  { "Da1back", "A", "A", &dataa_Da1back, 0, 0 },
-  { "Da2back", "A", "A", &dataa_Da2back, 0, 0 },
-  { "Da3back", "A", "A", &dataa_Da3back, 0, 0 },
-  { "Da4back", "A", "A", &dataa_Da4back, 0, 0 },
-  { "Da1front", "A", "A", &dataa_Da1front, 0, 0 },
-  { "Da2front", "A", "A", &dataa_Da2front, 0, 0 },
-  { "Da3front", "A", "A", &dataa_Da3front, 0, 0 },
-  { "Da4front", "A", "A", &dataa_Da4front, 0, 0 },
-  { "Da1objid", "A", "A", &dataa_Da1objid, 0, 0 },
-  { "Da2objid", "A", "A", &dataa_Da2objid, 0, 0 },
-  { "Da3objid", "A", "A", &dataa_Da3objid, 0, 0 },
-  { "Da4objid", "A", "A", &dataa_Da4objid, 0, 0 },
-  { "d1", "A", "A", &dataa_d1, 0, 0 }, { "d2", "A", "A", &dataa_d2, 0, 0 },
-  { "d3", "A", "A", &dataa_d3, 0, 0 }, { "d4", "A", "A", &dataa_d4, 0, 0 },
-  { "d5", "A", "A", &dataa_d5, 0, 0 }, { "d6", "A", "A", &dataa_d6, 0, 0 },
-  { "d7", "A", "A", &dataa_d7, 0, 0 }, { "d8", "A", "A", &dataa_d8, 0, 0 },
-  { "A1", "A", "A", &dataa_A1, 0, 0 }, { "A2", "A", "A", &dataa_A2, 0, 0 },
-  { "A3", "A", "A", &dataa_A3, 0, 0 }, { "A4", "A", "A", &dataa_A4, 0, 0 },
-  { "A5", "A", "A", &dataa_A5, 0, 0 }, { "A6", "A", "A", &dataa_A6, 0, 0 },
-  { "A7", "A", "A", &dataa_A7, 0, 0 }, { "A8", "A", "A", &dataa_A8, 0, 0 },
-  { "I1", "A", "A", &dataa_I1, 0, 0 }, { "I2", "A", "A", &dataa_I2, 0, 0 },
-  { "I3", "A", "A", &dataa_I3, 0, 0 }, { "I4", "A", "A", &dataa_I4, 0, 0 },
-  { "I5", "A", "A", &dataa_I5, 0, 0 }, { "I6", "A", "A", &dataa_I6, 0, 0 },
-  { "I7", "A", "A", &dataa_I7, 0, 0 }, { "I8", "A", "A", &dataa_I8, 0, 0 },
-  { "ODa1", "A", "A", &dataa_ODa1, 0, 0 },
-  { "ODa2", "A", "A", &dataa_ODa2, 0, 0 },
-  { "ODa3", "A", "A", &dataa_ODa3, 0, 0 },
-  { "ODa4", "A", "A", &dataa_ODa4, 0, 0 },
-  { "od1", "A", "A", &dataa_od1, 0, 0 }, { "od2", "A", "A", &dataa_od2, 0, 0 },
-  { "od3", "A", "A", &dataa_od3, 0, 0 }, { "od4", "A", "A", &dataa_od4, 0, 0 },
-  { "od5", "A", "A", &dataa_od5, 0, 0 }, { "od6", "A", "A", &dataa_od6, 0, 0 },
-  { "od7", "A", "A", &dataa_od7, 0, 0 }, { "od8", "A", "A", &dataa_od8, 0, 0 },
-  { "OA1", "A", "A", &dataa_OA1, 0, 0 }, { "OA2", "A", "A", &dataa_OA2, 0, 0 },
-  { "OA3", "A", "A", &dataa_OA3, 0, 0 }, { "OA4", "A", "A", &dataa_OA4, 0, 0 },
-  { "OA5", "A", "A", &dataa_OA5, 0, 0 }, { "OA6", "A", "A", &dataa_OA6, 0, 0 },
-  { "OA7", "A", "A", &dataa_OA7, 0, 0 }, { "OA8", "A", "A", &dataa_OA8, 0, 0 },
-  { "OI1", "A", "A", &dataa_OI1, 0, 0 }, { "OI2", "A", "A", &dataa_OI2, 0, 0 },
-  { "OI3", "A", "A", &dataa_OI3, 0, 0 }, { "OI4", "A", "A", &dataa_OI4, 0, 0 },
-  { "OI5", "A", "A", &dataa_OI5, 0, 0 }, { "OI6", "A", "A", &dataa_OI6, 0, 0 },
-  { "OI7", "A", "A", &dataa_OI7, 0, 0 }, { "OI8", "A", "A", &dataa_OI8, 0, 0 },
-  { "", "", "", NULL, 0, 0 } 
-};
+dataa_t_item template_items[100] = {
+    {"*/", "X", "X", &dataa_comment_end, 0, 0},
+    {"/*", "X", "X", &dataa_comment_start, 0, 0},
+    {"Da1", "A", "A", &dataa_Da1, 0, 0},
+    {"Da2", "A", "A", &dataa_Da2, 0, 0},
+    {"Da3", "A", "A", &dataa_Da3, 0, 0},
+    {"Da4", "A", "A", &dataa_Da4, 0, 0},
+    {"Da1back", "A", "A", &dataa_Da1back, 0, 0},
+    {"Da2back", "A", "A", &dataa_Da2back, 0, 0},
+    {"Da3back", "A", "A", &dataa_Da3back, 0, 0},
+    {"Da4back", "A", "A", &dataa_Da4back, 0, 0},
+    {"Da1front", "A", "A", &dataa_Da1front, 0, 0},
+    {"Da2front", "A", "A", &dataa_Da2front, 0, 0},
+    {"Da3front", "A", "A", &dataa_Da3front, 0, 0},
+    {"Da4front", "A", "A", &dataa_Da4front, 0, 0},
+    {"Da1objid", "A", "A", &dataa_Da1objid, 0, 0},
+    {"Da2objid", "A", "A", &dataa_Da2objid, 0, 0},
+    {"Da3objid", "A", "A", &dataa_Da3objid, 0, 0},
+    {"Da4objid", "A", "A", &dataa_Da4objid, 0, 0},
+    {"d1", "A", "A", &dataa_d1, 0, 0},
+    {"d2", "A", "A", &dataa_d2, 0, 0},
+    {"d3", "A", "A", &dataa_d3, 0, 0},
+    {"d4", "A", "A", &dataa_d4, 0, 0},
+    {"d5", "A", "A", &dataa_d5, 0, 0},
+    {"d6", "A", "A", &dataa_d6, 0, 0},
+    {"d7", "A", "A", &dataa_d7, 0, 0},
+    {"d8", "A", "A", &dataa_d8, 0, 0},
+    {"A1", "A", "A", &dataa_A1, 0, 0},
+    {"A2", "A", "A", &dataa_A2, 0, 0},
+    {"A3", "A", "A", &dataa_A3, 0, 0},
+    {"A4", "A", "A", &dataa_A4, 0, 0},
+    {"A5", "A", "A", &dataa_A5, 0, 0},
+    {"A6", "A", "A", &dataa_A6, 0, 0},
+    {"A7", "A", "A", &dataa_A7, 0, 0},
+    {"A8", "A", "A", &dataa_A8, 0, 0},
+    {"I1", "A", "A", &dataa_I1, 0, 0},
+    {"I2", "A", "A", &dataa_I2, 0, 0},
+    {"I3", "A", "A", &dataa_I3, 0, 0},
+    {"I4", "A", "A", &dataa_I4, 0, 0},
+    {"I5", "A", "A", &dataa_I5, 0, 0},
+    {"I6", "A", "A", &dataa_I6, 0, 0},
+    {"I7", "A", "A", &dataa_I7, 0, 0},
+    {"I8", "A", "A", &dataa_I8, 0, 0},
+    {"ODa1", "A", "A", &dataa_ODa1, 0, 0},
+    {"ODa2", "A", "A", &dataa_ODa2, 0, 0},
+    {"ODa3", "A", "A", &dataa_ODa3, 0, 0},
+    {"ODa4", "A", "A", &dataa_ODa4, 0, 0},
+    {"od1", "A", "A", &dataa_od1, 0, 0},
+    {"od2", "A", "A", &dataa_od2, 0, 0},
+    {"od3", "A", "A", &dataa_od3, 0, 0},
+    {"od4", "A", "A", &dataa_od4, 0, 0},
+    {"od5", "A", "A", &dataa_od5, 0, 0},
+    {"od6", "A", "A", &dataa_od6, 0, 0},
+    {"od7", "A", "A", &dataa_od7, 0, 0},
+    {"od8", "A", "A", &dataa_od8, 0, 0},
+    {"OA1", "A", "A", &dataa_OA1, 0, 0},
+    {"OA2", "A", "A", &dataa_OA2, 0, 0},
+    {"OA3", "A", "A", &dataa_OA3, 0, 0},
+    {"OA4", "A", "A", &dataa_OA4, 0, 0},
+    {"OA5", "A", "A", &dataa_OA5, 0, 0},
+    {"OA6", "A", "A", &dataa_OA6, 0, 0},
+    {"OA7", "A", "A", &dataa_OA7, 0, 0},
+    {"OA8", "A", "A", &dataa_OA8, 0, 0},
+    {"OI1", "A", "A", &dataa_OI1, 0, 0},
+    {"OI2", "A", "A", &dataa_OI2, 0, 0},
+    {"OI3", "A", "A", &dataa_OI3, 0, 0},
+    {"OI4", "A", "A", &dataa_OI4, 0, 0},
+    {"OI5", "A", "A", &dataa_OI5, 0, 0},
+    {"OI6", "A", "A", &dataa_OI6, 0, 0},
+    {"OI7", "A", "A", &dataa_OI7, 0, 0},
+    {"OI8", "A", "A", &dataa_OI8, 0, 0},
+    {"", "", "", NULL, 0, 0}};
 
 /*************************************************************************
-*
-* Name:		dataa_parse()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*string		I	string to be parsed.
-* char		*parse_char	I	parse charachter(s).
-* char		*inc_parse_char	I	parse charachter(s) that will be
-*					included in the parsed string.
-* char		*outstr		O	parsed strings.
-* int		max_rows	I	maximum number of chars in a parsed
-*					string.
-* int 		max_cols	I	maximum number of parsed elements.
-*
-* Description:
-*	Parses a string.
-*
-**************************************************************************/
+ *
+ * Name:		dataa_parse()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*string		I	string to be parsed.
+ * char		*parse_char	I	parse charachter(s).
+ * char		*inc_parse_char	I	parse charachter(s) that will be
+ *					included in the parsed string.
+ * char		*outstr		O	parsed strings.
+ * int		max_rows	I	maximum number of chars in a parsed
+ *					string.
+ * int 		max_cols	I	maximum number of parsed elements.
+ *
+ * Description:
+ *	Parses a string.
+ *
+ **************************************************************************/
 
-static int dataa_parse(char* string, char* parse_char, char* inc_parse_char,
-    char* outstr, int max_rows, int max_cols)
-{
+static int dataa_parse(char *string, char *parse_char, char *inc_parse_char,
+                       char *outstr, int max_rows, int max_cols) {
   int row;
   int col;
-  char* char_ptr;
-  char* inc_char_ptr;
+  char *char_ptr;
+  char *inc_char_ptr;
   int parsechar_found;
   int inc_parsechar_found;
   int next_token;
@@ -1421,19 +1380,18 @@ static int dataa_parse(char* string, char* parse_char, char* inc_parse_char,
 }
 
 /*************************************************************************
-*
-* Name:		dataa_isascii
-*
-* Type		int
-*
-* char		c	I	a character
-*
-* Description:
-*	Returns 1 if c is a ascii-character or digit, else return 0.
-*
-**************************************************************************/
-static int dataa_isascii(char c)
-{
+ *
+ * Name:		dataa_isascii
+ *
+ * Type		int
+ *
+ * char		c	I	a character
+ *
+ * Description:
+ *	Returns 1 if c is a ascii-character or digit, else return 0.
+ *
+ **************************************************************************/
+static int dataa_isascii(char c) {
   if (c >= '0' && c <= '9')
     return 1;
   if (c >= 'a' && c <= 'z')
@@ -1448,20 +1406,19 @@ static int dataa_isascii(char c)
   return 0;
 }
 /*************************************************************************
-*
-* Name:		dataa_isfrontA
-*
-* Type		int
-*
-* char		c	I	a character
-*
-* Description:
-*	Returns 1 if c2 is a ascii-character, digit, or c1c2 is '->', else
-*return 0.
-*
-**************************************************************************/
-static int dataa_isfrontA(char c1, char c2)
-{
+ *
+ * Name:		dataa_isfrontA
+ *
+ * Type		int
+ *
+ * char		c	I	a character
+ *
+ * Description:
+ *	Returns 1 if c2 is a ascii-character, digit, or c1c2 is '->', else
+ *return 0.
+ *
+ **************************************************************************/
+static int dataa_isfrontA(char c1, char c2) {
   if (dataa_isascii(c2))
     return 1;
   if (c1 == '-' && c2 == '>')
@@ -1470,19 +1427,18 @@ static int dataa_isfrontA(char c1, char c2)
   return 0;
 }
 /*************************************************************************
-*
-* Name:		dataa_isbackA
-*
-* Type		int
-*
-* char		c	I	a character
-*
-* Description:
-*	Returns 1 if c is a ascii-character, digit, '[' or '(', else return 0.
-*
-**************************************************************************/
-static int dataa_isbackA(char c)
-{
+ *
+ * Name:		dataa_isbackA
+ *
+ * Type		int
+ *
+ * char		c	I	a character
+ *
+ * Description:
+ *	Returns 1 if c is a ascii-character, digit, '[' or '(', else return 0.
+ *
+ **************************************************************************/
+static int dataa_isbackA(char c) {
   if (dataa_isascii(c))
     return 1;
   if (c == '[')
@@ -1494,25 +1450,24 @@ static int dataa_isbackA(char c)
 }
 
 /*************************************************************************
-*
-* Name:		dataa_get_next_line
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*str		I	buffer.
-* char		**pos		IO	position in buffer for next line.
-* char		*line		O	next line.
-* char		size		I	max size of line.
-* int		first		I	first call for this buffer.
-*
-* Description:
-*	Get the next line of a buffer.
-*
-**************************************************************************/
-static int dataa_get_next_line(
-    char* str, char** pos, char* line, int size, int first)
-{
+ *
+ * Name:		dataa_get_next_line
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*str		I	buffer.
+ * char		**pos		IO	position in buffer for next line.
+ * char		*line		O	next line.
+ * char		size		I	max size of line.
+ * int		first		I	first call for this buffer.
+ *
+ * Description:
+ *	Get the next line of a buffer.
+ *
+ **************************************************************************/
+static int dataa_get_next_line(char *str, char **pos, char *line, int size,
+                               int first) {
   char *s, *t;
   int i;
 
@@ -1545,26 +1500,25 @@ static int dataa_get_next_line(
 }
 
 /*************************************************************************
-*
-* Name:		dataa_add_item
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* dataa_ctx	dataactx	I	dataa context
-* char		*item		I	new item
-* char		*delim_front	I	front delimiter.
-* char		*delim_back	I	back delimiter.
-* int		*func()		I	callback function
-*
-* Description:
-*	Insert a new item in the context's item list.
-*
-**************************************************************************/
-static int dataa_add_item(dataa_ctx dataactx, char* item, char* delim_front,
-    char* delim_back, pwr_tStatus (*func)())
-{
-  dataa_t_item* item_ptr;
+ *
+ * Name:		dataa_add_item
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * dataa_ctx	dataactx	I	dataa context
+ * char		*item		I	new item
+ * char		*delim_front	I	front delimiter.
+ * char		*delim_back	I	back delimiter.
+ * int		*func()		I	callback function
+ *
+ * Description:
+ *	Insert a new item in the context's item list.
+ *
+ **************************************************************************/
+static int dataa_add_item(dataa_ctx dataactx, char *item, char *delim_front,
+                          char *delim_back, pwr_tStatus (*func)()) {
+  dataa_t_item *item_ptr;
 
   item_ptr = dataactx->items;
   while (item_ptr->item[0] != 0)
@@ -1581,20 +1535,19 @@ static int dataa_add_item(dataa_ctx dataactx, char* item, char* delim_front,
 }
 
 /*************************************************************************
-*
-* Name:		dataa_create_ctx
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* dataa_ctx	*dataactx	I	dataa context
-*
-* Description:
-*	Allocate memory and initiziate a new context.
-*
-**************************************************************************/
-static pwr_tStatus dataa_create_ctx(dataa_ctx* dataactx)
-{
+ *
+ * Name:		dataa_create_ctx
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * dataa_ctx	*dataactx	I	dataa context
+ *
+ * Description:
+ *	Allocate memory and initiziate a new context.
+ *
+ **************************************************************************/
+static pwr_tStatus dataa_create_ctx(dataa_ctx *dataactx) {
   /* Create the context */
   *dataactx = (dataa_ctx)calloc(1, sizeof(**dataactx));
   if (*dataactx == 0)
@@ -1607,55 +1560,54 @@ static pwr_tStatus dataa_create_ctx(dataa_ctx* dataactx)
 }
 
 /*************************************************************************
-*
-* Name:		dataa_delete_ctx()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-* dataa_ctx	dataactx	I	dataa context.
-*
-* Description:
-*	Delete a context.
-*	Free's all allocated memory in the dataa context.
-*
-**************************************************************************/
+ *
+ * Name:		dataa_delete_ctx()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ * dataa_ctx	dataactx	I	dataa context.
+ *
+ * Description:
+ *	Delete a context.
+ *	Free's all allocated memory in the dataa context.
+ *
+ **************************************************************************/
 
-static pwr_tStatus dataa_delete_ctx(dataa_ctx dataactx)
-{
-  free((char*)dataactx);
+static pwr_tStatus dataa_delete_ctx(dataa_ctx dataactx) {
+  free((char *)dataactx);
   return GSX__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		dataarithm_convert
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-* char		*str		I	code in dataarithm object
-* char		*newstr		I	converted code.
-* char		*object		I	name of object pointer.
-* char		*bufsize	I	size of newstr.
-*
-* Description:
-*	Convert the code of a dataarithm object.
-*
-**************************************************************************/
-pwr_tStatus dataarithm_convert(char* str, char* newstr, char* object,
-    int bufsize, char* error_line, int* error_line_size, int* error_line_num,
-    int* outsize)
-{
+ *
+ * Name:		dataarithm_convert
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ * char		*str		I	code in dataarithm object
+ * char		*newstr		I	converted code.
+ * char		*object		I	name of object pointer.
+ * char		*bufsize	I	size of newstr.
+ *
+ * Description:
+ *	Convert the code of a dataarithm object.
+ *
+ **************************************************************************/
+pwr_tStatus dataarithm_convert(char *str, char *newstr, char *object,
+                               int bufsize, char *error_line,
+                               int *error_line_size, int *error_line_num,
+                               int *outsize) {
   char line[200];
-  char* p;
-  dataa_t_item* item_ptr;
+  char *p;
+  dataa_t_item *item_ptr;
   pwr_tStatus sts;
-  char* t;
-  char* delim_p;
+  char *t;
+  char *delim_p;
   int hit, delim_hit;
   char tmpstr[200];
-  char* write_from;
+  char *write_from;
   int first_line;
   int end_of_text;
   dataa_ctx dataactx;
@@ -1736,17 +1688,17 @@ pwr_tStatus dataarithm_convert(char* str, char* newstr, char* object,
             /* Check front delimiter */
             delim_p = &item_ptr->delim_front[0];
             while (*delim_p != 0) {
-              if ((*delim_p == 'A'
-                      && !dataa_isfrontA(t == line ? '\0' : *(t - 1), *t))
-                  || (*delim_p == 'X') || (*delim_p == *t && *delim_p != 'A')) {
+              if ((*delim_p == 'A' &&
+                   !dataa_isfrontA(t == line ? '\0' : *(t - 1), *t)) ||
+                  (*delim_p == 'X') || (*delim_p == *t && *delim_p != 'A')) {
                 item_ptr->hit = 1;
                 item_ptr->hit_count = 1;
               }
               delim_p++;
             }
           } else {
-            if (item_ptr->hit_count >= 1
-                && item_ptr->hit_count < strlen(item_ptr->item) + 1) {
+            if (item_ptr->hit_count >= 1 &&
+                item_ptr->hit_count < strlen(item_ptr->item) + 1) {
               if (item_ptr->item[item_ptr->hit_count - 1] == *t) {
                 /* Still hit */
                 item_ptr->hit_count++;
@@ -1756,9 +1708,9 @@ pwr_tStatus dataarithm_convert(char* str, char* newstr, char* object,
                   /* More delimiter */
                   delim_p = &item_ptr->delim_front[0];
                   while (*delim_p != 0) {
-                    if ((*delim_p == 'A'
-                            && !dataa_isfrontA(t == line ? '\0' : *(t - 1), *t))
-                        || (*delim_p == 'X'))
+                    if ((*delim_p == 'A' &&
+                         !dataa_isfrontA(t == line ? '\0' : *(t - 1), *t)) ||
+                        (*delim_p == 'X'))
                       delim_hit = 1;
                     else if (*delim_p == *t)
                       delim_hit = 1;
@@ -1773,8 +1725,8 @@ pwr_tStatus dataarithm_convert(char* str, char* newstr, char* object,
             } else if (item_ptr->hit_count == strlen(item_ptr->item) + 1) {
               delim_p = &item_ptr->delim_back[0];
               while (*delim_p != 0) {
-                if ((*delim_p == 'A' && !dataa_isbackA(*t))
-                    || (*delim_p == 'X')) {
+                if ((*delim_p == 'A' && !dataa_isbackA(*t)) ||
+                    (*delim_p == 'X')) {
                   hit = 1;
                 } else if (*delim_p == *t) {
                   hit = 1;
@@ -1807,8 +1759,8 @@ pwr_tStatus dataarithm_convert(char* str, char* newstr, char* object,
             tmpstr[t - write_from - strlen(item_ptr->item)] = 0;
             strcpy(newstr + pos, tmpstr);
             pos += strlen(tmpstr);
-            sts = (item_ptr->func)(
-                dataactx, line, t, newstr + pos, &incr, object);
+            sts = (item_ptr->func)(dataactx, line, t, newstr + pos, &incr,
+                                   object);
             if (EVEN(sts)) {
               strncpy(error_line, line, *error_line_size);
               *error_line_num = dataactx->line_count,
@@ -1849,8 +1801,7 @@ pwr_tStatus dataarithm_convert(char* str, char* newstr, char* object,
 
 #ifdef TEST
 
-main()
-{
+main() {
   int sts;
   char object_var[] = "Z800022";
   char newstr[16000];
@@ -1861,7 +1812,7 @@ if ( !Da1 && d1)\n\
   od1 = 1;\n\
   Da1->Temp = 22;\n\
 }";
-  FILE* infile;
+  FILE *infile;
   char error_line[80];
   int error_num;
 
@@ -1872,13 +1823,13 @@ if ( !Da1 && d1)\n\
   fclose(infile);
 
   sts = dataarithm_convert(str, newstr, object_var, sizeof(newstr), error_line,
-      sizeof(error_line), &error_num);
+                           sizeof(error_line), &error_num);
   if (EVEN(sts))
     printf("Error in line %d,\n  %s\n", error_num, error_line);
   printf("sts : %d\n", sts);
   printf("%s", newstr);
   sts = dataarithm_convert(str, newstr, object_var, sizeof(newstr), error_line,
-      sizeof(error_line), &error_num);
+                           sizeof(error_line), &error_num);
   if (EVEN(sts))
     printf("Error in line %d,\n  %s\n", error_num, error_line);
 

@@ -61,7 +61,8 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   rp->Local = local;
 
   local->Qbus_fp = open("/dev/qbus", O_RDWR);
-  if (local->Qbus_fp == -1) {
+  if (local->Qbus_fp == -1)
+  {
     errh_Error("Qbus initialization error, IO rack %s", rp->Name);
     ctx->Node->EmergBreakTrue = 1;
     return IO__ERRDEVICE;
@@ -71,23 +72,25 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   return 1;
 }
 
-static pwr_tStatus IoRackSwap(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_eEvent event
+static pwr_tStatus IoRackSwap(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_eEvent event
 
-    )
+)
 {
   io_sRackLocal* local;
 
-  switch (event) {
+  switch (event)
+  {
   case io_eEvent_IoCommSwapInit:
   case io_eEvent_IoCommSwap:
-    if (!rp->Local) {
+    if (!rp->Local)
+    {
       /* Open Qbus driver */
       local = calloc(1, sizeof(*local));
       rp->Local = local;
 
       local->Qbus_fp = open("/dev/qbus", O_RDWR);
-      if (local->Qbus_fp == -1) {
+      if (local->Qbus_fp == -1)
+      {
         errh_Error("Qbus swap initialization error, IO rack %s", rp->Name);
         return IO__ERRDEVICE;
       }
@@ -121,5 +124,5 @@ static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Rack_SSAB) = { pwr_BindIoMethod(IoRackInit),
-  pwr_BindIoMethod(IoRackSwap), pwr_BindIoMethod(IoRackClose), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Rack_SSAB) = {pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackSwap),
+                                            pwr_BindIoMethod(IoRackClose), pwr_NullMethod};

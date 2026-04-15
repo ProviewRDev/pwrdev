@@ -45,82 +45,238 @@
 
 #include "ge_methods.h"
 
-pwr_tString80 GeMethods::op_name[GeMethods::opmeth_size] = { "Graph",
-  "Object Graph", "Trend", "History", "Fast", "Camera", "Event Log...",
-  "Block Events...", "Help", "Photo", "Note", "Parent Object Graph" };
+pwr_tString80 GeMethods::op_name[GeMethods::opmeth_size] = {
+    "Graph",        "Object Graph",    "Trend", "History", "Fast", "Camera",
+    "Event Log...", "Block Events...", "Help",  "Photo",   "Note", "Parent Object Graph"};
 
-pwr_tString80 GeMethods::op_subgraph[GeMethods::opmeth_size]
-    = { "pwr_mb2opengraph", "pwr_mb2openobjectgraph", "pwr_mb2trend",
-        "pwr_mb2history", "pwr_mb2fast", "pwr_mb2camera", "pwr_mb2histevent",
-        "pwr_mb2blockevents", "pwr_mb2help", "pwr_mb2photo", "pwr_mb2note",
-        "pwr_mb2parentgraph" };
+pwr_tString80 GeMethods::op_subgraph[GeMethods::opmeth_size] = {
+    "pwr_mb2opengraph", "pwr_mb2openobjectgraph", "pwr_mb2trend",     "pwr_mb2history",
+    "pwr_mb2fast",      "pwr_mb2camera",          "pwr_mb2histevent", "pwr_mb2blockevents",
+    "pwr_mb2help",      "pwr_mb2photo",           "pwr_mb2note",      "pwr_mb2parentgraph"};
 
-pwr_tString80 GeMethods::op_image[GeMethods::opmeth_size]
-    = { "$pwr_exe/xtt_meth_graph.png", "$pwr_exe/xtt_meth_classgraph.png",
-        "$pwr_exe/xtt_meth_trend.png", "$pwr_exe/xtt_meth_history.png",
-        "$pwr_exe/xtt_meth_fast.png", "", "$pwr_exe/xtt_meth_histevent.png",
-        "$pwr_exe/xtt_meth_block.png", "$pwr_exe/xtt_meth_help.png",
-        "$pwr_exe/xtt_meth_photo.png", "$pwr_exe/xtt_meth_note.png", "" };
+pwr_tString80 GeMethods::op_image[GeMethods::opmeth_size] = {
+    "$pwr_exe/xtt_meth_graph.png",     "$pwr_exe/xtt_meth_classgraph.png", "$pwr_exe/xtt_meth_trend.png",
+    "$pwr_exe/xtt_meth_history.png",   "$pwr_exe/xtt_meth_fast.png",       "",
+    "$pwr_exe/xtt_meth_histevent.png", "$pwr_exe/xtt_meth_block.png",      "$pwr_exe/xtt_meth_help.png",
+    "$pwr_exe/xtt_meth_photo.png",     "$pwr_exe/xtt_meth_note.png",       ""};
 
-pwr_tString80 GeMethods::op_tooltip[GeMethods::opmeth_size] = { "Graph",
-  "Object Graph", "Trend", "History", "Fast curve", "Camera", "Event log",
-  "Block events", "Help", "Photo", "Note", "Open parent object graph" };
+pwr_tString80 GeMethods::op_tooltip[GeMethods::opmeth_size] = {
+    "Graph",     "Object Graph", "Trend", "History", "Fast curve", "Camera",
+    "Event log", "Block events", "Help",  "Photo",   "Note",       "Open parent object graph"};
 
-pwr_tString80 GeMethods::op_method[GeMethods::opmeth_size]
-    = { "$Object-OpenGraph", "$Object-OpenObjectGraph", "$Object-OpenTrend",
-        "$Object-OpenHistory", "$Object-OpenFast", "$Object-Camera",
-        "$Object-HistEvent", "$Object-BlockEvents", "$Object-Help",
-        "$Object-Photo", "$Object-Note", "$Object-OpenParentObjectGraph" };
+pwr_tString80 GeMethods::op_method[GeMethods::opmeth_size] = {
+    "$Object-OpenGraph", "$Object-OpenObjectGraph", "$Object-OpenTrend", "$Object-OpenHistory",
+    "$Object-OpenFast",  "$Object-Camera",          "$Object-HistEvent", "$Object-BlockEvents",
+    "$Object-Help",      "$Object-Photo",           "$Object-Note",      "$Object-OpenParentObjectGraph"};
 
-pwr_tString80 GeMethods::op_filter[GeMethods::opmeth_size]
-    = { "$Object-OpenGraphFilter", "$Object-OpenObjectGraphFilter",
-        "$Object-OpenTrendFilter", "$Object-OpenHistoryFilter",
-        "$Object-OpenFastFilter", "$Object-CameraFilter",
-        "$Object-HistEventFilter", "$Object-BlockEventsFilter",
-        "$Object-HelpFilter", "$Object-PhotoFilter", "$Object-NoteFilter",
-        "$Object-OpenParentObjectGraphFilter" };
+pwr_tString80 GeMethods::op_filter[GeMethods::opmeth_size] = {
+    "$Object-OpenGraphFilter", "$Object-OpenObjectGraphFilter",
+    "$Object-OpenTrendFilter", "$Object-OpenHistoryFilter",
+    "$Object-OpenFastFilter",  "$Object-CameraFilter",
+    "$Object-HistEventFilter", "$Object-BlockEventsFilter",
+    "$Object-HelpFilter",      "$Object-PhotoFilter",
+    "$Object-NoteFilter",      "$Object-OpenParentObjectGraphFilter"};
 
-pwr_tString80 GeMethods::mnt_name[GeMethods::mntmeth_size] = { "Open Object",
-  "Open Plc", "RtNavigator", "Crossreferences", "Help Class", "DataSheet",
-  "CircuitDiagram", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-  "", "", "", "", "", "", "", "", "", "Simulate" };
+pwr_tString80 GeMethods::mnt_name[GeMethods::mntmeth_size] = {"Open Object",
+                                                              "Open Plc",
+                                                              "RtNavigator",
+                                                              "Crossreferences",
+                                                              "Help Class",
+                                                              "DataSheet",
+                                                              "CircuitDiagram",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "",
+                                                              "Simulate"};
 
-pwr_tString80 GeMethods::mnt_subgraph[GeMethods::mntmeth_size]
-    = { "pwr_mb2openobject", "pwr_mb2openplc", "pwr_mb2rtnavigator",
-        "pwr_mb2crossreferences", "pwr_mb2helpclass", "pwr_mb2datasheet",
-        "pwr_mb2circuitdiagram", "", "", "", "", "", "", "", "", "", "", "", "",
-        "", "", "", "", "", "", "", "", "", "", "", "", "pwr_mb2simulate" };
+pwr_tString80 GeMethods::mnt_subgraph[GeMethods::mntmeth_size] = {"pwr_mb2openobject",
+                                                                  "pwr_mb2openplc",
+                                                                  "pwr_mb2rtnavigator",
+                                                                  "pwr_mb2crossreferences",
+                                                                  "pwr_mb2helpclass",
+                                                                  "pwr_mb2datasheet",
+                                                                  "pwr_mb2circuitdiagram",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "",
+                                                                  "pwr_mb2simulate"};
 
-pwr_tString80 GeMethods::mnt_image[GeMethods::mntmeth_size]
-    = { "$pwr_exe/xtt_meth_openobject.png", "$pwr_exe/xtt_meth_trace.png",
-        "$pwr_exe/xtt_meth_navigator.png", "$pwr_exe/xtt_meth_crossref.png",
-        "$pwr_exe/xtt_meth_classhelp.png", "$pwr_exe/xtt_meth_datasheet.png",
-        "$pwr_exe/xtt_meth_circuitdiagram.png", "", "", "", "", "", "", "", "",
-        "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
+pwr_tString80 GeMethods::mnt_image[GeMethods::mntmeth_size] = {"$pwr_exe/xtt_meth_openobject.png",
+                                                               "$pwr_exe/xtt_meth_trace.png",
+                                                               "$pwr_exe/xtt_meth_navigator.png",
+                                                               "$pwr_exe/xtt_meth_crossref.png",
+                                                               "$pwr_exe/xtt_meth_classhelp.png",
+                                                               "$pwr_exe/xtt_meth_datasheet.png",
+                                                               "$pwr_exe/xtt_meth_circuitdiagram.png",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               "",
+                                                               ""};
 
-pwr_tString80 GeMethods::mnt_tooltip[GeMethods::mntmeth_size]
-    = { "Open Object", "Open Plc", "Navigator", "Crossreferences", "Help Class",
-        "DataSheet", "CircuitDiagram", "", "", "", "", "", "", "", "", "", "",
-        "", "", "", "", "", "", "", "", "", "", "", "", "", "", "Simulate" };
+pwr_tString80 GeMethods::mnt_tooltip[GeMethods::mntmeth_size] = {"Open Object",
+                                                                 "Open Plc",
+                                                                 "Navigator",
+                                                                 "Crossreferences",
+                                                                 "Help Class",
+                                                                 "DataSheet",
+                                                                 "CircuitDiagram",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "",
+                                                                 "Simulate"};
 
-pwr_tString80 GeMethods::mnt_method[GeMethods::mntmeth_size]
-    = { "$Object-OpenObject", "$Object-OpenTrace", "$Object-RtNavigator",
-        "$Object-OpenCrossref", "$Object-HelpClass", "$Object-DataSheet",
-        "$Object-CircuitDiagram", "", "", "", "", "", "", "", "", "", "", "",
-        "", "", "", "", "", "", "", "", "", "", "", "", "",
-        "$Object-Simulate" };
+pwr_tString80 GeMethods::mnt_method[GeMethods::mntmeth_size] = {"$Object-OpenObject",
+                                                                "$Object-OpenTrace",
+                                                                "$Object-RtNavigator",
+                                                                "$Object-OpenCrossref",
+                                                                "$Object-HelpClass",
+                                                                "$Object-DataSheet",
+                                                                "$Object-CircuitDiagram",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "$Object-Simulate"};
 
-pwr_tString80 GeMethods::mnt_filter[GeMethods::mntmeth_size]
-    = { "$Object-OpenObjectFilter", "$Object-OpenTraceFilter",
-        "$Object-RtNavigatorFilter", "$Object-OpenCrossrefFilter",
-        "$Object-HelpClassFilter", "$Object-DataSheetFilter",
-        "$Object-CircuitDiagramFilter", "", "", "", "", "", "", "", "", "", "",
-        "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-        "$Object-SimulateFilter" };
+pwr_tString80 GeMethods::mnt_filter[GeMethods::mntmeth_size] = {"$Object-OpenObjectFilter",
+                                                                "$Object-OpenTraceFilter",
+                                                                "$Object-RtNavigatorFilter",
+                                                                "$Object-OpenCrossrefFilter",
+                                                                "$Object-HelpClassFilter",
+                                                                "$Object-DataSheetFilter",
+                                                                "$Object-CircuitDiagramFilter",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "",
+                                                                "$Object-SimulateFilter"};
 
-int GeMethods::get_xm_mask(pwr_tAttrRef* arp, char* name,
-    pwr_sClass_XttMethodsMask* xm_mask, int* configured,
-    int(command_cb)(char* cmd, void* udata), void* udata)
+int GeMethods::get_xm_mask(pwr_tAttrRef* arp, char* name, pwr_sClass_XttMethodsMask* xm_mask, int* configured,
+                           int(command_cb)(char* cmd, void* udata), void* udata)
 {
   pwr_tAName aname, xm_name;
   pwr_tStatus sts;
@@ -128,9 +284,12 @@ int GeMethods::get_xm_mask(pwr_tAttrRef* arp, char* name,
   int mask_configure = 0;
 
   *configured = 0;
-  if (name) {
+  if (name)
+  {
     strncpy(aname, name, sizeof(aname));
-  } else {
+  }
+  else
+  {
     sts = gdh_AttrrefToName(arp, aname, sizeof(aname), cdh_mName_pathStrict);
     if (EVEN(sts))
       return sts;
@@ -139,24 +298,29 @@ int GeMethods::get_xm_mask(pwr_tAttrRef* arp, char* name,
   strcpy(xm_name, aname);
   strcat(xm_name, ".XttMethodsMask");
   sts = gdh_GetObjectInfo(xm_name, xm_mask, sizeof(*xm_mask));
-  if (ODD(sts)) {
-    if (!(xm_mask->Flags & pwr_mXttMethodsFlagsMask_IsConfigured)) {
+  if (ODD(sts))
+  {
+    if (!(xm_mask->Flags & pwr_mXttMethodsFlagsMask_IsConfigured))
+    {
       mask_configure = 1;
       *configured = 1;
     }
-  } else {
+  }
+  else
+  {
     mask_configure = 1;
     xm_mask->Flags = 0;
   }
 
-  if (mask_configure) {
+  if (mask_configure)
+  {
     xm_mask->OpMethods = 0;
-    for (int i = 0; i < opmeth_size; i++) {
+    for (int i = 0; i < opmeth_size; i++)
+    {
       if (streq(op_name[i], ""))
         continue;
 
-      sprintf(
-          command, "check method/filter=\"%s\"/object=%s", op_filter[i], aname);
+      sprintf(command, "check method/filter=\"%s\"/object=%s", op_filter[i], aname);
 
       sts = (command_cb)(command, udata);
       if (ODD(sts))
@@ -164,12 +328,12 @@ int GeMethods::get_xm_mask(pwr_tAttrRef* arp, char* name,
     }
     xm_mask->MntMethods = 0;
 
-    for (int i = 0; i < mntmeth_size; i++) {
+    for (int i = 0; i < mntmeth_size; i++)
+    {
       if (streq(mnt_name[i], ""))
         continue;
 
-      sprintf(command, "check method/filter=\"%s\"/object=%s", mnt_filter[i],
-          aname);
+      sprintf(command, "check method/filter=\"%s\"/object=%s", mnt_filter[i], aname);
 
       sts = (command_cb)(command, udata);
       if (ODD(sts))

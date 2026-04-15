@@ -55,7 +55,8 @@ static int colpal_init_proc(QWidget* w, GlowCtx* fctx, void* client_data)
   QtScrollWidgetGlow* colpal = ((QtScrollWidgetGlow*)w);
   ColPalCtx* ctx = (ColPalCtx*)colpal->parent_ctx;
 
-  if (((QtScrollWidgetGlow*)w)->scroll_h) {
+  if (((QtScrollWidgetGlow*)w)->scroll_h)
+  {
     widget_sScroll* scroll_data = new widget_sScroll();
     scroll_data->parent = w;
     scroll_data->scroll_h = colpal->scroll_h;
@@ -68,19 +69,20 @@ static int colpal_init_proc(QWidget* w, GlowCtx* fctx, void* client_data)
 
   ctx->configure();
 
-  if (colpal->init_proc) {
+  if (colpal->init_proc)
+  {
     return (colpal->init_proc)(ctx, client_data);
-  } else {
+  }
+  else
+  {
     return 1;
   }
 }
 
-QWidget* scrolledcolpalwidgetqt_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
-    QWidget** colpalwidget)
+QWidget* scrolledcolpalwidgetqt_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
+                                    QWidget** colpalwidget)
 {
   QtScrollWidgetGlow* w = new QtScrollWidgetGlow();
   *colpalwidget = w;
-  return w->initScroll(
-      glow_eCtxType_ColPal, init_proc, client_data, colpal_init_proc);
+  return w->initScroll(glow_eCtxType_ColPal, init_proc, client_data, colpal_init_proc);
 }

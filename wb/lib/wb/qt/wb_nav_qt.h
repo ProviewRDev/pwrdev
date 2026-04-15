@@ -47,10 +47,11 @@
 
 class NavQtTraceObject;
 
-class NavQt : public Nav {
+class NavQt : public Nav
+{
 public:
-  NavQt(void* parent_ctx, const char* name, ldh_tSesContext ldhses,
-      const char* root_name, QWidget** w, pwr_tStatus* status);
+  NavQt(void* parent_ctx, const char* name, ldh_tSesContext ldhses, const char* root_name, QWidget** w,
+        pwr_tStatus* status);
   ~NavQt();
 
   QWidget* brow_widget;
@@ -65,7 +66,8 @@ private:
   NavQtTraceObject* trace_obj;
 };
 
-class NavQtTraceObject : public QObject {
+class NavQtTraceObject : public QObject
+{
   Q_OBJECT
 
 public:

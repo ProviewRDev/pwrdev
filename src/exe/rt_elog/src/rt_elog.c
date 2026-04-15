@@ -49,14 +49,14 @@
 
 #define Log_Error(a, b) errh_Error("%s\n%m", b, a)
 #define Log(b) errh_Info(b)
-#define Log_Error_Exit(a, b)                                                   \
-  {                                                                            \
-    Log_Error(a, b);                                                           \
-    errh_SetStatus(PWR__SRVTERM);                                              \
-    exit(a);                                                                   \
+#define Log_Error_Exit(a, b)                                                                                 \
+  {                                                                                                          \
+    Log_Error(a, b);                                                                                         \
+    errh_SetStatus(PWR__SRVTERM);                                                                            \
+    exit(a);                                                                                                 \
   }
-#define If_Error_Log_Exit(a, b)                                                \
-  if ((a & 1) != 1)                                                            \
+#define If_Error_Log_Exit(a, b)                                                                              \
+  if ((a & 1) != 1)                                                                                          \
   Log_Error_Exit(a, b)
 
 #define KEY_ARRAY_SIZE 50
@@ -67,8 +67,7 @@ static pwr_tStatus Insert(mh_sMsgInfo* ip);
 
 pwr_tInt32 GetOldestEvents(pwr_tUInt32* nrOfEvents, pwr_tUInt32* nrOfKeys);
 
-void Store(
-    pwr_tBoolean* firstTime, pwr_tUInt32* nrOfEvents, pwr_tUInt32* nrOfKeys);
+void Store(pwr_tBoolean* firstTime, pwr_tUInt32* nrOfEvents, pwr_tUInt32* nrOfKeys);
 
 static sEvent* CopyEvent(mh_sMsgInfo* ip);
 int compTime(sKey d1, sKey d2);
@@ -107,13 +106,15 @@ int main()
   Init();
 
   /* Create queue for receival of events */
-  if (!qcom_CreateQ(&sts, &my_q, NULL, "events")) {
+  if (!qcom_CreateQ(&sts, &my_q, NULL, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__APPLTERM);
     exit(sts);
   }
 
-  if (!qcom_Bind(&sts, &my_q, &qcom_cQini)) {
+  if (!qcom_Bind(&sts, &my_q, &qcom_cQini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     errh_SetStatus(PWR__APPLTERM);
     exit(-1);
@@ -122,18 +123,17 @@ int main()
   oid.vid = lHelCB.Nid;
   oid.oix = pwr_cNVolumeId;
 
-  sts = mh_OutunitConnect(oid, mh_eOutunitType_Logger,
-      mh_mOutunitFlags_ReadWait, (mh_cbOutunitAck)Insert,
-      (mh_cbOutunitAlarm)Insert, (mh_cbOutunitBlock)Insert,
-      (mh_cbOutunitCancel)Insert, NULL, NULL, (mh_cbOutunitInfo)Insert,
-      (mh_cbOutunitReturn)Insert, NULL);
+  sts = mh_OutunitConnect(oid, mh_eOutunitType_Logger, mh_mOutunitFlags_ReadWait, (mh_cbOutunitAck)Insert,
+                          (mh_cbOutunitAlarm)Insert, (mh_cbOutunitBlock)Insert, (mh_cbOutunitCancel)Insert,
+                          NULL, NULL, (mh_cbOutunitInfo)Insert, (mh_cbOutunitReturn)Insert, NULL);
   If_Error_Log_Exit(sts, "mh_OutunitConnect");
 
   sts = mh_OutunitSetTimeout(lHelCB.ScanTime);
 
   errh_SetStatus(PWR__SRUN);
 
-  for (;;) {
+  for (;;)
+  {
     sts = mh_OutunitReceive();
     if (EVEN(sts) && sts != MH__TMO)
       Log_Error(sts, "mh_OutunitReceive");
@@ -141,13 +141,17 @@ int main()
 
     get.data = NULL;
     qcom_Get(&sts, &my_q, &get, 0);
-    if (sts != QCOM__TMO && sts != QCOM__QEMPTY) {
-      if (get.type.b == qcom_eBtype_event) {
+    if (sts != QCOM__TMO && sts != QCOM__QEMPTY)
+    {
+      if (get.type.b == qcom_eBtype_event)
+      {
         qcom_sEvent* ep = (qcom_sEvent*)get.data;
         ini_mEvent new_event;
-        if (get.type.s == qcom_cIini) {
+        if (get.type.s == qcom_cIini)
+        {
           new_event.m = ep->mask;
-          if (new_event.b.terminate) {
+          if (new_event.b.terminate)
+          {
             errh_SetStatus(PWR__APPLTERM);
             exit(0);
           }
@@ -185,7 +189,8 @@ void Init()
   sts = gdh_DLRefObjectInfoAttrref(&AttrRef, (pwr_tAddress*)&MH, &DLId);
   If_Error_Log_Exit(sts, "Couldn't get direct link to message handler object");
 
-  if (MH->EventLogSize == 0) {
+  if (MH->EventLogSize == 0)
+  {
     Log("EventLogSize = 0, no event logger will run on this node.");
     errh_SetStatus(pwr_cNStatus);
     exit(1);
@@ -193,24 +198,25 @@ void Init()
 
   lHelCB.MaxCardinality = MH->EventLogSize;
   lHelCB.MaxStoreLSize = 1000; /*not used*/
-  lHelCB.ScanTime = 2000; /* 5 seconds */
+  lHelCB.ScanTime = 2000;      /* 5 seconds */
 
   /*create the database if it's not already created*/
-  if ((ret = db_create(&dataBaseP, NULL, 0)) != 0) {
+  if ((ret = db_create(&dataBaseP, NULL, 0)) != 0)
+  {
     /*error creating db-handle send the mess to errh, then exit*/
     sprintf(msg, "db_create: %s, no eventlogger will run", db_strerror(ret));
     errh_Error(msg);
     exit(1);
   }
-/*open the database*/
+  /*open the database*/
 
 #if (DB_VERSION_MAJOR > 3) && (DB_VERSION_MINOR > 0)
-  ret = dataBaseP->open(
-      dataBaseP, NULL, fname, NULL, DATABASETYPE, DB_CREATE, 0664);
+  ret = dataBaseP->open(dataBaseP, NULL, fname, NULL, DATABASETYPE, DB_CREATE, 0664);
 #else
   ret = dataBaseP->open(dataBaseP, fname, NULL, DATABASETYPE, DB_CREATE, 0664);
 #endif
-  if (ret != 0) {
+  if (ret != 0)
+  {
     /*error opening/creating db send the mess to errh, then exit*/
     sprintf(msg, "db_open: %s, no eventlogger will run", db_strerror(ret));
     Log(msg);
@@ -245,7 +251,8 @@ static pwr_tStatus Insert(mh_sMsgInfo* ip)
   data.data = (void*)sp;
   data.size = sizeof(sEvent);
 
-  switch (ret = dataBaseP->put(dataBaseP, NULL, &key, &data, DB_NOOVERWRITE)) {
+  switch (ret = dataBaseP->put(dataBaseP, NULL, &key, &data, DB_NOOVERWRITE))
+  {
   case 0:
     /*everything is good*/
     nrOfInsertsSinceLastTime++;
@@ -263,8 +270,7 @@ static pwr_tStatus Insert(mh_sMsgInfo* ip)
   return MH__SUCCESS;
 }
 
-void Store(
-    pwr_tBoolean* firstTime, pwr_tUInt32* nrOfEvents, pwr_tUInt32* nrOfKeys)
+void Store(pwr_tBoolean* firstTime, pwr_tUInt32* nrOfEvents, pwr_tUInt32* nrOfKeys)
 {
   char msg[80];
   pwr_tInt32 ret = 0;
@@ -276,17 +282,20 @@ void Store(
   dataBaseP->sync(dataBaseP, 0);
 
   /*check if it's time to clean the DB*/
-  if (*firstTime
-      || ((*nrOfEvents + nrOfInsertsSinceLastTime) > lHelCB.MaxCardinality)) {
+  if (*firstTime || ((*nrOfEvents + nrOfInsertsSinceLastTime) > lHelCB.MaxCardinality))
+  {
     *firstTime = FALSE;
-    if (nrOfInsertsSinceLastTime > 0) {
+    if (nrOfInsertsSinceLastTime > 0)
+    {
       nrOfInsertsSinceLastTime--;
       *nrOfEvents = *nrOfEvents + 1;
     }
-    if (*nrOfKeys <= 0) {
+    if (*nrOfKeys <= 0)
+    {
       ret = GetOldestEvents(nrOfEvents, nrOfKeys);
       nrOfInsertsSinceLastTime = 0;
-      switch (ret) {
+      switch (ret)
+      {
       case RT_ELOG_UNKNOWN_ERROR:
         errh_Error("RT_ELOG_UNKNOWN_ERROR");
         break;
@@ -298,19 +307,23 @@ void Store(
         errh_Error("Undefined return: %d", ret);
         break;
       }
-    } else {
+    }
+    else
+    {
       lanklank = firstlink(listhead);
       skey = getlink(lanklank);
       memset(&key, 0, sizeof(key));
       key.data = &skey;
       key.size = sizeof(sKey);
 
-      if ((ret = dataBaseP->del(dataBaseP, NULL, &key, 0)) != 0) {
-        sprintf(msg,
-            "Error deleting Record in HistDB nrOfKeys = %d Errmess=%s\n",
-            *nrOfKeys, db_strerror(ret));
+      if ((ret = dataBaseP->del(dataBaseP, NULL, &key, 0)) != 0)
+      {
+        sprintf(msg, "Error deleting Record in HistDB nrOfKeys = %d Errmess=%s\n", *nrOfKeys,
+                db_strerror(ret));
         Log(msg);
-      } else {
+      }
+      else
+      {
         *nrOfEvents = *nrOfEvents - 1;
       }
 
@@ -318,15 +331,20 @@ void Store(
       *nrOfKeys = *nrOfKeys - 1;
     }
   }
-  if (*nrOfKeys > 0) {
+  if (*nrOfKeys > 0)
+  {
     lanklank = firstlink(listhead);
-    if (lanklank != 0) {
-      writeInfo(
-          *nrOfEvents + nrOfInsertsSinceLastTime, 0, &lanklank->data.EventTime);
-    } else {
+    if (lanklank != 0)
+    {
+      writeInfo(*nrOfEvents + nrOfInsertsSinceLastTime, 0, &lanklank->data.EventTime);
+    }
+    else
+    {
       writeInfo(*nrOfEvents + nrOfInsertsSinceLastTime, 0, NULL);
     }
-  } else {
+  }
+  else
+  {
     writeInfo(*nrOfEvents + nrOfInsertsSinceLastTime, 0, NULL);
   }
 }
@@ -344,7 +362,8 @@ pwr_tInt32 GetOldestEvents(pwr_tUInt32* nrOfEvents, pwr_tUInt32* nrOfKeys)
   dbcp = NULL;
 
   /* Acquire a cursor for the database. */
-  if ((ret = dataBaseP->cursor(dataBaseP, NULL, &dbcp, 0)) != 0) {
+  if ((ret = dataBaseP->cursor(dataBaseP, NULL, &dbcp, 0)) != 0)
+  {
     errh_Error("error dataBaseP->cursor: %s\n", db_strerror(ret));
     return RT_ELOG_UNKNOWN_ERROR;
   }
@@ -354,7 +373,8 @@ pwr_tInt32 GetOldestEvents(pwr_tUInt32* nrOfEvents, pwr_tUInt32* nrOfKeys)
   memset(&data, 0, sizeof(data));
 
   /*Get the first event*/
-  if ((ret = dbcp->c_get(dbcp, &key, &data, DB_FIRST)) != 0) {
+  if ((ret = dbcp->c_get(dbcp, &key, &data, DB_FIRST)) != 0)
+  {
     *nrOfEvents = 0;
     return RT_ELOG_DB_EMPTY;
   }
@@ -366,7 +386,8 @@ pwr_tInt32 GetOldestEvents(pwr_tUInt32* nrOfEvents, pwr_tUInt32* nrOfKeys)
   insort(lanklank, listhead, &compTime);
   tmp++;
 
-  while ((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0) {
+  while ((ret = dbcp->c_get(dbcp, &key, &data, DB_NEXT)) == 0)
+  {
     evCount++;
 
     tmpData = (sKey*)key.data;
@@ -374,20 +395,23 @@ pwr_tInt32 GetOldestEvents(pwr_tUInt32* nrOfEvents, pwr_tUInt32* nrOfKeys)
     putlink(*tmpData, lanklank);
     insort(lanklank, listhead, &compTime);
     tmp++;
-    if (nrlinks(listhead) > KEY_ARRAY_SIZE) {
+    if (nrlinks(listhead) > KEY_ARRAY_SIZE)
+    {
       tmp--;
       lanklank = lastlink(listhead);
       elimlink(&lanklank);
     }
   }
 
-  if (ret != DB_NOTFOUND) {
+  if (ret != DB_NOTFOUND)
+  {
     errh_Error("Error dbcp->c_get(DB_NEXT): %s\n", db_strerror(ret));
     return RT_ELOG_UNKNOWN_ERROR;
   }
 
   /*Close the cursor*/
-  if ((ret = dbcp->c_close(dbcp)) != 0) {
+  if ((ret = dbcp->c_close(dbcp)) != 0)
+  {
     errh_Error("Error dbcp_oldest->c_close(): %s\n", db_strerror(ret));
   }
   *nrOfEvents = evCount;
@@ -409,7 +433,8 @@ sEvent* CopyEvent(mh_sMsgInfo* ip)
   sp->EventType = ip->EventType;
   sp->EventTime = net_NetTimeToTime(&ip->EventTime);
 
-  switch (ip->EventType) {
+  switch (ip->EventType)
+  {
   case mh_eEvent_Alarm:
   case mh_eEvent_MaintenanceAlarm:
   case mh_eEvent_SystemAlarm:
@@ -443,7 +468,8 @@ sEvent* CopyEvent(mh_sMsgInfo* ip)
 
 int compTime(sKey d1, sKey d2)
 {
-  if (time_Acomp(&(d1.EventTime), &(d2.EventTime)) < 0) {
+  if (time_Acomp(&(d1.EventTime), &(d2.EventTime)) < 0)
+  {
     return 1;
   }
   return 0;
@@ -455,17 +481,16 @@ int writeInfo(int nrOfEvents, int firstTimeEver, pwr_tTime* oldestEventTime)
   char time_str[40];
 
   time_str[0] = 0;
-  if (oldestEventTime != NULL) {
-    time_AtoAscii(
-        oldestEventTime, time_eFormat_DateAndTime, time_str, sizeof(time_str));
+  if (oldestEventTime != NULL)
+  {
+    time_AtoAscii(oldestEventTime, time_eFormat_DateAndTime, time_str, sizeof(time_str));
   }
   // open a file to print info about the database to
   info_file = fopen(info_fname, "w");
   if (info_file == NULL)
     return 2;
 
-  fprintf(
-      info_file, "NrOfEvents:%d OldestEventTime:%s\n", nrOfEvents, time_str);
+  fprintf(info_file, "NrOfEvents:%d OldestEventTime:%s\n", nrOfEvents, time_str);
   fclose(info_file);
   return 1;
 }

@@ -46,18 +46,18 @@
 #define PB_MODULE_STATE_NOTINIT 0
 #define PB_MODULE_STATE_OPERATE 1
 
-//#define PB_SLAVE_STATE_NOTINIT 0
-//#define PB_SLAVE_STATE_STOPPED 1
-//#define PB_SLAVE_STATE_OPERATE 2
+// #define PB_SLAVE_STATE_NOTINIT 0
+// #define PB_SLAVE_STATE_STOPPED 1
+// #define PB_SLAVE_STATE_OPERATE 2
 
-//#define PB_MASTER_STATE_NOTINIT 0
-//#define PB_MASTER_STATE_STOPPED 1
-//#define PB_MASTER_STATE_CLEARED 2
-//#define PB_MASTER_STATE_OPERATE 3
+// #define PB_MASTER_STATE_NOTINIT 0
+// #define PB_MASTER_STATE_STOPPED 1
+// #define PB_MASTER_STATE_CLEARED 2
+// #define PB_MASTER_STATE_OPERATE 3
 
-//#define PB_STALLACTION_NONE	0
-//#define PB_STALLACTION_RESET 	1
-//#define PB_STALLACTION_BREAK 	2
+// #define PB_STALLACTION_NONE	0
+// #define PB_STALLACTION_RESET 	1
+// #define PB_STALLACTION_BREAK 	2
 
 #define PB_NUMREP_UNSIGNEDINT 0
 #define PB_NUMREP_SIGNEDINT 1
@@ -65,8 +65,8 @@
 #define PB_NUMREP_FLOATVAX 3
 #define PB_NUMREP_FLOATINTEL 4
 
-//#define PB_BYTEORDERING_LE	0
-//#define PB_BYTEORDERING_BE	1
+// #define PB_BYTEORDERING_LE	0
+// #define PB_BYTEORDERING_BE	1
 
 #define PB_ORIENTATION_BYTE 8
 #define PB_ORIENTATION_WORD 16
@@ -78,16 +78,19 @@
 
 typedef pwr_tMask mb_tSendMask;
 
-typedef enum {
+typedef enum
+{
   mb_mSendMask_ReadReq = 1,
   mb_mSendMask_WriteReq = 2,
 } mb_mSendMask;
 
-typedef struct {
+typedef struct
+{
   int initialized;
 } io_sAgentLocal;
 
-typedef struct {
+typedef struct
+{
   int initialized;
   int s;
   short int trans_id;
@@ -103,7 +106,8 @@ typedef struct {
   int reset_inputs;
 } io_sRackLocal;
 
-typedef struct {
+typedef struct
+{
   void* input_area;
   void* output_area;
   int scancount[IO_MAXCHAN];
@@ -116,11 +120,13 @@ typedef struct {
   int has_read_method;
 } io_sCardLocalMsg;
 
-typedef struct {
+typedef struct
+{
   io_sCardLocalMsg msg[2];
 } io_sCardLocal;
 
-typedef struct {
+typedef struct
+{
   pwr_tTime last_req_time;
   thread_s t;
   int c_socket;
@@ -129,7 +135,8 @@ typedef struct {
   int occupied;
 } io_sServerConnection;
 
-typedef struct {
+typedef struct
+{
   int initialized;
   int s;
   int current_socket;
@@ -139,13 +146,14 @@ typedef struct {
   int output_size;
   thread_sMutex mutex;
   io_sServerConnection connections[MB_MAX_CONNECTIONS];
-  void *inputs;
-  void *outputs;
+  void* inputs;
+  void* outputs;
   unsigned int inputs_size;
   unsigned int outputs_size;
 } io_sServerLocal;
 
-typedef struct {
+typedef struct
+{
   void* input_area;
   void* output_area;
   int scancount[IO_MAXCHAN];
@@ -161,39 +169,45 @@ typedef struct {
 } io_sServerModuleLocal;
 
 #pragma pack(1)
-typedef struct {
+typedef struct
+{
   unsigned char protocol_id[2];
   short int msg_size;
   short int msg_id[2];
 } remote_tcp_header;
 
-typedef struct _mbap_header {
+typedef struct _mbap_header
+{
   short int trans_id;
   short int proto_id;
   short int length;
   unsigned char unit_id;
 } mbap_header;
 
-typedef struct _read_req {
+typedef struct _read_req
+{
   mbap_header head;
   unsigned char fc;
   short int addr;
   short int quant;
 } read_req;
 
-typedef struct _rec_buf {
+typedef struct _rec_buf
+{
   mbap_header head;
   short int buf[1000];
 } rec_buf;
 
-typedef struct _write_single_req {
+typedef struct _write_single_req
+{
   mbap_header head;
   unsigned char fc;
   short int addr;
   short int value;
 } write_single_req;
 
-typedef struct _write_reg_req {
+typedef struct _write_reg_req
+{
   mbap_header head;
   unsigned char fc;
   short int addr;
@@ -202,7 +216,8 @@ typedef struct _write_reg_req {
   short int reg[125];
 } write_reg_req;
 
-typedef struct _write_coils_req {
+typedef struct _write_coils_req
+{
   mbap_header head;
   unsigned char fc;
   short int addr;
@@ -211,7 +226,8 @@ typedef struct _write_coils_req {
   unsigned char reg[250];
 } write_coils_req;
 
-typedef struct _read_dev_id_req {
+typedef struct _read_dev_id_req
+{
   mbap_header head;
   unsigned char fc;
   unsigned char mei_type;
@@ -219,52 +235,60 @@ typedef struct _read_dev_id_req {
   unsigned char object_id;
 } read_dev_id_req;
 
-typedef struct _res_write {
+typedef struct _res_write
+{
   unsigned char fc;
   short int addr;
   short int quant;
   short int buf[250];
 } res_write;
 
-typedef struct _res_read {
+typedef struct _res_read
+{
   unsigned char fc;
   unsigned char bc;
   short int buf[250];
 } res_read;
 
-typedef struct _res_fault {
+typedef struct _res_fault
+{
   unsigned char fc;
   unsigned char ec;
 } res_fault;
 
-typedef struct _rsp_fault {
+typedef struct _rsp_fault
+{
   mbap_header head;
   unsigned char fc;
   unsigned char ec;
 } rsp_fault;
 
-typedef struct _rsp_read {
+typedef struct _rsp_read
+{
   mbap_header head;
   unsigned char fc;
   unsigned char bc;
   short int buf[250];
 } rsp_read;
 
-typedef struct _rsp_write {
+typedef struct _rsp_write
+{
   mbap_header head;
   unsigned char fc;
   short int addr;
   short int quant;
 } rsp_write;
 
-typedef struct _rsp_single_write {
+typedef struct _rsp_single_write
+{
   mbap_header head;
   unsigned char fc;
   short int addr;
   short int value;
 } rsp_single_write;
 
-typedef struct _rsp_dev_id {
+typedef struct _rsp_dev_id
+{
   mbap_header head;
   unsigned char fc;
   unsigned char mei_type;
@@ -278,8 +302,7 @@ typedef struct _rsp_dev_id {
 
 #pragma pack(0)
 
-pwr_tStatus mb_recv_data(
-    io_sRackLocal* local, io_sRack* rp, pwr_sClass_Modbus_TCP_Slave* sp);
+pwr_tStatus mb_recv_data(io_sRackLocal* local, io_sRack* rp, pwr_sClass_Modbus_TCP_Slave* sp);
 
-pwr_tStatus mb_send_data(io_sRackLocal* local, io_sRack* rp,
-    pwr_sClass_Modbus_TCP_Slave* sp, mb_tSendMask mask);
+pwr_tStatus mb_send_data(io_sRackLocal* local, io_sRack* rp, pwr_sClass_Modbus_TCP_Slave* sp,
+                         mb_tSendMask mask);

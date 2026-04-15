@@ -60,8 +60,7 @@
 /*----------------------------------------------------------------------------*\
    Init method for the Modbus module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sServerModuleLocal* local;
   pwr_sClass_Modbus_TCP_ServerModule* op;
@@ -70,7 +69,8 @@ static pwr_tStatus IoCardInit(
   op = (pwr_sClass_Modbus_TCP_ServerModule*)cp->op;
   local = (io_sServerModuleLocal*)cp->Local;
 
-  for (i = 0; i < IO_MAXCHAN; i++) {
+  for (i = 0; i < IO_MAXCHAN; i++)
+  {
     local->scancount[i] = 0;
   }
 
@@ -82,8 +82,7 @@ static pwr_tStatus IoCardInit(
 /*----------------------------------------------------------------------------*\
    Read method for the Modbus TCP module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sServerModuleLocal* local;
   io_sServerLocal* local_server;
@@ -98,11 +97,12 @@ static pwr_tStatus IoCardRead(
   if (server->DisableServer || !local)
     return IO__SUCCESS;
 
-  if (server->Status == MB__NORMAL) {
+  if (server->Status == MB__NORMAL)
+  {
     thread_MutexLock(&local_server->mutex);
 
-    io_bus_card_read(ctx, rp, cp, local->input_area, NULL,
-        pwr_eByteOrderingEnum_BigEndian, pwr_eFloatRepEnum_FloatIntel);
+    io_bus_card_read(ctx, rp, cp, local->input_area, NULL, pwr_eByteOrderingEnum_BigEndian,
+                     pwr_eFloatRepEnum_FloatIntel);
 
     thread_MutexUnlock(&local_server->mutex);
   }
@@ -113,8 +113,7 @@ static pwr_tStatus IoCardRead(
 /*----------------------------------------------------------------------------*\
    Write method for the Pb module
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sServerModuleLocal* local;
   io_sServerLocal* local_server;
@@ -129,11 +128,12 @@ static pwr_tStatus IoCardWrite(
   if (server->DisableServer || !local)
     return IO__SUCCESS;
 
-  if (server->Status == MB__NORMAL) {
+  if (server->Status == MB__NORMAL)
+  {
     thread_MutexLock(&local_server->mutex);
 
-    io_bus_card_write(ctx, cp, local->output_area,
-        pwr_eByteOrderingEnum_BigEndian, pwr_eFloatRepEnum_FloatIntel);
+    io_bus_card_write(ctx, cp, local->output_area, pwr_eByteOrderingEnum_BigEndian,
+                      pwr_eFloatRepEnum_FloatIntel);
 
     thread_MutexUnlock(&local_server->mutex);
   }
@@ -145,6 +145,6 @@ static pwr_tStatus IoCardWrite(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Modbus_TCP_ServerModule)
-    = { pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardRead),
-        pwr_BindIoMethod(IoCardWrite), pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Modbus_TCP_ServerModule) = {pwr_BindIoMethod(IoCardInit),
+                                                          pwr_BindIoMethod(IoCardRead),
+                                                          pwr_BindIoMethod(IoCardWrite), pwr_NullMethod};

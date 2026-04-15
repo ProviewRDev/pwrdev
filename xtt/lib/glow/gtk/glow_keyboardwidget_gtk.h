@@ -41,23 +41,18 @@
 #include "glow_growctx.h"
 
 #define KEYBOARDWIDGETGTK_TYPE (keyboardwidgetgtk_get_type())
-#define KEYBOARDWIDGETGTK(obj)                                                 \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), KEYBOARDWIDGETGTK_TYPE, KeyboardWidgetGtk))
-#define KEYBOARDWIDGETGTK_CLASS(obj)                                           \
+#define KEYBOARDWIDGETGTK(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), KEYBOARDWIDGETGTK_TYPE, KeyboardWidgetGtk))
+#define KEYBOARDWIDGETGTK_CLASS(obj)                                                                         \
   (G_TYPE_CHECK_CLASS_CAST((obj), KEYBOARDWIDGETGTK, KeyboardWidgetGtkClass))
-#define IS_KEYBOARDWIDGETGTK(obj)                                              \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), KEYBOARDWIDGETGTK_TYPE))
-#define IS_KEYBOARDWIDGETGTK_CLASS(obj)                                        \
-  (G_TYPE_CHECK_CLASS_TYPE((obj), KEYBOARDWIDGETGTK_TYPE))
-#define KEYBOARDWIDGETGTK_GET_CLASS                                            \
+#define IS_KEYBOARDWIDGETGTK(obj) (G_TYPE_CHECK_INSTANCE_TYPE((obj), KEYBOARDWIDGETGTK_TYPE))
+#define IS_KEYBOARDWIDGETGTK_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE((obj), KEYBOARDWIDGETGTK_TYPE))
+#define KEYBOARDWIDGETGTK_GET_CLASS                                                                          \
   (G_TYPE_INSTANCE_GET_CLASS((obj), KEYBOARDWIDGETGTK, KeyboardWidgetGtkClass))
 
 GType keyboardwidgetgtk_get_type(void);
 
-GtkWidget* keyboardwidgetgtk_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data);
-GtkWidget* scrolledkeyboardwidgetgtk_new(
-    int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
-    GtkWidget** growwidget);
+GtkWidget* keyboardwidgetgtk_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data);
+GtkWidget* scrolledkeyboardwidgetgtk_new(int (*init_proc)(GlowCtx* ctx, void* client_data), void* client_data,
+                                         GtkWidget** growwidget);
 
 GtkWidget* keyboardnavwidgetgtk_new(GtkWidget* main_grow);

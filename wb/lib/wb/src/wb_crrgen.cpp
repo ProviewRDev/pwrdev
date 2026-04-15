@@ -45,32 +45,37 @@
 #include "wb_crrgen.h"
 #include "wb_utl.h"
 
-typedef enum {
+typedef enum
+{
   crrgen_eType_,
   crrgen_eType_Write,
   crrgen_eType_Read,
   crrgen_eType_Ref
 } crrgen_eType;
 
-typedef enum {
+typedef enum
+{
   crrgen_eTable_,
   crrgen_eTable_Object,
   crrgen_eTable_Signal,
   crrgen_eTable_SimSignal
 } crrgen_eTable;
 
-typedef struct sCrrKey {
+typedef struct sCrrKey
+{
   pwr_tAttrRef target;
   pwr_tAttrRef reference;
   crrgen_eType type;
 } sArefKey;
 
-typedef struct sCrr {
+typedef struct sCrr
+{
   tree_sNode node;
   sCrrKey key;
 } sCrr;
 
-typedef struct {
+typedef struct
+{
   pwr_tCid cid;
   pwr_tObjName body;
   pwr_tObjName attr;
@@ -79,180 +84,95 @@ typedef struct {
   int is_oid;
 } crrgen_tRefList;
 
-static crrgen_tRefList reflist[]
-    = { { pwr_cClass_plc, "DevBody", "ResetObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_resdv, "DevBody", "DvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_setdv, "DevBody", "DvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_stodv, "DevBody", "DvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetDv, "DevBody", "DvObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetDo, "DevBody", "DoObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_resdo, "DevBody", "DoObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_setdo, "DevBody", "DoObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_stodo, "DevBody", "DoObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetDi, "DevBody", "DiObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_cstoav, "DevBody", "AvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetAv, "DevBody", "AvObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_stoav, "DevBody", "AvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_cstoao, "DevBody", "AoObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetAo, "DevBody", "AoObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_stoao, "DevBody", "AoObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetAi, "DevBody", "AiObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_pos3p, "DevBody", "DoOpen", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_pos3p, "DevBody", "DoClose", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_inc3p, "DevBody", "DoOpen", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_inc3p, "DevBody", "DoClose", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_stodp, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_setdp, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_resdp, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_GetDp, "DevBody", "DpObject", crrgen_eType_Read,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_cstoap, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_GetAp, "DevBody", "ApObject", crrgen_eType_Read,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_stoap, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_GetPi, "DevBody", "CoObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_CStoIp, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_GetIp, "DevBody", "IpObject", crrgen_eType_Read,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_StoIp, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_stoii, "DevBody", "IiObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_stoio, "DevBody", "IoObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_stoiv, "DevBody", "IvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_cstoii, "DevBody", "IiObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_cstoio, "DevBody", "IoObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_cstoiv, "DevBody", "IvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetIi, "DevBody", "IiObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetIo, "DevBody", "IoObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetIv, "DevBody", "IvObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetSv, "DevBody", "SvObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_stosv, "DevBody", "SvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_cstosv, "DevBody", "SvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetSp, "DevBody", "SpObject", crrgen_eType_Read,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_stosp, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_cstosp, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_GetATv, "DevBody", "ATvObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_StoATv, "DevBody", "ATvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_CStoATv, "DevBody", "ATvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetATp, "DevBody", "ATpObject", crrgen_eType_Read,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_StoATp, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_CStoATp, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_GetDTv, "DevBody", "DTvObject", crrgen_eType_Read,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_StoDTv, "DevBody", "DTvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_CStoDTv, "DevBody", "DTvObject", crrgen_eType_Write,
-            crrgen_eTable_Signal, 0 },
-        { pwr_cClass_GetDTp, "DevBody", "DTpObject", crrgen_eType_Read,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_StoDTp, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_CStoDTp, "DevBody", "Object", crrgen_eType_Write,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_reset_so, "DevBody", "OrderObject", crrgen_eType_Read,
-            crrgen_eTable_Object, 1 },
-        { pwr_cClass_GetData, "DevBody", "DataObject", crrgen_eType_Ref,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_GetConstAv, "DevBody", "AvObject", crrgen_eType_Read,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_GetConstIv, "DevBody", "IvObject", crrgen_eType_Read,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_Di, "RtBody", "SigChanCon", crrgen_eType_Ref,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_Do, "RtBody", "SigChanCon", crrgen_eType_Ref,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_Po, "RtBody", "SigChanCon", crrgen_eType_Ref,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_Ai, "RtBody", "SigChanCon", crrgen_eType_Ref,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_Ao, "RtBody", "SigChanCon", crrgen_eType_Ref,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_Ii, "RtBody", "SigChanCon", crrgen_eType_Ref,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_Io, "RtBody", "SigChanCon", crrgen_eType_Ref,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_Co, "RtBody", "SigChanCon", crrgen_eType_Ref,
-            crrgen_eTable_Object, 0 },
-        { pwr_cClass_resdi, "DevBody", "DiObject", crrgen_eType_Write,
-            crrgen_eTable_SimSignal, 0 },
-        { pwr_cClass_setdi, "DevBody", "DiObject", crrgen_eType_Write,
-            crrgen_eTable_SimSignal, 0 },
-        { pwr_cClass_stodi, "DevBody", "DiObject", crrgen_eType_Write,
-            crrgen_eTable_SimSignal, 0 },
-        { pwr_cClass_toggledi, "DevBody", "DiObject", crrgen_eType_Write,
-            crrgen_eTable_SimSignal, 0 },
-        { pwr_cClass_stopi, "DevBody", "CoObject", crrgen_eType_Write,
-            crrgen_eTable_SimSignal, 0 },
-        { pwr_cClass_cstoai, "DevBody", "AiObject", crrgen_eType_Write,
-            crrgen_eTable_SimSignal, 0 },
-        { pwr_cClass_stoai, "DevBody", "AiObject", crrgen_eType_Write,
-            crrgen_eTable_SimSignal, 0 },
-        { pwr_cClass_cstoii, "DevBody", "IiObject", crrgen_eType_Write,
-            crrgen_eTable_SimSignal, 0 },
-        { pwr_cClass_stoii, "DevBody", "IiObject", crrgen_eType_Write,
-            crrgen_eTable_SimSignal, 0 },
-        { pwr_cClass_MountObject, "SysBody", "Object", crrgen_eType_Ref,
-            crrgen_eTable_Object, 1 } };
+static crrgen_tRefList reflist[] = {
+    {pwr_cClass_plc, "DevBody", "ResetObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_resdv, "DevBody", "DvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_setdv, "DevBody", "DvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_stodv, "DevBody", "DvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetDv, "DevBody", "DvObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetDo, "DevBody", "DoObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_resdo, "DevBody", "DoObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_setdo, "DevBody", "DoObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_stodo, "DevBody", "DoObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetDi, "DevBody", "DiObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_cstoav, "DevBody", "AvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetAv, "DevBody", "AvObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_stoav, "DevBody", "AvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_cstoao, "DevBody", "AoObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetAo, "DevBody", "AoObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_stoao, "DevBody", "AoObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetAi, "DevBody", "AiObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_pos3p, "DevBody", "DoOpen", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_pos3p, "DevBody", "DoClose", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_inc3p, "DevBody", "DoOpen", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_inc3p, "DevBody", "DoClose", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_stodp, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_setdp, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_resdp, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_GetDp, "DevBody", "DpObject", crrgen_eType_Read, crrgen_eTable_Object, 0},
+    {pwr_cClass_cstoap, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_GetAp, "DevBody", "ApObject", crrgen_eType_Read, crrgen_eTable_Object, 0},
+    {pwr_cClass_stoap, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_GetPi, "DevBody", "CoObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_CStoIp, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_GetIp, "DevBody", "IpObject", crrgen_eType_Read, crrgen_eTable_Object, 0},
+    {pwr_cClass_StoIp, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_stoii, "DevBody", "IiObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_stoio, "DevBody", "IoObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_stoiv, "DevBody", "IvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_cstoii, "DevBody", "IiObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_cstoio, "DevBody", "IoObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_cstoiv, "DevBody", "IvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetIi, "DevBody", "IiObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetIo, "DevBody", "IoObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetIv, "DevBody", "IvObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetSv, "DevBody", "SvObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_stosv, "DevBody", "SvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_cstosv, "DevBody", "SvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetSp, "DevBody", "SpObject", crrgen_eType_Read, crrgen_eTable_Object, 0},
+    {pwr_cClass_stosp, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_cstosp, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_GetATv, "DevBody", "ATvObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_StoATv, "DevBody", "ATvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_CStoATv, "DevBody", "ATvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetATp, "DevBody", "ATpObject", crrgen_eType_Read, crrgen_eTable_Object, 0},
+    {pwr_cClass_StoATp, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_CStoATp, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_GetDTv, "DevBody", "DTvObject", crrgen_eType_Read, crrgen_eTable_Signal, 0},
+    {pwr_cClass_StoDTv, "DevBody", "DTvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_CStoDTv, "DevBody", "DTvObject", crrgen_eType_Write, crrgen_eTable_Signal, 0},
+    {pwr_cClass_GetDTp, "DevBody", "DTpObject", crrgen_eType_Read, crrgen_eTable_Object, 0},
+    {pwr_cClass_StoDTp, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_CStoDTp, "DevBody", "Object", crrgen_eType_Write, crrgen_eTable_Object, 0},
+    {pwr_cClass_reset_so, "DevBody", "OrderObject", crrgen_eType_Read, crrgen_eTable_Object, 1},
+    {pwr_cClass_GetData, "DevBody", "DataObject", crrgen_eType_Ref, crrgen_eTable_Object, 0},
+    {pwr_cClass_GetConstAv, "DevBody", "AvObject", crrgen_eType_Read, crrgen_eTable_Object, 0},
+    {pwr_cClass_GetConstIv, "DevBody", "IvObject", crrgen_eType_Read, crrgen_eTable_Object, 0},
+    {pwr_cClass_Di, "RtBody", "SigChanCon", crrgen_eType_Ref, crrgen_eTable_Object, 0},
+    {pwr_cClass_Do, "RtBody", "SigChanCon", crrgen_eType_Ref, crrgen_eTable_Object, 0},
+    {pwr_cClass_Po, "RtBody", "SigChanCon", crrgen_eType_Ref, crrgen_eTable_Object, 0},
+    {pwr_cClass_Ai, "RtBody", "SigChanCon", crrgen_eType_Ref, crrgen_eTable_Object, 0},
+    {pwr_cClass_Ao, "RtBody", "SigChanCon", crrgen_eType_Ref, crrgen_eTable_Object, 0},
+    {pwr_cClass_Ii, "RtBody", "SigChanCon", crrgen_eType_Ref, crrgen_eTable_Object, 0},
+    {pwr_cClass_Io, "RtBody", "SigChanCon", crrgen_eType_Ref, crrgen_eTable_Object, 0},
+    {pwr_cClass_Co, "RtBody", "SigChanCon", crrgen_eType_Ref, crrgen_eTable_Object, 0},
+    {pwr_cClass_resdi, "DevBody", "DiObject", crrgen_eType_Write, crrgen_eTable_SimSignal, 0},
+    {pwr_cClass_setdi, "DevBody", "DiObject", crrgen_eType_Write, crrgen_eTable_SimSignal, 0},
+    {pwr_cClass_stodi, "DevBody", "DiObject", crrgen_eType_Write, crrgen_eTable_SimSignal, 0},
+    {pwr_cClass_toggledi, "DevBody", "DiObject", crrgen_eType_Write, crrgen_eTable_SimSignal, 0},
+    {pwr_cClass_stopi, "DevBody", "CoObject", crrgen_eType_Write, crrgen_eTable_SimSignal, 0},
+    {pwr_cClass_cstoai, "DevBody", "AiObject", crrgen_eType_Write, crrgen_eTable_SimSignal, 0},
+    {pwr_cClass_stoai, "DevBody", "AiObject", crrgen_eType_Write, crrgen_eTable_SimSignal, 0},
+    {pwr_cClass_cstoii, "DevBody", "IiObject", crrgen_eType_Write, crrgen_eTable_SimSignal, 0},
+    {pwr_cClass_stoii, "DevBody", "IiObject", crrgen_eType_Write, crrgen_eTable_SimSignal, 0},
+    {pwr_cClass_MountObject, "SysBody", "Object", crrgen_eType_Ref, crrgen_eTable_Object, 1}};
 
-static crrgen_tRefList codelist[] = { { pwr_cClass_dataarithm, "DevBody",
-                                          "Code", crrgen_eType_, crrgen_eTable_,
-                                          0 },
-  { pwr_cClass_dataarithml, "DevBody", "Code", crrgen_eType_, crrgen_eTable_,
-      0 },
-  { pwr_cClass_carithm, "DevBody", "Code", crrgen_eType_, crrgen_eTable_, 0 },
-  { pwr_cClass_aarithm, "DevBody", "Expression", crrgen_eType_, crrgen_eTable_,
-      0 },
-  { pwr_cClass_darithm, "DevBody", "Expression", crrgen_eType_, crrgen_eTable_,
-      0 } };
+static crrgen_tRefList codelist[] = {
+    {pwr_cClass_dataarithm, "DevBody", "Code", crrgen_eType_, crrgen_eTable_, 0},
+    {pwr_cClass_dataarithml, "DevBody", "Code", crrgen_eType_, crrgen_eTable_, 0},
+    {pwr_cClass_carithm, "DevBody", "Code", crrgen_eType_, crrgen_eTable_, 0},
+    {pwr_cClass_aarithm, "DevBody", "Expression", crrgen_eType_, crrgen_eTable_, 0},
+    {pwr_cClass_darithm, "DevBody", "Expression", crrgen_eType_, crrgen_eTable_, 0}};
 
 static int comp_crr(tree_sTable* tp, tree_sNode* x, tree_sNode* y);
 
@@ -334,10 +254,8 @@ wb_crrgen::wb_crrgen(wb_session* sp) : m_sp(sp)
 {
   pwr_tStatus sts;
 
-  m_object_th = tree_CreateTable(
-      &sts, sizeof(sCrrKey), offsetof(sCrr, key), sizeof(sCrr), 1000, comp_crr);
-  m_signal_th = tree_CreateTable(
-      &sts, sizeof(sCrrKey), offsetof(sCrr, key), sizeof(sCrr), 1000, comp_crr);
+  m_object_th = tree_CreateTable(&sts, sizeof(sCrrKey), offsetof(sCrr, key), sizeof(sCrr), 1000, comp_crr);
+  m_signal_th = tree_CreateTable(&sts, sizeof(sCrrKey), offsetof(sCrr, key), sizeof(sCrr), 1000, comp_crr);
 }
 
 wb_crrgen::~wb_crrgen()
@@ -352,17 +270,21 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
 {
   pwr_tStatus sts;
 
-  for (int i = 0; i < int(sizeof(reflist) / sizeof(reflist[0])); i++) {
+  for (int i = 0; i < int(sizeof(reflist) / sizeof(reflist[0])); i++)
+  {
     if (!sim && reflist[i].table == crrgen_eTable_SimSignal)
       continue;
 
-    for (wb_object o = m_sp->object(reflist[i].cid); o; o = o.next()) {
+    for (wb_object o = m_sp->object(reflist[i].cid); o; o = o.next())
+    {
       pwr_tAttrRef aref;
 
       // Skip if in LibHier
       bool in_libhier = false;
-      for (wb_object p = o.parent(); p; p = p.parent()) {
-        if (p.cid() == pwr_eClass_LibHier) {
+      for (wb_object p = o.parent(); p; p = p.parent())
+      {
+        if (p.cid() == pwr_eClass_LibHier)
+        {
           in_libhier = true;
           break;
         }
@@ -370,19 +292,21 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
       if (in_libhier)
         continue;
 
-      wb_attribute a
-          = m_sp->attribute(o.oid(), reflist[i].body, reflist[i].attr);
+      wb_attribute a = m_sp->attribute(o.oid(), reflist[i].body, reflist[i].attr);
 
-      if (reflist[i].is_oid) {
+      if (reflist[i].is_oid)
+      {
         // Objid reference
         pwr_tOid oid;
         a.value(&oid);
         aref = cdh_ObjidToAref(oid);
-      } else
+      }
+      else
         // AttrRef reference
         a.value(&aref);
 
-      if (cdh_ObjidIsNotNull(aref.Objid)) {
+      if (cdh_ObjidIsNotNull(aref.Objid))
+      {
         sCrrKey key;
 
         wb_utl::utl_replace_symbol((ldh_tSesContext)m_sp, o.oid(), &aref);
@@ -390,7 +314,8 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
         key.target = aref;
         key.reference = cdh_ObjidToAref(o.oid());
         key.type = reflist[i].type;
-        switch (reflist[i].table) {
+        switch (reflist[i].table)
+        {
         case crrgen_eTable_Signal:
         case crrgen_eTable_SimSignal:
           tree_Insert(&sts, m_signal_th, &key);
@@ -404,9 +329,11 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
     }
   }
 
-  if (graph) {
+  if (graph)
+  {
     // Ge references
-    for (wb_object o = m_sp->object(pwr_cClass_XttGraph); o; o = o.next()) {
+    for (wb_object o = m_sp->object(pwr_cClass_XttGraph); o; o = o.next())
+    {
       pwr_tString80 action;
       pwr_tFileName fname;
       char line[512];
@@ -418,7 +345,8 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
       wb_attribute a = m_sp->attribute(o.oid(), "RtBody", "Action");
 
       a.value(action);
-      if (strstr(action, ".pwg")) {
+      if (strstr(action, ".pwg"))
+      {
         sprintf(fname, "$pwrp_exe/%s", cdh_Low(action));
 
         dcli_translate_filename(fname, fname);
@@ -427,9 +355,9 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
         if (!fpg)
           continue;
 
-        while (fpg.getline(line, sizeof(line))) {
-          nr = dcli_parse(line, " ", "", (char*)linep,
-              sizeof(linep) / sizeof(linep[0]), sizeof(linep[0]), 0);
+        while (fpg.getline(line, sizeof(line)))
+        {
+          nr = dcli_parse(line, " ", "", (char*)linep, sizeof(linep) / sizeof(linep[0]), sizeof(linep[0]), 0);
           if (nr != 2)
             continue;
 
@@ -437,7 +365,8 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
           if (nr != 1)
             continue;
 
-          switch (tag) {
+          switch (tag)
+          {
           case ge_eSave_DigLowColor_attribute:
           case ge_eSave_DigColor_attribute:
           case ge_eSave_DigError_attribute:
@@ -558,7 +487,8 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
           case ge_eSave_SevHist_timerange_attr:
           case ge_eSave_SevHist_update_attr:
           case ge_eSave_DigSound_soundobject:
-          case ge_eSave_PopupMenu_ref_object: {
+          case ge_eSave_PopupMenu_ref_object:
+          {
             if ((s = strchr(linep[1], '#')))
               *s = 0;
 
@@ -570,14 +500,15 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
               break;
 
             int len = strlen(linep[1]);
-            if (len > 12
-                && str_NoCaseStrcmp(&linep[1][len - 12], ".ActualValue") == 0) {
+            if (len > 12 && str_NoCaseStrcmp(&linep[1][len - 12], ".ActualValue") == 0)
+            {
               linep[1][len - 12] = 0;
               al = m_sp->attribute(linep[1]);
               if (!al)
                 break;
             }
-            switch (al.tid()) {
+            switch (al.tid())
+            {
             case pwr_cClass_Di:
             case pwr_cClass_Do:
             case pwr_cClass_Dv:
@@ -590,7 +521,8 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
             case pwr_cClass_Iv:
             case pwr_cClass_Sv:
             case pwr_cClass_ATv:
-            case pwr_cClass_DTv: {
+            case pwr_cClass_DTv:
+            {
               sCrrKey key;
 
               key.target = al.aref();
@@ -599,7 +531,8 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
               tree_Insert(&sts, m_signal_th, &key);
               break;
             }
-            default: {
+            default:
+            {
               sCrrKey key;
 
               key.target = al.aref();
@@ -619,7 +552,8 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
           case ge_eSave_RadioButton_attribute:
           case ge_eSave_Slider_attribute:
           case ge_eSave_OptionMenu_attribute:
-          case ge_eSave_SetValue_attribute: {
+          case ge_eSave_SetValue_attribute:
+          {
             if ((s = strchr(linep[1], '#')))
               *s = 0;
 
@@ -631,14 +565,15 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
               break;
 
             int len = strlen(linep[1]);
-            if (len > 12
-                && str_NoCaseStrcmp(&linep[1][len - 12], ".ActualValue") == 0) {
+            if (len > 12 && str_NoCaseStrcmp(&linep[1][len - 12], ".ActualValue") == 0)
+            {
               linep[1][len - 12] = 0;
               al = m_sp->attribute(linep[1]);
               if (!al)
                 break;
             }
-            switch (al.tid()) {
+            switch (al.tid())
+            {
             case pwr_cClass_Di:
             case pwr_cClass_Do:
             case pwr_cClass_Dv:
@@ -651,7 +586,8 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
             case pwr_cClass_Iv:
             case pwr_cClass_Sv:
             case pwr_cClass_ATv:
-            case pwr_cClass_DTv: {
+            case pwr_cClass_DTv:
+            {
               sCrrKey key;
 
               key.target = al.aref();
@@ -660,7 +596,8 @@ void wb_crrgen::load(pwr_tStatus* rsts, int sim, int graph)
               tree_Insert(&sts, m_signal_th, &key);
               break;
             }
-            default: {
+            default:
+            {
               sCrrKey key;
 
               key.target = al.aref();
@@ -696,42 +633,39 @@ void wb_crrgen::write(pwr_tStatus* rsts)
   dcli_translate_filename(fname, fname);
 
   std::ofstream fps(fname);
-  if (!fps) {
+  if (!fps)
+  {
     *rsts = LDH__FILEOPEN;
     return;
   }
 
   sCrr* crr = (sCrr*)tree_Minimum(&sts, m_signal_th);
-  while (crr) {
+  while (crr)
+  {
     wb_attribute a_target = m_sp->attribute(&crr->key.target);
     wb_object o = m_sp->object(crr->key.reference.Objid);
-    if (!a_target) {
+    if (!a_target)
+    {
       if (crr->key.target.Objid.vid == crr->key.reference.Objid.vid)
         printf("** Undefined reference in: %s\n",
-            o.longName().name(
-                cdh_mName_volume | cdh_mName_path | cdh_mName_attribute));
+               o.longName().name(cdh_mName_volume | cdh_mName_path | cdh_mName_attribute));
       else
         printf("-- External reference in: %s\n",
-            o.longName().name(
-                cdh_mName_volume | cdh_mName_path | cdh_mName_attribute));
+               o.longName().name(cdh_mName_volume | cdh_mName_path | cdh_mName_attribute));
       crr = (sCrr*)tree_Successor(&sts, m_signal_th, crr);
       continue;
     }
     wb_cdef cdef = m_sp->cdef(o.cid());
 
-    if (!((crr->key.target.Flags.b.Object 
-	   && crr->key.target.Objid.vid == prev_target.Objid.vid
-	   && crr->key.target.Objid.oix == prev_target.Objid.oix)
-	  || (!crr->key.target.Flags.b.Object
-	      && crr->key.target.Objid.vid == prev_target.Objid.vid
-	      && crr->key.target.Objid.oix == prev_target.Objid.oix
-	      && crr->key.target.Offset == prev_target.Offset
-	      && crr->key.target.Size == prev_target.Size)))
-      fps << a_target.longName().name(
-                 cdh_mName_volume | cdh_mName_path | cdh_mName_attribute)
-          << '\n';
+    if (!((crr->key.target.Flags.b.Object && crr->key.target.Objid.vid == prev_target.Objid.vid &&
+           crr->key.target.Objid.oix == prev_target.Objid.oix) ||
+          (!crr->key.target.Flags.b.Object && crr->key.target.Objid.vid == prev_target.Objid.vid &&
+           crr->key.target.Objid.oix == prev_target.Objid.oix &&
+           crr->key.target.Offset == prev_target.Offset && crr->key.target.Size == prev_target.Size)))
+      fps << a_target.longName().name(cdh_mName_volume | cdh_mName_path | cdh_mName_attribute) << '\n';
 
-    switch (crr->key.type) {
+    switch (crr->key.type)
+    {
     case crrgen_eType_Write:
       type_char = 'W';
       break;
@@ -743,8 +677,7 @@ void wb_crrgen::write(pwr_tStatus* rsts)
       break;
     default:;
     }
-    fps << " " << type_char << " "
-        << o.longName().name(cdh_mName_path | cdh_mName_attribute) << " "
+    fps << " " << type_char << " " << o.longName().name(cdh_mName_path | cdh_mName_attribute) << " "
         << cdef.name() << '\n';
     memcpy(&prev_target, &crr->key.target, sizeof(prev_target));
     crr = (sCrr*)tree_Successor(&sts, m_signal_th, crr);
@@ -756,29 +689,32 @@ void wb_crrgen::write(pwr_tStatus* rsts)
   dcli_translate_filename(fname, fname);
 
   std::ofstream fpsl(fname);
-  if (!fps) {
+  if (!fps)
+  {
     *rsts = LDH__FILEOPEN;
     return;
   }
 
-  pwr_tCid siglist[] = { pwr_cClass_Di, pwr_cClass_Do, pwr_cClass_Dv,
-    pwr_cClass_Ai, pwr_cClass_Ao, pwr_cClass_Av, pwr_cClass_Ii, pwr_cClass_Io,
-    pwr_cClass_Iv, pwr_cClass_Co, pwr_cClass_Sv, pwr_cClass_ATv,
-    pwr_cClass_DTv };
+  pwr_tCid siglist[] = {pwr_cClass_Di, pwr_cClass_Do,  pwr_cClass_Dv, pwr_cClass_Ai, pwr_cClass_Ao,
+                        pwr_cClass_Av, pwr_cClass_Ii,  pwr_cClass_Io, pwr_cClass_Iv, pwr_cClass_Co,
+                        pwr_cClass_Sv, pwr_cClass_ATv, pwr_cClass_DTv};
 
-  for (int i = 0; i < int(sizeof(siglist) / sizeof(siglist[0])); i++) {
+  for (int i = 0; i < int(sizeof(siglist) / sizeof(siglist[0])); i++)
+  {
     pwr_tAttrRef aref;
 
-    for (m_sp->aref(siglist[i], &aref); m_sp->oddSts();
-         m_sp->nextAref(siglist[i], &aref, &aref)) {
+    for (m_sp->aref(siglist[i], &aref); m_sp->oddSts(); m_sp->nextAref(siglist[i], &aref, &aref))
+    {
       wb_object o = m_sp->object(aref.Objid);
       if (!o)
         continue;
 
       // Skip if in LibHier
       bool in_libhier = false;
-      for (wb_object p = o.parent(); p; p = p.parent()) {
-        if (p.cid() == pwr_eClass_LibHier) {
+      for (wb_object p = o.parent(); p; p = p.parent())
+      {
+        if (p.cid() == pwr_eClass_LibHier)
+        {
           in_libhier = true;
           break;
         }
@@ -790,9 +726,7 @@ void wb_crrgen::write(pwr_tStatus* rsts)
       if (!a)
         continue;
 
-      fpsl << a.longName().name(
-                  cdh_mName_path | cdh_mName_object | cdh_mName_attribute)
-           << '\n';
+      fpsl << a.longName().name(cdh_mName_path | cdh_mName_object | cdh_mName_attribute) << '\n';
     }
   }
   fpsl.close();
@@ -801,7 +735,8 @@ void wb_crrgen::write(pwr_tStatus* rsts)
   dcli_translate_filename(fname, fname);
 
   std::ofstream fpo(fname);
-  if (!fpo) {
+  if (!fpo)
+  {
     *rsts = LDH__FILEOPEN;
     return;
   }
@@ -809,36 +744,32 @@ void wb_crrgen::write(pwr_tStatus* rsts)
   memset(&prev_target, 0, sizeof(prev_target));
 
   crr = (sCrr*)tree_Minimum(&sts, m_object_th);
-  while (crr) {
+  while (crr)
+  {
     wb_attribute a_target = m_sp->attribute(&crr->key.target);
     wb_object o = m_sp->object(crr->key.reference.Objid);
-    if (!a_target) {
+    if (!a_target)
+    {
       if (crr->key.target.Objid.vid == crr->key.reference.Objid.vid)
         printf("** Undefined reference in: %s\n",
-            o.longName().name(
-                cdh_mName_volume | cdh_mName_path | cdh_mName_attribute));
+               o.longName().name(cdh_mName_volume | cdh_mName_path | cdh_mName_attribute));
       else
         printf("-- External reference in: %s\n",
-            o.longName().name(
-                cdh_mName_volume | cdh_mName_path | cdh_mName_attribute));
+               o.longName().name(cdh_mName_volume | cdh_mName_path | cdh_mName_attribute));
       crr = (sCrr*)tree_Successor(&sts, m_object_th, crr);
       continue;
     }
     wb_cdef cdef = m_sp->cdef(o.cid());
 
-    if (!((crr->key.target.Flags.b.Object 
-	   && crr->key.target.Objid.vid == prev_target.Objid.vid
-	   && crr->key.target.Objid.oix == prev_target.Objid.oix)
-	  || (!crr->key.target.Flags.b.Object
-	      && crr->key.target.Objid.vid == prev_target.Objid.vid
-	      && crr->key.target.Objid.oix == prev_target.Objid.oix
-	      && crr->key.target.Offset == prev_target.Offset
-	      && crr->key.target.Size == prev_target.Size)))
-      fpo << a_target.longName().name(
-                 cdh_mName_volume | cdh_mName_path | cdh_mName_attribute)
-          << '\n';
+    if (!((crr->key.target.Flags.b.Object && crr->key.target.Objid.vid == prev_target.Objid.vid &&
+           crr->key.target.Objid.oix == prev_target.Objid.oix) ||
+          (!crr->key.target.Flags.b.Object && crr->key.target.Objid.vid == prev_target.Objid.vid &&
+           crr->key.target.Objid.oix == prev_target.Objid.oix &&
+           crr->key.target.Offset == prev_target.Offset && crr->key.target.Size == prev_target.Size)))
+      fpo << a_target.longName().name(cdh_mName_volume | cdh_mName_path | cdh_mName_attribute) << '\n';
 
-    switch (crr->key.type) {
+    switch (crr->key.type)
+    {
     case crrgen_eType_Write:
       type_char = 'W';
       break;
@@ -850,8 +781,7 @@ void wb_crrgen::write(pwr_tStatus* rsts)
       break;
     default:;
     }
-    fpo << " " << type_char << " "
-        << o.longName().name(cdh_mName_path | cdh_mName_attribute) << " "
+    fpo << " " << type_char << " " << o.longName().name(cdh_mName_path | cdh_mName_attribute) << " "
         << cdef.name() << '\n';
     memcpy(&prev_target, &crr->key.target, sizeof(prev_target));
     crr = (sCrr*)tree_Successor(&sts, m_object_th, crr);
@@ -870,17 +800,22 @@ void wb_crrgen::write_code(pwr_tStatus* rsts)
   dcli_translate_filename(fname, fname);
 
   std::ofstream fpc(fname);
-  if (!fpc) {
+  if (!fpc)
+  {
     *rsts = LDH__FILEOPEN;
     return;
   }
 
-  for (int i = 0; i < int(sizeof(codelist) / sizeof(codelist[0])); i++) {
-    for (wb_object o = m_sp->object(codelist[i].cid); o; o = o.next()) {
+  for (int i = 0; i < int(sizeof(codelist) / sizeof(codelist[0])); i++)
+  {
+    for (wb_object o = m_sp->object(codelist[i].cid); o; o = o.next())
+    {
       // Skip if in LibHier
       bool in_libhier = false;
-      for (wb_object p = o.parent(); p; p = p.parent()) {
-        if (p.cid() == pwr_eClass_LibHier) {
+      for (wb_object p = o.parent(); p; p = p.parent())
+      {
+        if (p.cid() == pwr_eClass_LibHier)
+        {
           in_libhier = true;
           break;
         }
@@ -888,14 +823,13 @@ void wb_crrgen::write_code(pwr_tStatus* rsts)
       if (in_libhier)
         continue;
 
-      wb_attribute a
-          = m_sp->attribute(o.oid(), codelist[i].body, codelist[i].attr);
+      wb_attribute a = m_sp->attribute(o.oid(), codelist[i].body, codelist[i].attr);
 
       a.value(text);
 
-      if (!streq(text, "")) {
-        fpc << " _Obj_ " << o.longName().name(cdh_mName_path | cdh_mName_object)
-            << '\n';
+      if (!streq(text, ""))
+      {
+        fpc << " _Obj_ " << o.longName().name(cdh_mName_path | cdh_mName_object) << '\n';
         fpc << text << '\n';
       }
     }

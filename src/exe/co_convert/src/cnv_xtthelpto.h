@@ -43,7 +43,8 @@
 
 class CnvReadXtthelp;
 
-typedef enum {
+typedef enum
+{
   Cnv_eXtthelpToType_Html,
   Cnv_eXtthelpToType_Xml,
   Cnv_eXtthelpToType_Ps,
@@ -51,17 +52,16 @@ typedef enum {
   Cnv_eXtthelpToType_Text
 } Cnv_eXtthelpToType;
 
-class CnvXtthelpTo {
+class CnvXtthelpTo
+{
 public:
   // CnvXtthelpTo() {}
   virtual ~CnvXtthelpTo();
 
   virtual Cnv_eXtthelpToType type();
-  virtual void* insert(navh_eItemType item_type, const char* text1,
-      const char* text2, const char* text3, const char* link,
-      const char* link_bookmark, const char* file_name,
-      navh_eHelpFile file_type, int help_index, const char* bookmark,
-      int coding);
+  virtual void* insert(navh_eItemType item_type, const char* text1, const char* text2, const char* text3,
+                       const char* link, const char* link_bookmark, const char* file_name,
+                       navh_eHelpFile file_type, int help_index, const char* bookmark, int coding);
   virtual bool confpass();
   virtual void set_confpass(bool conf);
 };

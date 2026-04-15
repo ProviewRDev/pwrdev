@@ -39,9 +39,9 @@
 
 /* co_tst_log.h -- Log test results */
 
-
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include <string.h>
@@ -50,22 +50,20 @@ extern "C" {
 #include "co_cdh.h"
 #include "co_tst_msg.h"
 
-class tst_log {
-  pwr_tStatus m_sts;
-  pwr_tFileName m_filename;
-  char m_category[80];
-  FILE *m_fp;
+  class tst_log
+  {
+    pwr_tStatus m_sts;
+    pwr_tFileName m_filename;
+    char m_category[80];
+    FILE* m_fp;
 
- public:
-  tst_log(pwr_tStatus *sts, const char *category, const char *filename);
-  ~tst_log();
-  void log(const char severity, const char *text, 
-	   pwr_tStatus status = 0xffffffff);
-  void log(const char severity, const char *text1, 
-	   const char *text2, pwr_tStatus status = 0xffffffff);
-  void vlog(const char severity, const char *format, ...);
-};
-
+  public:
+    tst_log(pwr_tStatus* sts, const char* category, const char* filename);
+    ~tst_log();
+    void log(const char severity, const char* text, pwr_tStatus status = 0xffffffff);
+    void log(const char severity, const char* text1, const char* text2, pwr_tStatus status = 0xffffffff);
+    void vlog(const char severity, const char* format, ...);
+  };
 
 #if defined __cplusplus
 }

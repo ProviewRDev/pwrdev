@@ -42,12 +42,11 @@
 
 #include "xtt_tblnav_qt.h"
 
-TblNavQt::TblNavQt(void* xn_parent_ctx, sevcli_sHistItem* xn_itemlist,
-    int xn_item_cnt, QWidget** w, pwr_tStatus* status)
+TblNavQt::TblNavQt(void* xn_parent_ctx, sevcli_sHistItem* xn_itemlist, int xn_item_cnt, QWidget** w,
+                   pwr_tStatus* status)
     : TblNav(xn_parent_ctx, xn_itemlist, xn_item_cnt, status)
 {
-  form_widget
-      = scrolledbrowwidgetqt_new(TblNav::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetqt_new(TblNav::init_brow_cb, this, &brow_widget);
 
   // Create the root item
   *w = form_widget;
@@ -61,7 +60,4 @@ TblNavQt::~TblNavQt()
   form_widget->close();
 }
 
-void TblNavQt::set_inputfocus()
-{
-  brow_widget->setFocus();
-}
+void TblNavQt::set_inputfocus() { brow_widget->setFocus(); }

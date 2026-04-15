@@ -43,22 +43,20 @@
 
 #include "wb_palfile.h"
 
-extern "C" {
+extern "C"
+{
 #include "co_dcli.h"
 #include "pwr_baseclasses.h"
 }
 
-PalFileMenu::PalFileMenu(
-    const char* menu_title, int menu_item_type, PalFileMenu* menu_parent)
-    : item_type(menu_item_type), pixmap(0), child_list(0), parent(menu_parent),
-      next(0)
+PalFileMenu::PalFileMenu(const char* menu_title, int menu_item_type, PalFileMenu* menu_parent)
+    : item_type(menu_item_type), pixmap(0), child_list(0), parent(menu_parent), next(0)
 {
   strcpy(title, menu_title);
 }
 
-PalFileMenu* PalFile::config_tree_build(ldh_tSession ldhses,
-    const char* filename, pal_eNameType keytype, const char* keyname,
-    PalFileMenu* menu)
+PalFileMenu* PalFile::config_tree_build(ldh_tSession ldhses, const char* filename, pal_eNameType keytype,
+                                        const char* keyname, PalFileMenu* menu)
 {
   std::ifstream fp;
   int line_cnt = 0;
@@ -77,7 +75,8 @@ PalFileMenu* PalFile::config_tree_build(ldh_tSession ldhses,
     return menu_tree;
 
   line_cnt = 0;
-  while (1) {
+  while (1)
+  {
     if (!fp.getline(line, sizeof(line)))
       break;
     str_trim(line, line);
@@ -90,13 +89,13 @@ PalFileMenu* PalFile::config_tree_build(ldh_tSession ldhses,
     if (nr < 1)
       printf("** Syntax error in file %s, line %d\n", filename, line_cnt);
 
-    if (keytype != pal_eNameType_All) {
-      if ((keytype == pal_eNameType_TopObjects
-              && str_NoCaseStrcmp(type, "topobjects") == 0
-              && str_NoCaseStrcmp(name, keyname) == 0)
-          || (keytype == pal_eNameType_Palette
-                 && str_NoCaseStrcmp(type, "palette") == 0
-                 && str_NoCaseStrcmp(name, keyname) == 0)) {
+    if (keytype != pal_eNameType_All)
+    {
+      if ((keytype == pal_eNameType_TopObjects && str_NoCaseStrcmp(type, "topobjects") == 0 &&
+           str_NoCaseStrcmp(name, keyname) == 0) ||
+          (keytype == pal_eNameType_Palette && str_NoCaseStrcmp(type, "palette") == 0 &&
+           str_NoCaseStrcmp(name, keyname) == 0))
+      {
         if (nr != 2)
           printf("** Syntax error in file %s, line %d\n", filename, line_cnt);
 
@@ -111,13 +110,14 @@ PalFileMenu* PalFile::config_tree_build(ldh_tSession ldhses,
         if (!streq(line, "{"))
           printf("** Syntax error in file %s, line %d\n", filename, line_cnt);
 
-        menu_p = config_tree_build_children(
-            ldhses, &fp, &line_cnt, filename, menu_tree);
+        menu_p = config_tree_build_children(ldhses, &fp, &line_cnt, filename, menu_tree);
         if (!menu_tree->child_list)
           menu_tree->child_list = menu_p;
         break;
       }
-    } else {
+    }
+    else
+    {
       if (nr != 2)
         printf("** Syntax error in file %s, line %d\n", filename, line_cnt);
 
@@ -128,7 +128,8 @@ PalFileMenu* PalFile::config_tree_build(ldh_tSession ldhses,
 
       if (!menu_tree)
         menu_tree = menu_p;
-      else {
+      else
+      {
         for (mp = menu_tree; mp->next; mp = mp->next)
           ;
         mp->next = menu_p;
@@ -140,16 +141,15 @@ PalFileMenu* PalFile::config_tree_build(ldh_tSession ldhses,
       if (!streq(line, "{"))
         printf("** Syntax error in file %s, line %d\n", filename, line_cnt);
 
-      menu_p->child_list = config_tree_build_children(
-          ldhses, &fp, &line_cnt, filename, menu_p);
+      menu_p->child_list = config_tree_build_children(ldhses, &fp, &line_cnt, filename, menu_p);
     }
   }
   fp.close();
   return menu_tree;
 }
 
-PalFileMenu* PalFile::config_tree_build_children(ldh_tSession ldhses,
-    std::ifstream* fp, int* line_cnt, const char* filename, PalFileMenu* parent)
+PalFileMenu* PalFile::config_tree_build_children(ldh_tSession ldhses, std::ifstream* fp, int* line_cnt,
+                                                 const char* filename, PalFileMenu* parent)
 {
   PalFileMenu *menu_p, *prev = NULL, *mp = NULL;
   PalFileMenu* return_menu = NULL;
@@ -163,15 +163,18 @@ PalFileMenu* PalFile::config_tree_build_children(ldh_tSession ldhses,
   int found;
 
   // Children might already exist
-  if (parent) {
-    for (menu_p = parent->child_list; menu_p; menu_p = menu_p->next) {
+  if (parent)
+  {
+    for (menu_p = parent->child_list; menu_p; menu_p = menu_p->next)
+    {
       prev = menu_p;
       first = 0;
     }
   }
   menu_p = 0;
 
-  while (1) {
+  while (1)
+  {
     if (!fp->getline(line, sizeof(line)))
       break;
     str_trim(line, line);
@@ -184,66 +187,87 @@ PalFileMenu* PalFile::config_tree_build_children(ldh_tSession ldhses,
     if (nr < 1)
       printf("** Syntax error in file %s, line %d\n", filename, *line_cnt);
 
-    if (streq(type, "{")) {
+    if (streq(type, "{"))
+    {
       if (nr != 1 || !menu_p)
         printf("** Syntax error in file %s, line %d\n", filename, *line_cnt);
       else
         mp = config_tree_build_children(ldhses, fp, line_cnt, filename, menu_p);
       if (!menu_p->child_list)
         menu_p->child_list = mp;
-    } else if (streq(type, "}")) {
+    }
+    else if (streq(type, "}"))
+    {
       if (nr != 1)
         printf("** Syntax error in file %s, line %d\n", filename, *line_cnt);
       return return_menu;
-    } else if (str_NoCaseStrcmp(type, "menu") == 0) {
+    }
+    else if (str_NoCaseStrcmp(type, "menu") == 0)
+    {
       if (!(nr == 2 || nr == 3))
         printf("** Syntax error in file %s, line %d\n", filename, *line_cnt);
 
-      if (nr == 3 && (ldhses && !check_volume(ldhses, p1))) {
+      if (nr == 3 && (ldhses && !check_volume(ldhses, p1)))
+      {
         break;
       }
 
       // Check if it already exist
       found = 0;
-      for (menu_p = parent->child_list; menu_p; menu_p = menu_p->next) {
-        if (streq(menu_p->title, name)) {
+      for (menu_p = parent->child_list; menu_p; menu_p = menu_p->next)
+      {
+        if (streq(menu_p->title, name))
+        {
           found = 1;
           break;
         }
       }
 
-      if (!found) {
+      if (!found)
+      {
         menu_p = new PalFileMenu(name, pal_eMenuType_Menu, parent);
-        if (first) {
+        if (first)
+        {
           return_menu = menu_p;
           first = 0;
-        } else
+        }
+        else
           prev->next = menu_p;
         prev = menu_p;
       }
-    } else if (str_NoCaseStrcmp(type, "class") == 0) {
+    }
+    else if (str_NoCaseStrcmp(type, "class") == 0)
+    {
       if (!(nr == 2 || nr == 3))
         printf("** Syntax error in file %s, line %d\n", filename, *line_cnt);
 
-      if (nr == 2 || (nr == 3 && (!ldhses || check_volume(ldhses, p1)))) {
+      if (nr == 2 || (nr == 3 && (!ldhses || check_volume(ldhses, p1))))
+      {
         menu_p = new PalFileMenu(name, pal_eMenuType_Class, parent);
-        if (first) {
+        if (first)
+        {
           return_menu = menu_p;
           first = 0;
-        } else
+        }
+        else
           prev->next = menu_p;
         prev = menu_p;
       }
-    } else if (str_NoCaseStrcmp(type, "classvolume") == 0) {
+    }
+    else if (str_NoCaseStrcmp(type, "classvolume") == 0)
+    {
       if (!(nr == 2 || nr == 3))
         printf("** Syntax error in file %s, line %d\n", filename, *line_cnt);
 
-      if (nr == 2 || (nr == 3 && (!ldhses || check_volume(ldhses, p1)))) {
+      if (nr == 2 || (nr == 3 && (!ldhses || check_volume(ldhses, p1))))
+      {
         menu_p = new PalFileMenu(name, pal_eMenuType_ClassVolume, parent);
-        if (first) {
+        if (first)
+        {
           return_menu = menu_p;
           first = 0;
-        } else
+        }
+        else
           prev->next = menu_p;
         prev = menu_p;
       }
@@ -263,14 +287,15 @@ int PalFile::check_volume(ldh_tSession ldhses, char* name)
 
   // Find a class volume with this name
   sts = ldh_GetVolumeList(ldh_SessionToWB(ldhses), &volume);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = ldh_GetVolumeClass(ldh_SessionToWB(ldhses), volume, &classid);
     if (EVEN(sts))
       return 0;
 
-    if (cdh_isClassVolumeClass(classid)) {
-      sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses), volume, volume_name,
-          sizeof(volume_name), &size);
+    if (cdh_isClassVolumeClass(classid))
+    {
+      sts = ldh_VolumeIdToName(ldh_SessionToWB(ldhses), volume, volume_name, sizeof(volume_name), &size);
       if (EVEN(sts))
         return 0;
 
@@ -293,7 +318,8 @@ void PalFile::config_tree_free_children(PalFileMenu* first_child)
   PalFileMenu *menu_p, *next;
 
   menu_p = first_child;
-  while (menu_p) {
+  while (menu_p)
+  {
     next = menu_p->next;
     if (menu_p->child_list)
       config_tree_free_children(menu_p->child_list);
@@ -302,8 +328,7 @@ void PalFile::config_tree_free_children(PalFileMenu* first_child)
   }
 }
 
-void PalFile::config_tree_print(
-    const char* filename, PalFileMenu* menu_tree, pwr_tStatus* sts)
+void PalFile::config_tree_print(const char* filename, PalFileMenu* menu_tree, pwr_tStatus* sts)
 {
   pwr_tFileName fname;
   std::ofstream fp;
@@ -312,7 +337,8 @@ void PalFile::config_tree_print(
   *sts = 1;
   dcli_translate_filename(fname, filename);
   fp.open(fname);
-  if (!fp) {
+  if (!fp)
+  {
     *sts = 0;
     return;
   }
@@ -323,8 +349,7 @@ void PalFile::config_tree_print(
   fp.close();
 }
 
-void PalFile::config_tree_print_item(
-    PalFileMenu* item, std::ofstream& fp, int level)
+void PalFile::config_tree_print_item(PalFileMenu* item, std::ofstream& fp, int level)
 {
   PalFileMenu* menu_p;
   char ind_str[80] = "";
@@ -332,7 +357,8 @@ void PalFile::config_tree_print_item(
   for (int i = 0; i < level; i++)
     strcat(ind_str, "  ");
 
-  switch (item->item_type) {
+  switch (item->item_type)
+  {
   case pal_eMenuType_TopObjects:
     fp << "topobjects " << item->title << '\n' << "{\n";
     break;
@@ -350,11 +376,13 @@ void PalFile::config_tree_print_item(
     break;
   }
 
-  for (menu_p = item->child_list; menu_p; menu_p = menu_p->next) {
+  for (menu_p = item->child_list; menu_p; menu_p = menu_p->next)
+  {
     config_tree_print_item(menu_p, fp, level + 1);
   }
 
-  switch (item->item_type) {
+  switch (item->item_type)
+  {
   case pal_eMenuType_TopObjects:
   case pal_eMenuType_Palette:
   case pal_eMenuType_Menu:

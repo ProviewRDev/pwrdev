@@ -43,13 +43,15 @@
 
 #include "wb_bck.h"
 
-typedef enum { bckwitem_eItemType_Bck } bckwitem_eItemType;
+typedef enum
+{
+  bckwitem_eItemType_Bck
+} bckwitem_eItemType;
 
-class WbBckWNavBrow {
+class WbBckWNavBrow
+{
 public:
-  WbBckWNavBrow(BrowCtx* brow_ctx, void* lwnav) : ctx(brow_ctx), bckwnav(lwnav)
-  {
-  }
+  WbBckWNavBrow(BrowCtx* brow_ctx, void* lwnav) : ctx(brow_ctx), bckwnav(lwnav) {}
   ~WbBckWNavBrow();
 
   BrowCtx* ctx;
@@ -69,10 +71,10 @@ public:
   void brow_setup();
 };
 
-class WbBckWNav {
+class WbBckWNav
+{
 public:
-  WbBckWNav(void* l_parent_ctx, ldh_tSesContext l_ldhses, wb_bck_list* l_list,
-      int l_editmode);
+  WbBckWNav(void* l_parent_ctx, ldh_tSesContext l_ldhses, wb_bck_list* l_list, int l_editmode);
   virtual ~WbBckWNav();
 
   void* parent_ctx;
@@ -81,9 +83,7 @@ public:
   wb_bck_list* list;
   int editmode;
 
-  virtual void set_input_focus()
-  {
-  }
+  virtual void set_input_focus() {}
 
   void show();
   void clear();
@@ -98,10 +98,10 @@ public:
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
 };
 
-class ItemBck {
+class ItemBck
+{
 public:
-  ItemBck(WbBckWNav* bckwnav, bck_sItem* item_bck_item, brow_tNode dest,
-      flow_eDest dest_code);
+  ItemBck(WbBckWNav* bckwnav, bck_sItem* item_bck_item, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemBck();
 
   bckwitem_eItemType type;

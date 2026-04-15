@@ -54,12 +54,16 @@ int main(int argc, char* argv[])
   bool remote = false;
 
   strcpy(cmd, "firefox ");
-  for (int i = 1; i < argc; i++) {
-    if (streq(argv[i], "-remote")) {
+  for (int i = 1; i < argc; i++)
+  {
+    if (streq(argv[i], "-remote"))
+    {
       remote = true;
       strcat(cmd, argv[i]);
       strcat(cmd, " \"");
-    } else {
+    }
+    else
+    {
       strcat(cmd, argv[i]);
       if (i != argc - 1)
         strcat(cmd, " ");

@@ -57,7 +57,8 @@
   events when the
   object is clicked on, moved etc.
 */
-class GrowConGlue : public GrowNode {
+class GrowConGlue : public GrowNode
+{
 public:
   //! Constuctor
   /*!
@@ -67,13 +68,10 @@ public:
     \param y1		y coordinate for position.
     \param nodraw	Don't draw the object now.
   */
-  GrowConGlue(GrowCtx* glow_ctx, const char* name, double x1 = 0, double y1 = 0,
-      int nodraw = 0);
+  GrowConGlue(GrowCtx* glow_ctx, const char* name, double x1 = 0, double y1 = 0, int nodraw = 0);
 
   //! Noargs constructor
-  GrowConGlue()
-  {
-  }
+  GrowConGlue() {}
 
   ~GrowConGlue();
 
@@ -123,16 +121,13 @@ public:
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowConGlue;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowConGlue; }
 
-  int line_width_up; //!< Width in the up direction.
-  int line_width_down; //!< Width in the down direction.
-  int line_width_left; //!< Width in the left direction.
+  int line_width_up;    //!< Width in the up direction.
+  int line_width_down;  //!< Width in the down direction.
+  int line_width_left;  //!< Width in the left direction.
   int line_width_right; //!< Width in the right direction.
-  int border; //!< Draw with border.
+  int border;           //!< Draw with border.
 
   //! Draw the object.
   /*!
@@ -148,8 +143,8 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();
@@ -179,8 +174,8 @@ public:
     used to generate
     java code for the java bean.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ofstream& fp);
 
   //! A connected connection is modified
   /*!

@@ -63,35 +63,46 @@ pwr_tBoolean qos_WaitQue(pwr_tStatus* status, qdb_sQue* qp, int tmo)
 
   qdb_Unlock;
 
-  if (tmo == -1) {
+  if (tmo == -1)
+  {
     ts.tv_nsec = delta * 1000000;
 
-    while (1) {
-      if (!qp->lock.waiting) {
+    while (1)
+    {
+      if (!qp->lock.waiting)
+      {
         *status = QCOM__SUCCESS;
         qdb_Lock;
         return 1;
       }
       nanosleep(&ts, 0);
     }
-  } else {
-    while (1) {
-      if (!qp->lock.waiting) {
+  }
+  else
+  {
+    while (1)
+    {
+      if (!qp->lock.waiting)
+      {
         *status = QCOM__SUCCESS;
         qdb_Lock;
         return 1;
       }
 
-      if (!remaining_time) {
+      if (!remaining_time)
+      {
         /* Timeout */
         *status = QCOM__TMO;
         qdb_Lock;
         return 0;
       }
-      if (remaining_time <= delta) {
+      if (remaining_time <= delta)
+      {
         ts.tv_nsec = remaining_time * 1000000;
         remaining_time = 0;
-      } else {
+      }
+      else
+      {
         ts.tv_nsec = delta * 1000000;
         remaining_time -= delta;
       }
@@ -117,19 +128,22 @@ pwr_tBoolean qos_WaitQue(pwr_tStatus* status, qdb_sQue* qp, int tmo)
 
   qdb_Unlock;
 
-  if (tmo != qcom_cTmoEternal) {
-    #if defined(OS_CYGWIN)
+  if (tmo != qcom_cTmoEternal)
+  {
+#if defined(OS_CYGWIN)
     time_GetTime(&atime);
-    #else
+#else
     time_GetTimeMonotonic(&atime);
-    #endif
+#endif
     time_MsToD(&dtime, tmo);
     time_Aadd(&atime, &atime, &dtime);
     atime_ts.tv_sec = atime.tv_sec;
     atime_ts.tv_nsec = atime.tv_nsec;
 
     ok = pthread_cond_timedwait(&qp->lock.cond, &qp->lock.mutex, &atime_ts);
-  } else {
+  }
+  else
+  {
     ok = pthread_cond_wait(&qp->lock.cond, &qp->lock.mutex);
   }
 
@@ -137,10 +151,13 @@ pwr_tBoolean qos_WaitQue(pwr_tStatus* status, qdb_sQue* qp, int tmo)
 
   qdb_Lock;
 
-  if ((qp->lock.waiting) || (ok == ETIMEDOUT)) {
+  if ((qp->lock.waiting) || (ok == ETIMEDOUT))
+  {
     *sts = QCOM__TMO;
     qp->lock.waiting = FALSE;
-  } else {
+  }
+  else
+  {
     return TRUE;
   }
 #endif
@@ -175,7 +192,4 @@ qdb_sQlock* qos_CreateQlock(pwr_tStatus* sts, qdb_sQue* qp)
   return &qp->lock;
 }
 
-void qos_DeleteQlock(pwr_tStatus* sts, qdb_sQue* qp)
-{
-  qdb_AssumeLocked;
-}
+void qos_DeleteQlock(pwr_tStatus* sts, qdb_sQue* qp) { qdb_AssumeLocked; }

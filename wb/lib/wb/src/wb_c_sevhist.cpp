@@ -49,8 +49,8 @@
 
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father,
+                              pwr_tClassId Class)
 {
   pwr_tStatus sts;
   int size;
@@ -72,13 +72,14 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
 
   scid = cid = fcid;
   sts = ldh_GetSuperClass(Session, scid, &scid);
-  while (
-      ODD(sts) && cid != pwr_cClass_Component && cid != pwr_cClass_Aggregate) {
+  while (ODD(sts) && cid != pwr_cClass_Component && cid != pwr_cClass_Aggregate)
+  {
     scid = cid;
     sts = ldh_GetSuperClass(Session, scid, &cid);
   }
 
-  switch (scid) {
+  switch (scid)
+  {
   case pwr_cClass_BaseSensor:
     strcpy(AName, ".Value.ActualValue");
     break;
@@ -90,34 +91,34 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
     strcpy(AName, ".ActualValue");
   }
 
-  sts = ldh_ObjidToName(
-      Session, Father, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
+  sts = ldh_ObjidToName(Session, Father, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
   strcat(Name, AName);
 
   sts = ldh_NameToAttrRef(Session, Name, &Attribute);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     memset(&Attribute, 0, sizeof(Attribute));
   }
 
-  sts = ldh_SetObjectPar(Session, Object, "RtBody", "Attribute",
-      (char*)&Attribute, sizeof(Attribute));
+  sts = ldh_SetObjectPar(Session, Object, "RtBody", "Attribute", (char*)&Attribute, sizeof(Attribute));
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
   // Insert a thread object
   sts = ldh_GetClassList(Session, pwr_cClass_SevHistThread, &oid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     cnt++;
     toid = oid;
     sts = ldh_GetNextObject(Session, oid, &oid);
   }
 
-  if (cnt > 0) {
-    sts = ldh_SetObjectPar(
-        Session, Object, "RtBody", "ThreadObject", (char*)&toid, sizeof(toid));
+  if (cnt > 0)
+  {
+    sts = ldh_SetObjectPar(Session, Object, "RtBody", "ThreadObject", (char*)&toid, sizeof(toid));
     if (EVEN(sts))
       return sts;
   }
@@ -128,8 +129,7 @@ static pwr_tStatus PostCreate(ldh_tSesContext Session, pwr_tObjid Object,
 
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object,
-    pwr_tObjid Father, pwr_tClassId Class)
+static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object, pwr_tObjid Father, pwr_tClassId Class)
 {
   pwr_tStatus sts;
   int size;
@@ -145,20 +145,19 @@ static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object,
     // Keep the attribute
     return PWRB__SUCCESS;
 
-  sts = ldh_ObjidToName(
-      Session, Father, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
+  sts = ldh_ObjidToName(Session, Father, ldh_eName_Hierarchy, Name, sizeof(Name), &size);
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
   strcat(Name, ".ActualValue");
 
   sts = ldh_NameToAttrRef(Session, Name, &Attribute);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     memset(&Attribute, 0, sizeof(Attribute));
   }
 
-  sts = ldh_SetObjectPar(Session, Object, "RtBody", "Attribute",
-      (char*)&Attribute, sizeof(Attribute));
+  sts = ldh_SetObjectPar(Session, Object, "RtBody", "Attribute", (char*)&Attribute, sizeof(Attribute));
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
@@ -168,11 +167,10 @@ static pwr_tStatus PostMove(ldh_tSesContext Session, pwr_tObjid Object,
 //
 //  Syntax check.
 //
-static pwr_tStatus SyntaxCheck(
-    ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
-    int* ErrorCount, /* accumulated error count */
-    int* WarningCount /* accumulated waring count */
-    )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated waring count */
+)
 {
   pwr_tOid thread_oid;
   wb_session* sp = (wb_session*)Session;
@@ -194,11 +192,9 @@ static pwr_tStatus SyntaxCheck(
 
   wb_object othread = sp->object(thread_oid);
   if (!othread)
-    wsx_error_msg_str(
-        Session, "Bad thread object", Object, 'E', ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Bad thread object", Object, 'E', ErrorCount, WarningCount);
   else if (othread.cid() != pwr_cClass_SevHistThread)
-    wsx_error_msg_str(Session, "Bad thread object class", Object, 'E',
-        ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Bad thread object class", Object, 'E', ErrorCount, WarningCount);
 
   // Check StorageTime
   wb_attribute storagetime_a(a, 0, "StorageTime");
@@ -210,8 +206,7 @@ static pwr_tStatus SyntaxCheck(
     return storagetime_a.sts();
 
   if (storagetime.tv_sec == 0 && storagetime.tv_nsec == 0)
-    wsx_error_msg_str(
-        Session, "Bad StorageTime", Object, 'E', ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Bad StorageTime", Object, 'E', ErrorCount, WarningCount);
 
   // Check Attribute
   wb_attribute dataname_a(a, 0, "Attribute");
@@ -223,14 +218,15 @@ static pwr_tStatus SyntaxCheck(
     return dataname_a.sts();
 
   wb_attribute data_a = sp->attribute(&dataname_aref);
-  if (!data_a) {
-    wsx_error_msg_str(Session, "Bad Attribute reference", Object, 'E',
-        ErrorCount, WarningCount);
+  if (!data_a)
+  {
+    wsx_error_msg_str(Session, "Bad Attribute reference", Object, 'E', ErrorCount, WarningCount);
     return PWRB__SUCCESS;
   }
 
   // Check DataName type
-  switch (data_a.tid()) {
+  switch (data_a.tid())
+  {
   case pwr_eType_Boolean:
   case pwr_eType_Int64:
   case pwr_eType_Int32:
@@ -246,13 +242,12 @@ static pwr_tStatus SyntaxCheck(
   case pwr_eType_Time:
     break;
   default:
-    wsx_error_msg_str(Session, "Attribute type not supported", Object, 'E',
-        ErrorCount, WarningCount);
+    wsx_error_msg_str(Session, "Attribute type not supported", Object, 'E', ErrorCount, WarningCount);
   }
   return PWRB__SUCCESS;
 }
 
 //  Every method to be exported to the workbench should be registred here.
 
-pwr_dExport pwr_BindMethods(SevHist) = { pwr_BindMethod(PostCreate),
-  pwr_BindMethod(PostMove), pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(SevHist) = {pwr_BindMethod(PostCreate), pwr_BindMethod(PostMove),
+                                        pwr_BindMethod(SyntaxCheck), pwr_NullMethod};

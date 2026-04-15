@@ -66,8 +66,8 @@
 
   @aref edge Edge
 */
-#define edge_exec(obj, in)                                                     \
-  obj->Status = (in && !obj->StatusOld);                                       \
+#define edge_exec(obj, in)                                                                                   \
+  obj->Status = (in && !obj->StatusOld);                                                                     \
   obj->StatusOld = in;
 
 /*_*
@@ -86,29 +86,26 @@
   CARITHM
   @aref carithm CArithm
 */
-#define carithm_exec(obj, expr)                                                \
-  {                                                                            \
-    expr                                                                       \
-  }
+#define carithm_exec(obj, expr) {expr}
 
 /*_*
   SR_S
   @aref sr_s SR_S
 */
-#define sr_s_exec(obj, set, reset)                                             \
-  if (set)                                                                     \
-    obj->Status = true;                                                        \
-  else if (reset)                                                              \
+#define sr_s_exec(obj, set, reset)                                                                           \
+  if (set)                                                                                                   \
+    obj->Status = true;                                                                                      \
+  else if (reset)                                                                                            \
     obj->Status = false;
 
 /*_*
   SR_R
   @aref sr_r SR_R
 */
-#define sr_r_exec(obj, set, reset)                                             \
-  if (reset)                                                                   \
-    obj->Status = false;                                                       \
-  else if (set)                                                                \
+#define sr_r_exec(obj, set, reset)                                                                           \
+  if (reset)                                                                                                 \
+    obj->Status = false;                                                                                     \
+  else if (set)                                                                                              \
     obj->Status = true;
 
 /*_*
@@ -122,85 +119,97 @@
   @aref pulse Pulse
 */
 
-#define pulse_exec(obj, in)                                                    \
-  timer2_scan(tp, obj);                                                        \
-  if (in && !obj->StatusOld) {                                                 \
-    timer2_in(tp, obj);                                                        \
-    obj->Status = true;                                                        \
-  } else                                                                       \
-    obj->Status = obj->TimerFlag;                                              \
+#define pulse_exec(obj, in)                                                                                  \
+  timer2_scan(tp, obj);                                                                                      \
+  if (in && !obj->StatusOld)                                                                                 \
+  {                                                                                                          \
+    timer2_in(tp, obj);                                                                                      \
+    obj->Status = true;                                                                                      \
+  }                                                                                                          \
+  else                                                                                                       \
+    obj->Status = obj->TimerFlag;                                                                            \
   obj->StatusOld = in;
 
 /*_*
   WAIT
   @aref wait Wait
 */
-#define wait_exec(obj, in)                                                     \
-  timer2_scan(tp, obj);                                                        \
-  if (in && !obj->StatusOld) {                                                 \
-    timer2_in(tp, obj);                                                        \
-  }                                                                            \
-  obj->StatusOld = in;                                                         \
+#define wait_exec(obj, in)                                                                                   \
+  timer2_scan(tp, obj);                                                                                      \
+  if (in && !obj->StatusOld)                                                                                 \
+  {                                                                                                          \
+    timer2_in(tp, obj);                                                                                      \
+  }                                                                                                          \
+  obj->StatusOld = in;                                                                                       \
   obj->Status = in && !obj->TimerFlag;
 
 /*_*
   TIMER
   @aref timer Timer
 */
-#define timer_exec(obj, in)                                                    \
-  timer2_scan(tp, obj);                                                        \
-  if (!in && obj->StatusOld) {                                                 \
-    timer2_in(tp, obj);                                                        \
-  }                                                                            \
-  obj->StatusOld = in;                                                         \
+#define timer_exec(obj, in)                                                                                  \
+  timer2_scan(tp, obj);                                                                                      \
+  if (!in && obj->StatusOld)                                                                                 \
+  {                                                                                                          \
+    timer2_in(tp, obj);                                                                                      \
+  }                                                                                                          \
+  obj->StatusOld = in;                                                                                       \
   obj->Status = in || obj->TimerFlag;
 
 /*_*
   WAITH
   @aref waith Waith
 */
-#define waith_exec(obj, in, hold)                                              \
-  timer2_scan(tp, obj);                                                        \
-  if (in) {                                                                    \
-    if (!obj->StatusOld) {                                                     \
-      timer2_in(tp, obj);                                                      \
-      obj->CountOld = obj->TimerCount;                                         \
-    }                                                                          \
-    if (hold) {                                                                \
-      obj->TimerCount = obj->CountOld;                                         \
-      obj->StatusOld = true;                                                   \
-    } else {                                                                   \
-      obj->CountOld = obj->TimerCount;                                         \
-      obj->StatusOld = true;                                                   \
-      obj->Status = !obj->TimerFlag;                                           \
-    }                                                                          \
-  } else {                                                                     \
-    obj->StatusOld = false;                                                    \
-    obj->Status = false;                                                       \
+#define waith_exec(obj, in, hold)                                                                            \
+  timer2_scan(tp, obj);                                                                                      \
+  if (in)                                                                                                    \
+  {                                                                                                          \
+    if (!obj->StatusOld)                                                                                     \
+    {                                                                                                        \
+      timer2_in(tp, obj);                                                                                    \
+      obj->CountOld = obj->TimerCount;                                                                       \
+    }                                                                                                        \
+    if (hold)                                                                                                \
+    {                                                                                                        \
+      obj->TimerCount = obj->CountOld;                                                                       \
+      obj->StatusOld = true;                                                                                 \
+    }                                                                                                        \
+    else                                                                                                     \
+    {                                                                                                        \
+      obj->CountOld = obj->TimerCount;                                                                       \
+      obj->StatusOld = true;                                                                                 \
+      obj->Status = !obj->TimerFlag;                                                                         \
+    }                                                                                                        \
+  }                                                                                                          \
+  else                                                                                                       \
+  {                                                                                                          \
+    obj->StatusOld = false;                                                                                  \
+    obj->Status = false;                                                                                     \
   }
 
 /*_*
   SUPPRESSSUP
   @aref suppresssup SuppressSup
 */
-#define SuppressSup_exec(obj, sup, cid, in)                                    \
-  switch (cid) {                                                               \
-  case pwr_cClass_DSup:                                                        \
-    ((pwr_sClass_DSup*)sup)->Suppressed = in;                                  \
-    obj->Out = in || ((pwr_sClass_DSup*)sup)->Action;                          \
-    break;                                                                     \
-  case pwr_cClass_DSupComp:                                                    \
-    ((pwr_sClass_DSupComp*)sup)->Suppressed = in;                              \
-    obj->Out = in || ((pwr_sClass_DSupComp*)sup)->Action;                      \
-    break;                                                                     \
-  case pwr_cClass_ASup:                                                        \
-    ((pwr_sClass_ASup*)sup)->Suppressed = in;                                  \
-    obj->Out = in || ((pwr_sClass_ASup*)sup)->Action;                          \
-    break;                                                                     \
-  case pwr_cClass_ASupComp:                                                    \
-    ((pwr_sClass_ASupComp*)sup)->Suppressed = in;                              \
-    obj->Out = in || ((pwr_sClass_ASupComp*)sup)->Action;                      \
-    break;                                                                     \
-  default:;                                                                    \
-  }                                                                            \
+#define SuppressSup_exec(obj, sup, cid, in)                                                                  \
+  switch (cid)                                                                                               \
+  {                                                                                                          \
+  case pwr_cClass_DSup:                                                                                      \
+    ((pwr_sClass_DSup*)sup)->Suppressed = in;                                                                \
+    obj->Out = in || ((pwr_sClass_DSup*)sup)->Action;                                                        \
+    break;                                                                                                   \
+  case pwr_cClass_DSupComp:                                                                                  \
+    ((pwr_sClass_DSupComp*)sup)->Suppressed = in;                                                            \
+    obj->Out = in || ((pwr_sClass_DSupComp*)sup)->Action;                                                    \
+    break;                                                                                                   \
+  case pwr_cClass_ASup:                                                                                      \
+    ((pwr_sClass_ASup*)sup)->Suppressed = in;                                                                \
+    obj->Out = in || ((pwr_sClass_ASup*)sup)->Action;                                                        \
+    break;                                                                                                   \
+  case pwr_cClass_ASupComp:                                                                                  \
+    ((pwr_sClass_ASupComp*)sup)->Suppressed = in;                                                            \
+    obj->Out = in || ((pwr_sClass_ASupComp*)sup)->Action;                                                    \
+    break;                                                                                                   \
+  default:;                                                                                                  \
+  }                                                                                                          \
   obj->Suppressed = in;

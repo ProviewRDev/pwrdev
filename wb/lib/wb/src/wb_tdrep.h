@@ -45,7 +45,8 @@ class wb_mrepdbs;
 class wb_orep;
 class wb_mvrep;
 
-class wb_tdrep {
+class wb_tdrep
+{
   int m_nRef;
   wb_orep* m_orep;
   int m_sts;
@@ -66,33 +67,18 @@ public:
   void unref();
   wb_tdrep* ref();
 
-  size_t size()
-  {
-    return m_size;
-  }
+  size_t size() { return m_size; }
   pwr_tTid tid();
-  pwr_tTid typeRef()
-  {
-    return m_typeref;
-  }
-  pwr_eType type()
-  {
-    return m_type;
-  }
-  int nElement()
-  {
-    return m_elements;
-  }
+  pwr_tTid typeRef() { return m_typeref; }
+  pwr_eType type() { return m_type; }
+  int nElement() { return m_elements; }
   const char* pgmName();
 
   const char* name() const;
   wb_name longName();
   bool renameType(pwr_tStatus* sts, wb_name& name);
 
-  pwr_tStatus sts()
-  {
-    return m_sts;
-  }
+  pwr_tStatus sts() { return m_sts; }
 
 private:
   void init();

@@ -39,27 +39,27 @@
 
 /* xtt_localdb.h -- Local parameter database */
 
-typedef enum {
+typedef enum
+{
   xnav_eLdbType_Boolean,
   xnav_eLdbType_Int,
   xnav_eLdbType_Float,
   xnav_eLdbType_String
 } xnav_eLdbType;
 
-typedef struct sLdbEntry {
+typedef struct sLdbEntry
+{
   char name[80];
   xnav_eLdbType type;
   void* value_p;
   sLdbEntry* next;
 } xnav_sLdbEntry;
 
-class XNavLdb {
+class XNavLdb
+{
 public:
-  XNavLdb() : root(NULL){}
-  ~XNavLdb()
-  {
-    remove_all();
-  }
+  XNavLdb() : root(NULL) {}
+  ~XNavLdb() { remove_all(); }
   xnav_sLdbEntry* root;
   int entry_cnt;
 

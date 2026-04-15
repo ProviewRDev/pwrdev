@@ -44,7 +44,8 @@
 /*! \addtogroup Glow */
 /*@{*/
 
-typedef enum {
+typedef enum
+{
   colpal_eActive_FillColor,
   colpal_eActive_BorderColor,
   colpal_eActive_TextColor
@@ -62,7 +63,8 @@ typedef enum {
   routine for the event.
 */
 
-class ColPalCtx : public GrowCtx {
+class ColPalCtx : public GrowCtx
+{
 public:
   //! Constructor.
   /*!
@@ -70,18 +72,16 @@ public:
     \param zoom_fact	Initial zoomfactor.
   */
   ColPalCtx(const char* ctx_name, double zoom_fact = 100)
-      : GrowCtx(ctx_name, zoom_fact), columns(30),
-        current_fill(glow_eDrawType_LineGray),
-        current_border(glow_eDrawType_Line), current_text(glow_eDrawType_Line),
-        entry_width(0.3), entry_height(1), display_entry_width(3),
-        active(colpal_eActive_FillColor)
+      : GrowCtx(ctx_name, zoom_fact), columns(30), current_fill(glow_eDrawType_LineGray),
+        current_border(glow_eDrawType_Line), current_text(glow_eDrawType_Line), entry_width(0.3),
+        entry_height(1), display_entry_width(3), active(colpal_eActive_FillColor)
   {
     ctx_type = glow_eCtxType_ColPal;
     grid_on = 0;
   }
 
   //! Destructor
-  ~ColPalCtx(){}
+  ~ColPalCtx() {}
 
   //! Configure the palette.
   /*! This function creates all color rectangles and texts in the palette, and
@@ -102,10 +102,7 @@ public:
   void zoom(double factor);
 
   //! Reset to base zoomfactor.
-  void unzoom()
-  {
-    zoom(mw.base_zoom_factor / mw.zoom_factor_y);
-  }
+  void unzoom() { zoom(mw.base_zoom_factor / mw.zoom_factor_y); }
 
   //! Not used.
   void print(char* filename);
@@ -126,45 +123,36 @@ public:
   int event_handler(glow_eEvent event, int x, int y, int w, int h);
 
   void set_active(colpal_eActive a);
-  colpal_eActive get_active()
-  {
-    return active;
-  }
+  colpal_eActive get_active() { return active; }
   void set_colors();
   void update_custom_colors(GlowCustomColors* cc);
   static char* color_idx_to_text(int idx);
   static char* customcolor_idx_to_text(int idx);
   static char* colortheme_idx_to_text(int idx);
 
-  int columns; //!< Number of columns in the color palette.
-  glow_eDrawType current_fill; //!< The currently selected fill color.
+  int columns;                   //!< Number of columns in the color palette.
+  glow_eDrawType current_fill;   //!< The currently selected fill color.
   glow_eDrawType current_border; //!< The currently selected border color.
-  glow_eDrawType current_text; //!< The currently selected text color.
-  glow_eDrawType current_tone; //!< The currently selected color tone.
-  GlowArrayElem*
-      display_fill; //!< The rectangle object to display the current fillcolor.
+  glow_eDrawType current_text;   //!< The currently selected text color.
+  glow_eDrawType current_tone;   //!< The currently selected color tone.
+  GlowArrayElem* display_fill;   //!< The rectangle object to display the current fillcolor.
   GlowArrayElem* display_border; //!< The rectangle object to display the
   //! current border color.
-  GlowArrayElem*
-      display_text; //!< The rectangle object to display the current text color.
-  GlowArrayElem*
-      active_fill; //!< The rectangle object to mark fill color active.
-  GlowArrayElem*
-      active_border; //!< The rectangle object to mark border color active.
-  GlowArrayElem*
-      active_text; //!< The rectangle object to mark text color active.
-  GlowArrayElem*
-      active_tone; //!< The rectangle object to mark colortone active.
-  GlowArrayElem* text_fill; //!< The fill color text object.
-  GlowArrayElem* text_border; //!< The border color text object.
-  GlowArrayElem* text_text; //!< The text color text object.
-  GlowArrayElem* text_tone; //!< The text tone text object.
-  GlowArrayElem* color_description; //!< Description text for color theme.
+  GlowArrayElem* display_text;         //!< The rectangle object to display the current text color.
+  GlowArrayElem* active_fill;          //!< The rectangle object to mark fill color active.
+  GlowArrayElem* active_border;        //!< The rectangle object to mark border color active.
+  GlowArrayElem* active_text;          //!< The rectangle object to mark text color active.
+  GlowArrayElem* active_tone;          //!< The rectangle object to mark colortone active.
+  GlowArrayElem* text_fill;            //!< The fill color text object.
+  GlowArrayElem* text_border;          //!< The border color text object.
+  GlowArrayElem* text_text;            //!< The text color text object.
+  GlowArrayElem* text_tone;            //!< The text tone text object.
+  GlowArrayElem* color_description;    //!< Description text for color theme.
   GlowArrayElem* color_description_bg; //!< Background rect to description text.
-  double entry_width; //!< Width of a color palette entry.
-  double entry_height; //!< Height of a color palette entry.
-  double display_entry_width; //!< Width of a display entry.
-  colpal_eActive active; //!< Active colortype (fill, border or text).
+  double entry_width;                  //!< Width of a color palette entry.
+  double entry_height;                 //!< Height of a color palette entry.
+  double display_entry_width;          //!< Width of a display entry.
+  colpal_eActive active;               //!< Active colortype (fill, border or text).
 };
 
 //! Scroll horizontal.

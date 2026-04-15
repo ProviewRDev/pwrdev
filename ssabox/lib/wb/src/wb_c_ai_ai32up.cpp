@@ -50,10 +50,9 @@
   Check if it's ok to adopt a new object.
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus AnteAdopt(
-    ldh_tSesContext Session, pwr_tObjid Card, /* current card object */
-    pwr_tClassId Class /* class of child to adopt */
-    )
+static pwr_tStatus AnteAdopt(ldh_tSesContext Session, pwr_tObjid Card, /* current card object */
+                             pwr_tClassId Class                        /* class of child to adopt */
+)
 {
   pwr_tStatus sts;
   pwr_sClass_Ai_AI32uP RCard;
@@ -74,7 +73,8 @@ static pwr_tStatus AnteAdopt(
     return sts;
 
   MaxChan = MIN(32, RCard.MaxNoOfChannels);
-  for (i = 0, Chan = 1; i < (int)MaxChan; i++, Chan <<= 1) {
+  for (i = 0, Chan = 1; i < (int)MaxChan; i++, Chan <<= 1)
+  {
     if ((DCard.ChannelAllocation & Chan) == 0)
       break;
   }
@@ -89,10 +89,9 @@ static pwr_tStatus AnteAdopt(
   Adopt a new channel.
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus PostAdopt(
-    ldh_tSesContext Session, pwr_tObjid Card, /* current card object */
-    pwr_tObjid Channel, pwr_tClassId Class /* class of child to adopt */
-    )
+static pwr_tStatus PostAdopt(ldh_tSesContext Session, pwr_tObjid Card, /* current card object */
+                             pwr_tObjid Channel, pwr_tClassId Class    /* class of child to adopt */
+)
 {
   pwr_tStatus sts;
   pwr_sClass_Ai_AI32uP RCard;
@@ -121,7 +120,8 @@ static pwr_tStatus PostAdopt(
     return sts;
 
   MaxChan = MIN(32, RCard.MaxNoOfChannels);
-  for (i = 0, Chan = 1; i < (int)MaxChan; i++, Chan <<= 1) {
+  for (i = 0, Chan = 1; i < (int)MaxChan; i++, Chan <<= 1)
+  {
     if ((DCard.ChannelAllocation & Chan) == 0)
       break;
   }
@@ -131,8 +131,7 @@ static pwr_tStatus PostAdopt(
 
   /* allocate new channel */
   DCard.ChannelAllocation |= Chan;
-  sts = ldh_SetObjectBody(
-      Session, Card, "DevBody", (char*)&DCard, sizeof(DCard));
+  sts = ldh_SetObjectBody(Session, Card, "DevBody", (char*)&DCard, sizeof(DCard));
   if (EVEN(sts))
     return sts;
 
@@ -144,51 +143,56 @@ static pwr_tStatus PostAdopt(
     but is not implemented in this version of PROVIEW/R.
   */
 
-  switch (Class) {
+  switch (Class)
+  {
   case pwr_cClass_ChanAi:
-    sts = ldh_ReadObjectBody(
-        Session, Channel, "RtBody", &ChanAi, sizeof(ChanAi));
+    sts = ldh_ReadObjectBody(Session, Channel, "RtBody", &ChanAi, sizeof(ChanAi));
     if (EVEN(sts))
       return sts;
-    if (ChanAi.Description[0] != '\0') {
+    if (ChanAi.Description[0] != '\0')
+    {
       sprintf(Description, ChanAi.Description, i);
-      if (strlen(Description) <= sizeof(ChanAi.Description) - 1) {
+      if (strlen(Description) <= sizeof(ChanAi.Description) - 1)
+      {
         strcpy(ChanAi.Description, Description);
       }
     }
-    if (ChanAi.Identity[0] != '\0') {
+    if (ChanAi.Identity[0] != '\0')
+    {
       sprintf(Identity, ChanAi.Identity, i);
-      if (strlen(Identity) <= sizeof(ChanAi.Identity) - 1) {
+      if (strlen(Identity) <= sizeof(ChanAi.Identity) - 1)
+      {
         strcpy(ChanAi.Identity, Identity);
       }
     }
 
     ChanAi.Number = i;
-    sts = ldh_SetObjectBody(
-        Session, Channel, "RtBody", (char*)&ChanAi, sizeof(ChanAi));
+    sts = ldh_SetObjectBody(Session, Channel, "RtBody", (char*)&ChanAi, sizeof(ChanAi));
     strcpy(DefName, "pwrb:Class-ChanAi-Defaults");
     break;
   case pwr_cClass_ChanAit:
-    sts = ldh_ReadObjectBody(
-        Session, Channel, "RtBody", &ChanAit, sizeof(ChanAit));
+    sts = ldh_ReadObjectBody(Session, Channel, "RtBody", &ChanAit, sizeof(ChanAit));
     if (EVEN(sts))
       return sts;
-    if (ChanAit.Description[0] != '\0') {
+    if (ChanAit.Description[0] != '\0')
+    {
       sprintf(Description, ChanAit.Description, i);
-      if (strlen(Description) <= sizeof(ChanAit.Description) - 1) {
+      if (strlen(Description) <= sizeof(ChanAit.Description) - 1)
+      {
         strcpy(ChanAit.Description, Description);
       }
     }
-    if (ChanAit.Identity[0] != '\0') {
+    if (ChanAit.Identity[0] != '\0')
+    {
       sprintf(Identity, ChanAit.Identity, i);
-      if (strlen(Identity) <= sizeof(ChanAit.Identity) - 1) {
+      if (strlen(Identity) <= sizeof(ChanAit.Identity) - 1)
+      {
         strcpy(ChanAit.Identity, Identity);
       }
     }
 
     ChanAit.Number = i;
-    sts = ldh_SetObjectBody(
-        Session, Channel, "RtBody", (char*)&ChanAit, sizeof(ChanAit));
+    sts = ldh_SetObjectBody(Session, Channel, "RtBody", (char*)&ChanAit, sizeof(ChanAit));
     strcpy(DefName, "pwrb:Class-ChanAit-Defaults");
     break;
   }
@@ -198,9 +202,9 @@ static pwr_tStatus PostAdopt(
   sts = ldh_NameToObjid(Session, &DefObject, DefName);
   if (EVEN(sts))
     return PWRB__SUCCESS;
-  sts = ldh_ReadObjectBody(
-      Session, DefObject, "SysBody", &DefBody, sizeof(DefBody));
-  if (DefBody.Name[0] != '\0') {
+  sts = ldh_ReadObjectBody(Session, DefObject, "SysBody", &DefBody, sizeof(DefBody));
+  if (DefBody.Name[0] != '\0')
+  {
     sprintf(NewName, DefBody.Name, i + 1);
     NewName[31] = '\0';
     sts = ldh_SetObjectName(Session, Channel, NewName);
@@ -213,10 +217,9 @@ static pwr_tStatus PostAdopt(
   Unadopt a channel.
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus PostUnadopt(
-    ldh_tSesContext Session, pwr_tObjid Card, /* current card object */
-    pwr_tObjid Channel, pwr_tClassId Class /* class of child to adopt */
-    )
+static pwr_tStatus PostUnadopt(ldh_tSesContext Session, pwr_tObjid Card, /* current card object */
+                               pwr_tObjid Channel, pwr_tClassId Class    /* class of child to adopt */
+)
 {
   pwr_tStatus sts;
   pwr_sClass_Ai_AI32uP RCard;
@@ -248,18 +251,17 @@ static pwr_tStatus PostUnadopt(
     but is not implemented in this version of PROVIEW/R.
   */
 
-  switch (Class) {
+  switch (Class)
+  {
   case pwr_cClass_ChanAi:
-    sts = ldh_ReadObjectBody(
-        Session, Channel, "RtBody", &ChanAi, sizeof(ChanAi));
+    sts = ldh_ReadObjectBody(Session, Channel, "RtBody", &ChanAi, sizeof(ChanAi));
     if (EVEN(sts))
       return PWRB__SUCCESS;
 
     Chan = ChanAi.Number;
     break;
   case pwr_cClass_ChanAit:
-    sts = ldh_ReadObjectBody(
-        Session, Channel, "RtBody", &ChanAit, sizeof(ChanAit));
+    sts = ldh_ReadObjectBody(Session, Channel, "RtBody", &ChanAit, sizeof(ChanAit));
     if (EVEN(sts))
       return PWRB__SUCCESS;
 
@@ -272,8 +274,7 @@ static pwr_tStatus PostUnadopt(
     return PWRB__SUCCESS;
 
   DCard.ChannelAllocation &= ~(1 << Chan);
-  sts = ldh_SetObjectBody(
-      Session, Card, "DevBody", (char*)&DCard, sizeof(DCard));
+  sts = ldh_SetObjectBody(Session, Card, "DevBody", (char*)&DCard, sizeof(DCard));
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
@@ -292,16 +293,14 @@ static pwr_tStatus PostUnadopt(
   Syntax check.
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus SyntaxCheck(
-    ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
-    int* ErrorCount, /* accumulated error count */
-    int* WarningCount /* accumulated waring count */
-    )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated waring count */
+)
 {
   pwr_tStatus sts;
 
-  sts = wsx_CheckCard(
-      Session, Object, ErrorCount, WarningCount, wsx_mCardOption_DevName);
+  sts = wsx_CheckCard(Session, Object, ErrorCount, WarningCount, wsx_mCardOption_DevName);
   if (EVEN(sts))
     return sts;
 
@@ -312,6 +311,6 @@ static pwr_tStatus SyntaxCheck(
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(Ai_AI32uP) = { pwr_BindMethod(AnteAdopt),
-  pwr_BindMethod(PostUnadopt), pwr_BindMethod(PostAdopt),
-  pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(Ai_AI32uP) = {pwr_BindMethod(AnteAdopt), pwr_BindMethod(PostUnadopt),
+                                          pwr_BindMethod(PostAdopt), pwr_BindMethod(SyntaxCheck),
+                                          pwr_NullMethod};

@@ -42,8 +42,7 @@
 #include "glow_con.h"
 #include "glow_draw.h"
 
-int BrowCtx::insert(GlowArrayElem* element, GlowArrayElem* destination,
-    glow_eDest destination_code)
+int BrowCtx::insert(GlowArrayElem* element, GlowArrayElem* destination, glow_eDest destination_code)
 {
   int sts;
   double y;
@@ -85,8 +84,7 @@ void BrowCtx::configure(double y_redraw)
 
   a.configure();
   get_borders();
-  frame_x_right
-      = MAX(x_right, 1.0 * (mw.window_width + mw.offset_x) / mw.zoom_factor_x);
+  frame_x_right = MAX(x_right, 1.0 * (mw.window_width + mw.offset_x) / mw.zoom_factor_x);
   a.zoom();
   redraw(y_redraw);
   change_scrollbar();
@@ -96,7 +94,8 @@ void BrowCtx::change_scrollbar()
 {
   glow_sScroll data;
 
-  if (!scroll_size) {
+  if (!scroll_size)
+  {
     // Get scroll size from the width of the first element
     double ll_x, ur_x, ll_y, ur_y;
 
@@ -110,24 +109,23 @@ void BrowCtx::change_scrollbar()
   data.total_width = int((x_right - x_left) / scroll_size);
   data.total_height = int((y_high - y_low) / scroll_size);
   data.window_width = int(mw.window_width / scroll_size / mw.zoom_factor_x);
-  data.window_height
-      = int(mw.window_height / scroll_size / mw.zoom_factor_y + 1);
-  data.offset_x = int(
-      mw.offset_x / scroll_size / mw.zoom_factor_x - x_left / scroll_size);
-  data.offset_y
-      = int(mw.offset_y / scroll_size / mw.zoom_factor_y - y_low / scroll_size);
+  data.window_height = int(mw.window_height / scroll_size / mw.zoom_factor_y + 1);
+  data.offset_x = int(mw.offset_x / scroll_size / mw.zoom_factor_x - x_left / scroll_size);
+  data.offset_y = int(mw.offset_y / scroll_size / mw.zoom_factor_y - y_low / scroll_size);
 
   (scroll_callback)(&data);
 }
 
 void BrowCtx::redraw(double y_redraw)
 {
-  if (y_redraw) {
-    gdraw->clear_area(&mw, 0, mw.window_width,
-        int(y_redraw * mw.zoom_factor_y - mw.offset_y), mw.window_height);
-    draw(&mw, 0, (int)(y_redraw * mw.zoom_factor_y - mw.offset_y),
-        mw.window_width, mw.window_height);
-  } else {
+  if (y_redraw)
+  {
+    gdraw->clear_area(&mw, 0, mw.window_width, int(y_redraw * mw.zoom_factor_y - mw.offset_y),
+                      mw.window_height);
+    draw(&mw, 0, (int)(y_redraw * mw.zoom_factor_y - mw.offset_y), mw.window_width, mw.window_height);
+  }
+  else
+  {
     clear(&mw);
     draw(&mw, 0, 0, mw.window_width, mw.window_height);
   }
@@ -142,11 +140,9 @@ void BrowCtx::zoom(double factor)
   mw.zoom_factor_x *= factor;
   mw.zoom_factor_y *= factor;
   if (mw.offset_x != 0)
-    mw.offset_x = int(
-        (mw.offset_x - mw.window_width / 2.0 * (1.0 / factor - 1)) * factor);
+    mw.offset_x = int((mw.offset_x - mw.window_width / 2.0 * (1.0 / factor - 1)) * factor);
   if (mw.offset_y != 0)
-    mw.offset_y = int(
-        (mw.offset_y - mw.window_height / 2.0 * (1.0 / factor - 1)) * factor);
+    mw.offset_y = int((mw.offset_y - mw.window_height / 2.0 * (1.0 / factor - 1)) * factor);
   mw.offset_x = MAX(mw.offset_x, 0);
   mw.offset_y = MAX(mw.offset_y, 0);
   if ((x_right - x_left) * mw.zoom_factor_x <= mw.window_width)
@@ -174,7 +170,8 @@ void BrowCtx::print(char* filename)
 
   print_ps = new GlowPscript(filename, this, 1);
 
-  for (i = 0;; i++) {
+  for (i = 0;; i++)
+  {
     ll_y = i * height;
     ur_y = ll_y + height;
     ll_x = 0;
@@ -221,8 +218,8 @@ void brow_scroll_horizontal(BrowCtx* ctx, int value, int bottom)
 {
   int x_pix;
 
-  x_pix = int(-value * ctx->scroll_size * ctx->mw.zoom_factor_x
-      + (ctx->mw.offset_x - ctx->x_left * ctx->mw.zoom_factor_x));
+  x_pix = int(-value * ctx->scroll_size * ctx->mw.zoom_factor_x +
+              (ctx->mw.offset_x - ctx->x_left * ctx->mw.zoom_factor_x));
   ctx->scroll(x_pix, 0);
 }
 
@@ -230,15 +227,12 @@ void brow_scroll_vertical(BrowCtx* ctx, int value, int bottom)
 {
   int y_pix;
 
-  y_pix = int(-value * ctx->scroll_size * ctx->mw.zoom_factor_y
-      + (ctx->mw.offset_y - ctx->y_low * ctx->mw.zoom_factor_y));
+  y_pix = int(-value * ctx->scroll_size * ctx->mw.zoom_factor_y +
+              (ctx->mw.offset_y - ctx->y_low * ctx->mw.zoom_factor_y));
   // Correction for the bottom position
-  if (bottom
-      && (y_pix >= 0
-             || ctx->mw.window_height + y_pix
-                 < ctx->y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y))
+  if (bottom &&
+      (y_pix >= 0 || ctx->mw.window_height + y_pix < ctx->y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y))
     //        mw.window_height >= (y_high - y_low) * mw.zoom_factor_y)
-    y_pix = int(ctx->mw.window_height + ctx->mw.offset_y
-        - ctx->y_high * ctx->mw.zoom_factor_y);
+    y_pix = int(ctx->mw.window_height + ctx->mw.offset_y - ctx->y_high * ctx->mw.zoom_factor_y);
   ctx->scroll(0, y_pix);
 }

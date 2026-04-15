@@ -41,12 +41,15 @@
 
 #include "flow_browapi.h"
 
-typedef enum { logwitem_eItemType_Log } logwitem_eItemType;
+typedef enum
+{
+  logwitem_eItemType_Log
+} logwitem_eItemType;
 
-class CoLogWNavBrow {
+class CoLogWNavBrow
+{
 public:
-  CoLogWNavBrow(BrowCtx* brow_ctx, void* lwnav)
-      : ctx(brow_ctx), logwnav(lwnav){}
+  CoLogWNavBrow(BrowCtx* brow_ctx, void* lwnav) : ctx(brow_ctx), logwnav(lwnav) {}
   ~CoLogWNavBrow();
 
   BrowCtx* ctx;
@@ -65,7 +68,8 @@ public:
   void brow_setup();
 };
 
-class CoLogWNav {
+class CoLogWNav
+{
 public:
   CoLogWNav(void* l_parent_ctx, int l_show_item);
   virtual ~CoLogWNav();
@@ -74,9 +78,7 @@ public:
   CoLogWNavBrow* brow;
   int show_item;
 
-  virtual void set_input_focus()
-  {
-  }
+  virtual void set_input_focus() {}
 
   void show(char categories[][20], char* item);
   void zoom(double zoom_factor);
@@ -84,17 +86,16 @@ public:
 
   static int init_brow_cb(FlowCtx* fctx, void* client_data);
   static int brow_cb(FlowCtx* ctx, flow_tEvent event);
-  static void item_cb(void* ctx, pwr_tTime time, char* category, char* user,
-      char* item, char* comment);
+  static void item_cb(void* ctx, pwr_tTime time, char* category, char* user, char* item, char* comment);
 };
 
-class ItemLog {
+class ItemLog
+{
 public:
-  ItemLog(CoLogWNav* logwnav, const char* item_name, pwr_tTime item_time,
-      char* item_catogory, char* item_user, char* item_comment, brow_tNode dest,
-      flow_eDest dest_code);
+  ItemLog(CoLogWNav* logwnav, const char* item_name, pwr_tTime item_time, char* item_catogory,
+          char* item_user, char* item_comment, brow_tNode dest, flow_eDest dest_code);
   virtual ~ItemLog();
-  
+
   logwitem_eItemType type;
   CoLogWNav* logwnav;
   brow_tNode node;

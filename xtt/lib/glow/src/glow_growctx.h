@@ -47,18 +47,19 @@
 /*@{*/
 
 //! Editing modes
-typedef enum {
-  grow_eMode_Edit, //!< Ordinary edit mode
-  grow_eMode_Rect, //!< Create rectangle mode
-  grow_eMode_Line, //!< Create line mode
-  grow_eMode_PolyLine, //!< Create polyline mode
-  grow_eMode_Text, //!< Create text mode
-  grow_eMode_Circle, //!< Create circle mode
-  grow_eMode_Annot, //!< Create annotation mode
-  grow_eMode_ConPoint, //!< Create connection point mode
-  grow_eMode_Scale, //!< Scale object mode
+typedef enum
+{
+  grow_eMode_Edit,         //!< Ordinary edit mode
+  grow_eMode_Rect,         //!< Create rectangle mode
+  grow_eMode_Line,         //!< Create line mode
+  grow_eMode_PolyLine,     //!< Create polyline mode
+  grow_eMode_Text,         //!< Create text mode
+  grow_eMode_Circle,       //!< Create circle mode
+  grow_eMode_Annot,        //!< Create annotation mode
+  grow_eMode_ConPoint,     //!< Create connection point mode
+  grow_eMode_Scale,        //!< Scale object mode
   grow_eMode_EditPolyLine, //!< Edit polyline mode
-  grow_eMode_RectRounded //!< Create rounded rectangle mode
+  grow_eMode_RectRounded   //!< Create rounded rectangle mode
 } grow_eMode;
 
 class GrowGroup;
@@ -70,7 +71,8 @@ class GrowLayer;
   color and images,
   an extended event handling, and more advanced drawing routines.
 */
-class GrowCtx : public GlowCtx {
+class GrowCtx : public GlowCtx
+{
 public:
   //! Constructor
   /*!
@@ -111,7 +113,7 @@ public:
     If draw is defered the area of defered redraw is extended with this new
     area, and nothing more is done.
     Sets a clip of the specified area and draws first all connections in the
-    area, and then all other objects in the area. Draws the tooltip text, if 
+    area, and then all other objects in the area. Draws the tooltip text, if
     sthis is active, and selection rectangle if this is active.
   */
   void draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
@@ -152,10 +154,7 @@ public:
 
   //! Get the edit mode.
   /*! \return Current edit mode. */
-  grow_eMode mode()
-  {
-    return edit_mode;
-  }
+  grow_eMode mode() { return edit_mode; }
 
   //! Open and load a subgraph with a specified name.
   /*!
@@ -181,8 +180,7 @@ public:
   /*!
     \param filename	Name of file to save in.
   */
-  int export_script(char* filename,
-		    int (*userdata_cb)(void*, void*, std::ofstream&, char*));
+  int export_script(char* filename, int (*userdata_cb)(void*, void*, std::ofstream&, char*));
 
   //! Open and load a subgraph from file.
   /*!
@@ -225,10 +223,7 @@ public:
     \param element	Pointer to found nodeclass.
     \return		Returns 1 if nodeclass is found, else 0.
   */
-  int find_nc_by_name(const char* name, GlowArrayElem** element)
-  {
-    return a_nc.find_by_name(name, element);
-  }
+  int find_nc_by_name(const char* name, GlowArrayElem** element) { return a_nc.find_by_name(name, element); }
 
   //! Find a conclass by name.
   /*!
@@ -236,10 +231,7 @@ public:
     \param element	Pointer to found conclass.
     \return		Returns 1 if conclass is found, else 0.
   */
-  int find_cc_by_name(char* name, GlowArrayElem** element)
-  {
-    return a_cc.find_by_name(name, element);
-  }
+  int find_cc_by_name(char* name, GlowArrayElem** element) { return a_cc.find_by_name(name, element); }
 
   //! Get next connection point number for a subgraph
   /*!
@@ -247,10 +239,7 @@ public:
 
     Returns the number for next connectionpoint and increments the counter.
   */
-  int get_next_conpoint_num()
-  {
-    return conpoint_num_cnt++;
-  }
+  int get_next_conpoint_num() { return conpoint_num_cnt++; }
 
   //! Get next objectname number.
   /*!
@@ -258,10 +247,7 @@ public:
 
     Returns the number for next objectname.
   */
-  int get_next_objectname_num()
-  {
-    return objectname_cnt;
-  }
+  int get_next_objectname_num() { return objectname_cnt; }
 
   //! Get and increment next objectname number.
   /*!
@@ -269,19 +255,13 @@ public:
 
     Returns the number for next objectname and increments the counter.
   */
-  int incr_next_objectname_num()
-  {
-    return objectname_cnt++;
-  }
+  int incr_next_objectname_num() { return objectname_cnt++; }
 
   //! Set next layername number.
   /*!
     Set the number for next layername.
   */
-  void set_next_objectname_num(int num)
-  {
-    objectname_cnt = num;
-  }
+  void set_next_objectname_num(int num) { objectname_cnt = num; }
 
   //! Get and increment next layername number.
   /*!
@@ -289,10 +269,7 @@ public:
 
     Returns the number for next layername and increments the counter.
   */
-  int incr_next_layername_num()
-  {
-    return layername_cnt++;
-  }
+  int incr_next_layername_num() { return layername_cnt++; }
 
   //! Clear the window.
   /*!
@@ -321,16 +298,10 @@ public:
     *size = a_move.size();
   }
   //! Reset polyline drawing sequence.
-  void polyline_end()
-  {
-    polyline_not_first = 0;
-  }
+  void polyline_end() { polyline_not_first = 0; }
 
   //! Execute dynamic code for all objects.
-  void exec_dynamic()
-  {
-    a.exec_dynamic();
-  }
+  void exec_dynamic() { a.exec_dynamic(); }
 
   //! Call the registred dynamic callback.
   void dynamic_cb(GlowArrayElem* object, char* code, glow_eDynamicType type);
@@ -344,24 +315,15 @@ public:
 
   //! Set original text color on all selected objects.
   /*! \param drawtype	Original text color. */
-  void set_select_original_text_color(glow_eDrawType drawtype)
-  {
-    a_sel.set_original_text_color(drawtype);
-  }
+  void set_select_original_text_color(glow_eDrawType drawtype) { a_sel.set_original_text_color(drawtype); }
 
   //! Set original fill color on all selected objects.
   /*! \param drawtype	Original fill color. */
-  void set_select_original_fill_color(glow_eDrawType drawtype)
-  {
-    a_sel.set_original_fill_color(drawtype);
-  }
+  void set_select_original_fill_color(glow_eDrawType drawtype) { a_sel.set_original_fill_color(drawtype); }
 
   //! Set original color tone on all selected objects.
   /*! \param tone	Original color tone. */
-  void set_select_original_color_tone(glow_eDrawTone tone)
-  {
-    a_sel.set_original_color_tone(tone);
-  }
+  void set_select_original_color_tone(glow_eDrawTone tone) { a_sel.set_original_color_tone(tone); }
 
   //! Set original background color on all selected objects.
   /*! \param drawtype	Background color. */
@@ -372,87 +334,51 @@ public:
 
   //! Set original color lighness on all selected objects.
   /*! \param lightness	Original color lightness. */
-  void set_select_original_color_lightness(int lightness)
-  {
-    a_sel.set_original_color_lightness(lightness);
-  }
+  void set_select_original_color_lightness(int lightness) { a_sel.set_original_color_lightness(lightness); }
 
   //! Increase original color lightness on all selected objects.
   /*! \param lightness	Original color lightness increment. */
-  void incr_select_original_color_lightness(int lightness)
-  {
-    a_sel.incr_original_color_lightness(lightness);
-  }
+  void incr_select_original_color_lightness(int lightness) { a_sel.incr_original_color_lightness(lightness); }
 
   //! Set original color intensity on all selected objects.
   /*! \param intensity	Original color intensity. */
-  void set_select_original_color_intensity(int intensity)
-  {
-    a_sel.set_original_color_intensity(intensity);
-  }
+  void set_select_original_color_intensity(int intensity) { a_sel.set_original_color_intensity(intensity); }
 
   //! Increase original color intensity on all selected objects.
   /*! \param intensity	Original color intensiity increment. */
-  void incr_select_original_color_intensity(int intensity)
-  {
-    a_sel.incr_original_color_intensity(intensity);
-  }
+  void incr_select_original_color_intensity(int intensity) { a_sel.incr_original_color_intensity(intensity); }
 
   //! Set original color shift on all selected objects.
   /*! \param shift	Original color shift. */
-  void set_select_original_color_shift(int shift)
-  {
-    a_sel.set_original_color_shift(shift);
-  }
+  void set_select_original_color_shift(int shift) { a_sel.set_original_color_shift(shift); }
 
   //! Increase original color shift on all selected objects.
   /*! \param shift	Original color shift. */
-  void incr_select_original_color_shift(int shift)
-  {
-    a_sel.incr_original_color_shift(shift);
-  }
+  void incr_select_original_color_shift(int shift) { a_sel.incr_original_color_shift(shift); }
 
   //! Set linewidth on all selected objects.
   /*! \param linewidth	Line width. */
-  void set_select_linewidth(int linewidth)
-  {
-    a_sel.set_linewidth(linewidth);
-  }
+  void set_select_linewidth(int linewidth) { a_sel.set_linewidth(linewidth); }
 
   //! Set or reset fill on all selected objects.
   /*! \param fill	Fill. */
-  void set_select_fill(int fill)
-  {
-    a_sel.set_fill(fill);
-  }
+  void set_select_fill(int fill) { a_sel.set_fill(fill); }
 
   //! Set or reset border on all selected objects.
   /*! \param border	Border. */
-  void set_select_border(int border)
-  {
-    a_sel.set_border(border);
-  }
+  void set_select_border(int border) { a_sel.set_border(border); }
 
   //! Set or reset shadow on all selected objects.
   /*! \param shadow	Shadow. */
-  void set_select_shadow(int shadow)
-  {
-    a_sel.set_shadow(shadow);
-  }
+  void set_select_shadow(int shadow) { a_sel.set_shadow(shadow); }
 
   //! Set gradient type on all selected objects.
   /*! \param gradient	Gradient type. */
-  void set_select_gradient(glow_eGradient gradient)
-  {
-    a_sel.set_gradient(gradient);
-  }
+  void set_select_gradient(glow_eGradient gradient) { a_sel.set_gradient(gradient); }
 
   //! Set linetype on all selected objects.
   /*! \param type       Linetype. */
-  void set_select_linetype(glow_eLineType type)
-  {
-    a_sel.set_linetype(type);
-  }
+  void set_select_linetype(glow_eLineType type) { a_sel.set_linetype(type); }
 
   //! Scale selected object.
   /*!
@@ -493,10 +419,7 @@ public:
 
   //! Get background color.
   /*! \param color	Returned background color. */
-  void get_background(glow_eDrawType* color)
-  {
-    *color = background_color;
-  }
+  void get_background(glow_eDrawType* color) { *color = background_color; }
 
   //! Set background image.
   /*! \param image	Name of image file. */
@@ -548,24 +471,18 @@ public:
     The drawtype is calculated from the tone, intensity, lightness and inverse
     of the parent node.
   */
-  glow_eDrawType get_drawtype(glow_eDrawType local_drawtype,
-      glow_eDrawType highlight_drawtype, int highlight, void* node, int fill)
+  glow_eDrawType get_drawtype(glow_eDrawType local_drawtype, glow_eDrawType highlight_drawtype, int highlight,
+                              void* node, int fill)
   {
-    return GlowColor::get_drawtype(local_drawtype, highlight_drawtype,
-        highlight, node, fill, highlight_disabled);
+    return GlowColor::get_drawtype(local_drawtype, highlight_drawtype, highlight, node, fill,
+                                   highlight_disabled);
   }
 
   //! Disable highlight function.
-  void disable_highlight()
-  {
-    highlight_disabled = 1;
-  }
+  void disable_highlight() { highlight_disabled = 1; }
 
   //! Enable hightlight function.
-  void enable_highlight()
-  {
-    highlight_disabled = 0;
-  }
+  void enable_highlight() { highlight_disabled = 0; }
 
   //! Set dynamic code for subgraph.
   void set_dynamic(char* code, int size);
@@ -632,8 +549,8 @@ public:
     \param object		Object for restrictions. User for slider
     movement.
   */
-  void set_move_restrictions(glow_eMoveRestriction restriction,
-      double max_limit, double min_limit, GlowArrayElem* object);
+  void set_move_restrictions(glow_eMoveRestriction restriction, double max_limit, double min_limit,
+                             GlowArrayElem* object);
 
   //! Align selected objects.
   /*! \param direction		Alignment direction. */
@@ -645,31 +562,19 @@ public:
 
   //! Check if object is a subgraph.
   /*! \return 		Returns 1 if object is a subgraph, else 0. */
-  int is_subgraph()
-  {
-    return subgraph;
-  }
+  int is_subgraph() { return subgraph; }
 
   //! Check if object is a slider.
   /*! \return 		Returns 1 if object is a slider, else 0. */
-  int is_slider()
-  {
-    return slider;
-  }
+  int is_slider() { return slider; }
 
   //! Set that graph is modified or not since last save.
   /*! \param mod 	1: graph is modified, 0: graph is not modified. */
-  void set_modified(int mod)
-  {
-    modified = mod;
-  }
+  void set_modified(int mod) { modified = mod; }
 
   //! Get if graph is modified or not since last save.
   /*! \return  	Returns 1 if graph is modified, 0 if graph is not modified. */
-  int get_modified()
-  {
-    return modified;
-  }
+  int get_modified() { return modified; }
 
   //! Measure the extension of a subgraph.
   /*!
@@ -684,8 +589,7 @@ public:
     width the
     current zoom factor.
   */
-  void measure_javabean(double* pix_x_right, double* pix_x_left,
-      double* pix_y_high, double* pix_y_low);
+  void measure_javabean(double* pix_x_right, double* pix_x_left, double* pix_y_high, double* pix_y_low);
 
   //! Convert coordinates to pixel.
   /*!
@@ -707,8 +611,7 @@ public:
     level
     where the border width of the picture equals java_width.
   */
-  void set_javaframe(double* pix_x_right, double* pix_x_left,
-      double* pix_y_high, double* pix_y_low);
+  void set_javaframe(double* pix_x_right, double* pix_x_left, double* pix_y_high, double* pix_y_low);
 
   //! Export context as a javabean.
   /*!
@@ -725,8 +628,7 @@ public:
     \param components	0: Paint. 1: Declare components. 2: Set component
     attributes.
   */
-  void export_nodeclass_javabean(
-      GlowArrayElem* nc, std::ofstream& fp, int components);
+  void export_nodeclass_javabean(GlowArrayElem* nc, std::ofstream& fp, int components);
 
   //! Export annotation fonts in a nodeclass.
   /*!
@@ -735,8 +637,7 @@ public:
     \param components	0: Paint. 1: Declare components. 2: Set component
     attributes.
   */
-  void export_nc_javabean_font(
-      GlowArrayElem* nc, std::ofstream& fp, int components);
+  void export_nc_javabean_font(GlowArrayElem* nc, std::ofstream& fp, int components);
 
   //! Set java name of the context.
   /*! \param name 	Name of java class for the graph. */
@@ -771,8 +672,7 @@ public:
 
     Send a menu callback.
   */
-  int send_menu_callback(
-      GlowArrayElem* object, int item, glow_eEvent event, double x, double y);
+  int send_menu_callback(GlowArrayElem* object, int item, glow_eEvent event, double x, double y);
 
   //! Send a table callback if such a callback is registred.
   /*!
@@ -785,8 +685,7 @@ public:
 
     Send a table callback.
   */
-  int send_table_callback(GlowArrayElem* object, glow_eEvent event, double x,
-      double y, int column, int row);
+  int send_table_callback(GlowArrayElem* object, glow_eEvent event, double x, double y, int column, int row);
 
   //! Send a toolbar callback if such a callback is registred.
   /*!
@@ -798,8 +697,8 @@ public:
 
     Send a toolbar callback.
   */
-  int send_toolbar_callback(GlowArrayElem* object, glow_eEvent event, double x,
-      double y, int category, int idx);
+  int send_toolbar_callback(GlowArrayElem* object, glow_eEvent event, double x, double y, int category,
+                            int idx);
 
   //! Get configured scantimes.
   /*!
@@ -833,9 +732,8 @@ public:
     \param height	Returned height of text.
     \param descent	Returnd descent of text.
   */
-  void get_text_extent(char* text, int len, glow_eDrawType draw_type,
-      int text_size, glow_eFont font, double* width, double* height,
-      double* descent);
+  void get_text_extent(char* text, int len, glow_eDrawType draw_type, int text_size, glow_eFont font,
+                       double* width, double* height, double* descent);
 
   //! Get the window size
   /*!
@@ -928,9 +826,8 @@ public:
     coordinates. The limits are stored in y0 and y1 for the nodeclass of the
     objects.
   */
-  int get_background_object_limits(glow_eTraceType type, double x, double y,
-      GlowArrayElem** background, double* min, double* max,
-      glow_eDirection* direction);
+  int get_background_object_limits(glow_eTraceType type, double x, double y, GlowArrayElem** background,
+                                   double* min, double* max, glow_eDirection* direction);
 
   //! Set or reset scaletype to equal scale.
   /*!
@@ -940,10 +837,7 @@ public:
     proportions in x and y
     direction is kept.
   */
-  void set_scale_equal(int equal)
-  {
-    scale_equal = equal;
-  }
+  void set_scale_equal(int equal) { scale_equal = equal; }
 
   //! Call the translate callback if such a callback is registred.
   /*!
@@ -990,8 +884,7 @@ public:
   void set_owner(char* o);
 
   //! Get next object regarding position. */
-  int get_next_object_position(
-      GlowArrayElem* object, glow_eDirection dir, GlowArrayElem** next);
+  int get_next_object_position(GlowArrayElem* object, glow_eDirection dir, GlowArrayElem** next);
 
   //! Get previous object. */
   int get_previous_object(GlowArrayElem* object, GlowArrayElem** prev)
@@ -1000,16 +893,10 @@ public:
   }
 
   //! Get next object. */
-  int get_next_object(GlowArrayElem* object, GlowArrayElem** next)
-  {
-    return a.get_next(object, next);
-  }
+  int get_next_object(GlowArrayElem* object, GlowArrayElem** next) { return a.get_next(object, next); }
 
   //! Get first object. */
-  int get_first_object(GlowArrayElem** first)
-  {
-    return a.get_first(first);
-  }
+  int get_first_object(GlowArrayElem** first) { return a.get_first(first); }
 
   //! Check if object is visible. */
   int is_visible(GlowArrayElem* element, glow_eVisible type);
@@ -1018,27 +905,17 @@ public:
   void read_object(std::ifstream& fp, GlowArrayElem** o);
 
   //! Order object. */
-  int order_object(GlowArrayElem* o, GlowArrayElem* dest, glow_eDest code)
-  {
-    return a.move(o, dest, code);
-  }
+  int order_object(GlowArrayElem* o, GlowArrayElem* dest, glow_eDest code) { return a.move(o, dest, code); }
 
   void measure_window(double* ll_x, double* ll_y, double* ur_x, double* ur_y);
 
   int key_pressed(int key);
   int signal_send(char* signalname);
 
-  void pop(GlowArrayElem* element)
-  {
-    layer->pop(element);
-  }
+  void pop(GlowArrayElem* element) { layer->pop(element); }
   void set_text_coding(glow_eTextCoding coding);
-  void set_edit_set_mode(glow_eEditSetMode mode)
-  {
-    edit_set_mode = mode;
-  }
-  int set_custom_color(
-      glow_eDrawType color, double red, double green, double blue);
+  void set_edit_set_mode(glow_eEditSetMode mode) { edit_set_mode = mode; }
+  int set_custom_color(glow_eDrawType color, double red, double green, double blue);
   void reset_custom_colors();
   int custom_colors_is_empty();
   int read_customcolor_file(char* name);
@@ -1046,12 +923,9 @@ public:
   int check_object_name(char* name);
   void get_dashboard_info(double* cell_width, double* cell_height, int* columns, int* rows);
   void set_color_theme();
-  int is_dashboard() 
-  {
-    return dashboard;
-  }
+  int is_dashboard() { return dashboard; }
   int layer_active();
-  int get_active_layer(GrowLayer **layer);
+  int get_active_layer(GrowLayer** layer);
   int merge_visible_layers();
   int merge_visible_layers_to_bg();
   int merge_all_layers();
@@ -1061,7 +935,7 @@ public:
 
   static int get_dimension(char* filename, int* width, int* heigth);
 
-  char name[40]; //!< Name of the context.
+  char name[40];        //!< Name of the context.
   grow_eMode edit_mode; //!< Current edit mode.
   int conpoint_num_cnt; //!< Counter to get next number for when creating
   //! conpoints in a subgraph.
@@ -1087,98 +961,97 @@ public:
   //! selection rectangle.
   int select_rect_stored_ur_y; //!< Stored upper right y coordinate for
   //! selection rectangle.
-  double scale_x; //!< Scalefactor in x direction for scale of selected objects.
-  double scale_y; //!< Scalefactor in y direction for scale of selected objects.
-  double scale_center_x; //!< x coordinate for scaling point.
-  double scale_center_y; //!< y coordinate for scaling point.
-  glow_eScaleType scale_type; //!< Type of scaling.
+  double scale_x;                  //!< Scalefactor in x direction for scale of selected objects.
+  double scale_y;                  //!< Scalefactor in y direction for scale of selected objects.
+  double scale_center_x;           //!< x coordinate for scaling point.
+  double scale_center_y;           //!< y coordinate for scaling point.
+  glow_eScaleType scale_type;      //!< Type of scaling.
   glow_eDrawType background_color; //!< Background color of the window.
-  int highlight_disabled; //!< Highlight is disabled.
-  char* dynamic; //!< Dynamic code for a subgraph.
-  int dynamicsize; //!< Size of dynamic code.
-  int arg_cnt; //!< Number of arguments for dynamic code.
-  char argname[20][32]; //!< Name of arguments for dynamic code.
-  int argtype[20]; //!< Type of the arguments for dynamic code.
-  double x0; //!< Left border of graph.
-  double y0; //!< Low border of graph.
-  double x1; //!< Right border of graph.
-  double y1; //!< High border of graph.
-  int path_cnt; //!< Number of paths in searchpath
-  char path[10][80]; //!< Search paths where subgraphs and imagefiles are
+  int highlight_disabled;          //!< Highlight is disabled.
+  char* dynamic;                   //!< Dynamic code for a subgraph.
+  int dynamicsize;                 //!< Size of dynamic code.
+  int arg_cnt;                     //!< Number of arguments for dynamic code.
+  char argname[20][32];            //!< Name of arguments for dynamic code.
+  int argtype[20];                 //!< Type of the arguments for dynamic code.
+  double x0;                       //!< Left border of graph.
+  double y0;                       //!< Low border of graph.
+  double x1;                       //!< Right border of graph.
+  double y1;                       //!< High border of graph.
+  int path_cnt;                    //!< Number of paths in searchpath
+  char path[10][80];               //!< Search paths where subgraphs and imagefiles are
   //! searched for.
-  int dyn_type1; //!< Dyntype for a subgraph mask 1.
-  int dyn_type2; //!< Dyntype for a subgraph mask 2.
-  int dyn_action_type1; //!< Action type for a subgraph mask 1.
-  int dyn_action_type2; //!< Action type for a subgraph mask 2.
+  int dyn_type1;               //!< Dyntype for a subgraph mask 1.
+  int dyn_type2;               //!< Dyntype for a subgraph mask 2.
+  int dyn_action_type1;        //!< Action type for a subgraph mask 1.
+  int dyn_action_type2;        //!< Action type for a subgraph mask 2.
   glow_eDrawType dyn_color[4]; //!< Dynamic colors for a subgraph.
-  int dyn_attr[4]; //!< Dynamic attributes for a subgraph.
-  int no_con_obstacle; //!< Subgraph is not an obstacle for a connection.
-  int slider; //!< Subgraph is a slider.
+  int dyn_attr[4];             //!< Dynamic attributes for a subgraph.
+  int no_con_obstacle;         //!< Subgraph is not an obstacle for a connection.
+  int slider;                  //!< Subgraph is a slider.
   double slider_cursor_offset; //!< Offset between the cursor and coordinate for
   //! the currently moved slider.
   glow_eMoveRestriction move_restriction; //!< Actual move restrictions.
-  double restriction_max_limit; //!< Max limit of move restrictions. Used for
+  double restriction_max_limit;           //!< Max limit of move restrictions. Used for
   //! sliders.
   double restriction_min_limit; //!< Min limit of move restrictions. Used for
   //! sliders.
   GlowArrayElem* restriction_object; //!< Object the restrictions are valid for.
   //! Used for sliders.
-  int subgraph; //!< Context is a subgraph.
-  int modified; //!< Context is modified since last save operation.
+  int subgraph;                  //!< Context is a subgraph.
+  int modified;                  //!< Context is modified since last save operation.
   GlowExportJBean* export_jbean; //!< Java export object.
-  char java_name[40]; //!< Name of javaclass for context.
-  char next_subgraph[40]; //!< Name of subgraph for next page.
-  int animation_count; //!< Number of scans this page is displayed in an
+  char java_name[40];            //!< Name of javaclass for context.
+  char next_subgraph[40];        //!< Name of subgraph for next page.
+  int animation_count;           //!< Number of scans this page is displayed in an
   //! animation.
-  double scantime; //!< Scantime for slow cycle.
-  double fast_scantime; //!< Scantime for fast cycle.
-  double animation_scantime; //!< Scantime for animations.
-  int stored_offset_x; //!< Stored geometry: offset_x.
-  int stored_offset_y; //!< Stored geometry: offset_y.
+  double scantime;             //!< Scantime for slow cycle.
+  double fast_scantime;        //!< Scantime for fast cycle.
+  double animation_scantime;   //!< Scantime for animations.
+  int stored_offset_x;         //!< Stored geometry: offset_x.
+  int stored_offset_y;         //!< Stored geometry: offset_y.
   double stored_zoom_factor_x; //!< Stored geometry: zoom_factor_x.
   double stored_zoom_factor_y; //!< Stored geometry: zoom_factor_y.
-  double stored_grid_size_x; //!< Stored geometry: grid_size_x.
-  double stored_grid_size_y; //!< Stored geometry: grid_size_y.
-  int stored_grid_on; //!< Stored geometry: grid_on.
-  int stored_show_grid; //!< Stored geometry: show_grid.
-  int java_width; //!< Width in pixels when the graph is exported as a java
+  double stored_grid_size_x;   //!< Stored geometry: grid_size_x.
+  double stored_grid_size_y;   //!< Stored geometry: grid_size_y.
+  int stored_grid_on;          //!< Stored geometry: grid_on.
+  int stored_show_grid;        //!< Stored geometry: show_grid.
+  int java_width;              //!< Width in pixels when the graph is exported as a java
   //! frame.
-  int enable_bg_pixmap; //!< Display the background image.
+  int enable_bg_pixmap;      //!< Display the background image.
   char background_image[80]; //!< Filename of background image.
-  int background_tiled; //!< Background image it tiled, otherwised it is scaled
+  int background_tiled;      //!< Background image it tiled, otherwised it is scaled
   //! to cover the window.
-  int scale_active; //!< Scale of selected objects is active.
+  int scale_active;     //!< Scale of selected objects is active.
   int initial_position; //!< Initial position for curve contexts (a
   //! glow_eDirection).
-  int is_javaapplet; //!< Graph is exported as a java applet.
-  int is_javaapplication; //!< Graph is exported as a java frame.
-  glow_eCycle cycle; //!< Fast of slow cycle as default for subgraph.
+  int is_javaapplet;          //!< Graph is exported as a java applet.
+  int is_javaapplication;     //!< Graph is exported as a java frame.
+  glow_eCycle cycle;          //!< Fast of slow cycle as default for subgraph.
   glow_eMB3Action mb3_action; //!< Action performed when MB3 is clicked.
-  int scale_equal; //!< Scaleing of objects are equal in x and y direction.
-  int translate_on; //!< Send a translate callback to translate all texts of
+  int scale_equal;            //!< Scaleing of objects are equal in x and y direction.
+  int translate_on;           //!< Send a translate callback to translate all texts of
   //! text objects and annotations.
-  glow_eInputFocusMark
-      input_focus_mark; //!< How to mark input focus for a subgraph.
-  int background_disabled; //!< Disable drawing of background.
-  void (*redraw_callback)(void*); //!< Backcall function before drawing (if ctx
+  glow_eInputFocusMark input_focus_mark; //!< How to mark input focus for a subgraph.
+  int background_disabled;               //!< Disable drawing of background.
+  void (*redraw_callback)(void*);        //!< Backcall function before drawing (if ctx
   //! is window component).
-  void* redraw_data; //!< Data for redraw callback.
+  void* redraw_data;  //!< Data for redraw callback.
   int has_subwindows; //!< Graph contains subwindow objects (GrowWindow or
   //! GrowFolder)
-  int is_subwindow; //!< Is a subwindow context.
-  char owner[256]; //!< Owner, used by application
-  int anti_aliasing; //!< Use anti-aliasing
-  int window_resize; //!< Window resize restrictions, non or aspect ratio.
-  glow_eEnv environment; //!< Environment Development or Runtime.
-  glow_eTextCoding text_coding; //!< Text coding
-  int recursive_trace; //!< Subgraph recursive trace
+  int is_subwindow;                //!< Is a subwindow context.
+  char owner[256];                 //!< Owner, used by application
+  int anti_aliasing;               //!< Use anti-aliasing
+  int window_resize;               //!< Window resize restrictions, non or aspect ratio.
+  glow_eEnv environment;           //!< Environment Development or Runtime.
+  glow_eTextCoding text_coding;    //!< Text coding
+  int recursive_trace;             //!< Subgraph recursive trace
   glow_eEditSetMode edit_set_mode; //!< Special edit mode
   int dashboard;
-  GrowDashboard *dash;
-  double dash_cell_width; //!< Width of dashboard cell
-  double dash_cell_height; //!< Height of dashboard cell
-  int disable_subw_events; //!< Disable eventhandling in subwindows and tables
-  int current_color_theme; //!< Current color theme index
+  GrowDashboard* dash;
+  double dash_cell_width;   //!< Width of dashboard cell
+  double dash_cell_height;  //!< Height of dashboard cell
+  int disable_subw_events;  //!< Disable eventhandling in subwindows and tables
+  int current_color_theme;  //!< Current color theme index
   void set_layer_borders(); //!< Set borders of active layer
 };
 

@@ -52,7 +52,8 @@
 
 typedef struct s_FacilityCB sFacilityCB;
 
-struct s_FacilityCB {
+struct s_FacilityCB
+{
   struct LstHead FacL;
   char* facnam;
   int facnum;
@@ -79,7 +80,7 @@ void lex_FacName(char* facnam)
 
 void lex_FacNum(int facnum)
 {
-  struct LstHead * fl;
+  struct LstHead* fl;
 
   /*
    * To do: Check that the facility number is within the valid range
@@ -87,8 +88,10 @@ void lex_FacNum(int facnum)
    */
 
   /* Insert in ascending order */
-  LstForEach(fl, &lFacH) {
-    if (LstEntry(fl, sFacilityCB, FacL)->facnum > facnum) {
+  LstForEach(fl, &lFacH)
+  {
+    if (LstEntry(fl, sFacilityCB, FacL)->facnum > facnum)
+    {
       break;
     }
   }
@@ -98,29 +101,37 @@ void lex_FacNum(int facnum)
   CurrFac = NULL;
 }
 
-static void lex(FILE* fp) {
+static void lex(FILE* fp)
+{
   char buffer[500];
   int next_is_facnum = 0;
   int lineno = 1;
-  while (fgets(buffer, 500, fp) != NULL) {
-    if (strstr(buffer, "msg_sFacility")) {
+  while (fgets(buffer, 500, fp) != NULL)
+  {
+    if (strstr(buffer, "msg_sFacility"))
+    {
       char* facnam = strstr(buffer, "msg_sFacility") + 14; // "MYfacility[] = "
-      facnam[strchr(facnam, '[')-facnam] = '\0'; // "MYfacility"
-      if (!strstr(facnam, "facility")) {
+      facnam[strchr(facnam, '[') - facnam] = '\0';         // "MYfacility"
+      if (!strstr(facnam, "facility"))
+      {
         fprintf(stderr, "Syntax error in file %s line %d\n", inFile, lineno);
         exit(1);
       }
       lex_FacName(facnam);
       next_is_facnum = 1;
-    } else if (next_is_facnum) {
-      char *line = buffer;
-      while (!isdigit(line[0])) {
+    }
+    else if (next_is_facnum)
+    {
+      char* line = buffer;
+      while (!isdigit(line[0]))
+      {
         line++; // "1337,"
       }
-      line[strchr(line, ',')-line] = '\0';
+      line[strchr(line, ',') - line] = '\0';
       char* end;
       int facnum = strtol(line, &end, 10);
-      if (!facnum) {
+      if (!facnum)
+      {
         fprintf(stderr, "Syntax error in file %s line %d\n", inFile, lineno);
         exit(1);
       }
@@ -140,24 +151,25 @@ static void CopyFile(FILE* ifp, FILE* ofp)
 
 static void WriteFacility(FILE* cfp, char* branch)
 {
-  struct LstHead * fl;
+  struct LstHead* fl;
   int i = 0;
 
   fprintf(cfp, "static msg_sFacility *Facilities[] = {\n");
 
-  LstForEach(fl, &lFacH) {
+  LstForEach(fl, &lFacH)
+  {
     if (i++)
       fprintf(cfp, ",\n");
 
-    fprintf(cfp, "\t%-20s /* %4d */", LstEntry(fl, sFacilityCB, FacL)->facnam, LstEntry(fl, sFacilityCB, FacL)->facnum);
+    fprintf(cfp, "\t%-20s /* %4d */", LstEntry(fl, sFacilityCB, FacL)->facnam,
+            LstEntry(fl, sFacilityCB, FacL)->facnum);
   }
 
   fprintf(cfp, "};\n\n");
   if (LstEmpty(&lFacH))
     fprintf(cfp, "msg_sHead %sMsgHead = {0, 0};\n", branch ? branch : "pwrp");
   else
-    fprintf(cfp, "msg_sHead %sMsgHead = {MSG_NOF(Facilities), Facilities};\n",
-        branch ? branch : "pwrp");
+    fprintf(cfp, "msg_sHead %sMsgHead = {MSG_NOF(Facilities), Facilities};\n", branch ? branch : "pwrp");
 }
 
 int main(int argc, char** argv)
@@ -171,21 +183,26 @@ int main(int argc, char** argv)
   if (argc < 3)
     usage();
 
-  if (argv[1][0] == '-') {
-    if (argv[1][1] == 'b') {
+  if (argv[1][0] == '-')
+  {
+    if (argv[1][1] == 'b')
+    {
       branch = argv[2];
       bmsg = 1;
-    } else
+    }
+    else
       usage();
     if (argc != 5)
       usage();
-  } else if (argc != 3)
+  }
+  else if (argc != 3)
     usage();
 
   inFile = bmsg ? argv[3] : argv[1];
   outFile = bmsg ? argv[4] : argv[2];
 
-  if (!(in = fopen(inFile, "r"))) {
+  if (!(in = fopen(inFile, "r")))
+  {
     printf("Can't open input file: %s", inFile);
     exit(1);
   }
@@ -194,7 +211,8 @@ int main(int argc, char** argv)
 
   lex(in);
 
-  if (!(cfp = fopen(outFile, "w+"))) {
+  if (!(cfp = fopen(outFile, "w+")))
+  {
     printf("Can't open output file: %s", outFile);
     fclose(in);
     exit(1);

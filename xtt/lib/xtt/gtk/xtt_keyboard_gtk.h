@@ -41,18 +41,17 @@
 
 #include "xtt_keyboard.h"
 
-class XttKeyboardGtk : public XttKeyboard {
+class XttKeyboardGtk : public XttKeyboard
+{
 public:
-  XttKeyboardGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-      const char* xn_name, GtkWidget** w, keyboard_eKeymap keymap,
-      keyboard_eType type, int xn_color_theme, pwr_tStatus* status);
+  XttKeyboardGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, const char* xn_name, GtkWidget** w,
+                 keyboard_eKeymap keymap, keyboard_eType type, int xn_color_theme, pwr_tStatus* status);
   ~XttKeyboardGtk();
 
   void set_inputfocus();
   void pop();
   void set_transient(void* basewidget);
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
 
   GtkWidget* parent_wid;
   GtkWidget* keyboard_widget;

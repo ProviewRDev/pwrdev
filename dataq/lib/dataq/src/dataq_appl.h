@@ -46,105 +46,103 @@
 */
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
+  /** @addtogroup DataQAppl */
+  /** @{*/
 
-/** @addtogroup DataQAppl */
-/** @{*/
-
-#define QAPPL_QUEUELIST_MAX                                                   \
-  32 /* Max number of queues in a                                               \
+#define QAPPL_QUEUELIST_MAX                                                                                  \
+  32 /* Max number of queues in a                                                                            \
         appl_init call */
-#define QAPPL_APPLSESS_MAX                                                  \
-  32 /* Max number of application                                              \
+#define QAPPL_APPLSESS_MAX                                                                                   \
+  32 /* Max number of application                                                                            \
         sessions */
 
 #define qappl_mOption_Remove (1 << 0)
 #define qappl_mOption_NamePath (1 << 1)
 #define qappl_mOption_ReverseOrder (1 << 2)
 
-/** \defgroup DATAQ_DS DataQAppl Data Structures
- *  @{
- */
+  /** \defgroup DATAQ_DS DataQAppl Data Structures
+   *  @{
+   */
 
-/** Queue list */
-typedef struct qappl_s_queuelist {
-  pwr_tOName name;
-  pwr_tOid objid;
-  pwr_tAddress object_ptr;
-  pwr_tDlid subid;
-  pwr_tCid classid;
-  unsigned long index_mask[QAPPL_APPLSESS_MAX];
-  int tmp_size;
-  void* tmp_queue;
-  struct qappl_s_queuelist* next;
-} qappl_tQueueList;
+  /** Queue list */
+  typedef struct qappl_s_queuelist
+  {
+    pwr_tOName name;
+    pwr_tOid objid;
+    pwr_tAddress object_ptr;
+    pwr_tDlid subid;
+    pwr_tCid classid;
+    unsigned long index_mask[QAPPL_APPLSESS_MAX];
+    int tmp_size;
+    void* tmp_queue;
+    struct qappl_s_queuelist* next;
+  } qappl_tQueueList;
 
-/** Data info */
-typedef struct {
-  pwr_tOid objid; /**< Dataobject objid */
-  pwr_tOName name; /**< Dataobject name (last segment) */
-  pwr_tAddress object_ptr; /**< Pointer to data object */
-  pwr_tBoolean select; /**< The select attribute for the dataobject in the
-                          queue object. If the dataobject is present in several
-                          queues, select is set if the dataobject is selected
-                          in at least one of the queues. */
-  pwr_tBoolean front; /**< The Front attribute for the dataobject in the queue
-                         object. If the dataobject is present in several
-                         queues, front is set if the Front flag is set in one
-                         of the queues. */
-  pwr_tBoolean back; /**< The Back attribute for the dataobject in the queue
-                         object. If the dataobject is present in several
-                         queues, back is set if the Back flag is set in one
-                         of the queues. */
-  pwr_tBoolean newdata; /**< Marks that a data object is new since the last
-                           mirror. */
-  pwr_tBoolean removed; /**< Marks that the dataobject has disappeard since
-                           the last mirror. Requires the the option
-                           qappl_mOption_Remove is selected. */
-  unsigned long queue_mask; /**< Mask that specifies in which queue or which
-                              queues the dataobject resides. The first bit
-                              corresponds to the first queue, i.e. the first
-                              queue in queue list supplied to qappl_MirrorInit,
-                              etc. */
-} qappl_tDataInfo;
+  /** Data info */
+  typedef struct
+  {
+    pwr_tOid objid;           /**< Dataobject objid */
+    pwr_tOName name;          /**< Dataobject name (last segment) */
+    pwr_tAddress object_ptr;  /**< Pointer to data object */
+    pwr_tBoolean select;      /**< The select attribute for the dataobject in the
+                                 queue object. If the dataobject is present in several
+                                 queues, select is set if the dataobject is selected
+                                 in at least one of the queues. */
+    pwr_tBoolean front;       /**< The Front attribute for the dataobject in the queue
+                                 object. If the dataobject is present in several
+                                 queues, front is set if the Front flag is set in one
+                                 of the queues. */
+    pwr_tBoolean back;        /**< The Back attribute for the dataobject in the queue
+                                  object. If the dataobject is present in several
+                                  queues, back is set if the Back flag is set in one
+                                  of the queues. */
+    pwr_tBoolean newdata;     /**< Marks that a data object is new since the last
+                                 mirror. */
+    pwr_tBoolean removed;     /**< Marks that the dataobject has disappeard since
+                                 the last mirror. Requires the the option
+                                 qappl_mOption_Remove is selected. */
+    unsigned long queue_mask; /**< Mask that specifies in which queue or which
+                                queues the dataobject resides. The first bit
+                                corresponds to the first queue, i.e. the first
+                                queue in queue list supplied to qappl_MirrorInit,
+                                etc. */
+  } qappl_tDataInfo;
 
-/** DataQAppl context */
-typedef struct qappl_s_ctx {
-  qappl_tQueueList* queuelist[QAPPL_QUEUELIST_MAX];
-  unsigned long options;
-  int index;
-  unsigned long index_mask;
-  int queuelist_count;
-  int total_queuesize;
-  int data_count;
-  qappl_tDataInfo* datainfo;
-  struct qappl_s_ctx* next;
-} * qappl_tCtx;
+  /** DataQAppl context */
+  typedef struct qappl_s_ctx
+  {
+    qappl_tQueueList* queuelist[QAPPL_QUEUELIST_MAX];
+    unsigned long options;
+    int index;
+    unsigned long index_mask;
+    int queuelist_count;
+    int total_queuesize;
+    int data_count;
+    qappl_tDataInfo* datainfo;
+    struct qappl_s_ctx* next;
+  }* qappl_tCtx;
 
-/** @} */
-/**
- * \defgroup DATAQ_FC DataQAppl Functions
- * \ingroup DataQ
- * @{
- */
+  /** @} */
+  /**
+   * \defgroup DATAQ_FC DataQAppl Functions
+   * \ingroup DataQ
+   * @{
+   */
 
-pwr_tStatus qappl_MirrorInit(
-    pwr_tOName* queue_array, unsigned long options, qappl_tCtx* ctx);
+  pwr_tStatus qappl_MirrorInit(pwr_tOName* queue_array, unsigned long options, qappl_tCtx* ctx);
 
-pwr_tStatus qappl_Mirror(
-    qappl_tCtx applctx, int* data_count, qappl_tDataInfo** datainfo);
-pwr_tStatus qappl_RemoveData(qappl_tCtx applctx, pwr_tOid objid);
-pwr_tStatus qappl_RemoveAndDeleteData(
-    qappl_tCtx applctx, pwr_tOid objid);
-pwr_tStatus qappl_SelectData(qappl_tCtx applctx, pwr_tOid objid);
-pwr_tStatus qappl_TransportData(qappl_tCtx applctx, pwr_tOid objid,
-    unsigned int from_queue_mask, unsigned int to_queue_mask);
-pwr_tStatus qappl_InsertData(
-    qappl_tCtx applctx, pwr_tOid objid, unsigned int queue_mask);
-pwr_tStatus qappl_RemoveAndKeepData(
-    qappl_tCtx applctx, pwr_tOid objid, unsigned int queue_mask);
+  pwr_tStatus qappl_Mirror(qappl_tCtx applctx, int* data_count, qappl_tDataInfo** datainfo);
+  pwr_tStatus qappl_RemoveData(qappl_tCtx applctx, pwr_tOid objid);
+  pwr_tStatus qappl_RemoveAndDeleteData(qappl_tCtx applctx, pwr_tOid objid);
+  pwr_tStatus qappl_SelectData(qappl_tCtx applctx, pwr_tOid objid);
+  pwr_tStatus qappl_TransportData(qappl_tCtx applctx, pwr_tOid objid, unsigned int from_queue_mask,
+                                  unsigned int to_queue_mask);
+  pwr_tStatus qappl_InsertData(qappl_tCtx applctx, pwr_tOid objid, unsigned int queue_mask);
+  pwr_tStatus qappl_RemoveAndKeepData(qappl_tCtx applctx, pwr_tOid objid, unsigned int queue_mask);
 
 #if defined __cplusplus
 }

@@ -95,7 +95,8 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
   unsigned int input_area_chansize = 0;
   unsigned int output_area_chansize = 0;
 
-  while (cardp) {
+  while (cardp)
+  {
     local_card = calloc(1, sizeof(*local_card));
 
     cid = cardp->Class;
@@ -103,30 +104,31 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
     while (ODD(gdh_GetSuperClass(cid, &cid, cardp->Objid)))
       ;
 
-    switch (cid) {
-    case pwr_cClass_Modbus_RTU_Module: {
+    switch (cid)
+    {
+    case pwr_cClass_Modbus_RTU_Module:
+    {
       pwr_sClass_Modbus_RTU_Module* modulep;
 
       cardp->Local = local_card;
       no_di = 0;
       no_do = 0;
 
-      local_card->msg[0].input_area
-          = (void*)&(op->Inputs) + input_area_offset + input_area_chansize;
-      local_card->msg[0].output_area
-          = (void*)&(op->Outputs) + output_area_offset + output_area_chansize;
+      local_card->msg[0].input_area = (void*)&(op->Inputs) + input_area_offset + input_area_chansize;
+      local_card->msg[0].output_area = (void*)&(op->Outputs) + output_area_offset + output_area_chansize;
 
       modulep = (pwr_sClass_Modbus_RTU_Module*)cardp->op;
       modulep->Status = pwr_eModbusModule_StatusEnum_StatusUnknown;
 
-      io_bus_card_init(ctx, cardp, &input_area_offset, &input_area_chansize,
-          &output_area_offset, &output_area_chansize,
-          pwr_eByteOrderingEnum_BigEndian, io_eAlignment_Packed);
+      io_bus_card_init(ctx, cardp, &input_area_offset, &input_area_chansize, &output_area_offset,
+                       &output_area_chansize, pwr_eByteOrderingEnum_BigEndian, io_eAlignment_Packed);
 
       /* Count number of di and do */
-      for (i = 0; i < cardp->ChanListSize; i++) {
+      for (i = 0; i < cardp->ChanListSize; i++)
+      {
         chanp = &cardp->chanlist[i];
-        switch (chanp->ChanClass) {
+        switch (chanp->ChanClass)
+        {
         case pwr_cClass_ChanDi:
           no_di++;
           break;
@@ -135,10 +137,8 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
           break;
         }
       }
-      local_card->msg[0].input_size
-          = input_area_offset + input_area_chansize - prev_input_area_offset;
-      local_card->msg[0].output_size
-          = output_area_offset + output_area_chansize - prev_output_area_offset;
+      local_card->msg[0].input_size = input_area_offset + input_area_chansize - prev_input_area_offset;
+      local_card->msg[0].output_size = output_area_offset + output_area_chansize - prev_output_area_offset;
       local_card->msg[0].no_di = no_di;
       local_card->msg[0].no_do = no_do;
 
@@ -162,32 +162,22 @@ static pwr_tStatus IoRackInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
 /*----------------------------------------------------------------------------*\
    Read method for the Modbus_RTU slave
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoRackRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
    Write method for the Modbus_RTU slave
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoRackWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
 
 \*----------------------------------------------------------------------------*/
-static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp)
-{
-  return IO__SUCCESS;
-}
+static pwr_tStatus IoRackClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp) { return IO__SUCCESS; }
 
 /*----------------------------------------------------------------------------*\
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindIoMethods(Modbus_RTU_Slave)
-    = { pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackRead),
-        pwr_BindIoMethod(IoRackWrite), pwr_BindIoMethod(IoRackClose),
-        pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(Modbus_RTU_Slave) = {pwr_BindIoMethod(IoRackInit), pwr_BindIoMethod(IoRackRead),
+                                                   pwr_BindIoMethod(IoRackWrite),
+                                                   pwr_BindIoMethod(IoRackClose), pwr_NullMethod};

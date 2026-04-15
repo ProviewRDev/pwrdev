@@ -54,10 +54,11 @@ class AttrQtWidget;
 
 //! Attribute editor.
 /*! Displays grow attributes and dynamic attributes for an object or graph. */
-class AttrQt : public Attr {
+class AttrQt : public Attr
+{
 public:
-  AttrQt(QWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type,
-      void* a_object, attr_sItem* itemlist, int item_cnt);
+  AttrQt(QWidget* a_parent_wid, void* a_parent_ctx, attr_eType a_type, void* a_object, attr_sItem* itemlist,
+         int item_cnt);
 
   AttrQtWidget* toplevel;
   QWidget* brow_widget;
@@ -80,12 +81,12 @@ public:
   ~AttrQt();
 };
 
-class AttrQtWidget : public QDialog {
+class AttrQtWidget : public QDialog
+{
   Q_OBJECT
 
 public:
-  AttrQtWidget(AttrQt* parent_ctx, QWidget* parent)
-      : QDialog(parent), attr(parent_ctx) {}
+  AttrQtWidget(AttrQt* parent_ctx, QWidget* parent) : QDialog(parent), attr(parent_ctx) {}
 
 protected:
   void focusInEvent(QFocusEvent* event);

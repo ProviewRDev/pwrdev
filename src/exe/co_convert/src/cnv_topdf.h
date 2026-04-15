@@ -48,7 +48,8 @@
 #undef ps_cPageWidth
 #define ps_cPageWidth 595
 
-typedef enum {
+typedef enum
+{
   pdf_eObjType_Catalog,
   pdf_eObjType_Page,
   pdf_eObjType_Pages,
@@ -63,12 +64,12 @@ typedef enum {
 
 class CnvToPdf;
 
-class CnvPdfObj {
-  public:
+class CnvPdfObj
+{
+public:
   CnvPdfObj(CnvToPdf* otopdf, pdf_eObjType otype, int onumber)
-      : topdf(otopdf), type(otype), number(onumber), length(0), offset(0),
-        start(0), parent(0), first(0), last(0), next(0), prev(0), dest(0),
-        count(0), resource(-1), xobject_cnt(0)
+      : topdf(otopdf), type(otype), number(onumber), length(0), offset(0), start(0), parent(0), first(0),
+        last(0), next(0), prev(0), dest(0), count(0), resource(-1), xobject_cnt(0)
   {
     strcpy(fontname, "");
     strcpy(text, "");
@@ -98,40 +99,32 @@ class CnvPdfObj {
   int xobject[40];
 };
 
-class CnvToPdf : public CnvToPs {
-  public:
+class CnvToPdf : public CnvToPs
+{
+public:
   CnvToPdf() : CnvToPs(), prev_ci(0), xref_offset(0), im_cnt(0), use_outlines(1) {}
   ~CnvToPdf();
 
   void close();
-  void print_text(
-      const char* text, CnvStyle& style, int mode = ps_mPrintMode_Pos);
+  void print_text(const char* text, CnvStyle& style, int mode = ps_mPrintMode_Pos);
   void draw_rect(double lw, double x, double y, double w, double h);
-  void draw_arc(double lw, double x, double y, double w, double h, int angle1,
-      int angle2);
-  void draw_line(double lw, double x1, double y1, double x2, double y2,
-      int dashed, int gray);
+  void draw_arc(double lw, double x, double y, double w, double h, int angle1, int angle2);
+  void draw_line(double lw, double x1, double y1, double x2, double y2, int dashed, int gray);
   void draw_text(double x, double y, char* text, int bold, double size);
-  void draw_arrow(double x1, double y1, double x2, double y2, double x3,
-      double y3, int gray);
+  void draw_arrow(double x1, double y1, double x2, double y2, double x3, double y3, int gray);
   void print_pagebreak(int print_num);
   void print_content();
   void print_horizontal_line();
   int print_image(const char* filename);
   int print_image_inline(const char* filename);
-  void set_cf(int val)
-  {
-  }
+  void set_cf(int val) {}
   void set_ci(int val)
   {
     prev_ci = ci;
     ci = val;
   }
   void open();
-  void set_useoutlines(int u)
-  {
-    use_outlines = u;
-  }
+  void set_useoutlines(int u) { use_outlines = u; }
   char* fontname(CnvStyle& style);
 
   std::vector<CnvPdfObj> v_pages;

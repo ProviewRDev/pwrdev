@@ -42,26 +42,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "co_tree.h"
+#include "rt_cmvolc.h"
 #include "rt_gdh_msg.h"
 #include "rt_hash_msg.h"
-#include "co_tree.h"
-#include "rt_vol.h"
-#include "rt_cmvolc.h"
 #include "rt_ndc.h"
 #include "rt_subc.h"
+#include "rt_vol.h"
 
 typedef struct {
   tree_sNode node;
   pwr_tNodeId nid;
   unsigned int cnt;
-  net_sSubAdd* msg;
+  net_sSubAdd *msg;
 } sAdd;
 
 typedef struct {
   tree_sNode node;
   pwr_tNodeId nid;
   unsigned int cnt;
-  net_sSubRemove* msg;
+  net_sSubRemove *msg;
 } sRemove;
 
 static pwr_tUInt32 default_dt = 1000; /* Default value of update delta time */
@@ -70,20 +70,19 @@ static pwr_tUInt32 default_dt = 1000; /* Default value of update delta time */
 static pwr_tUInt32 default_tmo = 10000; /* Default value of timeout */
 /* Zero means infinite, i.e. no timeout */
 
-static void activateTimeoutWatch(sub_sClient* cp);
+static void activateTimeoutWatch(sub_sClient *cp);
 
-static void cancelTimeoutWatch(sub_sClient* cp);
+static void cancelTimeoutWatch(sub_sClient *cp);
 
-static void deleteClient(sub_sClient* cp);
+static void deleteClient(sub_sClient *cp);
 
-static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp);
+static gdb_sNode *testClient(pwr_tStatus *sts, sub_sClient *cp);
 
 /* This routine posts a subscription client entry for timeout watching. The
    tmo field of the entry must be filled in. The routine
    detects zero = infinite timeouts, and takes approprate action.  */
 
-static void activateTimeoutWatch(sub_sClient* cp)
-{
+static void activateTimeoutWatch(sub_sClient *cp) {
   gdb_AssumeLocked;
 
   /* Handle only remotely located objects with a tmo != 0.  */
@@ -97,8 +96,7 @@ static void activateTimeoutWatch(sub_sClient* cp)
 
 /* Remove a subscription client entry from timeout watching.  */
 
-static void cancelTimeoutWatch(sub_sClient* cp)
-{
+static void cancelTimeoutWatch(sub_sClient *cp) {
   gdb_AssumeLocked;
 
   if (cp->tmoactive) {
@@ -112,10 +110,9 @@ static void cancelTimeoutWatch(sub_sClient* cp)
    It does not terminate any outstanding subscritions, though.
    The database must be locked.  */
 
-static void deleteClient(sub_sClient* cp)
-{
+static void deleteClient(sub_sClient *cp) {
   pwr_tStatus sts;
-  gdb_sNode* np;
+  gdb_sNode *np;
 
   gdb_AssumeLocked;
 
@@ -139,7 +136,7 @@ static void deleteClient(sub_sClient* cp)
   }
 
   if (cp->cclass != pool_cNRef) {
-    gdb_sCclass* ccp;
+    gdb_sCclass *ccp;
 
     ccp = pool_Address(NULL, gdbroot->pool, cp->cclass);
     if (ccp == NULL)
@@ -158,22 +155,21 @@ static void deleteClient(sub_sClient* cp)
    A nid of 0 implies that the object was not available.
    The database must be locked.  */
 
-static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp)
-{
+static gdb_sNode *testClient(pwr_tStatus *sts, sub_sClient *cp) {
   pwr_tStatus lsts = GDH__SUCCESS;
   pwr_tSubid sid = cp->sid;
   cdh_sParseName parseName;
-  cdh_sParseName* pn;
-  gdb_sObject* op = NULL;
-  sub_sClient* rcp;
-  gdb_sVolume* vp;
-  gdb_sNode* np = NULL;
+  cdh_sParseName *pn;
+  gdb_sObject *op = NULL;
+  sub_sClient *rcp;
+  gdb_sVolume *vp;
+  gdb_sNode *np = NULL;
   mvol_sAttribute attribute;
-  mvol_sAttribute* ap = NULL;
-  pwr_sAttrRef* arp = NULL;
-  pwr_sAttrRef* rarp;
-  gdb_sCclass* ccp = NULL;
-  gdb_sCclass* ccpLocked;
+  mvol_sAttribute *ap = NULL;
+  pwr_sAttrRef *arp = NULL;
+  pwr_sAttrRef *rarp;
+  gdb_sCclass *ccp = NULL;
+  gdb_sCclass *ccpLocked;
   pool_tRef ccr;
   pwr_tUInt32 ridx;
   pwr_tBoolean equal = 0;
@@ -189,8 +185,8 @@ static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp)
         break;
 
       do {
-        ap = vol_NameToAttribute(
-            &lsts, &attribute, pn, gdb_mLo_global, vol_mTrans_all);
+        ap = vol_NameToAttribute(&lsts, &attribute, pn, gdb_mLo_global,
+                                 vol_mTrans_all);
         if (ap == NULL)
           break;
         rcp = hash_Search(sts, gdbroot->subc_ht, &sid);
@@ -214,8 +210,8 @@ static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp)
 
         /* Get cached class if needed */
         if (!op->u.c.flags.b.classChecked || !op->u.c.flags.b.classEqual) {
-          ccp = cmvolc_GetCachedClass(
-              &lsts, np, vp, ap, &equal, &fetched, NULL);
+          ccp =
+              cmvolc_GetCachedClass(&lsts, np, vp, ap, &equal, &fetched, NULL);
           if (EVEN(lsts)) {
             np = NULL;
             op = NULL;
@@ -244,8 +240,8 @@ static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp)
 
             if (ccr != cp->cclass) {
               if (cp->cclass != pool_cNRef) {
-                gdb_sCclass* cc2p
-                    = pool_Address(NULL, gdbroot->pool, cp->cclass);
+                gdb_sCclass *cc2p =
+                    pool_Address(NULL, gdbroot->pool, cp->cclass);
                 cmvolc_UnlockClass(NULL, cc2p);
               }
 
@@ -269,10 +265,10 @@ static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp)
 
     } else { /* Lookup by attribute reference.  */
       do {
-	arp = &cp->aref;
+        arp = &cp->aref;
 
         op = vol_OidToObject(&lsts, cp->aref.Objid, gdb_mLo_global,
-            vol_mTrans_all, cvol_eHint_none);
+                             vol_mTrans_all, cvol_eHint_none);
         if (op == NULL) {
           lsts = GDH__NOSUCHOBJ;
           break;
@@ -286,8 +282,8 @@ static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp)
         /* This is a not to ugly fix, but it should be removed, LW.
            It's done to make Leif-Göran Hansson happier. I.e. it makes
            the linksup program work.
-	   Removed, CS */
-        //cp->aref = cdh_ObjidToAref(op->g.oid);
+           Removed, CS */
+        // cp->aref = cdh_ObjidToAref(op->g.oid);
 
         vp = pool_Address(NULL, gdbroot->pool, op->l.vr);
         np = hash_Search(&lsts, gdbroot->nid_ht, &vp->g.nid);
@@ -301,12 +297,12 @@ static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp)
 
         /* Get cached class if needed */
         if (!op->u.c.flags.b.classChecked || !op->u.c.flags.b.classEqual) {
-          ap = vol_ArefToAttribute(
-              &lsts, &attribute, &cp->aref, gdb_mLo_global, vol_mTrans_all);
+          ap = vol_ArefToAttribute(&lsts, &attribute, &cp->aref, gdb_mLo_global,
+                                   vol_mTrans_all);
           if (ap == NULL)
             break;
-          ccp = cmvolc_GetCachedClass(
-              &lsts, np, vp, ap, &equal, &fetched, NULL);
+          ccp =
+              cmvolc_GetCachedClass(&lsts, np, vp, ap, &equal, &fetched, NULL);
           if (EVEN(lsts)) {
             np = NULL;
             op = NULL;
@@ -335,8 +331,8 @@ static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp)
 
             if (ccr != cp->cclass) {
               if (cp->cclass != pool_cNRef) {
-                gdb_sCclass* cc2p
-                    = pool_Address(NULL, gdbroot->pool, cp->cclass);
+                gdb_sCclass *cc2p =
+                    pool_Address(NULL, gdbroot->pool, cp->cclass);
                 cmvolc_UnlockClass(NULL, cc2p);
               }
 
@@ -351,7 +347,7 @@ static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp)
           if (fetched) {
             np = NULL;
             op = NULL;
-	    continue;
+            continue;
           }
         }
 
@@ -375,7 +371,7 @@ static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp)
       if (!equal) {
         ccpLocked = ccp;
         rarp = ndc_NarefToRaref(sts, ap, arp, ccp, &ridx, &cp->raref, &equal,
-            NULL, ccpLocked, vp, np);
+                                NULL, ccpLocked, vp, np);
         if (rarp == NULL || equal) {
           if (ccp->flags.b.cacheLock)
             cmvolc_UnlockClass(NULL, ccp);
@@ -384,8 +380,8 @@ static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp)
             np = gdbroot->no_node;
         } else {
           if (!ccp->flags.b.rnConv) {
-            ndc_sRemoteToNative* tbl;
-            gdb_sClass* c = hash_Search(sts, gdbroot->cid_ht, &ccp->key.cid);
+            ndc_sRemoteToNative *tbl;
+            gdb_sClass *c = hash_Search(sts, gdbroot->cid_ht, &ccp->key.cid);
             if (c == NULL)
               errh_Bugcheck(GDH__WEIRD, "can't get class");
 
@@ -420,19 +416,18 @@ static gdb_sNode* testClient(pwr_tStatus* sts, sub_sClient* cp)
    nodes, sending the SubAdd message and starting timeout watching.
    The database must be locked.  */
 
-void subc_ActivateList(pool_sQlink* lh, pwr_tObjid oid)
-{
+void subc_ActivateList(pool_sQlink *lh, pwr_tObjid oid) {
   pwr_tStatus sts;
-  tree_sTable* add;
-  net_sSubSpec* specp;
+  tree_sTable *add;
+  net_sSubSpec *specp;
   qcom_sQid tgt;
-  pool_sQlink* my_lh;
+  pool_sQlink *my_lh;
   pwr_tUInt32 my_subc_lc;
-  gdb_sNode* np;
-  gdb_sNode* old_np;
-  sub_sClient* cp;
-  pool_sQlink* cl;
-  sAdd* aep;
+  gdb_sNode *np;
+  gdb_sNode *old_np;
+  sub_sClient *cp;
+  pool_sQlink *cl;
+  sAdd *aep;
 
   /* Test each client. If existing object, fill in nid field
      and move the client to the appropriate nodes's subc_lh list. Turn
@@ -443,7 +438,7 @@ void subc_ActivateList(pool_sQlink* lh, pwr_tObjid oid)
      for an earlier subcli.  */
 
   add = tree_CreateTable(&sts, sizeof(pwr_tNodeId), offsetof(sAdd, nid),
-      sizeof(sAdd), 10, tree_Comp_nid);
+                         sizeof(sAdd), 10, tree_Comp_nid);
 
   /* Move all objects to a new, temporary root */
 
@@ -503,8 +498,8 @@ void subc_ActivateList(pool_sQlink* lh, pwr_tObjid oid)
 
         if (aep->msg == NULL) {
           aep->cnt = MIN(my_subc_lc, net_cSubMaxAdd);
-          aep->msg
-              = malloc(sizeof(net_sSubAdd) + sizeof(net_sSubSpec) * aep->cnt);
+          aep->msg =
+              malloc(sizeof(net_sSubAdd) + sizeof(net_sSubSpec) * aep->cnt);
           aep->msg->count = 0;
         } /* If there was no message allocated */
 
@@ -523,7 +518,7 @@ void subc_ActivateList(pool_sQlink* lh, pwr_tObjid oid)
           gdb_Unlock;
 
           net_Put(NULL, &tgt, aep->msg, net_eMsg_subAdd, 0,
-              pwr_Offset(aep->msg, spec[aep->msg->count]), 0);
+                  pwr_Offset(aep->msg, spec[aep->msg->count]), 0);
 
           gdb_Lock;
 
@@ -555,7 +550,7 @@ void subc_ActivateList(pool_sQlink* lh, pwr_tObjid oid)
         tgt = np->handler;
         pwr_Assert(tgt.nid != pwr_cNNodeId);
         net_Put(NULL, &tgt, aep->msg, net_eMsg_subAdd, 0,
-            pwr_Offset(aep->msg, spec[aep->msg->count]), 0);
+                pwr_Offset(aep->msg, spec[aep->msg->count]), 0);
       }
       free(aep->msg);
     }
@@ -571,13 +566,12 @@ void subc_ActivateList(pool_sQlink* lh, pwr_tObjid oid)
    holding the server entry corresponding to the client.
    The database should be locked on entry.  */
 
-void subc_CancelList(pool_sQlink* lh)
-{
+void subc_CancelList(pool_sQlink *lh) {
   qcom_sQid tgt;
   pwr_tNodeId nid;
   pwr_tSubid sid;
-  sub_sClient* cp;
-  pool_sQlink* cl;
+  sub_sClient *cp;
+  pool_sQlink *cl;
 
   gdb_AssumeLocked;
 
@@ -602,13 +596,12 @@ void subc_CancelList(pool_sQlink* lh)
 /* Cancel all subscriptions for a particular user.
    The database should be locked on entry.  */
 
-void subc_CancelUser(pid_t subscriber)
-{
-  sub_sClient* cp;
-  pool_sQlink* cl;
-  gdb_sNode* np;
-  pool_sQlink* nl;
-  pool_sQlink* lh;
+void subc_CancelUser(pid_t subscriber) {
+  sub_sClient *cp;
+  pool_sQlink *cl;
+  gdb_sNode *np;
+  pool_sQlink *nl;
+  pool_sQlink *lh;
 
   /* Allocate a temporary root */
 
@@ -648,13 +641,12 @@ void subc_CancelUser(pid_t subscriber)
    The subcli is linked into a list
    The database must be locked.  */
 
-sub_sClient* subc_Create(char* name, /* Input or NULL */
-    pwr_sAttrRef* arp, /* Input or NULL */
-    pool_sQlink* lh /* List header. */
-    )
-{
-  sub_sClient* cp;
-  sub_sClient* rcp;
+sub_sClient *subc_Create(char *name,        /* Input or NULL */
+                         pwr_sAttrRef *arp, /* Input or NULL */
+                         pool_sQlink *lh    /* List header. */
+) {
+  sub_sClient *cp;
+  sub_sClient *rcp;
   pwr_tInt32 s;
   pwr_tStatus sts;
 
@@ -697,9 +689,8 @@ sub_sClient* subc_Create(char* name, /* Input or NULL */
 
    The database should be locked.  */
 
-void subc_RemoveFromMessage(sub_sClient* cp)
-{
-  sub_sMessage* mp;
+void subc_RemoveFromMessage(sub_sClient *cp) {
+  sub_sMessage *mp;
 
   if (cp->submsg == pool_cNRef)
     return;
@@ -721,8 +712,7 @@ void subc_RemoveFromMessage(sub_sClient* cp)
 
 /* Changes the defaults for dt and tmo.  */
 
-void subc_SetDefaults(pwr_tInt32 dt, pwr_tInt32 tmo)
-{
+void subc_SetDefaults(pwr_tInt32 dt, pwr_tInt32 tmo) {
   if (dt >= 0) {
     if (dt != 0)
       default_dt = dt;
@@ -744,9 +734,8 @@ void subc_SetDefaults(pwr_tInt32 dt, pwr_tInt32 tmo)
    Doing this also prevents the pool from beeing exhausted
    since `old' data locks the 'message' in the pool.  */
 
-void subc_SetOld(sub_sClient* cp)
-{
-  void* adrs;
+void subc_SetOld(sub_sClient *cp) {
+  void *adrs;
 
   cp->old = TRUE;
 

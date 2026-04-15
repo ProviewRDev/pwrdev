@@ -54,21 +54,18 @@
 #define CNV_CONVDEF_SIZE 200
 
 static int cnv_remove_blank(char* out_str, char* in_str);
-static int cnv_string_to_partype(char* string, int args, char* third_arg,
-    cnv_eParType* type, int* size, char* format);
-static int cnv_convtable_add(cnv_eParType to_type, cnv_eParType from_type,
-    int to_offset, int from_offset, int to_size, int from_size, char* to_format,
-    char* from_format, cnv_t_conv_table* conv_table, int* conv_table_count);
-static int cnv_convtable_compress(
-    cnv_t_conv_table* conv_table, int* conv_table_count);
+static int cnv_string_to_partype(char* string, int args, char* third_arg, cnv_eParType* type, int* size,
+                                 char* format);
+static int cnv_convtable_add(cnv_eParType to_type, cnv_eParType from_type, int to_offset, int from_offset,
+                             int to_size, int from_size, char* to_format, char* from_format,
+                             cnv_t_conv_table* conv_table, int* conv_table_count);
+static int cnv_convtable_compress(cnv_t_conv_table* conv_table, int* conv_table_count);
 static int cnv_read_line(char* line, int maxsize, FILE* file);
 static int cnv_ReadConvTable(char* filename, pwr_sClass_ConvDef** convdef);
-static int cnv_GetConvTableFromClass(
-    pwr_tObjid class, pwr_sClass_ConvDef** convdef);
+static int cnv_GetConvTableFromClass(pwr_tObjid class, pwr_sClass_ConvDef** convdef);
 
-int cnv_CreateConvTable(pwr_sClass_ConvDef* to_convdef,
-    pwr_sClass_ConvDef* from_convdef, cnv_t_conv_table* conv_table,
-    int* conv_table_count)
+int cnv_CreateConvTable(pwr_sClass_ConvDef* to_convdef, pwr_sClass_ConvDef* from_convdef,
+                        cnv_t_conv_table* conv_table, int* conv_table_count)
 {
   char out_str[5][80];
   int nr;
@@ -92,16 +89,18 @@ int cnv_CreateConvTable(pwr_sClass_ConvDef* to_convdef,
   /* Search trough parameternames in the to convdef
      and match them with the from convdef */
   from_convdef_count = 0;
-  for (i = 0; i < CNV_CONVDEF_SIZE; i++) {
+  for (i = 0; i < CNV_CONVDEF_SIZE; i++)
+  {
     cnv_remove_blank(from_convdef->Param[i], from_convdef->Param[i]);
     if (from_convdef->Param[i][0] == 0)
       break;
     if (from_convdef->Param[i][0] == '!')
       continue;
 
-    nr = dcli_parse(from_convdef->Param[i], " 	", "", (char*)out_str,
-        sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]), 0);
-    if (nr != 2 && nr != 3 && nr != 4) {
+    nr = dcli_parse(from_convdef->Param[i], " 	", "", (char*)out_str, sizeof(out_str) / sizeof(out_str[0]),
+                    sizeof(out_str[0]), 0);
+    if (nr != 2 && nr != 3 && nr != 4)
+    {
       errh_CErrLog(CNV__SYNTAX, errh_ErrArgAF(from_convdef->Param[i]), NULL);
       return CNV__SYNTAX;
     }
@@ -111,82 +110,93 @@ int cnv_CreateConvTable(pwr_sClass_ConvDef* to_convdef,
     /* Second arg i parameter name */
     str_ToUpper(from_param[from_convdef_count], out_str[1]);
     strcpy(from_format[from_convdef_count], "");
-    sts = cnv_string_to_partype(type_str, nr, out_str[2],
-        &from_type[from_convdef_count], &from_size[from_convdef_count],
-        from_format[from_convdef_count]);
-    if (EVEN(sts)) {
+    sts = cnv_string_to_partype(type_str, nr, out_str[2], &from_type[from_convdef_count],
+                                &from_size[from_convdef_count], from_format[from_convdef_count]);
+    if (EVEN(sts))
+    {
       errh_CErrLog(sts, errh_ErrArgAF(to_convdef->Param[i]), NULL);
       return sts;
     }
     if (from_convdef_count == 0)
       from_offset[from_convdef_count] = 0;
-    else {
-      if (nr == 4) {
+    else
+    {
+      if (nr == 4)
+      {
         sts = sscanf(out_str[3], "%d", &offset);
-        if (sts != 1) {
-          errh_CErrLog(
-              CNV__SYNTAX, errh_ErrArgAF(from_convdef->Param[i]), NULL);
+        if (sts != 1)
+        {
+          errh_CErrLog(CNV__SYNTAX, errh_ErrArgAF(from_convdef->Param[i]), NULL);
           return CNV__SYNTAX;
         }
         from_offset[from_convdef_count] = offset;
-      } else
-        from_offset[from_convdef_count] = from_offset[from_convdef_count - 1]
-            + from_size[from_convdef_count - 1];
+      }
+      else
+        from_offset[from_convdef_count] =
+            from_offset[from_convdef_count - 1] + from_size[from_convdef_count - 1];
     }
     from_convdef_count++;
   }
 
   to_convdef_count = 0;
-  for (i = 0; i < CNV_CONVDEF_SIZE; i++) {
+  for (i = 0; i < CNV_CONVDEF_SIZE; i++)
+  {
     cnv_remove_blank(to_convdef->Param[i], to_convdef->Param[i]);
     if (to_convdef->Param[i][0] == 0)
       break;
     if (to_convdef->Param[i][0] == '!')
       continue;
 
-    nr = dcli_parse(to_convdef->Param[i], " 	", "", (char*)out_str,
-        sizeof(out_str) / sizeof(out_str[0]), sizeof(out_str[0]), 0);
-    if (nr != 2 && nr != 3 && nr != 4) {
+    nr = dcli_parse(to_convdef->Param[i], " 	", "", (char*)out_str, sizeof(out_str) / sizeof(out_str[0]),
+                    sizeof(out_str[0]), 0);
+    if (nr != 2 && nr != 3 && nr != 4)
+    {
       errh_CErrLog(CNV__SYNTAX, errh_ErrArgAF(to_convdef->Param[i]), NULL);
       return CNV__SYNTAX;
     }
 
     str_ToUpper(type_str, out_str[0]);
     strcpy(to_format[from_convdef_count], "");
-    sts = cnv_string_to_partype(type_str, nr, out_str[2],
-        &to_type[to_convdef_count], &to_size[to_convdef_count],
-        to_format[from_convdef_count]);
-    if (EVEN(sts)) {
+    sts = cnv_string_to_partype(type_str, nr, out_str[2], &to_type[to_convdef_count],
+                                &to_size[to_convdef_count], to_format[from_convdef_count]);
+    if (EVEN(sts))
+    {
       errh_CErrLog(sts, errh_ErrArgAF(to_convdef->Param[i]), NULL);
       return sts;
     }
     str_ToUpper(to_param[to_convdef_count], out_str[1]);
     if (to_convdef_count == 0)
       to_offset[to_convdef_count] = 0;
-    else {
-      if (nr == 4) {
+    else
+    {
+      if (nr == 4)
+      {
         sts = sscanf(out_str[3], "%d", &offset);
-        if (sts != 1) {
+        if (sts != 1)
+        {
           errh_CErrLog(CNV__SYNTAX, errh_ErrArgAF(to_convdef->Param[i]), NULL);
           return CNV__SYNTAX;
         }
         to_offset[to_convdef_count] = offset;
-      } else
-        to_offset[to_convdef_count]
-            = to_offset[to_convdef_count - 1] + to_size[to_convdef_count - 1];
+      }
+      else
+        to_offset[to_convdef_count] = to_offset[to_convdef_count - 1] + to_size[to_convdef_count - 1];
     }
     to_convdef_count++;
   }
 
-  for (i = 0; i < to_convdef_count; i++) {
+  for (i = 0; i < to_convdef_count; i++)
+  {
     /* Find a match i from_convdef */
-    for (j = 0; j < from_convdef_count; j++) {
-      if (!strcmp(to_param[i], from_param[j])) {
+    for (j = 0; j < from_convdef_count; j++)
+    {
+      if (!strcmp(to_param[i], from_param[j]))
+      {
         /* Hit */
-        sts = cnv_convtable_add(to_type[i], from_type[j], to_offset[i],
-            from_offset[j], to_size[i], from_size[j], to_format[i],
-            from_format[j], conv_table, conv_table_count);
-        if (EVEN(sts)) {
+        sts = cnv_convtable_add(to_type[i], from_type[j], to_offset[i], from_offset[j], to_size[i],
+                                from_size[j], to_format[i], from_format[j], conv_table, conv_table_count);
+        if (EVEN(sts))
+        {
           errh_CErrLog(sts, errh_ErrArgAF(to_param[i]), NULL);
           return sts;
         }
@@ -198,103 +208,125 @@ int cnv_CreateConvTable(pwr_sClass_ConvDef* to_convdef,
   return CNV__SUCCESS;
 }
 
-static int cnv_convtable_add(cnv_eParType to_type, cnv_eParType from_type,
-    int to_offset, int from_offset, int to_size, int from_size, char* to_format,
-    char* from_format, cnv_t_conv_table* conv_table, int* conv_table_count)
+static int cnv_convtable_add(cnv_eParType to_type, cnv_eParType from_type, int to_offset, int from_offset,
+                             int to_size, int from_size, char* to_format, char* from_format,
+                             cnv_t_conv_table* conv_table, int* conv_table_count)
 {
   cnv_t_conv_item* conv_table_ptr;
 
   conv_table_ptr = (cnv_t_conv_item*)conv_table + *conv_table_count;
 
-  if (to_type == from_type) {
+  if (to_type == from_type)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = to_size;
     conv_table_ptr->type = cnv_eConvType_memcpy;
-  } else if (from_type == cnv_eParType_Char && to_type == cnv_eParType_String) {
+  }
+  else if (from_type == cnv_eParType_Char && to_type == cnv_eParType_String)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = to_size;
     conv_table_ptr->type = cnv_eConvType_CharToString;
-  } else if (from_type == cnv_eParType_Int16 && to_type == cnv_eParType_Int32) {
+  }
+  else if (from_type == cnv_eParType_Int16 && to_type == cnv_eParType_Int32)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = 0;
     conv_table_ptr->type = cnv_eConvType_Int16ToInt32;
-  } else if (from_type == cnv_eParType_Int32
-      && to_type == cnv_eParType_Float32) {
+  }
+  else if (from_type == cnv_eParType_Int32 && to_type == cnv_eParType_Float32)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = 0;
     conv_table_ptr->type = cnv_eConvType_Int32ToFloat32;
-  } else if (from_type == cnv_eParType_Int32 && to_type == cnv_eParType_Int16) {
+  }
+  else if (from_type == cnv_eParType_Int32 && to_type == cnv_eParType_Int16)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = 0;
     conv_table_ptr->type = cnv_eConvType_Int32ToInt16;
-  } else if (from_type == cnv_eParType_Int32
-      && to_type == cnv_eParType_String) {
+  }
+  else if (from_type == cnv_eParType_Int32 && to_type == cnv_eParType_String)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = to_size;
     conv_table_ptr->type = cnv_eConvType_Int32ToString;
-  } else if (from_type == cnv_eParType_Int32 && to_type == cnv_eParType_Ascii) {
+  }
+  else if (from_type == cnv_eParType_Int32 && to_type == cnv_eParType_Ascii)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = to_size;
     conv_table_ptr->type = cnv_eConvType_Int32ToAscii;
-  } else if (from_type == cnv_eParType_Float32
-      && to_type == cnv_eParType_Int32) {
+  }
+  else if (from_type == cnv_eParType_Float32 && to_type == cnv_eParType_Int32)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = 0;
     conv_table_ptr->type = cnv_eConvType_Float32ToInt32;
-  } else if (from_type == cnv_eParType_Float32
-      && to_type == cnv_eParType_String) {
+  }
+  else if (from_type == cnv_eParType_Float32 && to_type == cnv_eParType_String)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = to_size;
     conv_table_ptr->type = cnv_eConvType_Float32ToString;
     strcpy(conv_table_ptr->format, from_format);
-  } else if (from_type == cnv_eParType_Float32
-      && to_type == cnv_eParType_Ascii) {
+  }
+  else if (from_type == cnv_eParType_Float32 && to_type == cnv_eParType_Ascii)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = to_size;
     conv_table_ptr->type = cnv_eConvType_Float32ToAscii;
     strcpy(conv_table_ptr->format, from_format);
-  } else if (from_type == cnv_eParType_String
-      && to_type == cnv_eParType_Int32) {
+  }
+  else if (from_type == cnv_eParType_String && to_type == cnv_eParType_Int32)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = from_size;
     conv_table_ptr->type = cnv_eConvType_StringToInt32;
-  } else if (from_type == cnv_eParType_String
-      && to_type == cnv_eParType_Float32) {
+  }
+  else if (from_type == cnv_eParType_String && to_type == cnv_eParType_Float32)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = from_size;
     conv_table_ptr->type = cnv_eConvType_StringToFloat32;
-  } else if (from_type == cnv_eParType_Ascii && to_type == cnv_eParType_Int32) {
+  }
+  else if (from_type == cnv_eParType_Ascii && to_type == cnv_eParType_Int32)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = from_size;
     conv_table_ptr->type = cnv_eConvType_AsciiToInt32;
-  } else if (from_type == cnv_eParType_Ascii
-      && to_type == cnv_eParType_Float32) {
+  }
+  else if (from_type == cnv_eParType_Ascii && to_type == cnv_eParType_Float32)
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = from_size;
     conv_table_ptr->type = cnv_eConvType_AsciiToFloat32;
-  } else if ((from_type == cnv_eParType_Time && to_type == cnv_eParType_Binary
-                 && to_size == sizeof(pwr_tTime))
-      || (from_type == cnv_eParType_Binary && to_type == cnv_eParType_Time
-             && from_size == sizeof(pwr_tTime))) {
+  }
+  else if ((from_type == cnv_eParType_Time && to_type == cnv_eParType_Binary &&
+            to_size == sizeof(pwr_tTime)) ||
+           (from_type == cnv_eParType_Binary && to_type == cnv_eParType_Time &&
+            from_size == sizeof(pwr_tTime)))
+  {
     conv_table_ptr->from = from_offset;
     conv_table_ptr->to = to_offset;
     conv_table_ptr->size = to_size;
     conv_table_ptr->type = cnv_eConvType_memcpy;
-  } else
+  }
+  else
     return CNV__CONVTYPE;
 
   (*conv_table_count)++;
@@ -302,69 +334,58 @@ static int cnv_convtable_add(cnv_eParType to_type, cnv_eParType from_type,
   return CNV__SUCCESS;
 }
 
-int cnv_ConvertData(cnv_t_conv_table* conv_table, int conv_table_count,
-    char* from_data, char* to_data)
+int cnv_ConvertData(cnv_t_conv_table* conv_table, int conv_table_count, char* from_data, char* to_data)
 {
   cnv_t_conv_item* conv_item;
   int i;
   char tmpstr[1000];
 
   conv_item = (cnv_t_conv_item*)conv_table;
-  for (i = 0; i < conv_table_count; i++) {
-    switch (conv_item->type) {
+  for (i = 0; i < conv_table_count; i++)
+  {
+    switch (conv_item->type)
+    {
     case cnv_eConvType_memcpy:
-      memcpy(to_data + conv_item->to, from_data + conv_item->from,
-          conv_item->size);
+      memcpy(to_data + conv_item->to, from_data + conv_item->from, conv_item->size);
       break;
     case cnv_eConvType_CharToString:
       memcpy(to_data + conv_item->to, from_data + conv_item->from, 1);
       memset(to_data + conv_item->to + 1, 0, 1);
       break;
     case cnv_eConvType_Int16ToInt32:
-      *(pwr_tInt32*)(to_data + conv_item->to)
-          = *(pwr_tInt16*)(from_data + conv_item->from);
+      *(pwr_tInt32*)(to_data + conv_item->to) = *(pwr_tInt16*)(from_data + conv_item->from);
       break;
     case cnv_eConvType_Int32ToFloat32:
-      *(pwr_tFloat32*)(to_data + conv_item->to)
-          = *(pwr_tInt32*)(from_data + conv_item->from);
+      *(pwr_tFloat32*)(to_data + conv_item->to) = *(pwr_tInt32*)(from_data + conv_item->from);
       break;
     case cnv_eConvType_Int32ToInt16:
-      *(pwr_tInt16*)(to_data + conv_item->to)
-          = *(pwr_tInt32*)(from_data + conv_item->from);
+      *(pwr_tInt16*)(to_data + conv_item->to) = *(pwr_tInt32*)(from_data + conv_item->from);
       break;
     case cnv_eConvType_Int32ToString:
-      sprintf(to_data + conv_item->to, "%d",
-          *(pwr_tInt32*)(from_data + conv_item->from));
+      sprintf(to_data + conv_item->to, "%d", *(pwr_tInt32*)(from_data + conv_item->from));
       break;
     case cnv_eConvType_Int32ToAscii:
-      sprintf(tmpstr, "%*d", conv_item->size,
-          *(pwr_tInt32*)(from_data + conv_item->from));
+      sprintf(tmpstr, "%*d", conv_item->size, *(pwr_tInt32*)(from_data + conv_item->from));
       memcpy(to_data + conv_item->to, tmpstr, conv_item->size);
       break;
     case cnv_eConvType_Float32ToInt32:
-      *(pwr_tInt32*)(to_data + conv_item->to)
-          = *(pwr_tFloat32*)(from_data + conv_item->from);
+      *(pwr_tInt32*)(to_data + conv_item->to) = *(pwr_tFloat32*)(from_data + conv_item->from);
       break;
     case cnv_eConvType_Float32ToString:
-      sprintf(to_data + conv_item->to, conv_item->format,
-          *(pwr_tFloat32*)(from_data + conv_item->from));
+      sprintf(to_data + conv_item->to, conv_item->format, *(pwr_tFloat32*)(from_data + conv_item->from));
       break;
     case cnv_eConvType_Float32ToAscii:
       if (conv_item->format[0] != 0)
-        sprintf(tmpstr, conv_item->format,
-            *(pwr_tFloat32*)(from_data + conv_item->from));
+        sprintf(tmpstr, conv_item->format, *(pwr_tFloat32*)(from_data + conv_item->from));
       else
-        sprintf(tmpstr, "%*f", conv_item->size,
-            *(pwr_tFloat32*)(from_data + conv_item->from));
+        sprintf(tmpstr, "%*f", conv_item->size, *(pwr_tFloat32*)(from_data + conv_item->from));
       memcpy(to_data + conv_item->to, tmpstr, conv_item->size);
       break;
     case cnv_eConvType_StringToInt32:
-      sscanf(from_data + conv_item->from, "%d",
-          (pwr_tInt32*)(to_data + conv_item->to));
+      sscanf(from_data + conv_item->from, "%d", (pwr_tInt32*)(to_data + conv_item->to));
       break;
     case cnv_eConvType_StringToFloat32:
-      sscanf(from_data + conv_item->from, "%f",
-          (pwr_tFloat32*)(to_data + conv_item->to));
+      sscanf(from_data + conv_item->from, "%f", (pwr_tFloat32*)(to_data + conv_item->to));
       break;
     case cnv_eConvType_AsciiToInt32:
       strncpy(tmpstr, from_data + conv_item->from, conv_item->size);
@@ -388,7 +409,8 @@ static int cnv_remove_blank(char* out_str, char* in_str)
 
   s = in_str;
   /* Find first not blank */
-  while (*s) {
+  while (*s)
+  {
     if (!(*s == 9 || *s == 32))
       break;
     s++;
@@ -397,7 +419,8 @@ static int cnv_remove_blank(char* out_str, char* in_str)
   /* Remove at end */
   s = out_str + strlen(out_str);
   s--;
-  while (s >= out_str) {
+  while (s >= out_str)
+  {
     if (!(*s == 9 || *s == 32))
       break;
     s--;
@@ -407,45 +430,66 @@ static int cnv_remove_blank(char* out_str, char* in_str)
   return CNV__SUCCESS;
 }
 
-static int cnv_string_to_partype(char* string, int args, char* third_arg,
-    cnv_eParType* type, int* size, char* format)
+static int cnv_string_to_partype(char* string, int args, char* third_arg, cnv_eParType* type, int* size,
+                                 char* format)
 {
   int nr;
 
-  if (!strcmp(string, "CHAR")) {
+  if (!strcmp(string, "CHAR"))
+  {
     *type = cnv_eParType_Char;
     *size = 1;
-  } else if (!strcmp(string, "BOOLEAN")) {
+  }
+  else if (!strcmp(string, "BOOLEAN"))
+  {
     *type = cnv_eParType_Boolean;
     *size = 4;
-  } else if (!strcmp(string, "INT8")) {
+  }
+  else if (!strcmp(string, "INT8"))
+  {
     *type = cnv_eParType_Int8;
     *size = 1;
-  } else if (!strcmp(string, "UINT8")) {
+  }
+  else if (!strcmp(string, "UINT8"))
+  {
     *type = cnv_eParType_UInt8;
     *size = 1;
-  } else if (!strcmp(string, "INT16")) {
+  }
+  else if (!strcmp(string, "INT16"))
+  {
     *type = cnv_eParType_Int16;
     *size = 2;
-  } else if (!strcmp(string, "UINT16")) {
+  }
+  else if (!strcmp(string, "UINT16"))
+  {
     *type = cnv_eParType_UInt16;
     *size = 2;
-  } else if (!strcmp(string, "INT32")) {
+  }
+  else if (!strcmp(string, "INT32"))
+  {
     *type = cnv_eParType_Int32;
     *size = 4;
-  } else if (!strcmp(string, "UINT32")) {
+  }
+  else if (!strcmp(string, "UINT32"))
+  {
     *type = cnv_eParType_UInt32;
     *size = 4;
-  } else if (!strcmp(string, "FLOAT32")) {
+  }
+  else if (!strcmp(string, "FLOAT32"))
+  {
     /* Format may be given as an argument */
     if (args >= 3 && !streq(third_arg, "-"))
       strcpy(format, third_arg);
     *type = cnv_eParType_Float32;
     *size = 4;
-  } else if (!strcmp(string, "FLOAT64")) {
+  }
+  else if (!strcmp(string, "FLOAT64"))
+  {
     *type = cnv_eParType_Float64;
     *size = 8;
-  } else if (!strcmp(string, "STRING")) {
+  }
+  else if (!strcmp(string, "STRING"))
+  {
     /* Size should be given as an argument */
     /* Third arg is size */
     if (args < 3 || streq(third_arg, "-"))
@@ -455,7 +499,9 @@ static int cnv_string_to_partype(char* string, int args, char* third_arg,
     if (nr != 1)
       return CNV__SYNTAX;
     *type = cnv_eParType_String;
-  } else if (!strcmp(string, "ASCII")) {
+  }
+  else if (!strcmp(string, "ASCII"))
+  {
     /* Size should be given as an argument */
     /* Third arg is size */
     if (args < 3 || streq(third_arg, "-"))
@@ -465,7 +511,9 @@ static int cnv_string_to_partype(char* string, int args, char* third_arg,
     if (nr != 1)
       return CNV__SYNTAX;
     *type = cnv_eParType_Ascii;
-  } else if (!strcmp(string, "BINARY")) {
+  }
+  else if (!strcmp(string, "BINARY"))
+  {
     /* Size should be given as an argument */
     if (args < 3 || streq(third_arg, "-"))
       return CNV__SYNTAX;
@@ -474,7 +522,9 @@ static int cnv_string_to_partype(char* string, int args, char* third_arg,
     if (nr != 1)
       return CNV__SYNTAX;
     *type = cnv_eParType_Binary;
-  } else if (!strcmp(string, "UNKNOWN")) {
+  }
+  else if (!strcmp(string, "UNKNOWN"))
+  {
     /* Size should be given as an argument */
     if (args < 3 || streq(third_arg, "-"))
       return CNV__SYNTAX;
@@ -483,17 +533,19 @@ static int cnv_string_to_partype(char* string, int args, char* third_arg,
     if (nr != 1)
       return CNV__SYNTAX;
     *type = cnv_eParType_Unknown;
-  } else if (!strcmp(string, "TIME")) {
+  }
+  else if (!strcmp(string, "TIME"))
+  {
     *type = cnv_eParType_Time;
     *size = 8;
-  } else
+  }
+  else
     return CNV__NOPARTYPE;
 
   return CNV__SUCCESS;
 }
 
-static int cnv_convtable_compress(
-    cnv_t_conv_table* conv_table, int* conv_table_count)
+static int cnv_convtable_compress(cnv_t_conv_table* conv_table, int* conv_table_count)
 {
   cnv_t_conv_item* conv_table_ptr;
   cnv_t_conv_item previous;
@@ -506,19 +558,23 @@ static int cnv_convtable_compress(
   current_ptr = (cnv_t_conv_item*)conv_table;
   conv_table_ptr = (cnv_t_conv_item*)conv_table + 1;
   memcpy(&previous, conv_table, sizeof(previous));
-  for (i = 1; i < *conv_table_count; i++) {
+  for (i = 1; i < *conv_table_count; i++)
+  {
     compress = 0;
-    if (current_ptr->type == cnv_eConvType_memcpy
-        && conv_table_ptr->type == cnv_eConvType_memcpy
-        && conv_table_ptr->to == (previous.to + previous.size)
-        && conv_table_ptr->from == (previous.from + previous.size)) {
+    if (current_ptr->type == cnv_eConvType_memcpy && conv_table_ptr->type == cnv_eConvType_memcpy &&
+        conv_table_ptr->to == (previous.to + previous.size) &&
+        conv_table_ptr->from == (previous.from + previous.size))
+    {
       compress = 1;
     }
 
-    if (compress) {
+    if (compress)
+    {
       /* Compress these */
       current_ptr->size += conv_table_ptr->size;
-    } else {
+    }
+    else
+    {
       current_ptr++;
       memcpy(current_ptr, conv_table_ptr, sizeof(*current_ptr));
       new_count++;
@@ -532,8 +588,7 @@ static int cnv_convtable_compress(
   return CNV__SUCCESS;
 }
 
-static int cnv_GetConvTableFromClass(
-    pwr_tObjid class, pwr_sClass_ConvDef** convdef)
+static int cnv_GetConvTableFromClass(pwr_tObjid class, pwr_sClass_ConvDef** convdef)
 {
   pwr_tClassId class_class;
   pwr_tObjid objid;
@@ -574,7 +629,8 @@ static int cnv_GetConvTableFromClass(
   param_size = sizeof((*convdef)->Param) / sizeof((*convdef)->Param[0]);
   i = 0;
   sts = gdh_GetChild(rtbody_objid, &objid);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     if (i >= param_size)
       break;
 
@@ -593,7 +649,8 @@ static int cnv_GetConvTableFromClass(
       return sts;
 
     add_size = 0;
-    switch (parinfo.Type) {
+    switch (parinfo.Type)
+    {
     case pwr_eType_Boolean:
       strcpy(type, "Boolean");
       break;
@@ -641,23 +698,28 @@ static int cnv_GetConvTableFromClass(
       add_size = 1;
       break;
     }
-    if (!(parinfo.Flags & PWR_MASK_ARRAY)) {
+    if (!(parinfo.Flags & PWR_MASK_ARRAY))
+    {
       strcpy((*convdef)->Param[i], type);
       strcat((*convdef)->Param[i], " ");
       strcat((*convdef)->Param[i], attrname);
       offset = parinfo.Offset;
-      if (add_size) {
+      if (add_size)
+      {
         size = parinfo.Size;
-        sprintf(
-            (*convdef)->Param[i] + strlen((*convdef)->Param[i]), " %d", size);
-      } else {
+        sprintf((*convdef)->Param[i] + strlen((*convdef)->Param[i]), " %d", size);
+      }
+      else
+      {
         sprintf((*convdef)->Param[i] + strlen((*convdef)->Param[i]), " -");
       }
-      sprintf(
-          (*convdef)->Param[i] + strlen((*convdef)->Param[i]), " %d", offset);
+      sprintf((*convdef)->Param[i] + strlen((*convdef)->Param[i]), " %d", offset);
       i++;
-    } else {
-      for (j = 0; j < (int)parinfo.Elements; j++) {
+    }
+    else
+    {
+      for (j = 0; j < (int)parinfo.Elements; j++)
+      {
         offset = parinfo.Offset + j * parinfo.Size / parinfo.Elements;
         if (i >= param_size)
           break;
@@ -665,15 +727,16 @@ static int cnv_GetConvTableFromClass(
         strcat((*convdef)->Param[i], " ");
         strcat((*convdef)->Param[i], attrname);
         sprintf((*convdef)->Param[i] + strlen((*convdef)->Param[i]), "[%d]", j);
-        if (add_size) {
+        if (add_size)
+        {
           size = parinfo.Size / parinfo.Elements;
-          sprintf(
-              (*convdef)->Param[i] + strlen((*convdef)->Param[i]), " %d", size);
-        } else {
+          sprintf((*convdef)->Param[i] + strlen((*convdef)->Param[i]), " %d", size);
+        }
+        else
+        {
           sprintf((*convdef)->Param[i] + strlen((*convdef)->Param[i]), " -");
         }
-        sprintf(
-            (*convdef)->Param[i] + strlen((*convdef)->Param[i]), " %d", offset);
+        sprintf((*convdef)->Param[i] + strlen((*convdef)->Param[i]), " %d", offset);
         i++;
       }
     }
@@ -691,23 +754,27 @@ static int cnv_ReadConvTable(char* filename, pwr_sClass_ConvDef** convdef)
   int sts;
 
   infile = fopen(filename, "r");
-  if (!infile) {
+  if (!infile)
+  {
     errh_CErrLog(CNV__NOFILE, errh_ErrArgAF(filename), NULL);
     return CNV__NOFILE;
   }
 
   *convdef = calloc(1, sizeof(**convdef));
-  if (*convdef == 0) {
+  if (*convdef == 0)
+  {
     fclose(infile);
     return CNV__NOMEMORY;
   }
 
   i = 0;
-  while (ODD(sts = cnv_read_line(line, sizeof(line), infile))) {
+  while (ODD(sts = cnv_read_line(line, sizeof(line), infile)))
+  {
     cnv_remove_blank(line, line);
     if (line[0] == '!')
       continue;
-    if (i >= CNV_CONVDEF_SIZE) {
+    if (i >= CNV_CONVDEF_SIZE)
+    {
       fclose(infile);
       return CNV__FILESIZE;
     }
@@ -720,17 +787,17 @@ static int cnv_ReadConvTable(char* filename, pwr_sClass_ConvDef** convdef)
 }
 
 /*************************************************************************
-*
-* Name:		dtt_read_line()
-*
-* Type		void
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Read a line for a file.
-*
-**************************************************************************/
+ *
+ * Name:		dtt_read_line()
+ *
+ * Type		void
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Read a line for a file.
+ *
+ **************************************************************************/
 
 static int cnv_read_line(char* line, int maxsize, FILE* file)
 {
@@ -745,10 +812,9 @@ static int cnv_read_line(char* line, int maxsize, FILE* file)
   return CNV__SUCCESS;
 }
 
-int cvn_ConvInit(pwr_tInt32 ToConvdefType, pwr_tObjid ToConvdef,
-    char* ToConvdefFile, pwr_tInt32 FromConvdefType, pwr_tObjid FromConvdef,
-    char* FromConvdefFile, pwr_tInt32* ConvTableSize, pwr_tInt32 AllocConvTable,
-    char** ConvTable)
+int cvn_ConvInit(pwr_tInt32 ToConvdefType, pwr_tObjid ToConvdef, char* ToConvdefFile,
+                 pwr_tInt32 FromConvdefType, pwr_tObjid FromConvdef, char* FromConvdefFile,
+                 pwr_tInt32* ConvTableSize, pwr_tInt32 AllocConvTable, char** ConvTable)
 {
   cnv_t_conv_table* conv_table;
   int conv_table_count;
@@ -758,78 +824,101 @@ int cvn_ConvInit(pwr_tInt32 ToConvdefType, pwr_tObjid ToConvdef,
   pwr_sClass_ConvDef* to_convdef_ptr;
   pwr_sClass_ConvDef* from_convdef_ptr;
 
-  if (ToConvdefType == CNV_CONVDEFTYPE_OBJ) {
+  if (ToConvdefType == CNV_CONVDEFTYPE_OBJ)
+  {
     /* Get pointer to ConvDef object */
     sts = gdh_ObjidToPointer(ToConvdef, (pwr_tAddress*)&to_convdef_ptr);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_CErrLog(CNV__CONVDEFOBJECT, errh_ErrArgMsg(sts), NULL);
       *ConvTableSize = 0;
       return CNV__CONVDEFOBJECT;
     }
-  } else if (ToConvdefType == CNV_CONVDEFTYPE_FILE) {
+  }
+  else if (ToConvdefType == CNV_CONVDEFTYPE_FILE)
+  {
     sts = cnv_ReadConvTable(ToConvdefFile, &to_convdef_ptr);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_CErrLog(CNV__CONVDEFFILE, errh_ErrArgMsg(sts), NULL);
       *ConvTableSize = 0;
       return CNV__CONVDEFFILE;
     }
-  } else if (ToConvdefType == CNV_CONVDEFTYPE_CLASS) {
+  }
+  else if (ToConvdefType == CNV_CONVDEFTYPE_CLASS)
+  {
     sts = cnv_GetConvTableFromClass(ToConvdef, &to_convdef_ptr);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_CErrLog(CNV__CONVDEFCLASS, errh_ErrArgMsg(sts), NULL);
       *ConvTableSize = 0;
       return CNV__CONVDEFCLASS;
     }
-  } else {
+  }
+  else
+  {
     errh_CErrLog(CNV__CONVDEFTYPE, NULL);
     *ConvTableSize = 0;
     return CNV__CONVDEFTYPE;
   }
 
-  if (FromConvdefType == CNV_CONVDEFTYPE_OBJ) {
+  if (FromConvdefType == CNV_CONVDEFTYPE_OBJ)
+  {
     /* Get pointer to ConvDef object */
     sts = gdh_ObjidToPointer(FromConvdef, (pwr_tAddress*)&from_convdef_ptr);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_CErrLog(CNV__CONVDEFOBJECT, errh_ErrArgMsg(sts), NULL);
       *ConvTableSize = 0;
       return CNV__CONVDEFOBJECT;
     }
-  } else if (FromConvdefType == CNV_CONVDEFTYPE_FILE) {
+  }
+  else if (FromConvdefType == CNV_CONVDEFTYPE_FILE)
+  {
     sts = cnv_ReadConvTable(FromConvdefFile, &from_convdef_ptr);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_CErrLog(CNV__CONVDEFFILE, errh_ErrArgMsg(sts), NULL);
       *ConvTableSize = 0;
       return CNV__CONVDEFFILE;
     }
-  } else if (FromConvdefType == CNV_CONVDEFTYPE_CLASS) {
+  }
+  else if (FromConvdefType == CNV_CONVDEFTYPE_CLASS)
+  {
     sts = cnv_GetConvTableFromClass(FromConvdef, &from_convdef_ptr);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       errh_CErrLog(CNV__CONVDEFCLASS, errh_ErrArgMsg(sts), NULL);
       *ConvTableSize = 0;
       return CNV__CONVDEFCLASS;
     }
-  } else {
+  }
+  else
+  {
     errh_CErrLog(CNV__CONVDEFTYPE, NULL);
     *ConvTableSize = 0;
     return CNV__CONVDEFTYPE;
   }
 
   conv_table_count = 0;
-  if (AllocConvTable) {
+  if (AllocConvTable)
+  {
     /* Allocate space for the conversion table */
     conv_table = calloc(1, sizeof(*conv_table));
-    if (!conv_table) {
+    if (!conv_table)
+    {
       errh_CErrLog(CNV__NOMEMORY, NULL);
       *ConvTableSize = 0;
       return CNV__NOMEMORY;
     }
-  } else
+  }
+  else
     /* The user has already allocated space */
     conv_table = (cnv_t_conv_table*)ConvTable;
 
-  sts = cnv_CreateConvTable(
-      to_convdef_ptr, from_convdef_ptr, conv_table, &conv_table_count);
-  if (EVEN(sts)) {
+  sts = cnv_CreateConvTable(to_convdef_ptr, from_convdef_ptr, conv_table, &conv_table_count);
+  if (EVEN(sts))
+  {
     *ConvTableSize = 0;
     return sts;
   }
@@ -840,11 +929,13 @@ int cvn_ConvInit(pwr_tInt32 ToConvdefType, pwr_tObjid ToConvdef,
 
   *ConvTableSize = conv_table_count;
 
-  if (log) {
+  if (log)
+  {
     printf("nr	from	to	size	type\n");
-    for (i = 0; i < conv_table_count; i++) {
-      printf("%d	%d	%d	%d	%d\n", i, (*conv_table)[i].from,
-          (*conv_table)[i].to, (*conv_table)[i].size, (*conv_table)[i].type);
+    for (i = 0; i < conv_table_count; i++)
+    {
+      printf("%d	%d	%d	%d	%d\n", i, (*conv_table)[i].from, (*conv_table)[i].to,
+             (*conv_table)[i].size, (*conv_table)[i].type);
     }
   }
   return CNV__SUCCESS;

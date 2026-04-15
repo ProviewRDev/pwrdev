@@ -52,7 +52,8 @@
   passes. The curves are drawn filled or unfilled.
 */
 
-class GrowCurve : public GrowTrend {
+class GrowCurve : public GrowTrend
+{
 public:
   //! Constuctor
   /*!
@@ -71,26 +72,18 @@ public:
     \param fill_d_type	Fill color.
     \param nodraw	Don't draw the object now.
   */
-  GrowCurve(GrowCtx* glow_ctx, const char* name, glow_sCurveData* data,
-      double x = 0, double y = 0, double w = 0, double h = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int fill_rect = 0,
-      int display_border = 1, glow_eDrawType fill_d_type = glow_eDrawType_Line,
-      int nodraw = 0);
+  GrowCurve(GrowCtx* glow_ctx, const char* name, glow_sCurveData* data, double x = 0, double y = 0,
+            double w = 0, double h = 0, glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
+            glow_mDisplayLevel display_lev = glow_mDisplayLevel_1, int fill_rect = 0, int display_border = 1,
+            glow_eDrawType fill_d_type = glow_eDrawType_Line, int nodraw = 0);
   virtual ~GrowCurve();
 
   glow_eCurveType type; //!< Type of curve.
-  int split_digsquare; //!< Split digtal curves on different lines
+  int split_digsquare;  //!< Split digtal curves on different lines
 
   void set_type(glow_eCurveType t);
-  void set_digital_split(int set)
-  {
-    split_digsquare = set;
-  }
-  void get_digital_split(int* set)
-  {
-    *set = split_digsquare;
-  }
+  void set_digital_split(int set) { split_digsquare = set; }
+  void get_digital_split(int* set) { *set = split_digsquare; }
 
   //! Configure the curves
   /*!

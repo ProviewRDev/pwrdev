@@ -46,10 +46,10 @@
 class CoWow;
 class MsgWindow;
 
-class RtMon {
+class RtMon
+{
 public:
-  RtMon(void* rtmon_parent_ctx, const char* rtmon_name,
-      const char* rtmon_display, pwr_tStatus* status);
+  RtMon(void* rtmon_parent_ctx, const char* rtmon_name, const char* rtmon_display, pwr_tStatus* status);
   virtual ~RtMon();
 
   void* parent_ctx;
@@ -63,23 +63,12 @@ public:
   char nodename[40];
   char display[80];
 
-  virtual void pop()
-  {
-  }
-  virtual void set_clock_cursor()
-  {
-  }
-  virtual void reset_cursor()
-  {
-  }
-  virtual void free_cursor()
-  {
-  }
+  virtual void pop() {}
+  virtual void set_clock_cursor() {}
+  virtual void reset_cursor() {}
+  virtual void free_cursor() {}
 
-  void set_scantime(float scantime)
-  {
-    nodelistnav->scantime = int(scantime * 1000);
-  }
+  void set_scantime(float scantime) { nodelistnav->scantime = int(scantime * 1000); }
   void activate_help();
   void activate_start();
   void activate_restart();

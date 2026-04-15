@@ -38,78 +38,76 @@
 
 #include "co_string.h"
 
-#include "glow_keyboardctx.h"
-#include "glow_conpoint.h"
 #include "glow_con.h"
-#include "glow_growrect.h"
-#include "glow_growtext.h"
+#include "glow_conpoint.h"
 #include "glow_growline.h"
 #include "glow_growpolyline.h"
+#include "glow_growrect.h"
+#include "glow_growtext.h"
+#include "glow_keyboardctx.h"
 #include "glow_msg.h"
 
-static char keyboard_keymap_numeric[4][17] = { { "789x456-123Ex0.x" },
-  { "789x456-123Ex0.x" }, { "789x456-123Ex0,x" }, { "789x456-123Ex0,x" } };
+static char keyboard_keymap_numeric[4][17] = {{"789x456-123Ex0.x"},
+                                              {"789x456-123Ex0.x"},
+                                              {"789x456-123Ex0,x"},
+                                              {"789x456-123Ex0,x"}};
 
-static char keyboard_keymap_alphabetic[4][52] = { { "½abcdefghijklm@-½"
-                                                    "½nopqrstuvwxyz/*½"
-                                                    "½1234567890½½½,.½" },
-  { "½ABCDEFGHIJKLM@-½"
-    "½NOPQRSTUVWXYZ/*½"
-    "½1234567890½½½,.½" },
-  { "½abcdefghijklmå-½"
-    "½nopqrstuvwxyzäö½"
-    "½1234567890½½½,.½" },
-  { "½ABCDEFGHIJKLMÅ-½"
-    "½NOPQRSTUVWXYZÄÖ½"
-    "½1234567890½½½,.½" } };
+static char keyboard_keymap_alphabetic[4][52] = {{"½abcdefghijklm@-½"
+                                                  "½nopqrstuvwxyz/*½"
+                                                  "½1234567890½½½,.½"},
+                                                 {"½ABCDEFGHIJKLM@-½"
+                                                  "½NOPQRSTUVWXYZ/*½"
+                                                  "½1234567890½½½,.½"},
+                                                 {"½abcdefghijklmå-½"
+                                                  "½nopqrstuvwxyzäö½"
+                                                  "½1234567890½½½,.½"},
+                                                 {"½ABCDEFGHIJKLMÅ-½"
+                                                  "½NOPQRSTUVWXYZÄÖ½"
+                                                  "½1234567890½½½,.½"}};
 
 static char keyboard_keymap[4][50] = {
-  // Low_en_us
-  { "1234567890-="
-    "qwertyuiop[]"
-    "asdfghjkl;\'#"
-    "\\zxcvbnm,./" },
-  // High_en_us
-  { "!@#$%^&*()_+"
-    "QWERTYUIOP{}"
-    "ASDFGHJKL:*~"
-    "|ZXCVBNM<>?" },
-  // Low_sv_se
-  { "1234567890+\'"
-    "qwertyuiopå~"
-    "asdfghjklöä\'"
-    "<zxcvbnm,.-" },
-  // High_sv_se
-  { "!\"#¤%&/()=?`"
-    "QWERTYUIOPÅ^"
-    "ASDFGHJKLÖÄ*"
-    ">ZXCVBNM;:_" }
-};
+    // Low_en_us
+    {"1234567890-="
+     "qwertyuiop[]"
+     "asdfghjkl;\'#"
+     "\\zxcvbnm,./"},
+    // High_en_us
+    {"!@#$%^&*()_+"
+     "QWERTYUIOP{}"
+     "ASDFGHJKL:*~"
+     "|ZXCVBNM<>?"},
+    // Low_sv_se
+    {"1234567890+\'"
+     "qwertyuiopå~"
+     "asdfghjklöä\'"
+     "<zxcvbnm,.-"},
+    // High_sv_se
+    {"!\"#¤%&/()=?`"
+     "QWERTYUIOPÅ^"
+     "ASDFGHJKLÖÄ*"
+     ">ZXCVBNM;:_"}};
 
 keyboard_eKeymap KeyboardCtx::default_keymap = keyboard_eKeymap_Low_en_us;
 keyboard_eType KeyboardCtx::default_type = keyboard_eType_Standard;
 
-void KeyboardCtx::set_keymap(keyboard_eKeymap keymap)
-{
+void KeyboardCtx::set_keymap(keyboard_eKeymap keymap) {
   current_keymap = keymap;
   configure();
 }
 
-void KeyboardCtx::set_type(keyboard_eType t)
-{
+void KeyboardCtx::set_type(keyboard_eType t) {
   type = t;
   configure();
 }
 
-void KeyboardCtx::configure()
-{
+void KeyboardCtx::configure() {
   double x = 0.0, y, width = 0.0, height = 0.0;
   double d = 4.0;
   double sep = 0.1;
   char key_text[40];
   char name[40];
   int i;
-  char* keymap;
+  char *keymap;
 
   if (nodraw)
     return;
@@ -132,19 +130,19 @@ void KeyboardCtx::configure()
 
         sprintf(name, "Key%d", i);
 
-        keys[i] = new GrowRect(this, name, x, y, d, d,
-            glow_eCtColor_ButtonBordercolor, 1, 0, glow_mDisplayLevel_1, 1, 1,
-            1, glow_eCtColor_ButtonFillcolor);
-        insert((GlowArrayElem*)keys[i]);
+        keys[i] = new GrowRect(
+            this, name, x, y, d, d, glow_eCtColor_ButtonBordercolor, 1, 0,
+            glow_mDisplayLevel_1, 1, 1, 1, glow_eCtColor_ButtonFillcolor);
+        insert((GlowArrayElem *)keys[i]);
 
-        ((GrowRect*)keys[i])->shadow_width = 12;
-        ((GrowRect*)keys[i])->relief = glow_eRelief_Up;
+        ((GrowRect *)keys[i])->shadow_width = 12;
+        ((GrowRect *)keys[i])->relief = glow_eRelief_Up;
 
         sprintf(name, "KeyText%d", i);
 
-        text_keys[i] = new GrowText(this, name, key_text, x + d / 2 - 0.2,
-            y + d / 2 + 0.2, glow_eDrawType_TextHelvetica,
-            glow_eCtColor_ButtonTextcolor, 8);
+        text_keys[i] = new GrowText(
+            this, name, key_text, x + d / 2 - 0.2, y + d / 2 + 0.2,
+            glow_eDrawType_TextHelvetica, glow_eCtColor_ButtonTextcolor, 8);
         insert(text_keys[i]);
 
         x += d + sep;
@@ -229,115 +227,117 @@ void KeyboardCtx::configure()
 
       sprintf(name, "Key%d", i);
 
-      keys[i] = new GrowRect(this, name, x, y, width, height,
-          glow_eCtColor_ButtonBordercolor, 1, 0, glow_mDisplayLevel_1, 1, 1, 1,
-          glow_eCtColor_ButtonFillcolor);
-      insert((GlowArrayElem*)keys[i]);
+      keys[i] = new GrowRect(
+          this, name, x, y, width, height, glow_eCtColor_ButtonBordercolor, 1,
+          0, glow_mDisplayLevel_1, 1, 1, 1, glow_eCtColor_ButtonFillcolor);
+      insert((GlowArrayElem *)keys[i]);
 
-      ((GrowRect*)keys[i])->shadow_width = 12;
-      ((GrowRect*)keys[i])->relief = glow_eRelief_Up;
+      ((GrowRect *)keys[i])->shadow_width = 12;
+      ((GrowRect *)keys[i])->relief = glow_eRelief_Up;
 
       if (i == 47) {
         // Up, draw arrow
         sprintf(name, "KeyLine%d", i);
 
-        glow_sPoint p[4] = { { x + d / 2, y + d / 2 - 0.6 },
-          { x + d / 2 - 0.8, y + d / 2 + 0.6 },
-          { x + d / 2 + 0.8, y + d / 2 + 0.6 } };
+        glow_sPoint p[4] = {{x + d / 2, y + d / 2 - 0.6},
+                            {x + d / 2 - 0.8, y + d / 2 + 0.6},
+                            {x + d / 2 + 0.8, y + d / 2 + 0.6}};
 
         sprintf(name, "KeyPLine%d", i);
-        GlowPolyLine* pline
-            = new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor,
-                2, 0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
+        GlowPolyLine *pline =
+            new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor, 2,
+                             0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
         insert(pline);
       } else if (i == 48) {
         // Down, draw arrow
         sprintf(name, "KeyLine%d", i);
 
-        glow_sPoint p[4] = { { x + d / 2, y + d / 2 + 0.6 },
-          { x + d / 2 - 0.8, y + d / 2 - 0.6 },
-          { x + d / 2 + 0.8, y + d / 2 - 0.6 } };
+        glow_sPoint p[4] = {{x + d / 2, y + d / 2 + 0.6},
+                            {x + d / 2 - 0.8, y + d / 2 - 0.6},
+                            {x + d / 2 + 0.8, y + d / 2 - 0.6}};
 
         sprintf(name, "KeyPLine%d", i);
-        GlowPolyLine* pline
-            = new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor,
-                2, 0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
+        GlowPolyLine *pline =
+            new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor, 2,
+                             0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
         insert(pline);
       } else if (i == 49) {
         // Left, draw arrow
         sprintf(name, "KeyLine%d", i);
 
-        glow_sPoint p[4] = { { x + d / 2 - 0.6, y + d / 2 },
-          { x + d / 2 + 0.6, y + d / 2 - 0.8 },
-          { x + d / 2 + 0.6, y + d / 2 + 0.8 } };
+        glow_sPoint p[4] = {{x + d / 2 - 0.6, y + d / 2},
+                            {x + d / 2 + 0.6, y + d / 2 - 0.8},
+                            {x + d / 2 + 0.6, y + d / 2 + 0.8}};
 
         sprintf(name, "KeyPLine%d", i);
-        GlowPolyLine* pline
-            = new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor,
-                2, 0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
+        GlowPolyLine *pline =
+            new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor, 2,
+                             0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
         insert(pline);
       } else if (i == 50) {
         // Left, draw arrow
         sprintf(name, "KeyLine%d", i);
 
-        glow_sPoint p[4] = { { x + d / 2 + 0.6, y + d / 2 },
-          { x + d / 2 - 0.6, y + d / 2 - 0.8 },
-          { x + d / 2 - 0.6, y + d / 2 + 0.8 } };
+        glow_sPoint p[4] = {{x + d / 2 + 0.6, y + d / 2},
+                            {x + d / 2 - 0.6, y + d / 2 - 0.8},
+                            {x + d / 2 - 0.6, y + d / 2 + 0.8}};
 
         sprintf(name, "KeyPLine%d", i);
-        GlowPolyLine* pline
-            = new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor,
-                2, 0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
+        GlowPolyLine *pline =
+            new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor, 2,
+                             0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
         insert(pline);
       } else if (i == 52) {
         // Backspace, draw arrow
         sprintf(name, "KeyLine%d", i);
 
-        GrowLine* line = new GrowLine(this, name, x + d / 2 - 1.0, y + d / 2,
-            x + d / 2 + 1.0, y + d / 2, glow_eCtColor_ButtonTextcolor, 2, 0);
+        GrowLine *line = new GrowLine(this, name, x + d / 2 - 1.0, y + d / 2,
+                                      x + d / 2 + 1.0, y + d / 2,
+                                      glow_eCtColor_ButtonTextcolor, 2, 0);
         insert(line);
-        glow_sPoint p[4] = { { x + d / 2 - 1.0, y + d / 2 },
-          { x + d / 2 - 0.3, y + d / 2 + 0.3 },
-          { x + d / 2 - 0.3, y + d / 2 - 0.3 } };
+        glow_sPoint p[4] = {{x + d / 2 - 1.0, y + d / 2},
+                            {x + d / 2 - 0.3, y + d / 2 + 0.3},
+                            {x + d / 2 - 0.3, y + d / 2 - 0.3}};
 
         sprintf(name, "KeyPLine%d", i);
-        GlowPolyLine* pline
-            = new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor,
-                2, 0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
+        GlowPolyLine *pline =
+            new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor, 2,
+                             0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
         insert(pline);
       } else if (i == 51) {
         // Return, draw arrow
         sprintf(name, "KeyLine%d", i);
 
-        GrowLine* line = new GrowLine(this, name, x + d / 2 - 1.0,
-            y + 2 * d + d / 2, x + d / 2, y + 2 * d + d / 2,
-            glow_eCtColor_ButtonTextcolor, 2, 0);
-        insert(line);
-        line = new GrowLine(this, name, x + d / 2, y + 2 * d + 0.1, x + d / 2,
+        GrowLine *line = new GrowLine(
+            this, name, x + d / 2 - 1.0, y + 2 * d + d / 2, x + d / 2,
             y + 2 * d + d / 2, glow_eCtColor_ButtonTextcolor, 2, 0);
         insert(line);
-        glow_sPoint p[4] = { { x + d / 2 - 1.0, y + 2 * d + d / 2 },
-          { x + d / 2 - 0.3, y + 2 * d + d / 2 + 0.3 },
-          { x + d / 2 - 0.3, y + 2 * d + d / 2 - 0.3 } };
+        line = new GrowLine(this, name, x + d / 2, y + 2 * d + 0.1, x + d / 2,
+                            y + 2 * d + d / 2, glow_eCtColor_ButtonTextcolor, 2,
+                            0);
+        insert(line);
+        glow_sPoint p[4] = {{x + d / 2 - 1.0, y + 2 * d + d / 2},
+                            {x + d / 2 - 0.3, y + 2 * d + d / 2 + 0.3},
+                            {x + d / 2 - 0.3, y + 2 * d + d / 2 - 0.3}};
 
         sprintf(name, "KeyPLine%d", i);
-        GlowPolyLine* pline
-            = new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor,
-                2, 0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
+        GlowPolyLine *pline =
+            new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor, 2,
+                             0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
         insert(pline);
 
         sprintf(name, "KeyText%d", i);
 
-        text_keys[i] = new GrowText(this, name, key_text, x + d / 2 - 1.4,
-            y + d / 2 + 0.2, glow_eDrawType_TextHelvetica,
-            glow_eCtColor_ButtonTextcolor, 8);
+        text_keys[i] = new GrowText(
+            this, name, key_text, x + d / 2 - 1.4, y + d / 2 + 0.2,
+            glow_eDrawType_TextHelvetica, glow_eCtColor_ButtonTextcolor, 8);
         insert(text_keys[i]);
       } else {
         sprintf(name, "KeyText%d", i);
 
-        text_keys[i] = new GrowText(this, name, key_text, x + d / 2 - 1.4,
-            y + d / 2 + 0.2, glow_eDrawType_TextHelvetica,
-            glow_eCtColor_ButtonTextcolor, 8);
+        text_keys[i] = new GrowText(
+            this, name, key_text, x + d / 2 - 1.4, y + d / 2 + 0.2,
+            glow_eDrawType_TextHelvetica, glow_eCtColor_ButtonTextcolor, 8);
         insert(text_keys[i]);
       }
     }
@@ -360,19 +360,19 @@ void KeyboardCtx::configure()
 
         sprintf(name, "Key%d", i);
 
-        keys[i] = new GrowRect(this, name, x, y, d, d,
-            glow_eCtColor_ButtonBordercolor, 1, 0, glow_mDisplayLevel_1, 1, 1,
-            1, glow_eCtColor_ButtonFillcolor);
-        insert((GlowArrayElem*)keys[i]);
+        keys[i] = new GrowRect(
+            this, name, x, y, d, d, glow_eCtColor_ButtonBordercolor, 1, 0,
+            glow_mDisplayLevel_1, 1, 1, 1, glow_eCtColor_ButtonFillcolor);
+        insert((GlowArrayElem *)keys[i]);
 
-        ((GrowRect*)keys[i])->shadow_width = 12;
-        ((GrowRect*)keys[i])->relief = glow_eRelief_Up;
+        ((GrowRect *)keys[i])->shadow_width = 12;
+        ((GrowRect *)keys[i])->relief = glow_eRelief_Up;
 
         sprintf(name, "KeyText%d", i);
 
-        text_keys[i] = new GrowText(this, name, key_text, x + d / 2 - 0.2,
-            y + d / 2 + 0.2, glow_eDrawType_TextHelvetica,
-            glow_eCtColor_ButtonTextcolor, 8);
+        text_keys[i] = new GrowText(
+            this, name, key_text, x + d / 2 - 0.2, y + d / 2 + 0.2,
+            glow_eDrawType_TextHelvetica, glow_eCtColor_ButtonTextcolor, 8);
         insert(text_keys[i]);
 
         x += d + sep;
@@ -409,64 +409,65 @@ void KeyboardCtx::configure()
 
       sprintf(name, "Key%d", i);
 
-      keys[i] = new GrowRect(this, name, x, y, width, height,
-          glow_eCtColor_ButtonBordercolor, 1, 0, glow_mDisplayLevel_1, 1, 1, 1,
-          glow_eCtColor_ButtonFillcolor);
-      insert((GlowArrayElem*)keys[i]);
+      keys[i] = new GrowRect(
+          this, name, x, y, width, height, glow_eCtColor_ButtonBordercolor, 1,
+          0, glow_mDisplayLevel_1, 1, 1, 1, glow_eCtColor_ButtonFillcolor);
+      insert((GlowArrayElem *)keys[i]);
 
-      ((GrowRect*)keys[i])->shadow_width = 12;
-      ((GrowRect*)keys[i])->relief = glow_eRelief_Up;
+      ((GrowRect *)keys[i])->shadow_width = 12;
+      ((GrowRect *)keys[i])->relief = glow_eRelief_Up;
 
       if (i == 3) {
         // Backspace, draw arrow
         sprintf(name, "KeyLine%d", i);
 
-        GrowLine* line = new GrowLine(this, name, x + d / 2 - 1.0, y + d / 2,
-            x + d / 2 + 1.0, y + d / 2, glow_eCtColor_ButtonTextcolor, 2, 0);
+        GrowLine *line = new GrowLine(this, name, x + d / 2 - 1.0, y + d / 2,
+                                      x + d / 2 + 1.0, y + d / 2,
+                                      glow_eCtColor_ButtonTextcolor, 2, 0);
         insert(line);
-        glow_sPoint p[4] = { { x + d / 2 - 1.0, y + d / 2 },
-          { x + d / 2 - 0.3, y + d / 2 + 0.3 },
-          { x + d / 2 - 0.3, y + d / 2 - 0.3 } };
+        glow_sPoint p[4] = {{x + d / 2 - 1.0, y + d / 2},
+                            {x + d / 2 - 0.3, y + d / 2 + 0.3},
+                            {x + d / 2 - 0.3, y + d / 2 - 0.3}};
 
         sprintf(name, "KeyPLine%d", i);
-        GlowPolyLine* pline
-            = new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor,
-                2, 0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
+        GlowPolyLine *pline =
+            new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor, 2,
+                             0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
         insert(pline);
       } else if (i == 15) {
         // Return, draw arrow
         sprintf(name, "KeyLine%d", i);
 
-        GrowLine* line = new GrowLine(this, name, x + d / 2 - 1.0,
-            y + d / 2 + 0.7, x + d / 2 + 0.5, y + d / 2 + 0.7,
-            glow_eCtColor_ButtonTextcolor, 2, 0);
+        GrowLine *line = new GrowLine(
+            this, name, x + d / 2 - 1.0, y + d / 2 + 0.7, x + d / 2 + 0.5,
+            y + d / 2 + 0.7, glow_eCtColor_ButtonTextcolor, 2, 0);
         insert(line);
         line = new GrowLine(this, name, x + d / 2 + 0.5, y + d / 2 + 0.1,
-            x + d / 2 + 0.5, y + d / 2 + 0.7, glow_eCtColor_ButtonTextcolor, 2,
-            0);
+                            x + d / 2 + 0.5, y + d / 2 + 0.7,
+                            glow_eCtColor_ButtonTextcolor, 2, 0);
         insert(line);
-        glow_sPoint p[4] = { { x + d / 2 - 1.0, y + d / 2 + 0.7 },
-          { x + d / 2 - 0.3, y + d / 2 + 0.7 + 0.3 },
-          { x + d / 2 - 0.3, y + d / 2 + 0.7 - 0.3 } };
+        glow_sPoint p[4] = {{x + d / 2 - 1.0, y + d / 2 + 0.7},
+                            {x + d / 2 - 0.3, y + d / 2 + 0.7 + 0.3},
+                            {x + d / 2 - 0.3, y + d / 2 + 0.7 - 0.3}};
 
         sprintf(name, "KeyPLine%d", i);
-        GlowPolyLine* pline
-            = new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor,
-                2, 0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
+        GlowPolyLine *pline =
+            new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor, 2,
+                             0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
         insert(pline);
 
         sprintf(name, "KeyText%d", i);
 
-        text_keys[i] = new GrowText(this, name, key_text, x + d / 2 - 1.4,
-            y + d / 2 - 0.6, glow_eDrawType_TextHelvetica,
-            glow_eCtColor_ButtonTextcolor, 8);
+        text_keys[i] = new GrowText(
+            this, name, key_text, x + d / 2 - 1.4, y + d / 2 - 0.6,
+            glow_eDrawType_TextHelvetica, glow_eCtColor_ButtonTextcolor, 8);
         insert(text_keys[i]);
       } else {
         sprintf(name, "KeyText%d", i);
 
-        text_keys[i] = new GrowText(this, name, key_text, x + d / 2 - 1.4,
-            y + d / 2 + 0.2, glow_eDrawType_TextHelvetica,
-            glow_eCtColor_ButtonTextcolor, 8);
+        text_keys[i] = new GrowText(
+            this, name, key_text, x + d / 2 - 1.4, y + d / 2 + 0.2,
+            glow_eDrawType_TextHelvetica, glow_eCtColor_ButtonTextcolor, 8);
         insert(text_keys[i]);
       }
     }
@@ -489,19 +490,19 @@ void KeyboardCtx::configure()
 
         sprintf(name, "Key%d", i);
 
-        keys[i] = new GrowRect(this, name, x, y, d, d,
-            glow_eCtColor_ButtonBordercolor, 1, 0, glow_mDisplayLevel_1, 1, 1,
-            1, glow_eCtColor_ButtonFillcolor);
-        insert((GlowArrayElem*)keys[i]);
+        keys[i] = new GrowRect(
+            this, name, x, y, d, d, glow_eCtColor_ButtonBordercolor, 1, 0,
+            glow_mDisplayLevel_1, 1, 1, 1, glow_eCtColor_ButtonFillcolor);
+        insert((GlowArrayElem *)keys[i]);
 
-        ((GrowRect*)keys[i])->shadow_width = 12;
-        ((GrowRect*)keys[i])->relief = glow_eRelief_Up;
+        ((GrowRect *)keys[i])->shadow_width = 12;
+        ((GrowRect *)keys[i])->relief = glow_eRelief_Up;
 
         sprintf(name, "KeyText%d", i);
 
-        text_keys[i] = new GrowText(this, name, key_text, x + d / 2 - 0.2,
-            y + d / 2 + 0.2, glow_eDrawType_TextHelvetica,
-            glow_eCtColor_ButtonTextcolor, 8);
+        text_keys[i] = new GrowText(
+            this, name, key_text, x + d / 2 - 0.2, y + d / 2 + 0.2,
+            glow_eDrawType_TextHelvetica, glow_eCtColor_ButtonTextcolor, 8);
         insert(text_keys[i]);
 
         x += d + sep;
@@ -554,63 +555,64 @@ void KeyboardCtx::configure()
 
       sprintf(name, "Key%d", i);
 
-      keys[i] = new GrowRect(this, name, x, y, width, height,
-          glow_eCtColor_ButtonBordercolor, 1, 0, glow_mDisplayLevel_1, 1, 1, 1,
-          glow_eCtColor_ButtonFillcolor);
-      insert((GlowArrayElem*)keys[i]);
+      keys[i] = new GrowRect(
+          this, name, x, y, width, height, glow_eCtColor_ButtonBordercolor, 1,
+          0, glow_mDisplayLevel_1, 1, 1, 1, glow_eCtColor_ButtonFillcolor);
+      insert((GlowArrayElem *)keys[i]);
 
-      ((GrowRect*)keys[i])->shadow_width = 12;
-      ((GrowRect*)keys[i])->relief = glow_eRelief_Up;
+      ((GrowRect *)keys[i])->shadow_width = 12;
+      ((GrowRect *)keys[i])->relief = glow_eRelief_Up;
 
       if (i == 16) {
         // Backspace, draw arrow
         sprintf(name, "KeyLine%d", i);
 
-        GrowLine* line = new GrowLine(this, name, x + d / 2 - 1.0, y + d / 2,
-            x + d / 2 + 1.0, y + d / 2, glow_eCtColor_ButtonTextcolor, 2, 0);
+        GrowLine *line = new GrowLine(this, name, x + d / 2 - 1.0, y + d / 2,
+                                      x + d / 2 + 1.0, y + d / 2,
+                                      glow_eCtColor_ButtonTextcolor, 2, 0);
         insert(line);
-        glow_sPoint p[4] = { { x + d / 2 - 1.0, y + d / 2 },
-          { x + d / 2 - 0.3, y + d / 2 + 0.3 },
-          { x + d / 2 - 0.3, y + d / 2 - 0.3 } };
+        glow_sPoint p[4] = {{x + d / 2 - 1.0, y + d / 2},
+                            {x + d / 2 - 0.3, y + d / 2 + 0.3},
+                            {x + d / 2 - 0.3, y + d / 2 - 0.3}};
 
         sprintf(name, "KeyPLine%d", i);
-        GlowPolyLine* pline
-            = new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor,
-                2, 0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
+        GlowPolyLine *pline =
+            new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor, 2,
+                             0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
         insert(pline);
       } else if (i == 33) {
         // Return, draw arrow
         sprintf(name, "KeyLine%d", i);
 
-        GrowLine* line
-            = new GrowLine(this, name, x + d / 2 - 1.0, y + d + d / 2,
-                x + d / 2, y + d + d / 2, glow_eCtColor_ButtonTextcolor, 2, 0);
+        GrowLine *line =
+            new GrowLine(this, name, x + d / 2 - 1.0, y + d + d / 2, x + d / 2,
+                         y + d + d / 2, glow_eCtColor_ButtonTextcolor, 2, 0);
         insert(line);
         line = new GrowLine(this, name, x + d / 2, y + d + 0.1, x + d / 2,
-            y + d + d / 2, glow_eCtColor_ButtonTextcolor, 2, 0);
+                            y + d + d / 2, glow_eCtColor_ButtonTextcolor, 2, 0);
         insert(line);
-        glow_sPoint p[4] = { { x + d / 2 - 1.0, y + d + d / 2 },
-          { x + d / 2 - 0.3, y + d + d / 2 + 0.3 },
-          { x + d / 2 - 0.3, y + d + d / 2 - 0.3 } };
+        glow_sPoint p[4] = {{x + d / 2 - 1.0, y + d + d / 2},
+                            {x + d / 2 - 0.3, y + d + d / 2 + 0.3},
+                            {x + d / 2 - 0.3, y + d + d / 2 - 0.3}};
 
         sprintf(name, "KeyPLine%d", i);
-        GlowPolyLine* pline
-            = new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor,
-                2, 0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
+        GlowPolyLine *pline =
+            new GrowPolyLine(this, name, p, 3, glow_eCtColor_ButtonTextcolor, 2,
+                             0, 1, 0, 0, glow_eCtColor_ButtonTextcolor, 1);
         insert(pline);
 
         sprintf(name, "KeyText%d", i);
 
-        text_keys[i] = new GrowText(this, name, key_text, x + d / 2 - 1.4,
-            y + d / 2 - 0.2, glow_eDrawType_TextHelvetica,
-            glow_eCtColor_ButtonTextcolor, 8);
+        text_keys[i] = new GrowText(
+            this, name, key_text, x + d / 2 - 1.4, y + d / 2 - 0.2,
+            glow_eDrawType_TextHelvetica, glow_eCtColor_ButtonTextcolor, 8);
         insert(text_keys[i]);
       } else {
         sprintf(name, "KeyText%d", i);
 
-        text_keys[i] = new GrowText(this, name, key_text, x + d / 2 - 1.4,
-            y + d / 2 + 0.2, glow_eDrawType_TextHelvetica,
-            glow_eCtColor_ButtonTextcolor, 8);
+        text_keys[i] = new GrowText(
+            this, name, key_text, x + d / 2 - 1.4, y + d / 2 + 0.2,
+            glow_eDrawType_TextHelvetica, glow_eCtColor_ButtonTextcolor, 8);
         insert(text_keys[i]);
       }
     }
@@ -623,15 +625,13 @@ void KeyboardCtx::configure()
   hot_mode = glow_eHotMode_Disabled;
 }
 
-void KeyboardCtx::redraw()
-{
+void KeyboardCtx::redraw() {
   clear(&mw);
   draw(&mw, 0, 0, mw.window_width, mw.window_height);
   nav_zoom();
 }
 
-void KeyboardCtx::zoom(double factor)
-{
+void KeyboardCtx::zoom(double factor) {
   if (fabs(factor) < DBL_EPSILON)
     return;
 
@@ -655,16 +655,15 @@ void KeyboardCtx::zoom(double factor)
   nav_zoom();
 }
 
-int KeyboardCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
-{
+int KeyboardCtx::event_handler(glow_eEvent event, int x, int y, int w, int h) {
   int sts;
   int i;
-  GlowCtx* ctx;
+  GlowCtx *ctx;
   double fx, fy;
   int keyc = 0;
   int send_cb = 0;
   int idx = 0;
-  char* keymap;
+  char *keymap;
   char name[40];
 
   ctx = this;
@@ -712,8 +711,8 @@ int KeyboardCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       }
       if (idx_found) {
         // Invert rect
-        ((GrowRect*)keys[idx])->relief = glow_eRelief_Up;
-        ((GrowRect*)keys[idx])->draw();
+        ((GrowRect *)keys[idx])->relief = glow_eRelief_Up;
+        ((GrowRect *)keys[idx])->draw();
       }
     }
     break;
@@ -755,8 +754,8 @@ int KeyboardCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
       }
       if (idx_found) {
         // Invert rect
-        ((GrowRect*)keys[idx])->relief = glow_eRelief_Down;
-        ((GrowRect*)keys[idx])->draw();
+        ((GrowRect *)keys[idx])->relief = glow_eRelief_Down;
+        ((GrowRect *)keys[idx])->draw();
       }
     }
     break;
@@ -910,8 +909,8 @@ int KeyboardCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
         }
       }
       if (send_cb) {
-        if (event_callback[glow_eEvent_Key_Ascii]
-            && sts != GLOW__NO_PROPAGATE) {
+        if (event_callback[glow_eEvent_Key_Ascii] &&
+            sts != GLOW__NO_PROPAGATE) {
           static glow_sEvent e;
 
           e.event = glow_eEvent_Key_Ascii;
@@ -944,22 +943,19 @@ int KeyboardCtx::event_handler(glow_eEvent event, int x, int y, int w, int h)
   return 1;
 }
 
-void KeyboardCtx::get_size(int* width, int* height)
-{
+void KeyboardCtx::get_size(int *width, int *height) {
   *width = int((x_right - x_left) * mw.zoom_factor_x);
   *height = int((y_high - y_low) * mw.zoom_factor_y);
 }
 
-void KeyboardCtx::set_size(int width, int height)
-{
+void KeyboardCtx::set_size(int width, int height) {
   mw.zoom_factor_x = ((float)width) / (x_right - x_left);
   mw.zoom_factor_y = ((float)height) / (y_high - y_low);
   a.zoom();
   redraw();
 }
 
-void KeyboardCtx::set_shift(int shift)
-{
+void KeyboardCtx::set_shift(int shift) {
   if (shift) {
     if (ODD((int)current_keymap))
       current_keymap = (keyboard_eKeymap)(current_keymap + 1);

@@ -50,14 +50,11 @@
 //
 // Create the navigator widget
 //
-TblNavGtk::TblNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid,
-    sevcli_sHistItem* xn_itemlist, int xn_item_cnt, GtkWidget** w,
-    pwr_tStatus* status)
-    : TblNav(xn_parent_ctx, xn_itemlist, xn_item_cnt, status),
-      parent_wid(xn_parent_wid)
+TblNavGtk::TblNavGtk(void* xn_parent_ctx, GtkWidget* xn_parent_wid, sevcli_sHistItem* xn_itemlist,
+                     int xn_item_cnt, GtkWidget** w, pwr_tStatus* status)
+    : TblNav(xn_parent_ctx, xn_itemlist, xn_item_cnt, status), parent_wid(xn_parent_wid)
 {
-  form_widget
-      = scrolledbrowwidgetgtk_new(TblNav::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetgtk_new(TblNav::init_brow_cb, this, &brow_widget);
 
   gtk_widget_show_all(brow_widget);
 
@@ -76,7 +73,4 @@ TblNavGtk::~TblNavGtk()
   gtk_widget_destroy(form_widget);
 }
 
-void TblNavGtk::set_inputfocus()
-{
-  gtk_widget_grab_focus(brow_widget);
-}
+void TblNavGtk::set_inputfocus() { gtk_widget_grab_focus(brow_widget); }

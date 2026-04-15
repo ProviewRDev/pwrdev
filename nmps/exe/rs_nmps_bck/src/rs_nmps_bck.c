@@ -35,20 +35,20 @@
  */
 
 /*************************************************************************
-*
-* 	PROGRAM		rs_nmps_bck
-*
-*       Modifierad
-*		960205	Claes Sjöfors	Skapad
-*
-*	Funktion:	Backup av NMpsCell objekt och data objekt.
-**************************************************************************/
+ *
+ * 	PROGRAM		rs_nmps_bck
+ *
+ *       Modifierad
+ *		960205	Claes Sjöfors	Skapad
+ *
+ *	Funktion:	Backup av NMpsCell objekt och data objekt.
+ **************************************************************************/
 
 /*_Include filer_________________________________________________________*/
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 #include "pwr_nmpsclasses.h"
 
@@ -57,10 +57,10 @@
 #include "co_string.h"
 #include "co_time.h"
 
+#include "rs_nmps_msg.h"
 #include "rt_gdh_msg.h"
 #include "rt_hash_msg.h"
 #include "rt_ini_event.h"
-#include "rs_nmps_msg.h"
 #include "rt_qcom_msg.h"
 
 #include "nmps.h"
@@ -127,11 +127,11 @@ typedef struct {
 typedef struct nmpsbck_clist_tag {
   pwr_tObjid objid;
   pwr_tClassId class;
-  char* buffer;
+  char *buffer;
   int buffer_size;
-  char* objectp;
+  char *objectp;
   unsigned int object_size;
-  struct nmpsbck_clist_tag* next_ptr;
+  struct nmpsbck_clist_tag *next_ptr;
 } nmpsbck_t_clist;
 
 typedef struct nmpsbck_data_tag {
@@ -140,103 +140,103 @@ typedef struct nmpsbck_data_tag {
   pwr_tClassId class;
   int size;
   char data_name[120];
-  char* data_ptr;
+  char *data_ptr;
   gdh_tDlid data_subid;
   unsigned char found;
   unsigned char new;
   unsigned char created;
-  struct nmpsbck_data_tag* next_ptr;
-  struct nmpsbck_data_tag* prev_ptr;
+  struct nmpsbck_data_tag *next_ptr;
+  struct nmpsbck_data_tag *prev_ptr;
 } nmpsbck_t_data_list;
 
 typedef struct nmpsbck_cell_tag {
   pwr_tObjid objid;
   pwr_tClassId class;
-  pwr_sClass_NMpsMirrorCell* cell;
+  pwr_sClass_NMpsMirrorCell *cell;
   gdh_tDlid subid;
   int size;
   int backup_now;
-  struct nmpsbck_cell_tag* next_ptr;
+  struct nmpsbck_cell_tag *next_ptr;
 } nmpsbck_t_cell_list;
 
 typedef struct {
   int CellObjectCount;
   int DataObjectCount;
   pwr_tUInt32 LoopCount;
-  pwr_sClass_NMpsBackupConfig* bckconfig;
+  pwr_sClass_NMpsBackupConfig *bckconfig;
   gdh_tDlid bckconfig_dlid;
-  nmpsbck_t_cell_list* cellist;
+  nmpsbck_t_cell_list *cellist;
   int cell_count;
-  nmpsbck_t_data_list* data_list;
+  nmpsbck_t_data_list *data_list;
   int init_done;
-  char* buffer;
+  char *buffer;
   int buffer_size;
   int cellist_size;
-  FILE* bckfile1;
-  FILE* bckfile2;
+  FILE *bckfile1;
+  FILE *bckfile2;
   int file1_pos;
   int file2_pos;
   int file_num;
   int increment;
   int record_count;
-} * bck_ctx;
+} *bck_ctx;
 
 static pwr_tStatus nmpsbck_data_handler(bck_ctx bckctx);
 static pwr_tStatus nmpsbck_set_cell_backup_done();
-static pwr_tStatus nmpsbck_data_db_delete(
-    nmpsbck_t_data_list** data_list, nmpsbck_t_data_list* data_ptr);
-static pwr_tStatus nmpsbck_data_db_create(
-    bck_ctx bckctx, pwr_tObjid objid, nmpsbck_t_data_list** datalist_ptr);
-static pwr_tStatus nmpsbck_data_db_find(nmpsbck_t_data_list* data_list,
-    pwr_tObjid objid, nmpsbck_t_data_list** datalist_ptr);
+static pwr_tStatus nmpsbck_data_db_delete(nmpsbck_t_data_list **data_list,
+                                          nmpsbck_t_data_list *data_ptr);
+static pwr_tStatus nmpsbck_data_db_create(bck_ctx bckctx, pwr_tObjid objid,
+                                          nmpsbck_t_data_list **datalist_ptr);
+static pwr_tStatus nmpsbck_data_db_find(nmpsbck_t_data_list *data_list,
+                                        pwr_tObjid objid,
+                                        nmpsbck_t_data_list **datalist_ptr);
 static pwr_tStatus nmpsbck_cellist_add(bck_ctx bckctx, pwr_tObjid objid,
-    nmpsbck_t_cell_list** cellist, int* cellist_count);
+                                       nmpsbck_t_cell_list **cellist,
+                                       int *cellist_count);
 static pwr_tStatus nmps_get_bckconfig(bck_ctx bckctx);
 static pwr_tStatus nmps_cell_init(bck_ctx bckctx);
 static pwr_tStatus nmpsbck_get_cellbuffer(bck_ctx bckctx);
 static pwr_tStatus nmpsbck_fill_buffer(bck_ctx bckctx);
-static pwr_tStatus nmpsbck_write_cells(bck_ctx bckctx, FILE* bckfile);
-static pwr_tStatus nmpsbck_write_data(bck_ctx bckctx, FILE* bckfile);
-static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile);
+static pwr_tStatus nmpsbck_write_cells(bck_ctx bckctx, FILE *bckfile);
+static pwr_tStatus nmpsbck_write_data(bck_ctx bckctx, FILE *bckfile);
+static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char *backupfile);
 static pwr_tStatus nmpsbck_cell_handler(bck_ctx bckctx);
 static pwr_tStatus nmpsbck_free(bck_ctx bckctx);
 
 /*************************************************************************
-*
-* Name:		nmps_fgetname()
-*
-* Type		int
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*	Get filename for a filedescriptor.
-*	This function is not implementet on all os, therefor a defaultname
-*	should be supplied which is returned for this os.
-*
-**************************************************************************/
-static char* nmps_fgetname(FILE* fp, char* name, char* def_name)
-{
+ *
+ * Name:		nmps_fgetname()
+ *
+ * Type		int
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *	Get filename for a filedescriptor.
+ *	This function is not implementet on all os, therefor a defaultname
+ *	should be supplied which is returned for this os.
+ *
+ **************************************************************************/
+static char *nmps_fgetname(FILE *fp, char *name, char *def_name) {
   strcpy(name, def_name);
   return name;
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_get_filename
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Backup of data objects.
-*
-**************************************************************************/
-int nmpsbck_get_filename(char* inname, char* outname, char* ext)
-{
-  char* s;
-  char* s2;
+ *
+ * Name:		nmpsbck_get_filename
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Backup of data objects.
+ *
+ **************************************************************************/
+int nmpsbck_get_filename(char *inname, char *outname, char *ext) {
+  char *s;
+  char *s2;
 
   dcli_translate_filename(outname, inname);
 
@@ -263,27 +263,26 @@ int nmpsbck_get_filename(char* inname, char* outname, char* ext)
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_data_handler
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Backup of data objects.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_data_handler
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Backup of data objects.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_data_handler(bck_ctx bckctx)
-{
-  nmpsbck_t_data_list* data_ptr;
-  nmpsbck_t_data_list* next_ptr;
+static pwr_tStatus nmpsbck_data_handler(bck_ctx bckctx) {
+  nmpsbck_t_data_list *data_ptr;
+  nmpsbck_t_data_list *next_ptr;
   pwr_tStatus sts;
   int data_count;
   int offset;
   int i, k;
-  nmpsbck_t_cellheader* cellheader;
+  nmpsbck_t_cellheader *cellheader;
 
   /* Reset the found and new flag in all data entries */
   data_ptr = bckctx->data_list;
@@ -295,7 +294,7 @@ static pwr_tStatus nmpsbck_data_handler(bck_ctx bckctx)
   /* Loop trough the cells to identify the new ones */
   offset = 0;
   for (i = 0; i < bckctx->cell_count; i++) {
-    cellheader = (nmpsbck_t_cellheader*)(bckctx->buffer + offset);
+    cellheader = (nmpsbck_t_cellheader *)(bckctx->buffer + offset);
     offset += sizeof(*cellheader);
     switch (cellheader->class) {
     case pwr_cClass_NMpsCell:
@@ -304,21 +303,21 @@ static pwr_tStatus nmpsbck_data_handler(bck_ctx bckctx)
     case pwr_cClass_NMpsStoreCell:
     case pwr_cClass_NMpsStoreCell60:
     case pwr_cClass_NMpsStoreCell120: {
-      pwr_sClass_NMpsCell* cell_ptr;
-      plc_t_DataInfo* data_block_ptr;
+      pwr_sClass_NMpsCell *cell_ptr;
+      plc_t_DataInfo *data_block_ptr;
 
-      cell_ptr = (pwr_sClass_NMpsCell*)(bckctx->buffer + offset);
-      data_block_ptr = (plc_t_DataInfo*)&cell_ptr->Data1P;
+      cell_ptr = (pwr_sClass_NMpsCell *)(bckctx->buffer + offset);
+      data_block_ptr = (plc_t_DataInfo *)&cell_ptr->Data1P;
       for (k = 0; k < cell_ptr->LastIndex; k++) {
         /* Check if the objid already is in the data_db */
-        sts = nmpsbck_data_db_find(
-            bckctx->data_list, data_block_ptr->DataP.Aref.Objid, &data_ptr);
+        sts = nmpsbck_data_db_find(bckctx->data_list,
+                                   data_block_ptr->DataP.Aref.Objid, &data_ptr);
         if (ODD(sts))
           data_ptr->found = 1;
         else {
           /* New data object, insert it */
-          sts = nmpsbck_data_db_create(
-              bckctx, data_block_ptr->DataP.Aref.Objid, &data_ptr);
+          sts = nmpsbck_data_db_create(bckctx, data_block_ptr->DataP.Aref.Objid,
+                                       &data_ptr);
           if (EVEN(sts))
             return sts;
           data_ptr->found = 1;
@@ -329,21 +328,21 @@ static pwr_tStatus nmpsbck_data_handler(bck_ctx bckctx)
       break;
     }
     case pwr_cClass_NMpsMirrorCell: {
-      pwr_sClass_NMpsMirrorCell* cell_ptr;
-      plc_t_DataInfoMirCell* data_block_ptr;
+      pwr_sClass_NMpsMirrorCell *cell_ptr;
+      plc_t_DataInfoMirCell *data_block_ptr;
 
-      cell_ptr = (pwr_sClass_NMpsMirrorCell*)(bckctx->buffer + offset);
-      data_block_ptr = (plc_t_DataInfoMirCell*)&cell_ptr->Data1P;
+      cell_ptr = (pwr_sClass_NMpsMirrorCell *)(bckctx->buffer + offset);
+      data_block_ptr = (plc_t_DataInfoMirCell *)&cell_ptr->Data1P;
       for (k = 0; k < cell_ptr->LastIndex; k++) {
         /* Check if the objid already is in the data_db */
-        sts = nmpsbck_data_db_find(
-            bckctx->data_list, data_block_ptr->DataP.Aref.Objid, &data_ptr);
+        sts = nmpsbck_data_db_find(bckctx->data_list,
+                                   data_block_ptr->DataP.Aref.Objid, &data_ptr);
         if (ODD(sts))
           data_ptr->found = 1;
         else {
           /* New data object, insert it */
-          sts = nmpsbck_data_db_create(
-              bckctx, data_block_ptr->DataP.Aref.Objid, &data_ptr);
+          sts = nmpsbck_data_db_create(bckctx, data_block_ptr->DataP.Aref.Objid,
+                                       &data_ptr);
           if (EVEN(sts)) {
             /* The object does not exist... */
             continue;
@@ -383,19 +382,18 @@ static pwr_tStatus nmpsbck_data_handler(bck_ctx bckctx)
 }
 
 /****************************************************************************
-* Name:		nmpsbck_data_db_delete()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Delete an entry in the datalist.
-*
-**************************************************************************/
-static pwr_tStatus nmpsbck_data_db_delete(
-    nmpsbck_t_data_list** data_list, nmpsbck_t_data_list* data_ptr)
-{
+ * Name:		nmpsbck_data_db_delete()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Delete an entry in the datalist.
+ *
+ **************************************************************************/
+static pwr_tStatus nmpsbck_data_db_delete(nmpsbck_t_data_list **data_list,
+                                          nmpsbck_t_data_list *data_ptr) {
   if (data_ptr == *data_list) {
     /* Change the root */
     *data_list = data_ptr->next_ptr;
@@ -414,26 +412,25 @@ static pwr_tStatus nmpsbck_data_db_delete(
 }
 
 /****************************************************************************
-* Name:		nmpsbck_data_db_create()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Create an entry in the datalist for an objid.
-*
-**************************************************************************/
-static pwr_tStatus nmpsbck_data_db_create(
-    bck_ctx bckctx, pwr_tObjid objid, nmpsbck_t_data_list** datalist_ptr)
-{
-  nmpsbck_t_data_list* next_ptr;
+ * Name:		nmpsbck_data_db_create()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Create an entry in the datalist for an objid.
+ *
+ **************************************************************************/
+static pwr_tStatus nmpsbck_data_db_create(bck_ctx bckctx, pwr_tObjid objid,
+                                          nmpsbck_t_data_list **datalist_ptr) {
+  nmpsbck_t_data_list *next_ptr;
   pwr_tStatus sts;
   pwr_sAttrRef attrref;
   pwr_tClassId class;
   unsigned int size;
   pwr_tOName data_name;
-  char* data_ptr;
+  char *data_ptr;
   gdh_tDlid data_subid;
 
   sts = gdh_GetObjectClass(objid, &class);
@@ -442,15 +439,15 @@ static pwr_tStatus nmpsbck_data_db_create(
   sts = gdh_GetObjectSize(objid, &size);
   if (EVEN(sts))
     LogAndReturn(NMPS__BCKDATA, sts);
-  sts = gdh_ObjidToName(
-      objid, data_name, sizeof(data_name), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(objid, data_name, sizeof(data_name),
+                        cdh_mName_volumeStrict);
   if (EVEN(sts))
     LogAndReturn(NMPS__BCKDATA, sts);
 
   /* Get a direct link to the object */
   attrref = cdh_ObjidToAref(objid);
-  sts = gdh_DLRefObjectInfoAttrref(
-      &attrref, (pwr_tAddress*)&data_ptr, &data_subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress *)&data_ptr,
+                                   &data_subid);
   if (EVEN(sts))
     LogAndReturn(NMPS__BCKDATA, sts);
 
@@ -477,20 +474,20 @@ static pwr_tStatus nmpsbck_data_db_create(
 }
 
 /****************************************************************************
-* Name:		nmpsbck_data_db_find()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Find an entry in the datalist for an objid.
-*
-**************************************************************************/
-static pwr_tStatus nmpsbck_data_db_find(nmpsbck_t_data_list* data_list,
-    pwr_tObjid objid, nmpsbck_t_data_list** datalist_ptr)
-{
-  nmpsbck_t_data_list* data_ptr;
+ * Name:		nmpsbck_data_db_find()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Find an entry in the datalist for an objid.
+ *
+ **************************************************************************/
+static pwr_tStatus nmpsbck_data_db_find(nmpsbck_t_data_list *data_list,
+                                        pwr_tObjid objid,
+                                        nmpsbck_t_data_list **datalist_ptr) {
+  nmpsbck_t_data_list *data_ptr;
   int found;
 
   /* Insert first in list */
@@ -512,20 +509,20 @@ static pwr_tStatus nmpsbck_data_db_find(nmpsbck_t_data_list* data_list,
 }
 
 /****************************************************************************
-* Name:		nmpsbck_data_db_find_old()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Find an entry in the datalist for an old objid.
-*
-**************************************************************************/
-static pwr_tStatus nmpsbck_data_db_find_old(nmpsbck_t_data_list* data_list,
-    pwr_tObjid old_objid, nmpsbck_t_data_list** datalist_ptr)
-{
-  nmpsbck_t_data_list* data_ptr;
+ * Name:		nmpsbck_data_db_find_old()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Find an entry in the datalist for an old objid.
+ *
+ **************************************************************************/
+static pwr_tStatus
+nmpsbck_data_db_find_old(nmpsbck_t_data_list *data_list, pwr_tObjid old_objid,
+                         nmpsbck_t_data_list **datalist_ptr) {
+  nmpsbck_t_data_list *data_ptr;
   int found;
 
   /* Insert first in list */
@@ -547,19 +544,19 @@ static pwr_tStatus nmpsbck_data_db_find_old(nmpsbck_t_data_list* data_list,
 }
 
 /****************************************************************************
-* Name:		nmpsbck_data_db_create()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Create an entry in the datalist for an objid.
-*
-**************************************************************************/
-static pwr_tStatus nmpsbck_clist_store(
-    nmpsbck_t_clist** clist, pwr_tObjid objid, nmpsbck_t_clist** clist_ptr)
-{
+ * Name:		nmpsbck_data_db_create()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Create an entry in the datalist for an objid.
+ *
+ **************************************************************************/
+static pwr_tStatus nmpsbck_clist_store(nmpsbck_t_clist **clist,
+                                       pwr_tObjid objid,
+                                       nmpsbck_t_clist **clist_ptr) {
   *clist_ptr = calloc(1, sizeof(nmpsbck_t_clist));
   if (clist_ptr == 0)
     return NMPS__NOMEMORY;
@@ -573,19 +570,18 @@ static pwr_tStatus nmpsbck_clist_store(
 }
 
 /****************************************************************************
-* Name:		nmpsbck_clist_find()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Find an entry in clist.
-*
-**************************************************************************/
-static pwr_tStatus nmpsbck_clist_find(
-    nmpsbck_t_clist* clist, pwr_tObjid objid, nmpsbck_t_clist** clist_ptr)
-{
+ * Name:		nmpsbck_clist_find()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Find an entry in clist.
+ *
+ **************************************************************************/
+static pwr_tStatus nmpsbck_clist_find(nmpsbck_t_clist *clist, pwr_tObjid objid,
+                                      nmpsbck_t_clist **clist_ptr) {
   while (clist != NULL) {
     if (cdh_ObjidIsEqual(clist->objid, objid)) {
       *clist_ptr = clist;
@@ -597,19 +593,18 @@ static pwr_tStatus nmpsbck_clist_find(
 }
 
 /****************************************************************************
-* Name:		nmpsbck_clist_free()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Free the clist.
-*
-**************************************************************************/
-static pwr_tStatus nmpsbck_clist_free(nmpsbck_t_clist* clist)
-{
-  nmpsbck_t_clist* clist_ptr;
+ * Name:		nmpsbck_clist_free()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Free the clist.
+ *
+ **************************************************************************/
+static pwr_tStatus nmpsbck_clist_free(nmpsbck_t_clist *clist) {
+  nmpsbck_t_clist *clist_ptr;
 
   while (clist != NULL) {
     clist_ptr = clist;
@@ -622,30 +617,30 @@ static pwr_tStatus nmpsbck_clist_free(nmpsbck_t_clist* clist)
 }
 
 /****************************************************************************
-* Name:		nmpsbck_cellist_add()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Add a cell to the cellist
-*
-**************************************************************************/
+ * Name:		nmpsbck_cellist_add()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Add a cell to the cellist
+ *
+ **************************************************************************/
 static pwr_tStatus nmpsbck_cellist_add(bck_ctx bckctx, pwr_tObjid objid,
-    nmpsbck_t_cell_list** cellist, int* cellist_count)
-{
-  nmpsbck_t_cell_list* cellist_ptr;
+                                       nmpsbck_t_cell_list **cellist,
+                                       int *cellist_count) {
+  nmpsbck_t_cell_list *cellist_ptr;
   pwr_sAttrRef attrref;
   pwr_tStatus sts;
   pwr_tClassId class;
-  char* objectp;
+  char *objectp;
 
   sts = gdh_GetObjectClass(objid, &class);
   if (EVEN(sts))
     LogAndReturn(NMPS__BCKCELL, sts);
 
-  sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+  sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
   if (EVEN(sts))
     LogAndReturn(NMPS__BCKCELL, sts);
 
@@ -657,12 +652,12 @@ static pwr_tStatus nmpsbck_cellist_add(bck_ctx bckctx, pwr_tObjid objid,
   case pwr_cClass_NMpsStoreCell:
   case pwr_cClass_NMpsStoreCell60:
   case pwr_cClass_NMpsStoreCell120:
-    if (!(((pwr_sClass_NMpsCell*)objectp)->Function & NMPS_CELLFUNC_BACKUP))
+    if (!(((pwr_sClass_NMpsCell *)objectp)->Function & NMPS_CELLFUNC_BACKUP))
       return NMPS__SUCCESS;
     break;
   case pwr_cClass_NMpsMirrorCell:
-    if (!(((pwr_sClass_NMpsMirrorCell*)objectp)->Function
-            & NMPS_CELLFUNC_BACKUP))
+    if (!(((pwr_sClass_NMpsMirrorCell *)objectp)->Function &
+          NMPS_CELLFUNC_BACKUP))
       return NMPS__SUCCESS;
     break;
   default:
@@ -682,8 +677,8 @@ static pwr_tStatus nmpsbck_cellist_add(bck_ctx bckctx, pwr_tObjid objid,
 
   /* Direct link to the cell */
   attrref = cdh_ObjidToAref(objid);
-  sts = gdh_DLRefObjectInfoAttrref(
-      &attrref, (pwr_tAddress*)&cellist_ptr->cell, &cellist_ptr->subid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress *)&cellist_ptr->cell,
+                                   &cellist_ptr->subid);
   if (EVEN(sts))
     LogAndReturn(NMPS__BCKCELL, sts);
 
@@ -694,18 +689,18 @@ static pwr_tStatus nmpsbck_cellist_add(bck_ctx bckctx, pwr_tObjid objid,
   case pwr_cClass_NMpsStoreCell:
   case pwr_cClass_NMpsStoreCell60:
   case pwr_cClass_NMpsStoreCell120:
-    cellist_ptr->size
-        = (char*)&(((pwr_sClass_NMpsCell*)(cellist_ptr->cell))->Data1P)
-        - (char*)(cellist_ptr->cell)
-        + ((pwr_sClass_NMpsCell*)(cellist_ptr->cell))->MaxSize
-            * sizeof(plc_t_DataInfo);
+    cellist_ptr->size =
+        (char *)&(((pwr_sClass_NMpsCell *)(cellist_ptr->cell))->Data1P) -
+        (char *)(cellist_ptr->cell) +
+        ((pwr_sClass_NMpsCell *)(cellist_ptr->cell))->MaxSize *
+            sizeof(plc_t_DataInfo);
     break;
   case pwr_cClass_NMpsMirrorCell:
-    cellist_ptr->size
-        = (char*)&(((pwr_sClass_NMpsMirrorCell*)(cellist_ptr->cell))->Data1P)
-        - (char*)(cellist_ptr->cell)
-        + ((pwr_sClass_NMpsMirrorCell*)(cellist_ptr->cell))->MaxSize
-            * sizeof(plc_t_DataInfoMirCell);
+    cellist_ptr->size =
+        (char *)&(((pwr_sClass_NMpsMirrorCell *)(cellist_ptr->cell))->Data1P) -
+        (char *)(cellist_ptr->cell) +
+        ((pwr_sClass_NMpsMirrorCell *)(cellist_ptr->cell))->MaxSize *
+            sizeof(plc_t_DataInfoMirCell);
     break;
   }
 
@@ -714,20 +709,19 @@ static pwr_tStatus nmpsbck_cellist_add(bck_ctx bckctx, pwr_tObjid objid,
 }
 
 /*************************************************************************
-*
-* Name:		nmps_get_bckconfig
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Hämta pekare till backup konfig objektet.
-*
-**************************************************************************/
+ *
+ * Name:		nmps_get_bckconfig
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Hämta pekare till backup konfig objektet.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmps_get_bckconfig(bck_ctx bckctx)
-{
+static pwr_tStatus nmps_get_bckconfig(bck_ctx bckctx) {
   pwr_tStatus sts;
   pwr_tObjid objid;
   pwr_sAttrRef attrref;
@@ -739,28 +733,27 @@ static pwr_tStatus nmps_get_bckconfig(bck_ctx bckctx)
 
   /* Direct link to the cell */
   attrref = cdh_ObjidToAref(objid);
-  sts = gdh_DLRefObjectInfoAttrref(
-      &attrref, (pwr_tAddress*)&bckctx->bckconfig, &bckctx->bckconfig_dlid);
+  sts = gdh_DLRefObjectInfoAttrref(&attrref, (pwr_tAddress *)&bckctx->bckconfig,
+                                   &bckctx->bckconfig_dlid);
   if (EVEN(sts))
     return sts;
   return NMPS__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		nmps_cell_init
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Initiering av cell funktionen.
-*
-**************************************************************************/
+ *
+ * Name:		nmps_cell_init
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Initiering av cell funktionen.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmps_cell_init(bck_ctx bckctx)
-{
+static pwr_tStatus nmps_cell_init(bck_ctx bckctx) {
   pwr_tStatus sts;
   pwr_tObjid objid;
 
@@ -770,8 +763,8 @@ static pwr_tStatus nmps_cell_init(bck_ctx bckctx)
   sts = gdh_GetClassList(pwr_cClass_NMpsCell, &objid);
   while (ODD(sts)) {
     /* Store and direct link the cells */
-    sts = nmpsbck_cellist_add(
-        bckctx, objid, &bckctx->cellist, &bckctx->cell_count);
+    sts = nmpsbck_cellist_add(bckctx, objid, &bckctx->cellist,
+                              &bckctx->cell_count);
     if (EVEN(sts))
       return sts;
 
@@ -781,8 +774,8 @@ static pwr_tStatus nmps_cell_init(bck_ctx bckctx)
   sts = gdh_GetClassList(pwr_cClass_NMpsCell60, &objid);
   while (ODD(sts)) {
     /* Store and direct link the cells */
-    sts = nmpsbck_cellist_add(
-        bckctx, objid, &bckctx->cellist, &bckctx->cell_count);
+    sts = nmpsbck_cellist_add(bckctx, objid, &bckctx->cellist,
+                              &bckctx->cell_count);
     if (EVEN(sts))
       return sts;
 
@@ -792,8 +785,8 @@ static pwr_tStatus nmps_cell_init(bck_ctx bckctx)
   sts = gdh_GetClassList(pwr_cClass_NMpsCell120, &objid);
   while (ODD(sts)) {
     /* Store and direct link the cells */
-    sts = nmpsbck_cellist_add(
-        bckctx, objid, &bckctx->cellist, &bckctx->cell_count);
+    sts = nmpsbck_cellist_add(bckctx, objid, &bckctx->cellist,
+                              &bckctx->cell_count);
     if (EVEN(sts))
       return sts;
 
@@ -804,8 +797,8 @@ static pwr_tStatus nmps_cell_init(bck_ctx bckctx)
   sts = gdh_GetClassList(pwr_cClass_NMpsStoreCell, &objid);
   while (ODD(sts)) {
     /* Store and direct link the cells */
-    sts = nmpsbck_cellist_add(
-        bckctx, objid, &bckctx->cellist, &bckctx->cell_count);
+    sts = nmpsbck_cellist_add(bckctx, objid, &bckctx->cellist,
+                              &bckctx->cell_count);
     if (EVEN(sts))
       return sts;
 
@@ -815,8 +808,8 @@ static pwr_tStatus nmps_cell_init(bck_ctx bckctx)
   sts = gdh_GetClassList(pwr_cClass_NMpsStoreCell60, &objid);
   while (ODD(sts)) {
     /* Store and direct link the cells */
-    sts = nmpsbck_cellist_add(
-        bckctx, objid, &bckctx->cellist, &bckctx->cell_count);
+    sts = nmpsbck_cellist_add(bckctx, objid, &bckctx->cellist,
+                              &bckctx->cell_count);
     if (EVEN(sts))
       return sts;
 
@@ -826,8 +819,8 @@ static pwr_tStatus nmps_cell_init(bck_ctx bckctx)
   sts = gdh_GetClassList(pwr_cClass_NMpsStoreCell120, &objid);
   while (ODD(sts)) {
     /* Store and direct link the cells */
-    sts = nmpsbck_cellist_add(
-        bckctx, objid, &bckctx->cellist, &bckctx->cell_count);
+    sts = nmpsbck_cellist_add(bckctx, objid, &bckctx->cellist,
+                              &bckctx->cell_count);
     if (EVEN(sts))
       return sts;
 
@@ -838,8 +831,8 @@ static pwr_tStatus nmps_cell_init(bck_ctx bckctx)
   sts = gdh_GetClassList(pwr_cClass_NMpsMirrorCell, &objid);
   while (ODD(sts)) {
     /* Store and direct link the cells */
-    sts = nmpsbck_cellist_add(
-        bckctx, objid, &bckctx->cellist, &bckctx->cell_count);
+    sts = nmpsbck_cellist_add(bckctx, objid, &bckctx->cellist,
+                              &bckctx->cell_count);
     if (EVEN(sts))
       return sts;
 
@@ -852,24 +845,23 @@ static pwr_tStatus nmps_cell_init(bck_ctx bckctx)
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_cell_handler
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Mirroring.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_cell_handler
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Mirroring.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_get_cellbuffer(bck_ctx bckctx)
-{
-  char* old_buffer;
+static pwr_tStatus nmpsbck_get_cellbuffer(bck_ctx bckctx) {
+  char *old_buffer;
   char old_buffer_size;
   int size;
-  nmpsbck_t_cell_list* cell_ptr;
+  nmpsbck_t_cell_list *cell_ptr;
 
   old_buffer = bckctx->buffer;
   old_buffer_size = bckctx->buffer_size;
@@ -896,22 +888,21 @@ static pwr_tStatus nmpsbck_get_cellbuffer(bck_ctx bckctx)
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_fill_buffer
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Fill the local buffer of cell objects.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_fill_buffer
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Fill the local buffer of cell objects.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_fill_buffer(bck_ctx bckctx)
-{
+static pwr_tStatus nmpsbck_fill_buffer(bck_ctx bckctx) {
   pwr_tStatus sts;
-  nmpsbck_t_cell_list* cell_ptr;
+  nmpsbck_t_cell_list *cell_ptr;
   nmpsbck_t_cellheader cellheader;
   int offset;
 
@@ -925,8 +916,8 @@ static pwr_tStatus nmpsbck_fill_buffer(bck_ctx bckctx)
     cellheader.size = cell_ptr->size;
 
     /* Check that there is size enough */
-    if (offset + (int)sizeof(cellheader) + cellheader.size
-        > bckctx->buffer_size) {
+    if (offset + (int)sizeof(cellheader) + cellheader.size >
+        bckctx->buffer_size) {
       sts = nmpsbck_get_cellbuffer(bckctx);
       if (EVEN(sts))
         return sts;
@@ -945,35 +936,35 @@ static pwr_tStatus nmpsbck_fill_buffer(bck_ctx bckctx)
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_write_cells
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Write the cell objects in the local buffer on file.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_write_cells
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Write the cell objects in the local buffer on file.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_write_cells(bck_ctx bckctx, FILE* bckfile)
-{
+static pwr_tStatus nmpsbck_write_cells(bck_ctx bckctx, FILE *bckfile) {
   nmpsbck_t_cellheader cellheader;
-  nmpsbck_t_cellheader* cellheader_ptr;
+  nmpsbck_t_cellheader *cellheader_ptr;
   pwr_tUInt32 csts;
   int offset;
-  nmpsbck_t_cell_list* cell_ptr;
+  nmpsbck_t_cell_list *cell_ptr;
 
   if (bckctx->increment) {
     /* Write only cells with backup_now flag */
     offset = 0;
     cell_ptr = bckctx->cellist;
     while (cell_ptr) {
-      cellheader_ptr = (nmpsbck_t_cellheader*)(bckctx->buffer + offset);
+      cellheader_ptr = (nmpsbck_t_cellheader *)(bckctx->buffer + offset);
       if (cell_ptr->backup_now) {
-        csts = fwrite(cellheader_ptr,
-            sizeof(*cellheader_ptr) + cellheader_ptr->size, 1, bckfile);
+        csts =
+            fwrite(cellheader_ptr,
+                   sizeof(*cellheader_ptr) + cellheader_ptr->size, 1, bckfile);
         if (csts == 0)
           return csts;
         cell_ptr->backup_now = 0;
@@ -1005,23 +996,22 @@ static pwr_tStatus nmpsbck_write_cells(bck_ctx bckctx, FILE* bckfile)
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_write_data
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Write the data objects in the local buffer on file.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_write_data
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Write the data objects in the local buffer on file.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_write_data(bck_ctx bckctx, FILE* bckfile)
-{
+static pwr_tStatus nmpsbck_write_data(bck_ctx bckctx, FILE *bckfile) {
   nmpsbck_t_dataheader dataheader;
   pwr_tUInt32 csts;
-  nmpsbck_t_data_list* data_ptr;
+  nmpsbck_t_data_list *data_ptr;
 
   data_ptr = bckctx->data_list;
   while (data_ptr != NULL) {
@@ -1054,20 +1044,19 @@ static pwr_tStatus nmpsbck_write_data(bck_ctx bckctx, FILE* bckfile)
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_open_file
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Open current backup file and write a file header.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_open_file
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Open current backup file and write a file header.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_open_file(bck_ctx bckctx)
-{
+static pwr_tStatus nmpsbck_open_file(bck_ctx bckctx) {
   nmpsbck_t_fileheader fileheader;
   pwr_tUInt32 csts;
   pwr_tFileName filename;
@@ -1097,8 +1086,8 @@ static pwr_tStatus nmpsbck_open_file(bck_ctx bckctx)
 
       /* Work with file 1 */
       /* Open file */
-      nmpsbck_get_filename(
-          bckctx->bckconfig->BackupFile, filename, NMPSBCK_FILE_EXT1);
+      nmpsbck_get_filename(bckctx->bckconfig->BackupFile, filename,
+                           NMPSBCK_FILE_EXT1);
 
       bckctx->bckfile1 = fopen(filename, "w+");
       if (bckctx->bckfile1 != NULL) {
@@ -1141,8 +1130,8 @@ static pwr_tStatus nmpsbck_open_file(bck_ctx bckctx)
 
       /* Work with file 2 */
       /* Open file */
-      nmpsbck_get_filename(
-          bckctx->bckconfig->BackupFile, filename, NMPSBCK_FILE_EXT2);
+      nmpsbck_get_filename(bckctx->bckconfig->BackupFile, filename,
+                           NMPSBCK_FILE_EXT2);
 
       bckctx->bckfile2 = fopen(filename, "w+");
       if (bckctx->bckfile2 != NULL) {
@@ -1167,31 +1156,30 @@ static pwr_tStatus nmpsbck_open_file(bck_ctx bckctx)
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_write
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Write the nmps objects in the backup file.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_write
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Write the nmps objects in the backup file.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_write(bck_ctx bckctx)
-{
+static pwr_tStatus nmpsbck_write(bck_ctx bckctx) {
   pwr_tStatus sts;
   nmpsbck_t_recordheader recordheader;
   pwr_tUInt32 csts;
   long int actpos;
-  FILE* bckfile;
+  FILE *bckfile;
 
   if (!bckctx->bckconfig->BackupOn)
     return NMPS__SUCCESS;
 
-  if ((bckctx->file_num == 1 && bckctx->bckfile1 == 0)
-      || (bckctx->file_num == 2 && bckctx->bckfile2 == 0))
+  if ((bckctx->file_num == 1 && bckctx->bckfile1 == 0) ||
+      (bckctx->file_num == 2 && bckctx->bckfile2 == 0))
     /* This is the first time, open the file */
     sts = nmpsbck_open_file(bckctx);
 
@@ -1273,20 +1261,19 @@ bck_write_error:
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_cells
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Read the cell objects from backup file.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_cells
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Read the cell objects from backup file.
+ *
+ **************************************************************************/
 
-static int nmpsbck_timecmp(pwr_tTime* time_old, pwr_tTime* time_new)
-{
+static int nmpsbck_timecmp(pwr_tTime *time_old, pwr_tTime *time_new) {
   int sts;
 
   sts = time_Acomp(time_new, time_old);
@@ -1297,23 +1284,23 @@ static int nmpsbck_timecmp(pwr_tTime* time_old, pwr_tTime* time_new)
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_check_file
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Check the consistency of a backup file.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_check_file
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Check the consistency of a backup file.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_check_file(bck_ctx bckctx, FILE* bckfile,
-    int* record_count, unsigned int* record_start, unsigned int* cellarea_start,
-    unsigned int* dataarea_start, pwr_tTime* first_record_time,
-    pwr_tTime* last_record_time, int time_only)
-{
+static pwr_tStatus
+nmpsbck_check_file(bck_ctx bckctx, FILE *bckfile, int *record_count,
+                   unsigned int *record_start, unsigned int *cellarea_start,
+                   unsigned int *dataarea_start, pwr_tTime *first_record_time,
+                   pwr_tTime *last_record_time, int time_only) {
   nmpsbck_t_fileheader fileheader;
   nmpsbck_t_recordheader recordheader;
   nmpsbck_t_recordheader recordheaderend;
@@ -1439,42 +1426,41 @@ static pwr_tStatus nmpsbck_check_file(bck_ctx bckctx, FILE* bckfile,
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_read
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Read the cell objects from backup file.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_read
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Read the cell objects from backup file.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
-{
+static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char *backupfile) {
   pwr_tStatus sts;
   nmpsbck_t_cellheader cellheader;
   nmpsbck_t_dataheader dataheader;
-  FILE* bckfile;
-  FILE* bckfile1;
-  FILE* bckfile2;
+  FILE *bckfile;
+  FILE *bckfile1;
+  FILE *bckfile2;
   pwr_tUInt32 csts;
   long int actpos;
   int k;
-  char* databuff = 0;
+  char *databuff = 0;
   int databuff_size = 0;
-  nmpsbck_t_data_list* data_ptr;
-  nmpsbck_t_data_list* next_ptr;
-  char* objectp;
+  nmpsbck_t_data_list *data_ptr;
+  nmpsbck_t_data_list *next_ptr;
+  char *objectp;
   pwr_tFileName filename;
   int file_num = 1;
   int record_count;
   pwr_tUInt32 cellarea_start[NMPSBCK_MAX_RECORDS];
   pwr_tUInt32 dataarea_start[NMPSBCK_MAX_RECORDS];
   pwr_tUInt32 record_start[NMPSBCK_MAX_RECORDS];
-  nmpsbck_t_clist* clist = 0;
-  nmpsbck_t_clist* clist_ptr;
+  nmpsbck_t_clist *clist = 0;
+  nmpsbck_t_clist *clist_ptr;
   int cell_read_success = 0;
   int data_read_success = 0;
   int i;
@@ -1487,7 +1473,7 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
   pwr_tTime bckfile2_time;
   pwr_tStatus bckfile1_sts;
   pwr_tStatus bckfile2_sts;
-  char* ptr;
+  char *ptr;
   int return_sts;
 
   /* Open file 1 */
@@ -1500,9 +1486,9 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
     bckfile1_sts = NMPS__BCKOPEN;
   else {
     /* Get time of first record */
-    bckfile1_sts = nmpsbck_check_file(bckctx, bckfile1, &record_count,
-        record_start, cellarea_start, dataarea_start, &bckfile1_time,
-        &last_record_time, 1);
+    bckfile1_sts = nmpsbck_check_file(
+        bckctx, bckfile1, &record_count, record_start, cellarea_start,
+        dataarea_start, &bckfile1_time, &last_record_time, 1);
     if (EVEN(bckfile1_sts)) {
       Log(NMPS__RELOAD_FILE1, bckfile1_sts);
       fclose(bckfile1);
@@ -1520,9 +1506,9 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
     bckfile2_sts = NMPS__BCKOPEN;
   else {
     /* Get time of first record */
-    bckfile2_sts = nmpsbck_check_file(bckctx, bckfile2, &record_count,
-        record_start, cellarea_start, dataarea_start, &bckfile2_time,
-        &last_record_time, 1);
+    bckfile2_sts = nmpsbck_check_file(
+        bckctx, bckfile2, &record_count, record_start, cellarea_start,
+        dataarea_start, &bckfile2_time, &last_record_time, 1);
     if (EVEN(bckfile2_sts)) {
       Log(NMPS__RELOAD_FILE2, bckfile2_sts);
       fclose(bckfile2);
@@ -1534,16 +1520,16 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
     /* Compare time and choose the latest file */
     if (nmpsbck_timecmp(&bckfile1_time, &bckfile2_time)) {
       /* Number 2 is the lastest, check consistency of file 2 */
-      bckfile2_sts = nmpsbck_check_file(bckctx, bckfile2, &record_count,
-          record_start, cellarea_start, dataarea_start, &first_record_time,
-          &last_record_time, 0);
+      bckfile2_sts = nmpsbck_check_file(
+          bckctx, bckfile2, &record_count, record_start, cellarea_start,
+          dataarea_start, &first_record_time, &last_record_time, 0);
       if (EVEN(bckfile2_sts)) {
         /* File number 2 is currupt, try file number 1 */
         Log(NMPS__RELOAD_FILE2, bckfile2_sts);
         fclose(bckfile2);
-        bckfile1_sts = nmpsbck_check_file(bckctx, bckfile1, &record_count,
-            record_start, cellarea_start, dataarea_start, &first_record_time,
-            &last_record_time, 0);
+        bckfile1_sts = nmpsbck_check_file(
+            bckctx, bckfile1, &record_count, record_start, cellarea_start,
+            dataarea_start, &first_record_time, &last_record_time, 0);
         if (EVEN(bckfile1_sts)) {
           /* Both files are corrupt, log and return */
           Log(NMPS__RELOAD_FILE1, bckfile1_sts);
@@ -1561,16 +1547,16 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
       }
     } else {
       /* Number 1 is the lastest, check consistency of file 1 */
-      bckfile1_sts = nmpsbck_check_file(bckctx, bckfile1, &record_count,
-          record_start, cellarea_start, dataarea_start, &first_record_time,
-          &last_record_time, 0);
+      bckfile1_sts = nmpsbck_check_file(
+          bckctx, bckfile1, &record_count, record_start, cellarea_start,
+          dataarea_start, &first_record_time, &last_record_time, 0);
       if (EVEN(bckfile1_sts)) {
         /* File number 1 is currupt, try file number 2 */
         Log(NMPS__RELOAD_FILE1, bckfile1_sts);
         fclose(bckfile1);
-        bckfile2_sts = nmpsbck_check_file(bckctx, bckfile2, &record_count,
-            record_start, cellarea_start, dataarea_start, &first_record_time,
-            &last_record_time, 0);
+        bckfile2_sts = nmpsbck_check_file(
+            bckctx, bckfile2, &record_count, record_start, cellarea_start,
+            dataarea_start, &first_record_time, &last_record_time, 0);
         if (EVEN(bckfile2_sts)) {
           /* Both files are corrupt, log and return */
           Log(NMPS__RELOAD_FILE2, bckfile1_sts);
@@ -1589,9 +1575,9 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
     }
   } else if (ODD(bckfile1_sts)) {
     /* File 2 is currupt, go for file 1 */
-    bckfile1_sts = nmpsbck_check_file(bckctx, bckfile1, &record_count,
-        record_start, cellarea_start, dataarea_start, &first_record_time,
-        &last_record_time, 0);
+    bckfile1_sts = nmpsbck_check_file(
+        bckctx, bckfile1, &record_count, record_start, cellarea_start,
+        dataarea_start, &first_record_time, &last_record_time, 0);
     if (EVEN(bckfile1_sts)) {
       /* Both files are corrupt, log and return */
       Log(NMPS__RELOAD_FILE1, bckfile1_sts);
@@ -1604,9 +1590,9 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
     bckfile = bckfile1;
   } else if (ODD(bckfile2_sts)) {
     /* File 1 is currupt, go for file2 */
-    bckfile2_sts = nmpsbck_check_file(bckctx, bckfile2, &record_count,
-        record_start, cellarea_start, dataarea_start, &first_record_time,
-        &last_record_time, 0);
+    bckfile2_sts = nmpsbck_check_file(
+        bckctx, bckfile2, &record_count, record_start, cellarea_start,
+        dataarea_start, &first_record_time, &last_record_time, 0);
     if (EVEN(bckfile2_sts)) {
       /* Both files are corrupt, log and return */
       Log(NMPS__RELOAD_FILE2, bckfile2_sts);
@@ -1668,14 +1654,14 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
         break;
 
       /* Check if the objid already is in the data_db */
-      sts = nmpsbck_data_db_find_old(
-          bckctx->data_list, dataheader.objid, &data_ptr);
+      sts = nmpsbck_data_db_find_old(bckctx->data_list, dataheader.objid,
+                                     &data_ptr);
       if (ODD(sts))
         continue;
 
       created = 1;
       sts = gdh_CreateObject(dataheader.data_name, dataheader.class, 0, &objid,
-          pwr_cNObjid, 0, pwr_cNObjid);
+                             pwr_cNObjid, 0, pwr_cNObjid);
       if (sts == GDH__DUPLNAME) {
         /* The object already exist, this might be a static object */
         sts = gdh_NameToObjid(dataheader.data_name, &objid);
@@ -1699,8 +1685,8 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
       data_ptr->new = 1;
       data_ptr->created = created;
 
-      memcpy(
-          data_ptr->data_ptr, databuff, MIN(dataheader.size, data_ptr->size));
+      memcpy(data_ptr->data_ptr, databuff,
+             MIN(dataheader.size, data_ptr->size));
     }
     if (!data_read_success)
       break;
@@ -1759,8 +1745,8 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
       clist_ptr->buffer_size = cellheader.size;
       clist_ptr->class = cellheader.class;
 
-      sts = gdh_ObjidToPointer(
-          clist_ptr->objid, (pwr_tAddress*)&clist_ptr->objectp);
+      sts = gdh_ObjidToPointer(clist_ptr->objid,
+                               (pwr_tAddress *)&clist_ptr->objectp);
       if (EVEN(sts)) {
         sts = NMPS__RELOADINCONS;
         goto nmpsbck_read_abort;
@@ -1783,13 +1769,13 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
       case pwr_cClass_NMpsStoreCell:
       case pwr_cClass_NMpsStoreCell60:
       case pwr_cClass_NMpsStoreCell120: {
-        pwr_sClass_NMpsCell* cell_ptr;
-        pwr_sClass_NMpsCell* object_ptr;
-        plc_t_DataInfo* data_block_ptr;
+        pwr_sClass_NMpsCell *cell_ptr;
+        pwr_sClass_NMpsCell *object_ptr;
+        plc_t_DataInfo *data_block_ptr;
 
-        cell_ptr = (pwr_sClass_NMpsCell*)clist_ptr->buffer;
-        object_ptr = (pwr_sClass_NMpsCell*)clist_ptr->objectp;
-        data_block_ptr = (plc_t_DataInfo*)&cell_ptr->Data1P;
+        cell_ptr = (pwr_sClass_NMpsCell *)clist_ptr->buffer;
+        object_ptr = (pwr_sClass_NMpsCell *)clist_ptr->objectp;
+        data_block_ptr = (plc_t_DataInfo *)&cell_ptr->Data1P;
         for (k = 0; k < cell_ptr->LastIndex; k++) {
           /* Check if the objid already is in the data_db */
           sts = nmpsbck_data_db_find_old(
@@ -1807,8 +1793,8 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
           data_block_ptr++;
         }
         /* Replace DataLast and DataL */
-        if (cell_ptr->LastIndex > 0
-            && cdh_ObjidIsNotNull(cell_ptr->DataLP.Aref.Objid)) {
+        if (cell_ptr->LastIndex > 0 &&
+            cdh_ObjidIsNotNull(cell_ptr->DataLP.Aref.Objid)) {
           sts = nmpsbck_data_db_find_old(
               bckctx->data_list, cell_ptr->DataLP.Aref.Objid, &data_ptr);
           if (EVEN(sts)) {
@@ -1843,13 +1829,13 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
         break;
       }
       case pwr_cClass_NMpsMirrorCell: {
-        pwr_sClass_NMpsMirrorCell* cell_ptr;
-        pwr_sClass_NMpsMirrorCell* object_ptr;
-        plc_t_DataInfoMirCell* data_block_ptr;
+        pwr_sClass_NMpsMirrorCell *cell_ptr;
+        pwr_sClass_NMpsMirrorCell *object_ptr;
+        plc_t_DataInfoMirCell *data_block_ptr;
 
-        cell_ptr = (pwr_sClass_NMpsMirrorCell*)clist_ptr->buffer;
-        object_ptr = (pwr_sClass_NMpsMirrorCell*)clist_ptr->objectp;
-        data_block_ptr = (plc_t_DataInfoMirCell*)&cell_ptr->Data1P;
+        cell_ptr = (pwr_sClass_NMpsMirrorCell *)clist_ptr->buffer;
+        object_ptr = (pwr_sClass_NMpsMirrorCell *)clist_ptr->objectp;
+        data_block_ptr = (plc_t_DataInfoMirCell *)&cell_ptr->Data1P;
         for (k = 0; k < cell_ptr->LastIndex; k++) {
           /* Check if the objid already is in the data_db */
           sts = nmpsbck_data_db_find_old(
@@ -1866,8 +1852,8 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
           data_block_ptr++;
         }
         /* Replace DataLast */
-        if (cell_ptr->LastIndex > 0
-            && cdh_ObjidIsNotNull(cell_ptr->DataLastP.Aref.Objid)) {
+        if (cell_ptr->LastIndex > 0 &&
+            cdh_ObjidIsNotNull(cell_ptr->DataLastP.Aref.Objid)) {
           sts = nmpsbck_data_db_find_old(
               bckctx->data_list, cell_ptr->DataLastP.Aref.Objid, &data_ptr);
           if (EVEN(sts)) {
@@ -1930,21 +1916,21 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
     case pwr_cClass_NMpsStoreCell:
     case pwr_cClass_NMpsStoreCell60:
     case pwr_cClass_NMpsStoreCell120:
-      ((pwr_sClass_NMpsCell*)clist_ptr->buffer)->ReloadDone = 0;
-      ((pwr_sClass_NMpsCell*)clist_ptr->buffer)->MirrorRestart = 1;
-      ((pwr_sClass_NMpsCell*)clist_ptr->buffer)->Function
-          = ((pwr_sClass_NMpsCell*)clist_ptr->objectp)->Function;
+      ((pwr_sClass_NMpsCell *)clist_ptr->buffer)->ReloadDone = 0;
+      ((pwr_sClass_NMpsCell *)clist_ptr->buffer)->MirrorRestart = 1;
+      ((pwr_sClass_NMpsCell *)clist_ptr->buffer)->Function =
+          ((pwr_sClass_NMpsCell *)clist_ptr->objectp)->Function;
       memcpy(clist_ptr->objectp, clist_ptr->buffer,
-          MIN((int)clist_ptr->object_size, clist_ptr->buffer_size));
+             MIN((int)clist_ptr->object_size, clist_ptr->buffer_size));
       break;
     case pwr_cClass_NMpsMirrorCell:
       /* Copy to temporary area for the mirror job to read */
-      ptr = (char*)&((pwr_sClass_NMpsMirrorCell*)clist_ptr->buffer)->Data1P;
-      memcpy(((pwr_sClass_NMpsMirrorCell*)(clist_ptr->objectp))->TempArea, ptr,
-          ptr - clist_ptr->buffer);
-      ((pwr_sClass_NMpsMirrorCell*)(clist_ptr->objectp))->ReloadDone
-          = NMPS_CELL_RELOADDONE;
-      ((pwr_sClass_NMpsMirrorCell*)(clist_ptr->objectp))->MirrorRestart = 1;
+      ptr = (char *)&((pwr_sClass_NMpsMirrorCell *)clist_ptr->buffer)->Data1P;
+      memcpy(((pwr_sClass_NMpsMirrorCell *)(clist_ptr->objectp))->TempArea, ptr,
+             ptr - clist_ptr->buffer);
+      ((pwr_sClass_NMpsMirrorCell *)(clist_ptr->objectp))->ReloadDone =
+          NMPS_CELL_RELOADDONE;
+      ((pwr_sClass_NMpsMirrorCell *)(clist_ptr->objectp))->MirrorRestart = 1;
       break;
     }
 
@@ -1957,15 +1943,15 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
   while (ODD(sts)) {
     sts = nmpsbck_clist_find(clist, cellheader.objid, &clist_ptr);
     if (EVEN(sts)) {
-      sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+      sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
       if (EVEN(sts)) {
         nmpsbck_set_cell_backup_done();
         LogAndReturn(NMPS__RESTOREERROR, sts);
       }
 
-      if (((pwr_sClass_NMpsCell*)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
-        ((pwr_sClass_NMpsCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
-        ((pwr_sClass_NMpsCell*)objectp)->InitTime = 1;
+      if (((pwr_sClass_NMpsCell *)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
+        ((pwr_sClass_NMpsCell *)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
+        ((pwr_sClass_NMpsCell *)objectp)->InitTime = 1;
       }
     }
     sts = gdh_GetNextObject(objid, &objid);
@@ -1974,15 +1960,15 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
   while (ODD(sts)) {
     sts = nmpsbck_clist_find(clist, cellheader.objid, &clist_ptr);
     if (EVEN(sts)) {
-      sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+      sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
       if (EVEN(sts)) {
         nmpsbck_set_cell_backup_done();
         LogAndReturn(NMPS__RESTOREERROR, sts);
       }
 
-      if (((pwr_sClass_NMpsCell*)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
-        ((pwr_sClass_NMpsCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
-        ((pwr_sClass_NMpsCell*)objectp)->InitTime = 1;
+      if (((pwr_sClass_NMpsCell *)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
+        ((pwr_sClass_NMpsCell *)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
+        ((pwr_sClass_NMpsCell *)objectp)->InitTime = 1;
       }
     }
     sts = gdh_GetNextObject(objid, &objid);
@@ -1991,15 +1977,15 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
   while (ODD(sts)) {
     sts = nmpsbck_clist_find(clist, cellheader.objid, &clist_ptr);
     if (EVEN(sts)) {
-      sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+      sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
       if (EVEN(sts)) {
         nmpsbck_set_cell_backup_done();
         LogAndReturn(NMPS__RESTOREERROR, sts);
       }
 
-      if (((pwr_sClass_NMpsCell*)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
-        ((pwr_sClass_NMpsCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
-        ((pwr_sClass_NMpsCell*)objectp)->InitTime = 1;
+      if (((pwr_sClass_NMpsCell *)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
+        ((pwr_sClass_NMpsCell *)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
+        ((pwr_sClass_NMpsCell *)objectp)->InitTime = 1;
       }
     }
     sts = gdh_GetNextObject(objid, &objid);
@@ -2008,16 +1994,17 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
   while (ODD(sts)) {
     sts = nmpsbck_clist_find(clist, cellheader.objid, &clist_ptr);
     if (EVEN(sts)) {
-      sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+      sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
       if (EVEN(sts)) {
         nmpsbck_set_cell_backup_done();
         LogAndReturn(NMPS__RESTOREERROR, sts);
       }
 
-      if (((pwr_sClass_NMpsStoreCell*)objectp)->Function
-          & NMPS_CELLFUNC_BACKUP) {
-        ((pwr_sClass_NMpsStoreCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
-        ((pwr_sClass_NMpsStoreCell*)objectp)->InitTime = 1;
+      if (((pwr_sClass_NMpsStoreCell *)objectp)->Function &
+          NMPS_CELLFUNC_BACKUP) {
+        ((pwr_sClass_NMpsStoreCell *)objectp)->ReloadDone =
+            NMPS_CELL_RELOADDONE;
+        ((pwr_sClass_NMpsStoreCell *)objectp)->InitTime = 1;
       }
     }
     sts = gdh_GetNextObject(objid, &objid);
@@ -2026,16 +2013,17 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
   while (ODD(sts)) {
     sts = nmpsbck_clist_find(clist, cellheader.objid, &clist_ptr);
     if (EVEN(sts)) {
-      sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+      sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
       if (EVEN(sts)) {
         nmpsbck_set_cell_backup_done();
         LogAndReturn(NMPS__RESTOREERROR, sts);
       }
 
-      if (((pwr_sClass_NMpsStoreCell*)objectp)->Function
-          & NMPS_CELLFUNC_BACKUP) {
-        ((pwr_sClass_NMpsStoreCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
-        ((pwr_sClass_NMpsStoreCell*)objectp)->InitTime = 1;
+      if (((pwr_sClass_NMpsStoreCell *)objectp)->Function &
+          NMPS_CELLFUNC_BACKUP) {
+        ((pwr_sClass_NMpsStoreCell *)objectp)->ReloadDone =
+            NMPS_CELL_RELOADDONE;
+        ((pwr_sClass_NMpsStoreCell *)objectp)->InitTime = 1;
       }
     }
     sts = gdh_GetNextObject(objid, &objid);
@@ -2044,16 +2032,17 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
   while (ODD(sts)) {
     sts = nmpsbck_clist_find(clist, cellheader.objid, &clist_ptr);
     if (EVEN(sts)) {
-      sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+      sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
       if (EVEN(sts)) {
         nmpsbck_set_cell_backup_done();
         LogAndReturn(NMPS__RESTOREERROR, sts);
       }
 
-      if (((pwr_sClass_NMpsStoreCell*)objectp)->Function
-          & NMPS_CELLFUNC_BACKUP) {
-        ((pwr_sClass_NMpsStoreCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
-        ((pwr_sClass_NMpsStoreCell*)objectp)->InitTime = 1;
+      if (((pwr_sClass_NMpsStoreCell *)objectp)->Function &
+          NMPS_CELLFUNC_BACKUP) {
+        ((pwr_sClass_NMpsStoreCell *)objectp)->ReloadDone =
+            NMPS_CELL_RELOADDONE;
+        ((pwr_sClass_NMpsStoreCell *)objectp)->InitTime = 1;
       }
     }
     sts = gdh_GetNextObject(objid, &objid);
@@ -2062,16 +2051,16 @@ static pwr_tStatus nmpsbck_read(bck_ctx bckctx, char* backupfile)
   while (ODD(sts)) {
     sts = nmpsbck_clist_find(clist, cellheader.objid, &clist_ptr);
     if (EVEN(sts)) {
-      sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+      sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
       if (EVEN(sts)) {
         nmpsbck_set_cell_backup_done();
         LogAndReturn(NMPS__RESTOREERROR, sts);
       }
 
-      if (((pwr_sClass_NMpsMirrorCell*)objectp)->Function
-          & NMPS_CELLFUNC_BACKUP)
-        ((pwr_sClass_NMpsMirrorCell*)objectp)->ReloadDone
-            = NMPS_CELL_RELOADDONE;
+      if (((pwr_sClass_NMpsMirrorCell *)objectp)->Function &
+          NMPS_CELLFUNC_BACKUP)
+        ((pwr_sClass_NMpsMirrorCell *)objectp)->ReloadDone =
+            NMPS_CELL_RELOADDONE;
     }
     sts = gdh_GetNextObject(objid, &objid);
   }
@@ -2123,128 +2112,129 @@ nmpsbck_read_abort:
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_set_cell_backup_done
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Set backup done flag in all cell objects with backup function.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_set_cell_backup_done
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Set backup done flag in all cell objects with backup function.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_set_cell_backup_done()
-{
+static pwr_tStatus nmpsbck_set_cell_backup_done() {
   pwr_tStatus sts;
   pwr_tObjid objid;
-  char* objectp;
+  char *objectp;
 
   /* Release all cells with backup function, by setting the
      backup done flag */
   sts = gdh_GetClassList(pwr_cClass_NMpsCell, &objid);
   while (ODD(sts)) {
-    sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+    sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
     if (EVEN(sts))
       LogAndReturn(NMPS__RESTOREERROR, sts);
 
-    if (((pwr_sClass_NMpsCell*)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
-      ((pwr_sClass_NMpsCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
-      ((pwr_sClass_NMpsCell*)objectp)->InitTime = 1;
+    if (((pwr_sClass_NMpsCell *)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
+      ((pwr_sClass_NMpsCell *)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
+      ((pwr_sClass_NMpsCell *)objectp)->InitTime = 1;
     }
     sts = gdh_GetNextObject(objid, &objid);
   }
   sts = gdh_GetClassList(pwr_cClass_NMpsCell60, &objid);
   while (ODD(sts)) {
-    sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+    sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
     if (EVEN(sts))
       LogAndReturn(NMPS__RESTOREERROR, sts);
 
-    if (((pwr_sClass_NMpsCell*)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
-      ((pwr_sClass_NMpsCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
-      ((pwr_sClass_NMpsCell*)objectp)->InitTime = 1;
+    if (((pwr_sClass_NMpsCell *)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
+      ((pwr_sClass_NMpsCell *)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
+      ((pwr_sClass_NMpsCell *)objectp)->InitTime = 1;
     }
     sts = gdh_GetNextObject(objid, &objid);
   }
   sts = gdh_GetClassList(pwr_cClass_NMpsCell120, &objid);
   while (ODD(sts)) {
-    sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+    sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
     if (EVEN(sts))
       LogAndReturn(NMPS__RESTOREERROR, sts);
 
-    if (((pwr_sClass_NMpsCell*)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
-      ((pwr_sClass_NMpsCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
-      ((pwr_sClass_NMpsCell*)objectp)->InitTime = 1;
+    if (((pwr_sClass_NMpsCell *)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
+      ((pwr_sClass_NMpsCell *)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
+      ((pwr_sClass_NMpsCell *)objectp)->InitTime = 1;
     }
     sts = gdh_GetNextObject(objid, &objid);
   }
   sts = gdh_GetClassList(pwr_cClass_NMpsStoreCell, &objid);
   while (ODD(sts)) {
-    sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+    sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
     if (EVEN(sts))
       LogAndReturn(NMPS__RESTOREERROR, sts);
 
-    if (((pwr_sClass_NMpsStoreCell*)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
-      ((pwr_sClass_NMpsStoreCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
-      ((pwr_sClass_NMpsStoreCell*)objectp)->InitTime = 1;
+    if (((pwr_sClass_NMpsStoreCell *)objectp)->Function &
+        NMPS_CELLFUNC_BACKUP) {
+      ((pwr_sClass_NMpsStoreCell *)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
+      ((pwr_sClass_NMpsStoreCell *)objectp)->InitTime = 1;
     }
     sts = gdh_GetNextObject(objid, &objid);
   }
   sts = gdh_GetClassList(pwr_cClass_NMpsStoreCell60, &objid);
   while (ODD(sts)) {
-    sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+    sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
     if (EVEN(sts))
       LogAndReturn(NMPS__RESTOREERROR, sts);
 
-    if (((pwr_sClass_NMpsStoreCell*)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
-      ((pwr_sClass_NMpsStoreCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
-      ((pwr_sClass_NMpsStoreCell*)objectp)->InitTime = 1;
+    if (((pwr_sClass_NMpsStoreCell *)objectp)->Function &
+        NMPS_CELLFUNC_BACKUP) {
+      ((pwr_sClass_NMpsStoreCell *)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
+      ((pwr_sClass_NMpsStoreCell *)objectp)->InitTime = 1;
     }
     sts = gdh_GetNextObject(objid, &objid);
   }
   sts = gdh_GetClassList(pwr_cClass_NMpsStoreCell120, &objid);
   while (ODD(sts)) {
-    sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+    sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
     if (EVEN(sts))
       LogAndReturn(NMPS__RESTOREERROR, sts);
 
-    if (((pwr_sClass_NMpsStoreCell*)objectp)->Function & NMPS_CELLFUNC_BACKUP) {
-      ((pwr_sClass_NMpsStoreCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
-      ((pwr_sClass_NMpsStoreCell*)objectp)->InitTime = 1;
+    if (((pwr_sClass_NMpsStoreCell *)objectp)->Function &
+        NMPS_CELLFUNC_BACKUP) {
+      ((pwr_sClass_NMpsStoreCell *)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
+      ((pwr_sClass_NMpsStoreCell *)objectp)->InitTime = 1;
     }
     sts = gdh_GetNextObject(objid, &objid);
   }
   sts = gdh_GetClassList(pwr_cClass_NMpsMirrorCell, &objid);
   while (ODD(sts)) {
-    sts = gdh_ObjidToPointer(objid, (pwr_tAddress*)&objectp);
+    sts = gdh_ObjidToPointer(objid, (pwr_tAddress *)&objectp);
     if (EVEN(sts))
       LogAndReturn(NMPS__RESTOREERROR, sts);
 
-    if (((pwr_sClass_NMpsMirrorCell*)objectp)->Function & NMPS_CELLFUNC_BACKUP)
-      ((pwr_sClass_NMpsMirrorCell*)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
+    if (((pwr_sClass_NMpsMirrorCell *)objectp)->Function & NMPS_CELLFUNC_BACKUP)
+      ((pwr_sClass_NMpsMirrorCell *)objectp)->ReloadDone = NMPS_CELL_RELOADDONE;
     sts = gdh_GetNextObject(objid, &objid);
   }
   return NMPS__SUCCESS;
 }
 
 /*************************************************************************
-*
-* Name:		nmpsbck_cell_handler
-*
-* Typ		int
-*
-* Typ		Parameter	IOGF	Beskrivning
-*
-* Beskrivning:
-*	Mirroring.
-*
-**************************************************************************/
+ *
+ * Name:		nmpsbck_cell_handler
+ *
+ * Typ		int
+ *
+ * Typ		Parameter	IOGF	Beskrivning
+ *
+ * Beskrivning:
+ *	Mirroring.
+ *
+ **************************************************************************/
 
-static pwr_tStatus nmpsbck_cell_handler(bck_ctx bckctx)
-{
+static pwr_tStatus nmpsbck_cell_handler(bck_ctx bckctx) {
   pwr_tStatus sts;
-  nmpsbck_t_cell_list* cell_ptr;
+  nmpsbck_t_cell_list *cell_ptr;
   int backup_now;
 
   /* Loop through the cell objects */
@@ -2258,17 +2248,17 @@ static pwr_tStatus nmpsbck_cell_handler(bck_ctx bckctx)
     case pwr_cClass_NMpsStoreCell:
     case pwr_cClass_NMpsStoreCell60:
     case pwr_cClass_NMpsStoreCell120:
-      if (((pwr_sClass_NMpsCell*)(cell_ptr->cell))->BackupNow) {
+      if (((pwr_sClass_NMpsCell *)(cell_ptr->cell))->BackupNow) {
         backup_now = 1;
         cell_ptr->backup_now = 1;
-        ((pwr_sClass_NMpsCell*)(cell_ptr->cell))->BackupNow = 0;
+        ((pwr_sClass_NMpsCell *)(cell_ptr->cell))->BackupNow = 0;
       }
       break;
     case pwr_cClass_NMpsMirrorCell:
-      if (((pwr_sClass_NMpsMirrorCell*)(cell_ptr->cell))->BackupNow) {
+      if (((pwr_sClass_NMpsMirrorCell *)(cell_ptr->cell))->BackupNow) {
         backup_now = 1;
         cell_ptr->backup_now = 1;
-        ((pwr_sClass_NMpsMirrorCell*)(cell_ptr->cell))->BackupNow = 0;
+        ((pwr_sClass_NMpsMirrorCell *)(cell_ptr->cell))->BackupNow = 0;
       }
       break;
     }
@@ -2292,20 +2282,19 @@ static pwr_tStatus nmpsbck_cell_handler(bck_ctx bckctx)
 }
 
 /****************************************************************************
-* Name:		nmpsbck_free()
-*
-* Type		pwr_tStatus
-*
-* Type		Parameter	IOGF	Description
-*
-* Description:
-*		Free the bck context.
-*
-**************************************************************************/
-static pwr_tStatus nmpsbck_free(bck_ctx bckctx)
-{
-  nmpsbck_t_data_list* data_ptr;
-  nmpsbck_t_data_list* next_ptr;
+ * Name:		nmpsbck_free()
+ *
+ * Type		pwr_tStatus
+ *
+ * Type		Parameter	IOGF	Description
+ *
+ * Description:
+ *		Free the bck context.
+ *
+ **************************************************************************/
+static pwr_tStatus nmpsbck_free(bck_ctx bckctx) {
+  nmpsbck_t_data_list *data_ptr;
+  nmpsbck_t_data_list *next_ptr;
 
   /* Free the object database */
   data_ptr = bckctx->data_list;
@@ -2324,8 +2313,7 @@ static pwr_tStatus nmpsbck_free(bck_ctx bckctx)
   return NMPS__SUCCESS;
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
   bck_ctx bckctx;
   pwr_tStatus sts;
   float scantime;
@@ -2438,9 +2426,9 @@ int main(int argc, char* argv[])
         }
 
         count++;
-        if (count > full_scan || first_scan || file_reopen
-            || bckctx->record_count >= NMPSBCK_MAX_RECORDS - 1
-            || bckctx->bckconfig->ForceFullBackup) {
+        if (count > full_scan || first_scan || file_reopen ||
+            bckctx->record_count >= NMPSBCK_MAX_RECORDS - 1 ||
+            bckctx->bckconfig->ForceFullBackup) {
           /* Time for full backup */
           if (bckctx->bckconfig->ForceFullBackup)
             bckctx->bckconfig->ForceFullBackup = 0;
@@ -2471,7 +2459,7 @@ int main(int argc, char* argv[])
         first_scan = 0;
       } else {
         ini_mEvent new_event;
-        qcom_sEvent* ep = (qcom_sEvent*)get.data;
+        qcom_sEvent *ep = (qcom_sEvent *)get.data;
 
         new_event.m = ep->mask;
         if (new_event.b.oldPlcStop && !swap) {

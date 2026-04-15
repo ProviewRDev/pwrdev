@@ -34,7 +34,8 @@
  * General Public License plus this exception.
  */
 
-typedef enum {
+typedef enum
+{
   cnv_eConvType_memcpy,
   cnv_eConvType_CharToString,
   cnv_eConvType_Int16ToInt32,
@@ -51,7 +52,8 @@ typedef enum {
   cnv_eConvType_AsciiToFloat32
 } cnv_eConvType;
 
-typedef enum {
+typedef enum
+{
   cnv_eParType__ = 0,
   cnv_eParType_Char,
   cnv_eParType_Boolean,
@@ -71,7 +73,8 @@ typedef enum {
   cnv_eParType_
 } cnv_eParType;
 
-typedef struct {
+typedef struct
+{
   int from;
   int to;
   int size;
@@ -83,10 +86,8 @@ typedef struct {
 
 typedef cnv_t_conv_item cnv_t_conv_table[CNV_CONV_TABLE_SIZE];
 
-int cnv_ConvertData(cnv_t_conv_table* conv_table, int conv_table_count,
-    char* from_data, char* to_data);
+int cnv_ConvertData(cnv_t_conv_table* conv_table, int conv_table_count, char* from_data, char* to_data);
 
-int cvn_ConvInit(pwr_tInt32 ToConvdefType, pwr_tObjid ToConvdef,
-    char* ToConvdefFile, pwr_tInt32 FromConvdefType, pwr_tObjid FromConvdef,
-    char* FromConvdefFile, pwr_tInt32* ConvTableSize, pwr_tInt32 AllocConvTable,
-    char** ConvTable);
+int cvn_ConvInit(pwr_tInt32 ToConvdefType, pwr_tObjid ToConvdef, char* ToConvdefFile,
+                 pwr_tInt32 FromConvdefType, pwr_tObjid FromConvdef, char* FromConvdefFile,
+                 pwr_tInt32* ConvTableSize, pwr_tInt32 AllocConvTable, char** ConvTable);

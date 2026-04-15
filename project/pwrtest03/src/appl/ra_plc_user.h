@@ -28,4 +28,3 @@
 #include "simul.h"
 
 #endif
-

@@ -61,21 +61,21 @@ static pwr_tStatus OpenProject(ldh_sMenuCall* ip)
   pwr_tFileName fname;
   pwr_tCmd cmd;
 
-  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody",
-      "Project", &project, &size);
+  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody", "Project", &project, &size);
   if (EVEN(sts))
     return sts;
 
   printf("Open %s\n", project);
 
   dcli_translate_filename(fname, "$pwr_exe/wb_pvd_pl.sh");
-  sprintf(cmd, "%s opendb \"%s\" \"%s\" \"%s\" &", fname, project,
-      CoLogin::username(), CoLogin::ucpassword());
+  sprintf(cmd, "%s opendb \"%s\" \"%s\" \"%s\" &", fname, project, CoLogin::username(),
+          CoLogin::ucpassword());
 
   free(project);
 
   sts = system(cmd);
-  if (sts == -1 || sts == 127) {
+  if (sts == -1 || sts == 127)
+  {
     printf("-- Error when creating process.\n");
     return sts;
   }
@@ -93,8 +93,7 @@ static pwr_tStatus CopyProject(ldh_sMenuCall* ip)
   pwr_sClass_ProjectReg* body;
   char description[140];
 
-  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Object,
-      oname, sizeof(oname), &size);
+  sts = ldh_ObjidToName(ip->PointedSession, ip->Pointed.Objid, ldh_eName_Object, oname, sizeof(oname), &size);
   if (EVEN(sts))
     return sts;
 
@@ -102,8 +101,7 @@ static pwr_tStatus CopyProject(ldh_sMenuCall* ip)
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_GetObjectBody(
-      ip->PointedSession, ip->Pointed.Objid, "RtBody", (void**)&body, &size);
+  sts = ldh_GetObjectBody(ip->PointedSession, ip->Pointed.Objid, "RtBody", (void**)&body, &size);
   if (EVEN(sts))
     return sts;
 
@@ -115,13 +113,11 @@ static pwr_tStatus CopyProject(ldh_sMenuCall* ip)
   strcpy(body->CopyFrom, body->Project);
   strcat(body->Project, "2");
 
-  sts = ldh_CreateObject(
-      ip->PointedSession, &oid, oname, cid, ip->Pointed.Objid, ldh_eDest_After);
+  sts = ldh_CreateObject(ip->PointedSession, &oid, oname, cid, ip->Pointed.Objid, ldh_eDest_After);
   if (EVEN(sts))
     return sts;
 
-  sts = ldh_SetObjectBody(
-      ip->PointedSession, oid, "RtBody", (char*)body, sizeof(*body));
+  sts = ldh_SetObjectBody(ip->PointedSession, oid, "RtBody", (char*)body, sizeof(*body));
   if (EVEN(sts))
     return sts;
 
@@ -141,16 +137,15 @@ static pwr_tStatus PostRename(ldh_tSesContext Session, pwr_tOid Object)
   if (EVEN(sts))
     return sts;
 
-  if (streq(project, "") || (project[0] == 'o' && isdigit(project[1]))) {
-    sts = ldh_ObjidToName(
-        Session, Object, ldh_eName_Object, name, sizeof(name), &size);
+  if (streq(project, "") || (project[0] == 'o' && isdigit(project[1])))
+  {
+    sts = ldh_ObjidToName(Session, Object, ldh_eName_Object, name, sizeof(name), &size);
     if (EVEN(sts))
       return sts;
 
     str_ToLower(name, name);
 
-    sts = ldh_SetObjectPar(
-        Session, Object, "RtBody", "Project", name, sizeof(name));
+    sts = ldh_SetObjectPar(Session, Object, "RtBody", "Project", name, sizeof(name));
     if (EVEN(sts))
       return sts;
   }
@@ -163,5 +158,5 @@ static pwr_tStatus PostRename(ldh_tSesContext Session, pwr_tOid Object)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(ProjectReg) = { pwr_BindMethod(OpenProject),
-  pwr_BindMethod(CopyProject), pwr_BindMethod(PostRename), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(ProjectReg) = {pwr_BindMethod(OpenProject), pwr_BindMethod(CopyProject),
+                                           pwr_BindMethod(PostRename), pwr_NullMethod};

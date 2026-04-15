@@ -41,7 +41,8 @@
 
 #include "wb_log.h"
 
-class wb_log_qt : public wb_log {
+class wb_log_qt : public wb_log
+{
   CoLogQt* m_log;
 
 public:

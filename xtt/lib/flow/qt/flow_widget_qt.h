@@ -41,9 +41,8 @@
 
 #include <QWidget>
 
-QWidget* scrolledflowwidgetqt_new(
-    int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
-    QWidget** flowwidget);
+QWidget* scrolledflowwidgetqt_new(int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
+                                  QWidget** flowwidget);
 
 QWidget* flownavwidgetqt_new(QWidget* main_flow);
 

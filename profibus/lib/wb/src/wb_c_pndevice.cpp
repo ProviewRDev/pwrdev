@@ -710,7 +710,8 @@ int pndevice_save_cb(void* sctx)
         if (EVEN(sts))
         {
           std::ostringstream msg;
-          msg << "Error populating channel vectors for subslot " << subslot.first << ", sts " << std::hex << sts;
+          msg << "Error populating channel vectors for subslot " << subslot.first << ", sts " << std::hex
+              << sts;
           MsgWindow::message('E', msg.str().c_str());
           ((WNav*)ctx->editor_ctx)->reset_nodraw();
           return sts;
@@ -907,7 +908,8 @@ static int pndevice_populate_channel_vectors(device_sCtx* ctx, GSDML::IOData* io
   // Output!
   for (auto const& output_data_item : io_data->_Output._DataItem)
   {
-    sts = pndevice_fill_io_vector_from_data_item(output_vect, &output_data_item, index++, subslot_number, true);
+    sts =
+        pndevice_fill_io_vector_from_data_item(output_vect, &output_data_item, index++, subslot_number, true);
 
     if (EVEN(sts))
       return sts;

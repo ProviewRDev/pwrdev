@@ -47,14 +47,16 @@
 #include "rt_gdh_msg.h"
 #include "rs_remote_msg.h"
 
-extern "C" {
+extern "C"
+{
 #include "remote_ndc.h"
 #include "rt_vol.h"
 #include "co_dcli.h"
 #include "co_time.h"
 }
 
-class subitem {
+class subitem
+{
 public:
   int m_size;
   void* m_p;
@@ -78,12 +80,11 @@ public:
     if (m_p)
       free(m_p);
   }
-  subitem(const subitem& x)
-      : m_size(x.m_size), m_p(0), m_cid(x.m_cid), m_offset(x.m_offset),
-        m_oid(x.m_oid)
+  subitem(const subitem& x) : m_size(x.m_size), m_p(0), m_cid(x.m_cid), m_offset(x.m_offset), m_oid(x.m_oid)
   {
     strcpy(m_attr, x.m_attr);
-    if (x.m_p) {
+    if (x.m_p)
+    {
       m_p = malloc(m_size);
       memcpy(m_p, x.m_p, m_size);
     }
@@ -95,10 +96,12 @@ public:
     m_offset = x.m_offset;
     strcpy(m_attr, x.m_attr);
     m_oid = x.m_oid;
-    if (x.m_p) {
+    if (x.m_p)
+    {
       m_p = malloc(m_size);
       memcpy(m_p, x.m_p, m_size);
-    } else
+    }
+    else
       m_p = 0;
     return *this;
   }
@@ -123,34 +126,41 @@ void remote_pvd_pwrcli::objectOid(co_procom* pcom, pwr_tOix oix)
   msg.Oid.vid = rpvd_vid;
 
   sts = udp_Request((char*)&msg, sizeof(msg), (char**)&rmsg);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     pcom->provideStatus(sts);
     return;
   }
-  if (sts == REM__TIMEOUT) {
+  if (sts == REM__TIMEOUT)
+  {
     pcom->provideStatus(REM__UDPNOCON);
     return;
   }
-  while (rmsg->Id != msg.Id) {
+  while (rmsg->Id != msg.Id)
+  {
     dispatch(pcom, (rpvd_sMsg*)rmsg);
 
     sts = udp_Receive((char**)&rmsg, 1000);
-    if (sts == REM__TIMEOUT) {
+    if (sts == REM__TIMEOUT)
+    {
       pcom->provideStatus(REM__DISORDER);
       return;
     }
   }
-  if (rmsg->Type != rpvd_eMsg_Object) {
+  if (rmsg->Type != rpvd_eMsg_Object)
+  {
     pcom->provideStatus(REM__DISORDER);
     return;
   }
-  if (EVEN(rmsg->Status)) {
+  if (EVEN(rmsg->Status))
+  {
     pcom->provideStatus(rmsg->Status);
     return;
   }
 
   std::vector<procom_obj> m_list;
-  for (int i = 0; i < rmsg->OSize; i++) {
+  for (int i = 0; i < rmsg->OSize; i++)
+  {
     procom_obj item;
 
     item.oix = rmsg->o[i].oix;
@@ -179,34 +189,41 @@ void remote_pvd_pwrcli::objectName(co_procom* pcom, char* name, pwr_tOix poix)
   msg.POid.oix = poix;
 
   sts = udp_Request((char*)&msg, sizeof(msg), (char**)&rmsg);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     pcom->provideStatus(sts);
     return;
   }
-  if (sts == REM__TIMEOUT) {
+  if (sts == REM__TIMEOUT)
+  {
     pcom->provideStatus(REM__UDPNOCON);
     return;
   }
-  while (rmsg->Id != msg.Id) {
+  while (rmsg->Id != msg.Id)
+  {
     dispatch(pcom, (rpvd_sMsg*)rmsg);
 
     sts = udp_Receive((char**)&rmsg, 1000);
-    if (sts == REM__TIMEOUT) {
+    if (sts == REM__TIMEOUT)
+    {
       pcom->provideStatus(REM__DISORDER);
       return;
     }
   }
-  if (rmsg->Type != rpvd_eMsg_Object) {
+  if (rmsg->Type != rpvd_eMsg_Object)
+  {
     pcom->provideStatus(REM__DISORDER);
     return;
   }
-  if (EVEN(rmsg->Status)) {
+  if (EVEN(rmsg->Status))
+  {
     pcom->provideStatus(rmsg->Status);
     return;
   }
 
   std::vector<procom_obj> m_list;
-  for (int i = 0; i < rmsg->OSize; i++) {
+  for (int i = 0; i < rmsg->OSize; i++)
+  {
     procom_obj item;
 
     item.oix = rmsg->o[i].oix;
@@ -222,8 +239,8 @@ void remote_pvd_pwrcli::objectName(co_procom* pcom, char* name, pwr_tOix poix)
   pcom->provideObjects(GDH__SUCCESS, m_list);
 }
 
-void remote_pvd_pwrcli::writeAttribute(co_procom* pcom, pwr_tOix oix,
-    unsigned int offset, unsigned int size, char* buffer)
+void remote_pvd_pwrcli::writeAttribute(co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size,
+                                       char* buffer)
 {
   rpvd_sMsgWriteAttribute msg;
   rpvd_sMsgAny* rmsg;
@@ -244,13 +261,15 @@ void remote_pvd_pwrcli::writeAttribute(co_procom* pcom, pwr_tOix oix,
   aref.Size = size;
 
   sts = gdh_GetObjectClass(msg.Oid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     pcom->provideStatus(sts);
     return;
   }
 
   sts = gdh_ClassAttrrefToAttr(cid, &aref, aname, sizeof(aname));
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     pcom->provideStatus(sts);
     return;
   }
@@ -259,7 +278,8 @@ void remote_pvd_pwrcli::writeAttribute(co_procom* pcom, pwr_tOix oix,
   // TODO Float conversion
   if (rpvd_opsys == 0 || rpvd_opsys == gdbroot->my_node->os)
     memcpy(&msg.Value, buffer, size);
-  else {
+  else
+  {
     gdb_sNode n;
     gdb_sClass* cp;
     int rsize;
@@ -269,40 +289,45 @@ void remote_pvd_pwrcli::writeAttribute(co_procom* pcom, pwr_tOix oix,
 
     rsize = aref.Size;
     cp = (gdb_sClass*)hash_Search(&sts, gdbroot->cid_ht, &cid);
-    if (cp != NULL) {
-      rndc_ConvertData(&sts, &n, cp, &msg.Value, buffer, (pwr_tUInt32*)&rsize,
-          ndc_eOp_decode, aref.Offset, 0);
+    if (cp != NULL)
+    {
+      rndc_ConvertData(&sts, &n, cp, &msg.Value, buffer, (pwr_tUInt32*)&rsize, ndc_eOp_decode, aref.Offset,
+                       0);
     }
   }
 
   sts = udp_Request((char*)&msg, sizeof(msg), (char**)&rmsg);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     pcom->provideStatus(sts);
     return;
   }
-  if (sts == REM__TIMEOUT) {
+  if (sts == REM__TIMEOUT)
+  {
     pcom->provideStatus(REM__UDPNOCON);
     return;
   }
 
-  while (rmsg->Id != msg.Id) {
+  while (rmsg->Id != msg.Id)
+  {
     dispatch(pcom, (rpvd_sMsg*)rmsg);
 
     sts = udp_Receive((char**)&rmsg, 1000);
-    if (sts == REM__TIMEOUT) {
+    if (sts == REM__TIMEOUT)
+    {
       pcom->provideStatus(REM__DISORDER);
       return;
     }
   }
-  if (rmsg->Type != rpvd_eMsg_Status) {
+  if (rmsg->Type != rpvd_eMsg_Status)
+  {
     pcom->provideStatus(REM__DISORDER);
     return;
   }
   pcom->provideStatus(rmsg->Status);
 }
 
-void remote_pvd_pwrcli::readAttribute(
-    co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size)
+void remote_pvd_pwrcli::readAttribute(co_procom* pcom, pwr_tOix oix, unsigned int offset, unsigned int size)
 {
   rpvd_sMsgReadAttribute msg;
   rpvd_sMsgAttribute* rmsg;
@@ -322,13 +347,15 @@ void remote_pvd_pwrcli::readAttribute(
   aref.Size = size;
 
   sts = gdh_GetObjectClass(msg.Oid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     pcom->provideStatus(sts);
     return;
   }
 
   sts = gdh_ClassAttrrefToAttr(cid, &aref, aname, sizeof(aname));
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     pcom->provideStatus(sts);
     return;
   }
@@ -336,37 +363,46 @@ void remote_pvd_pwrcli::readAttribute(
   strcpy(msg.Attribute, aname);
 
   sts = udp_Request((char*)&msg, sizeof(msg), (char**)&rmsg);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     pcom->provideStatus(sts);
     return;
   }
-  if (sts == REM__TIMEOUT) {
+  if (sts == REM__TIMEOUT)
+  {
     pcom->provideStatus(REM__UDPNOCON);
     return;
   }
-  while (rmsg->Id != msg.Id) {
+  while (rmsg->Id != msg.Id)
+  {
     dispatch(pcom, (rpvd_sMsg*)rmsg);
 
     sts = udp_Receive((char**)&rmsg, 1000);
-    if (sts == REM__TIMEOUT) {
+    if (sts == REM__TIMEOUT)
+    {
       pcom->provideStatus(REM__DISORDER);
       return;
     }
   }
-  if (rmsg->Type != rpvd_eMsg_Attribute) {
+  if (rmsg->Type != rpvd_eMsg_Attribute)
+  {
     pcom->provideStatus(REM__DISORDER);
     return;
   }
-  if (EVEN(rmsg->Status)) {
+  if (EVEN(rmsg->Status))
+  {
     pcom->provideStatus(rmsg->Status);
     return;
   }
 
   // TODO Float conversion !!!
-  if (rpvd_opsys == 0 || rpvd_opsys == gdbroot->my_node->os) {
+  if (rpvd_opsys == 0 || rpvd_opsys == gdbroot->my_node->os)
+  {
     void* p = &rmsg->Value;
     pcom->provideAttr(GDH__SUCCESS, oix, rmsg->Size, p);
-  } else {
+  }
+  else
+  {
     gdb_sNode n;
     gdb_sClass* cp;
     void* p = NULL;
@@ -377,11 +413,13 @@ void remote_pvd_pwrcli::readAttribute(
     p = malloc(MAX(rmsg->Size, (int)aref.Size));
     size = aref.Size;
     cp = (gdb_sClass*)hash_Search(&sts, gdbroot->cid_ht, &cid);
-    if (cp != NULL) {
-      rndc_ConvertData(&sts, &n, cp, p, &rmsg->Value, (pwr_tUInt32*)&size,
-          ndc_eOp_encode, aref.Offset, 0);
+    if (cp != NULL)
+    {
+      rndc_ConvertData(&sts, &n, cp, p, &rmsg->Value, (pwr_tUInt32*)&size, ndc_eOp_encode, aref.Offset, 0);
       pcom->provideAttr(GDH__SUCCESS, oix, rmsg->Size, p);
-    } else {
+    }
+    else
+    {
       pcom->provideStatus(GDH__NOSUCHCLASS);
     }
   }
@@ -391,8 +429,10 @@ void remote_pvd_pwrcli::dispatch(co_procom* pcom, rpvd_sMsg* msg)
 {
   pwr_tStatus sts;
 
-  switch (msg->Any.Type) {
-  case rpvd_eMsg_NodeUp: {
+  switch (msg->Any.Type)
+  {
+  case rpvd_eMsg_NodeUp:
+  {
     rpvd_sMsgAny rmsg;
 
     printf("NodeUp\n");
@@ -416,7 +456,8 @@ void remote_pvd_pwrcli::receive(co_procom* pcom)
 
   // Get any message
   sts = udp_Receive((char**)&msg, 20);
-  if (ODD(sts) && sts != REM__TIMEOUT) {
+  if (ODD(sts) && sts != REM__TIMEOUT)
+  {
     dispatch(pcom, (rpvd_sMsg*)msg);
   }
 }
@@ -436,8 +477,8 @@ void remote_pvd_pwrcli::subRestore()
   rpvd_sMsgAny* rmsg;
   pwr_tStatus sts;
 
-  for (sublist_iterator it = rpvd_sublist.begin(); it != rpvd_sublist.end();
-       it++) {
+  for (sublist_iterator it = rpvd_sublist.begin(); it != rpvd_sublist.end(); it++)
+  {
     msg.Type = rpvd_eMsg_SubAdd;
     msg.Id = rpvd_id++;
 
@@ -450,8 +491,8 @@ void remote_pvd_pwrcli::subRestore()
   }
 }
 
-void remote_pvd_pwrcli::subAssociateBuffer(co_procom* pcom, void** buff,
-    int oix, int offset, int size, pwr_tSubid subid)
+void remote_pvd_pwrcli::subAssociateBuffer(co_procom* pcom, void** buff, int oix, int offset, int size,
+                                           pwr_tSubid subid)
 {
   rpvd_sMsgSubAdd msg;
   rpvd_sMsgAny* rmsg;
@@ -467,7 +508,8 @@ void remote_pvd_pwrcli::subAssociateBuffer(co_procom* pcom, void** buff,
   msg.Oid.vid = rpvd_vid;
 
   sts = gdh_GetObjectSize(msg.Oid, &osize);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     pcom->provideStatus(sts);
     return;
   }
@@ -480,16 +522,19 @@ void remote_pvd_pwrcli::subAssociateBuffer(co_procom* pcom, void** buff,
     aref.Flags.b.Object = 1;
 
   sts = gdh_GetObjectClass(msg.Oid, &cid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     pcom->provideStatus(sts);
     return;
   }
 
   if (aref.Flags.b.Object)
     strcpy(aname, "");
-  else {
+  else
+  {
     sts = gdh_ClassAttrrefToAttr(cid, &aref, aname, sizeof(aname));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       pcom->provideStatus(sts);
       return;
     }
@@ -499,34 +544,41 @@ void remote_pvd_pwrcli::subAssociateBuffer(co_procom* pcom, void** buff,
   msg.Size = size;
 
   sts = udp_Request((char*)&msg, sizeof(msg), (char**)&rmsg);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     pcom->provideStatus(sts);
     return;
   }
-  if (sts == REM__TIMEOUT) {
+  if (sts == REM__TIMEOUT)
+  {
     pcom->provideStatus(REM__UDPNOCON);
     return;
   }
-  while (rmsg->Id != msg.Id) {
+  while (rmsg->Id != msg.Id)
+  {
     dispatch(pcom, (rpvd_sMsg*)rmsg);
 
     sts = udp_Receive((char**)&rmsg, 1000);
-    if (sts == REM__TIMEOUT) {
+    if (sts == REM__TIMEOUT)
+    {
       pcom->provideStatus(REM__DISORDER);
       return;
     }
   }
-  if (rmsg->Type != rpvd_eMsg_Status) {
+  if (rmsg->Type != rpvd_eMsg_Status)
+  {
     pcom->provideStatus(REM__DISORDER);
     return;
   }
-  if (EVEN(rmsg->Status)) {
+  if (EVEN(rmsg->Status))
+  {
     pcom->provideStatus(rmsg->Status);
     return;
   }
 
   pcom->provideStatus(rmsg->Status);
-  if (ODD(rmsg->Status)) {
+  if (ODD(rmsg->Status))
+  {
     // Add to local list
     subitem s(size, cid, offset, msg.Attribute, msg.Oid);
     rpvd_sublist[subid.rix] = s;
@@ -551,24 +603,29 @@ void remote_pvd_pwrcli::subDisassociateBuffer(co_procom* pcom, pwr_tSubid subid)
   msg.Rix = subid.rix;
 
   sts = udp_Request((char*)&msg, sizeof(msg), (char**)&rmsg);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     pcom->provideStatus(sts);
     return;
   }
-  if (sts == REM__TIMEOUT) {
+  if (sts == REM__TIMEOUT)
+  {
     pcom->provideStatus(REM__UDPNOCON);
     return;
   }
-  while (rmsg->Id != msg.Id) {
+  while (rmsg->Id != msg.Id)
+  {
     dispatch(pcom, (rpvd_sMsg*)rmsg);
 
     sts = udp_Receive((char**)&rmsg, 1000);
-    if (sts == REM__TIMEOUT) {
+    if (sts == REM__TIMEOUT)
+    {
       pcom->provideStatus(REM__DISORDER);
       return;
     }
   }
-  if (rmsg->Type != rpvd_eMsg_Status) {
+  if (rmsg->Type != rpvd_eMsg_Status)
+  {
     pcom->provideStatus(REM__DISORDER);
     return;
   }
@@ -586,7 +643,8 @@ void remote_pvd_pwrcli::subRequest(co_procom* pcom)
 
   msg.Type = rpvd_eMsg_SubRequest;
   msg.Id = rpvd_id++;
-  for (;;) {
+  for (;;)
+  {
     sts = udp_CheckLink();
     if (EVEN(sts))
       return;
@@ -598,15 +656,18 @@ void remote_pvd_pwrcli::subRequest(co_procom* pcom)
     sts = udp_Receive((char**)&rmsg, 1000);
     if (EVEN(sts))
       return;
-    if (sts == REM__TIMEOUT) {
+    if (sts == REM__TIMEOUT)
+    {
       udp_LinkFailure();
       return;
     }
-    while (rmsg->Id != msg.Id) {
+    while (rmsg->Id != msg.Id)
+    {
       dispatch(pcom, (rpvd_sMsg*)rmsg);
 
       sts = udp_Receive((char**)&rmsg, 1000);
-      if (sts == REM__TIMEOUT) {
+      if (sts == REM__TIMEOUT)
+      {
         pcom->provideStatus(REM__DISORDER);
         return;
       }
@@ -614,19 +675,24 @@ void remote_pvd_pwrcli::subRequest(co_procom* pcom)
 
     // Unpack the message
     subp = (char*)&rmsg->Data;
-    while (*(int*)subp != -1) {
+    while (*(int*)subp != -1)
+    {
       rix = *(int*)subp;
       subp += 4;
       size = *(int*)subp;
       subp += 4;
 
       sublist_iterator it = rpvd_sublist.find(rix);
-      if (it != rpvd_sublist.end()) {
+      if (it != rpvd_sublist.end())
+      {
         // TODO Data conversion !!!
 
-        if (rpvd_opsys == 0 || rpvd_opsys == gdbroot->my_node->os) {
+        if (rpvd_opsys == 0 || rpvd_opsys == gdbroot->my_node->os)
+        {
           memcpy(it->second.m_p, subp, it->second.m_size);
-        } else {
+        }
+        else
+        {
           gdb_sNode n;
           gdb_sClass* cp;
           int size;
@@ -637,11 +703,11 @@ void remote_pvd_pwrcli::subRequest(co_procom* pcom)
           n.netver = gdbroot->my_node->netver;
           size = it->second.m_size;
 
-          cp = (gdb_sClass*)hash_Search(
-              &sts, gdbroot->cid_ht, &it->second.m_cid);
-          if (cp != NULL) {
-            rndc_ConvertData(&sts, &n, cp, it->second.m_p, subp,
-                (pwr_tUInt32*)&size, ndc_eOp_encode, it->second.m_offset, 0);
+          cp = (gdb_sClass*)hash_Search(&sts, gdbroot->cid_ht, &it->second.m_cid);
+          if (cp != NULL)
+          {
+            rndc_ConvertData(&sts, &n, cp, it->second.m_p, subp, (pwr_tUInt32*)&size, ndc_eOp_encode,
+                             it->second.m_offset, 0);
           }
         }
       }
@@ -662,7 +728,8 @@ void remote_pvd_pwrcli::nodeUp()
   msg.Id = rpvd_id++;
 
   sts = udp_Request((char*)&msg, sizeof(msg), (char**)&rmsg);
-  if (EVEN(sts) || sts == REM__TIMEOUT) {
+  if (EVEN(sts) || sts == REM__TIMEOUT)
+  {
   }
 }
 
@@ -690,7 +757,8 @@ int main(int argc, char* argv[])
   int server_id;
 
   /* Read arguments */
-  if (argc < 5) {
+  if (argc < 5)
+  {
     usage();
     exit(0);
   }
@@ -699,49 +767,59 @@ int main(int argc, char* argv[])
   strncpy(remote_vid, argv[3], sizeof(remote_vid));
   strncpy(remote_volume_name, argv[4], sizeof(remote_volume_name));
 
-  if (argc >= 6) {
+  if (argc >= 6)
+  {
     sts = sscanf(argv[5], "%d", &server_id);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       usage();
       exit(0);
     }
-  } else
+  }
+  else
     server_id = 200;
 
-  if (argc >= 7) {
+  if (argc >= 7)
+  {
     sts = sscanf(argv[6], "%d", &udp_port);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       usage();
       exit(0);
     }
-  } else
+  }
+  else
     udp_port = 3051;
 
-  if (argc >= 8) {
+  if (argc >= 8)
+  {
     sts = sscanf(argv[7], "%d", &rpvd_opsys);
-    if (sts != 1) {
+    if (sts != 1)
+    {
       usage();
       exit(0);
     }
-  } else
+  }
+  else
     rpvd_opsys = 0;
 
   cdh_StringToVolumeId(remote_vid, &rpvd_vid);
   strcpy(rpvd_vname, remote_volume_name);
 
   sts = udp_Init(remote_address, remote_host_name, udp_port);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     exit(0);
   }
 
   remote_pvd_pwrcli provider(pvd_eEnv_Rt);
   rt_procom procom(&provider,
-      errh_eAnix_appl20, // Application index
-      "remote_pvd_pwrcli", // Process name
-      server_id, // Sid
-      rpvd_vid, // Vid
-      rpvd_vname, // Volume name
-      0); // Global
+                   errh_eAnix_appl20,   // Application index
+                   "remote_pvd_pwrcli", // Process name
+                   server_id,           // Sid
+                   rpvd_vid,            // Vid
+                   rpvd_vname,          // Volume name
+                   0);                  // Global
 
   procom.init();
 

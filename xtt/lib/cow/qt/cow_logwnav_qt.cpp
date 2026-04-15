@@ -44,8 +44,7 @@
 CoLogWNavQt::CoLogWNavQt(void* l_parent_ctx, int l_show_item, QWidget** w)
     : CoLogWNav(l_parent_ctx, l_show_item)
 {
-  form_widget
-      = scrolledbrowwidgetqt_new(CoLogWNav::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetqt_new(CoLogWNav::init_brow_cb, this, &brow_widget);
 
   // Create the root item
   *w = form_widget;
@@ -57,7 +56,4 @@ CoLogWNavQt::~CoLogWNavQt()
   form_widget->close();
 }
 
-void CoLogWNavQt::set_input_focus()
-{
-  brow_widget->setFocus();
-}
+void CoLogWNavQt::set_input_focus() { brow_widget->setFocus(); }

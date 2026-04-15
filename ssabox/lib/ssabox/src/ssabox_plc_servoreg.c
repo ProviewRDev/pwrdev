@@ -68,8 +68,7 @@
 /*_*
   @aref ssab_servoreg Ssab_ServoReg
 */
-void Ssab_ServoReg_exec(plc_sThread* tp, pwr_sClass_Ssab_ServoReg* object)
-{
+void Ssab_ServoReg_exec(plc_sThread *tp, pwr_sClass_Ssab_ServoReg *object) {
   double aD, uD, xD, dt, control, uRamp, xDiff;
   int delaysteps;
 
@@ -101,8 +100,8 @@ void Ssab_ServoReg_exec(plc_sThread* tp, pwr_sClass_Ssab_ServoReg* object)
   object->umaxP = *object->umaxPP;
   object->umaxN = *object->umaxNP;
   object->positioning = *object->positioningP;
-  if (object->positioning
-      && object->enableRamp) // uR not used - use the regulator for positioning
+  if (object->positioning &&
+      object->enableRamp) // uR not used - use the regulator for positioning
     control = (xDiff > 0.0 ? object->umaxP : object->umaxN);
 
   /* 2. PID regulator */
@@ -118,9 +117,9 @@ void Ssab_ServoReg_exec(plc_sThread* tp, pwr_sClass_Ssab_ServoReg* object)
     if (delaysteps > object->maxdelaysteps)
       delaysteps = object->maxdelaysteps;
     SR_extractRef(SR_OBJ_LISTPP, delaysteps, &aD, &uD, &xD);
-    control = uD + object->kPID[0] * (uD - object->uc)
-        + object->kPID[1] * (xD - object->xc)
-        + object->kPID[2] * (aD - object->ac);
+    control = uD + object->kPID[0] * (uD - object->uc) +
+              object->kPID[1] * (xD - object->xc) +
+              object->kPID[2] * (aD - object->ac);
   }
 
   /* 3. Square root ramp */
@@ -129,10 +128,10 @@ void Ssab_ServoReg_exec(plc_sThread* tp, pwr_sClass_Ssab_ServoReg* object)
   // Possibly solve this problem by taking into account further conditions.
 
   if (object->enableRamp) {
-    uRamp = SIGN(xDiff) * (-object->DelayRamp * object->amaxS
-                              + sqrt(object->DelayRamp * object->DelayRamp
-                                        * object->amaxS * object->amaxS
-                                    + 2.0 * ABS(xDiff) * object->amaxS));
+    uRamp = SIGN(xDiff) * (-object->DelayRamp * object->amaxS +
+                           sqrt(object->DelayRamp * object->DelayRamp *
+                                    object->amaxS * object->amaxS +
+                                2.0 * ABS(xDiff) * object->amaxS));
     if ((xDiff >= 0.0 && control > uRamp) || (xDiff < 0.0 && control < uRamp)) {
       control = uRamp;
       object->RampActive = TRUE;
@@ -143,8 +142,8 @@ void Ssab_ServoReg_exec(plc_sThread* tp, pwr_sClass_Ssab_ServoReg* object)
 
   /* 4. Dead zone */
 
-  if (object->enableDZ && (object->uR == 0.0)
-      && (ABS(xDiff) < object->DeadZone)) {
+  if (object->enableDZ && (object->uR == 0.0) &&
+      (ABS(xDiff) < object->DeadZone)) {
     control = 0.0;
     object->DZActive = TRUE;
   } else
@@ -152,8 +151,8 @@ void Ssab_ServoReg_exec(plc_sThread* tp, pwr_sClass_Ssab_ServoReg* object)
 
   /* 5. Timer dead zone */
 
-  if (object->enableTDZ && (object->uR == 0.0)
-      && (ABS(xDiff) < object->TimerDeadZone)) {
+  if (object->enableTDZ && (object->uR == 0.0) &&
+      (ABS(xDiff) < object->TimerDeadZone)) {
     object->TDZElapsedTime += *(object->ScanTime);
     if (object->TDZElapsedTime > object->TDZTime) {
       control = 0.0;

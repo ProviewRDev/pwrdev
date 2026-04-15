@@ -51,13 +51,15 @@
 typedef struct s_FacilityCB sFacilityCB;
 typedef struct s_MsgCB sMsgCB;
 
-struct s_MsgCB {
+struct s_MsgCB
+{
   struct LstHead MsgL;
   msg_sMsg m;
   msg_eSeverity Severity;
 };
 
-struct s_FacilityCB {
+struct s_FacilityCB
+{
   struct LstHead FacL;
   struct LstHead MsgH;
   msg_sFacility f;
@@ -77,14 +79,11 @@ void lex_FacName(const char* FacName)
   LstInsert(&lFacH, &facp->FacL);
 }
 
-void lex_FacNum(int FacNum)
-{
-  LstEntry(lFacH.prev, sFacilityCB, FacL)->f.FacNum = FacNum;
-}
+void lex_FacNum(int FacNum) { LstEntry(lFacH.prev, sFacilityCB, FacL)->f.FacNum = FacNum; }
 
 void lex_FacPrefix(const char* Prefix)
 {
-  char *str = strncpy(malloc(strlen(Prefix) + 3), Prefix, strlen(Prefix)+1);
+  char* str = strncpy(malloc(strlen(Prefix) + 3), Prefix, strlen(Prefix) + 1);
   strcat(str, "__\0");
   LstEntry(lFacH.prev, sFacilityCB, FacL)->f.Prefix = str;
 }
@@ -111,7 +110,8 @@ static void TranslateFormatSpec(const char* msgstr, char** transstr)
   int len = 0;
 
   /* '"' will be substituted with  '\"', allocate space for it */
-  while (*m) {
+  while (*m)
+  {
     if (*m == '"')
       extra++;
     m++;
@@ -122,11 +122,15 @@ static void TranslateFormatSpec(const char* msgstr, char** transstr)
   l = *transstr;
   m = msgstr;
 
-  while (*m != '\0') {
-    if (*m == '"') {
+  while (*m != '\0')
+  {
+    if (*m == '"')
+    {
       *l++ = '\\';
       *l++ = '"';
-    } else {
+    }
+    else
+    {
       *l++ = *m;
     }
     m++;
@@ -138,8 +142,7 @@ void lex_MsgText(const char* Text)
 {
   struct LstHead* ml = LstEntry(lFacH.prev, sFacilityCB, FacL)->MsgH.prev;
 
-  TranslateFormatSpec(
-      Text, &LstEntry(ml, sMsgCB, MsgL)->m.MsgTxt); /* convert any VMS-style form spec */
+  TranslateFormatSpec(Text, &LstEntry(ml, sMsgCB, MsgL)->m.MsgTxt); /* convert any VMS-style form spec */
 }
 
 void lex_MsgSeverity(msg_eSeverity Severity)
@@ -148,69 +151,92 @@ void lex_MsgSeverity(msg_eSeverity Severity)
   LstEntry(ml, sMsgCB, MsgL)->Severity = Severity;
 }
 
-static void lex(FILE* fp) {
+static void lex(FILE* fp)
+{
   char buffer[500];
   int lineno = 1;
-  while (fgets(buffer, 500, fp) != NULL) {
-    if (strstr(buffer, ".facility")) {
-      char *line = strstr(buffer, ".facility") + 10;
-      while (isspace(line[0])) {
+  while (fgets(buffer, 500, fp) != NULL)
+  {
+    if (strstr(buffer, ".facility"))
+    {
+      char* line = strstr(buffer, ".facility") + 10;
+      while (isspace(line[0]))
+      {
         line++;
       }
-      char *facnam = line; // "ASD,123 "
-      char *facnum0 = strchr(line, ',')+1; // "123 "
-      facnam[strchr(facnam, ',')-facnam] = '\0'; // "ASD"
+      char* facnam = line;                         // "ASD,123 "
+      char* facnum0 = strchr(line, ',') + 1;       // "123 "
+      facnam[strchr(facnam, ',') - facnam] = '\0'; // "ASD"
       char* tmp = facnum0;
-      while (isdigit(tmp[0])) {
+      while (isdigit(tmp[0]))
+      {
         tmp++;
       }
-      facnum0[tmp-facnum0] = '\0';
+      facnum0[tmp - facnum0] = '\0';
       tmp = NULL;
       int facnum = strtol(facnum0, &tmp, 10);
-      if (!facnum) {
+      if (!facnum)
+      {
         fprintf(stderr, "Syntax error in file %s line %d\n", inFile, lineno);
         exit(1);
       }
       lex_FacName(facnam);
       lex_FacNum(facnum);
       lex_FacPrefix(facnam);
-    } else if (isalnum(buffer[0])) { // "mymsg   <my message text>  /error"
-      char *msgname = buffer; // msgname = "mymsg   <my message text>  /error"
-      char *tmp = msgname;
-      while (isalnum(tmp[0]) || tmp[0] == '_') {
+    }
+    else if (isalnum(buffer[0]))
+    {                         // "mymsg   <my message text>  /error"
+      char* msgname = buffer; // msgname = "mymsg   <my message text>  /error"
+      char* tmp = msgname;
+      while (isalnum(tmp[0]) || tmp[0] == '_')
+      {
         tmp++;
       }
       tmp[0] = '\0'; // msgname = "mymsg"
       tmp++;
 
-      while (tmp[0] != '<') {
+      while (tmp[0] != '<')
+      {
         tmp++;
       }
       tmp++;
       char* msgtxt = tmp; // msgtxt = "my message text>  /error"
-      while (tmp[0] != '>') {
+      while (tmp[0] != '>')
+      {
         tmp++;
       }
       tmp[0] = '\0'; // msgtxt = "my message text"
       tmp++;
 
-      char *msgseverity = tmp; // "  /error"
-      while (isspace(msgseverity[0])) {
+      char* msgseverity = tmp; // "  /error"
+      while (isspace(msgseverity[0]))
+      {
         msgseverity++; // "/error"
       }
       lex_MsgName(msgname);
       lex_MsgText(msgtxt);
-      if (msgseverity[1] == 'w') {
+      if (msgseverity[1] == 'w')
+      {
         lex_MsgSeverity(msg_eSeverity_Warning);
-      } else if (msgseverity[1] == 's') {
+      }
+      else if (msgseverity[1] == 's')
+      {
         lex_MsgSeverity(msg_eSeverity_Success);
-      } else if (msgseverity[1] == 'e') {
+      }
+      else if (msgseverity[1] == 'e')
+      {
         lex_MsgSeverity(msg_eSeverity_Error);
-      } else if (msgseverity[1] == 'i') {
+      }
+      else if (msgseverity[1] == 'i')
+      {
         lex_MsgSeverity(msg_eSeverity_Info);
-      } else if (msgseverity[1] == 'f') {
+      }
+      else if (msgseverity[1] == 'f')
+      {
         lex_MsgSeverity(msg_eSeverity_Fatal);
-      } else {
+      }
+      else
+      {
         fprintf(stderr, "Syntax error in file %s line %d\n", inFile, lineno);
         exit(1);
       }
@@ -219,10 +245,10 @@ static void lex(FILE* fp) {
   }
 }
 
-static void WriteFiles(char* fname, FILE* cfp, FILE* hfp, FILE *pfp)
+static void WriteFiles(char* fname, FILE* cfp, FILE* hfp, FILE* pfp)
 {
-  struct LstHead * fl;
-  struct LstHead * ml;
+  struct LstHead* fl;
+  struct LstHead* ml;
   int idx;
   int facid;
   char prefix[32];
@@ -233,7 +259,8 @@ static void WriteFiles(char* fname, FILE* cfp, FILE* hfp, FILE *pfp)
   fprintf(hfp, "#ifndef %s_h\n", fname);
   fprintf(hfp, "#define %s_h\n\n", fname);
 
-  LstForEach(fl, &lFacH) {
+  LstForEach(fl, &lFacH)
+  {
     facid = 0x800 + LstEntry(fl, sFacilityCB, FacL)->f.FacNum;
     snprintf(name, sizeof(name), "%s_FACILITY", LstEntry(fl, sFacilityCB, FacL)->f.FacName);
     fprintf(hfp, "#define %-29s %9d /* x%08x */\n", name, facid, facid);
@@ -248,7 +275,8 @@ static void WriteFiles(char* fname, FILE* cfp, FILE* hfp, FILE *pfp)
     fprintf(cfp, "static msg_sMsg %s[] = {\n", msgName);
 
     idx = 1;
-    LstForEach(ml, &LstEntry(fl, sFacilityCB, FacL)->MsgH) {
+    LstForEach(ml, &LstEntry(fl, sFacilityCB, FacL)->MsgH)
+    {
       if (idx != 1)
         fprintf(cfp, ",\n");
 
@@ -256,17 +284,16 @@ static void WriteFiles(char* fname, FILE* cfp, FILE* hfp, FILE *pfp)
       snprintf(name, sizeof(name), "%s%s", prefix, LstEntry(ml, sMsgCB, MsgL)->m.MsgName);
       fprintf(hfp, "#define %-29s %9.9d /* x%08x */\n", name, msg, msg);
       if (pfp)
-	fprintf(pfp, "%s = %d\n", name, msg);
+        fprintf(pfp, "%s = %d\n", name, msg);
       fprintf(cfp, "\t{\"%s\", \"%s\"}", LstEntry(ml, sMsgCB, MsgL)->m.MsgName,
-          LstEntry(ml, sMsgCB, MsgL)->m.MsgTxt);
+              LstEntry(ml, sMsgCB, MsgL)->m.MsgTxt);
       idx++;
     }
     fprintf(cfp, "\n};\n\n");
 
-    fprintf(cfp, "static msg_sFacility %sfacility[] = {\n\t",
-        LstEntry(fl, sFacilityCB, FacL)->f.FacName);
-    fprintf(cfp, "{%d, \"%s\", \"%s\", MSG_NOF(%s), %s}\n",
-        LstEntry(fl, sFacilityCB, FacL)->f.FacNum, LstEntry(fl, sFacilityCB, FacL)->f.FacName, prefix, msgName, msgName);
+    fprintf(cfp, "static msg_sFacility %sfacility[] = {\n\t", LstEntry(fl, sFacilityCB, FacL)->f.FacName);
+    fprintf(cfp, "{%d, \"%s\", \"%s\", MSG_NOF(%s), %s}\n", LstEntry(fl, sFacilityCB, FacL)->f.FacNum,
+            LstEntry(fl, sFacilityCB, FacL)->f.FacName, prefix, msgName, msgName);
     fprintf(cfp, "};\n\n");
   }
 
@@ -280,32 +307,38 @@ int main(int argc, char** argv)
   FILE* pfp = NULL;
   FILE* in = NULL;
 
-  if (!(argc == 4 || argc == 5)) {
+  if (!(argc == 4 || argc == 5))
+  {
     printf("Usage: co_msg2cmsg msg-file c_msg-file h-file [py-file]\n");
     exit(2);
   }
 
   inFile = argv[1];
-  if (!(in = fopen(inFile, "r"))) {
+  if (!(in = fopen(inFile, "r")))
+  {
     printf("Can't open input file: %s\n", inFile);
     exit(2);
   }
 
-  if (!(cfp = fopen(argv[2], "w"))) {
+  if (!(cfp = fopen(argv[2], "w")))
+  {
     printf("Can't open c_msg-output file: %s\n", argv[2]);
     fclose(in);
     exit(2);
   }
 
-  if (!(hfp = fopen(argv[3], "w"))) {
+  if (!(hfp = fopen(argv[3], "w")))
+  {
     printf("Can't open h-output file: %s\n", argv[3]);
     fclose(in);
     fclose(cfp);
     exit(2);
   }
 
-  if (argc >= 5) {
-    if (!(pfp = fopen(argv[4], "w"))) {
+  if (argc >= 5)
+  {
+    if (!(pfp = fopen(argv[4], "w")))
+    {
       printf("Can't open python-output file: %s\n", argv[4]);
       fclose(in);
       fclose(cfp);

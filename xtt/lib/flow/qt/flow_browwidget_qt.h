@@ -41,9 +41,8 @@
 
 #include <QWidget>
 
-QWidget* scrolledbrowwidgetqt_new(
-    int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
-    QWidget** browwidget);
+QWidget* scrolledbrowwidgetqt_new(int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
+                                  QWidget** browwidget);
 
 void browwidgetqt_modify_ctx(QWidget* w, void* ctx);
 

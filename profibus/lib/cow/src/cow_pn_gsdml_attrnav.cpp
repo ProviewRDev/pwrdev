@@ -2995,7 +2995,6 @@ void ItemPnEnumRTClass::setup_node()
 
   *m_value_p = value;
   brow_SetAnnotation(m_node, 1, m_value_p->c_str(), m_value_p->length());
-
 }
 
 void ItemPnEnumRTClass::scan_impl(ItemPnValueSelectItem<std::string> const* selected_item) const
@@ -3103,8 +3102,8 @@ int ItemPnStartupMode::open_children_impl()
   {
     for (auto const& startup_mode : supported_modes)
     {
-      new ItemPnValueSelectItem<std::string>(m_attrnav, startup_mode.c_str(), "", this, m_value_p, startup_mode,
-                                             startup_mode.c_str(), m_node, flow_eDest_IntoLast);
+      new ItemPnValueSelectItem<std::string>(m_attrnav, startup_mode.c_str(), "", this, m_value_p,
+                                             startup_mode, startup_mode.c_str(), m_node, flow_eDest_IntoLast);
     }
   }
 
@@ -3130,7 +3129,8 @@ void ItemPnStartupMode::setup_node()
   m_noedit = 0;
 
   if (!m_value_p->empty() &&
-      (supported_modes.empty() || m_interface_submodule_item->_ApplicationRelations._StartupMode.inList(*m_value_p)))
+      (supported_modes.empty() ||
+       m_interface_submodule_item->_ApplicationRelations._StartupMode.inList(*m_value_p)))
   {
     value = *m_value_p;
   }

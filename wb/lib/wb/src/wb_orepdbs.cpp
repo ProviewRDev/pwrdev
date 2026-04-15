@@ -37,10 +37,7 @@
 #include "wb_orepdbs.h"
 #include "wb_vrepdbs.h"
 
-void* wb_orepdbs::operator new(size_t size, wb_vrepdbs* v)
-{
-  return (void*)v->new_wb_orepdbs(size);
-}
+void* wb_orepdbs::operator new(size_t size, wb_vrepdbs* v) { return (void*)v->new_wb_orepdbs(size); }
 
 wb_orepdbs::wb_orepdbs(dbs_sObject* o)
 {
@@ -137,75 +134,36 @@ wb_name wb_orepdbs::longName()
   return wb_name(str);
 }
 
-pwr_tTime wb_orepdbs::ohTime() const
-{
-  return m_o->time;
-}
+pwr_tTime wb_orepdbs::ohTime() const { return m_o->time; }
 
-pwr_tTime wb_orepdbs::rbTime() const
-{
-  return m_o->rbody.time;
-}
+pwr_tTime wb_orepdbs::rbTime() const { return m_o->rbody.time; }
 
-pwr_tTime wb_orepdbs::dbTime() const
-{
-  return m_o->dbody.time;
-}
+pwr_tTime wb_orepdbs::dbTime() const { return m_o->dbody.time; }
 
-pwr_mClassDef wb_orepdbs::flags() const
-{
-  return m_o->ohFlags;
-}
+pwr_mClassDef wb_orepdbs::flags() const { return m_o->ohFlags; }
 
-bool wb_orepdbs::isOffspringOf(const wb_orep* o) const
-{
-  return false;
-}
+bool wb_orepdbs::isOffspringOf(const wb_orep* o) const { return false; }
 
-wb_orep* wb_orepdbs::after(pwr_tStatus* sts)
-{
-  return m_vrep->after(sts, (wb_orep*)this);
-}
+wb_orep* wb_orepdbs::after(pwr_tStatus* sts) { return m_vrep->after(sts, (wb_orep*)this); }
 
-wb_orep* wb_orepdbs::before(pwr_tStatus* sts)
-{
-  return m_vrep->before(sts, (wb_orep*)this);
-}
+wb_orep* wb_orepdbs::before(pwr_tStatus* sts) { return m_vrep->before(sts, (wb_orep*)this); }
 
-wb_orep* wb_orepdbs::ancestor(pwr_tStatus* sts)
-{
-  return m_vrep->ancestor(sts, (wb_orep*)this);
-}
+wb_orep* wb_orepdbs::ancestor(pwr_tStatus* sts) { return m_vrep->ancestor(sts, (wb_orep*)this); }
 
-wb_orep* wb_orepdbs::parent(pwr_tStatus* sts)
-{
-  return m_vrep->parent(sts, (wb_orep*)this);
-}
+wb_orep* wb_orepdbs::parent(pwr_tStatus* sts) { return m_vrep->parent(sts, (wb_orep*)this); }
 
-wb_orep* wb_orepdbs::first(pwr_tStatus* sts)
-{
-  return m_vrep->first(sts, (wb_orep*)this);
-}
+wb_orep* wb_orepdbs::first(pwr_tStatus* sts) { return m_vrep->first(sts, (wb_orep*)this); }
 
 wb_orep* wb_orepdbs::child(pwr_tStatus* sts, wb_name& name)
 {
   return m_vrep->child(sts, (wb_orep*)this, name);
 }
 
-wb_orep* wb_orepdbs::last(pwr_tStatus* sts)
-{
-  return m_vrep->last(sts, (wb_orep*)this);
-}
+wb_orep* wb_orepdbs::last(pwr_tStatus* sts) { return m_vrep->last(sts, (wb_orep*)this); }
 
-wb_orep* wb_orepdbs::next(pwr_tStatus* sts)
-{
-  return m_vrep->next(sts, (wb_orep*)this);
-}
+wb_orep* wb_orepdbs::next(pwr_tStatus* sts) { return m_vrep->next(sts, (wb_orep*)this); }
 
-wb_orep* wb_orepdbs::previous(pwr_tStatus* sts)
-{
-  return m_vrep->previous(sts, (wb_orep*)this);
-}
+wb_orep* wb_orepdbs::previous(pwr_tStatus* sts) { return m_vrep->previous(sts, (wb_orep*)this); }
 
 wb_adrep* wb_orepdbs::attribute(pwr_tStatus* sts)
 {

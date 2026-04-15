@@ -62,7 +62,8 @@ pwr_tStatus aproc_RegisterObject(pwr_tOid oid)
   if (!anix)
     return PROC__ANIX;
 
-  if (!proc_np) {
+  if (!proc_np)
+  {
     pwr_tOid noid;
 
     sts = gdh_GetNodeObject(0, &noid);
@@ -97,7 +98,8 @@ pwr_tStatus aproc_TimeStamp(float cycletime, float maxdelay)
   if (!anix)
     return PROC__ANIX;
 
-  if (!proc_np) {
+  if (!proc_np)
+  {
     pwr_tOid noid;
 
     sts = gdh_GetNodeObject(0, &noid);

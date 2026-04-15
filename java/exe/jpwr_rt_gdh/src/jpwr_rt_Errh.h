@@ -5,68 +5,62 @@
 #ifndef _Included_jpwr_rt_Errh
 #define _Included_jpwr_rt_Errh
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 #undef jpwr_rt_Errh_eAnix_webmon
 #define jpwr_rt_Errh_eAnix_webmon 14L
 #undef jpwr_rt_Errh_eAnix_webmonmh
 #define jpwr_rt_Errh_eAnix_webmonmh 15L
-/* Inaccessible static: initDone */
-/*
- * Class:     jpwr_rt_Errh
- * Method:    init
- * Signature: (Ljava/lang/String;I)I
- */
-JNIEXPORT jint JNICALL Java_jpwr_rt_Errh_init
-  (JNIEnv *, jobject, jstring, jint);
+  /* Inaccessible static: initDone */
+  /*
+   * Class:     jpwr_rt_Errh
+   * Method:    init
+   * Signature: (Ljava/lang/String;I)I
+   */
+  JNIEXPORT jint JNICALL Java_jpwr_rt_Errh_init(JNIEnv*, jobject, jstring, jint);
 
-/*
- * Class:     jpwr_rt_Errh
- * Method:    close
- * Signature: ()V
- */
-JNIEXPORT void JNICALL Java_jpwr_rt_Errh_setStatus
-  (JNIEnv *, jobject, jint);
+  /*
+   * Class:     jpwr_rt_Errh
+   * Method:    close
+   * Signature: ()V
+   */
+  JNIEXPORT void JNICALL Java_jpwr_rt_Errh_setStatus(JNIEnv*, jobject, jint);
 
-/*
- * Class:     jpwr_rt_Errh
- * Method:    fatal
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_jpwr_rt_Errh_fatal
-  (JNIEnv *, jobject, jstring);
+  /*
+   * Class:     jpwr_rt_Errh
+   * Method:    fatal
+   * Signature: (Ljava/lang/String;)V
+   */
+  JNIEXPORT void JNICALL Java_jpwr_rt_Errh_fatal(JNIEnv*, jobject, jstring);
 
-/*
- * Class:     jpwr_rt_Errh
- * Method:    error
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_jpwr_rt_Errh_error
-  (JNIEnv *, jobject, jstring);
+  /*
+   * Class:     jpwr_rt_Errh
+   * Method:    error
+   * Signature: (Ljava/lang/String;)V
+   */
+  JNIEXPORT void JNICALL Java_jpwr_rt_Errh_error(JNIEnv*, jobject, jstring);
 
-/*
- * Class:     jpwr_rt_Errh
- * Method:    warning
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_jpwr_rt_Errh_warning
-  (JNIEnv *, jobject, jstring);
+  /*
+   * Class:     jpwr_rt_Errh
+   * Method:    warning
+   * Signature: (Ljava/lang/String;)V
+   */
+  JNIEXPORT void JNICALL Java_jpwr_rt_Errh_warning(JNIEnv*, jobject, jstring);
 
-/*
- * Class:     jpwr_rt_Errh
- * Method:    info
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_jpwr_rt_Errh_info
-  (JNIEnv *, jobject, jstring);
+  /*
+   * Class:     jpwr_rt_Errh
+   * Method:    info
+   * Signature: (Ljava/lang/String;)V
+   */
+  JNIEXPORT void JNICALL Java_jpwr_rt_Errh_info(JNIEnv*, jobject, jstring);
 
-/*
- * Class:     jpwr_rt_Errh
- * Method:    success
- * Signature: (Ljava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_jpwr_rt_Errh_success
-  (JNIEnv *, jobject, jstring);
+  /*
+   * Class:     jpwr_rt_Errh
+   * Method:    success
+   * Signature: (Ljava/lang/String;)V
+   */
+  JNIEXPORT void JNICALL Java_jpwr_rt_Errh_success(JNIEnv*, jobject, jstring);
 
 #ifdef __cplusplus
 }

@@ -45,33 +45,31 @@
 #include "cow_rtmon_gtk.h"
 #include "cow_xhelp_gtk.h"
 
-static void usage()
-{
-  printf("\nUsage: pwr_rtmonitor\n");
-}
+static void usage() { printf("\nUsage: pwr_rtmonitor\n"); }
 
 static void rtmon_help_cb(void* ctx, const char* topic)
 {
-  CoXHelp::dhelp(
-      "index", "", navh_eHelpFile_Other, "$pwr_lang/rtmon_help.dat", 0);
+  CoXHelp::dhelp("index", "", navh_eHelpFile_Other, "$pwr_lang/rtmon_help.dat", 0);
 }
 
-static void rtmon_close_cb(void* ctx)
-{
-  exit(0);
-}
+static void rtmon_close_cb(void* ctx) { exit(0); }
 
 int main(int argc, char* argv[])
 {
   int sts;
   char display[80] = "";
 
-  if (argc > 1) {
-    for (int i = 1; i < argc; i++) {
-      if (streq(argv[i], "-h")) {
+  if (argc > 1)
+  {
+    for (int i = 1; i < argc; i++)
+    {
+      if (streq(argv[i], "-h"))
+      {
         usage();
         exit(0);
-      } else if (streq(argv[i], "--display") && i + 1 < argc) {
+      }
+      else if (streq(argv[i], "--display") && i + 1 < argc)
+      {
         strncpy(display, argv[i + 1], sizeof(display));
       }
     }
@@ -83,13 +81,13 @@ int main(int argc, char* argv[])
   setlocale(LC_TIME, "en_US");
 
   // Load css file
-  GtkCssProvider *provider;
+  GtkCssProvider* provider;
   pwr_tFileName fname;
   dcli_translate_filename(fname, "$pwr_load/pwr_rtmon_gtk.css");
   provider = gtk_css_provider_new();
-  gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(
-      gdk_display_get_default()), GTK_STYLE_PROVIDER(provider), 
-      GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  gtk_style_context_add_provider_for_screen(gdk_display_get_default_screen(gdk_display_get_default()),
+                                            GTK_STYLE_PROVIDER(provider),
+                                            GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   gtk_css_provider_load_from_path(provider, fname, NULL);
   g_object_unref(provider);
 

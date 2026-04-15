@@ -47,7 +47,8 @@
 #define _z_ ,
 
 /* Direct link table */
-typedef struct {
+typedef struct
+{
   void** Pointer;
   pwr_sAttrRef AttrRef;
   pwr_tClassId ObjType;
@@ -56,90 +57,112 @@ typedef struct {
   pwr_tUInt32 Offset;
 } plc_t_rtdbref;
 
-typedef struct {
+typedef struct
+{
   pwr_tBoolean ActualValue;
 } plc_sClass_Di;
 
-typedef struct {
+typedef struct
+{
   pwr_tBoolean ActualValue;
 } plc_sClass_Do;
 
-typedef struct {
+typedef struct
+{
   pwr_tBoolean ActualValue;
 } plc_sClass_Po;
 
-typedef struct {
+typedef struct
+{
   pwr_tBoolean ActualValue;
 } plc_sClass_Dv;
 
-typedef struct {
+typedef struct
+{
   pwr_tInt32 RawValue;
 } plc_sClass_Co;
 
-typedef struct {
+typedef struct
+{
   pwr_tFloat32 ActualValue;
 } plc_sClass_Ai;
 
-typedef struct {
+typedef struct
+{
   pwr_tFloat32 ActualValue;
 } plc_sClass_Ao;
 
-typedef struct {
+typedef struct
+{
   pwr_tFloat32 ActualValue;
 } plc_sClass_Av;
 
-typedef struct {
+typedef struct
+{
   pwr_tInt32 ActualValue;
 } plc_sClass_Ii;
 
-typedef struct {
+typedef struct
+{
   pwr_tInt32 ActualValue;
 } plc_sClass_Io;
 
-typedef struct {
+typedef struct
+{
   pwr_tInt32 ActualValue;
 } plc_sClass_Iv;
 
-typedef struct {
+typedef struct
+{
   pwr_tBoolean ActualValue;
 } plc_sClass_BBoolean;
 
-typedef struct {
+typedef struct
+{
   pwr_tInt64 ActualValue;
 } plc_sClass_BInt64;
 
-typedef struct {
+typedef struct
+{
   pwr_tInt32 ActualValue;
 } plc_sClass_BInt32;
 
-typedef struct {
+typedef struct
+{
   pwr_tInt16 ActualValue;
 } plc_sClass_BInt16;
 
-typedef struct {
+typedef struct
+{
   pwr_tInt8 ActualValue;
 } plc_sClass_BInt8;
 
-typedef struct {
+typedef struct
+{
   pwr_tFloat32 ActualValue;
 } plc_sClass_BFloat32;
 
-typedef struct {
+typedef struct
+{
   pwr_tFloat64 ActualValue;
 } plc_sClass_BFloat64;
 
-typedef struct {
+typedef struct
+{
   char ActualValue[1];
 } plc_sClass_BString;
 
-typedef struct {
+typedef struct
+{
   pwr_tTime ActualValue;
 } plc_sClass_ATv;
 
-typedef struct {
+typedef struct
+{
   pwr_tDeltaTime ActualValue;
 } plc_sClass_DTv;
 
-typedef struct {
+typedef struct
+{
   pwr_tString80 ActualValue;
 } plc_sClass_Sv;

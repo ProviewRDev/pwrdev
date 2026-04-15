@@ -40,20 +40,18 @@
 #include "glow_customcolors.h"
 #include "glow_draw_gtk.h"
 
-class GlowCustomColorsGtk : public GlowCustomColors {
+class GlowCustomColorsGtk : public GlowCustomColors
+{
 public:
   GlowCustomColorsGtk() : color_vect_cnt(0)
   {
     memset(color_vect, 0, sizeof(color_vect));
     memset(gcs, 0, sizeof(gcs));
   }
-  ~GlowCustomColorsGtk()
-  {
-  }
+  ~GlowCustomColorsGtk() {}
 
   cairo_pattern_t* gcs[glow_eDrawType_CustomColor__ - glow_eDrawType_CustomColor1];
-  GdkColor
-      color_vect[glow_eDrawType_CustomColor__ - glow_eDrawType_CustomColor1];
+  GdkColor color_vect[glow_eDrawType_CustomColor__ - glow_eDrawType_CustomColor1];
   int color_vect_cnt;
 };
 

@@ -50,7 +50,8 @@
 #include "libusbio.h"
 #include "rt_io_m_motioncontrol_usb.h"
 
-typedef struct {
+typedef struct
+{
   pwr_tTime ErrTime;
   int USB_Handle;
   int portA_hasDi;
@@ -75,8 +76,7 @@ typedef struct {
   pwr_tTime ConnectRetry;
 } io_sLocal;
 
-static int usbio_reconnect(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static int usbio_reconnect(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local = cp->Local;
   io_sLocalUSB* localUSB = (io_sLocalUSB*)rp->Local;
@@ -91,15 +91,18 @@ static int usbio_reconnect(
   time_GetTime(&time);
 
   time_Adiff(&diff, &time, &local->ConnectRetry);
-  if (time_DToFloat(0, &diff) > 1.0) {
-    for (i = 0; i < (int)sizeof(localUSB->USB_Handle); i++) {
+  if (time_DToFloat(0, &diff) > 1.0)
+  {
+    for (i = 0; i < (int)sizeof(localUSB->USB_Handle); i++)
+    {
       status = USBIO_Open(&handle);
       if (status)
         break;
 
       status = USBIO_GetSerialNr(&handle, &snum);
 
-      if (snum == op->Super.Address) {
+      if (snum == op->Super.Address)
+      {
         local->USB_Handle = localUSB->USB_Handle[local->Idx] = handle;
         op->Status = status;
         op->Super.ErrorCount = 0;
@@ -115,13 +118,12 @@ static int usbio_reconnect(
   return 0;
 }
 
-static pwr_tStatus IoCardInit(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardInit(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   int found = 0;
   int i;
-  unsigned char port_mask[3] = { 255, 255, 63 };
-  unsigned char port[3] = { 0, 0, 0 };
+  unsigned char port_mask[3] = {255, 255, 63};
+  unsigned char port[3] = {0, 0, 0};
   int active;
   int timeout;
   io_sLocal* local;
@@ -132,15 +134,18 @@ static pwr_tStatus IoCardInit(
   cp->Local = local;
 
   /* Find the handle in rack local data */
-  for (i = 0; i < (int)sizeof(localUSB->USB_Handle); i++) {
-    if (localUSB->snum[i] == op->Super.Address) {
+  for (i = 0; i < (int)sizeof(localUSB->USB_Handle); i++)
+  {
+    if (localUSB->snum[i] == op->Super.Address)
+    {
       found = 1;
       local->USB_Handle = localUSB->USB_Handle[i];
       break;
     }
   }
 
-  if (!found) {
+  if (!found)
+  {
     errh_Error("Io init error, USBIO card not found '%s'", cp->Name);
     op->Status = pwr_eMotionControl_StatusEnum_FindDevice;
     return 0;
@@ -155,18 +160,21 @@ static pwr_tStatus IoCardInit(
   local->portA_hasDo = 0;
   local->portA_diMask = 0;
   local->portA_doMask = 0;
-  for (i = 0; i < 8; i++) {
-    if (cp->chanlist[i].cop && cp->chanlist[i].sop
-        && cp->chanlist[i].ChanClass == pwr_cClass_ChanDi) {
+  for (i = 0; i < 8; i++)
+  {
+    if (cp->chanlist[i].cop && cp->chanlist[i].sop && cp->chanlist[i].ChanClass == pwr_cClass_ChanDi)
+    {
       local->portA_hasDi = 1;
       local->portA_diMask |= (1 << i);
-    } else if (cp->chanlist[i].cop && cp->chanlist[i].sop
-        && cp->chanlist[i].ChanClass == pwr_cClass_ChanDo) {
+    }
+    else if (cp->chanlist[i].cop && cp->chanlist[i].sop && cp->chanlist[i].ChanClass == pwr_cClass_ChanDo)
+    {
       local->portA_hasDo = 1;
       local->portA_doMask |= (1 << i);
     }
   }
-  if (local->portA_hasDi || local->portA_hasDo) {
+  if (local->portA_hasDi || local->portA_hasDo)
+  {
     op->Status = USBIO_ConfigDIO(&local->USB_Handle, 1, local->portA_diMask);
     if (op->Status)
       errh_Error("IO Init Card '%s', Status %d", cp->Name, op->Status);
@@ -176,19 +184,21 @@ static pwr_tStatus IoCardInit(
   local->portB_hasDi = 0;
   local->portB_hasDo = 0;
   local->portB_hasAi = 0;
-  for (i = 8; i < 16; i++) {
-    if (cp->chanlist[i].cop && cp->chanlist[i].sop
-        && cp->chanlist[i].ChanClass == pwr_cClass_ChanDi) {
+  for (i = 8; i < 16; i++)
+  {
+    if (cp->chanlist[i].cop && cp->chanlist[i].sop && cp->chanlist[i].ChanClass == pwr_cClass_ChanDi)
+    {
       local->portB_hasDi = 1;
       local->portB_diMask |= (1 << (i - 8));
-    } else if (cp->chanlist[i].cop && cp->chanlist[i].sop
-        && cp->chanlist[i].ChanClass == pwr_cClass_ChanDo) {
+    }
+    else if (cp->chanlist[i].cop && cp->chanlist[i].sop && cp->chanlist[i].ChanClass == pwr_cClass_ChanDo)
+    {
       local->portB_hasDo = 1;
       local->portB_doMask |= (1 << (i - 8));
     }
-    if (cp->chanlist[i].cop && cp->chanlist[i].sop
-        && (cp->chanlist[i].ChanClass == pwr_cClass_ChanAi
-               || cp->chanlist[i].ChanClass == pwr_cClass_ChanAit)) {
+    if (cp->chanlist[i].cop && cp->chanlist[i].sop &&
+        (cp->chanlist[i].ChanClass == pwr_cClass_ChanAi || cp->chanlist[i].ChanClass == pwr_cClass_ChanAit))
+    {
       local->portB_hasAi = 1;
       local->portB_aiMask |= (1 << (i - 8));
 
@@ -197,40 +207,46 @@ static pwr_tStatus IoCardInit(
     }
   }
 
-  if (local->portB_hasDi || local->portB_hasDo) {
+  if (local->portB_hasDi || local->portB_hasDo)
+  {
     op->Status = USBIO_ConfigDIO(&local->USB_Handle, 2, local->portB_diMask);
     if (op->Status)
       errh_Error("IO Init Card '%s', Status %d", cp->Name, op->Status);
   }
 
-  if (local->portB_hasAi) {
+  if (local->portB_hasAi)
+  {
     int num_ai = 0;
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < 8; i++)
+    {
       if (local->portB_aiMask & (1 << i))
         num_ai = i + 1;
     }
     op->Status = USBIO_ConfigAI(&local->USB_Handle, num_ai);
     if (op->Status)
       errh_Error("IO Init Card '%s', Status %d", cp->Name, op->Status);
-  } else
+  }
+  else
     op->Status = USBIO_ConfigAI(&local->USB_Handle, 0);
 
   /* Configure port C */
   local->portC_hasDi = 0;
   local->portC_hasDo = 0;
   local->portC_hasAo = 0;
-  for (i = 16; i < 21; i++) {
-    if (cp->chanlist[i].cop && cp->chanlist[i].sop
-        && cp->chanlist[i].ChanClass == pwr_cClass_ChanDi) {
+  for (i = 16; i < 21; i++)
+  {
+    if (cp->chanlist[i].cop && cp->chanlist[i].sop && cp->chanlist[i].ChanClass == pwr_cClass_ChanDi)
+    {
       local->portC_hasDi = 1;
       local->portC_diMask |= (1 << (i - 16));
-    } else if (cp->chanlist[i].cop && cp->chanlist[i].sop
-        && cp->chanlist[i].ChanClass == pwr_cClass_ChanDo) {
+    }
+    else if (cp->chanlist[i].cop && cp->chanlist[i].sop && cp->chanlist[i].ChanClass == pwr_cClass_ChanDo)
+    {
       local->portC_hasDo = 1;
       local->portC_doMask |= (1 << (i - 16));
     }
-    if (cp->chanlist[i].cop && cp->chanlist[i].sop
-        && cp->chanlist[i].ChanClass == pwr_cClass_ChanAo) {
+    if (cp->chanlist[i].cop && cp->chanlist[i].sop && cp->chanlist[i].ChanClass == pwr_cClass_ChanAo)
+    {
       local->portC_hasAo = 1;
       local->portC_aoMask |= (1 << (i - 16));
 
@@ -239,24 +255,27 @@ static pwr_tStatus IoCardInit(
     }
   }
 
-  if (cp->chanlist[18].cop && cp->chanlist[18].sop
-      && cp->chanlist[18].ChanClass == pwr_cClass_ChanIi)
+  if (cp->chanlist[18].cop && cp->chanlist[18].sop && cp->chanlist[18].ChanClass == pwr_cClass_ChanIi)
     local->portC_hasIi = 1;
 
-  if (local->portC_hasDi || local->portC_hasDo) {
+  if (local->portC_hasDi || local->portC_hasDo)
+  {
     op->Status = USBIO_ConfigDIO(&local->USB_Handle, 3, local->portC_diMask);
     if (op->Status)
       errh_Error("IO Init Card '%s', Status %d", cp->Name, op->Status);
   }
 
-  if (local->portC_hasAo) {
+  if (local->portC_hasAo)
+  {
     op->Status = USBIO_ConfigAO(&local->USB_Handle, local->portC_aoMask >> 3);
     if (op->Status)
       errh_Error("IO Init Card '%s', Status %d", cp->Name, op->Status);
-  } else
+  }
+  else
     op->Status = USBIO_ConfigAO(&local->USB_Handle, 0);
 
-  if (local->portC_hasIi) {
+  if (local->portC_hasIi)
+  {
     op->Status = USBIO_ConfigCounter(&local->USB_Handle, 0);
     if (op->Status)
       errh_Error("IO Init Card '%s', Status %d", cp->Name, op->Status);
@@ -269,23 +288,20 @@ static pwr_tStatus IoCardInit(
     active = 0;
 
   timeout = 1000 * op->WatchdogTime;
-  op->Status = USBIO_ConfigWatchdog(
-      &local->USB_Handle, active, timeout, 1, port_mask, port, 3);
+  op->Status = USBIO_ConfigWatchdog(&local->USB_Handle, active, timeout, 1, port_mask, port, 3);
 
   errh_Info("Init of USBIO card '%s'", cp->Name);
 
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardClose(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardClose(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   free(cp->Local);
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardRead(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardRead(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local = cp->Local;
   pwr_sClass_MotionControl_USBIO* op = (pwr_sClass_MotionControl_USBIO*)cp->op;
@@ -294,18 +310,22 @@ static pwr_tStatus IoCardRead(
   unsigned int m;
   pwr_tUInt32 error_count = op->Super.ErrorCount;
 
-  if (local->Disconnected) {
+  if (local->Disconnected)
+  {
     if (!usbio_reconnect(ctx, ap, rp, cp))
       return IO__SUCCESS;
   }
 
-  if (local->portA_hasDi) {
+  if (local->portA_hasDi)
+  {
     op->Status = USBIO_ReadDI(&local->USB_Handle, 1, &value);
     if (op->Status)
       op->Super.ErrorCount++;
-    else {
+    else
+    {
       m = 1;
-      for (i = 0; i < 8; i++) {
+      for (i = 0; i < 8; i++)
+      {
         if (m & local->portA_diMask)
           *(pwr_tBoolean*)cp->chanlist[i].vbp = ((value & m) != 0);
         m = m << 1;
@@ -313,13 +333,16 @@ static pwr_tStatus IoCardRead(
     }
   }
 
-  if (local->portB_hasDi) {
+  if (local->portB_hasDi)
+  {
     op->Status = USBIO_ReadDI(&local->USB_Handle, 2, &value);
     if (op->Status)
       op->Super.ErrorCount++;
-    else {
+    else
+    {
       m = 1;
-      for (i = 0; i < 8; i++) {
+      for (i = 0; i < 8; i++)
+      {
         if (m & local->portB_diMask)
           *(pwr_tBoolean*)cp->chanlist[i + 8].vbp = ((value & m) != 0);
         m = m << 1;
@@ -327,15 +350,18 @@ static pwr_tStatus IoCardRead(
     }
   }
 
-  if (local->portB_hasAi) {
+  if (local->portB_hasAi)
+  {
     int ivalue;
     pwr_tFloat32 actvalue;
 
     // op->Status = USBIO_ReadAllAI( &local->USB_Handle, avalue);
 
     m = 1;
-    for (i = 0; i < 8; i++) {
-      if (m & local->portB_aiMask) {
+    for (i = 0; i < 8; i++)
+    {
+      if (m & local->portB_aiMask)
+      {
         io_sChannel* chanp = &cp->chanlist[i + 8];
         pwr_sClass_ChanAi* cop = (pwr_sClass_ChanAi*)chanp->cop;
         pwr_sClass_Ai* sop = (pwr_sClass_Ai*)chanp->sop;
@@ -347,15 +373,15 @@ static pwr_tStatus IoCardRead(
         op->Status = USBIO_ReadADVal(&local->USB_Handle, i + 1, &ivalue);
         if (op->Status)
           op->Super.ErrorCount++;
-        else {
+        else
+        {
           io_ConvertAi(cop, ivalue, &actvalue);
 
           // Filter
-          if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0
-              && sop->FilterAttribute[0] > ctx->ScanTime) {
-            actvalue = *(pwr_tFloat32*)chanp->vbp
-                + ctx->ScanTime / sop->FilterAttribute[0]
-                    * (actvalue - *(pwr_tFloat32*)chanp->vbp);
+          if (sop->FilterType == 1 && sop->FilterAttribute[0] > 0 && sop->FilterAttribute[0] > ctx->ScanTime)
+          {
+            actvalue = *(pwr_tFloat32*)chanp->vbp +
+                       ctx->ScanTime / sop->FilterAttribute[0] * (actvalue - *(pwr_tFloat32*)chanp->vbp);
           }
 
           *(pwr_tFloat32*)chanp->vbp = actvalue;
@@ -367,13 +393,16 @@ static pwr_tStatus IoCardRead(
     }
   }
 
-  if (local->portC_hasDi) {
+  if (local->portC_hasDi)
+  {
     op->Status = USBIO_ReadDI(&local->USB_Handle, 3, &value);
     if (op->Status)
       op->Super.ErrorCount++;
-    else {
+    else
+    {
       m = 1;
-      for (i = 0; i < 5; i++) {
+      for (i = 0; i < 5; i++)
+      {
         if (m & local->portC_diMask)
           *(pwr_tBoolean*)cp->chanlist[i + 16].vbp = ((value & m) != 0);
         m = m << 1;
@@ -381,17 +410,22 @@ static pwr_tStatus IoCardRead(
     }
   }
 
-  if (local->portC_hasIi) {
+  if (local->portC_hasIi)
+  {
     int overflow;
     unsigned int covalue;
 
     op->Status = USBIO_ReadCounter(&local->USB_Handle, &covalue, &overflow);
     if (op->Status)
       op->Super.ErrorCount++;
-    else {
-      if (!overflow) {
+    else
+    {
+      if (!overflow)
+      {
         *(pwr_tUInt32*)cp->chanlist[18].vbp = covalue;
-      } else {
+      }
+      else
+      {
         // Reset counter
         op->Status = USBIO_ConfigCounter(&local->USB_Handle, 2);
         *(pwr_tUInt32*)cp->chanlist[18].vbp = 0;
@@ -399,15 +433,16 @@ static pwr_tStatus IoCardRead(
     }
   }
 
-  if (op->Super.ErrorCount >= op->Super.ErrorSoftLimit
-      && error_count < op->Super.ErrorSoftLimit) {
+  if (op->Super.ErrorCount >= op->Super.ErrorSoftLimit && error_count < op->Super.ErrorSoftLimit)
+  {
     errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
     ctx->IOHandler->CardErrorSoftLimit = 1;
     ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
     //    if ( op->Reconnect)
     //      local->Disconnected = 1;
   }
-  if (op->Super.ErrorCount >= op->Super.ErrorHardLimit) {
+  if (op->Super.ErrorCount >= op->Super.ErrorHardLimit)
+  {
     errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
     ctx->Node->EmergBreakTrue = 1;
     ctx->IOHandler->CardErrorHardLimit = 1;
@@ -418,8 +453,7 @@ static pwr_tStatus IoCardRead(
   return IO__SUCCESS;
 }
 
-static pwr_tStatus IoCardWrite(
-    io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
+static pwr_tStatus IoCardWrite(io_tCtx ctx, io_sAgent* ap, io_sRack* rp, io_sCard* cp)
 {
   io_sLocal* local = cp->Local;
   pwr_sClass_MotionControl_USBIO* op = (pwr_sClass_MotionControl_USBIO*)cp->op;
@@ -429,16 +463,20 @@ static pwr_tStatus IoCardWrite(
   unsigned int m;
   pwr_tUInt32 error_count = op->Super.ErrorCount;
 
-  if (local->Disconnected) {
+  if (local->Disconnected)
+  {
     if (!usbio_reconnect(ctx, ap, rp, cp))
       return IO__SUCCESS;
   }
 
-  if (local->portA_hasDo) {
+  if (local->portA_hasDo)
+  {
     m = 1;
     value = 0;
-    for (i = 0; i < 8; i++) {
-      if (m & local->portA_doMask) {
+    for (i = 0; i < 8; i++)
+    {
+      if (m & local->portA_doMask)
+      {
         if (*(pwr_tBoolean*)cp->chanlist[i].vbp)
           value |= m;
       }
@@ -449,11 +487,14 @@ static pwr_tStatus IoCardWrite(
       op->Super.ErrorCount++;
   }
 
-  if (local->portB_hasDo) {
+  if (local->portB_hasDo)
+  {
     m = 1;
     value = 0;
-    for (i = 0; i < 8; i++) {
-      if (m & local->portB_doMask) {
+    for (i = 0; i < 8; i++)
+    {
+      if (m & local->portB_doMask)
+      {
         if (*(pwr_tBoolean*)cp->chanlist[i + 8].vbp)
           value |= m;
       }
@@ -464,11 +505,14 @@ static pwr_tStatus IoCardWrite(
       op->Super.ErrorCount++;
   }
 
-  if (local->portC_hasDo) {
+  if (local->portC_hasDo)
+  {
     m = 1;
     value = 0;
-    for (i = 0; i < 5; i++) {
-      if (m & local->portC_doMask) {
+    for (i = 0; i < 5; i++)
+    {
+      if (m & local->portC_doMask)
+      {
         if (*(pwr_tBoolean*)cp->chanlist[i + 16].vbp)
           value |= m;
       }
@@ -479,16 +523,17 @@ static pwr_tStatus IoCardWrite(
       op->Super.ErrorCount++;
   }
 
-  if (local->portC_hasAo) {
+  if (local->portC_hasAo)
+  {
     pwr_sClass_ChanAo* cop;
-    if (local->portC_aoMask & 8) {
+    if (local->portC_aoMask & 8)
+    {
       cop = (pwr_sClass_ChanAo*)cp->chanlist[19].cop;
       if (cop->CalculateNewCoef)
         // Request to calculate new coefficients
         io_AoRangeToCoef(&cp->chanlist[19]);
 
-      fvalue = *(pwr_tFloat32*)cp->chanlist[19].vbp * cop->OutPolyCoef1
-          + cop->OutPolyCoef0;
+      fvalue = *(pwr_tFloat32*)cp->chanlist[19].vbp * cop->OutPolyCoef1 + cop->OutPolyCoef0;
       if (fvalue < 0)
         fvalue = 0;
       else if (fvalue > 5)
@@ -497,14 +542,14 @@ static pwr_tStatus IoCardWrite(
       if (op->Status)
         op->Super.ErrorCount++;
     }
-    if (local->portC_aoMask & 16) {
+    if (local->portC_aoMask & 16)
+    {
       cop = (pwr_sClass_ChanAo*)cp->chanlist[20].cop;
       if (cop->CalculateNewCoef)
         // Request to calculate new coefficients
         io_AoRangeToCoef(&cp->chanlist[20]);
 
-      fvalue = *(pwr_tFloat32*)cp->chanlist[20].vbp * cop->OutPolyCoef1
-          + cop->OutPolyCoef0;
+      fvalue = *(pwr_tFloat32*)cp->chanlist[20].vbp * cop->OutPolyCoef1 + cop->OutPolyCoef0;
       if (fvalue < 0)
         fvalue = 0;
       else if (fvalue > 5)
@@ -515,15 +560,16 @@ static pwr_tStatus IoCardWrite(
     }
   }
 
-  if (op->Super.ErrorCount >= op->Super.ErrorSoftLimit
-      && error_count < op->Super.ErrorSoftLimit) {
+  if (op->Super.ErrorCount >= op->Super.ErrorSoftLimit && error_count < op->Super.ErrorSoftLimit)
+  {
     errh_Warning("IO Card ErrorSoftLimit reached, '%s'", cp->Name);
     ctx->IOHandler->CardErrorSoftLimit = 1;
     ctx->IOHandler->ErrorSoftLimitObject = cdh_ObjidToAref(cp->Objid);
     //    if ( op->Reconnect)
     //      local->Disconnected = 1;
   }
-  if (op->Super.ErrorCount >= op->Super.ErrorHardLimit) {
+  if (op->Super.ErrorCount >= op->Super.ErrorHardLimit)
+  {
     errh_Error("IO Card ErrorHardLimit reached '%s', IO stopped", cp->Name);
     ctx->Node->EmergBreakTrue = 1;
     ctx->IOHandler->CardErrorHardLimit = 1;
@@ -536,7 +582,6 @@ static pwr_tStatus IoCardWrite(
 
 /*  Every method should be registred here. */
 
-pwr_dExport pwr_BindIoMethods(MotionControl_USBIO)
-    = { pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose),
-        pwr_BindIoMethod(IoCardRead), pwr_BindIoMethod(IoCardWrite),
-        pwr_NullMethod };
+pwr_dExport pwr_BindIoMethods(MotionControl_USBIO) = {
+    pwr_BindIoMethod(IoCardInit), pwr_BindIoMethod(IoCardClose), pwr_BindIoMethod(IoCardRead),
+    pwr_BindIoMethod(IoCardWrite), pwr_NullMethod};

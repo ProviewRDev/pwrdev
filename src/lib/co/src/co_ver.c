@@ -45,8 +45,7 @@
 
 void ver_WriteVersionInfo(char* program)
 {
-  printf("\n   Proview/R Version %s for %s on %s\n", pwrv_cPwrVersionStr,
-      syi_OpSys(), syi_Hardware());
+  printf("\n   Proview/R Version %s for %s on %s\n", pwrv_cPwrVersionStr, syi_OpSys(), syi_Hardware());
   printf("   %s\n\n", pwrv_cPwrCopyright);
   printf("   Proview/R is free software; you can redistribute it and/or\n\
    modify it under the terms of the GNU General Public License.\n\n\

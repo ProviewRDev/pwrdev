@@ -37,7 +37,8 @@
 #ifndef rt_mh_blockdb_h
 #define rt_mh_blockdb_h
 
-typedef struct {
+typedef struct
+{
   pwr_tTime CreationTime;
   pwr_tTime OpenTime;
   pwr_tTime CloseTime;
@@ -56,27 +57,28 @@ typedef struct {
   long SectPos;
 } mh_sBlockDbHead;
 
-typedef struct {
+typedef struct
+{
   FILE* File;
   mh_sBlockDbHead Head;
 } mh_sBlockDb;
 
 /*------------------------------------------------------------------------------
-*/
+ */
 mh_sBlockDb* mh_BlockDbOpen(char* FileName, pwr_tUInt32* size);
 
 /*------------------------------------------------------------------------------
-*/
+ */
 
 mh_sBlockDb* mh_BlockDbClose(mh_sBlockDb* dp);
 
 /*------------------------------------------------------------------------------
-*/
+ */
 
 mh_sBlockDb* mh_BlockDbGet(mh_sBlockDb* dp, pwr_tUInt32* size, char* buffer);
 
 /*------------------------------------------------------------------------------
-*/
+ */
 
 mh_sBlockDb* mh_BlockDbPut(mh_sBlockDb* dp, pwr_tUInt32 size, char* buffer);
 #endif

@@ -42,7 +42,6 @@
 
 void Misc_PingPongFo_init(pwr_sClass_Misc_PingPongFo* object);
 void Misc_PingPongFo_exec(plc_sThread* tp, pwr_sClass_Misc_PingPongFo* object);
-void Misc_DemoPattern_exec(
-    plc_sThread* tp, pwr_sClass_Misc_DemoPattern* object);
+void Misc_DemoPattern_exec(plc_sThread* tp, pwr_sClass_Misc_DemoPattern* object);
 
 #endif

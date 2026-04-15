@@ -38,10 +38,11 @@
 #define co_ccm_h
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* co_ccm.h -- script interpreter */
+  /* co_ccm.h -- script interpreter */
 
 #define CCM_DECL_STRING 1
 #define CCM_DECL_INT 2
@@ -54,210 +55,220 @@ extern "C" {
 #define CCM_NO_ELEM -1
 #define CCM_FUNCLEVEL_MAX 20
 
-typedef long int ccm_tInt;
-typedef float ccm_tFloat;
-typedef char ccm_tString[K_STRING_SIZE];
+  typedef long int ccm_tInt;
+  typedef float ccm_tFloat;
+  typedef char ccm_tString[K_STRING_SIZE];
 
 #define ccm_cIntFormat "%ld"
 
-typedef struct s_arg_ {
-  char value_name[100];
-  int value_decl;
-  ccm_tInt value_int;
-  ccm_tFloat value_float;
-  ccm_tString value_string;
-  int value_type;
-  int var_decl;
-  char var_name[32];
-  long int value_returned;
-  struct s_arg_* next;
-} ccm_sArg;
+  typedef struct s_arg_
+  {
+    char value_name[100];
+    int value_decl;
+    ccm_tInt value_int;
+    ccm_tFloat value_float;
+    ccm_tString value_string;
+    int value_type;
+    int var_decl;
+    char var_name[32];
+    long int value_returned;
+    struct s_arg_* next;
+  } ccm_sArg;
 
-typedef int (*ccm_tFunc)(
-    void*, ccm_sArg*, int, int*, ccm_tFloat*, ccm_tInt*, char*);
+  typedef int (*ccm_tFunc)(void*, ccm_sArg*, int, int*, ccm_tFloat*, ccm_tInt*, char*);
 
-typedef struct ccm_sLine_ {
-  char line[K_LINE_SIZE];
-  int row;
-  int type;
-  struct ccm_sLine_* next;
-  struct ccm_sLine_* prev;
-} ccm_sLine;
+  typedef struct ccm_sLine_
+  {
+    char line[K_LINE_SIZE];
+    int row;
+    int type;
+    struct ccm_sLine_* next;
+    struct ccm_sLine_* prev;
+  } ccm_sLine;
 
-typedef struct ccm_sIntvar_ {
-  char name[32];
-  char namespc[32];
-  ccm_tInt* value;
-  int elements;
-  int array;
-  struct ccm_sIntvar_* next;
-} ccm_sIntvar;
+  typedef struct ccm_sIntvar_
+  {
+    char name[32];
+    char namespc[32];
+    ccm_tInt* value;
+    int elements;
+    int array;
+    struct ccm_sIntvar_* next;
+  } ccm_sIntvar;
 
-typedef struct ccm_sFloatvar_ {
-  char name[32];
-  char namespc[32];
-  ccm_tFloat* value;
-  int elements;
-  int array;
-  struct ccm_sFloatvar_* next;
-} ccm_sFloatvar;
+  typedef struct ccm_sFloatvar_
+  {
+    char name[32];
+    char namespc[32];
+    ccm_tFloat* value;
+    int elements;
+    int array;
+    struct ccm_sFloatvar_* next;
+  } ccm_sFloatvar;
 
-typedef struct ccm_sStringvar_ {
-  char name[32];
-  char namespc[32];
-  char* value;
-  int elements;
-  int array;
-  struct ccm_sStringvar_* next;
-} ccm_sStringvar;
+  typedef struct ccm_sStringvar_
+  {
+    char name[32];
+    char namespc[32];
+    char* value;
+    int elements;
+    int array;
+    struct ccm_sStringvar_* next;
+  } ccm_sStringvar;
 
-typedef struct ccm_sOperand_ {
-  int type;
-  char name[100];
-  int value_decl;
-  ccm_tInt value_int;
-  ccm_tFloat value_float;
-  ccm_tString value_string;
-  int result_decl;
-  ccm_tInt result_int;
-  ccm_tFloat result_float;
-  ccm_tString result_string;
-  int result_done;
-  int o_operator;
-  int local_type;
-  int local_operator;
-  int prio;
-  int parlevel;
-  int done;
-  int orig_type;
-  ccm_tFunc func;
-  struct ccm_sOperand_* next;
-  struct ccm_sOperand_* prev;
-} ccm_sOperand;
+  typedef struct ccm_sOperand_
+  {
+    int type;
+    char name[100];
+    int value_decl;
+    ccm_tInt value_int;
+    ccm_tFloat value_float;
+    ccm_tString value_string;
+    int result_decl;
+    ccm_tInt result_int;
+    ccm_tFloat result_float;
+    ccm_tString result_string;
+    int result_done;
+    int o_operator;
+    int local_type;
+    int local_operator;
+    int prio;
+    int parlevel;
+    int done;
+    int orig_type;
+    ccm_tFunc func;
+    struct ccm_sOperand_* next;
+    struct ccm_sOperand_* prev;
+  } ccm_sOperand;
 
-typedef struct ccm_sFunc_ {
-  char name[32];
-  int decl;
-  ccm_sLine* start_line;
-  ccm_sLine* end_line;
-  struct ccm_sFunc_* next;
-} ccm_sFunc;
+  typedef struct ccm_sFunc_
+  {
+    char name[32];
+    int decl;
+    ccm_sLine* start_line;
+    ccm_sLine* end_line;
+    struct ccm_sFunc_* next;
+  } ccm_sFunc;
 
-typedef struct ccm_sFileCtx_ {
-  ccm_sLine* main_start_line;
-  ccm_sLine* main_end_line;
-  int verify;
-  int current_row;
-  int error_row;
-  char error_line[160];
-  int break_before;
-  char namespc[32];
-  int (*externcmd_func)(char*, void*);
-  int (*deffilename_func)(char*, char*, void*);
-  int (*errormessage_func)(char*, int, void*);
-  ccm_sFunc* func_list;
-  ccm_sIntvar* gblint_list;
-  ccm_sFloatvar* gblfloat_list;
-  ccm_sStringvar* gblstring_list;
-  ccm_sLine* line_list;
-  void* main_funcctx;
-  void* funcctx;
-  void* funcctx_stack[CCM_FUNCLEVEL_MAX];
-  int funcctx_cnt;
-  int extfunc_return_mode;
-  char extfunc_line[256];
-  char last_fgets[1024];
-  ccm_sArg* main_arg_list;
-  int main_arg_count;
-  void* client_data;
-} * ccm_tFileCtx;
+  typedef struct ccm_sFileCtx_
+  {
+    ccm_sLine* main_start_line;
+    ccm_sLine* main_end_line;
+    int verify;
+    int current_row;
+    int error_row;
+    char error_line[160];
+    int break_before;
+    char namespc[32];
+    int (*externcmd_func)(char*, void*);
+    int (*deffilename_func)(char*, char*, void*);
+    int (*errormessage_func)(char*, int, void*);
+    ccm_sFunc* func_list;
+    ccm_sIntvar* gblint_list;
+    ccm_sFloatvar* gblfloat_list;
+    ccm_sStringvar* gblstring_list;
+    ccm_sLine* line_list;
+    void* main_funcctx;
+    void* funcctx;
+    void* funcctx_stack[CCM_FUNCLEVEL_MAX];
+    int funcctx_cnt;
+    int extfunc_return_mode;
+    char extfunc_line[256];
+    char last_fgets[1024];
+    ccm_sArg* main_arg_list;
+    int main_arg_count;
+    void* client_data;
+  }* ccm_tFileCtx;
 
-typedef struct {
-  char line[K_LINE_SIZE];
-  ccm_tFileCtx filectx;
-  int pos;
-  int delim_pos;
-  int state;
-  int level;
-  int num_decl;
-  int num_neg;
-  int num_exp;
-  char msg[80];
-  int last_type;
-  ccm_sOperand* curr_operand;
-  ccm_sOperand* list;
-} * ccm_tRowCtx;
+  typedef struct
+  {
+    char line[K_LINE_SIZE];
+    ccm_tFileCtx filectx;
+    int pos;
+    int delim_pos;
+    int state;
+    int level;
+    int num_decl;
+    int num_neg;
+    int num_exp;
+    char msg[80];
+    int last_type;
+    ccm_sOperand* curr_operand;
+    ccm_sOperand* list;
+  }* ccm_tRowCtx;
 
-typedef struct ccm_sFuncCtx_ {
-  char msg[80];
-  ccm_tFileCtx filectx;
-  ccm_sIntvar* locint_list;
-  ccm_sFloatvar* locfloat_list;
-  ccm_sStringvar* locstring_list;
-  ccm_sOperand* list;
-  ccm_sLine* current_line;
-  int is_main;
-  int for_init;
-  ccm_sArg* arg_list;
-  int arg_count;
-} * ccm_tFuncCtx;
+  typedef struct ccm_sFuncCtx_
+  {
+    char msg[80];
+    ccm_tFileCtx filectx;
+    ccm_sIntvar* locint_list;
+    ccm_sFloatvar* locfloat_list;
+    ccm_sStringvar* locstring_list;
+    ccm_sOperand* list;
+    ccm_sLine* current_line;
+    int is_main;
+    int for_init;
+    ccm_sArg* arg_list;
+    int arg_count;
+  }* ccm_tFuncCtx;
 
-typedef struct {
-  char classname[32];
-  char name[32];
-  int (*sysfunc)(void*, ccm_sArg*, int, int*, ccm_tFloat*, ccm_tInt*, char*);
-} ccm_sSysFunc;
+  typedef struct
+  {
+    char classname[32];
+    char name[32];
+    int (*sysfunc)(void*, ccm_sArg*, int, int*, ccm_tFloat*, ccm_tInt*, char*);
+  } ccm_sSysFunc;
 
-typedef struct ccm_sSingeLineCtx_ {
-  ccm_tFuncCtx funcctx;
-  int result_decl;
-  ccm_tFloat result_float;
-  ccm_tInt result_int;
-  char result_string;
-} * ccm_tSingleLineCtx;
+  typedef struct ccm_sSingeLineCtx_
+  {
+    ccm_tFuncCtx funcctx;
+    int result_decl;
+    ccm_tFloat result_float;
+    ccm_tInt result_int;
+    char result_string;
+  }* ccm_tSingleLineCtx;
 
-int ccm_register_function(const char* classname, const char* name,
-    int (*sysfunc)(void*, ccm_sArg*, int, int*, ccm_tFloat*, ccm_tInt*, char*));
+  int ccm_register_function(const char* classname, const char* name,
+                            int (*sysfunc)(void*, ccm_sArg*, int, int*, ccm_tFloat*, ccm_tInt*, char*));
 
-int ccm_file_exec(char* cmd, int (*externcmd_func)(char*, void*),
-    int (*deffilename_func)(char*, char*, void*),
-    int (*errormessage_func)(char*, int, void*), int* appl_sts, int verify,
-    int break_before, void** ctx, int extfunc_return_mode, int resume,
-    char* extfunc_line, void* client_data);
+  int ccm_file_exec(char* cmd, int (*externcmd_func)(char*, void*),
+                    int (*deffilename_func)(char*, char*, void*), int (*errormessage_func)(char*, int, void*),
+                    int* appl_sts, int verify, int break_before, void** ctx, int extfunc_return_mode,
+                    int resume, char* extfunc_line, void* client_data);
 
-int ccm_buffer_exec(char* buffer, const char *args, int (*externcmd_func)(char*, void*),
-    int (*deffilename_func)(char*, char*, void*),
-    int (*errormessage_func)(char*, int, void*), int* appl_sts, int verify,
-    int break_before, void** ctx, int extfunc_return_mode, char* extfunc_line,
-    void* client_data);
+  int ccm_buffer_exec(char* buffer, const char* args, int (*externcmd_func)(char*, void*),
+                      int (*deffilename_func)(char*, char*, void*),
+                      int (*errormessage_func)(char*, int, void*), int* appl_sts, int verify,
+                      int break_before, void** ctx, int extfunc_return_mode, char* extfunc_line,
+                      void* client_data);
 
-int ccm_create_external_var(const char* name, int decl, ccm_tFloat value_float,
-    ccm_tInt value_int, char* value_string);
+  int ccm_create_external_var(const char* name, int decl, ccm_tFloat value_float, ccm_tInt value_int,
+                              char* value_string);
 
-int ccm_delete_external_var(const char* name, ccm_tFloat value_float,
-    ccm_tInt value_int, char* value_string);
+  int ccm_delete_external_var(const char* name, ccm_tFloat value_float, ccm_tInt value_int,
+                              char* value_string);
 
-int ccm_set_external_var(const char* name, int decl, ccm_tFloat value_float,
-    ccm_tInt value_int, char* value_string);
+  int ccm_set_external_var(const char* name, int decl, ccm_tFloat value_float, ccm_tInt value_int,
+                           char* value_string);
 
-int ccm_get_external_var(const char* name, int decl, ccm_tFloat* value_float,
-    ccm_tInt* value_int, char* value_string);
+  int ccm_get_external_var(const char* name, int decl, ccm_tFloat* value_float, ccm_tInt* value_int,
+                           char* value_string);
 
-int ccm_ref_var(ccm_tFuncCtx funcctx, const char* name, void** valuep, 
-    int *decl, int *array, int *elements);
+  int ccm_ref_var(ccm_tFuncCtx funcctx, const char* name, void** valuep, int* decl, int* array,
+                  int* elements);
 
-int ccm_ref_external_var(const char* name, int decl, void** valuep);
+  int ccm_ref_external_var(const char* name, int decl, void** valuep);
 
-int ccm_singleline_init(ccm_tSingleLineCtx* ctx, char* line,
-    int (*errormessage_func)(char*, int, void*), void* client_data);
+  int ccm_singleline_init(ccm_tSingleLineCtx* ctx, char* line, int (*errormessage_func)(char*, int, void*),
+                          void* client_data);
 
-int ccm_singleline_exec(ccm_tSingleLineCtx ctx);
+  int ccm_singleline_exec(ccm_tSingleLineCtx ctx);
 
-int ccm_singleline_exec_int(ccm_tSingleLineCtx ctx, ccm_tInt* result);
+  int ccm_singleline_exec_int(ccm_tSingleLineCtx ctx, ccm_tInt* result);
 
-int ccm_singleline_exec_float(ccm_tSingleLineCtx ctx, ccm_tFloat* result);
+  int ccm_singleline_exec_float(ccm_tSingleLineCtx ctx, ccm_tFloat* result);
 
-void ccm_singleline_free(ccm_tSingleLineCtx ctx);
+  void ccm_singleline_free(ccm_tSingleLineCtx ctx);
 
 #ifdef __cplusplus
 }

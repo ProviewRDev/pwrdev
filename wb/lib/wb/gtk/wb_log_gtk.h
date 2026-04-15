@@ -41,7 +41,8 @@
 
 #include "wb_log.h"
 
-class wb_log_gtk : public wb_log {
+class wb_log_gtk : public wb_log
+{
   CoLogGtk* m_log;
 
 public:
@@ -50,10 +51,7 @@ public:
     m_log = new CoLogGtk(parent, wlog_cLogFile);
     m_log->set_default();
   }
-  ~wb_log_gtk()
-  {
-    delete m_log;
-  }
+  ~wb_log_gtk() { delete m_log; }
 };
 
 #endif

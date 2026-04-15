@@ -43,7 +43,8 @@
 
 #include "xtt_clognav.h"
 
-class CLogNavGtk : public CLogNav {
+class CLogNavGtk : public CLogNav
+{
 public:
   CLogNavGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, GtkWidget** w);
   ~CLogNavGtk();

@@ -45,27 +45,29 @@
 
 class Graph;
 
-class JournalPos {
+class JournalPos
+{
 public:
-  JournalPos()
-  {
-  }
+  JournalPos() {}
   std::streampos undo_pos;
   std::streampos redo_pos;
   std::streampos end_pos;
 };
 
-class MoveObject {
- public:
+class MoveObject
+{
+public:
   char name[80];
   char name_prev[80];
-  MoveObject() {
-    strcpy(name,"");
-    strcpy(name_prev,"");
+  MoveObject()
+  {
+    strcpy(name, "");
+    strcpy(name_prev, "");
   }
 };
 
-typedef enum {
+typedef enum
+{
   journal_eAction_DeleteObject,
   journal_eAction_DeleteSelect,
   journal_eAction_MoveObject,
@@ -108,7 +110,8 @@ typedef enum {
   journal_eAction_PostOrderObject
 } journal_eAction;
 
-typedef enum {
+typedef enum
+{
   journal_eStatus_Empty,
   journal_eStatus_Stored,
   journal_eStatus_Undo,
@@ -118,8 +121,8 @@ typedef enum {
   journal_eStatus_AnteGroup
 } journal_eStatus;
 
-
-class GraphJournal {
+class GraphJournal
+{
 public:
   GraphJournal(Graph* g, int* sts);
   ~GraphJournal();
@@ -128,7 +131,7 @@ public:
   int undo();
   int redo();
   void read_tag(int tag);
-  void read_str(int tag, char *name, int size);
+  void read_str(int tag, char* name, int size);
   void read_int(int tag, int* size);
   void check_object_number(grow_tObject o);
   int open(const char* name);

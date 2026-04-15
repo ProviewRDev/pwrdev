@@ -49,35 +49,37 @@
 #include "xtt_otree_qt.h"
 #include "xtt_trend_qt.h"
 
-XttTrendQt::XttTrendQt(void* parent_ctx, char* name, QWidget** w,
-    pwr_sAttrRef* trend_list, pwr_sAttrRef* plotgroup, int width, int height,
-    unsigned int x_options, int x_color_theme, void* basewidget, int* sts)
-    : XttTrend(parent_ctx, name, trend_list, plotgroup, x_options,
-        x_color_theme, sts)
+XttTrendQt::XttTrendQt(void* parent_ctx, char* name, QWidget** w, pwr_sAttrRef* trend_list,
+                       pwr_sAttrRef* plotgroup, int width, int height, unsigned int x_options,
+                       int x_color_theme, void* basewidget, int* sts)
+    : XttTrend(parent_ctx, name, trend_list, plotgroup, x_options, x_color_theme, sts)
 {
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     // Error from XttTrend constructor
     return;
   }
   *sts = XNAV__SUCCESS;
 
-  curve = new GeCurveQt(this, name, NULL, gcd, 1, width, height, options,
-      color_theme, basewidget);
+  curve = new GeCurveQt(this, name, NULL, gcd, 1, width, height, options, color_theme, basewidget);
   curve->close_cb = trend_close_cb;
   curve->help_cb = trend_help_cb;
   curve->snapshot_cb = trend_snapshot_cb;
   curve->add_cb = trend_add_cb;
   curve->madd_cb = trend_madd_cb;
-  if (w) {
+  if (w)
+  {
     *w = (QWidget*)curve->get_widget();
   }
 
-  if (trend_tid == pwr_cClass_DsTrendCurve) {
-    curve->enable(curve_mEnable_Snapshot | curve_mEnable_Add
-        | curve_mEnable_CurveType | curve_mEnable_FillCurve);
-  } else {
-    curve->enable(
-        curve_mEnable_Add | curve_mEnable_CurveType | curve_mEnable_FillCurve);
+  if (trend_tid == pwr_cClass_DsTrendCurve)
+  {
+    curve->enable(curve_mEnable_Snapshot | curve_mEnable_Add | curve_mEnable_CurveType |
+                  curve_mEnable_FillCurve);
+  }
+  else
+  {
+    curve->enable(curve_mEnable_Add | curve_mEnable_CurveType | curve_mEnable_FillCurve);
   }
 
   wow = new CoWowQt(((GeCurveQt*)curve)->toplevel);
@@ -87,26 +89,29 @@ XttTrendQt::XttTrendQt(void* parent_ctx, char* name, QWidget** w,
 
 XttTrendQt::~XttTrendQt()
 {
-  if (timerid) {
+  if (timerid)
+  {
     timerid->remove();
   }
 
-  for (int i = 0; i < trend_cnt; i++) {
+  for (int i = 0; i < trend_cnt; i++)
+  {
     gdh_UnrefObjectInfo(subid[i]);
   }
   delete curve;
-  if (gcd) {
+  if (gcd)
+  {
     delete gcd;
   }
-  if (otree) {
+  if (otree)
+  {
     delete otree;
   }
   delete wow;
 }
 
-XttOTree* XttTrendQt::tree_new(const char* title, pwr_tAttrRef* itemlist,
-    int itemcnt, unsigned int layout,
-    pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
+XttOTree* XttTrendQt::tree_new(const char* title, pwr_tAttrRef* itemlist, int itemcnt, unsigned int layout,
+                               pwr_tStatus (*action_cb)(void*, pwr_tAttrRef*))
 {
   return new XttOTreeQt(this, title, itemlist, itemcnt, layout, action_cb);
 }

@@ -52,7 +52,8 @@ static int gdk_init_done = 0;
 int cnv_get_image(char* fname, cnv_tImImage* image, cnv_tPixmap* pixmap)
 {
 #if defined PWRE_CONF_GTK
-  if (!gdk_init_done) {
+  if (!gdk_init_done)
+  {
     gdk_init(0, 0);
     gdk_init_done = 1;
   }
@@ -87,8 +88,7 @@ void cnv_print_image(cnv_tImImage image, char* filename)
   strcpy(type, s + 1);
 
   if (streq(type, "jpg"))
-    gdk_pixbuf_save(
-        (GdkPixbuf*)image, filename, "jpeg", &error, "quality", "100", NULL);
+    gdk_pixbuf_save((GdkPixbuf*)image, filename, "jpeg", &error, "quality", "100", NULL);
   else
     gdk_pixbuf_save((GdkPixbuf*)image, filename, type, &error, NULL);
 
@@ -113,9 +113,8 @@ int cnv_image_height(cnv_tImImage image)
 #endif
 }
 
-void cnv_image_pixel_iter(cnv_tImImage image,
-    void (*pixel_cb)(void*, std::ofstream&, unsigned char*), void* userdata,
-    std::ofstream& fp)
+void cnv_image_pixel_iter(cnv_tImImage image, void (*pixel_cb)(void*, std::ofstream&, unsigned char*),
+                          void* userdata, std::ofstream& fp)
 {
 #if defined PWRE_CONF_GTK
   unsigned char *rgb, *rgb_row;
@@ -123,7 +122,7 @@ void cnv_image_pixel_iter(cnv_tImImage image,
   int rgb_width;
   int rowstride;
   int n_channels;
-  unsigned char null_rgb[4] = { 0, 0, 0, 0 };
+  unsigned char null_rgb[4] = {0, 0, 0, 0};
 
   rgb = gdk_pixbuf_get_pixels((GdkPixbuf*)image);
   rgb_height = gdk_pixbuf_get_height((GdkPixbuf*)image);
@@ -132,15 +131,19 @@ void cnv_image_pixel_iter(cnv_tImImage image,
   n_channels = gdk_pixbuf_get_n_channels((GdkPixbuf*)image);
 
   rgb_row = rgb;
-  for (int j = 0; j < rgb_height; j++) {
+  for (int j = 0; j < rgb_height; j++)
+  {
     rgb = rgb_row;
-    for (int i = 0; i < rgb_width; i++) {
-      if (n_channels >= 4) {
+    for (int i = 0; i < rgb_width; i++)
+    {
+      if (n_channels >= 4)
+      {
         if (*(rgb + 3))
           (pixel_cb)(userdata, fp, rgb);
         else
           (pixel_cb)(userdata, fp, null_rgb);
-      } else if (n_channels == 3)
+      }
+      else if (n_channels == 3)
         (pixel_cb)(userdata, fp, rgb);
       rgb += n_channels;
     }

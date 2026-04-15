@@ -36,6 +36,4 @@
 
 #include "wb_treeexport.h"
 
-wb_treeexport::~wb_treeexport()
-{
-}
+wb_treeexport::~wb_treeexport() {}

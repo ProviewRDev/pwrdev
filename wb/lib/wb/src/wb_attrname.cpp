@@ -38,28 +38,29 @@
 
 #include "wb_attrname.h"
 
-wb_attrname::wb_attrname() : wb_name()
-{
-}
+wb_attrname::wb_attrname() : wb_name() {}
 
 wb_attrname::wb_attrname(const char* name)
 {
-  try {
+  try
+  {
     pwr_tOName str;
-    if (*name != '.') {
+    if (*name != '.')
+    {
       strcpy(str, ".");
       strncat(str, name, sizeof(str) - 1);
-    } else
+    }
+    else
       strncpy(str, name, sizeof(str));
     m_nrep = new wb_nrep(str);
     m_sts = LDH__SUCCESS;
     m_nrep->ref();
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     m_sts = e.sts();
     m_nrep = 0;
   }
 }
 
-wb_attrname::~wb_attrname()
-{
-}
+wb_attrname::~wb_attrname() {}

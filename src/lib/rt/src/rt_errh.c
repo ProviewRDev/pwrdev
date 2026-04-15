@@ -71,7 +71,7 @@
 #define ERRH_MAX_ANIX_NAME_LEN 32
 
 typedef void* aa_list[];
-#define aa_arg(ap, vap, type) (ap ? ((type)*ap++) : va_arg(vap, type))
+#define aa_arg(ap, vap, type) (ap ? ((type) * ap++) : va_arg(vap, type))
 
 typedef enum
 {

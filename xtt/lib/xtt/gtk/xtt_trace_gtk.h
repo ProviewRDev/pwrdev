@@ -39,7 +39,8 @@
 
 #include "xtt_trace.h"
 
-class RtTraceGtk : public RtTrace {
+class RtTraceGtk : public RtTrace
+{
 public:
   GtkWidget* parent_wid;
   GtkWidget* flow_widget;
@@ -49,8 +50,7 @@ public:
   GtkWidget* nav_shell;
   GtkWidget* nav_widget;
 
-  RtTraceGtk(void* parent_ctx, GtkWidget* parent_wid, pwr_tObjid objid,
-      pwr_tStatus* status);
+  RtTraceGtk(void* parent_ctx, GtkWidget* parent_wid, pwr_tObjid objid, pwr_tStatus* status);
   ~RtTraceGtk();
 
   void pop();

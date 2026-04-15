@@ -46,13 +46,15 @@
 
 #include "co_error.h"
 #include "co_string.h"
-extern "C" {
+extern "C"
+{
 #include "co_cdh.h"
 #include "co_errno.h"
 #include "co_time.h"
 }
 
-extern "C" {
+extern "C"
+{
 #include "rt_aproc.h"
 #include "rt_gdh.h"
 #include "rt_ini_event.h"
@@ -63,14 +65,9 @@ extern "C" {
 #include "rt_smon_msg.h"
 #include "rt_sysmon.h"
 
-sysmon_object::sysmon_object(pwr_sAttrRef* arp)
-    : aref(*arp), p(0), scan_div(0), scan_cnt(0)
-{
-}
+sysmon_object::sysmon_object(pwr_sAttrRef* arp) : aref(*arp), p(0), scan_div(0), scan_cnt(0) {}
 
-sysmon_object::~sysmon_object()
-{
-}
+sysmon_object::~sysmon_object() {}
 
 void sysmon_object::open(double base_scantime)
 {
@@ -85,7 +82,8 @@ void sysmon_object::open(double base_scantime)
   if (EVEN(sts))
     throw co_error(sts);
 
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_DiskSup:
     if (((pwr_sClass_DiskSup*)p)->ScanTime)
       scan_div = int(((pwr_sClass_DiskSup*)p)->ScanTime / base_scantime + 0.5);
@@ -98,7 +96,8 @@ void sysmon_object::open(double base_scantime)
 
 pwr_tStatus sysmon_object::status()
 {
-  switch (cid) {
+  switch (cid)
+  {
   case pwr_cClass_DiskSup:
     return ((pwr_sClass_DiskSup*)p)->Status;
   default:;
@@ -106,10 +105,7 @@ pwr_tStatus sysmon_object::status()
   return SMON__UNKNOWN;
 }
 
-void sysmon_object::close()
-{
-  gdh_DLUnrefObjectInfo(p_dlid);
-}
+void sysmon_object::close() { gdh_DLUnrefObjectInfo(p_dlid); }
 
 void sysmon_object::scan()
 {
@@ -130,16 +126,20 @@ void rt_sysmon::open()
 
   // Open server configuration object SysMonConfig
   sts = gdh_GetClassList(pwr_cClass_SysMonConfig, &oid);
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     aref = cdh_ObjidToAref(oid);
     sts = gdh_DLRefObjectInfoAttrref(&aref, (void**)&conf, &conf_dlid);
     if (EVEN(sts))
       throw co_error(sts);
   }
 
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     scan_time = 1.0 / conf->ScanTime;
-  } else {
+  }
+  else
+  {
     scan_time = 1;
     errh_Info("No sysmon configuration, using base frequency 1 Hz");
     oid = pwr_cNObjid;
@@ -150,15 +150,19 @@ void rt_sysmon::open()
 
   // Open DiskSup objects
   for (sts = gdh_GetClassListAttrRef(pwr_cClass_DiskSup, &aref); ODD(sts);
-       sts = gdh_GetNextAttrRef(pwr_cClass_DiskSup, &aref, &aref)) {
+       sts = gdh_GetNextAttrRef(pwr_cClass_DiskSup, &aref, &aref))
+  {
     disksup_object* o = new disksup_object(&aref);
     objects.push_back(o);
-    try {
+    try
+    {
       o->open(scan_time);
       if (conf)
         conf->DiskSupObjects[sysmon_cnt] = aref.Objid;
       sysmon_cnt++;
-    } catch (co_error& e) {
+    }
+    catch (co_error& e)
+    {
       delete o;
       objects.pop_back();
       errh_Error("DiskSup configuration error: %s", (char*)e.what().c_str());
@@ -168,7 +172,8 @@ void rt_sysmon::open()
 
 void rt_sysmon::close()
 {
-  for (int i = objects.size() - 1; i >= 0; i--) {
+  for (int i = objects.size() - 1; i >= 0; i--)
+  {
     objects[i]->close();
     delete objects[i];
     objects.pop_back();
@@ -186,11 +191,13 @@ void rt_sysmon::scan()
   // Find most severe status
   sts = PWR__SRUN;
   severity = errh_Severity(sts);
-  for (int i = 0; i < (int)objects.size(); i++) {
+  for (int i = 0; i < (int)objects.size(); i++)
+  {
     objects[i]->scan();
     osts = objects[i]->status();
     oseverity = errh_Severity(osts);
-    if (oseverity > severity) {
+    if (oseverity > severity)
+    {
       sts = osts;
       severity = oseverity;
     }
@@ -205,7 +212,8 @@ void init(qcom_sQid* qid)
   pwr_tStatus sts;
 
   sts = gdh_Init("rt_sysmon");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     exit(sts);
   }
@@ -213,7 +221,8 @@ void init(qcom_sQid* qid)
   errh_Init("pwr_sysmon", errh_eAnix_sysmon);
   errh_SetStatus(PWR__SRVSTARTUP);
 
-  if (!qcom_Init(&sts, 0, "pwr_sysmon")) {
+  if (!qcom_Init(&sts, 0, "pwr_sysmon"))
+  {
     errh_Fatal("qcom_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -221,14 +230,16 @@ void init(qcom_sQid* qid)
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, qid, &qAttr, "events")) {
+  if (!qcom_CreateQ(&sts, qid, &qAttr, "events"))
+  {
     errh_Fatal("qcom_CreateQ, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 
   qini = qcom_cQini;
-  if (!qcom_Bind(&sts, qid, &qini)) {
+  if (!qcom_Bind(&sts, qid, &qini))
+  {
     errh_Fatal("qcom_Bind(Qini), %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
@@ -248,9 +259,12 @@ int main()
 
   init(&qid);
 
-  try {
+  try
+  {
     sysmon.open();
-  } catch (co_error& e) {
+  }
+  catch (co_error& e)
+  {
     errh_Error((char*)e.what().c_str());
     errh_Fatal("rt_sysmon aborting");
     errh_SetStatus(PWR__SRVTERM);
@@ -261,31 +275,41 @@ int main()
   errh_SetStatus(PWR__SRUN);
 
   first_scan = true;
-  for (;;) {
-    if (first_scan) {
+  for (;;)
+  {
+    if (first_scan)
+    {
       tmo = (int)(sysmon.scantime() * 1000 - 1);
     }
 
     get.maxSize = sizeof(mp);
     get.data = mp;
     qcom_Get(&sts, &qid, &get, tmo);
-    if (sts == QCOM__TMO || sts == QCOM__QEMPTY) {
+    if (sts == QCOM__TMO || sts == QCOM__QEMPTY)
+    {
       if (!swap)
         sysmon.scan();
-    } else {
+    }
+    else
+    {
       ini_mEvent new_event;
       qcom_sEvent* ep = (qcom_sEvent*)get.data;
 
       new_event.m = ep->mask;
-      if (new_event.b.oldPlcStop && !swap) {
+      if (new_event.b.oldPlcStop && !swap)
+      {
         errh_SetStatus(PWR__SRVRESTART);
         swap = 1;
         sysmon.close();
-      } else if (new_event.b.swapDone && swap) {
+      }
+      else if (new_event.b.swapDone && swap)
+      {
         swap = 0;
         sysmon.open();
         errh_SetStatus(PWR__SRUN);
-      } else if (new_event.b.terminate) {
+      }
+      else if (new_event.b.terminate)
+      {
         exit(0);
       }
     }
@@ -302,9 +326,11 @@ void disksup_object::exec()
   pwr_sClass_DiskSup* o = (pwr_sClass_DiskSup*)p;
 
   sts = statfs(o->DiskName, &buf);
-  if (sts != 0) {
+  if (sts != 0)
+  {
     sts = errno_GetStatus();
-    if (o->Status != sts) {
+    if (o->Status != sts)
+    {
       o->Status = sts;
       printf("Can't find disk\n");
     }
@@ -314,18 +340,22 @@ void disksup_object::exec()
   o->CurrentUse = 100.0 - 100.0 * buf.f_bfree / buf.f_blocks;
 
   // Check if limit is exceeded
-  if (!(o->CurrentUse < o->UsedMaxLimit)) {
-    if (o->Status != SMON__DISKHIGHLIMIT) {
+  if (!(o->CurrentUse < o->UsedMaxLimit))
+  {
+    if (o->Status != SMON__DISKHIGHLIMIT)
+    {
       o->Status = SMON__DISKHIGHLIMIT;
-      if (o->Action & pwr_mDiskSupActionMask_Alarm) {
+      if (o->Action & pwr_mDiskSupActionMask_Alarm)
+      {
         pwr_tOName name;
 
         sts = gdh_ObjidToName(aref.Objid, name, sizeof(name), cdh_mNName);
-        rt_sysmon::alarm_send(
-            aref.Objid, o->DetectText, name, o->EventPriority);
+        rt_sysmon::alarm_send(aref.Objid, o->DetectText, name, o->EventPriority);
       }
-      if (o->Action & pwr_mDiskSupActionMask_Command) {
-        if (!streq(o->Command, "")) {
+      if (o->Action & pwr_mDiskSupActionMask_Command)
+      {
+        if (!streq(o->Command, ""))
+        {
           char msg[200];
 
           system(o->Command);
@@ -334,7 +364,8 @@ void disksup_object::exec()
         }
       }
     }
-  } else
+  }
+  else
     o->Status = SMON__SUCCESS;
 #endif
 }
@@ -351,11 +382,9 @@ int rt_sysmon::connect_alarm()
     /* We are already connected */
     return SMON__SUCCESS;
 
-  sts = mh_ApplConnect(pwr_cNObjid, (mh_mApplFlags)0, "AbortEventName",
-      AbortEventType, AbortEventPrio,
-      (mh_mEventFlags)(
-          mh_mEventFlags_Bell | mh_mEventFlags_Ack | mh_mEventFlags_Return),
-      "AbortEventText", &NoOfActMessages);
+  sts = mh_ApplConnect(pwr_cNObjid, (mh_mApplFlags)0, "AbortEventName", AbortEventType, AbortEventPrio,
+                       (mh_mEventFlags)(mh_mEventFlags_Bell | mh_mEventFlags_Ack | mh_mEventFlags_Return),
+                       "AbortEventText", &NoOfActMessages);
   if (EVEN(sts))
     return sts;
 
@@ -363,8 +392,7 @@ int rt_sysmon::connect_alarm()
   return SMON__SUCCESS;
 }
 
-int rt_sysmon::alarm_send(
-    pwr_tOid oid, char* alarm_text, char* alarm_name, int alarm_prio)
+int rt_sysmon::alarm_send(pwr_tOid oid, char* alarm_text, char* alarm_name, int alarm_prio)
 {
   mh_sApplMessage mh_msg;
   pwr_tUInt32 mh_id;
@@ -374,8 +402,8 @@ int rt_sysmon::alarm_send(
   if (EVEN(sts))
     return sts;
   mh_msg.Object = oid;
-  mh_msg.EventFlags = (mh_mEventFlags)(
-      mh_mEventFlags_Returned | mh_mEventFlags_NoObject | mh_mEventFlags_Bell);
+  mh_msg.EventFlags =
+      (mh_mEventFlags)(mh_mEventFlags_Returned | mh_mEventFlags_NoObject | mh_mEventFlags_Bell);
   time_GetTime(&mh_msg.EventTime);
 
   mh_msg.SupObject = pwr_cNObjid;

@@ -39,7 +39,7 @@
 #include "twolist.h"
 #include <stdlib.h>
 
-void newhead(headtyp** hpp)
+void newhead(headtyp **hpp)
 /* Skapar en ny tom lista */
 {
   *hpp = malloc(sizeof(headtyp));
@@ -48,7 +48,7 @@ void newhead(headtyp** hpp)
   (*hpp)->befo = (*hpp)->next = *hpp;
 }
 
-void newlink(linktyp** lpp)
+void newlink(linktyp **lpp)
 /* Skapar en ny tom länk */
 {
   *lpp = malloc(sizeof(linktyp));
@@ -56,14 +56,14 @@ void newlink(linktyp** lpp)
   (*lpp)->befo = (*lpp)->next = NULL;
 }
 
-void putlink(datatyp d, linktyp* lp)
+void putlink(datatyp d, linktyp *lp)
 /* Sätter in data i en länk */
 {
   if (lp != NULL)
     lp->data = d;
 }
 
-datatyp getlink(linktyp* lp)
+datatyp getlink(linktyp *lp)
 /* Returnerar data från en länk */
 {
   datatyp d = {{0, {0, 0}, 0}, {0, 0}};
@@ -73,7 +73,7 @@ datatyp getlink(linktyp* lp)
   return d;
 }
 
-void inlast(linktyp* lp, headtyp* hp)
+void inlast(linktyp *lp, headtyp *hp)
 /* Sätter in länk sist i lista */
 {
   hp->befo->next = lp;
@@ -82,7 +82,7 @@ void inlast(linktyp* lp, headtyp* hp)
   lp->next = hp;
 }
 
-void infirst(linktyp* lp, headtyp* hp)
+void infirst(linktyp *lp, headtyp *hp)
 /* Sätter in länk först i lista */
 {
   hp->next->befo = lp;
@@ -91,7 +91,7 @@ void infirst(linktyp* lp, headtyp* hp)
   lp->befo = hp;
 }
 
-void inpred(linktyp* lp, linktyp* ep)
+void inpred(linktyp *lp, linktyp *ep)
 /* Sätter in första länken före den andra */
 {
   ep->befo->next = lp;
@@ -100,7 +100,7 @@ void inpred(linktyp* lp, linktyp* ep)
   lp->next = ep;
 }
 
-void insucc(linktyp* lp, linktyp* ep)
+void insucc(linktyp *lp, linktyp *ep)
 /* Sätter in första länken efter den andra */
 {
   ep->next->befo = lp;
@@ -109,7 +109,7 @@ void insucc(linktyp* lp, linktyp* ep)
   lp->befo = ep;
 }
 
-void insort(linktyp* lp, headtyp* hp, int (*is_less)(datatyp d1, datatyp d2))
+void insort(linktyp *lp, headtyp *hp, int (*is_less)(datatyp d1, datatyp d2))
 /* Sätter in länken sorterad enligt is_less */
 {
   linktyp *sp, *ep;
@@ -125,10 +125,10 @@ void insort(linktyp* lp, headtyp* hp, int (*is_less)(datatyp d1, datatyp d2))
   elimlink(&sp);
 }
 
-linktyp* firstlink(headtyp* hp)
+linktyp *firstlink(headtyp *hp)
 /* Returnerar pekare till första länken i listan */
 {
-  linktyp* ep;
+  linktyp *ep;
 
   if (!empty(hp))
     ep = hp->next;
@@ -137,10 +137,10 @@ linktyp* firstlink(headtyp* hp)
   return ep;
 }
 
-linktyp* lastlink(headtyp* hp)
+linktyp *lastlink(headtyp *hp)
 /* Returnerar pekare till sista länken i listan */
 {
-  linktyp* ep;
+  linktyp *ep;
 
   if (!empty(hp))
     ep = hp->befo;
@@ -149,10 +149,10 @@ linktyp* lastlink(headtyp* hp)
   return ep;
 }
 
-linktyp* predlink(linktyp* lp)
+linktyp *predlink(linktyp *lp)
 /* Returnerar pekare till länken före  */
 {
-  linktyp* ep;
+  linktyp *ep;
 
   if (is_link(lp->befo))
     ep = lp->befo;
@@ -161,10 +161,10 @@ linktyp* predlink(linktyp* lp)
   return ep;
 }
 
-linktyp* succlink(linktyp* lp)
+linktyp *succlink(linktyp *lp)
 /* Returnerar pekare till länken efter */
 {
-  linktyp* ep;
+  linktyp *ep;
 
   if (is_link(lp->next))
     ep = lp->next;
@@ -173,23 +173,23 @@ linktyp* succlink(linktyp* lp)
   return ep;
 }
 
-int is_link(linktyp* lp)
+int is_link(linktyp *lp)
 /* Returnerar 1 om länk annars 0 */
 {
   return (lp->kind == lank);
 }
 
-int empty(headtyp* hp)
+int empty(headtyp *hp)
 /* Returnerar 1 om listan tom annars 0 */
 {
   return (hp->next->kind == head);
 }
 
-int nrlinks(headtyp* hp)
+int nrlinks(headtyp *hp)
 /* Returnerar antalet länkar i listan */
 {
   int sum = 0;
-  linktyp* ep;
+  linktyp *ep;
 
   ep = firstlink(hp);
   while (ep != NULL) {
@@ -199,7 +199,7 @@ int nrlinks(headtyp* hp)
   return sum;
 }
 
-void outlist(linktyp* lp)
+void outlist(linktyp *lp)
 /* Tar bort länken från listan */
 {
   if (lp->befo != NULL && lp->next != NULL) {
@@ -210,7 +210,7 @@ void outlist(linktyp* lp)
   }
 }
 
-void elimlink(linktyp** lpp)
+void elimlink(linktyp **lpp)
 /* Tar bort, avallokerar och NULL-ställer länken */
 {
   outlist(*lpp);
@@ -218,10 +218,10 @@ void elimlink(linktyp** lpp)
   *lpp = NULL;
 }
 
-void clearhead(headtyp* hp)
+void clearhead(headtyp *hp)
 /* Eliminerar alla länkar från listan */
 {
-  linktyp* ep;
+  linktyp *ep;
 
   while (!empty(hp)) {
     ep = firstlink(hp);
@@ -229,7 +229,7 @@ void clearhead(headtyp* hp)
   }
 }
 
-void elimhead(headtyp** hpp)
+void elimhead(headtyp **hpp)
 /* Eliminerar och NULL-ställer listan */
 {
   clearhead(*hpp);

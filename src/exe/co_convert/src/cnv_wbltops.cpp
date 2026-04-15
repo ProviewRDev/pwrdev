@@ -58,16 +58,22 @@ int CnvWblToPs::init(char* first)
 
   strcpy(fname, ctx->dir);
   strcat(fname, ctx->rw->volume_name);
-  if (ctx->generate_pdf) {
+  if (ctx->generate_pdf)
+  {
     strcat(fname, ".pdf");
-  } else {
+  }
+  else
+  {
     strcat(fname, ".ps");
   }
   str_ToLower(fname, fname);
 
-  if (ctx->generate_pdf) {
+  if (ctx->generate_pdf)
+  {
     tops->set_filename(ps_eFile_Body, fname);
-  } else {
+  }
+  else
+  {
     tops->set_filename(ps_eFile_Info, fname);
     tops->set_filename(ps_eFile_Body, ps_cTmpFile);
   }
@@ -93,18 +99,14 @@ int CnvWblToPs::init(char* first)
   tops->y = ps_cPageHeight - ps_cTopMargin - 450;
   tops->print_text(pwrv_cPwrCopyright, tops->style[tops->ci].text);
   tops->print_text("", tops->style[tops->ci].text);
-  tops->print_text(
-      "Permission is granted to copy, distribute and/or modify this document",
-      tops->style[tops->ci].text);
-  tops->print_text(
-      "under the terms of the GNU Free Documentation License, Version 1.2",
-      tops->style[tops->ci].text);
-  tops->print_text(
-      "or any later version published by the Free Software Foundation;",
-      tops->style[tops->ci].text);
-  tops->print_text(
-      "with no Invariant Sections, no Front-Cover Texts, and no Back-Cover",
-      tops->style[tops->ci].text);
+  tops->print_text("Permission is granted to copy, distribute and/or modify this document",
+                   tops->style[tops->ci].text);
+  tops->print_text("under the terms of the GNU Free Documentation License, Version 1.2",
+                   tops->style[tops->ci].text);
+  tops->print_text("or any later version published by the Free Software Foundation;",
+                   tops->style[tops->ci].text);
+  tops->print_text("with no Invariant Sections, no Front-Cover Texts, and no Back-Cover",
+                   tops->style[tops->ci].text);
   tops->print_text("Texts.", tops->style[tops->ci].text);
 
   tops->y = ps_cPageHeight - ps_cTopMargin;
@@ -115,10 +117,7 @@ int CnvWblToPs::init(char* first)
   return 1;
 }
 
-int CnvWblToPs::close()
-{
-  return 1;
-}
+int CnvWblToPs::close() { return 1; }
 
 int CnvWblToPs::class_exec()
 {
@@ -141,54 +140,73 @@ int CnvWblToPs::class_exec()
   sprintf(txt, "%s %s", Lng::translate("Class"), ctx->rw->class_name);
   tops->print_h1(txt, 0, CnvCtx::low(ctx->rw->class_name));
 
-  if (!lng_sts) {
+  if (!lng_sts)
+  {
     sprintf(txt, "(%s)", Lng::translate("English text not available"));
     tops->print_text(txt, tops->style[tops->ci].link);
   }
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_author, "")) {
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_author, ""))
+  {
     sprintf(txt, "%s %s", Lng::translate("Author"), ctx->rw->doc_author);
     tops->print_text(txt, tops->style[tops->ci].text);
   }
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_creator, "")) {
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_creator, ""))
+  {
     sprintf(txt, "%s %s", Lng::translate("Creator"), ctx->rw->doc_creator);
     tops->print_text(txt, tops->style[tops->ci].text);
   }
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_version, "")) {
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_version, ""))
+  {
     sprintf(txt, "%s %s", Lng::translate("Version"), ctx->rw->doc_version);
     tops->print_text(txt, tops->style[tops->ci].text);
   }
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_code, "")) {
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_code, ""))
+  {
     sprintf(txt, "%s %s", Lng::translate("Code"), ctx->rw->doc_code);
     tops->print_text(txt, tops->style[tops->ci].text);
   }
 
   tops->print_h2(Lng::translate("Description"));
-  if (ctx->rw->doc_fresh) {
-    for (i = 0; i < ctx->rw->doc_cnt; i++) {
+  if (ctx->rw->doc_fresh)
+  {
+    for (i = 0; i < ctx->rw->doc_cnt; i++)
+    {
       str_trim(txt, ctx->rw->doc_text[i]);
-      if (str_StartsWith(CnvCtx::low(txt), "@image")) {
+      if (str_StartsWith(CnvCtx::low(txt), "@image"))
+      {
         char imagefile[80];
 
         str_trim(imagefile, txt + 6);
         tops->print_image(imagefile);
-      } else if (str_StartsWith(CnvCtx::low(txt), "@b")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@b"))
+      {
         tops->print_text(txt + 2, tops->style[tops->ci].boldtext);
-      } else if (str_StartsWith(CnvCtx::low(txt), "@h1")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@h1"))
+      {
         tops->print_h2(txt + 3);
-      } else if (str_StartsWith(CnvCtx::low(txt), "@h2")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@h2"))
+      {
         tops->print_h3(txt + 3);
-      } else if (str_StartsWith(CnvCtx::low(txt), "@i")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@i"))
+      {
         tops->print_text(txt + 2, tops->style[tops->ci].text);
-      } else
+      }
+      else
         tops->print_text(ctx->rw->doc_text[i], tops->style[tops->ci].text);
     }
   }
-  for (i = 0; i < ctx->rw->doc_clink_cnt; i++) {
-    if (!conf_pass) {
+  for (i = 0; i < ctx->rw->doc_clink_cnt; i++)
+  {
+    if (!conf_pass)
+    {
       int page;
       char str[210];
       char text[200];
@@ -207,20 +225,21 @@ int CnvWblToPs::class_exec()
         *s = 0;
 
       int sts = tops->content.find_link(link_ref, text, &page);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         sprintf(str, "  (%s %s ", Lng::translate("See"), text);
         sprintf(&str[strlen(str)], "%s %d)", Lng::translate("page"), page);
-        tops->print_text(ctx->rw->doc_clink_text[i], tops->style[tops->ci].text,
-            ps_mPrintMode_Start);
-        tops->print_text(str, tops->style[tops->ci].link, ps_mPrintMode_End);
-      } else {
-        tops->print_text(ctx->rw->doc_clink_text[i], tops->style[tops->ci].text,
-            ps_mPrintMode_Start);
-        sprintf(
-            str, "  (%s %s)", Lng::translate("See"), ctx->rw->doc_clink_ref[i]);
+        tops->print_text(ctx->rw->doc_clink_text[i], tops->style[tops->ci].text, ps_mPrintMode_Start);
         tops->print_text(str, tops->style[tops->ci].link, ps_mPrintMode_End);
       }
-    } else
+      else
+      {
+        tops->print_text(ctx->rw->doc_clink_text[i], tops->style[tops->ci].text, ps_mPrintMode_Start);
+        sprintf(str, "  (%s %s)", Lng::translate("See"), ctx->rw->doc_clink_ref[i]);
+        tops->print_text(str, tops->style[tops->ci].link, ps_mPrintMode_End);
+      }
+    }
+    else
       tops->print_text(ctx->rw->doc_clink_text[i], tops->style[tops->ci].text);
   }
   return 1;
@@ -236,17 +255,15 @@ int CnvWblToPs::body_exec()
   tops->print_h2(text);
   sprintf(text, "Struct pwr_sClass_%s", ctx->rw->body_structname);
   tops->print_text(text, tops->style[tops->ci].boldtext);
-  if (!streq(ctx->rw->body_flags, "")) {
+  if (!streq(ctx->rw->body_flags, ""))
+  {
     sprintf(text, "Flags %s", ctx->rw->body_flags);
     tops->print_text(text, tops->style[tops->ci].boldtext);
   }
   return 1;
 }
 
-int CnvWblToPs::class_close()
-{
-  return 1;
-}
+int CnvWblToPs::class_close() { return 1; }
 
 int CnvWblToPs::attribute_exec()
 {
@@ -257,8 +274,7 @@ int CnvWblToPs::attribute_exec()
   int page;
   int lng_sts = 1;
 
-  if (streq(ctx->rw->attr_typeref, "CastId")
-      || streq(ctx->rw->attr_typeref, "DisableAttr"))
+  if (streq(ctx->rw->attr_typeref, "CastId") || streq(ctx->rw->attr_typeref, "DisableAttr"))
     return 1;
 
   if (Lng::current() != lng_eLanguage_en_US)
@@ -266,48 +282,53 @@ int CnvWblToPs::attribute_exec()
 
   tops->print_h3(ctx->rw->attr_name);
   if (ctx->rw->attr_array && ctx->rw->attr_pointer)
-    sprintf(txt, "%s Array[%s] of pointers to %s", Lng::translate("Type"),
-        ctx->rw->attr_elements, ctx->rw->attr_typeref);
+    sprintf(txt, "%s Array[%s] of pointers to %s", Lng::translate("Type"), ctx->rw->attr_elements,
+            ctx->rw->attr_typeref);
   else if (ctx->rw->attr_array)
-    sprintf(txt, "%s Array[%s] of %s", Lng::translate("Type"),
-        ctx->rw->attr_elements, ctx->rw->attr_typeref);
+    sprintf(txt, "%s Array[%s] of %s", Lng::translate("Type"), ctx->rw->attr_elements, ctx->rw->attr_typeref);
   else if (ctx->rw->attr_pointer)
-    sprintf(
-        txt, "%s Pointer to %s", Lng::translate("Type"), ctx->rw->attr_typeref);
+    sprintf(txt, "%s Pointer to %s", Lng::translate("Type"), ctx->rw->attr_typeref);
   else
     sprintf(txt, "%s %s", Lng::translate("Type"), ctx->rw->attr_typeref);
 
-  int sts
-      = tops->content.find_link(CnvCtx::low(ctx->rw->attr_typeref), text, &page);
-  if (ODD(sts)) {
+  int sts = tops->content.find_link(CnvCtx::low(ctx->rw->attr_typeref), text, &page);
+  if (ODD(sts))
+  {
     tops->print_text(txt, tops->style[tops->ci].boldtext, ps_mPrintMode_Start);
     sprintf(txt, " (%s ", Lng::translate("See"));
     sprintf(&txt[strlen(txt)], "%s %d)", Lng::translate("page"), page);
     tops->print_text(txt, tops->style[tops->ci].link, ps_mPrintMode_End);
-  } else
+  }
+  else
     tops->print_text(txt, tops->style[tops->ci].boldtext);
 
   sprintf(txt, "%s %s", Lng::translate("Class"), ctx->rw->attr_type);
   tops->print_text(txt, tops->style[tops->ci].boldtext);
 
-  if (!streq(ctx->rw->attr_flags, "")) {
+  if (!streq(ctx->rw->attr_flags, ""))
+  {
     sprintf(txt, "Flags %s", ctx->rw->attr_flags);
     tops->print_text(txt, tops->style[tops->ci].boldtext);
   }
-  if (!streq(ctx->rw->attr_pgmname, "")) {
+  if (!streq(ctx->rw->attr_pgmname, ""))
+  {
     sprintf(txt, "PmgName %s", ctx->rw->attr_pgmname);
     tops->print_text(txt, tops->style[tops->ci].boldtext);
   }
   tops->print_text("", tops->style[tops->ci].text);
 
-  if (ctx->rw->doc_fresh) {
-    for (i = 0; i < ctx->rw->doc_cnt; i++) {
-      if ((s = strstr(CnvCtx::low(ctx->rw->doc_text[i]), "@image")) != 0) {
+  if (ctx->rw->doc_fresh)
+  {
+    for (i = 0; i < ctx->rw->doc_cnt; i++)
+    {
+      if ((s = strstr(CnvCtx::low(ctx->rw->doc_text[i]), "@image")) != 0)
+      {
         char imagefile[80];
 
         str_trim(imagefile, s + 6);
         tops->print_image(imagefile);
-      } else
+      }
+      else
         tops->print_text(ctx->rw->doc_text[i], tops->style[tops->ci].text);
     }
   }
@@ -335,62 +356,81 @@ int CnvWblToPs::typedef_exec()
   sprintf(txt, "%s %s", Lng::translate("Type"), ctx->rw->typedef_name);
   tops->print_h1(txt, 0, CnvCtx::low(ctx->rw->typedef_name));
 
-  if (!lng_sts) {
+  if (!lng_sts)
+  {
     sprintf(txt, "(%s)", Lng::translate("English text not available"));
     tops->print_text(txt, tops->style[tops->ci].link);
   }
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->typedef_typeref, "")) {
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->typedef_typeref, ""))
+  {
     sprintf(txt, "TypeRef %s", ctx->rw->typedef_typeref);
     tops->print_text(txt, tops->style[tops->ci].boldtext);
   }
 
-  if (ctx->rw->typedef_elements > 1) {
+  if (ctx->rw->typedef_elements > 1)
+  {
     sprintf(txt, "Elements %d", ctx->rw->typedef_elements);
     tops->print_text(txt, tops->style[tops->ci].boldtext);
   }
-  if (!streq(ctx->rw->typedef_pgmname, "")) {
+  if (!streq(ctx->rw->typedef_pgmname, ""))
+  {
     sprintf(txt, "Pgmname %s", ctx->rw->typedef_pgmname);
     tops->print_text(txt, tops->style[tops->ci].boldtext);
   }
   tops->print_text("", tops->style[tops->ci].text);
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_author, "")) {
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_author, ""))
+  {
     sprintf(txt, "%s %s", Lng::translate("Author"), ctx->rw->doc_author);
     tops->print_text(txt, tops->style[tops->ci].text);
   }
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_version, "")) {
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_version, ""))
+  {
     sprintf(txt, "%s %s", Lng::translate("Version"), ctx->rw->doc_version);
     tops->print_text(txt, tops->style[tops->ci].text);
   }
 
-  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_code, "")) {
+  if (ctx->rw->doc_fresh && !streq(ctx->rw->doc_code, ""))
+  {
     sprintf(txt, "%s %s", Lng::translate("Code"), ctx->rw->doc_code);
     tops->print_text(txt, tops->style[tops->ci].text);
   }
 
   tops->print_h2(Lng::translate("Description"));
-  if (ctx->rw->doc_fresh) {
-    for (i = 0; i < ctx->rw->doc_cnt; i++) {
+  if (ctx->rw->doc_fresh)
+  {
+    for (i = 0; i < ctx->rw->doc_cnt; i++)
+    {
       str_trim(txt, ctx->rw->doc_text[i]);
-      if (str_StartsWith(CnvCtx::low(txt), "@image")) {
+      if (str_StartsWith(CnvCtx::low(txt), "@image"))
+      {
         char imagefile[80];
 
         str_trim(imagefile, txt + 6);
         tops->print_image(imagefile);
-      } else if (str_StartsWith(CnvCtx::low(txt), "@b")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@b"))
+      {
         tops->print_text(txt + 2, tops->style[tops->ci].boldtext);
-      } else if (str_StartsWith(CnvCtx::low(txt), "@h1")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@h1"))
+      {
         tops->print_h2(txt + 3);
-      } else if (str_StartsWith(CnvCtx::low(txt), "@h2")) {
+      }
+      else if (str_StartsWith(CnvCtx::low(txt), "@h2"))
+      {
         tops->print_h3(txt + 3);
-      } else
+      }
+      else
         tops->print_text(ctx->rw->doc_text[i], tops->style[tops->ci].text);
     }
   }
-  for (i = 0; i < ctx->rw->doc_clink_cnt; i++) {
-    if (!conf_pass) {
+  for (i = 0; i < ctx->rw->doc_clink_cnt; i++)
+  {
+    if (!conf_pass)
+    {
       int page;
       char str[256];
       char text[200];
@@ -409,20 +449,21 @@ int CnvWblToPs::typedef_exec()
         *s = 0;
 
       int sts = tops->content.find_link(link_ref, text, &page);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         sprintf(str, " (%s %s ", Lng::translate("See"), text);
         sprintf(&str[strlen(str)], "%s %d)", Lng::translate("page"), page);
-        tops->print_text(ctx->rw->doc_clink_text[i], tops->style[tops->ci].text,
-            ps_mPrintMode_Start);
-        tops->print_text(str, tops->style[tops->ci].link, ps_mPrintMode_End);
-      } else {
-        tops->print_text(ctx->rw->doc_clink_text[i], tops->style[tops->ci].text,
-            ps_mPrintMode_Start);
-        sprintf(
-            str, "  (%s %s)", Lng::translate("See"), ctx->rw->doc_clink_ref[i]);
+        tops->print_text(ctx->rw->doc_clink_text[i], tops->style[tops->ci].text, ps_mPrintMode_Start);
         tops->print_text(str, tops->style[tops->ci].link, ps_mPrintMode_End);
       }
-    } else
+      else
+      {
+        tops->print_text(ctx->rw->doc_clink_text[i], tops->style[tops->ci].text, ps_mPrintMode_Start);
+        sprintf(str, "  (%s %s)", Lng::translate("See"), ctx->rw->doc_clink_ref[i]);
+        tops->print_text(str, tops->style[tops->ci].link, ps_mPrintMode_End);
+      }
+    }
+    else
       tops->print_text(ctx->rw->doc_clink_text[i], tops->style[tops->ci].text);
   }
   return 1;
@@ -448,20 +489,25 @@ int CnvWblToPs::bit_exec()
   sprintf(txt, "Text %s", ctx->rw->bit_text);
   tops->print_text(txt, tops->style[tops->ci].boldtext);
 
-  if (!streq(ctx->rw->bit_pgmname, "")) {
+  if (!streq(ctx->rw->bit_pgmname, ""))
+  {
     sprintf(txt, "PmgName %s", ctx->rw->bit_pgmname);
     tops->print_text(txt, tops->style[tops->ci].boldtext);
   }
   tops->print_text("", tops->style[tops->ci].text);
 
-  if (ctx->rw->doc_fresh) {
-    for (i = 0; i < ctx->rw->doc_cnt; i++) {
-      if ((s = strstr(CnvCtx::low(ctx->rw->doc_text[i]), "@image")) != 0) {
+  if (ctx->rw->doc_fresh)
+  {
+    for (i = 0; i < ctx->rw->doc_cnt; i++)
+    {
+      if ((s = strstr(CnvCtx::low(ctx->rw->doc_text[i]), "@image")) != 0)
+      {
         char imagefile[80];
 
         str_trim(imagefile, s + 6);
         tops->print_image(imagefile);
-      } else
+      }
+      else
         tops->print_text(ctx->rw->doc_text[i], tops->style[tops->ci].text);
     }
   }

@@ -46,7 +46,6 @@
 
 /* co_nav_help.h -- Help file parser */
 
-
 #ifndef co_api_h
 typedef enum
 {

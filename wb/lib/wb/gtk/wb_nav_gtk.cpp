@@ -43,34 +43,28 @@
 #include "wb_ldh_msg.h"
 #include "wb_nav_gtk.h"
 
-static void nav_sel_lose_cb(
-    GtkWidget* w, GdkEventSelection* event, gpointer data);
-static void nav_sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
-    guint info, guint time_stamp, gpointer data);
+static void nav_sel_lose_cb(GtkWidget* w, GdkEventSelection* event, gpointer data);
+static void nav_sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data, guint info, guint time_stamp,
+                               gpointer data);
 
 //
 // Create the navigator widget
 //
-NavGtk::NavGtk(void* nav_parent_ctx, GtkWidget* nav_parent_wid,
-    const char* nav_name, ldh_tSesContext nav_ldhses, const char* nav_root_name,
-    GtkWidget** w, pwr_tStatus* status)
-    : Nav(nav_parent_ctx, nav_name, nav_ldhses, nav_root_name, status),
-      parent_wid(nav_parent_wid)
+NavGtk::NavGtk(void* nav_parent_ctx, GtkWidget* nav_parent_wid, const char* nav_name,
+               ldh_tSesContext nav_ldhses, const char* nav_root_name, GtkWidget** w, pwr_tStatus* status)
+    : Nav(nav_parent_ctx, nav_name, nav_ldhses, nav_root_name, status), parent_wid(nav_parent_wid)
 {
-  GtkWidget* scrolledbrow
-      = scrolledbrowwidgetgtk_new(Nav::init_brow_cb, this, &brow_widget);
+  GtkWidget* scrolledbrow = scrolledbrowwidgetgtk_new(Nav::init_brow_cb, this, &brow_widget);
 
   form_widget = gtk_frame_new(NULL);
   gtk_container_add(GTK_CONTAINER(form_widget), scrolledbrow);
   gtk_container_set_border_width(GTK_CONTAINER(scrolledbrow), 3);
 
   selection_widget = gtk_invisible_new();
-  gtk_selection_add_target(
-      selection_widget, GDK_SELECTION_PRIMARY, GDK_SELECTION_TYPE_STRING, 1);
-  g_signal_connect(
-      selection_widget, "selection-get", G_CALLBACK(nav_sel_convert_cb), this);
-  sel_lose_id = g_signal_connect(selection_widget, "selection-clear-event",
-      G_CALLBACK(nav_sel_lose_cb), this);
+  gtk_selection_add_target(selection_widget, GDK_SELECTION_PRIMARY, GDK_SELECTION_TYPE_STRING, 1);
+  g_signal_connect(selection_widget, "selection-get", G_CALLBACK(nav_sel_convert_cb), this);
+  sel_lose_id =
+      g_signal_connect(selection_widget, "selection-clear-event", G_CALLBACK(nav_sel_lose_cb), this);
   gtk_widget_show_all(brow_widget);
 
   set_inputfocus(0);
@@ -91,8 +85,8 @@ NavGtk::~NavGtk()
   gtk_widget_destroy(form_widget);
 }
 
-static void nav_sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
-    guint info, guint time_stamp, gpointer data)
+static void nav_sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data, guint info, guint time_stamp,
+                               gpointer data)
 {
   NavGtk* nav = (NavGtk*)data;
   char name[200];
@@ -101,20 +95,22 @@ static void nav_sel_convert_cb(GtkWidget* w, GtkSelectionData* selection_data,
   if (!nav->selection_owner)
     return;
 
-  if (!nav->get_plant_select_cb) {
+  if (!nav->get_plant_select_cb)
+  {
     strcpy(name, "");
-  } else {
+  }
+  else
+  {
     sts = nav->get_plant_select_cb(nav->parent_ctx, name, sizeof(name));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       strcpy(name, "");
     }
   }
-  gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8,
-      (const guchar*)name, strlen(name));
+  gtk_selection_data_set(selection_data, GDK_SELECTION_TYPE_STRING, 8, (const guchar*)name, strlen(name));
 }
 
-static void nav_sel_lose_cb(
-    GtkWidget* w, GdkEventSelection* event, gpointer data)
+static void nav_sel_lose_cb(GtkWidget* w, GdkEventSelection* event, gpointer data)
 {
   Nav* nav = (Nav*)data;
 
@@ -126,17 +122,19 @@ void NavGtk::set_selection_owner(int set)
 {
   gboolean sts;
 
-  if (set) {
-    sts = gtk_selection_owner_set(
-        selection_widget, GDK_SELECTION_PRIMARY, gtk_get_current_event_time());
-    if (!sts) {
+  if (set)
+  {
+    sts = gtk_selection_owner_set(selection_widget, GDK_SELECTION_PRIMARY, gtk_get_current_event_time());
+    if (!sts)
+    {
       brow_SelectClear(brow_ctx);
       return;
     }
     selection_owner = 1;
-  } else {
-    sts = gtk_selection_owner_set(
-        NULL, GDK_SELECTION_PRIMARY, gtk_get_current_event_time());
+  }
+  else
+  {
+    sts = gtk_selection_owner_set(NULL, GDK_SELECTION_PRIMARY, gtk_get_current_event_time());
     selection_owner = 0;
   }
 }
@@ -146,16 +144,19 @@ void NavGtk::set_inputfocus(int focus)
   if (!displayed)
     return;
 
-  if (focus) {
-    //GdkColor color;
+  if (focus)
+  {
+    // GdkColor color;
 
-    //gdk_color_parse("Black", &color);
-    //gtk_widget_modify_bg(form_widget, GTK_STATE_NORMAL, &color);
+    // gdk_color_parse("Black", &color);
+    // gtk_widget_modify_bg(form_widget, GTK_STATE_NORMAL, &color);
     gtk_widget_grab_focus(brow_widget);
-  } else {
-    //GdkColor color;
+  }
+  else
+  {
+    // GdkColor color;
 
-    //gdk_color_parse("White", &color);
-    //gtk_widget_modify_bg(form_widget, GTK_STATE_NORMAL, &color);
+    // gdk_color_parse("White", &color);
+    // gtk_widget_modify_bg(form_widget, GTK_STATE_NORMAL, &color);
   }
 }

@@ -48,11 +48,11 @@
 
 class GeCurveQtWidget;
 
-class GeCurveQt : public GeCurve {
+class GeCurveQt : public GeCurve
+{
 public:
-  GeCurveQt(void* gc_parent_ctx, char* curve_name, char* filename,
-      GeCurveData* curve_data, int pos_right, int gc_width, int gc_height,
-      unsigned int gc_options, int gc_color_theme, void* basewidget);
+  GeCurveQt(void* gc_parent_ctx, char* curve_name, char* filename, GeCurveData* curve_data, int pos_right,
+            int gc_width, int gc_height, unsigned int gc_options, int gc_color_theme, void* basewidget);
   ~GeCurveQt();
 
   GeCurveQtWidget* toplevel;
@@ -101,7 +101,8 @@ public:
   void* get_widget();
 };
 
-class GeCurveQtWidget : public QWidget {
+class GeCurveQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

@@ -47,27 +47,22 @@ class wb_object;
 class wb_orep;
 class wb_attribute;
 
-class wb_cdef : public wb_status {
+class wb_cdef : public wb_status
+{
 public:
   wb_cdrep* m_cdrep;
 
   wb_cdef();
   wb_cdef(wb_cdrep* cdrep);
-  wb_cdef(wb_adef&); // x = other_object
+  wb_cdef(wb_adef&);       // x = other_object
   wb_cdef(const wb_orep&); // x = other orep
   wb_cdef(wb_mvrep*, pwr_tCid);
   wb_cdef(const wb_cdef&);
   ~wb_cdef();
 
   wb_cdef& operator=(const wb_cdef&);
-  operator bool() const
-  {
-    return (m_cdrep != 0);
-  }
-  operator wb_cdrep*() const
-  {
-    return m_cdrep;
-  }
+  operator bool() const { return (m_cdrep != 0); }
+  operator wb_cdrep*() const { return m_cdrep; }
 
   bool operator==(wb_cdef&);
 
@@ -88,8 +83,7 @@ public:
   wb_bdef bdef(wb_name bname);
 
   void templateBody(pwr_tStatus* sts, pwr_eBix bix, void* p, pwr_tOid oid);
-  void attrTemplateBody(
-      pwr_tStatus* sts, pwr_eBix bix, void* p, wb_attribute& a);
+  void attrTemplateBody(pwr_tStatus* sts, pwr_eBix bix, void* p, wb_attribute& a);
   wb_object classBody(const char* bname);
   wb_cdef super();
 

@@ -49,8 +49,7 @@
 #include "rt_redu_msg.h"
 
 static pwr_tStatus add_table_object(redu_tCtx ctx, pwr_tAttrRef* o);
-static pwr_tStatus add_table_attr(
-    redu_tCtx ctx, pwr_tAttrRef* aref, gdh_sAttrDef* bd);
+static pwr_tStatus add_table_attr(redu_tCtx ctx, pwr_tAttrRef* aref, gdh_sAttrDef* bd);
 
 pwr_tStatus redu_create_table(redu_tCtx ctx)
 {
@@ -61,9 +60,8 @@ pwr_tStatus redu_create_table(redu_tCtx ctx)
   if (ctx->t)
     redu_free_table(ctx);
 
-  for (i = 0; i < sizeof(ctx->packetp->Hierarchies)
-           / sizeof(ctx->packetp->Hierarchies[0]);
-       i++) {
+  for (i = 0; i < sizeof(ctx->packetp->Hierarchies) / sizeof(ctx->packetp->Hierarchies[0]); i++)
+  {
     if (ctx->packetp->Hierarchies[i].vid == 0)
       continue;
 
@@ -91,7 +89,8 @@ void redu_free_table(redu_tCtx ctx)
   redu_sTable *e, *enext;
 
   e = ctx->t;
-  while (e) {
+  while (e)
+  {
     enext = e->next;
     free(e);
     e = enext;
@@ -124,7 +123,8 @@ static pwr_tStatus add_table_object(redu_tCtx ctx, pwr_tAttrRef* o)
   if (EVEN(sts))
     return sts;
 
-  if (tid == pwr_cClass_MountObject) {
+  if (tid == pwr_cClass_MountObject)
+  {
     /* Skip for now... TODO */
     pwr_sClass_MountObject* p;
     pwr_tOid oid;
@@ -140,11 +140,12 @@ static pwr_tStatus add_table_object(redu_tCtx ctx, pwr_tAttrRef* o)
     if (EVEN(sts))
       return sts;
 
-    if (info.cid == pwr_cClass_SharedVolume
-        || info.cid == pwr_cClass_SubVolume) {
+    if (info.cid == pwr_cClass_SharedVolume || info.cid == pwr_cClass_SubVolume)
+    {
       maref = cdh_ObjidToAref(oid);
       o = &maref;
-    } else
+    }
+    else
       return REDU__SUCCESS;
 
     sts = gdh_GetAttrRefTid(o, &tid);
@@ -156,12 +157,12 @@ static pwr_tStatus add_table_object(redu_tCtx ctx, pwr_tAttrRef* o)
   if (EVEN(sts))
     return sts;
 
-  for (i = 0; i < rows; i++) {
-    if (bd[i].attr->Param.Info.Flags & PWR_MASK_RTVIRTUAL
-        || bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE)
+  for (i = 0; i < rows; i++)
+  {
+    if (bd[i].attr->Param.Info.Flags & PWR_MASK_RTVIRTUAL || bd[i].attr->Param.Info.Flags & PWR_MASK_PRIVATE)
       continue;
-    if (!(bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS)
-        && !(bd[i].attr->Param.Info.Flags & PWR_MASK_REDUTRANSFER))
+    if (!(bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS) &&
+        !(bd[i].attr->Param.Info.Flags & PWR_MASK_REDUTRANSFER))
       continue;
 
     if (bd[i].attr->Param.Info.Flags & PWR_MASK_ARRAY)
@@ -169,8 +170,10 @@ static pwr_tStatus add_table_object(redu_tCtx ctx, pwr_tAttrRef* o)
     else
       elements = 1;
 
-    if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS) {
-      if (elements == 1) {
+    if (bd[i].attr->Param.Info.Flags & PWR_MASK_CLASS)
+    {
+      if (elements == 1)
+      {
         if (str_StartsWith(bd[i].attrName, "Super."))
           strcpy(aname, &bd[i].attrName[6]);
         else
@@ -183,8 +186,11 @@ static pwr_tStatus add_table_object(redu_tCtx ctx, pwr_tAttrRef* o)
         sts = add_table_object(ctx, &aref);
         if (EVEN(sts))
           return sts;
-      } else {
-        for (j = 0; j < elements; j++) {
+      }
+      else
+      {
+        for (j = 0; j < elements; j++)
+        {
           if (str_StartsWith(bd[i].attrName, "Super."))
             sprintf(aname, "%s[%d]", &bd[i].attrName[6], j);
           else
@@ -199,7 +205,9 @@ static pwr_tStatus add_table_object(redu_tCtx ctx, pwr_tAttrRef* o)
             return sts;
         }
       }
-    } else {
+    }
+    else
+    {
       if (str_StartsWith(bd[i].attrName, "Super."))
         strcpy(aname, &bd[i].attrName[6]);
       else
@@ -214,11 +222,12 @@ static pwr_tStatus add_table_object(redu_tCtx ctx, pwr_tAttrRef* o)
   }
 
   /* Add children */
-  if (o->Flags.b.Object) {
+  if (o->Flags.b.Object)
+  {
     pwr_tObjid coid;
 
-    for (sts = gdh_GetChild(o->Objid, &coid); ODD(sts);
-         sts = gdh_GetNextSibling(coid, &coid)) {
+    for (sts = gdh_GetChild(o->Objid, &coid); ODD(sts); sts = gdh_GetNextSibling(coid, &coid))
+    {
       aref = cdh_ObjidToAref(coid);
 
       sts = add_table_object(ctx, &aref);
@@ -229,8 +238,7 @@ static pwr_tStatus add_table_object(redu_tCtx ctx, pwr_tAttrRef* o)
   return REDU__SUCCESS;
 }
 
-static pwr_tStatus add_table_attr(
-    redu_tCtx ctx, pwr_tAttrRef* aref, gdh_sAttrDef* bd)
+static pwr_tStatus add_table_attr(redu_tCtx ctx, pwr_tAttrRef* aref, gdh_sAttrDef* bd)
 {
   pwr_tStatus sts;
   redu_sTable* t;
@@ -240,7 +248,8 @@ static pwr_tStatus add_table_attr(
   if (EVEN(sts))
     return sts;
 
-  if (aref->Flags.b.Indirect) {
+  if (aref->Flags.b.Indirect)
+  {
     if (*(unsigned long*)p == 0)
       return REDU__SUCCESS;
     p = gdh_TranslateRtdbPointer(*(unsigned long*)p);
@@ -282,7 +291,8 @@ pwr_tStatus redu_create_message(redu_tCtx ctx, void** msg)
   time_GetTime(&start_time);
   bufp = buf + sizeof(redu_sMsgHeader);
 
-  for (e = ctx->t; e; e = e->next) {
+  for (e = ctx->t; e; e = e->next)
+  {
     memcpy(bufp, e->p, e->size);
     bufp += e->size;
   }
@@ -290,7 +300,8 @@ pwr_tStatus redu_create_message(redu_tCtx ctx, void** msg)
   time_GetTime(&end_time);
   time_Adiff(&dtime, &end_time, &start_time);
   time_DToFloat(&ctx->msg_time, &dtime);
-  if (ctx->packetp) {
+  if (ctx->packetp)
+  {
     ctx->packetp->TransmitCnt++;
     ctx->packetp->PackTime = ctx->msg_time;
   }
@@ -308,7 +319,8 @@ pwr_tStatus redu_unpack_message(redu_tCtx ctx, void* msg)
   int tsts;
 
   tsts = time_Acomp_NE(&ctx->table_version, &((redu_sMsgHeader*)msg)->version);
-  if (tsts != 0) {
+  if (tsts != 0)
+  {
     if (tsts == -2)
       return 0;
     else
@@ -319,7 +331,8 @@ pwr_tStatus redu_unpack_message(redu_tCtx ctx, void* msg)
   time_GetTime(&start_time);
   bufp = msg + sizeof(redu_sMsgHeader);
 
-  for (e = ctx->t; e; e = e->next) {
+  for (e = ctx->t; e; e = e->next)
+  {
     memcpy(e->p, bufp, e->size);
     bufp += e->size;
   }
@@ -327,7 +340,8 @@ pwr_tStatus redu_unpack_message(redu_tCtx ctx, void* msg)
   time_GetTime(&end_time);
   time_Adiff(&dtime, &end_time, &start_time);
   time_DToFloat(&ctx->msg_time, &dtime);
-  if (ctx->packetp) {
+  if (ctx->packetp)
+  {
     ctx->packetp->ReceiveCnt++;
     ctx->packetp->UnpackTime = ctx->msg_time;
   }
@@ -349,14 +363,15 @@ pwr_tStatus redu_send_table(redu_tCtx ctx, void** table_msg)
   ((redu_sTableMsgHeader*)msg)->version = ctx->table_version;
 
   msgp = msg + sizeof(redu_sTableMsgHeader);
-  for (e = ctx->t; e; e = e->next) {
-    memcpy(
-        &((redu_sTableMsgElement*)msgp)->aref, &e->aref, sizeof(pwr_tAttrRef));
+  for (e = ctx->t; e; e = e->next)
+  {
+    memcpy(&((redu_sTableMsgElement*)msgp)->aref, &e->aref, sizeof(pwr_tAttrRef));
     ((redu_sTableMsgElement*)msgp)->size = e->size;
     msgp += sizeof(redu_sTableMsgElement);
   }
 
-  if (ctx->packetp) {
+  if (ctx->packetp)
+  {
     ctx->packetp->TablePacketSize = size;
     ctx->packetp->Attributes = ctx->attr_cnt;
   }
@@ -381,9 +396,9 @@ pwr_tStatus redu_receive_table(redu_tCtx ctx, void* table_msg)
     redu_free_table(ctx);
 
   timelog(2, "Table received");
-  tsts = time_Acomp_NE(
-      &ctx->nodep->CurrentVersion, &((redu_sTableMsgHeader*)msg)->version);
-  if (tsts != 0) {
+  tsts = time_Acomp_NE(&ctx->nodep->CurrentVersion, &((redu_sTableMsgHeader*)msg)->version);
+  if (tsts != 0)
+  {
     if (tsts == -2)
       return 0;
     else
@@ -393,10 +408,10 @@ pwr_tStatus redu_receive_table(redu_tCtx ctx, void* table_msg)
   attributes = ((redu_sTableMsgHeader*)msg)->attributes;
 
   msgp = msg + sizeof(redu_sTableMsgHeader);
-  for (i = 0; i < attributes; i++) {
+  for (i = 0; i < attributes; i++)
+  {
     e = (redu_sTable*)calloc(1, sizeof(*e));
-    memcpy(
-        &e->aref, &((redu_sTableMsgElement*)msgp)->aref, sizeof(pwr_tAttrRef));
+    memcpy(&e->aref, &((redu_sTableMsgElement*)msgp)->aref, sizeof(pwr_tAttrRef));
     e->size = ((redu_sTableMsgElement*)msgp)->size;
     if (ctx->t_last)
       e->offset = ctx->t_last->offset + ctx->t_last->size;
@@ -433,7 +448,8 @@ void redu_print_table(redu_tCtx ctx)
   pwr_tStatus sts;
 
   e = ctx->t;
-  while (e) {
+  while (e)
+  {
     sts = gdh_AttrrefToName(&e->aref, name, sizeof(name), cdh_mNName);
     printf("%5d %5d %s\n", e->offset, e->size, name);
 
@@ -460,8 +476,7 @@ pwr_tStatus redu_send(redu_tCtx ctx, void* msg, int size, unsigned int msg_id)
   return sts;
 }
 
-pwr_tStatus redu_init(
-    redu_tCtx* ctx, pwr_sNode* nodep, pwr_sClass_RedcomPacket* packetp)
+pwr_tStatus redu_init(redu_tCtx* ctx, pwr_sNode* nodep, pwr_sClass_RedcomPacket* packetp)
 {
   qcom_sQattr qattr;
   pwr_tStatus sts;
@@ -475,7 +490,8 @@ pwr_tStatus redu_init(
   c->msgid_table = 1000 + c->prio;
   c->msgid_cyclic = c->prio;
 
-  switch (c->prio) {
+  switch (c->prio)
+  {
   case redu_ePrio_1:
     c->rcv_qid.qix = redu_cQixPrio1;
     break;
@@ -524,8 +540,7 @@ pwr_tStatus redu_init(
   return REDU__SUCCESS;
 }
 
-pwr_tStatus redu_receive(
-    redu_tCtx ctx, unsigned int timeout, int* size, void** msg)
+pwr_tStatus redu_receive(redu_tCtx ctx, unsigned int timeout, int* size, void** msg)
 {
   pwr_tStatus sts;
   qcom_sGet get;
@@ -537,7 +552,8 @@ pwr_tStatus redu_receive(
   if (sts == QCOM__TMO)
     return sts;
 
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     *size = get.size;
     *msg = get.data;
   }
@@ -564,8 +580,10 @@ pwr_tStatus redu_get_initial_state(char* nodename, int busid, int* state)
   if (!fp)
     return REDU__REDCOMFILE;
 
-  while ((s = fgets(buffer, sizeof(buffer) - 1, fp)) != NULL) {
-    if (*s == '#' || *s == '!') {
+  while ((s = fgets(buffer, sizeof(buffer) - 1, fp)) != NULL)
+  {
+    if (*s == '#' || *s == '!')
+    {
       s++;
       continue;
     }
@@ -574,7 +592,8 @@ pwr_tStatus redu_get_initial_state(char* nodename, int busid, int* state)
     if (n != 5)
       break;
 
-    if (streq(name, nodename)) {
+    if (streq(name, nodename))
+    {
       local_found = 1;
       // *state = atoi(s_state);
       *state = pwr_eRedundancyState_Init;
@@ -655,7 +674,8 @@ pwr_tStatus redu_set_state(pwr_eRedundancyState state)
   if (EVEN(sts))
     return sts;
 
-  switch (state) {
+  switch (state)
+  {
   case pwr_eRedundancyState_Active:
     p->SetActive = 1;
     break;
@@ -687,8 +707,7 @@ pwr_tStatus redu_appl_init(redu_tCtx* ctx, pwr_sClass_RedcomPacket* packetp)
   return redu_init(ctx, nodep, packetp);
 }
 
-pwr_tStatus redu_appl_send(
-    redu_tCtx ctx, void* msg, int size, pwr_tTime version, unsigned int msg_id)
+pwr_tStatus redu_appl_send(redu_tCtx ctx, void* msg, int size, pwr_tTime version, unsigned int msg_id)
 {
   pwr_tStatus sts;
 
@@ -697,25 +716,27 @@ pwr_tStatus redu_appl_send(
   ((redu_sMsgHeader*)msg)->version = version;
 
   sts = redu_send(ctx, msg, size, msg_id);
-  if (ODD(sts) && ctx->packetp) {
+  if (ODD(sts) && ctx->packetp)
+  {
     ctx->packetp->TransmitCnt++;
     ctx->packetp->PacketSize = size;
   }
   return sts;
 }
 
-pwr_tStatus redu_appl_receive(
-    redu_tCtx ctx, unsigned int timeout, void** msg, int* size)
+pwr_tStatus redu_appl_receive(redu_tCtx ctx, unsigned int timeout, void** msg, int* size)
 {
   pwr_tStatus sts;
 
   sts = redu_receive(ctx, timeout, size, msg);
-  if (EVEN(sts) && sts != QCOM__TMO) {
+  if (EVEN(sts) && sts != QCOM__TMO)
+  {
     // Wait to avoid looping
-    struct timespec ts = { timeout / 1000, (timeout * 1000000) % 1000000000 };
+    struct timespec ts = {timeout / 1000, (timeout * 1000000) % 1000000000};
     nanosleep(&ts, NULL);
   }
-  if (ODD(sts) && ctx->packetp) {
+  if (ODD(sts) && ctx->packetp)
+  {
     ctx->packetp->ReceiveCnt++;
     ctx->packetp->PacketSize = *size;
   }

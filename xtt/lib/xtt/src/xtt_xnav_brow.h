@@ -39,12 +39,16 @@
 
 #include "flow_browapi.h"
 
-typedef enum { brow_eUserType_XNav, brow_eUserType_XAttNav } brow_eUserType;
+typedef enum
+{
+  brow_eUserType_XNav,
+  brow_eUserType_XAttNav
+} brow_eUserType;
 
-class XNavBrow {
+class XNavBrow
+{
 public:
-  XNavBrow(
-      BrowCtx* brow_ctx, void* brow_userdata, brow_eUserType brow_usertype);
+  XNavBrow(BrowCtx* brow_ctx, void* brow_userdata, brow_eUserType brow_usertype);
 
   BrowCtx* ctx;
   void* userdata;

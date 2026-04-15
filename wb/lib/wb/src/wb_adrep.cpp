@@ -56,16 +56,17 @@ wb_adrep* wb_adrep::ref()
 }
 
 wb_adrep::wb_adrep(wb_orep& o)
-    : m_nRef(0), m_orep(&o), m_sts(LDH__SUCCESS), m_subClass(pwr_eClass__),
-      m_isSubattr(false)
+    : m_nRef(0), m_orep(&o), m_sts(LDH__SUCCESS), m_subClass(pwr_eClass__), m_isSubattr(false)
 {
   m_orep->ref();
   strcpy(m_subName, "");
 
   pwr_tStatus sts;
-  switch (m_orep->cid()) {
+  switch (m_orep->cid())
+  {
   case pwr_eClass_Param:
-  case pwr_eClass_TargetAttribute: {
+  case pwr_eClass_TargetAttribute:
+  {
     pwr_sParam attr;
 
     m_orep->vrep()->readBody(&sts, m_orep, pwr_eBix_sys, (void*)&attr);
@@ -88,7 +89,8 @@ wb_adrep::wb_adrep(wb_orep& o)
   }
   case pwr_eClass_Intern:
   case pwr_eClass_Input:
-  case pwr_eClass_Output: {
+  case pwr_eClass_Output:
+  {
     pwr_sIntern attr;
 
     m_orep->vrep()->readBody(&sts, m_orep, pwr_eBix_sys, (void*)&attr);
@@ -110,7 +112,8 @@ wb_adrep::wb_adrep(wb_orep& o)
 
     break;
   }
-  case pwr_eClass_ObjXRef: {
+  case pwr_eClass_ObjXRef:
+  {
     pwr_sObjXRef attr;
 
     m_orep->vrep()->readBody(&sts, m_orep, pwr_eBix_sys, (void*)&attr);
@@ -128,7 +131,8 @@ wb_adrep::wb_adrep(wb_orep& o)
 
     break;
   }
-  case pwr_eClass_AttrXRef: {
+  case pwr_eClass_AttrXRef:
+  {
     pwr_sAttrXRef attr;
 
     m_orep->vrep()->readBody(&sts, m_orep, pwr_eBix_sys, (void*)&attr);
@@ -146,7 +150,8 @@ wb_adrep::wb_adrep(wb_orep& o)
 
     break;
   }
-  case pwr_eClass_Buffer: {
+  case pwr_eClass_Buffer:
+  {
     pwr_sBuffer attr;
 
     m_orep->vrep()->readBody(&sts, m_orep, pwr_eBix_sys, (void*)&attr);
@@ -171,10 +176,7 @@ wb_adrep::wb_adrep(wb_orep& o)
   }
 }
 
-wb_adrep::~wb_adrep()
-{
-  m_orep->unref();
-}
+wb_adrep::~wb_adrep() { m_orep->unref(); }
 
 wb_adrep* wb_adrep::next(pwr_tStatus* sts)
 {
@@ -183,7 +185,8 @@ wb_adrep* wb_adrep::next(pwr_tStatus* sts)
     return 0;
 
   wb_adrep* adrep = new wb_adrep((wb_orep&)*orep);
-  if (m_isSubattr) {
+  if (m_isSubattr)
+  {
     adrep->m_isSubattr = true;
     adrep->m_offset = m_offset + adrep->m_offset - m_suboffset;
     strcpy(adrep->m_subName, m_subName);
@@ -203,7 +206,8 @@ wb_adrep* wb_adrep::prev(pwr_tStatus* sts)
     return 0;
 
   wb_adrep* adrep = new wb_adrep((wb_orep&)*orep);
-  if (m_isSubattr) {
+  if (m_isSubattr)
+  {
     adrep->m_isSubattr = true;
     adrep->m_offset = m_offset - (adrep->m_offset - m_suboffset);
     strcpy(adrep->m_subName, m_subName);
@@ -216,30 +220,15 @@ wb_adrep* wb_adrep::prev(pwr_tStatus* sts)
   return adrep;
 }
 
-wb_cdrep* wb_adrep::cdrep()
-{
-  return new wb_cdrep(this);
-}
+wb_cdrep* wb_adrep::cdrep() { return new wb_cdrep(this); }
 
-wb_bdrep* wb_adrep::bdrep()
-{
-  return new wb_bdrep(this);
-}
+wb_bdrep* wb_adrep::bdrep() { return new wb_bdrep(this); }
 
-pwr_tOid wb_adrep::aoid()
-{
-  return m_orep->oid();
-}
+pwr_tOid wb_adrep::aoid() { return m_orep->oid(); }
 
-int wb_adrep::aix()
-{
-  return cdh_oixToAix(m_orep->oid().oix);
-}
+int wb_adrep::aix() { return cdh_oixToAix(m_orep->oid().oix); }
 
-pwr_eBix wb_adrep::bix()
-{
-  return (pwr_eBix)cdh_oixToBix(m_orep->oid().oix);
-}
+pwr_eBix wb_adrep::bix() { return (pwr_eBix)cdh_oixToBix(m_orep->oid().oix); }
 
 pwr_sAttrRef wb_adrep::aref()
 {
@@ -282,10 +271,7 @@ pwr_tOid wb_adrep::boid()
 //
 // Return identity of class that owns this attribute
 //
-pwr_tCid wb_adrep::cid()
-{
-  return m_orep->cid();
-}
+pwr_tCid wb_adrep::cid() { return m_orep->cid(); }
 
 wb_vrep* wb_adrep::vrep() const
 {
@@ -294,10 +280,7 @@ wb_vrep* wb_adrep::vrep() const
   return m_orep->vrep();
 }
 
-const char* wb_adrep::name() const
-{
-  return m_orep->name();
-}
+const char* wb_adrep::name() const { return m_orep->name(); }
 
 void wb_adrep::add(wb_adrep* ad, int idx)
 {
@@ -327,17 +310,15 @@ const char* wb_adrep::subName() const
     return m_subName;
 }
 
-wb_name wb_adrep::longName()
-{
-  return m_orep->longName();
-}
+wb_name wb_adrep::longName() { return m_orep->longName(); }
 
 void* wb_adrep::body(void* p)
 {
   pwr_tStatus sts;
   int size;
 
-  switch (m_orep->cid()) {
+  switch (m_orep->cid())
+  {
   case pwr_eClass_Param:
     size = sizeof(pwr_sParam);
     break;

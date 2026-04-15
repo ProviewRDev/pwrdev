@@ -39,16 +39,17 @@
 
 /* xtt_fileview.cpp -- view and select files */
 
-typedef enum { fileview_eType_Open, fileview_eType_Save } fileview_eType;
+typedef enum
+{
+  fileview_eType_Open,
+  fileview_eType_Save
+} fileview_eType;
 
-class XttFileview {
+class XttFileview
+{
 public:
-  XttFileview()
-  {
-  }
-  ~XttFileview()
-  {
-  }
+  XttFileview() {}
+  ~XttFileview() {}
 };
 
 #endif

@@ -50,10 +50,7 @@ void WAtt::message_cb(void* watt, char severity, const char* message)
   ((WAtt*)watt)->message(severity, message);
 }
 
-void WAtt::change_value_cb(void* watt)
-{
-  ((WAtt*)watt)->change_value(1);
-}
+void WAtt::change_value_cb(void* watt) { ((WAtt*)watt)->change_value(1); }
 
 void WAtt::activate_print()
 {
@@ -92,14 +89,11 @@ int WAtt::open_changevalue(const char* name, int close)
   return WATT__SUCCESS;
 }
 
-WAtt::~WAtt()
-{
-}
+WAtt::~WAtt() {}
 
-WAtt::WAtt(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref,
-    int wa_editmode, int wa_advanced_user, int wa_display_objectname)
-    : parent_ctx(wa_parent_ctx), ldhses(wa_ldhses), aref(wa_aref),
-      editmode(wa_editmode), input_open(0), input_multiline(0), close_cb(0),
-      redraw_cb(0), client_data(0), pending_close(0)
+WAtt::WAtt(void* wa_parent_ctx, ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref, int wa_editmode,
+           int wa_advanced_user, int wa_display_objectname)
+    : parent_ctx(wa_parent_ctx), ldhses(wa_ldhses), aref(wa_aref), editmode(wa_editmode), input_open(0),
+      input_multiline(0), close_cb(0), redraw_cb(0), client_data(0), pending_close(0)
 {
 }

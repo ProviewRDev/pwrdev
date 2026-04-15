@@ -45,12 +45,14 @@
 
 class XttMultiViewQtWidget;
 
-typedef struct {
+typedef struct
+{
   int tag;
   void* data;
 } View;
 
-class XttMultiViewQt : public XttMultiView {
+class XttMultiViewQt : public XttMultiView
+{
 public:
   std::vector<QWidget*> comp_widget;
   std::vector<QWidget*> exchange_widget;
@@ -58,20 +60,19 @@ public:
   std::vector<View> views;
   CoWowFocusTimerQt focustimer;
 
-  XttMultiViewQt(void* parent_ctx, const char* name, pwr_tAttrRef* aref,
-      int width, int height, int x, int y, unsigned int options,
-      void* basewidget, int color_theme, pwr_tStatus* sts,
-      int (*mv_command_cb)(void*, char*, char*, char*, void*),
-      int (*mv_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
-      int (*mv_is_authorized_cb)(void*, unsigned int),
-      void (*mv_keyboard_cb)(void*, void*, int, int));
+  XttMultiViewQt(void* parent_ctx, const char* name, pwr_tAttrRef* aref, int width, int height, int x, int y,
+                 unsigned int options, void* basewidget, int color_theme, pwr_tStatus* sts,
+                 int (*mv_command_cb)(void*, char*, char*, char*, void*),
+                 int (*mv_get_current_objects_cb)(void*, pwr_sAttrRef**, int**),
+                 int (*mv_is_authorized_cb)(void*, unsigned int),
+                 void (*mv_keyboard_cb)(void*, void*, int, int));
   ~XttMultiViewQt();
 
   void pop();
   void set_size(int width, int height);
   void* get_widget();
-  int set_subwindow_source(const char* name, char* source, char* object,
-      double* borders, int insert = 1, int more = 0);
+  int set_subwindow_source(const char* name, char* source, char* object, double* borders, int insert = 1,
+                           int more = 0);
   int key_pressed(int key);
   void close_input_all();
   void signal_send(char* signalname);
@@ -82,7 +83,8 @@ private:
   XttMultiViewQtWidget* toplevel;
 };
 
-class XttMultiViewQtWidget : public QWidget {
+class XttMultiViewQtWidget : public QWidget
+{
 public:
   XttMultiViewQtWidget(XttMultiViewQt* parent) : QWidget(), multiview(parent) {}
 

@@ -75,35 +75,31 @@ int main(int argc, char** argv)
   init(&qid);
   errh_SetStatus(PWR__SRUN);
 
-  for (;;) {
+  for (;;)
+  {
     mp = receive(&qid, &get);
 
     np = node(mp);
-    if (np == NULL) {
-      errh_Error("sender %u.%u, type %u.%u, size %u, reply %u.%u",
-          get.sender.nid, get.sender.aix, get.type.b, get.type.s, get.size,
-          get.reply.nid, get.reply.qix);
+    if (np == NULL)
+    {
+      errh_Error("sender %u.%u, type %u.%u, size %u, reply %u.%u", get.sender.nid, get.sender.aix, get.type.b,
+                 get.type.s, get.size, get.reply.nid, get.reply.qix);
       continue;
     }
 
-    switch ((int)get.type.s) {
+    switch ((int)get.type.s)
+    {
     case net_eMsg_nodeUp:
       nodeUp((net_sNodeUp*)mp);
       break;
     case net_eMsg_createObject:
-      gdb_ScopeLock
-      {
-        subc_ActivateList(&gdbroot->no_node->subc_lh, pwr_cNObjid);
-      }
+      gdb_ScopeLock { subc_ActivateList(&gdbroot->no_node->subc_lh, pwr_cNObjid); }
       gdb_ScopeUnlock;
       break;
 
     case net_eMsg_deleteObject:
       notify = (net_sNotify*)mp;
-      gdb_ScopeLock
-      {
-        subc_ActivateList(&np->subc_lh, notify->oid);
-      }
+      gdb_ScopeLock { subc_ActivateList(&np->subc_lh, notify->oid); }
       gdb_ScopeUnlock;
       break;
 
@@ -118,8 +114,8 @@ int main(int argc, char** argv)
       break;
 
     default:
-      errh_Error("Unexpected subtype %d received from %d.%d %X", get.type.s,
-          get.reply.qix, get.reply.nid, get.pid);
+      errh_Error("Unexpected subtype %d received from %d.%d %X", get.type.s, get.reply.qix, get.reply.nid,
+                 get.pid);
     }
 
     qcom_Free(&sts, mp);
@@ -133,7 +129,8 @@ static void init(qcom_sQid* myQid)
   pwr_tStatus sts;
 
   sts = gdh_Init("pwr_nacp");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_Fatal("gdh_Init, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -145,13 +142,15 @@ static void init(qcom_sQid* myQid)
 
   qAttr.type = qcom_eQtype_private;
   qAttr.quota = 100;
-  if (!qcom_CreateQ(&sts, &qid, &qAttr, "nacp")) {
+  if (!qcom_CreateQ(&sts, &qid, &qAttr, "nacp"))
+  {
     errh_Error("Failed to create QCOM que\n%m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
   }
 #else
-  if (!qcom_AttachQ(&sts, &qcom_cQnacp)) {
+  if (!qcom_AttachQ(&sts, &qcom_cQnacp))
+  {
     errh_Fatal("qcom_AttachQ, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(sts);
@@ -159,7 +158,8 @@ static void init(qcom_sQid* myQid)
 #endif
   *myQid = qcom_cQnacp;
 
-  if (!qcom_Bind(&sts, myQid, &qcom_cQini)) {
+  if (!qcom_Bind(&sts, myQid, &qcom_cQini))
+  {
     errh_Fatal("qcom_Bind, %m", sts);
     errh_SetStatus(PWR__SRVTERM);
     exit(-1);
@@ -183,24 +183,27 @@ static void* receive(qcom_sQid* qid, qcom_sGet* get)
   pwr_tStatus sts;
   void* mp;
 
-  for (;;) {
+  for (;;)
+  {
     get->data = NULL;
     /* Loop until receiving a valid message.  */
     mp = qcom_Get(&sts, &qcom_cQnacp, get, qcom_cTmoEternal);
-    if (mp == NULL) {
+    if (mp == NULL)
+    {
       errh_Error("qcom_Get, %m", sts);
       continue;
     }
 
-    if (get->type.b == qcom_eBtype_event) {
+    if (get->type.b == qcom_eBtype_event)
+    {
       event(get);
       qcom_Free(&sts, mp);
       continue;
     }
 
-    else if (get->type.b != net_cMsgClass) {
-      errh_Error("Received bad message, type: <%d>, subtype: <%d>", get->type.b,
-          get->type.s);
+    else if (get->type.b != net_cMsgClass)
+    {
+      errh_Error("Received bad message, type: <%d>, subtype: <%d>", get->type.b, get->type.s);
       qcom_Free(&sts, mp);
       continue;
     }
@@ -218,7 +221,8 @@ static void event(qcom_sGet* get)
     return;
 
   new_event.m = ep->mask;
-  if (new_event.b.terminate) {
+  if (new_event.b.terminate)
+  {
     exit(0);
   }
 }
@@ -230,20 +234,18 @@ static gdb_sNode* node(net_sMessage* mp)
   pwr_tStatus sts;
   gdb_sNode* np;
 
-  if (mp->nid == pwr_cNNodeId) {
+  if (mp->nid == pwr_cNNodeId)
+  {
     errh_Error("Message from pwr_cNNodeId received");
     return NULL;
   }
 
-  gdb_ScopeLock
-  {
-    np = hash_Search(&sts, gdbroot->nid_ht, &mp->nid);
-  }
+  gdb_ScopeLock { np = hash_Search(&sts, gdbroot->nid_ht, &mp->nid); }
   gdb_ScopeUnlock;
 
-  if (np == NULL) {
-    errh_Error("Message about unknown node: (%s) received\n",
-        cdh_NodeIdToString(NULL, mp->nid, 0, 0));
+  if (np == NULL)
+  {
+    errh_Error("Message about unknown node: (%s) received\n", cdh_NodeIdToString(NULL, mp->nid, 0, 0));
     return NULL;
   }
 
@@ -263,13 +265,12 @@ static void nodeUp(net_sNodeUp* mp)
   gdb_sNode* np;
 
   np = hash_Search(&sts, gdbroot->nid_ht, &mp->nid);
-  if (np == NULL) {
-    errh_Error("Message about unknown node: (%s) received\n",
-        cdh_NodeIdToString(NULL, mp->nid, 0, 0));
+  if (np == NULL)
+  {
+    errh_Error("Message about unknown node: (%s) received\n", cdh_NodeIdToString(NULL, mp->nid, 0, 0));
     return;
   }
-  errh_Info("Up, link to node %s (%s)", np->name,
-      cdh_NodeIdToString(NULL, mp->nid, 0, 0));
+  errh_Info("Up, link to node %s (%s)", np->name, cdh_NodeIdToString(NULL, mp->nid, 0, 0));
 
   gdb_ScopeLock
   {
@@ -295,38 +296,41 @@ static void lockMountServers(gdb_sNode* np)
   gdb_AssumeLocked;
 
   for (vl = pool_Qsucc(NULL, gdbroot->pool, &np->own_lh); vl != &np->own_lh;
-       vl = pool_Qsucc(NULL, gdbroot->pool, vl)) {
+       vl = pool_Qsucc(NULL, gdbroot->pool, vl))
+  {
     vp = pool_Qitem(vl, gdb_sVolume, l.own_ll);
 
-    if (vl->self == vl->flink) {
+    if (vl->self == vl->flink)
+    {
       /* Connection lost and volume removed from own list */
       errh_Error("Volume not owned any more, %s", vp->g.name.orig);
       return;
     }
-    if (!vp->l.flags.b.isConnected) {
+    if (!vp->l.flags.b.isConnected)
+    {
       /* !!! Todo !!! How do we make this known ?  */
       errh_Error("Volume not connected, %s", vp->g.name.orig);
       continue;
     }
 
-    for (msl = pool_Qsucc(NULL, gdbroot->pool, &vp->l.volms_lh);
-         msl != &vp->l.volms_lh; msl = pool_Qsucc(NULL, gdbroot->pool, msl)) {
+    for (msl = pool_Qsucc(NULL, gdbroot->pool, &vp->l.volms_lh); msl != &vp->l.volms_lh;
+         msl = pool_Qsucc(NULL, gdbroot->pool, msl))
+    {
       msp = pool_Qitem(msl, gdb_sMountServer, volms_ll);
       op = hash_Search(&sts, gdbroot->oid_ht, &msp->oid);
-      if (op == NULL) {
-        op = cvolc_OidToObject(
-            &sts, vp, msp->oid, vol_mTrans_none, cvol_eHint_none);
-        if (op == NULL) {
-          errh_Error("Can't fetch the mount server's object, %s",
-              cdh_ObjidToString(msp->oid, 0));
+      if (op == NULL)
+      {
+        op = cvolc_OidToObject(&sts, vp, msp->oid, vol_mTrans_none, cvol_eHint_none);
+        if (op == NULL)
+        {
+          errh_Error("Can't fetch the mount server's object, %s", cdh_ObjidToString(msp->oid, 0));
           /* !!! Todo !!! How do we make this error known ?  */
           continue;
         }
       }
       msp->msor = pool_ItemReference(NULL, gdbroot->pool, op);
       op->l.flags.b.isMountServer = 1;
-      if (msp->nodms_ll.self == msp->nodms_ll.flink
-          && msp->nodms_ll.self == msp->nodms_ll.blink)
+      if (msp->nodms_ll.self == msp->nodms_ll.flink && msp->nodms_ll.self == msp->nodms_ll.blink)
         pool_QinsertPred(NULL, gdbroot->pool, &msp->nodms_ll, &np->nodms_lh);
 
       /* if (0)

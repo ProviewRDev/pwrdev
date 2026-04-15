@@ -48,10 +48,9 @@
 
 /*  Check if it's ok to adopt a new object.  */
 
-static pwr_tStatus AnteAdopt(
-    ldh_tSesContext Session, pwr_tObjid Card, /* current card object */
-    pwr_tClassId Class /* class of child to adopt */
-    )
+static pwr_tStatus AnteAdopt(ldh_tSesContext Session, pwr_tObjid Card, /* current card object */
+                             pwr_tClassId Class                        /* class of child to adopt */
+)
 {
   pwr_tStatus sts;
   pwr_sClass_Co_PI24BO RCard;
@@ -72,7 +71,8 @@ static pwr_tStatus AnteAdopt(
     return sts;
 
   MaxCounter = MIN(32, RCard.MaxNoOfCounters);
-  for (i = 0, Chan = 1; i < (int)MaxCounter; i++, Chan <<= 1) {
+  for (i = 0, Chan = 1; i < (int)MaxCounter; i++, Chan <<= 1)
+  {
     if ((DCard.ChannelAllocation & Chan) == 0)
       break;
   }
@@ -85,10 +85,9 @@ static pwr_tStatus AnteAdopt(
 
 /*  Adopt a new channel.  */
 
-static pwr_tStatus PostAdopt(
-    ldh_tSesContext Session, pwr_tObjid Card, /* current card object */
-    pwr_tObjid Channel, pwr_tClassId Class /* class of child to adopt */
-    )
+static pwr_tStatus PostAdopt(ldh_tSesContext Session, pwr_tObjid Card, /* current card object */
+                             pwr_tObjid Channel, pwr_tClassId Class    /* class of child to adopt */
+)
 {
   pwr_tStatus sts;
   pwr_sClass_Co_PI24BO RCard;
@@ -116,7 +115,8 @@ static pwr_tStatus PostAdopt(
     return sts;
 
   MaxCounter = MIN(32, RCard.MaxNoOfCounters);
-  for (i = 0, Chan = 1; i < (int)MaxCounter; i++, Chan <<= 1) {
+  for (i = 0, Chan = 1; i < (int)MaxCounter; i++, Chan <<= 1)
+  {
     if ((DCard.ChannelAllocation & Chan) == 0)
       break;
   }
@@ -126,8 +126,7 @@ static pwr_tStatus PostAdopt(
 
   /* allocate new channel */
   DCard.ChannelAllocation |= Chan;
-  sts = ldh_SetObjectBody(
-      Session, Card, "DevBody", (char*)&DCard, sizeof(DCard));
+  sts = ldh_SetObjectBody(Session, Card, "DevBody", (char*)&DCard, sizeof(DCard));
   if (EVEN(sts))
     return sts;
 
@@ -137,28 +136,31 @@ static pwr_tStatus PostAdopt(
      this should be done by a method of the channel object,
      but is not implemented in this version of PROVIEW/R.  */
 
-  switch (Class) {
+  switch (Class)
+  {
   case pwr_cClass_ChanCo:
-    sts = ldh_ReadObjectBody(
-        Session, Channel, "RtBody", &ChanCo, sizeof(ChanCo));
+    sts = ldh_ReadObjectBody(Session, Channel, "RtBody", &ChanCo, sizeof(ChanCo));
     if (EVEN(sts))
       return sts;
-    if (ChanCo.Description[0] != '\0') {
+    if (ChanCo.Description[0] != '\0')
+    {
       sprintf(Description, ChanCo.Description, i);
-      if (strlen(Description) <= sizeof(ChanCo.Description) - 1) {
+      if (strlen(Description) <= sizeof(ChanCo.Description) - 1)
+      {
         strcpy(ChanCo.Description, Description);
       }
     }
-    if (ChanCo.Identity[0] != '\0') {
+    if (ChanCo.Identity[0] != '\0')
+    {
       sprintf(Identity, ChanCo.Identity, i);
-      if (strlen(Identity) <= sizeof(ChanCo.Identity) - 1) {
+      if (strlen(Identity) <= sizeof(ChanCo.Identity) - 1)
+      {
         strcpy(ChanCo.Identity, Identity);
       }
     }
 
     ChanCo.Number = i;
-    sts = ldh_SetObjectBody(
-        Session, Channel, "RtBody", (char*)&ChanCo, sizeof(ChanCo));
+    sts = ldh_SetObjectBody(Session, Channel, "RtBody", (char*)&ChanCo, sizeof(ChanCo));
     strcpy(DefName, "pwrb:Class-ChanCo-Defaults");
     break;
   }
@@ -168,9 +170,9 @@ static pwr_tStatus PostAdopt(
   sts = ldh_NameToObjid(Session, &DefObject, DefName);
   if (EVEN(sts))
     return PWRB__SUCCESS;
-  sts = ldh_ReadObjectBody(
-      Session, DefObject, "SysBody", &DefBody, sizeof(DefBody));
-  if (DefBody.Name[0] != '\0') {
+  sts = ldh_ReadObjectBody(Session, DefObject, "SysBody", &DefBody, sizeof(DefBody));
+  if (DefBody.Name[0] != '\0')
+  {
     sprintf(NewName, DefBody.Name, i + 1);
     NewName[31] = '\0';
     sts = ldh_SetObjectName(Session, Channel, NewName);
@@ -181,10 +183,9 @@ static pwr_tStatus PostAdopt(
 
 /*  Unadopt a channel.  */
 
-static pwr_tStatus PostUnadopt(
-    ldh_tSesContext Session, pwr_tObjid Card, /* current card object */
-    pwr_tObjid Channel, pwr_tClassId Class /* class of child to adopt */
-    )
+static pwr_tStatus PostUnadopt(ldh_tSesContext Session, pwr_tObjid Card, /* current card object */
+                               pwr_tObjid Channel, pwr_tClassId Class    /* class of child to adopt */
+)
 {
   pwr_tStatus sts;
   pwr_sClass_Co_PI24BO RCard;
@@ -213,10 +214,10 @@ static pwr_tStatus PostUnadopt(
      this should be done by a method of the channel object,
      but is not implemented in this version of PROVIEW/R.  */
 
-  switch (Class) {
+  switch (Class)
+  {
   case pwr_cClass_ChanCo:
-    sts = ldh_ReadObjectBody(
-        Session, Channel, "RtBody", &ChanCo, sizeof(ChanCo));
+    sts = ldh_ReadObjectBody(Session, Channel, "RtBody", &ChanCo, sizeof(ChanCo));
     if (EVEN(sts))
       return PWRB__SUCCESS;
 
@@ -229,8 +230,7 @@ static pwr_tStatus PostUnadopt(
     return PWRB__SUCCESS;
 
   DCard.ChannelAllocation &= ~(1 << Chan);
-  sts = ldh_SetObjectBody(
-      Session, Card, "DevBody", (char*)&DCard, sizeof(DCard));
+  sts = ldh_SetObjectBody(Session, Card, "DevBody", (char*)&DCard, sizeof(DCard));
   if (EVEN(sts))
     return PWRB__SUCCESS;
 
@@ -249,11 +249,10 @@ static pwr_tStatus PostUnadopt(
   Syntax check.
 \*----------------------------------------------------------------------------*/
 
-static pwr_tStatus SyntaxCheck(
-    ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
-    int* ErrorCount, /* accumulated error count */
-    int* WarningCount /* accumulated waring count */
-    )
+static pwr_tStatus SyntaxCheck(ldh_tSesContext Session, pwr_tAttrRef Object, /* current object */
+                               int* ErrorCount,                              /* accumulated error count */
+                               int* WarningCount                             /* accumulated waring count */
+)
 {
   pwr_tStatus sts;
 
@@ -265,6 +264,6 @@ static pwr_tStatus SyntaxCheck(
 }
 /*  Every method to be exported to the workbench should be registred here.  */
 
-pwr_dExport pwr_BindMethods(Co_PI24BO) = { pwr_BindMethod(AnteAdopt),
-  pwr_BindMethod(PostUnadopt), pwr_BindMethod(PostAdopt),
-  pwr_BindMethod(SyntaxCheck), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(Co_PI24BO) = {pwr_BindMethod(AnteAdopt), pwr_BindMethod(PostUnadopt),
+                                          pwr_BindMethod(PostAdopt), pwr_BindMethod(SyntaxCheck),
+                                          pwr_NullMethod};

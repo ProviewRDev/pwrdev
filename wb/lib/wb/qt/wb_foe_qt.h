@@ -48,7 +48,8 @@
 
 class WFoeQtWidget;
 
-class WFoeQt : public WFoe {
+class WFoeQt : public WFoe
+{
 public:
   QLabel* label;
   QLineEdit* textinput;
@@ -79,11 +80,11 @@ public:
   QAction* changetext;
   QAction* expand;
   QAction* compress;
-  QMenu* edit; /* entry of the menu */
-  QAction* trace_togg; /* togg under the function entry of the menu */
+  QMenu* edit;            /* entry of the menu */
+  QAction* trace_togg;    /* togg under the function entry of the menu */
   QAction* simulate_togg; /* togg under the function entry of the menu */
-  QAction* view_togg; /* togg under the function entry of the menu */
-  QAction* edit_togg; /* togg under the function entry of the menu */
+  QAction* view_togg;     /* togg under the function entry of the menu */
+  QAction* edit_togg;     /* togg under the function entry of the menu */
   QWidget* con_palette;
   QWidget* node_palette;
   QWidget* nav_palette;
@@ -114,48 +115,45 @@ public:
   QAction* select_cp_nextdown;
   CoWowFocusTimerQt focustimer;
 
-  WFoeQt(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram,
-      ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, int f_map_window,
-      ldh_eAccess f_access, unsigned int f_options, pwr_tStatus* sts);
-  WFoeQt(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram,
-      ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
-      vldh_t_node nodeobject, unsigned long windowindex,
-      unsigned long new_window, int f_map_window, ldh_eAccess f_access,
-      foe_eFuncAccess function_access, unsigned int f_options,
-      pwr_tStatus* sts);
+  WFoeQt(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
+         ldh_tSesContext ldhsesctx, int f_map_window, ldh_eAccess f_access, unsigned int f_options,
+         pwr_tStatus* sts);
+  WFoeQt(void* f_parent_ctx, const char* f_name, pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx,
+         ldh_tSesContext ldhsesctx, vldh_t_node nodeobject, unsigned long windowindex,
+         unsigned long new_window, int f_map_window, ldh_eAccess f_access, foe_eFuncAccess function_access,
+         unsigned int f_options, pwr_tStatus* sts);
 
   virtual void pop();
-  virtual WAtt* watt_new(void* a_parent_ctx, ldh_tSesContext a_ldhses,
-      pwr_sAttrRef a_aref, int a_editmode, int a_advanced_user,
-      int a_display_objectname);
-  virtual WAttText* watttext_new(void* a_parent_ctx, ldh_tSesContext a_ldhses,
-      pwr_sAttrRef a_aref, int a_editmode, pwr_tStatus* status);
-  virtual WFoe* subwindow_new(void* f_parent_ctx, char* f_name,
-      pwr_tObjid plcprogram, ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx,
-      vldh_t_node nodeobject, unsigned long windowindex,
-      unsigned long new_window, int f_map_window, ldh_eAccess f_access,
-      foe_eFuncAccess function_access, unsigned int f_options,
-      pwr_tStatus* sts);
+  virtual WAtt* watt_new(void* a_parent_ctx, ldh_tSesContext a_ldhses, pwr_sAttrRef a_aref, int a_editmode,
+                         int a_advanced_user, int a_display_objectname);
+  virtual WAttText* watttext_new(void* a_parent_ctx, ldh_tSesContext a_ldhses, pwr_sAttrRef a_aref,
+                                 int a_editmode, pwr_tStatus* status);
+  virtual WFoe* subwindow_new(void* f_parent_ctx, char* f_name, pwr_tObjid plcprogram,
+                              ldh_tWBContext ldhwbctx, ldh_tSesContext ldhsesctx, vldh_t_node nodeobject,
+                              unsigned long windowindex, unsigned long new_window, int f_map_window,
+                              ldh_eAccess f_access, foe_eFuncAccess function_access, unsigned int f_options,
+                              pwr_tStatus* sts);
   virtual void destroy();
   virtual void set_title();
   virtual void message(const char* new_label);
   virtual void msgbox(const char* new_label);
-  virtual int create_window(int x_top, int y_top, int width_adb, int height_adb,
-      ldh_tSesContext ldhsession, foe_eFuncAccess function_access);
+  virtual int create_window(int x_top, int y_top, int width_adb, int height_adb, ldh_tSesContext ldhsession,
+                            foe_eFuncAccess function_access);
   virtual int get_textinput(const char* message, int (*function)(WFoe*, char*));
   virtual int edit_set_entries();
   virtual int view_set_entries();
   virtual void set_mode_button_state(int mode, int state);
   virtual int modify_popup(unsigned long popupmenu_mask, int x, int y);
   virtual int get_selection(char* str, int len);
-  virtual void popupmsg(const char* new_label, void (*yes_procedure)(WFoe*),
-      void (*no_procedure)(WFoe*), void (*cancel_procedure)(WFoe*));
+  virtual void popupmsg(const char* new_label, void (*yes_procedure)(WFoe*), void (*no_procedure)(WFoe*),
+                        void (*cancel_procedure)(WFoe*));
 
 private:
   WFoeQtWidget* toplevel;
 };
 
-class WFoeQtWidget : public QWidget {
+class WFoeQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

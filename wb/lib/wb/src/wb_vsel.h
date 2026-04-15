@@ -46,12 +46,12 @@
 
 #define VSEL_MAX_VOLUMES 200
 
-class WVsel {
+class WVsel
+{
 public:
-  WVsel(pwr_tStatus* status, void* wv_parent_ctx, const char* wv_name,
-      ldh_tWBContext wv_wbctx, char* volumename,
-      int (*bc_success)(void*, pwr_tVolumeId*, int), void (*bc_cancel)(),
-      int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wv_wb_type);
+  WVsel(pwr_tStatus* status, void* wv_parent_ctx, const char* wv_name, ldh_tWBContext wv_wbctx,
+        char* volumename, int (*bc_success)(void*, pwr_tVolumeId*, int), void (*bc_cancel)(),
+        int (*bc_time_to_exit)(void*), int show_volumes, wb_eType wv_wb_type);
   virtual ~WVsel();
 
   void* parent_ctx;
@@ -67,12 +67,8 @@ public:
   wb_eType wb_type;
   CoWow* wow;
 
-  virtual void list_add_item(char* str)
-  {
-  }
-  virtual void list_clear()
-  {
-  }
+  virtual void list_add_item(char* str) {}
+  virtual void list_clear() {}
 
   pwr_tStatus load_volumelist();
   pwr_tStatus check_volumelist(int quiet, int* display_window);

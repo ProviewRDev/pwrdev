@@ -40,15 +40,15 @@
 #include "pwr.h"
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-char* msg_GetMsg(const int sts, char* buf, int bufSize);
+  char* msg_GetMsg(const int sts, char* buf, int bufSize);
 
-char* msg_GetText(const int sts, char* buf, int bufSize);
+  char* msg_GetText(const int sts, char* buf, int bufSize);
 
-char* msg_GetMessage(
-    const pwr_tStatus sts, unsigned int flags, char* buf, int bufSize);
+  char* msg_GetMessage(const pwr_tStatus sts, unsigned int flags, char* buf, int bufSize);
 
 #if defined __cplusplus
 }

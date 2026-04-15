@@ -70,13 +70,12 @@ LOCAL_DATA
 #pragma check_stack(off)
 #endif
 
-FUNCTION PUBLIC INT16 fmbgdl_get_data_len(
-    IN INT16 result,         /* Service-Result */
-    IN USIGN8 service,       /* Service */
-    IN USIGN8 primitive,     /* Service-Primitive */
-    IN USIGN8 FAR* data_ptr, /* pointer to data */
-    OUT INT16* data_len_ptr  /* length of data */
-    )
+FUNCTION PUBLIC INT16 fmbgdl_get_data_len(IN INT16 result,         /* Service-Result */
+                                          IN USIGN8 service,       /* Service */
+                                          IN USIGN8 primitive,     /* Service-Primitive */
+                                          IN USIGN8 FAR* data_ptr, /* pointer to data */
+                                          OUT INT16* data_len_ptr  /* length of data */
+)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -101,8 +100,7 @@ possible return values:
     {
     case FMB_SET_CONFIGURATION:
     {
-      T_FMB_SET_CONFIGURATION_REQ FAR* req_ptr =
-          (T_FMB_SET_CONFIGURATION_REQ FAR*)data_ptr;
+      T_FMB_SET_CONFIGURATION_REQ FAR* req_ptr = (T_FMB_SET_CONFIGURATION_REQ FAR*)data_ptr;
 #ifdef WIN32
       req_ptr->sm7_active &= 0xFE;
 #else

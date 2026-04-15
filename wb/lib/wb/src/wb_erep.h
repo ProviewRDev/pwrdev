@@ -51,11 +51,10 @@ class wb_tdrep;
 class wb_adrep;
 class wb_name;
 
-class wb_volcheck {
+class wb_volcheck
+{
 public:
-  wb_volcheck()
-  {
-  }
+  wb_volcheck() {}
   wb_volcheck(char* vname, char* filename, pwr_tVid vid, pwr_tTime time);
   char m_vname[80];
   char m_filename[80];
@@ -65,7 +64,8 @@ public:
   pwr_tUInt32 m_dvversion;
 };
 
-class wb_erep {
+class wb_erep
+{
   typedef std::map<pwr_tVid, wb_vrep*>::iterator vrep_iterator;
   typedef std::map<std::string, wb_tMethod>::iterator methods_iterator;
   typedef std::vector<wb_vrep*>::iterator buffer_iterator;
@@ -91,15 +91,12 @@ public:
   void unref();
   wb_erep* ref();
 
-  wb_merep* merep()
-  {
-    return m_merep;
-  }
+  wb_merep* merep() { return m_merep; }
   wb_vrep* volume(pwr_tStatus* sts);
   wb_vrep* volume(pwr_tStatus* sts, pwr_tVid vid);
   wb_vrep* volume(pwr_tStatus* sts, const char* name);
-  wb_vrep* createVolume(pwr_tStatus* sts, pwr_tVid vid, pwr_tCid cid,
-      const char* name, ldh_eVolRep type, char* server, bool add = true);
+  wb_vrep* createVolume(pwr_tStatus* sts, pwr_tVid vid, pwr_tCid cid, const char* name, ldh_eVolRep type,
+                        char* server, bool add = true);
   wb_vrep* nextVolume(pwr_tStatus* sts, pwr_tVid vid);
   wb_vrep* externVolume(pwr_tStatus* sts, pwr_tVid vid);
   wb_vrep* bufferVolume(pwr_tStatus* sts);
@@ -125,15 +122,11 @@ public:
   int nextVolatileVid(pwr_tStatus* sts, char* name);
   void setRefMerep(wb_merep* merep);
   void resetRefMerep();
-  bool refMerepOccupied()
-  {
-    return m_ref_merep_occupied;
-  }
+  bool refMerepOccupied() { return m_ref_merep_occupied; }
   bool check_lock(char* name, ldh_eVolDb type);
   void checkVolumes(pwr_tStatus* sts, char* nodeconfigname);
   static void printMethods();
-  static void volumeNameToFilename(
-      pwr_tStatus* sts, char* name, char* filename);
+  static void volumeNameToFilename(pwr_tStatus* sts, char* name, char* filename);
 
 private:
   void loadDirList(pwr_tStatus* status);
@@ -141,8 +134,7 @@ private:
   void loadMeta(pwr_tStatus* status, char* db);
   void loadLocalWb(pwr_tStatus* sts);
   void bindMethods();
-  void checkVolume(pwr_tStatus* sts, pwr_tVid vid,
-      std::vector<wb_volcheck>& carray, int* err_cnt);
+  void checkVolume(pwr_tStatus* sts, pwr_tVid vid, std::vector<wb_volcheck>& carray, int* err_cnt);
 
   static void at_exit();
 };

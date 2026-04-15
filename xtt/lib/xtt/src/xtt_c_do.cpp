@@ -156,8 +156,7 @@ static pwr_tStatus TestValueFalse(xmenu_sMenuCall* ip)
   Every method to be exported to xtt should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindXttMethods(Do)
-    = { pwr_BindXttMethod(InvertOn), pwr_BindXttMethod(InvertOff),
-        pwr_BindXttMethod(TestOn), pwr_BindXttMethod(TestOff),
-        pwr_BindXttMethod(TestValueTrue), pwr_BindXttMethod(TestValueFalse),
-        pwr_BindXttMethod(SetFilter), pwr_NullMethod };
+pwr_dExport pwr_BindXttMethods(Do) = {pwr_BindXttMethod(InvertOn),      pwr_BindXttMethod(InvertOff),
+                                      pwr_BindXttMethod(TestOn),        pwr_BindXttMethod(TestOff),
+                                      pwr_BindXttMethod(TestValueTrue), pwr_BindXttMethod(TestValueFalse),
+                                      pwr_BindXttMethod(SetFilter),     pwr_NullMethod};

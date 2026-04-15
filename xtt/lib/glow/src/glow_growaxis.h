@@ -53,7 +53,8 @@ class GlowExportScript;
   when the
   object is clicked on, moved etc.
 */
-class GrowAxis : public GrowRect {
+class GrowAxis : public GrowRect
+{
 public:
   //! Constuctor
   /*!
@@ -69,11 +70,9 @@ public:
     \param t_drawtype	Drawtype for text.
     \param nodraw	Don't draw the object now.
   */
-  GrowAxis(GrowCtx* glow_ctx, const char* name, double x1 = 0, double y1 = 0,
-      double x2 = 0, double y2 = 0,
-      glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1,
-      int t_size = 2, glow_eDrawType t_drawtype = glow_eDrawType_TextHelvetica,
-      int nodraw = 0);
+  GrowAxis(GrowCtx* glow_ctx, const char* name, double x1 = 0, double y1 = 0, double x2 = 0, double y2 = 0,
+           glow_eDrawType border_d_type = glow_eDrawType_Line, int line_w = 1, int t_size = 2,
+           glow_eDrawType t_drawtype = glow_eDrawType_TextHelvetica, int nodraw = 0);
 
   //! Destructor
   /*! Remove the object from context, and erase it from the screen.
@@ -126,23 +125,20 @@ public:
   /*!
     \return The type of the object.
   */
-  glow_eObjectType type()
-  {
-    return glow_eObjectType_GrowAxis;
-  }
+  glow_eObjectType type() { return glow_eObjectType_GrowAxis; }
 
-  int text_size; //!< Size of text.
-  glow_eDrawType text_drawtype; //!< Drawtype for text.
+  int text_size;                      //!< Size of text.
+  glow_eDrawType text_drawtype;       //!< Drawtype for text.
   glow_eDrawType text_color_drawtype; //!< Text color.
-  double max_value; //!< Max value for the scale.
-  double min_value; //!< Min value for the scale.
-  int lines; //!< Number of perpendicular lines.
-  int linelength; //!< Length of perpendicular lines.
-  int longquotient; //!< Quotient of lines that are a little bit longer.
-  int valuequotient; //!< Quotient of lines that displays a value.
-  double increment; //!< Value difference between two lines.
-  char format[20]; //!< Format of displayed values.
-  GlowTraceData trace; //!< Obsolete
+  double max_value;                   //!< Max value for the scale.
+  double min_value;                   //!< Min value for the scale.
+  int lines;                          //!< Number of perpendicular lines.
+  int linelength;                     //!< Length of perpendicular lines.
+  int longquotient;                   //!< Quotient of lines that are a little bit longer.
+  int valuequotient;                  //!< Quotient of lines that displays a value.
+  double increment;                   //!< Value difference between two lines.
+  char format[20];                    //!< Format of displayed values.
+  GlowTraceData trace;                //!< Obsolete
 
   //! Draw the object.
   /*!
@@ -158,8 +154,8 @@ public:
     multiplied with the parentnodes transform, to give the appropriate
     coordinates for the drawing.
   */
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
 
   //! Redraw the area inside the objects border.
   void draw();
@@ -225,12 +221,12 @@ public:
     used to generate
     java code for the bean.
   */
-  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass,
-      int* shape_cnt, int node_cnt, int in_nc, std::ofstream& fp);
+  void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
+                       int in_nc, std::ofstream& fp);
 
   //! Set configuration values for the axis.
-  void set_conf(double max_val, double min_val, int no_of_lines, int long_quot,
-      int value_quot, double rot, const char* format);
+  void set_conf(double max_val, double min_val, int no_of_lines, int long_quot, int value_quot, double rot,
+                const char* format);
 
   //! Set format for the axis.
   void set_format(const char* f);

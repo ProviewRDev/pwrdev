@@ -37,7 +37,8 @@
 #ifndef ge_cmn_h
 #define ge_cmn_h
 
-typedef struct {
+typedef struct
+{
   void* value;
   char name[80];
   int type;

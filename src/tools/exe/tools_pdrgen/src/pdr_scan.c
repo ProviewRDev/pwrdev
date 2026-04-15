@@ -58,7 +58,7 @@ static char sccsid[] = "@(#)rpc_scan.c 1.6 87/06/24 (C) 1987 SMI";
 #define endcomment(where) (where[-1] == '*' && where[0] == '/')
 
 static int pushed = 0; /* is a token pushed */
-static token lasttok; /* last token, if pushed */
+static token lasttok;  /* last token, if pushed */
 
 static void unget_token(token* tokp);
 
@@ -82,7 +82,8 @@ static void docppline(char* line, int* lineno, char** fname);
 void scan(tok_kind expect, token* tokp)
 {
   get_token(tokp);
-  if (tokp->kind != expect) {
+  if (tokp->kind != expect)
+  {
     expected1(expect);
   }
 }
@@ -93,7 +94,8 @@ void scan(tok_kind expect, token* tokp)
 void scan2(tok_kind expect1, tok_kind expect2, token* tokp)
 {
   get_token(tokp);
-  if (tokp->kind != expect1 && tokp->kind != expect2) {
+  if (tokp->kind != expect1 && tokp->kind != expect2)
+  {
     expected2(expect1, expect2);
   }
 }
@@ -104,7 +106,8 @@ void scan2(tok_kind expect1, tok_kind expect2, token* tokp)
 void scan3(tok_kind expect1, tok_kind expect2, tok_kind expect3, token* tokp)
 {
   get_token(tokp);
-  if (tokp->kind != expect1 && tokp->kind != expect2 && tokp->kind != expect3) {
+  if (tokp->kind != expect1 && tokp->kind != expect2 && tokp->kind != expect3)
+  {
     expected3(expect1, expect2, expect3);
   }
 }
@@ -115,7 +118,8 @@ void scan3(tok_kind expect1, tok_kind expect2, tok_kind expect3, token* tokp)
 void scan_num(token* tokp)
 {
   get_token(tokp);
-  switch (tokp->kind) {
+  switch (tokp->kind)
+  {
   case TOK_IDENT:
     break;
   default:
@@ -138,7 +142,8 @@ void peek(token* tokp)
 int peekscan(tok_kind expect, token* tokp)
 {
   peek(tokp);
-  if (tokp->kind == expect) {
+  if (tokp->kind == expect)
+  {
     get_token(tokp);
     return (1);
   }
@@ -152,46 +157,68 @@ void get_token(token* tokp)
 {
   int commenting;
 
-  if (pushed) {
+  if (pushed)
+  {
     pushed = 0;
     *tokp = lasttok;
     return;
   }
   commenting = 0;
-  for (;;) {
-    if (*where == 0) {
-      for (;;) {
-        if (!fgets(curline, MAXLINESIZE, fin)) {
+  for (;;)
+  {
+    if (*where == 0)
+    {
+      for (;;)
+      {
+        if (!fgets(curline, MAXLINESIZE, fin))
+        {
           tokp->kind = TOK_EOF;
           *where = 0;
           return;
         }
         linenum++;
-        if (commenting) {
+        if (commenting)
+        {
           break;
-        } else if (cppline(curline)) {
+        }
+        else if (cppline(curline))
+        {
           docppline(curline, &linenum, &infilename);
-        } else if (directive(curline)) {
+        }
+        else if (directive(curline))
+        {
           printdirective(curline);
-        } else {
+        }
+        else
+        {
           break;
         }
       }
       where = curline;
-    } else if (isspace(*where)) {
-      while (isspace(*where)) {
+    }
+    else if (isspace(*where))
+    {
+      while (isspace(*where))
+      {
         where++; /* eat */
       }
-    } else if (commenting) {
+    }
+    else if (commenting)
+    {
       where++;
-      if (endcomment(where)) {
+      if (endcomment(where))
+      {
         where++;
         commenting--;
       }
-    } else if (startcomment(where)) {
+    }
+    else if (startcomment(where))
+    {
       where += 2;
       commenting++;
-    } else {
+    }
+    else
+    {
       break;
     }
   }
@@ -199,7 +226,8 @@ void get_token(token* tokp)
   /*
    * 'where' is not whitespace, comment or directive Must be a token!
    */
-  switch (*where) {
+  switch (*where)
+  {
   case ':':
     tokp->kind = TOK_COLON;
     where++;
@@ -274,15 +302,19 @@ void get_token(token* tokp)
     break;
 
   default:
-    if (!(isalpha(*where) || *where == '_')) {
+    if (!(isalpha(*where) || *where == '_'))
+    {
       char buf[100];
       char* p;
 
       s_print(buf, "illegal character in file: ");
       p = buf + strlen(buf);
-      if (isprint(*where)) {
+      if (isprint(*where))
+      {
         s_print(p, "%c", *where);
-      } else {
+      }
+      else
+      {
         s_print(p, "%d", *where);
       }
       error(buf);
@@ -304,10 +336,12 @@ static void findstrconst(char** str, char** val)
   int size;
 
   p = *str;
-  do {
+  do
+  {
     p++;
   } while (*p && *p != '"');
-  if (*p == 0) {
+  if (*p == 0)
+  {
     error("unterminated string constant");
   }
   p++;
@@ -324,13 +358,18 @@ static void findconst(char** str, char** val)
   int size;
 
   p = *str;
-  if (*p == '0' && *(p + 1) == 'x') {
+  if (*p == '0' && *(p + 1) == 'x')
+  {
     p++;
-    do {
+    do
+    {
       p++;
     } while (isxdigit(*p));
-  } else {
-    do {
+  }
+  else
+  {
+    do
+    {
       p++;
     } while (isdigit(*p));
   }
@@ -342,14 +381,14 @@ static void findconst(char** str, char** val)
 }
 
 static token symbols[] = {
-  { TOK_CONST, "const" }, { TOK_UNION, "union" }, { TOK_SWITCH, "switch" },
-  { TOK_CASE, "case" }, { TOK_DEFAULT, "default" }, { TOK_STRUCT, "struct" },
-  { TOK_TYPEDEF, "typedef" }, { TOK_ENUM, "enum" }, { TOK_OPAQUE, "opaque" },
-  { TOK_BOOL, "bool" }, { TOK_VOID, "void" }, { TOK_CHAR, "char" },
-  { TOK_INT, "int" }, { TOK_UNSIGNED, "unsigned" }, { TOK_SHORT, "short" },
-  { TOK_LONG, "long" }, { TOK_FLOAT, "float" }, { TOK_DOUBLE, "double" },
-  { TOK_STRING, "string" }, { TOK_PROGRAM, "program" },
-  { TOK_VERSION, "pdr_version" }, { TOK_EOF, "??????" },
+    {TOK_CONST, "const"},     {TOK_UNION, "union"},       {TOK_SWITCH, "switch"},
+    {TOK_CASE, "case"},       {TOK_DEFAULT, "default"},   {TOK_STRUCT, "struct"},
+    {TOK_TYPEDEF, "typedef"}, {TOK_ENUM, "enum"},         {TOK_OPAQUE, "opaque"},
+    {TOK_BOOL, "bool"},       {TOK_VOID, "void"},         {TOK_CHAR, "char"},
+    {TOK_INT, "int"},         {TOK_UNSIGNED, "unsigned"}, {TOK_SHORT, "short"},
+    {TOK_LONG, "long"},       {TOK_FLOAT, "float"},       {TOK_DOUBLE, "double"},
+    {TOK_STRING, "string"},   {TOK_PROGRAM, "program"},   {TOK_VERSION, "pdr_version"},
+    {TOK_EOF, "??????"},
 };
 
 static void findkind(char** mark, token* tokp)
@@ -359,10 +398,13 @@ static void findkind(char** mark, token* tokp)
   char* str;
 
   str = *mark;
-  for (s = symbols; s->kind != TOK_EOF; s++) {
+  for (s = symbols; s->kind != TOK_EOF; s++)
+  {
     len = strlen(s->str);
-    if (str_StartsWith(str, s->str)) {
-      if (!isalnum(str[len]) && str[len] != '_') {
+    if (str_StartsWith(str, s->str))
+    {
+      if (!isalnum(str[len]) && str[len] != '_')
+      {
         tokp->kind = s->kind;
         tokp->str = s->str;
         *mark = str + len;
@@ -379,20 +421,11 @@ static void findkind(char** mark, token* tokp)
   *mark = str + len;
 }
 
-static int cppline(char* line)
-{
-  return (line == curline && *line == '#');
-}
+static int cppline(char* line) { return (line == curline && *line == '#'); }
 
-static int directive(char* line)
-{
-  return (line == curline && *line == '%');
-}
+static int directive(char* line) { return (line == curline && *line == '%'); }
 
-static void printdirective(char* line)
-{
-  f_print(fout, "%s", line + 1);
-}
+static void printdirective(char* line) { f_print(fout, "%s", line + 1); }
 
 static void docppline(char* line, int* lineno, char** fname)
 {
@@ -401,31 +434,40 @@ static void docppline(char* line, int* lineno, char** fname)
   char* p;
 
   line++;
-  while (isspace(*line)) {
+  while (isspace(*line))
+  {
     line++;
   }
   num = atoi(line);
-  while (isdigit(*line)) {
+  while (isdigit(*line))
+  {
     line++;
   }
-  while (isspace(*line)) {
+  while (isspace(*line))
+  {
     line++;
   }
-  if (*line != '"') {
+  if (*line != '"')
+  {
     error("preprocessor error");
   }
   line++;
   p = file = alloc(strlen(line) + 1);
-  while (*line && *line != '"') {
+  while (*line && *line != '"')
+  {
     *p++ = *line++;
   }
-  if (*line == 0) {
+  if (*line == 0)
+  {
     error("preprocessor error");
   }
   *p = 0;
-  if (*file == 0) {
+  if (*file == 0)
+  {
     *fname = NULL;
-  } else {
+  }
+  else
+  {
     *fname = file;
   }
   *lineno = num - 1;

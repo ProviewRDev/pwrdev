@@ -39,7 +39,8 @@
 
 #include "pwr.h"
 
-class wb_oset {
+class wb_oset
+{
 public:
 };
 

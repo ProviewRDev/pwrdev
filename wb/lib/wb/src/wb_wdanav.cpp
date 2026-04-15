@@ -55,31 +55,21 @@
 
 static char null_str[] = "";
 
-static int wdanav_attr_found_cb(
-    pwr_sAttrRef* aref, void* a1, void* a2, void* a3, void* a4, void* a5);
+static int wdanav_attr_found_cb(pwr_sAttrRef* aref, void* a1, void* a2, void* a3, void* a4, void* a5);
 
-void WdaNav::message(char sev, const char* text)
-{
-  (message_cb)(parent_ctx, sev, text);
-}
+void WdaNav::message(char sev, const char* text) { (message_cb)(parent_ctx, sev, text); }
 
-int WdaNav::print(char* filename)
-{
-  return brow_Print(brow->ctx, filename);
-}
+int WdaNav::print(char* filename) { return brow_Print(brow->ctx, filename); }
 
 //
 // Create the navigator widget
 //
-WdaNav::WdaNav(void* wa_parent_ctx, const char* wa_name,
-    ldh_tSesContext wa_ldhses, pwr_tObjid wa_objid, pwr_tClassId wa_classid,
-    char* wa_attribute, int wa_editmode, int wa_advanced_user,
-    int wa_display_objectname, wb_eUtility wa_utility, pwr_tStatus* status)
-    : parent_ctx(wa_parent_ctx), ldhses(wa_ldhses), objid(wa_objid),
-      classid(wa_classid), editmode(wa_editmode),
-      advanced_user(wa_advanced_user),
-      display_objectname(wa_display_objectname), bypass(0), trace_started(0),
-      message_cb(NULL), utility(wa_utility), displayed(0), attrobjects(0)
+WdaNav::WdaNav(void* wa_parent_ctx, const char* wa_name, ldh_tSesContext wa_ldhses, pwr_tObjid wa_objid,
+               pwr_tClassId wa_classid, char* wa_attribute, int wa_editmode, int wa_advanced_user,
+               int wa_display_objectname, wb_eUtility wa_utility, pwr_tStatus* status)
+    : parent_ctx(wa_parent_ctx), ldhses(wa_ldhses), objid(wa_objid), classid(wa_classid),
+      editmode(wa_editmode), advanced_user(wa_advanced_user), display_objectname(wa_display_objectname),
+      bypass(0), trace_started(0), message_cb(NULL), utility(wa_utility), displayed(0), attrobjects(0)
 {
   strcpy(name, wa_name);
   strcpy(attribute, wa_attribute);
@@ -89,15 +79,12 @@ WdaNav::WdaNav(void* wa_parent_ctx, const char* wa_name,
 //
 //  Delete a nav context
 //
-WdaNav::~WdaNav()
-{
-}
+WdaNav::~WdaNav() {}
 
 //
 // Check that the current selected item is valid for change
 //
-int WdaNav::check_attr(int* multiline, brow_tObject* node, char* name,
-    char** init_value, int* size)
+int WdaNav::check_attr(int* multiline, brow_tObject* node, char* name, char** init_value, int* size)
 {
   brow_tNode* node_list;
   int node_count;
@@ -111,13 +98,15 @@ int WdaNav::check_attr(int* multiline, brow_tObject* node, char* name,
   brow_GetUserData(node_list[0], (void**)&base_item);
   free(node_list);
 
-  switch (base_item->type) {
+  switch (base_item->type)
+  {
   case wnav_eItemType_Attr:
   case wnav_eItemType_AttrInput:
   case wnav_eItemType_AttrInputF:
   case wnav_eItemType_AttrInputInv:
   case wnav_eItemType_AttrOutput:
-  case wnav_eItemType_AttrArrayElem: {
+  case wnav_eItemType_AttrArrayElem:
+  {
     WItemBaseAttr* item = (WItemBaseAttr*)base_item;
 
     if (!editmode)
@@ -126,19 +115,24 @@ int WdaNav::check_attr(int* multiline, brow_tObject* node, char* name,
       return WDA__FLAGNOEDIT;
     if (item->flags & PWR_MASK_STATE && !bypass)
       return WDA__FLAGSTATE;
-    if (item->type_id == pwr_eType_Text) {
+    if (item->type_id == pwr_eType_Text)
+    {
       *multiline = 1;
       *size = item->size;
       sts = item->get_value(init_value);
       if (EVEN(sts))
         return sts;
-    } else if (item->type_id == pwr_eType_String) {
+    }
+    else if (item->type_id == pwr_eType_String)
+    {
       *multiline = 0;
       *size = item->size;
       sts = item->get_value(init_value);
       if (EVEN(sts))
         return sts;
-    } else {
+    }
+    else
+    {
       char* valp;
       int len;
 
@@ -152,7 +146,8 @@ int WdaNav::check_attr(int* multiline, brow_tObject* node, char* name,
     strcpy(name, item->attr);
     break;
   }
-  case wnav_eItemType_ObjectName: {
+  case wnav_eItemType_ObjectName:
+  {
     if (!editmode)
       return WDA__NOEDIT;
     sts = ((WItemObjectName*)base_item)->get_value(init_value);
@@ -176,7 +171,8 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   WdaNav* wdanav;
   WItem* item;
 
-  if (event->event == flow_eEvent_ObjectDeleted) {
+  if (event->event == flow_eEvent_ObjectDeleted)
+  {
     brow_GetUserData(event->object.object, (void**)&item);
     delete item;
     return 1;
@@ -184,23 +180,30 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
 
   brow_GetCtxUserData((BrowCtx*)ctx, (void**)&wdanav);
   wdanav->message(' ', null_str);
-  switch (event->event) {
-  case flow_eEvent_Key_Up: {
+  switch (event->event)
+  {
+  case flow_eEvent_Key_Up:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(wdanav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetLast(wdanav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
+    }
+    else
+    {
       sts = brow_GetPrevious(wdanav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         sts = brow_GetLast(wdanav->brow->ctx, &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -216,22 +219,28 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       free(node_list);
     break;
   }
-  case flow_eEvent_Key_Down: {
+  case flow_eEvent_Key_Down:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
     int sts;
 
     brow_GetSelectedNodes(wdanav->brow->ctx, &node_list, &node_count);
-    if (!node_count) {
+    if (!node_count)
+    {
       sts = brow_GetFirst(wdanav->brow->ctx, &object);
       if (EVEN(sts))
         return 1;
-    } else {
+    }
+    else
+    {
       sts = brow_GetNext(wdanav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         sts = brow_GetFirst(wdanav->brow->ctx, &object);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           if (node_count)
             free(node_list);
           return 1;
@@ -250,15 +259,18 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
   case flow_eEvent_SelectClear:
     brow_ResetSelectInverse(wdanav->brow->ctx);
     break;
-  case flow_eEvent_MB1Click: {
+  case flow_eEvent_MB1Click:
+  {
     // Select
     double ll_x, ll_y, ur_x, ur_y;
     int sts;
 
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_MeasureNode(event->object.object, &ll_x, &ll_y, &ur_x, &ur_y);
-      if (event->object.x < ll_x + 1.0) {
+      if (event->object.x < ll_x + 1.0)
+      {
         // Simulate doubleclick
         flow_tEvent doubleclick_event;
 
@@ -270,9 +282,12 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         return sts;
       }
 
-      if (brow_FindSelectedObject(wdanav->brow->ctx, event->object.object)) {
+      if (brow_FindSelectedObject(wdanav->brow->ctx, event->object.object))
+      {
         brow_SelectClear(wdanav->brow->ctx);
-      } else {
+      }
+      else
+      {
         brow_SelectClear(wdanav->brow->ctx);
         brow_SetInverse(event->object.object, 1);
         brow_SelectInsert(wdanav->brow->ctx, event->object.object);
@@ -283,23 +298,28 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_Key_PageDown: {
+  case flow_eEvent_Key_PageDown:
+  {
     brow_Page(wdanav->brow->ctx, 0.8);
     break;
   }
-  case flow_eEvent_Key_PageUp: {
+  case flow_eEvent_Key_PageUp:
+  {
     brow_Page(wdanav->brow->ctx, -0.8);
     break;
   }
-  case flow_eEvent_ScrollDown: {
+  case flow_eEvent_ScrollDown:
+  {
     brow_Page(wdanav->brow->ctx, 0.1);
     break;
   }
-  case flow_eEvent_ScrollUp: {
+  case flow_eEvent_ScrollUp:
+  {
     brow_Page(wdanav->brow->ctx, -0.1);
     break;
   }
-  case flow_eEvent_Key_Left: {
+  case flow_eEvent_Key_Left:
+  {
     brow_tNode* node_list;
     int node_count;
     brow_tObject object;
@@ -312,16 +332,19 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     if (brow_IsOpen(node_list[0]))
       // Close this node
       object = node_list[0];
-    else {
+    else
+    {
       // Close parent
       sts = brow_GetParent(wdanav->brow->ctx, node_list[0], &object);
-      if (EVEN(sts)) {
+      if (EVEN(sts))
+      {
         free(node_list);
         return 1;
       }
     }
     brow_GetUserData(object, (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case wnav_eItemType_Attr:
       ((WItemAttr*)item)->close(0, 0);
       break;
@@ -344,7 +367,8 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_Right: {
+  case flow_eEvent_Key_Right:
+  {
     brow_tNode* node_list;
     int node_count;
     int sts;
@@ -354,7 +378,8 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       return 1;
 
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case wnav_eItemType_Attr:
       sts = ((WItemAttr*)item)->open_children(0, 0);
       if (ODD(sts))
@@ -388,7 +413,8 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     case wnav_eItemType_AttrArrayOutput:
       ((WItemAttrArrayOutput*)item)->open_attributes(0, 0);
       break;
-    case wnav_eItemType_Enum: {
+    case wnav_eItemType_Enum:
+    {
       int value;
 
       if (!wdanav->advanced_user)
@@ -398,7 +424,8 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
         ((WItemEnum*)item)->set();
       break;
     }
-    case wnav_eItemType_Mask: {
+    case wnav_eItemType_Mask:
+    {
       int value;
 
       if (!wdanav->advanced_user)
@@ -412,7 +439,8 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     free(node_list);
     break;
   }
-  case flow_eEvent_Key_ShiftRight: {
+  case flow_eEvent_Key_ShiftRight:
+  {
     brow_tNode* node_list;
     int node_count;
     int value;
@@ -425,26 +453,31 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       return 1;
 
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type) {
+    switch (item->type)
+    {
     case wnav_eItemType_AttrArray:
       ((WItemAttrArray*)item)->open_attributes(0, 0);
       break;
-    case wnav_eItemType_AttrInput: {
+    case wnav_eItemType_AttrInput:
+    {
       brow_GetRadiobutton(node_list[0], 0, &value);
       ((WItemAttrInput*)item)->set_mask(0, !value);
       break;
     }
-    case wnav_eItemType_AttrInputF: {
+    case wnav_eItemType_AttrInputF:
+    {
       brow_GetRadiobutton(node_list[0], 0, &value);
       ((WItemAttrInputF*)item)->set_mask(0, !value);
       break;
     }
-    case wnav_eItemType_AttrOutput: {
+    case wnav_eItemType_AttrOutput:
+    {
       brow_GetRadiobutton(node_list[0], 0, &value);
       ((WItemAttrOutput*)item)->set_mask(0, !value);
       break;
     }
-    case wnav_eItemType_AttrArrayOutput: {
+    case wnav_eItemType_AttrArrayOutput:
+    {
       brow_GetRadiobutton(node_list[0], 0, &value);
       ((WItemAttrArrayOutput*)item)->set_mask(0, !value);
       break;
@@ -453,7 +486,8 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     }
     break;
   }
-  case flow_eEvent_Key_ShiftLeft: {
+  case flow_eEvent_Key_ShiftLeft:
+  {
     brow_tNode* node_list;
     int node_count;
 
@@ -465,15 +499,18 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
       return 1;
 
     brow_GetUserData(node_list[0], (void**)&item);
-    switch (item->type) {
-    case wnav_eItemType_AttrInput: {
+    switch (item->type)
+    {
+    case wnav_eItemType_AttrInput:
+    {
       int value;
 
       brow_GetRadiobutton(node_list[0], 1, &value);
       ((WItemAttrInput*)item)->set_mask(1, !value);
       break;
     }
-    case wnav_eItemType_AttrInputInv: {
+    case wnav_eItemType_AttrInputInv:
+    {
       int value;
 
       brow_GetRadiobutton(node_list[0], 0, &value);
@@ -485,24 +522,23 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     break;
   }
   case flow_eEvent_MB1DoubleClick:
-    switch (event->object.object_type) {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case wnav_eItemType_Attr:
         ((WItemAttr*)item)->open_children(event->object.x, event->object.y);
         break;
       case wnav_eItemType_AttrArray:
-        ((WItemAttrArray*)item)
-            ->open_attributes(event->object.x, event->object.y);
+        ((WItemAttrArray*)item)->open_attributes(event->object.x, event->object.y);
         break;
       case wnav_eItemType_AttrArrayOutput:
-        ((WItemAttrArrayOutput*)item)
-            ->open_attributes(event->object.x, event->object.y);
+        ((WItemAttrArrayOutput*)item)->open_attributes(event->object.x, event->object.y);
         break;
       case wnav_eItemType_AttrArrayElem:
-        ((WItemAttrArrayElem*)item)
-            ->open_children(event->object.x, event->object.y);
+        ((WItemAttrArrayElem*)item)->open_children(event->object.x, event->object.y);
         break;
       default:;
       }
@@ -510,40 +546,38 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
     default:;
     }
     break;
-  case flow_eEvent_Radiobutton: {
-    switch (event->object.object_type) {
+  case flow_eEvent_Radiobutton:
+  {
+    switch (event->object.object_type)
+    {
     case flow_eObjectType_Node:
       brow_GetUserData(event->object.object, (void**)&item);
-      switch (item->type) {
+      switch (item->type)
+      {
       case wnav_eItemType_AttrInput:
         if (wdanav->utility != wb_eUtility_PlcEditor)
           break;
-        ((WItemAttrInput*)item)
-            ->set_mask(event->radiobutton.number, !event->radiobutton.value);
+        ((WItemAttrInput*)item)->set_mask(event->radiobutton.number, !event->radiobutton.value);
         break;
       case wnav_eItemType_AttrInputInv:
         if (wdanav->utility != wb_eUtility_PlcEditor)
           break;
-        ((WItemAttrInputInv*)item)
-            ->set_mask(event->radiobutton.number, !event->radiobutton.value);
+        ((WItemAttrInputInv*)item)->set_mask(event->radiobutton.number, !event->radiobutton.value);
         break;
       case wnav_eItemType_AttrInputF:
         if (wdanav->utility != wb_eUtility_PlcEditor)
           break;
-        ((WItemAttrInputF*)item)
-            ->set_mask(event->radiobutton.number, !event->radiobutton.value);
+        ((WItemAttrInputF*)item)->set_mask(event->radiobutton.number, !event->radiobutton.value);
         break;
       case wnav_eItemType_AttrOutput:
         if (wdanav->utility != wb_eUtility_PlcEditor)
           break;
-        ((WItemAttrOutput*)item)
-            ->set_mask(event->radiobutton.number, !event->radiobutton.value);
+        ((WItemAttrOutput*)item)->set_mask(event->radiobutton.number, !event->radiobutton.value);
         break;
       case wnav_eItemType_AttrArrayOutput:
         if (wdanav->utility != wb_eUtility_PlcEditor)
           break;
-        ((WItemAttrArrayOutput*)item)
-            ->set_mask(event->radiobutton.number, !event->radiobutton.value);
+        ((WItemAttrArrayOutput*)item)->set_mask(event->radiobutton.number, !event->radiobutton.value);
         break;
       case wnav_eItemType_Enum:
         if (!event->radiobutton.value)
@@ -560,11 +594,13 @@ int WdaNav::brow_cb(FlowCtx* ctx, flow_tEvent event)
 
     break;
   }
-  case flow_eEvent_Map: {
+  case flow_eEvent_Map:
+  {
     wdanav->displayed = 1;
     break;
   }
-  case flow_eEvent_Resized: {
+  case flow_eEvent_Resized:
+  {
     brow_Redraw(wdanav->brow->ctx, 0);
     break;
   }
@@ -593,7 +629,8 @@ int WdaNav::get_attr()
   brow_SetNodraw(brow->ctx);
 
   found = 0;
-  for (i = 0; i < 3; i++) {
+  for (i = 0; i < 3; i++)
+  {
     if (i == 0)
       strcpy(body, "RtBody");
     else if (i == 1)
@@ -604,8 +641,10 @@ int WdaNav::get_attr()
     sts = ldh_GetObjectBodyDef(ldhses, classid, body, 1, &bodydef, &rows);
     if (EVEN(sts))
       continue;
-    for (j = 0; j < rows; j++) {
-      if (str_NoCaseStrcmp(attribute, bodydef[j].ParName) == 0) {
+    for (j = 0; j < rows; j++)
+    {
+      if (str_NoCaseStrcmp(attribute, bodydef[j].ParName) == 0)
+      {
         found = 1;
         break;
       }
@@ -616,19 +655,23 @@ int WdaNav::get_attr()
     free((char*)bodydef);
   }
 
-  if (!found) {
+  if (!found)
+  {
     brow_ResetNodraw(brow->ctx);
     return WDA__ATTRNOTFOUND;
   }
 
-  if (bodydef[j].Par->Output.Info.Type == pwr_eType_Buffer) {
+  if (bodydef[j].Par->Output.Info.Type == pwr_eType_Buffer)
+  {
     free((char*)bodydef);
     brow_ResetNodraw(brow->ctx);
     return WDA__ATTRINVALID;
   }
 
-  if (bodydef[j].Par->Output.Info.Flags & PWR_MASK_ARRAY) {
-    if (bodydef[j].Par->Output.Info.Flags & PWR_MASK_INVISIBLE) {
+  if (bodydef[j].Par->Output.Info.Flags & PWR_MASK_ARRAY)
+  {
+    if (bodydef[j].Par->Output.Info.Flags & PWR_MASK_INVISIBLE)
+    {
       free((char*)bodydef);
       brow_ResetNodraw(brow->ctx);
       return WDA__ATTRINVISIBLE;
@@ -644,14 +687,15 @@ int WdaNav::get_attr()
 
   classid_vect[0] = classid;
   classid_vect[1] = 0;
-  if (!attrobjects) {
-    trv_get_objects_hcn(ldhses, objid, classid_vect, namep,
-        wdanav_attr_found_cb, (void*)this, (void*)&bodydef[j], (void*)body,
-        NULL, NULL);
-  } else {
-    trv_get_attrobjects(ldhses, objid, classid_vect, namep, trv_eDepth_Deep,
-        wdanav_attr_found_cb, (void*)this, (void*)&bodydef[j], (void*)body,
-        NULL, NULL);
+  if (!attrobjects)
+  {
+    trv_get_objects_hcn(ldhses, objid, classid_vect, namep, wdanav_attr_found_cb, (void*)this,
+                        (void*)&bodydef[j], (void*)body, NULL, NULL);
+  }
+  else
+  {
+    trv_get_attrobjects(ldhses, objid, classid_vect, namep, trv_eDepth_Deep, wdanav_attr_found_cb,
+                        (void*)this, (void*)&bodydef[j], (void*)body, NULL, NULL);
   }
   free((char*)bodydef);
 
@@ -660,8 +704,7 @@ int WdaNav::get_attr()
   return WDA__SUCCESS;
 }
 
-static int wdanav_attr_found_cb(
-    pwr_sAttrRef* aref, void* a1, void* a2, void* a3, void* a4, void* a5)
+static int wdanav_attr_found_cb(pwr_sAttrRef* aref, void* a1, void* a2, void* a3, void* a4, void* a5)
 {
   WdaNav* wdanav = (WdaNav*)a1;
   ldh_sParDef* bodydef = (ldh_sParDef*)a2;
@@ -679,65 +722,46 @@ static int wdanav_attr_found_cb(
 
   if (!(s = strchr(name, '.')))
     strcpy(aname, bodydef[0].ParName);
-  else {
+  else
+  {
     strcpy(aname, s + 1);
     strcat(aname, ".");
     strcat(aname, bodydef[0].ParName);
   }
 
   if (bodydef[0].Par->Output.Info.Elements <= 1)
-    new WItemAttr(wdanav->brow, wdanav->ldhses, objid, NULL,
-        flow_eDest_IntoLast, aname, bodydef[0].Par->Output.Info.Type,
-        bodydef[0].Par->Output.TypeRef, bodydef[0].Par->Output.Info.Size,
-        bodydef[0].Par->Output.Info.Flags, body, 1);
+    new WItemAttr(wdanav->brow, wdanav->ldhses, objid, NULL, flow_eDest_IntoLast, aname,
+                  bodydef[0].Par->Output.Info.Type, bodydef[0].Par->Output.TypeRef,
+                  bodydef[0].Par->Output.Info.Size, bodydef[0].Par->Output.Info.Flags, body, 1);
   else
-    new WItemAttrArray(wdanav->brow, wdanav->ldhses, objid, NULL,
-        flow_eDest_IntoLast, aname, bodydef[0].Par->Output.Info.Elements,
-        bodydef[0].Par->Output.Info.Type, bodydef[0].Par->Output.TypeRef,
-        bodydef[0].Par->Output.Info.Size, bodydef[0].Par->Output.Info.Flags,
-        body, 1);
+    new WItemAttrArray(wdanav->brow, wdanav->ldhses, objid, NULL, flow_eDest_IntoLast, aname,
+                       bodydef[0].Par->Output.Info.Elements, bodydef[0].Par->Output.Info.Type,
+                       bodydef[0].Par->Output.TypeRef, bodydef[0].Par->Output.Info.Size,
+                       bodydef[0].Par->Output.Info.Flags, body, 1);
 
   return 1;
 }
 
 void WdaNav::enable_events()
 {
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_ShiftRight, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_ShiftLeft, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Map, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Resized, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, brow_cb);
-  brow_EnableEvent(
-      brow->ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1Click, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_MB1DoubleClick, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_SelectClear, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ObjectDeleted, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Up, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Down, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Right, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftRight, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_Left, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_ShiftLeft, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PF3, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Radiobutton, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Map, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Resized, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PageUp, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_Key_PageDown, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ScrollUp, flow_eEventType_CallBack, brow_cb);
+  brow_EnableEvent(brow->ctx, flow_eEvent_ScrollDown, flow_eEventType_CallBack, brow_cb);
 }
 
 //
@@ -769,7 +793,8 @@ int WdaNav::object_exist(brow_tObject object)
   int i;
 
   brow_GetObjectList(brow->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     if (object_list[i] == object)
       return 1;
   }
@@ -784,10 +809,12 @@ int WdaNav::find_by_objid(pwr_tObjid oi, brow_tObject* object)
   WItem* base_item;
 
   brow_GetObjectList(brow->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&base_item);
 
-    if (cdh_ObjidIsEqual(base_item->objid, oi)) {
+    if (cdh_ObjidIsEqual(base_item->objid, oi))
+    {
       *object = object_list[i];
       return 1;
     }
@@ -795,8 +822,8 @@ int WdaNav::find_by_objid(pwr_tObjid oi, brow_tObject* object)
   return 0;
 }
 
-int WdaNav::update(pwr_tObjid new_objid, pwr_tClassId new_classid,
-    char* new_attribute, int new_attrobjects, char* new_search_name)
+int WdaNav::update(pwr_tObjid new_objid, pwr_tClassId new_classid, char* new_attribute, int new_attrobjects,
+                   char* new_search_name)
 {
   int sts;
   int keep_select;
@@ -806,9 +833,8 @@ int WdaNav::update(pwr_tObjid new_objid, pwr_tClassId new_classid,
   WItem* base_item;
   brow_tObject object;
 
-  if (cdh_ObjidIsEqual(objid, new_objid) && classid == new_classid
-      && streq(attribute, new_attribute) && streq(search_name, new_search_name)
-      && attrobjects == new_attrobjects)
+  if (cdh_ObjidIsEqual(objid, new_objid) && classid == new_classid && streq(attribute, new_attribute) &&
+      streq(search_name, new_search_name) && attrobjects == new_attrobjects)
     return WDA__SUCCESS;
 
   if (cdh_ObjidIsEqual(objid, new_objid) && classid == new_classid)
@@ -816,11 +842,13 @@ int WdaNav::update(pwr_tObjid new_objid, pwr_tClassId new_classid,
   else
     keep_select = 0;
 
-  if (keep_select) {
+  if (keep_select)
+  {
     brow_GetSelectedNodes(brow->ctx, &node_list, &node_count);
     if (!node_count)
       keep_objid = pwr_cNObjid;
-    else {
+    else
+    {
       brow_GetUserData(node_list[0], (void**)&base_item);
       free(node_list);
 
@@ -840,13 +868,17 @@ int WdaNav::update(pwr_tObjid new_objid, pwr_tClassId new_classid,
   brow_ResetNodraw(brow->ctx);
   brow_Redraw(brow->ctx, 0);
 
-  if (keep_select) {
+  if (keep_select)
+  {
     // Select previous selected objid
-    if (cdh_ObjidIsNotNull(keep_objid) && find_by_objid(keep_objid, &object)) {
+    if (cdh_ObjidIsNotNull(keep_objid) && find_by_objid(keep_objid, &object))
+    {
       brow_SetInverse(object, 1);
       brow_SelectInsert(brow->ctx, object);
     }
-  } else {
+  }
+  else
+  {
     // Scroll to top position
     if (ODD(brow_GetFirst(brow->ctx, &object)))
       brow_CenterObject(brow->ctx, object, 0.0);
@@ -871,26 +903,28 @@ int WdaNav::set_attr_value(brow_tObject node, char* name, char* value_str)
 
   brow_GetUserData(node, (void**)&base_item);
 
-  switch (base_item->type) {
+  switch (base_item->type)
+  {
   case wnav_eItemType_Attr:
   case wnav_eItemType_AttrInput:
   case wnav_eItemType_AttrInputF:
   case wnav_eItemType_AttrInputInv:
-  case wnav_eItemType_AttrOutput: {
+  case wnav_eItemType_AttrOutput:
+  {
     WItemBaseAttr* item = (WItemBaseAttr*)base_item;
 
     // Check that objid is still the same
     if (!streq(item->attr, name))
       return WDA__DISAPPEARD;
 
-    sts = wnav_attr_string_to_value(
-        ldhses, item->type_id, value_str, buff, sizeof(buff), item->size);
+    sts = wnav_attr_string_to_value(ldhses, item->type_id, value_str, buff, sizeof(buff), item->size);
     if (EVEN(sts))
       message('E', "Input syntax error");
-    else {
-      sts = ldh_SetObjectPar(
-          ldhses, item->objid, item->body, item->attr, buff, item->size);
-      switch (base_item->type) {
+    else
+    {
+      sts = ldh_SetObjectPar(ldhses, item->objid, item->body, item->attr, buff, item->size);
+      switch (base_item->type)
+      {
       case wnav_eItemType_Attr:
         ((WItemAttr*)item)->update();
         break;
@@ -911,7 +945,8 @@ int WdaNav::set_attr_value(brow_tObject node, char* name, char* value_str)
     }
     return sts;
   }
-  case wnav_eItemType_AttrArrayElem: {
+  case wnav_eItemType_AttrArrayElem:
+  {
     char* value;
 
     WItemAttrArrayElem* item = (WItemAttrArrayElem*)base_item;
@@ -920,26 +955,25 @@ int WdaNav::set_attr_value(brow_tObject node, char* name, char* value_str)
     if (!streq(item->attr, name))
       return WDA__DISAPPEARD;
 
-    sts = wnav_attr_string_to_value(
-        ldhses, item->type_id, value_str, buff, sizeof(buff), item->size);
+    sts = wnav_attr_string_to_value(ldhses, item->type_id, value_str, buff, sizeof(buff), item->size);
     if (EVEN(sts))
       message('E', "Input syntax error");
-    else {
-      sts = ldh_GetObjectPar(
-          ldhses, item->objid, item->body, item->attr, (char**)&value, &size);
+    else
+    {
+      sts = ldh_GetObjectPar(ldhses, item->objid, item->body, item->attr, (char**)&value, &size);
       if (EVEN(sts))
         return sts;
 
       memcpy(value + item->element * item->size, buff, item->size);
-      sts = ldh_SetObjectPar(
-          ldhses, item->objid, item->body, item->attr, value, size);
+      sts = ldh_SetObjectPar(ldhses, item->objid, item->body, item->attr, value, size);
       free((char*)value);
 
       item->update();
     }
     return sts;
   }
-  case wnav_eItemType_ObjectName: {
+  case wnav_eItemType_ObjectName:
+  {
     WItemObjectName* item = (WItemObjectName*)base_item;
 
     // Check that objid is still the same
@@ -957,10 +991,7 @@ int WdaNav::set_attr_value(brow_tObject node, char* name, char* value_str)
   return 1;
 }
 
-void WdaNav::redraw()
-{
-  brow_Redraw(brow->ctx, 0);
-}
+void WdaNav::redraw() { brow_Redraw(brow->ctx, 0); }
 
 int WdaNav::select_by_name(char* name)
 {
@@ -973,19 +1004,23 @@ int WdaNav::select_by_name(char* name)
 
   brow_GetObjectList(brow->ctx, &object_list, &object_cnt);
   found = 0;
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&base_item);
 
-    switch (base_item->type) {
+    switch (base_item->type)
+    {
     case wnav_eItemType_Attr:
     case wnav_eItemType_AttrInput:
     case wnav_eItemType_AttrInputF:
     case wnav_eItemType_AttrInputInv:
     case wnav_eItemType_AttrOutput:
-    case wnav_eItemType_AttrArrayElem: {
+    case wnav_eItemType_AttrArrayElem:
+    {
       WItemBaseAttr* item = (WItemBaseAttr*)base_item;
 
-      if (streq(name, item->attr)) {
+      if (streq(name, item->attr))
+      {
         object = object_list[i];
         found = 1;
       }
@@ -1025,29 +1060,34 @@ int WdaNav::print_textfile(char* filename)
     return WDA__NOFILE;
 
   brow_GetObjectList(brow->ctx, &object_list, &object_cnt);
-  for (i = 0; i < object_cnt; i++) {
+  for (i = 0; i < object_cnt; i++)
+  {
     brow_GetUserData(object_list[i], (void**)&base_item);
 
-    switch (base_item->type) {
+    switch (base_item->type)
+    {
     case wnav_eItemType_Attr:
     case wnav_eItemType_AttrInput:
     case wnav_eItemType_AttrInputF:
     case wnav_eItemType_AttrInputInv:
     case wnav_eItemType_AttrOutput:
-    case wnav_eItemType_AttrArrayElem: {
+    case wnav_eItemType_AttrArrayElem:
+    {
       WItemBaseAttr* item = (WItemBaseAttr*)base_item;
 
-      sts = ldh_ObjidToName(ldhses, item->objid, cdh_mName_volumeStrict, oname,
-          sizeof(oname), &size);
-      if (EVEN(sts)) {
+      sts = ldh_ObjidToName(ldhses, item->objid, cdh_mName_volumeStrict, oname, sizeof(oname), &size);
+      if (EVEN(sts))
+      {
         fclose(fp);
         return sts;
       }
 
-      switch (item->type_id) {
+      switch (item->type_id)
+      {
       case pwr_eType_Text:
         sts = item->get_value(&value);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           fclose(fp);
           return sts;
         }
@@ -1056,7 +1096,8 @@ int WdaNav::print_textfile(char* filename)
         break;
       case pwr_eType_String:
         sts = item->get_value(&value);
-        if (EVEN(sts)) {
+        if (EVEN(sts))
+        {
           fclose(fp);
           return sts;
         }
@@ -1113,7 +1154,8 @@ int WdaNav::import_textfile(char* filename)
   brow_Redraw(brow->ctx, 0);
 
   row = 0;
-  while (dcli_read_line(line, sizeof(line), fp)) {
+  while (dcli_read_line(line, sizeof(line), fp))
+  {
     row++;
 
     str_trim(line, line);
@@ -1128,7 +1170,8 @@ int WdaNav::import_textfile(char* filename)
       continue;
 
     len = s - line;
-    if (len > (int)sizeof(name) - 1) {
+    if (len > (int)sizeof(name) - 1)
+    {
       sprintf(msg, "** Syntax error, %s, line %d\n", filename, row);
       MsgWindow::message('E', msg, msgw_ePop_Default);
       status = WDA__SYNTAX;
@@ -1142,7 +1185,8 @@ int WdaNav::import_textfile(char* filename)
     str_trim(value, value);
 
     sts = ldh_NameToAttrRef(ldhses, name, &aref);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       sprintf(msg, "** Syntax error, %s, line %d\n", filename, row);
       MsgWindow::message('E', msg, msgw_ePop_Default);
       status = WDA__SYNTAX;
@@ -1151,7 +1195,8 @@ int WdaNav::import_textfile(char* filename)
 
     if ((s = strchr(name, '.')))
       strcpy(attr, s + 1);
-    else {
+    else
+    {
       sprintf(msg, "** Syntax error, %s, line %d\n", filename, row);
       MsgWindow::message('E', msg, msgw_ePop_Default);
       status = WDA__SYNTAX;
@@ -1159,36 +1204,44 @@ int WdaNav::import_textfile(char* filename)
     }
 
     found = 0;
-    for (i = 0; i < object_cnt; i++) {
+    for (i = 0; i < object_cnt; i++)
+    {
       brow_GetUserData(object_list[i], (void**)&base_item);
 
-      switch (base_item->type) {
+      switch (base_item->type)
+      {
       case wnav_eItemType_Attr:
       case wnav_eItemType_AttrInput:
       case wnav_eItemType_AttrInputF:
       case wnav_eItemType_AttrInputInv:
       case wnav_eItemType_AttrOutput:
-      case wnav_eItemType_AttrArrayElem: {
+      case wnav_eItemType_AttrArrayElem:
+      {
         WItemBaseAttr* item = (WItemBaseAttr*)base_item;
 
-        if (cdh_ObjidIsEqual(item->objid, aref.Objid)
-            && str_NoCaseStrcmp(item->attr, attr) == 0) {
+        if (cdh_ObjidIsEqual(item->objid, aref.Objid) && str_NoCaseStrcmp(item->attr, attr) == 0)
+        {
           // Item found
           found = 1;
-          switch (item->type_id) {
-          case pwr_eType_Text: {
+          switch (item->type_id)
+          {
+          case pwr_eType_Text:
+          {
             char str[1024];
             int end_found = 0;
             int len;
 
             strcpy(str, &value[1]);
             len = strlen(str);
-            if (str[len - 1] != '\"') {
+            if (str[len - 1] != '\"')
+            {
               str[len] = '\n';
               str[len + 1] = 0;
               // Continue on next line
-              while (dcli_read_line(line, sizeof(line), fp)) {
-                if (strlen(str) + strlen(line) > sizeof(str)) {
+              while (dcli_read_line(line, sizeof(line), fp))
+              {
+                if (strlen(str) + strlen(line) > sizeof(str))
+                {
                   sprintf(msg, "** Syntax error, %s, line %d\n", filename, row);
                   MsgWindow::message('E', msg, msgw_ePop_Default);
                   brow_ResetNodraw(brow->ctx);
@@ -1197,22 +1250,28 @@ int WdaNav::import_textfile(char* filename)
                 }
                 strcat(str, line);
                 len = strlen(str);
-                if (str[len - 1] != '\"') {
+                if (str[len - 1] != '\"')
+                {
                   str[len] = '\n';
                   str[len + 1] = 0;
-                } else {
+                }
+                else
+                {
                   str[len - 1] = 0;
                   strcpy(value, str);
                   end_found = 1;
                   break;
                 }
               }
-            } else {
+            }
+            else
+            {
               str[strlen(str) - 1] = 0;
               strcpy(value, str);
               end_found = 1;
             }
-            if (!end_found) {
+            if (!end_found)
+            {
               sprintf(msg, "** Syntax error, %s, line %d\n", filename, row);
               MsgWindow::message('E', msg, msgw_ePop_Default);
               brow_ResetNodraw(brow->ctx);
@@ -1222,7 +1281,8 @@ int WdaNav::import_textfile(char* filename)
 
             break;
           }
-          case pwr_eType_String: {
+          case pwr_eType_String:
+          {
             // Remove ""
             char str[600];
             strcpy(str, &value[1]);
@@ -1239,7 +1299,8 @@ int WdaNav::import_textfile(char* filename)
       default:;
       }
     }
-    if (!found) {
+    if (!found)
+    {
       sprintf(msg, "** Attribute not found %s, row %d\n", name, row);
       MsgWindow::message('E', msg, msgw_ePop_Default);
       status = WDA__NOATTR;

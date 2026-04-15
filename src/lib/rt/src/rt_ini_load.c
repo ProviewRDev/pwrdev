@@ -60,19 +60,15 @@ static pwr_tBoolean checkSect(pwr_tStatus*, ini_sContext*, int, int);
 static gdb_sObject* oidToObject(pwr_tObjid);
 static pwr_tBoolean loadSectObject(pwr_tStatus*, ini_sContext*, ivol_sVolume*);
 static pwr_tBoolean loadSectRbody(pwr_tStatus*, ini_sContext*, ivol_sVolume*);
-static pwr_tBoolean loadSectScObject(
-    pwr_tStatus*, ini_sContext*, ivol_sVolume*);
+static pwr_tBoolean loadSectScObject(pwr_tStatus*, ini_sContext*, ivol_sVolume*);
 static pwr_tBoolean loadSectVolume(pwr_tStatus*, ini_sContext*, ivol_sVolume*);
 static pwr_tBoolean readSectFile(pwr_tStatus*, ini_sContext*, ivol_sVolume*);
 static pwr_tBoolean readSectVolRef(pwr_tStatus*, ini_sContext*, ivol_sVolume*);
 static pwr_tBoolean readSectVolume(pwr_tStatus*, ini_sContext*, ivol_sVolume*);
-static gdb_sObject* reloadObject(
-    pwr_tStatus*, ini_sContext*, ivol_sVolume*, dbs_sObject*);
-static pwr_tBoolean reloadSectObject(
-    pwr_tStatus*, ini_sContext*, ivol_sVolume*);
+static gdb_sObject* reloadObject(pwr_tStatus*, ini_sContext*, ivol_sVolume*, dbs_sObject*);
+static pwr_tBoolean reloadSectObject(pwr_tStatus*, ini_sContext*, ivol_sVolume*);
 static pwr_tBoolean reloadSectRbody(pwr_tStatus*, ini_sContext*, ivol_sVolume*);
-static pwr_tBoolean reloadSectVolume(
-    pwr_tStatus*, ini_sContext*, ivol_sVolume*);
+static pwr_tBoolean reloadSectVolume(pwr_tStatus*, ini_sContext*, ivol_sVolume*);
 static char* strsav(char*);
 static void create_active_io();
 static void delete_old_io();
@@ -87,7 +83,8 @@ static char* strsav(char* s)
     return NULL;
 
   len = strlen(s);
-  if (len > 0) {
+  if (len > 0)
+  {
     t = malloc(len + 1);
     strcpy(t, s);
   }
@@ -95,28 +92,27 @@ static char* strsav(char* s)
   return t;
 }
 
-static pwr_tBoolean checkSect(
-    pwr_tStatus* status, ini_sContext* cp, int sects, int version)
+static pwr_tBoolean checkSect(pwr_tStatus* status, ini_sContext* cp, int sects, int version)
 {
   pwr_dStatus(sts, status, INI__SUCCESS);
 
-  if (cp->sect.version != version) {
+  if (cp->sect.version != version)
+  {
     *sts = INI__SECTVERSION;
-    errh_LogError(&cp->log, "Section header Versions differ: %d != %d",
-        cp->sect.version, version);
+    errh_LogError(&cp->log, "Section header Versions differ: %d != %d", cp->sect.version, version);
     cp->errors++;
-  } else if (((1 << cp->sect.type) & sects) != 0) {
+  }
+  else if (((1 << cp->sect.type) & sects) != 0)
+  {
     *sts = INI__MULTSECT;
-    errh_LogError(
-        &cp->log, "Section type allready read, %d", 1 << cp->sect.type);
+    errh_LogError(&cp->log, "Section type allready read, %d", 1 << cp->sect.type);
     cp->errors++;
   }
 
   return ODD(*sts);
 }
 
-static gdb_sObject* reloadObject(
-    pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp, dbs_sObject* oh)
+static gdb_sObject* reloadObject(pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp, dbs_sObject* oh)
 {
   gdb_sObject* op;
   ivol_sObject* iop;
@@ -129,22 +125,24 @@ static gdb_sObject* reloadObject(
   gdb_ScopeLock
   {
     op = oidToObject(oh->oid);
-    if (op != NULL) {
+    if (op != NULL)
+    {
       op->u.n.flags.b.swapDelete = 0;
 
-      if (op->g.oid.oix != 0) {
+      if (op->g.oid.oix != 0)
+      {
         flags.b.father = op->g.f.poid.oix != oh->poid.oix;
         flags.b.name = !streq(op->g.f.name.orig, oh->name);
-        flags.b.server = op->g.flags.m & net_mGo_isClient
-            && cdh_ObjidIsNotEqual(op->g.soid, oh->soid);
+        flags.b.server = op->g.flags.m & net_mGo_isClient && cdh_ObjidIsNotEqual(op->g.soid, oh->soid);
         flags.b.classid = op->g.cid != oh->cid;
-        flags.b.size
-            = !op->g.flags.b.isAliasClient && op->g.size != oh->rbody.size;
+        flags.b.size = !op->g.flags.b.isAliasClient && op->g.size != oh->rbody.size;
         flags.b.flags = op->u.n.lflags.m != oh->flags.m;
         // flags.b.body   = time_Acomp(&op->u.n.time, &oh->rbody.time) != 0;
         flags.b.body = time_Acomp(&op->u.n.time, &oh->time) != 0;
       }
-    } else {
+    }
+    else
+    {
       flags.b.created = 1;
       op = ivol_LoadObject(sts, vp, oh, vol_mLink_swapLoad);
       flags.b.body = op->g.size > 0;
@@ -166,9 +164,12 @@ static gdb_sObject* reloadObject(
   if (iop->cp == NULL)
     errh_Bugcheck(2, "class definition missing");
 
-  if (flags.b.created) {
+  if (flags.b.created)
+  {
     lst_InsertPred(NULL, &vp->cre_lh, &iop->obj_ll, iop);
-  } else {
+  }
+  else
+  {
     if (oh->flags.b.io)
       lst_InsertPred(NULL, &vp->upd_io_lh, &iop->obj_ll, iop);
     else
@@ -180,10 +181,12 @@ static gdb_sObject* reloadObject(
     iop->unlink.b.noSibList = iop->flags.b.father;
     iop->unlink.b.noCidList = iop->flags.b.classid;
     iop->link.m = iop->unlink.m;
-    if (iop->upd_body != NULL) {
+    if (iop->upd_body != NULL)
+    {
       printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!error");
     }
-    if (flags.b.body && op->g.size > 0) {
+    if (flags.b.body && op->g.size > 0)
+    {
       iop->upd_body = calloc(1, op->g.size);
     }
   }
@@ -202,40 +205,37 @@ static gdb_sObject* oidToObject(pwr_tObjid oid)
   return op;
 }
 
-static pwr_tBoolean readSectFile(
-    pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
+static pwr_tBoolean readSectFile(pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
 {
   char timbuf[32];
 
   pwr_dStatus(sts, status, INI__SUCCESS);
 
-  if (cp->dbs.file.version != dbs_cVersionFile) {
+  if (cp->dbs.file.version != dbs_cVersionFile)
+  {
     *sts = INI__SECTVERSION;
-    errh_LogError(&cp->log, "dbs_cVersionFile differ: %d != %d",
-        cp->dbs.file.version, dbs_cVersionFile);
+    errh_LogError(&cp->log, "dbs_cVersionFile differ: %d != %d", cp->dbs.file.version, dbs_cVersionFile);
     cp->errors++;
   }
 
-  time_AtoAscii(
-      &cp->dbs.file.time, time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
+  time_AtoAscii(&cp->dbs.file.time, time_eFormat_DateAndTime, timbuf, sizeof(timbuf));
 
   errh_LogInfo(&cp->log, "Created %s", timbuf);
   if (!cp->node.rtVersion.tv_sec)
     cp->node.rtVersion = cp->dbs.file.time;
 
-  if (vp->time.tv_sec != 0) {
+  if (vp->time.tv_sec != 0)
+  {
     // Time inserted from volref
-    if (time_Acomp(&vp->time, &cp->dbs.file.time) != 0) {
+    if (time_Acomp(&vp->time, &cp->dbs.file.time) != 0)
+    {
       char timbuf1[32];
       char timbuf2[32];
 
-      time_AtoAscii(
-          &vp->time, time_eFormat_DateAndTime, timbuf1, sizeof(timbuf1));
-      time_AtoAscii(&cp->dbs.file.time, time_eFormat_DateAndTime, timbuf2,
-          sizeof(timbuf2));
+      time_AtoAscii(&vp->time, time_eFormat_DateAndTime, timbuf1, sizeof(timbuf1));
+      time_AtoAscii(&cp->dbs.file.time, time_eFormat_DateAndTime, timbuf2, sizeof(timbuf2));
 
-      errh_LogWarning(&cp->log, "Version mismatch for volume: %s, %s != %s",
-          vp->name, timbuf1, timbuf2);
+      errh_LogWarning(&cp->log, "Version mismatch for volume: %s, %s != %s", vp->name, timbuf1, timbuf2);
       cp->warnings++;
     }
   }
@@ -244,8 +244,7 @@ static pwr_tBoolean readSectFile(
   return ODD(*sts);
 }
 
-static pwr_tBoolean readSectVolRef(
-    pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* dvp)
+static pwr_tBoolean readSectVolRef(pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* dvp)
 {
   dbs_sVolRef volRef;
   ivol_sVolume* vp;
@@ -259,13 +258,14 @@ static pwr_tBoolean readSectVolRef(
 
   /* Read the section */
 
-  for (i = 0; i < cp->sect.size; i += dbs_dAlign(sizeof(volRef))) {
+  for (i = 0; i < cp->sect.size; i += dbs_dAlign(sizeof(volRef)))
+  {
     if (!dbs_AlignedRead(sts, &volRef, sizeof(volRef), &cp->dbs))
       return NO;
 
-    if (cp->dbs.file.format.m != cp->format.m) {
-      pdrmem_create(&pdrs, &volRef, sizeof(volRef), PDR_DECODE,
-          cp->dbs.file.format, cp->format);
+    if (cp->dbs.file.format.m != cp->format.m)
+    {
+      pdrmem_create(&pdrs, &volRef, sizeof(volRef), PDR_DECODE, cp->dbs.file.format, cp->format);
 
       if (!pdr_dbs_sVolRef(&pdrs, &volRef))
         pwr_Return(NO, sts, INI__XDR);
@@ -274,7 +274,8 @@ static pwr_tBoolean readSectVolRef(
     /* Try to find the volume in the volume list.  */
 
     vp = tree_Find(sts, cp->vid_t, &volRef.vid);
-    if (vp == NULL) {
+    if (vp == NULL)
+    {
       /* This volume is not in the volume list.  */
 
       vp = tree_Insert(sts, cp->vid_t, &volRef.vid);
@@ -284,36 +285,39 @@ static pwr_tBoolean readSectVolRef(
       if (!cdh_isClassVolumeClass(volRef.cid))
         vp->isVolRef = 1;
       vp->volRef = volRef;
-      vp->oid_t = tree_CreateTable(sts, sizeof(pwr_tObjectIx),
-          offsetof(ivol_sObject, oix), sizeof(ivol_sObject), 10, tree_Comp_oix);
+      vp->oid_t = tree_CreateTable(sts, sizeof(pwr_tObjectIx), offsetof(ivol_sObject, oix),
+                                   sizeof(ivol_sObject), 10, tree_Comp_oix);
       lst_Init(NULL, &vp->upd_lh, NULL);
       lst_Init(NULL, &vp->upd_io_lh, NULL);
       lst_Init(NULL, &vp->cre_lh, NULL);
-    } else if (vp->time.tv_sec != 0) {
+    }
+    else if (vp->time.tv_sec != 0)
+    {
       /* Do some checks.  */
-      if (dvp->volume.cid == pwr_eClass_DetachedClassVolume) {
+      if (dvp->volume.cid == pwr_eClass_DetachedClassVolume)
+      {
         /* Check dvVersion */
-        if (vp->volume.dvVersion != volRef.time.tv_sec) {
-          errh_LogWarning(&cp->log,
-              "Version mismatch for volume %s: %s, %u (present), %d (detached)",
-              dvp->name, vp->name, vp->volume.dvVersion, volRef.time.tv_sec);
+        if (vp->volume.dvVersion != volRef.time.tv_sec)
+        {
+          errh_LogWarning(&cp->log, "Version mismatch for volume %s: %s, %u (present), %d (detached)",
+                          dvp->name, vp->name, vp->volume.dvVersion, volRef.time.tv_sec);
           cp->warnings++;
-        } else
-          errh_LogInfo(&cp->log,
-              "Detached volref for %s: %s, %u (present), %d (detached)",
-              dvp->name, vp->name, vp->volume.dvVersion, volRef.time.tv_sec);
-      } else {
-        if (time_Acomp(&vp->time, &volRef.time) != 0) {
+        }
+        else
+          errh_LogInfo(&cp->log, "Detached volref for %s: %s, %u (present), %d (detached)", dvp->name,
+                       vp->name, vp->volume.dvVersion, volRef.time.tv_sec);
+      }
+      else
+      {
+        if (time_Acomp(&vp->time, &volRef.time) != 0)
+        {
           char timbuf1[32];
           char timbuf2[32];
 
-          time_AtoAscii(
-              &vp->time, time_eFormat_DateAndTime, timbuf1, sizeof(timbuf1));
-          time_AtoAscii(
-              &volRef.time, time_eFormat_DateAndTime, timbuf2, sizeof(timbuf2));
+          time_AtoAscii(&vp->time, time_eFormat_DateAndTime, timbuf1, sizeof(timbuf1));
+          time_AtoAscii(&volRef.time, time_eFormat_DateAndTime, timbuf2, sizeof(timbuf2));
 
-          errh_LogWarning(&cp->log, "Version mismatch for volume: %s, %s != %s",
-              vp->name, timbuf1, timbuf2);
+          errh_LogWarning(&cp->log, "Version mismatch for volume: %s, %s != %s", vp->name, timbuf1, timbuf2);
           cp->warnings++;
         }
       }
@@ -322,8 +326,7 @@ static pwr_tBoolean readSectVolRef(
   return ODD(*sts);
 }
 
-static pwr_tBoolean readSectVolume(
-    pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
+static pwr_tBoolean readSectVolume(pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
 {
   PDR pdrs;
 
@@ -335,9 +338,9 @@ static pwr_tBoolean readSectVolume(
   if (!dbs_AlignedRead(sts, &vp->volume, cp->sect.size, &cp->dbs))
     return NO;
 
-  if (cp->dbs.file.format.m != cp->format.m) {
-    pdrmem_create(&pdrs, &vp->volume, sizeof(vp->volume), PDR_DECODE,
-        cp->dbs.file.format, cp->format);
+  if (cp->dbs.file.format.m != cp->format.m)
+  {
+    pdrmem_create(&pdrs, &vp->volume, sizeof(vp->volume), PDR_DECODE, cp->dbs.file.format, cp->format);
     if (!pdr_dbs_sVolume(&pdrs, &vp->volume))
       pwr_Return(NO, sts, INI__XDR);
   }
@@ -348,8 +351,7 @@ static pwr_tBoolean readSectVolume(
   return ODD(*sts);
 }
 
-static pwr_tBoolean loadSectRbody(
-    pwr_tStatus* sts, ini_sContext* cp, ivol_sVolume* vp)
+static pwr_tBoolean loadSectRbody(pwr_tStatus* sts, ini_sContext* cp, ivol_sVolume* vp)
 {
   pwr_tInt32 i;
   dbs_sBody ob;
@@ -362,16 +364,18 @@ static pwr_tBoolean loadSectRbody(
 
   i = cp->sect.size; /* Remaining # of bytes in section */
   nextpos = cp->sect.offset;
-  while (i > 0) {
+  while (i > 0)
+  {
     fseek(cp->dbs.f, nextpos, SEEK_SET);
-    if (!dbs_AlignedRead(sts, &ob, sizeof(ob), &cp->dbs)) {
+    if (!dbs_AlignedRead(sts, &ob, sizeof(ob), &cp->dbs))
+    {
       errh_LogFatal(&cp->log, "loadSectRbody, fread, %m", *sts);
       return NO;
     }
 
-    if (cp->dbs.file.format.m != cp->format.m) {
-      pdrmem_create(
-          &pdrs, &ob, sizeof(ob), PDR_DECODE, cp->dbs.file.format, cp->format);
+    if (cp->dbs.file.format.m != cp->format.m)
+    {
+      pdrmem_create(&pdrs, &ob, sizeof(ob), PDR_DECODE, cp->dbs.file.format, cp->format);
       if (!pdr_dbs_sBody(&pdrs, &ob))
         pwr_Return(NO, sts, INI__XDR);
     }
@@ -380,18 +384,24 @@ static pwr_tBoolean loadSectRbody(
     nextpos = ftell(cp->dbs.f) + dbs_dAlign(ob.size);
 
     bp = ivol_GetBody(sts, ob.oid, NULL);
-    if (bp == NULL) {
+    if (bp == NULL)
+    {
       *sts = INI__SUCCESS;
       // errh_LogError(&cp->log, "Cannot find body of object %s\n%m",
       // cdh_ObjidToString(ob.oid,0), *sts);
-    } else {
-      if (dbs_dAlign(bp->size) < ob.size) {
-        errh_LogError(&cp->log, "Data beyond size of body, Objid %s",
-            cdh_ObjidToString(ob.oid, 0));
-      } else if (bp->size > ob.size) {
-        errh_LogError(&cp->log, "Data is smaller than size of body, Objid %s",
-            cdh_ObjidToString(ob.oid, 0));
-      } else {
+    }
+    else
+    {
+      if (dbs_dAlign(bp->size) < ob.size)
+      {
+        errh_LogError(&cp->log, "Data beyond size of body, Objid %s", cdh_ObjidToString(ob.oid, 0));
+      }
+      else if (bp->size > ob.size)
+      {
+        errh_LogError(&cp->log, "Data is smaller than size of body, Objid %s", cdh_ObjidToString(ob.oid, 0));
+      }
+      else
+      {
         body = bp->body;
         if (fread(body, bp->size, 1, cp->dbs.f) == 0)
           pwr_Return(NO, sts, errno_GetStatus());
@@ -402,8 +412,7 @@ static pwr_tBoolean loadSectRbody(
   return INI__SUCCESS;
 }
 
-static pwr_tBoolean reloadSectRbody(
-    pwr_tStatus* sts, ini_sContext* cp, ivol_sVolume* vp)
+static pwr_tBoolean reloadSectRbody(pwr_tStatus* sts, ini_sContext* cp, ivol_sVolume* vp)
 {
   pwr_tInt32 i;
   dbs_sBody ob;
@@ -417,20 +426,23 @@ static pwr_tBoolean reloadSectRbody(
   i = cp->sect.size; /* Remaining # of bytes in section */
   nextpos = cp->sect.offset;
 
-  while (i > 0) {
-    if (fseek(cp->dbs.f, nextpos, SEEK_SET) != 0) {
+  while (i > 0)
+  {
+    if (fseek(cp->dbs.f, nextpos, SEEK_SET) != 0)
+    {
       *sts = errno_GetStatus();
       errh_LogFatal(&cp->log, "reloadSectRbody, fseek, %m", *sts);
       break;
     }
-    if (!dbs_AlignedRead(sts, &ob, sizeof(ob), &cp->dbs)) {
+    if (!dbs_AlignedRead(sts, &ob, sizeof(ob), &cp->dbs))
+    {
       errh_LogFatal(&cp->log, "reloadSectRbody, fread, %m", *sts);
       break;
     }
 
-    if (cp->dbs.file.format.m != cp->format.m) {
-      pdrmem_create(
-          &pdrs, &ob, sizeof(ob), PDR_DECODE, cp->dbs.file.format, cp->format);
+    if (cp->dbs.file.format.m != cp->format.m)
+    {
+      pdrmem_create(&pdrs, &ob, sizeof(ob), PDR_DECODE, cp->dbs.file.format, cp->format);
       if (!pdr_dbs_sBody(&pdrs, &ob))
         pwr_Return(NO, sts, INI__XDR);
     }
@@ -442,33 +454,46 @@ static pwr_tBoolean reloadSectRbody(
     if (iop == NULL)
       continue;
 
-    if (iop->body == NULL) {
+    if (iop->body == NULL)
+    {
       iop->size = iop->op->g.size;
       iop->body = pool_Address(NULL, gdbroot->rtdb, iop->op->u.n.body);
     }
 
-    if (iop->flags.b.created && iop->flags.b.body) {
+    if (iop->flags.b.created && iop->flags.b.body)
+    {
       body = iop->body;
-    } else if (iop->flags.b.body) {
-      if (iop->upd_body == NULL) {
+    }
+    else if (iop->flags.b.body)
+    {
+      if (iop->upd_body == NULL)
+      {
         printf("iop->upd_body == NULL\n");
       }
       body = iop->upd_body;
-    } else {
+    }
+    else
+    {
       continue;
     }
 
-    if (iop->body == NULL) {
+    if (iop->body == NULL)
+    {
       // errh_LogError(&cp->log, "Cannot find body of object %s\n%m",
       // cdh_ObjidToString(ob.oid,0), sts);
-    } else {
-      if (dbs_dAlign(iop->op->g.size) < ob.size) {
-        errh_LogError(&cp->log, "Data beyond size of body, Objid %s",
-            cdh_ObjidToString(ob.oid, 0));
-      } else if (iop->op->g.size > ob.size) {
-        errh_LogError(&cp->log, "Data is smaller than size of body, Objid %s",
-            cdh_ObjidToString(ob.oid, 0));
-      } else {
+    }
+    else
+    {
+      if (dbs_dAlign(iop->op->g.size) < ob.size)
+      {
+        errh_LogError(&cp->log, "Data beyond size of body, Objid %s", cdh_ObjidToString(ob.oid, 0));
+      }
+      else if (iop->op->g.size > ob.size)
+      {
+        errh_LogError(&cp->log, "Data is smaller than size of body, Objid %s", cdh_ObjidToString(ob.oid, 0));
+      }
+      else
+      {
         if (fread(body, iop->op->g.size, 1, cp->dbs.f) == 0)
           pwr_Return(NO, sts, errno_GetStatus());
       }
@@ -478,8 +503,7 @@ static pwr_tBoolean reloadSectRbody(
   return ODD(*sts);
 }
 
-static pwr_tBoolean loadSectObject(
-    pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
+static pwr_tBoolean loadSectObject(pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
 {
   pwr_tUInt32 i;
   dbs_sObject oh;
@@ -493,15 +517,17 @@ static pwr_tBoolean loadSectObject(
   if (fseek(cp->dbs.f, cp->sect.offset, SEEK_SET) != 0)
     pwr_Return(NO, sts, errno_GetStatus());
 
-  for (i = 0; i < cp->sect.size; i += dbs_dAlign(sizeof(oh))) {
-    if (!dbs_AlignedRead(sts, &oh, sizeof(oh), &cp->dbs)) {
+  for (i = 0; i < cp->sect.size; i += dbs_dAlign(sizeof(oh)))
+  {
+    if (!dbs_AlignedRead(sts, &oh, sizeof(oh), &cp->dbs))
+    {
       errh_LogFatal(&cp->log, "loadSectObject, fread, %m", *sts);
       break;
     }
 
-    if (cp->dbs.file.format.m != cp->format.m) {
-      pdrmem_create(
-          &pdrs, &oh, sizeof(oh), PDR_DECODE, cp->dbs.file.format, cp->format);
+    if (cp->dbs.file.format.m != cp->format.m)
+    {
+      pdrmem_create(&pdrs, &oh, sizeof(oh), PDR_DECODE, cp->dbs.file.format, cp->format);
       if (!pdr_dbs_sObject(&pdrs, &oh))
         pwr_Return(NO, sts, INI__XDR);
     }
@@ -511,15 +537,16 @@ static pwr_tBoolean loadSectObject(
     if (oh.cid == pwr_eClass_Node && oh.oid.vid == cp->node.nid)
       cp->node.nod_oid = oh.oid; /* This is the node object.  */
 
-    if (oh.flags.b.devOnly) {
+    if (oh.flags.b.devOnly)
+    {
       continue;
     }
 
     op = ivol_LoadObject(sts, vp, &oh, vol_mLink_load);
-    if (op == NULL) {
-      errh_LogError(&cp->log, "Loading object %s, %s, parent %s\n%m",
-          cdh_ObjidToString(oh.oid, 0), oh.name, cdh_ObjidToString(oh.poid, 0),
-          *sts);
+    if (op == NULL)
+    {
+      errh_LogError(&cp->log, "Loading object %s, %s, parent %s\n%m", cdh_ObjidToString(oh.oid, 0), oh.name,
+                    cdh_ObjidToString(oh.poid, 0), *sts);
       return NO;
     }
   }
@@ -527,8 +554,7 @@ static pwr_tBoolean loadSectObject(
   return YES;
 }
 
-static pwr_tBoolean reloadSectObject(
-    pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
+static pwr_tBoolean reloadSectObject(pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
 {
   pwr_tUInt32 i;
   dbs_sObject oh;
@@ -544,15 +570,17 @@ static pwr_tBoolean reloadSectObject(
   if (fseek(cp->dbs.f, cp->sect.offset, SEEK_SET) != 0)
     pwr_Return(NO, sts, errno_GetStatus());
 
-  for (i = 0; i < cp->sect.size; i += dbs_dAlign(sizeof(oh))) {
-    if (!dbs_AlignedRead(sts, &oh, sizeof(oh), &cp->dbs)) {
+  for (i = 0; i < cp->sect.size; i += dbs_dAlign(sizeof(oh)))
+  {
+    if (!dbs_AlignedRead(sts, &oh, sizeof(oh), &cp->dbs))
+    {
       errh_LogFatal(&cp->log, "reloadSectObject, fread, %m", *sts);
       return NO;
     }
 
-    if (cp->dbs.file.format.m != cp->format.m) {
-      pdrmem_create(
-          &pdrs, &oh, sizeof(oh), PDR_DECODE, cp->dbs.file.format, cp->format);
+    if (cp->dbs.file.format.m != cp->format.m)
+    {
+      pdrmem_create(&pdrs, &oh, sizeof(oh), PDR_DECODE, cp->dbs.file.format, cp->format);
       if (!pdr_dbs_sObject(&pdrs, &oh))
         pwr_Return(NO, sts, INI__XDR);
     }
@@ -564,10 +592,10 @@ static pwr_tBoolean reloadSectObject(
       continue;
 
     op = reloadObject(sts, cp, vp, &oh);
-    if (op == NULL) {
-      errh_LogError(&cp->log, "Loading object %s, %s, parent %s\n%m",
-          cdh_ObjidToString(oh.oid, 0), oh.name, cdh_ObjidToString(oh.poid, 0),
-          sts);
+    if (op == NULL)
+    {
+      errh_LogError(&cp->log, "Loading object %s, %s, parent %s\n%m", cdh_ObjidToString(oh.oid, 0), oh.name,
+                    cdh_ObjidToString(oh.poid, 0), sts);
       return NO;
     }
   }
@@ -575,8 +603,7 @@ static pwr_tBoolean reloadSectObject(
   return ODD(*sts);
 }
 
-static pwr_tBoolean loadSectScObject(
-    pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
+static pwr_tBoolean loadSectScObject(pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
 {
   pwr_tUInt32 i;
   dbs_sScObject sc;
@@ -590,23 +617,26 @@ static pwr_tBoolean loadSectScObject(
   if (fseek(cp->dbs.f, cp->sect.offset, SEEK_SET) != 0)
     pwr_Return(NO, sts, errno_GetStatus());
 
-  for (i = 0; i < cp->sect.size; i += dbs_dAlign(sizeof(sc))) {
-    if (!dbs_AlignedRead(sts, &sc, sizeof(sc), &cp->dbs)) {
+  for (i = 0; i < cp->sect.size; i += dbs_dAlign(sizeof(sc)))
+  {
+    if (!dbs_AlignedRead(sts, &sc, sizeof(sc), &cp->dbs))
+    {
       errh_LogFatal(&cp->log, "loadSectScObject, fread, %m", *sts);
       break;
     }
 
-    if (cp->dbs.file.format.m != cp->format.m) {
-      pdrmem_create(
-          &pdrs, &sc, sizeof(sc), PDR_DECODE, cp->dbs.file.format, cp->format);
+    if (cp->dbs.file.format.m != cp->format.m)
+    {
+      pdrmem_create(&pdrs, &sc, sizeof(sc), PDR_DECODE, cp->dbs.file.format, cp->format);
       if (!pdr_dbs_sScObject(&pdrs, &sc))
         pwr_Return(NO, sts, INI__XDR);
     }
 
     scp = ivol_LoadScObject(sts, vp, &sc, vol_mLinkSc_load);
-    if (scp == NULL) {
-      errh_LogError(&cp->log, "Loading object %s, parent %s\n%m",
-          cdh_ObjidToString(sc.oid, 0), cdh_ObjidToString(sc.poid, 0), *sts);
+    if (scp == NULL)
+    {
+      errh_LogError(&cp->log, "Loading object %s, parent %s\n%m", cdh_ObjidToString(sc.oid, 0),
+                    cdh_ObjidToString(sc.poid, 0), *sts);
       return NO;
     }
   }
@@ -614,8 +644,7 @@ static pwr_tBoolean loadSectScObject(
   return YES;
 }
 
-static pwr_tBoolean loadSectVolume(
-    pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
+static pwr_tBoolean loadSectVolume(pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
 {
   PDR pdrs;
 
@@ -626,28 +655,27 @@ static pwr_tBoolean loadSectVolume(
   if (fseek(cp->dbs.f, cp->sect.offset, SEEK_SET) != 0)
     pwr_Return(NO, sts, errno_GetStatus());
 
-  if (!dbs_AlignedRead(sts, &vp->volume, cp->sect.size, &cp->dbs)) {
+  if (!dbs_AlignedRead(sts, &vp->volume, cp->sect.size, &cp->dbs))
+  {
     errh_LogFatal(&cp->log, "loadSectVolume, fread, %m", *sts);
     return NO;
   }
 
-  if (cp->dbs.file.format.m != cp->format.m) {
-    pdrmem_create(&pdrs, &vp->volume, sizeof(vp->volume), PDR_DECODE,
-        cp->dbs.file.format, cp->format);
+  if (cp->dbs.file.format.m != cp->format.m)
+  {
+    pdrmem_create(&pdrs, &vp->volume, sizeof(vp->volume), PDR_DECODE, cp->dbs.file.format, cp->format);
     if (!pdr_dbs_sVolume(&pdrs, &vp->volume))
       pwr_Return(NO, sts, INI__XDR);
   }
 
-  errh_LogInfo(&cp->log, "Loading volume %s (%s)...", vp->volume.name,
-      vp->volume.className);
+  errh_LogInfo(&cp->log, "Loading volume %s (%s)...", vp->volume.name, vp->volume.className);
 
   vp->vp = ivol_LoadVolume(sts, &vp->volume, &cp->dbs.file.format);
 
   return ODD(*sts);
 }
 
-static pwr_tBoolean reloadSectVolume(
-    pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
+static pwr_tBoolean reloadSectVolume(pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
 {
   PDR pdrs;
 
@@ -658,20 +686,20 @@ static pwr_tBoolean reloadSectVolume(
   if (fseek(cp->dbs.f, cp->sect.offset, SEEK_SET) != 0)
     pwr_Return(NO, sts, errno_GetStatus());
 
-  if (!dbs_AlignedRead(sts, &vp->volume, cp->sect.size, &cp->dbs)) {
+  if (!dbs_AlignedRead(sts, &vp->volume, cp->sect.size, &cp->dbs))
+  {
     errh_LogFatal(&cp->log, "reloadSectVolume, fread, %m", *sts);
     return NO;
   }
 
-  if (cp->dbs.file.format.m != cp->format.m) {
-    pdrmem_create(&pdrs, &vp->volume, sizeof(vp->volume), PDR_DECODE,
-        cp->dbs.file.format, cp->format);
+  if (cp->dbs.file.format.m != cp->format.m)
+  {
+    pdrmem_create(&pdrs, &vp->volume, sizeof(vp->volume), PDR_DECODE, cp->dbs.file.format, cp->format);
     if (!pdr_dbs_sVolume(&pdrs, &vp->volume))
       pwr_Return(NO, sts, INI__XDR);
   }
 
-  errh_LogInfo(&cp->log, "Loading volume %s (%s)...", vp->volume.name,
-      vp->volume.className);
+  errh_LogInfo(&cp->log, "Loading volume %s (%s)...", vp->volume.name, vp->volume.className);
 
   gdb_Lock;
 
@@ -692,22 +720,19 @@ ini_sContext* ini_CheckContext(pwr_tStatus* status, ini_sContext* cp)
   cp->nodefile.logOpenFail = errh_LogInfo;
 
   if (!cp->flags.b.applfile)
-    sprintf(cp->applfile.name, dbs_cNameAppl, cp->dir, cdh_Low(cp->origname),
-        cp->busid);
+    sprintf(cp->applfile.name, dbs_cNameAppl, cp->dir, cdh_Low(cp->origname), cp->busid);
   // str_ToLower(cp->applfile.name, cp->applfile.name);
   cp->applfile.errcount = NULL;
   cp->applfile.logOpenFail = errh_LogInfo;
 
   if (!cp->flags.b.bootfile)
-    sprintf(cp->bootfile.name, dbs_cNameBoot, cp->dir, cdh_Low(cp->origname),
-        cp->busid);
+    sprintf(cp->bootfile.name, dbs_cNameBoot, cp->dir, cdh_Low(cp->origname), cp->busid);
   // str_ToLower(cp->bootfile.name, cp->bootfile.name);
   cp->bootfile.errcount = &cp->fatals;
   cp->bootfile.logOpenFail = errh_LogFatal;
 
   if (!cp->flags.b.nodefile)
-    sprintf(cp->nodefile.name, dbs_cNameNode, cp->dir, cdh_Low(cp->origname),
-        cp->busid);
+    sprintf(cp->nodefile.name, dbs_cNameNode, cp->dir, cdh_Low(cp->origname), cp->busid);
   // str_ToLower(cp->nodefile.name, cp->nodefile.name);
   cp->nodefile.errcount = &cp->fatals;
   cp->nodefile.logOpenFail = errh_LogFatal;
@@ -729,21 +754,22 @@ ini_sContext* ini_CreateContext(pwr_tStatus* status)
   if (cp == NULL)
     return NULL;
 
-  cp->nid_t = tree_CreateTable(sts, sizeof(pwr_tNodeId),
-      offsetof(qini_sNode, nid), sizeof(qini_sNode), 10, tree_Comp_nid);
+  cp->nid_t = tree_CreateTable(sts, sizeof(pwr_tNodeId), offsetof(qini_sNode, nid), sizeof(qini_sNode), 10,
+                               tree_Comp_nid);
 
-  cp->vid_t = tree_CreateTable(sts, sizeof(pwr_tVolumeId),
-      offsetof(ivol_sVolume, vid), sizeof(ivol_sVolume), 10, tree_Comp_vid);
+  cp->vid_t = tree_CreateTable(sts, sizeof(pwr_tVolumeId), offsetof(ivol_sVolume, vid), sizeof(ivol_sVolume),
+                               10, tree_Comp_vid);
 
-  cp->proc_t = tree_CreateTable(sts, sizeof(((ini_sProc*)0)->id),
-      offsetof(ini_sProc, id), sizeof(ini_sProc), 10, tree_Comp_strncmp);
+  cp->proc_t = tree_CreateTable(sts, sizeof(((ini_sProc*)0)->id), offsetof(ini_sProc, id), sizeof(ini_sProc),
+                                10, tree_Comp_strncmp);
 
   lst_Init(NULL, &cp->vol_lh, NULL);
   lst_Init(NULL, &cp->proc_lh, NULL);
 
   co_GetOwnFormat(&cp->format);
 
-  if (cp->vid_t == NULL) {
+  if (cp->vid_t == NULL)
+  {
     free(cp);
     return NULL;
   }
@@ -758,7 +784,8 @@ FILE* ini_OpenFile(pwr_tStatus* status, ini_sContext* cp, ini_sFile* fp)
   pwr_dStatus(sts, status, INI__SUCCESS);
 
   f = fopen(fp->name, "r");
-  if (f == NULL) {
+  if (f == NULL)
+  {
     if (fp->errcount)
       (*fp->errcount)++;
     if (fp->logOpenFail)
@@ -793,16 +820,15 @@ char* ini_LoadDirectory(pwr_tStatus* status, ini_sContext* cp)
     if ((s = getenv(dbs_cNameBaseDirectory)) != NULL)
       sprintf(cp->bdir, "%s/", s);
     else
-      errh_LogError(&cp->log, "Environment variable '%s' is not defined",
-          dbs_cNameBaseDirectory);
+      errh_LogError(&cp->log, "Environment variable '%s' is not defined", dbs_cNameBaseDirectory);
 
     if ((s = getenv(dbs_cNameDirectory)) != NULL)
       sprintf(cp->dir, "%s/", s);
     else
-      errh_LogError(&cp->log, "Environment variable '%s' is not defined",
-          dbs_cNameDirectory);
+      errh_LogError(&cp->log, "Environment variable '%s' is not defined", dbs_cNameDirectory);
 
-    if (!cp->flags.b.busid) {
+    if (!cp->flags.b.busid)
+    {
       s = getenv(pwr_dEnvBusId);
       if (s != NULL)
 
@@ -815,9 +841,9 @@ char* ini_LoadDirectory(pwr_tStatus* status, ini_sContext* cp)
   *sts = ini_LoadAlias(cp->aliasfile.name);
   if (ODD(*sts))
     *sts = ini_GetAlias(cp->nodename, cp->alias, 0);
-  if (ODD(*sts)) {
-    errh_LogInfo(&cp->log, "Alias defined to %s for this node %s", cp->alias,
-        cp->nodename);
+  if (ODD(*sts))
+  {
+    errh_LogInfo(&cp->log, "Alias defined to %s for this node %s", cp->alias, cp->nodename);
     strcpy(cp->nodename, cp->alias);
   }
 
@@ -837,7 +863,8 @@ void ini_SetSystemStatus(ini_sContext* cp, pwr_tStatus sts)
 
 void ini_UpdateSystemInfo(ini_sContext* cp, int boot)
 {
-  if (boot) {
+  if (boot)
+  {
     cp->np->BootVersion = cp->node.rtVersion;
     cp->np->BootPlcVersion = cp->node.plcVersion;
     time_GetTime(&cp->np->BootTime);
@@ -845,7 +872,8 @@ void ini_UpdateSystemInfo(ini_sContext* cp, int boot)
   cp->np->CurrentVersion = cp->node.rtVersion;
   cp->np->CurrentPlcVersion = cp->node.plcVersion;
 
-  if (!boot) {
+  if (!boot)
+  {
     cp->np->Restarts++;
     time_GetTime(&cp->np->RestartTime);
   }
@@ -879,13 +907,16 @@ void ini_ReadBootFile(pwr_tStatus* status, ini_sContext* cp)
   errh_LogInfo(&cp->log, "Reading Boot file %s", cp->bootfile.name);
 
   for (i = 0, nvol = 0, s = fgets(buffer, sizeof(buffer) - 1, f); s != NULL;
-       s = fgets(buffer, sizeof(buffer) - 1, f)) {
-    if (*s == '!') {
+       s = fgets(buffer, sizeof(buffer) - 1, f))
+  {
+    if (*s == '!')
+    {
       s++;
       continue;
     }
 
-    switch (i) {
+    switch (i)
+    {
     case 0: /* Creation Date.  */
       i++;
       time[0] = day[0] = '\0';
@@ -895,23 +926,25 @@ void ini_ReadBootFile(pwr_tStatus* status, ini_sContext* cp)
       i++;
       cp->proj[0] = '\0';
       n = sscanf(s, "%s", cp->proj);
-      errh_LogInfo(
-          &cp->log, "Created at %s %s for project: %s", day, time, cp->proj);
+      errh_LogInfo(&cp->log, "Created at %s %s for project: %s", day, time, cp->proj);
       break;
     case 2:
       i++;
       cp->group[0] = '\0';
       n = sscanf(s, "%s", cp->group);
       break;
-    case 3: { /* Find PLC programs.  */
+    case 3:
+    { /* Find PLC programs.  */
       char prog_array[50][80];
       int progs;
       int j;
 
       i++;
 
-      if (!cp->flags.b.plcfile) {
-        if (*s == '-') {
+      if (!cp->flags.b.plcfile)
+      {
+        if (*s == '-')
+        {
           /* No plc programs */
           cp->plcfile = 0;
           continue;
@@ -920,11 +953,11 @@ void ini_ReadBootFile(pwr_tStatus* status, ini_sContext* cp)
         if (s[strlen(s) - 1] == '\n')
           s[strlen(s) - 1] = 0;
 
-        progs = dcli_parse(s, ",", "", (char*)prog_array,
-            sizeof(prog_array) / sizeof(prog_array[0]), sizeof(prog_array[0]),
-            0);
+        progs = dcli_parse(s, ",", "", (char*)prog_array, sizeof(prog_array) / sizeof(prog_array[0]),
+                           sizeof(prog_array[0]), 0);
 
-        if (progs < 1) {
+        if (progs < 1)
+        {
           errh_LogError(&cp->log, "Bootfile corrupt, error in plc data");
           cp->errors++;
           cp->plcfile = 0;
@@ -935,11 +968,10 @@ void ini_ReadBootFile(pwr_tStatus* status, ini_sContext* cp)
 
         cp->plcfile_cnt = progs;
 
-        for (j = 0; j < progs; j++) {
-          snprintf(cp->plcfile[j].name, sizeof(cp->plcfile[0].name), "%s",
-              prog_array[j]);
-          errh_LogInfo(
-              &cp->log, "This node vill run PLC file: %s", cp->plcfile[j].name);
+        for (j = 0; j < progs; j++)
+        {
+          snprintf(cp->plcfile[j].name, sizeof(cp->plcfile[0].name), "%s", prog_array[j]);
+          errh_LogInfo(&cp->log, "This node vill run PLC file: %s", cp->plcfile[j].name);
           cp->plcfile[j].logOpenFail = errh_LogInfo;
         }
       }
@@ -949,27 +981,31 @@ void ini_ReadBootFile(pwr_tStatus* status, ini_sContext* cp)
     case 4: /* Find root volume.  */
       i++;
       n = sscanf(s, "%s %s", vname, vids);
-      if (n < 2) {
+      if (n < 2)
+      {
         errh_LogError(&cp->log, "Found no root volume");
         cp->errors++;
         continue;
-      } else {
+      }
+      else
+      {
         *sts = cdh_StringToVolumeId(vids, &vid);
-        if (EVEN(*sts)) {
+        if (EVEN(*sts))
+        {
           errh_LogError(&cp->log, "Found no root volume");
           cp->errors++;
           continue;
         }
-        errh_LogInfo(&cp->log, "This node has node identity %s (%d)",
-            cdh_NodeIdToString(NULL, vid, 0, 0), vid);
+        errh_LogInfo(&cp->log, "This node has node identity %s (%d)", cdh_NodeIdToString(NULL, vid, 0, 0),
+                     vid);
         cp->node.nid = vid;
       }
       vp = tree_Insert(sts, cp->vid_t, &vid);
       strcpy(vp->name, vname);
       lst_InsertPred(NULL, &cp->vol_lh, &vp->ll, vp);
       vp->isVolRef = 0;
-      vp->oid_t = tree_CreateTable(sts, sizeof(pwr_tObjectIx),
-          offsetof(ivol_sObject, oix), sizeof(ivol_sObject), 10, tree_Comp_oix);
+      vp->oid_t = tree_CreateTable(sts, sizeof(pwr_tObjectIx), offsetof(ivol_sObject, oix),
+                                   sizeof(ivol_sObject), 10, tree_Comp_oix);
       lst_Init(NULL, &vp->upd_lh, NULL);
       lst_Init(NULL, &vp->upd_io_lh, NULL);
       lst_Init(NULL, &vp->cre_lh, NULL);
@@ -977,32 +1013,37 @@ void ini_ReadBootFile(pwr_tStatus* status, ini_sContext* cp)
       break;
     case 5: /* Find other volume.  */
       n = sscanf(s, "%s %s", vname, vids);
-      if (n < 2) {
+      if (n < 2)
+      {
         errh_LogError(&cp->log, "Error in line, skip to next line\n%s", s);
         cp->errors++;
         continue;
-      } else {
+      }
+      else
+      {
         *sts = cdh_StringToVolumeId(vids, &vid);
-        if (EVEN(*sts)) {
-          errh_LogError(
-              &cp->log, "Error in line, skip to next line\n%s\n%m", s, *sts);
+        if (EVEN(*sts))
+        {
+          errh_LogError(&cp->log, "Error in line, skip to next line\n%s\n%m", s, *sts);
           cp->errors++;
           continue;
         }
       }
       /* Do we have this volume?  */
       vp = tree_Find(sts, cp->vid_t, &vid);
-      if (vp != NULL) {
+      if (vp != NULL)
+      {
         errh_LogInfo(&cp->log, "Volume already defined: %s", s);
         vp->isVolRef = 0;
         /* todo !!! check versions */
-      } else {
+      }
+      else
+      {
         vp = tree_Insert(sts, cp->vid_t, &vid);
         strcpy(vp->name, vname);
         lst_InsertPred(NULL, &cp->vol_lh, &vp->ll, vp);
-        vp->oid_t = tree_CreateTable(sts, sizeof(pwr_tObjectIx),
-            offsetof(ivol_sObject, oix), sizeof(ivol_sObject), 10,
-            tree_Comp_oix);
+        vp->oid_t = tree_CreateTable(sts, sizeof(pwr_tObjectIx), offsetof(ivol_sObject, oix),
+                                     sizeof(ivol_sObject), 10, tree_Comp_oix);
         lst_Init(NULL, &vp->upd_lh, NULL);
         lst_Init(NULL, &vp->upd_io_lh, NULL);
         lst_Init(NULL, &vp->cre_lh, NULL);
@@ -1018,32 +1059,34 @@ void ini_ReadBootFile(pwr_tStatus* status, ini_sContext* cp)
   vp = tree_Insert(sts, cp->vid_t, &vid);
   strcpy(vp->name, "rt");
   lst_InsertPred(NULL, &cp->vol_lh, &vp->ll, vp);
-  vp->oid_t = tree_CreateTable(sts, sizeof(pwr_tObjectIx),
-      offsetof(ivol_sObject, oix), sizeof(ivol_sObject), 10, tree_Comp_oix);
+  vp->oid_t = tree_CreateTable(sts, sizeof(pwr_tObjectIx), offsetof(ivol_sObject, oix), sizeof(ivol_sObject),
+                               10, tree_Comp_oix);
   lst_Init(NULL, &vp->upd_lh, NULL);
   lst_Init(NULL, &vp->upd_io_lh, NULL);
   lst_Init(NULL, &vp->cre_lh, NULL);
 }
 
 pwr_tBoolean ini_IterVolumes(pwr_tStatus* sts, ini_sContext* cp,
-    pwr_tBoolean (*func)(pwr_tStatus*, ini_sContext*, ivol_sVolume*))
+                             pwr_tBoolean (*func)(pwr_tStatus*, ini_sContext*, ivol_sVolume*))
 {
   ivol_sVolume* vp;
   lst_sEntry* vl;
 
-  for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL;
-       vp = lst_Succ(NULL, vl, &vl)) {
+  for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL; vp = lst_Succ(NULL, vl, &vl))
+  {
     sprintf(vp->filename, dbs_cNameVolume, cp->bdir, cdh_Low(vp->name));
     // str_ToLower(vp->filename, vp->filename);
 
     dbs_Open(sts, &cp->dbs, vp->filename);
-    if (*sts == ERRNO__NOENT) { /* Give pwrp a chance */
+    if (*sts == ERRNO__NOENT)
+    { /* Give pwrp a chance */
       sprintf(vp->filename, dbs_cNameVolume, cp->dir, cdh_Low(vp->name));
       //  str_ToLower(vp->filename, vp->filename);
       dbs_Open(sts, &cp->dbs, vp->filename);
     }
 
-    if (EVEN(*sts)) {
+    if (EVEN(*sts))
+    {
       errh_LogError(&cp->log, "Open file %s, %m", vp->filename, *sts);
       cp->errors++;
       continue;
@@ -1055,9 +1098,9 @@ pwr_tBoolean ini_IterVolumes(pwr_tStatus* sts, ini_sContext* cp,
 
     dbs_Close(sts, &cp->dbs);
 
-    if (EVEN(*sts)) {
-      errh_LogError(&cp->log, "Error while reading volume file %s, %m",
-          vp->filename, *sts);
+    if (EVEN(*sts))
+    {
+      errh_LogError(&cp->log, "Error while reading volume file %s, %m", vp->filename, *sts);
       cp->errors++;
       break;
     }
@@ -1066,8 +1109,7 @@ pwr_tBoolean ini_IterVolumes(pwr_tStatus* sts, ini_sContext* cp,
 }
 
 /* read all load file headers to get sizes */
-pwr_tBoolean ini_CheckVolumeFile(
-    pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
+pwr_tBoolean ini_CheckVolumeFile(pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
 {
   int reqmask = 0;
   int sects = 0;
@@ -1077,21 +1119,25 @@ pwr_tBoolean ini_CheckVolumeFile(
   pwr_dStatus(sts, status, INI__SUCCESS);
 
   nextpos = dbs_dAlign(sizeof(dbs_sFile));
-  do {
-    if (fseek(cp->dbs.f, nextpos, SEEK_SET) != 0) {
+  do
+  {
+    if (fseek(cp->dbs.f, nextpos, SEEK_SET) != 0)
+    {
       *sts = errno_GetStatus();
       errh_LogFatal(&cp->log, "ini_CheckVolumeFile, fseek, %m", *sts);
       return NO;
     }
-    if (!dbs_AlignedRead(sts, &cp->sect, sizeof(cp->sect), &cp->dbs)) {
+    if (!dbs_AlignedRead(sts, &cp->sect, sizeof(cp->sect), &cp->dbs))
+    {
       errh_LogFatal(&cp->log, "ini_CheckVolumeFile, fread, %m", *sts);
       return NO;
     }
 
-    if (cp->dbs.file.format.m != cp->format.m) {
-      pdrmem_create(&pdrs, &cp->sect, sizeof(cp->sect), PDR_DECODE,
-          cp->dbs.file.format, cp->format);
-      if (!pdr_dbs_sSect(&pdrs, &cp->sect)) {
+    if (cp->dbs.file.format.m != cp->format.m)
+    {
+      pdrmem_create(&pdrs, &cp->sect, sizeof(cp->sect), PDR_DECODE, cp->dbs.file.format, cp->format);
+      if (!pdr_dbs_sSect(&pdrs, &cp->sect))
+      {
         *sts = INI__XDR;
         errh_LogFatal(&cp->log, "ini_CheckVolumeFile, pdr, %m", *sts);
         return NO;
@@ -1100,7 +1146,8 @@ pwr_tBoolean ini_CheckVolumeFile(
 
     nextpos = ftell(cp->dbs.f);
 
-    switch (cp->sect.type) {
+    switch (cp->sect.type)
+    {
     case dbs_eSect_dir:
       if (checkSect(sts, cp, sects, dbs_cVersionDirectory))
         readSectFile(sts, cp, vp);
@@ -1124,7 +1171,7 @@ pwr_tBoolean ini_CheckVolumeFile(
       break;
     default:
       *sts = INI__BADSECT; /* Successful return status; means that */
-      break; /* we can continue after unknown sections */
+      break;               /* we can continue after unknown sections */
     }
     if (EVEN(*sts))
       break; /* Panic exit */
@@ -1133,10 +1180,10 @@ pwr_tBoolean ini_CheckVolumeFile(
 
   } while (cp->sect.type != dbs_eSect_rbody);
 
-  reqmask = (1 << dbs_eSect_dir) | (1 << dbs_eSect_volume)
-      | (1 << dbs_eSect_volref) | (1 << dbs_eSect_oid) | (1 << dbs_eSect_object)
-      | (1 << dbs_eSect_rbody);
-  if ((sects & reqmask) != reqmask) {
+  reqmask = (1 << dbs_eSect_dir) | (1 << dbs_eSect_volume) | (1 << dbs_eSect_volref) | (1 << dbs_eSect_oid) |
+            (1 << dbs_eSect_object) | (1 << dbs_eSect_rbody);
+  if ((sects & reqmask) != reqmask)
+  {
     *sts = INI__SECTORDER;
     errh_LogError(&cp->log, "Section order");
     cp->errors++;
@@ -1145,8 +1192,7 @@ pwr_tBoolean ini_CheckVolumeFile(
   return ODD(*sts);
 }
 
-pwr_tBoolean ini_LoadVolume(
-    pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
+pwr_tBoolean ini_LoadVolume(pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
 {
   pwr_tUInt32 reqmask = 0;
   pwr_tUInt32 sects = 0;
@@ -1156,35 +1202,41 @@ pwr_tBoolean ini_LoadVolume(
   pwr_dStatus(sts, status, INI__SUCCESS);
 
   nextpos = dbs_dAlign(sizeof(dbs_sFile));
-  do {
-    if (fseek(cp->dbs.f, nextpos, SEEK_SET) != 0) {
+  do
+  {
+    if (fseek(cp->dbs.f, nextpos, SEEK_SET) != 0)
+    {
       *sts = errno_GetStatus();
       errh_LogFatal(&cp->log, "ini_LoadVolumeFile, fseek, %m", *sts);
       return NO;
     }
-    if (!dbs_AlignedRead(sts, &cp->sect, sizeof(cp->sect), &cp->dbs)) {
+    if (!dbs_AlignedRead(sts, &cp->sect, sizeof(cp->sect), &cp->dbs))
+    {
       errh_LogFatal(&cp->log, "ini_LoadVolumeFile, fread, %m", *sts);
       return NO;
     }
 
-    if (cp->dbs.file.format.m != cp->format.m) {
-      pdrmem_create(&pdrs, &cp->sect, sizeof(cp->sect), PDR_DECODE,
-          cp->dbs.file.format, cp->format);
-      if (!pdr_dbs_sSect(&pdrs, &cp->sect)) {
+    if (cp->dbs.file.format.m != cp->format.m)
+    {
+      pdrmem_create(&pdrs, &cp->sect, sizeof(cp->sect), PDR_DECODE, cp->dbs.file.format, cp->format);
+      if (!pdr_dbs_sSect(&pdrs, &cp->sect))
+      {
         *sts = INI__XDR;
         errh_LogFatal(&cp->log, "ini_LoadVolumeFile, pdr, %m", *sts);
         return NO;
       }
     }
 
-    if (cp->sect.version != dbs_cVersionDirectory) {
+    if (cp->sect.version != dbs_cVersionDirectory)
+    {
       *sts = INI__HEADVERSION;
       break;
     }
 
     nextpos = ftell(cp->dbs.f);
 
-    switch (cp->sect.type) {
+    switch (cp->sect.type)
+    {
     case dbs_eSect_dir:
       checkSect(sts, cp, sects, dbs_cVersionDirectory);
       break;
@@ -1212,7 +1264,7 @@ pwr_tBoolean ini_LoadVolume(
         loadSectScObject(sts, cp, vp);
       break;
       *sts = INI__BADSECT; /* Successful return status; means that */
-      break; /* we can continue after unknown sections */
+      break;               /* we can continue after unknown sections */
     }
     if (EVEN(*sts))
       break; /* Panic exit */
@@ -1222,11 +1274,11 @@ pwr_tBoolean ini_LoadVolume(
   } while (cp->sect.type != dbs_eSect_rbody);
 
   /** @todo add dbs_eSect_scobject to reqmask */
-  reqmask = (1 << dbs_eSect_dir) | (1 << dbs_eSect_volume)
-      | (1 << dbs_eSect_volref) | (1 << dbs_eSect_oid) | (1 << dbs_eSect_object)
-      | (1 << dbs_eSect_rbody);
+  reqmask = (1 << dbs_eSect_dir) | (1 << dbs_eSect_volume) | (1 << dbs_eSect_volref) | (1 << dbs_eSect_oid) |
+            (1 << dbs_eSect_object) | (1 << dbs_eSect_rbody);
 
-  if ((sects & reqmask) != reqmask) {
+  if ((sects & reqmask) != reqmask)
+  {
     *sts = INI__SECTORDER;
     errh_LogError(&cp->log, "Section order");
     cp->errors++;
@@ -1235,8 +1287,7 @@ pwr_tBoolean ini_LoadVolume(
   return ODD(*sts);
 }
 
-pwr_tBoolean ini_ReloadVolume(
-    pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
+pwr_tBoolean ini_ReloadVolume(pwr_tStatus* status, ini_sContext* cp, ivol_sVolume* vp)
 {
   pwr_tUInt32 reqmask = 0;
   pwr_tUInt32 sects = 0;
@@ -1246,35 +1297,41 @@ pwr_tBoolean ini_ReloadVolume(
   pwr_dStatus(sts, status, INI__SUCCESS);
 
   nextpos = dbs_dAlign(sizeof(dbs_sFile));
-  do {
-    if (fseek(cp->dbs.f, nextpos, SEEK_SET) != 0) {
+  do
+  {
+    if (fseek(cp->dbs.f, nextpos, SEEK_SET) != 0)
+    {
       *sts = errno_GetStatus();
       errh_LogFatal(&cp->log, "ini_ReloadVolumeFile, fseek, %m", *sts);
       return NO;
     }
-    if (!dbs_AlignedRead(sts, &cp->sect, sizeof(cp->sect), &cp->dbs)) {
+    if (!dbs_AlignedRead(sts, &cp->sect, sizeof(cp->sect), &cp->dbs))
+    {
       errh_LogFatal(&cp->log, "ini_ReloadVolumeFile, fread, %m", *sts);
       return NO;
     }
 
-    if (cp->dbs.file.format.m != cp->format.m) {
-      pdrmem_create(&pdrs, &cp->sect, sizeof(cp->sect), PDR_DECODE,
-          cp->dbs.file.format, cp->format);
-      if (!pdr_dbs_sSect(&pdrs, &cp->sect)) {
+    if (cp->dbs.file.format.m != cp->format.m)
+    {
+      pdrmem_create(&pdrs, &cp->sect, sizeof(cp->sect), PDR_DECODE, cp->dbs.file.format, cp->format);
+      if (!pdr_dbs_sSect(&pdrs, &cp->sect))
+      {
         *sts = INI__XDR;
         errh_LogFatal(&cp->log, "ini_ReloadVolumeFile, pdr, %m", *sts);
         return NO;
       }
     }
 
-    if (cp->sect.version != dbs_cVersionDirectory) {
+    if (cp->sect.version != dbs_cVersionDirectory)
+    {
       *sts = INI__HEADVERSION;
       break;
     }
 
     nextpos = ftell(cp->dbs.f);
 
-    switch (cp->sect.type) {
+    switch (cp->sect.type)
+    {
     case dbs_eSect_dir:
       checkSect(sts, cp, sects, dbs_cVersionDirectory);
       break;
@@ -1298,7 +1355,7 @@ pwr_tBoolean ini_ReloadVolume(
       break;
     default:
       *sts = INI__BADSECT; /* Successful return status; means that */
-      break; /* we can continue after unknown sections */
+      break;               /* we can continue after unknown sections */
     }
     if (EVEN(*sts))
       break; /* Panic exit */
@@ -1307,11 +1364,11 @@ pwr_tBoolean ini_ReloadVolume(
 
   } while (cp->sect.type != dbs_eSect_rbody);
 
-  reqmask = (1 << dbs_eSect_dir) | (1 << dbs_eSect_volume)
-      | (1 << dbs_eSect_volref) | (1 << dbs_eSect_oid) | (1 << dbs_eSect_object)
-      | (1 << dbs_eSect_rbody);
+  reqmask = (1 << dbs_eSect_dir) | (1 << dbs_eSect_volume) | (1 << dbs_eSect_volref) | (1 << dbs_eSect_oid) |
+            (1 << dbs_eSect_object) | (1 << dbs_eSect_rbody);
 
-  if ((sects & reqmask) != reqmask) {
+  if ((sects & reqmask) != reqmask)
+  {
     *sts = INI__SECTORDER;
     errh_LogError(&cp->log, "Section order");
     cp->errors++;
@@ -1333,10 +1390,7 @@ pwr_tBoolean ini_LoadNode(pwr_tStatus* status, ini_sContext* cp)
   pwr_tBoolean result;
   pwr_dStatus(sts, status, INI__SUCCESS);
 
-  gdb_ScopeLock
-  {
-    result = ini_IterVolumes(sts, cp, ini_LoadVolume);
-  }
+  gdb_ScopeLock { result = ini_IterVolumes(sts, cp, ini_LoadVolume); }
   gdb_ScopeUnlock;
 
   return result;
@@ -1349,8 +1403,7 @@ pwr_tBoolean ini_ReloadNode(pwr_tStatus* status, ini_sContext* cp)
   return ini_IterVolumes(sts, cp, ini_ReloadVolume);
 }
 
-pwr_tBoolean ini_UpdateBodies(
-    pwr_tStatus* status, ini_sContext* cp, pwr_tBoolean io)
+pwr_tBoolean ini_UpdateBodies(pwr_tStatus* status, ini_sContext* cp, pwr_tBoolean io)
 {
   ivol_sVolume* vp;
   lst_sEntry* vl;
@@ -1360,15 +1413,15 @@ pwr_tBoolean ini_UpdateBodies(
 
   pwr_dStatus(sts, status, INI__SUCCESS);
 
-  for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL;
-       vp = lst_Succ(NULL, vl, &vl)) {
+  for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL; vp = lst_Succ(NULL, vl, &vl))
+  {
     if (io)
       bl = &vp->upd_io_lh;
     else
       bl = &vp->upd_lh;
 
-    for (iop = lst_Succ(NULL, bl, &iol); iop != NULL;
-         iop = lst_Succ(NULL, iol, &iol)) {
+    for (iop = lst_Succ(NULL, bl, &iol); iop != NULL; iop = lst_Succ(NULL, iol, &iol))
+    {
       if (iop->body == NULL || iop->upd_body == NULL)
         continue;
       ivol_CopyBody(sts, iop->upd_body, iop->body, iop->cp);
@@ -1378,8 +1431,7 @@ pwr_tBoolean ini_UpdateBodies(
   return TRUE;
 }
 
-pwr_tBoolean ini_FreeBodies(
-    pwr_tStatus* status, ini_sContext* cp, pwr_tBoolean io)
+pwr_tBoolean ini_FreeBodies(pwr_tStatus* status, ini_sContext* cp, pwr_tBoolean io)
 {
   ivol_sVolume* vp;
   lst_sEntry* vl;
@@ -1389,15 +1441,15 @@ pwr_tBoolean ini_FreeBodies(
 
   pwr_dStatus(sts, status, INI__SUCCESS);
 
-  for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL;
-       vp = lst_Succ(NULL, vl, &vl)) {
+  for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL; vp = lst_Succ(NULL, vl, &vl))
+  {
     if (io)
       bl = &vp->upd_io_lh;
     else
       bl = &vp->upd_lh;
 
-    for (iop = lst_Succ(NULL, bl, &iol); iop != NULL;
-         iop = lst_Succ(NULL, iol, &iol)) {
+    for (iop = lst_Succ(NULL, bl, &iol); iop != NULL; iop = lst_Succ(NULL, iol, &iol))
+    {
       if (iop->upd_body == NULL)
         continue;
       free(iop->upd_body);
@@ -1408,8 +1460,7 @@ pwr_tBoolean ini_FreeBodies(
   return YES;
 }
 
-pwr_tBoolean ini_DecodeBodies(
-    pwr_tStatus* status, ini_sContext* cp, pwr_tBoolean io)
+pwr_tBoolean ini_DecodeBodies(pwr_tStatus* status, ini_sContext* cp, pwr_tBoolean io)
 {
   ivol_sVolume* vp;
   lst_sEntry* vl;
@@ -1419,15 +1470,15 @@ pwr_tBoolean ini_DecodeBodies(
 
   pwr_dStatus(sts, status, INI__SUCCESS);
 
-  for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL;
-       vp = lst_Succ(NULL, vl, &vl)) {
+  for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL; vp = lst_Succ(NULL, vl, &vl))
+  {
     if (io)
       bl = &vp->upd_io_lh;
     else
       bl = &vp->upd_lh;
 
-    for (iop = lst_Succ(NULL, bl, &iol); iop != NULL;
-         iop = lst_Succ(NULL, iol, &iol)) {
+    for (iop = lst_Succ(NULL, bl, &iol); iop != NULL; iop = lst_Succ(NULL, iol, &iol))
+    {
       if (iop->body == NULL || iop->upd_body == NULL)
         continue;
       if (!ivol_DecodeBody(sts, iop->upd_body, iop->cp))
@@ -1445,8 +1496,8 @@ pwr_tBoolean ini_UpdateDatabase(pwr_tStatus* status, ini_sContext* cp)
 
   pwr_dStatus(sts, status, INI__SUCCESS);
 
-  for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL;
-       vp = lst_Succ(NULL, vl, &vl)) {
+  for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL; vp = lst_Succ(NULL, vl, &vl))
+  {
   }
 
   return YES;
@@ -1466,13 +1517,15 @@ pwr_tBoolean ini_BuildNode(pwr_tStatus* status, ini_sContext* cp)
   gdb_ScopeLock
   {
     ivol_BuildNode(sts, &cp->node, &cp->dbs.file.format);
-    if (EVEN(*sts)) {
+    if (EVEN(*sts))
+    {
       errh_LogFatal(&cp->log, "Building runtime database, %m", *sts);
       break;
     }
 
     node_bp = ivol_GetBody(sts, cp->node.nod_oid, NULL);
-    if (node_bp == NULL) {
+    if (node_bp == NULL)
+    {
       errh_LogFatal(&cp->log, "Can not find a node object!");
       break;
     }
@@ -1482,7 +1535,8 @@ pwr_tBoolean ini_BuildNode(pwr_tStatus* status, ini_sContext* cp)
   }
   gdb_ScopeUnlock;
 
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     if (cp->flags.b.ignoreFatal)
       return NO;
     exit(INI__ERROR);
@@ -1491,9 +1545,10 @@ pwr_tBoolean ini_BuildNode(pwr_tStatus* status, ini_sContext* cp)
   /* Create a $System object and set SystemName to project name given in boot
    * file.  */
 
-  tsts = gdh_CreateObject("pwrNode-System", pwr_eClass_System,
-      sizeof(pwr_sSystem), &oid, pwr_cNObjid, 0, pwr_cNObjid);
-  if (ODD(tsts)) {
+  tsts = gdh_CreateObject("pwrNode-System", pwr_eClass_System, sizeof(pwr_sSystem), &oid, pwr_cNObjid, 0,
+                          pwr_cNObjid);
+  if (ODD(tsts))
+  {
     gdh_SetObjectInfo("pwrNode-System.SystemName", cp->proj, size);
     gdh_SetObjectInfo("pwrNode-System.SystemGroup", cp->group, gsize);
     gdh_SetObjectReadOnly(oid);
@@ -1518,8 +1573,8 @@ pwr_tBoolean ini_RebuildNode(pwr_tStatus* status, ini_sContext* cp)
 
   gdb_ScopeExcl
   {
-    for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL;
-         vp = lst_Succ(NULL, vl, &vl)) {
+    for (vp = lst_Succ(NULL, &cp->vol_lh, &vl); vp != NULL; vp = lst_Succ(NULL, vl, &vl))
+    {
       if (cp->flags.b.verbose)
         errh_LogInfo(&cp->log, "Rebuild volume: %s", vp->volume.name);
       ivol_RebuildVolume(sts, vp, &cp->dbs.file.format);
@@ -1538,7 +1593,8 @@ pwr_tBoolean ini_RebuildNode(pwr_tStatus* status, ini_sContext* cp)
     errh_LogInfo(&cp->log, "Io areas created");
 
   node_bp = ivol_GetBody(sts, cp->node.nod_oid, NULL);
-  if (node_bp == NULL) {
+  if (node_bp == NULL)
+  {
     errh_LogFatal(&cp->log, "Can not find a node object!");
   }
   cp->np = (pwr_sNode*)node_bp->body;
@@ -1587,9 +1643,8 @@ pwr_tBoolean ini_ReadNodeFile(pwr_tStatus* status, ini_sContext* cp)
   return YES;
 }
 
-ini_sProc* ini_ProcInsert(pwr_tStatus* status, ini_sContext* cp, char* id,
-    char* name, int load, int run, char* file, int prio, int debug,
-    pwr_tCid confcid, char* arg, void* objectp)
+ini_sProc* ini_ProcInsert(pwr_tStatus* status, ini_sContext* cp, char* id, char* name, int load, int run,
+                          char* file, int prio, int debug, pwr_tCid confcid, char* arg, void* objectp)
 {
   ini_sProc* pp;
   char buf[255];
@@ -1604,7 +1659,8 @@ ini_sProc* ini_ProcInsert(pwr_tStatus* status, ini_sContext* cp, char* id,
   if (pp == NULL)
     return NULL;
 
-  if (name != NULL && name[0] != '\0' && strcmp(name, "\"\"")) {
+  if (name != NULL && name[0] != '\0' && strcmp(name, "\"\""))
+  {
     if (pp->proc.name != NULL)
       free(pp->proc.name);
     sprintf(buf, name, cp->busid);
@@ -1614,18 +1670,21 @@ ini_sProc* ini_ProcInsert(pwr_tStatus* status, ini_sContext* cp, char* id,
     pp->proc.flags.b.load = load != 0;
   if (run != -1)
     pp->flags.b.run = run != 0;
-  if (file != NULL && file[0] != '\0' && strcmp(file, "\"\"")) {
+  if (file != NULL && file[0] != '\0' && strcmp(file, "\"\""))
+  {
     if (pp->proc.file != NULL)
       free(pp->proc.file);
     pp->proc.file = strsav(file);
     s = getenv("pwr_exe");
     sprintf(buf, "%s/%s", s, file);
     ret = stat(buf, &f_stat);
-    if (ret == -1) {
+    if (ret == -1)
+    {
       s = getenv("pwrp_exe");
       sprintf(buf, "%s/%s", s, file);
       ret = stat(buf, &f_stat);
-      if (ret == -1) {
+      if (ret == -1)
+      {
         pp->flags.b.run = 0;
         pp->proc.flags.b.load = 0;
       }
@@ -1633,7 +1692,8 @@ ini_sProc* ini_ProcInsert(pwr_tStatus* status, ini_sContext* cp, char* id,
   }
   if (confcid && EVEN(gdh_GetClassList(confcid, &oid)))
     pp->flags.b.run = 0;
-  if (arg != NULL && arg[0] != '\0' && strcmp(arg, "\"\"")) {
+  if (arg != NULL && arg[0] != '\0' && strcmp(arg, "\"\""))
+  {
     if (pp->proc.arg != NULL)
       free(pp->proc.arg);
     pp->proc.arg = strsav(arg);
@@ -1643,7 +1703,8 @@ ini_sProc* ini_ProcInsert(pwr_tStatus* status, ini_sContext* cp, char* id,
   if (debug != -1)
     pp->proc.flags.b.debug = debug != 0;
   pp->objectp = objectp;
-  if (!lst_IsLinked(NULL, &pp->proc_ll)) {
+  if (!lst_IsLinked(NULL, &pp->proc_ll))
+  {
     lst_InsertPred(NULL, &cp->proc_lh, &pp->proc_ll, pp);
   }
 
@@ -1664,10 +1725,12 @@ void ini_ProcStart(pwr_tStatus* status, ini_sContext* cp, ini_sProc* pp)
   if (pp->flags.b.running)
     return;
 
-  if (pp->flags.b.run) {
-    errh_LogInfo(&cp->log, "Starting %s, file: %s, prio: %d", pp->id,
-        pp->proc.file, pp->proc.p_prio);
-  } else {
+  if (pp->flags.b.run)
+  {
+    errh_LogInfo(&cp->log, "Starting %s, file: %s, prio: %d", pp->id, pp->proc.file, pp->proc.p_prio);
+  }
+  else
+  {
     errh_LogInfo(&cp->log, "Not starting %s, file: %s", pp->id, pp->proc.file);
     return;
   }
@@ -1684,12 +1747,15 @@ void ini_ProcPrio(pwr_tStatus* status, ini_sContext* cp, ini_sProc* pp)
   if (pp->flags.b.running)
     return;
 
-  if (pp->flags.b.run) {
+  if (pp->flags.b.run)
+  {
 #if defined(OS_LINUX)
-    if (!(pp->flags.b.plc)) {
+    if (!(pp->flags.b.plc))
+    {
       struct sched_param sp;
       sp.sched_priority = pp->proc.p_prio;
-      if (sched_setscheduler(pp->proc.pid, SCHED_RR, &sp) == -1) {
+      if (sched_setscheduler(pp->proc.pid, SCHED_RR, &sp) == -1)
+      {
         perror("sched_setscheduler");
         fprintf(stderr, "failed to set pid %d's policy\n", pp->proc.pid);
         return;
@@ -1700,16 +1766,17 @@ void ini_ProcPrio(pwr_tStatus* status, ini_sContext* cp, ini_sProc* pp)
 }
 
 void ini_ProcIter(pwr_tStatus* status, ini_sContext* cp, int mask, int pmask,
-    void (*func)(pwr_tStatus*, ini_sContext*, ini_sProc*))
+                  void (*func)(pwr_tStatus*, ini_sContext*, ini_sProc*))
 {
   lst_sEntry* pl;
   ini_sProc* pp;
 
   pwr_dStatus(sts, status, INI__SUCCESS);
 
-  for (pp = lst_Succ(NULL, &cp->proc_lh, &pl); pp != NULL;
-       pp = lst_Succ(NULL, pl, &pl)) {
-    if (pp->proc.flags.m & mask) {
+  for (pp = lst_Succ(NULL, &cp->proc_lh, &pl); pp != NULL; pp = lst_Succ(NULL, pl, &pl))
+  {
+    if (pp->proc.flags.m & mask)
+    {
       if (!pmask || (pp->flags.m & pmask))
         func(sts, cp, pp);
     }
@@ -1727,16 +1794,22 @@ void ini_ProcWait(pwr_tStatus* status, ini_sContext* cp)
 
   pwr_dStatus(sts, status, INI__SUCCESS);
 
-  for (;;) {
+  for (;;)
+  {
     int status;
 
     get.data = NULL;
     qcom_Get(sts, &cp->eventQ, &get, tmo);
-    if (*sts == QCOM__TMO || *sts == QCOM__QEMPTY) {
+    if (*sts == QCOM__TMO || *sts == QCOM__QEMPTY)
+    {
       errh_Info("Timeout");
-    } else if (get.data == NULL) {
+    }
+    else if (get.data == NULL)
+    {
       errh_Info("Nulldata");
-    } else {
+    }
+    else
+    {
       errh_Info("%d %s", get.size, get.data);
       qcom_Free(NULL, get.data);
     }
@@ -1748,9 +1821,10 @@ void ini_ProcWait(pwr_tStatus* status, ini_sContext* cp)
     if (pid == last_pid)
       break;
 
-    for (pp = lst_Succ(NULL, &cp->proc_lh, &pl); pp != NULL;
-         pp = lst_Succ(NULL, pl, &pl)) {
-      if (pp->proc.pid == pid) {
+    for (pp = lst_Succ(NULL, &cp->proc_lh, &pl); pp != NULL; pp = lst_Succ(NULL, pl, &pl))
+    {
+      if (pp->proc.pid == pid)
+      {
         errh_Info("Process %s exited with status %d", pp->proc.name, status);
         break;
       }
@@ -1842,18 +1916,19 @@ static void create_active_io()
   bi_cnt = 0;
   bi_size = 0;
   for (sts = gdh_GetSubClassList(pwr_cClass_Bi, &subcid); ODD(sts);
-       sts = gdh_GetNextSubClass(pwr_cClass_Bi, subcid, &subcid)) {
+       sts = gdh_GetNextSubClass(pwr_cClass_Bi, subcid, &subcid))
+  {
     pwr_tTypeId a_type;
     unsigned int a_size, a_offs, a_dim;
 
     for (sts = gdh_GetClassListAttrRef(subcid, &aref); ODD(sts);
-         sts = gdh_GetNextAttrRef(subcid, &aref, &aref)) {
+         sts = gdh_GetNextAttrRef(subcid, &aref, &aref))
+    {
       sts = gdh_ArefANameToAref(&aref, "ActualValue", &actval_aref);
       if (EVEN(sts))
         continue;
 
-      sts = gdh_GetAttributeCharAttrref(
-          &actval_aref, &a_type, &a_size, &a_offs, &a_dim);
+      sts = gdh_GetAttributeCharAttrref(&actval_aref, &a_type, &a_size, &a_offs, &a_dim);
       if (EVEN(sts))
         continue;
 
@@ -1866,18 +1941,19 @@ static void create_active_io()
   bo_cnt = 0;
   bo_size = 0;
   for (sts = gdh_GetSubClassList(pwr_cClass_Bo, &subcid); ODD(sts);
-       sts = gdh_GetNextSubClass(pwr_cClass_Bo, subcid, &subcid)) {
+       sts = gdh_GetNextSubClass(pwr_cClass_Bo, subcid, &subcid))
+  {
     pwr_tTypeId a_type;
     unsigned int a_size, a_offs, a_dim;
 
     for (sts = gdh_GetClassListAttrRef(subcid, &aref); ODD(sts);
-         sts = gdh_GetNextAttrRef(subcid, &aref, &aref)) {
+         sts = gdh_GetNextAttrRef(subcid, &aref, &aref))
+    {
       sts = gdh_ArefANameToAref(&aref, "ActualValue", &actval_aref);
       if (EVEN(sts))
         continue;
 
-      sts = gdh_GetAttributeCharAttrref(
-          &actval_aref, &a_type, &a_size, &a_offs, &a_dim);
+      sts = gdh_GetAttributeCharAttrref(&actval_aref, &a_type, &a_size, &a_offs, &a_dim);
       if (EVEN(sts))
         continue;
 
@@ -1886,104 +1962,102 @@ static void create_active_io()
       bo_size += a_size;
     }
   }
-  sts = gdh_CreateObject("pwrNode-active", pwr_eClass_NodeHier, 0, &oid,
-      pwr_cNObjid, 0, pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io", pwr_eClass_NodeHier, 0, &oid,
-      pwr_cNObjid, 0, pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-ai", pwr_cClass_AiArea,
-      ai_cnt * sizeof(((pwr_sClass_AiArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
-      pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-ao", pwr_cClass_AoArea,
-      ao_cnt * sizeof(((pwr_sClass_AoArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
-      pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-av", pwr_cClass_AvArea,
-      av_cnt * sizeof(((pwr_sClass_AvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
-      pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-ca", pwr_cClass_CaArea,
-      co_cnt * sizeof(((pwr_sClass_CaArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
-      pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-co", pwr_cClass_CoArea,
-      co_cnt * sizeof(((pwr_sClass_CoArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
-      pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-di", pwr_cClass_DiArea,
-      di_cnt * sizeof(((pwr_sClass_DiArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
-      pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-do", pwr_cClass_DoArea,
-      do_cnt * sizeof(((pwr_sClass_DoArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
-      pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-dv", pwr_cClass_DvArea,
-      dv_cnt * sizeof(((pwr_sClass_DvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
-      pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-ii", pwr_cClass_IiArea,
-      ii_cnt * sizeof(((pwr_sClass_IiArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
-      pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-io", pwr_cClass_IoArea,
-      io_cnt * sizeof(((pwr_sClass_IoArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
-      pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-iv", pwr_cClass_IvArea,
-      iv_cnt * sizeof(((pwr_sClass_IvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
-      pwr_cNObjid);
+  sts = gdh_CreateObject("pwrNode-active", pwr_eClass_NodeHier, 0, &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts = gdh_CreateObject("pwrNode-active-io", pwr_eClass_NodeHier, 0, &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-ai", pwr_cClass_AiArea,
+                       ai_cnt * sizeof(((pwr_sClass_AiArea*)0)->Value[0]), &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-ao", pwr_cClass_AoArea,
+                       ao_cnt * sizeof(((pwr_sClass_AoArea*)0)->Value[0]), &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-av", pwr_cClass_AvArea,
+                       av_cnt * sizeof(((pwr_sClass_AvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-ca", pwr_cClass_CaArea,
+                       co_cnt * sizeof(((pwr_sClass_CaArea*)0)->Value[0]), &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-co", pwr_cClass_CoArea,
+                       co_cnt * sizeof(((pwr_sClass_CoArea*)0)->Value[0]), &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-di", pwr_cClass_DiArea,
+                       di_cnt * sizeof(((pwr_sClass_DiArea*)0)->Value[0]), &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-do", pwr_cClass_DoArea,
+                       do_cnt * sizeof(((pwr_sClass_DoArea*)0)->Value[0]), &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-dv", pwr_cClass_DvArea,
+                       dv_cnt * sizeof(((pwr_sClass_DvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-ii", pwr_cClass_IiArea,
+                       ii_cnt * sizeof(((pwr_sClass_IiArea*)0)->Value[0]), &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-io", pwr_cClass_IoArea,
+                       io_cnt * sizeof(((pwr_sClass_IoArea*)0)->Value[0]), &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-iv", pwr_cClass_IvArea,
+                       iv_cnt * sizeof(((pwr_sClass_IvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0, pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-atv", pwr_cClass_ATvArea,
-      atv_cnt * sizeof(((pwr_sClass_ATvArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         atv_cnt * sizeof(((pwr_sClass_ATvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-dtv", pwr_cClass_DTvArea,
-      dtv_cnt * sizeof(((pwr_sClass_DTvArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-sv", pwr_cClass_SvArea,
-      sv_cnt * sizeof(((pwr_sClass_SvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
-      pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-bi", pwr_cClass_BiArea, bi_size,
-      &oid, pwr_cNObjid, 0, pwr_cNObjid);
-  sts = gdh_CreateObject("pwrNode-active-io-bo", pwr_cClass_BoArea, bo_size,
-      &oid, pwr_cNObjid, 0, pwr_cNObjid);
+                         dtv_cnt * sizeof(((pwr_sClass_DTvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-sv", pwr_cClass_SvArea,
+                       sv_cnt * sizeof(((pwr_sClass_SvArea*)0)->Value[0]), &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-bi", pwr_cClass_BiArea, bi_size, &oid, pwr_cNObjid, 0, pwr_cNObjid);
+  sts =
+      gdh_CreateObject("pwrNode-active-io-bo", pwr_cClass_BoArea, bo_size, &oid, pwr_cNObjid, 0, pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-dv_init", pwr_cClass_InitArea,
-      dv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         dv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-av_init", pwr_cClass_InitArea,
-      av_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         av_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-iv_init", pwr_cClass_InitArea,
-      iv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         iv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-ai_init", pwr_cClass_InitArea,
-      ai_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         ai_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-ao_init", pwr_cClass_InitArea,
-      ao_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         ao_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-di_init", pwr_cClass_InitArea,
-      di_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         di_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-do_init", pwr_cClass_InitArea,
-      do_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         do_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-ii_init", pwr_cClass_InitArea,
-      ii_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         ii_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-io_init", pwr_cClass_InitArea,
-      io_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         io_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-atv_init", pwr_cClass_InitArea,
-      atv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         atv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-dtv_init", pwr_cClass_InitArea,
-      dtv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         dtv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-sv_init", pwr_cClass_InitArea,
-      sv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         sv_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-bi_init", pwr_cClass_InitArea,
-      bi_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         bi_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-bi_initsize", pwr_cClass_InitArea,
-      bi_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         bi_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-bo_init", pwr_cClass_InitArea,
-      bo_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         bo_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
   sts = gdh_CreateObject("pwrNode-active-io-bo_initsize", pwr_cClass_InitArea,
-      bo_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid,
-      0, pwr_cNObjid);
+                         bo_cnt * sizeof(((pwr_sClass_InitArea*)0)->Value[0]), &oid, pwr_cNObjid, 0,
+                         pwr_cNObjid);
 }
 
 static void rename_active_io(ini_sContext* cp)
@@ -1996,12 +2070,14 @@ static void rename_active_io(ini_sContext* cp)
     delete_old_io();
 
   sts = gdh_NameToObjid("pwrNode-active", &oid);
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_LogError(&cp->log, "gdh_NameToObjid(pwrNode-active, &oid), %m", sts);
     return;
   }
   sts = gdh_RenameObject(oid, "old");
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_LogError(&cp->log, "gdh_RenameObject(oid, pwrNode-old), %m", sts);
     return;
   }

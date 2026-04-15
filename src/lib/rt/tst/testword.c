@@ -36,15 +36,18 @@
 
 main()
 {
-  union {
+  union
+  {
     int i;
-    struct {
+    struct
+    {
       char c0;
       char c1;
       char c2;
       char c3;
     } c;
-    struct {
+    struct
+    {
       unsigned int b0 : 4;
       unsigned int b1 : 4;
       unsigned int b2 : 8;

@@ -62,10 +62,7 @@ int main(int argc, char* argv[])
   if (!qcom_Init(&sts, NULL))
     exit(sts);
 
-  qdb_ScopeLock
-  {
-    qp = qdb_AttachQue(&sts, qdb->export, qdb->ap);
-  }
+  qdb_ScopeLock { qp = qdb_AttachQue(&sts, qdb->export, qdb->ap); }
   qdb_ScopeUnlock;
 
   if (qp == NULL)
@@ -77,22 +74,25 @@ int main(int argc, char* argv[])
 
   pp = qnet_Open(&sts, &port);
 
-  while (qdb->g->up) {
+  while (qdb->g->up)
+  {
     p = qcom_Get(&sts, &qdb->g->qid_export, NULL, qcom_cTmoEternal);
     if (p == NULL)
       continue;
     bp = (qdb_sBuffer*)p - 1;
     pwr_Assert(bp->c.type == qdb_eBuffer_base);
 
-    if (bp->c.flags.b.broadcast) {
-      if (!bp->c.flags.b.imported) {
+    if (bp->c.flags.b.broadcast)
+    {
+      if (!bp->c.flags.b.imported)
+      {
         qdb_ScopeLock
         {
-          for (nl = pool_Qsucc(NULL, &qdb->pool, &qdb->g->node_lh);
-               nl != &qdb->g->node_lh; nl = pool_Qsucc(NULL, &qdb->pool, nl)) {
+          for (nl = pool_Qsucc(NULL, &qdb->pool, &qdb->g->node_lh); nl != &qdb->g->node_lh;
+               nl = pool_Qsucc(NULL, &qdb->pool, nl))
+          {
             np = pool_Qitem(nl, qdb_sNode, node_ll);
-            if (np == qdb->my_node || np == qdb->no_node
-                || np->state != qdb_eState_up)
+            if (np == qdb->my_node || np == qdb->no_node || np->state != qdb_eState_up)
               continue;
 
             nbp = qdb_CopyBuffer(&sts, bp);
@@ -102,7 +102,8 @@ int main(int argc, char* argv[])
             nbp->b.info.receiver.nid = np->nid;
             nbp->b.info.rid = ++np->bc_snd_id;
 
-            if (pool_QhasOne(NULL, &qdb->pool, &np->bcb_lh)) {
+            if (pool_QhasOne(NULL, &qdb->pool, &np->bcb_lh))
+            {
               sbp = qdb_CopyBuffer(&sts, nbp);
 
               qdb_Unlock;
@@ -115,8 +116,11 @@ int main(int argc, char* argv[])
         }
         qdb_ScopeUnlock;
       }
-    } else {
-      if (bp->c.flags.b.reply) {
+    }
+    else
+    {
+      if (bp->c.flags.b.reply)
+      {
         nbp = NULL;
         qdb_ScopeLock
         {
@@ -125,7 +129,8 @@ int main(int argc, char* argv[])
             break;
           if (rp->rid != bp->b.info.rid)
             break; /* here we could choose not to send the buffer */
-          if (pool_QisEmpty(&sts, &qdb->pool, &rp->b_lh)) {
+          if (pool_QisEmpty(&sts, &qdb->pool, &rp->b_lh))
+          {
             nbp = qdb_CopyBuffer(&sts, bp);
             if (nbp == NULL)
               break;
@@ -136,8 +141,9 @@ int main(int argc, char* argv[])
         qdb_ScopeUnlock;
         if (rp == NULL || rp->rid == bp->b.info.rid)
           qnet_Put(&sts, pp, bp);
-
-      } else {
+      }
+      else
+      {
         qnet_Put(&sts, pp, bp);
       }
     }

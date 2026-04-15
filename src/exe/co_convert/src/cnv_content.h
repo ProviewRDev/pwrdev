@@ -43,8 +43,9 @@
 
 #include "cnv_style.h"
 
-class CnvContentElem {
-  public:
+class CnvContentElem
+{
+public:
   CnvContentElem() : page_number(0), header_level(0)
   {
     strcpy(text, "");
@@ -58,11 +59,10 @@ class CnvContentElem {
   char text[80];
 };
 
-class CnvContent {
-  public:
-  CnvContent()
-  {
-  }
+class CnvContent
+{
+public:
+  CnvContent() {}
   std::vector<CnvContentElem> tab;
   void add(CnvContentElem& elem);
   int find_link(const char* subject, char* text, int* page);

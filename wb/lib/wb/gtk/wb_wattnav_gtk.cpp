@@ -37,9 +37,10 @@
 /* wb_wattnav_gtk.cpp -- Display object info */
 
 #include <stdlib.h>
-//#include "cow_gtk.h"
+// #include "cow_gtk.h"
 
-extern "C" {
+extern "C"
+{
 #include "pwr_baseclasses.h"
 #include "co_time.h"
 #include "rt_mh_net.h"
@@ -55,17 +56,15 @@ extern "C" {
 //
 // Create the navigator widget
 //
-WAttNavGtk::WAttNavGtk(void* wa_parent_ctx, wattnav_eType wa_type,
-    GtkWidget* wa_parent_wid, const char* wa_name, ldh_tSesContext wa_ldhses,
-    pwr_sAttrRef wa_aref, int wa_editmode, int wa_advanced_user,
-    int wa_display_objectname, wb_eUtility wa_utility, GtkWidget** w,
-    pwr_tStatus* status)
-    : WAttNav(wa_parent_ctx, wa_type, wa_name, wa_ldhses, wa_aref, wa_editmode,
-          wa_advanced_user, wa_display_objectname, wa_utility, status),
+WAttNavGtk::WAttNavGtk(void* wa_parent_ctx, wattnav_eType wa_type, GtkWidget* wa_parent_wid,
+                       const char* wa_name, ldh_tSesContext wa_ldhses, pwr_sAttrRef wa_aref, int wa_editmode,
+                       int wa_advanced_user, int wa_display_objectname, wb_eUtility wa_utility, GtkWidget** w,
+                       pwr_tStatus* status)
+    : WAttNav(wa_parent_ctx, wa_type, wa_name, wa_ldhses, wa_aref, wa_editmode, wa_advanced_user,
+              wa_display_objectname, wa_utility, status),
       parent_wid(wa_parent_wid)
 {
-  form_widget
-      = scrolledbrowwidgetgtk_new(WAttNav::init_brow_cb, this, &brow_widget);
+  form_widget = scrolledbrowwidgetgtk_new(WAttNav::init_brow_cb, this, &brow_widget);
 
   gtk_widget_show_all(brow_widget);
 
@@ -90,8 +89,7 @@ pwr_tStatus WAttNavGtk::get_selection(char* str, int size)
 
   sts = CoWowGtk::GetSelection(form_widget, str, size, objid_atom);
   if (EVEN(sts))
-    sts = CoWowGtk::GetSelection(
-        form_widget, str, size, GDK_SELECTION_TYPE_STRING);
+    sts = CoWowGtk::GetSelection(form_widget, str, size, GDK_SELECTION_TYPE_STRING);
   return sts;
 }
 

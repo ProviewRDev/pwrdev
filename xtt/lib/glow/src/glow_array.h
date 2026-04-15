@@ -56,7 +56,8 @@ class GrowCtx;
 class GlowExportFlow;
 class GlowExportScript;
 
-class GlowArray {
+class GlowArray
+{
 public:
   //! Constructor.
   /*!
@@ -67,7 +68,7 @@ public:
   GlowArray(int allocate, int incr);
 
   //! Noargs constructor.
-  GlowArray(): allocated(0),alloc_incr(0),a_size(0),a(NULL) {}
+  GlowArray() : allocated(0), alloc_incr(0), a_size(0), a(NULL) {}
 
   //! Initiates an array to be a copy of another array.
   /*!
@@ -109,10 +110,7 @@ public:
   /*!
     \return 	The number of objects in the array.
   */
-  int size()
-  {
-    return a_size;
-  }
+  int size() { return a_size; }
 
   //! Insert an element last.
   /*!
@@ -143,10 +141,7 @@ public:
   int find_by_name(const char* name, GlowArrayElem** element);
 
   //! Clear the array.
-  void clear()
-  {
-    a_size = 0;
-  }
+  void clear() { a_size = 0; }
   void delete_all();
   void get_objectlist(GlowArrayElem*** list, int* size)
   {
@@ -162,38 +157,32 @@ public:
   void open(GrowCtx* ctx, std::ifstream& fp);
   void draw();
   void draw(GlowWind* w, void* pos, int highlight, int hot, void* node);
-  //void erase(GlowWind* w, void* pos, int hot, void* node);
-  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node,
-      void* colornode, void *transpnode);
-  //void erase(GlowWind* w, GlowTransform* t, int hot, void* node);
+  // void erase(GlowWind* w, void* pos, int hot, void* node);
+  void draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+            void* transpnode);
+  // void erase(GlowWind* w, GlowTransform* t, int hot, void* node);
   void draw_inverse(void* pos, int hot, void* node);
   void nav_draw(void* pos, int highlight, void* node);
   void nav_draw(GlowTransform* t, int highlight, void* node, void* colornode);
   void nav_erase(void* pos, void* node);
   void nav_erase(GlowTransform* t, void* node);
   void traverse(int x, int y);
-  void get_borders(
-      double* x_right, double* x_left, double* y_high, double* y_low);
-  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left,
-      double* y_high, double* y_low, void* node);
-  void get_borders(GlowTransform* t, double* x_right, double* x_left,
-      double* y_high, double* y_low);
+  void get_borders(double* x_right, double* x_left, double* y_high, double* y_low);
+  void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,
+                   void* node);
+  void get_borders(GlowTransform* t, double* x_right, double* x_left, double* y_high, double* y_low);
   int event_handler(GlowWind* w, glow_eEvent event, int x, int y);
-  int event_handler(
-      GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
+  int event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy);
   int event_handler(GlowWind* w, glow_eEvent event, double fx, double fy);
-  int event_handler(
-      GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
-  int event_handler(
-      GlowWind* w, void* pos, glow_eEvent event, int x, int y, int num);
+  int event_handler(GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node);
+  int event_handler(GlowWind* w, void* pos, glow_eEvent event, int x, int y, int num);
   void conpoint_select(void* pos, int x, int y, double* distance, void** cp);
-  void conpoint_select(GlowTransform* t, int x, int y, double* distance,
-      void** cp, int* pix_x, int* pix_y);
+  void conpoint_select(GlowTransform* t, int x, int y, double* distance, void** cp, int* pix_x, int* pix_y);
   int get_conpoint(int num, double* x, double* y, glow_eDirection* dir);
   void set_highlight(int on);
   void set_hot(int on);
   void select_region_insert(double ll_x, double ll_y, double ur_x, double ur_y,
-      glow_eSelectPolicy select_policy);
+                            glow_eSelectPolicy select_policy);
   void shift(void* pos, double delta_x, double delta_y, int highlight, int hot);
   void move(double delta_x, double delta_y, int grid);
   void move_noerase(int delta_x, int delta_y, int grid);
@@ -201,8 +190,7 @@ public:
   void conpoint_refcon_erase(void* node, int conpoint);
   void set_inverse(int on);
   void configure();
-  int brow_insert(
-      GlowArrayElem* element, GlowArrayElem* destination, glow_eDest code);
+  int brow_insert(GlowArrayElem* element, GlowArrayElem* destination, glow_eDest code);
   int move(GlowArrayElem* element, GlowArrayElem* destination, glow_eDest code);
   void brow_remove(void* ctx, GlowArrayElem* element);
   void brow_close(void* ctx, GlowArrayElem* element);
@@ -259,9 +247,9 @@ public:
   void set_last_group(char* name);
   char* get_last_group();
   void set_parent(GlowArrayElem* parent);
-  int get_background_object_limits(GlowTransform* t, glow_eTraceType type,
-      double x, double y, GlowArrayElem** background, double* min, double* max,
-      glow_eDirection* direction);
+  int get_background_object_limits(GlowTransform* t, glow_eTraceType type, double x, double y,
+                                   GlowArrayElem** background, double* min, double* max,
+                                   glow_eDirection* direction);
   void flip(double x0, double y0, glow_eFlipDirection dir);
   void convert(glow_eConvert version);
   void set_rootnode(void* node);

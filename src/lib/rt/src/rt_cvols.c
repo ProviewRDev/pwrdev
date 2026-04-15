@@ -41,14 +41,14 @@
 #include "rt_gdh_msg.h"
 #include "rt_cvols.h"
 
-cvol_sNotify* cvols_InitNotify(
-    gdb_sObject* op, cvol_sNotify* nmp, net_eMsg subtype)
+cvol_sNotify* cvols_InitNotify(gdb_sObject* op, cvol_sNotify* nmp, net_eMsg subtype)
 {
   unsigned int size = 0;
 
   gdb_AssumeLocked;
 
-  switch (subtype) {
+  switch (subtype)
+  {
   case net_eMsg_createObject:
     size = sizeof(net_sCreateObject);
     break;
@@ -98,8 +98,9 @@ void cvols_Notify(cvol_sNotify* nmp)
      NOTA BENE !!!
         In this version we send to all known nodes. */
 
-  for (nl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->nod_lh);
-       nl != &gdbroot->db->nod_lh; nl = pool_Qsucc(NULL, gdbroot->pool, nl)) {
+  for (nl = pool_Qsucc(NULL, gdbroot->pool, &gdbroot->db->nod_lh); nl != &gdbroot->db->nod_lh;
+       nl = pool_Qsucc(NULL, gdbroot->pool, nl))
+  {
     np = pool_Qitem(nl, gdb_sNode, nod_ll);
     if (np == gdbroot->my_node || np == gdbroot->no_node)
       continue;
@@ -109,8 +110,7 @@ void cvols_Notify(cvol_sNotify* nmp)
     tgt.nid = np->nid;
 
     if (!net_Put(&lsts, &tgt, &nmp->msg, nmp->subtype, 0, nmp->size, 0))
-      errh_Warning("Notify: error %x sending subtype %s to node %s", lsts,
-          "Notify", np->name);
+      errh_Warning("Notify: error %x sending subtype %s to node %s", lsts, "Notify", np->name);
   }
 
   /* Submit to the NETH ACP to check if any subscriptions are affected.  */

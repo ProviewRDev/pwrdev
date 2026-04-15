@@ -42,36 +42,30 @@
 #include "flow_ctx.h"
 
 #include <gtk/gtk.h>
-//#include <gtk/gtkprivate.h>
+// #include <gtk/gtkprivate.h>
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #define FLOWWIDGETGTK_TYPE (flowwidgetgtk_get_type())
-#define FLOWWIDGETGTK(obj)                                                     \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), FLOWWIDGETGTK_TYPE, FlowWidgetGtk))
-#define FLOWWIDGETGTK_CLASS(obj)                                               \
-  (G_TYPE_CHECK_CLASS_CAST((obj), FLOWWIDGETGTK, FlowWidgetGtkClass))
-#define IS_FLOWWIDGETGTK(obj)                                                  \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), FLOWWIDGETGTK_TYPE))
-#define IS_FLOWWIDGETGTK_CLASS(obj)                                            \
-  (G_TYPE_CHECK_CLASS_TYPE((obj), FLOWWIDGETGTK_TYPE))
-#define FLOWWIDGETGTK_GET_CLASS                                                \
-  (G_TYPE_INSTANCE_GET_CLASS((obj), FLOWWIDGETGTK, FlowWidgetGtkClass))
+#define FLOWWIDGETGTK(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), FLOWWIDGETGTK_TYPE, FlowWidgetGtk))
+#define FLOWWIDGETGTK_CLASS(obj) (G_TYPE_CHECK_CLASS_CAST((obj), FLOWWIDGETGTK, FlowWidgetGtkClass))
+#define IS_FLOWWIDGETGTK(obj) (G_TYPE_CHECK_INSTANCE_TYPE((obj), FLOWWIDGETGTK_TYPE))
+#define IS_FLOWWIDGETGTK_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE((obj), FLOWWIDGETGTK_TYPE))
+#define FLOWWIDGETGTK_GET_CLASS (G_TYPE_INSTANCE_GET_CLASS((obj), FLOWWIDGETGTK, FlowWidgetGtkClass))
 
-GType flowwidgetgtk_get_type(void);
+  GType flowwidgetgtk_get_type(void);
 
-GtkWidget* flowwidgetgtk_new(
-    int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data);
-GtkWidget* scrolledflowwidgetgtk_new(
-    int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
-    GtkWidget** flowwidget);
+  GtkWidget* flowwidgetgtk_new(int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data);
+  GtkWidget* scrolledflowwidgetgtk_new(int (*init_proc)(FlowCtx* ctx, void* client_data), void* client_data,
+                                       GtkWidget** flowwidget);
 
-GtkWidget* flownavwidgetgtk_new(GtkWidget* main_flow);
+  GtkWidget* flownavwidgetgtk_new(GtkWidget* main_flow);
 
-void flowwidgetgtk_get_ctx(GtkWidget* w, void** ctx);
-void flowwidgetgtk_modify_ctx(GtkWidget* w, void* ctx);
+  void flowwidgetgtk_get_ctx(GtkWidget* w, void** ctx);
+  void flowwidgetgtk_modify_ctx(GtkWidget* w, void* ctx);
 
 #if defined __cplusplus
 }

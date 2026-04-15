@@ -50,7 +50,8 @@ void DpCollect_exec(plc_sThread* tp, pwr_sClass_DpCollect* object)
   int i;
   pwr_tBoolean** InP;
 
-  for (i = 0; i < object->MaxIndex; i++) {
+  for (i = 0; i < object->MaxIndex; i++)
+  {
     InP = (pwr_tBoolean**)((char*)&object->DpIn1P + i * pwr_cInputOffset);
     object->Dp[i] = **InP;
   }
@@ -64,7 +65,8 @@ void ApCollect_exec(plc_sThread* tp, pwr_sClass_ApCollect* object)
   int i;
   pwr_tFloat32** InP;
 
-  for (i = 0; i < object->MaxIndex; i++) {
+  for (i = 0; i < object->MaxIndex; i++)
+  {
     InP = (pwr_tFloat32**)((char*)&object->ApIn1P + i * pwr_cInputOffset);
     object->Ap[i] = **InP;
   }
@@ -78,7 +80,8 @@ void IpCollect_exec(plc_sThread* tp, pwr_sClass_IpCollect* object)
   int i;
   pwr_tInt32** InP;
 
-  for (i = 0; i < object->MaxIndex; i++) {
+  for (i = 0; i < object->MaxIndex; i++)
+  {
     InP = (pwr_tInt32**)((char*)&object->IpIn1P + i * pwr_cInputOffset);
     object->Ip[i] = **InP;
   }
@@ -90,8 +93,7 @@ void IpCollect_exec(plc_sThread* tp, pwr_sClass_IpCollect* object)
 void DpDistribute_exec(plc_sThread* tp, pwr_sClass_DpDistribute* object)
 {
   if (*object->DataInP)
-    memcpy(&object->DpOut1, *object->DataInP,
-        MIN(object->MaxIndex, 24) * sizeof(pwr_tBoolean));
+    memcpy(&object->DpOut1, *object->DataInP, MIN(object->MaxIndex, 24) * sizeof(pwr_tBoolean));
 }
 
 /*_*
@@ -100,8 +102,7 @@ void DpDistribute_exec(plc_sThread* tp, pwr_sClass_DpDistribute* object)
 void ApDistribute_exec(plc_sThread* tp, pwr_sClass_ApDistribute* object)
 {
   if (*object->DataInP)
-    memcpy(&object->ApOut1, *object->DataInP,
-        MIN(object->MaxIndex, 24) * sizeof(pwr_tFloat32));
+    memcpy(&object->ApOut1, *object->DataInP, MIN(object->MaxIndex, 24) * sizeof(pwr_tFloat32));
 }
 
 /*_*
@@ -110,8 +111,7 @@ void ApDistribute_exec(plc_sThread* tp, pwr_sClass_ApDistribute* object)
 void IpDistribute_exec(plc_sThread* tp, pwr_sClass_IpDistribute* object)
 {
   if (*object->DataInP)
-    memcpy(&object->IpOut1, *object->DataInP,
-        MIN(object->MaxIndex, 24) * sizeof(pwr_tInt32));
+    memcpy(&object->IpOut1, *object->DataInP, MIN(object->MaxIndex, 24) * sizeof(pwr_tInt32));
 }
 
 /*_*
@@ -122,7 +122,8 @@ void DataCollect_exec(plc_sThread* tp, pwr_sClass_DataCollect* object)
   int i;
   pwr_tDataRef** InP;
 
-  for (i = 0; i < object->MaxIndex; i++) {
+  for (i = 0; i < object->MaxIndex; i++)
+  {
     InP = (pwr_tDataRef**)((char*)&object->DataIn1P + i * pwr_cInputOffset);
     memcpy(&object->DataP[i], *InP, sizeof(pwr_tDataRef));
   }
@@ -131,8 +132,7 @@ void DataCollect_exec(plc_sThread* tp, pwr_sClass_DataCollect* object)
 /*_*
   @aref cstoattrefp CStoAttrRefP
 */
-void CStoAttrRefP_exec(
-    plc_sThread* tp, pwr_sClass_CStoAttrRefP* o, pwr_sAttrRef* aref)
+void CStoAttrRefP_exec(plc_sThread* tp, pwr_sClass_CStoAttrRefP* o, pwr_sAttrRef* aref)
 {
   if (*o->CondP)
     *aref = o->InP->Aref;

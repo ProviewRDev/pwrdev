@@ -50,7 +50,7 @@
 #define DATAQ_DISP_QUEUENUM 10
 
 #define DATAQ_DISP_DIRECT_FORW 0
-//#define DATAQ_DISP_DIRECT_BACKW 1
+// #define DATAQ_DISP_DIRECT_BACKW 1
 
 #define DATAQ_DISP_ORDERTYPE_NEXT 1
 #define DATAQ_DISP_ORDERTYPE_PREV 2
@@ -60,12 +60,11 @@
 
 /* 		DATAQ RUTINER			*/
 
-typedef struct {
+typedef struct
+{
   pwr_tFloat32** QueueP pwr_dAlignLW;
   pwr_tFloat32* Queue pwr_dAlignLW;
 } dataq_sQueueInput;
-
-
 
 /*_*
   @aref qdisplay QDisplay
@@ -84,19 +83,20 @@ void QDisplayFo_init(pwr_sClass_QDisplayFo* o)
   pwr_sClass_QDisplay* co;
   pwr_tDlid dlid;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
-  if (EVEN(sts)) {
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  if (EVEN(sts))
+  {
     o->PlcConnectP = 0;
     return;
   }
   co = (pwr_sClass_QDisplay*)o->PlcConnectP;
 
   /* Get size of data objects */
-  sts = gdh_ObjidToName(cdh_ClassIdToObjid(co->Config.DataClass), classname,
-      sizeof(classname), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(cdh_ClassIdToObjid(co->Config.DataClass), classname, sizeof(classname),
+                        cdh_mName_volumeStrict);
 
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     strcat(classname, "-RtBody");
     sts = gdh_NameToObjid(classname, &rtbody_objid);
   }
@@ -104,7 +104,8 @@ void QDisplayFo_init(pwr_sClass_QDisplayFo* o)
   if (ODD(sts))
     sts = gdh_ObjidToPointer(rtbody_objid, (void*)&bodyp);
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_CErrLog(DATAQ__DISPCLASS, errh_ErrArgMsg(sts), NULL);
     co->Intern.DataSize = 0;
     return;
@@ -113,56 +114,71 @@ void QDisplayFo_init(pwr_sClass_QDisplayFo* o)
   co->Intern.DataSize = bodyp->Size;
 
   /* Get offset for the attributes */
-  for (i = 0; i < 5; i++) {
-    if (co->Config.FloatAttr[i][0] != 0) {
+  for (i = 0; i < 5; i++)
+  {
+    if (co->Config.FloatAttr[i][0] != 0)
+    {
       strcpy(attr_str, ".");
       strcat(attr_str, co->Config.FloatAttr[i]);
       sts = gdh_ClassAttrToAttrref(co->Config.DataClass, attr_str, &attr_ref);
       if (ODD(sts))
         co->Intern.FloatAttrOffs[i] = attr_ref.Offset;
-      else {
+      else
+      {
         co->Intern.FloatAttrOffs[i] = -1;
         errh_CErrLog(DATAQ__DISPFATTR, errh_ErrArgMsg(sts), NULL);
       }
-    } else
+    }
+    else
       co->Intern.FloatAttrOffs[i] = -1;
   }
-  for (i = 0; i < 5; i++) {
-    if (co->Config.BooleanAttr[i][0] != 0) {
+  for (i = 0; i < 5; i++)
+  {
+    if (co->Config.BooleanAttr[i][0] != 0)
+    {
       strcpy(attr_str, ".");
       strcat(attr_str, co->Config.BooleanAttr[i]);
       sts = gdh_ClassAttrToAttrref(co->Config.DataClass, attr_str, &attr_ref);
       if (ODD(sts))
         co->Intern.BooleanAttrOffs[i] = attr_ref.Offset;
-      else {
+      else
+      {
         co->Intern.BooleanAttrOffs[i] = -1;
         errh_CErrLog(DATAQ__DISPBATTR, errh_ErrArgMsg(sts), NULL);
       }
-    } else
+    }
+    else
       co->Intern.BooleanAttrOffs[i] = -1;
   }
-  for (i = 0; i < 5; i++) {
-    if (co->Config.IntAttr[i][0] != 0) {
+  for (i = 0; i < 5; i++)
+  {
+    if (co->Config.IntAttr[i][0] != 0)
+    {
       int b16 = 0;
       char* s;
 
       strcpy(attr_str, ".");
       strcat(attr_str, co->Config.IntAttr[i]);
-      if ((s = strchr(attr_str, '#'))) {
+      if ((s = strchr(attr_str, '#')))
+      {
         if (str_NoCaseStrcmp(s, "##int16") == 0)
           b16 = 1;
         *s = 0;
       }
       sts = gdh_ClassAttrToAttrref(co->Config.DataClass, attr_str, &attr_ref);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         co->Intern.IntAttrOffs[i] = attr_ref.Offset;
         if (b16)
           co->Intern.IntAttrOffs[i] |= (1 << 31);
-      } else {
+      }
+      else
+      {
         co->Intern.IntAttrOffs[i] = -1;
         errh_CErrLog(DATAQ__DISPIATTR, errh_ErrArgMsg(sts), NULL);
       }
-    } else
+    }
+    else
       co->Intern.IntAttrOffs[i] = -1;
   }
 
@@ -174,14 +190,13 @@ void QDisplayFo_init(pwr_sClass_QDisplayFo* o)
     link = (pwr_sClass_QDisplayLink*)((pwr_sClass_QDisplayLinkFo*)linkfo)->PlcConnectP;
   else
     link = 0;
-    
+
   if (link && link->Intern.MaxDispNumber < co->Config.Number)
     link->Intern.MaxDispNumber = co->Config.Number;
 
   if (co->Config.MaxSize == 0)
     co->Config.MaxSize = DATAQ_DISP_SIZE;
 }
-
 
 void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
 {
@@ -220,8 +235,10 @@ void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
     queuep += DATAQ_DISP_QUEUENUM - 1;
 
   /* Check that the queue is initialized */
-  for (j = 0; j < DATAQ_DISP_QUEUENUM; j++) {
-    if (queuep->QueueP != &queuep->Queue) {
+  for (j = 0; j < DATAQ_DISP_QUEUENUM; j++)
+  {
+    if (queuep->QueueP != &queuep->Queue)
+    {
       queue = (pwr_sClass_DataQ1*)*(queuep->QueueP);
 
       if (!(queue->Super.Intern.ReloadDone & pwr_mDataQBackupMask_BackupInitialized))
@@ -237,17 +254,21 @@ void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
   if (co->Config.Function == DATAQ_DISPFUNC_REVERSE)
     queuep += DATAQ_DISP_QUEUENUM - 1;
 
-  for (j = 0; j < DATAQ_DISP_QUEUENUM; j++) {
-    if (queuep->QueueP != &queuep->Queue) {
+  for (j = 0; j < DATAQ_DISP_QUEUENUM; j++)
+  {
+    if (queuep->QueueP != &queuep->Queue)
+    {
       queue = (pwr_sClass_DataQ1*)*(queuep->QueueP);
 
       data_info = &queue->Data[0];
       if (co->Config.Function == DATAQ_DISPFUNC_REVERSE)
         data_info += queue->DataSize - 1;
-      for (i = num; i < num + queue->DataSize; i++) {
+      for (i = num; i < num + queue->DataSize; i++)
+      {
         datap = (char*)data_info->Data.Ptr;
         dataptr[i] = datap;
-        if (datap) {
+        if (datap)
+        {
           co->Objid[i] = data_info->Data.Aref.Objid;
           if (co->Intern.FloatAttrOffs[0] >= 0)
             co->F1[i] = *(pwr_tFloat32*)(datap + co->Intern.FloatAttrOffs[0]);
@@ -269,38 +290,44 @@ void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
             co->B4[i] = *(pwr_tBoolean*)(datap + co->Intern.BooleanAttrOffs[3]);
           if (co->Intern.BooleanAttrOffs[4] >= 0)
             co->B5[i] = *(pwr_tBoolean*)(datap + co->Intern.BooleanAttrOffs[4]);
-          if (co->Intern.IntAttrOffs[0] != -1) {
+          if (co->Intern.IntAttrOffs[0] != -1)
+          {
             if (co->Intern.IntAttrOffs[0] & (1 << 31))
               co->I1[i] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[0] & 0x3fffffff));
             else
               co->I1[i] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[0] & 0x3fffffff));
           }
-          if (co->Intern.IntAttrOffs[1] != -1) {
+          if (co->Intern.IntAttrOffs[1] != -1)
+          {
             if (co->Intern.IntAttrOffs[1] & (1 << 31))
               co->I2[i] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[1] & 0x3fffffff));
             else
               co->I2[i] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[1] & 0x3fffffff));
           }
-          if (co->Intern.IntAttrOffs[2] != -1) {
+          if (co->Intern.IntAttrOffs[2] != -1)
+          {
             if (co->Intern.IntAttrOffs[2] & (1 << 31))
               co->I3[i] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[2] & 0x3fffffff));
             else
               co->I3[i] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[2] & 0x3fffffff));
           }
-          if (co->Intern.IntAttrOffs[3] != -1) {
+          if (co->Intern.IntAttrOffs[3] != -1)
+          {
             if (co->Intern.IntAttrOffs[3] & (1 << 31))
               co->I4[i] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[3] & 0x3fffffff));
             else
               co->I4[i] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[3] & 0x3fffffff));
           }
-          if (co->Intern.IntAttrOffs[4] != -1) {
+          if (co->Intern.IntAttrOffs[4] != -1)
+          {
             if (co->Intern.IntAttrOffs[4] & (1 << 31))
               co->I5[i] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[4] & 0x3fffffff));
             else
               co->I5[i] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[4] & 0x3fffffff));
           }
         }
-        if (i == max_size - 1) {
+        if (i == max_size - 1)
+        {
           full = 1;
           num = i + 1;
           break;
@@ -320,120 +347,124 @@ void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
       queuep--;
   }
 
-  if (co->Intern.OldDataSize > num) {
+  if (co->Intern.OldDataSize > num)
+  {
     /* Reset values */
-    memset(&co->Objid[num], 0,
-        (co->Intern.OldDataSize - num) * sizeof(pwr_tObjid));
-    memset(&co->Select[num], 0,
-        (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
-    memset(&co->Intern.OldSelect[num], 0,
-        (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
+    memset(&co->Objid[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tObjid));
+    memset(&co->Select[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
+    memset(&co->Intern.OldSelect[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
     if (co->Intern.FloatAttrOffs[0] >= 0)
-      memset(&co->F1[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tFloat32));
+      memset(&co->F1[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tFloat32));
     if (co->Intern.FloatAttrOffs[1] >= 0)
-      memset(&co->F2[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tFloat32));
+      memset(&co->F2[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tFloat32));
     if (co->Intern.FloatAttrOffs[2] >= 0)
-      memset(&co->F3[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tFloat32));
+      memset(&co->F3[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tFloat32));
     if (co->Intern.FloatAttrOffs[3] >= 0)
-      memset(&co->F4[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tFloat32));
+      memset(&co->F4[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tFloat32));
     if (co->Intern.FloatAttrOffs[4] >= 0)
-      memset(&co->F5[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tFloat32));
+      memset(&co->F5[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tFloat32));
     if (co->Intern.BooleanAttrOffs[0] >= 0)
-      memset(&co->B1[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
+      memset(&co->B1[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
     if (co->Intern.BooleanAttrOffs[1] >= 0)
-      memset(&co->B2[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
+      memset(&co->B2[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
     if (co->Intern.BooleanAttrOffs[2] >= 0)
-      memset(&co->B3[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
+      memset(&co->B3[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
     if (co->Intern.BooleanAttrOffs[3] >= 0)
-      memset(&co->B4[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
+      memset(&co->B4[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
     if (co->Intern.BooleanAttrOffs[4] >= 0)
-      memset(&co->B5[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
+      memset(&co->B5[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tBoolean));
     if (co->Intern.IntAttrOffs[0] != -1)
-      memset(&co->I1[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tInt32));
+      memset(&co->I1[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tInt32));
     if (co->Intern.IntAttrOffs[1] != -1)
-      memset(&co->I2[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tInt32));
+      memset(&co->I2[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tInt32));
     if (co->Intern.IntAttrOffs[2] != -1)
-      memset(&co->I3[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tInt32));
+      memset(&co->I3[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tInt32));
     if (co->Intern.IntAttrOffs[3] != -1)
-      memset(&co->I4[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tInt32));
+      memset(&co->I4[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tInt32));
     if (co->Intern.IntAttrOffs[4] != -1)
-      memset(&co->I5[num], 0,
-          (co->Intern.OldDataSize - num) * sizeof(pwr_tInt32));
+      memset(&co->I5[num], 0, (co->Intern.OldDataSize - num) * sizeof(pwr_tInt32));
   }
 
-  memset(&co->Select[co->Intern.OldDataSize], 0,
-      (max_size - co->Intern.OldDataSize) * sizeof(pwr_tBoolean));
+  memset(&co->Select[co->Intern.OldDataSize], 0, (max_size - co->Intern.OldDataSize) * sizeof(pwr_tBoolean));
 
   if (link && link->Intern.ResetData)
-    if (o->DisplayObjectP != &o->DisplayObject) {
+    if (o->DisplayObjectP != &o->DisplayObject)
+    {
       memset(*o->DisplayObjectP, 0, co->Intern.DataSize);
       link->Intern.ResetData = 0;
     }
 
   /* Detect new selection */
   select_exist = 0;
-  for (i = 0; i < num; i++) {
-    if (co->Select[i] && !co->Intern.OldSelect[i]) {
+  for (i = 0; i < num; i++)
+  {
+    if (co->Select[i] && !co->Intern.OldSelect[i])
+    {
       /* New selection */
-      if (link) {
+      if (link)
+      {
         link->Intern.SelectObjid = co->Objid[i];
         link->Intern.SelectExist = 1;
-      } else
+      }
+      else
         co->Intern.SelectObjid = co->Objid[i];
       co->Intern.OldSelect[i] = co->Select[i];
-    } else if (!co->Select[i] && co->Intern.OldSelect[i]) {
+    }
+    else if (!co->Select[i] && co->Intern.OldSelect[i])
+    {
       /* New deselection */
-      if (link) {
+      if (link)
+      {
         if (cdh_ObjidIsEqual(co->Objid[i], link->Intern.SelectObjid))
           link->Intern.SelectObjid = pwr_cNObjid;
-      } else {
+      }
+      else
+      {
         if (cdh_ObjidIsEqual(co->Objid[i], co->Intern.SelectObjid))
           co->Intern.SelectObjid = pwr_cNObjid;
       }
       co->Intern.OldSelect[i] = co->Select[i];
     }
 
-    if (link) {
-      if (cdh_ObjidIsEqual(co->Objid[i], link->Intern.SelectObjid)) {
+    if (link)
+    {
+      if (cdh_ObjidIsEqual(co->Objid[i], link->Intern.SelectObjid))
+      {
         co->Select[i] = 1;
         link->Intern.SelectExist = 1;
-        if (o->DisplayObjectP != &o->DisplayObject) {
+        if (o->DisplayObjectP != &o->DisplayObject)
+        {
           if (dataptr[i])
             memcpy(*o->DisplayObjectP, dataptr[i], co->Intern.DataSize);
         }
-      } else
+      }
+      else
         co->Select[i] = 0;
-    } else {
-      if (cdh_ObjidIsEqual(co->Objid[i], co->Intern.SelectObjid)) {
+    }
+    else
+    {
+      if (cdh_ObjidIsEqual(co->Objid[i], co->Intern.SelectObjid))
+      {
         select_exist = 1;
         co->Select[i] = 1;
-      } else
+      }
+      else
         co->Select[i] = 0;
     }
   }
   if (!link && !select_exist)
     co->Intern.SelectObjid = pwr_cNObjid;
 
-  if (link && link->Intern.DoRemove) {
+  if (link && link->Intern.DoRemove)
+  {
     queuep = (dataq_sQueueInput*)&o->Queue1P;
-    for (j = 0; j < DATAQ_DISP_QUEUENUM; j++) {
-      if (queuep->QueueP != &queuep->Queue) {
+    for (j = 0; j < DATAQ_DISP_QUEUENUM; j++)
+    {
+      if (queuep->QueueP != &queuep->Queue)
+      {
         queue = (pwr_sClass_DataQ1*)*(queuep->QueueP);
-        if (!queue->Super.Control.Commit) {
+        if (!queue->Super.Control.Commit)
+        {
           queue->Super.Control.Objid = link->Intern.SelectObjid;
           queue->Super.Control.Operation = pwr_eDataQCtlEnum_DeleteObjid;
           queue->Super.Control.Commit = 1;
@@ -441,28 +472,38 @@ void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
       }
       queuep++;
     }
-  } else if (link && link->Intern.DoMoveForward) {
+  }
+  else if (link && link->Intern.DoMoveForward)
+  {
     queuep = (dataq_sQueueInput*)&o->Queue1P;
-    for (j = 0; j < DATAQ_DISP_QUEUENUM; j++) {
-      if (queuep->QueueP != &queuep->Queue) {
+    for (j = 0; j < DATAQ_DISP_QUEUENUM; j++)
+    {
+      if (queuep->QueueP != &queuep->Queue)
+      {
         queue = (pwr_sClass_DataQ1*)*(queuep->QueueP);
-        if (!queue->Super.Control.Commit) {
+        if (!queue->Super.Control.Commit)
+        {
           queue->Super.Control.Objid = link->Intern.SelectObjid;
           if (co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW)
-            queue->Super.Control.Operation =  pwr_eDataQCtlEnum_MoveForward;
+            queue->Super.Control.Operation = pwr_eDataQCtlEnum_MoveForward;
           else
-            queue->Super.Control.Operation =  pwr_eDataQCtlEnum_MoveBackward;
+            queue->Super.Control.Operation = pwr_eDataQCtlEnum_MoveBackward;
           queue->Super.Control.Commit = 1;
         }
       }
       queuep++;
     }
-  } else if (link && link->Intern.DoMoveBackward) {
+  }
+  else if (link && link->Intern.DoMoveBackward)
+  {
     queuep = (dataq_sQueueInput*)&o->Queue1P;
-    for (j = 0; j < DATAQ_DISP_QUEUENUM; j++) {
-      if (queuep->QueueP != &queuep->Queue) {
+    for (j = 0; j < DATAQ_DISP_QUEUENUM; j++)
+    {
+      if (queuep->QueueP != &queuep->Queue)
+      {
         queue = (pwr_sClass_DataQ1*)*(queuep->QueueP);
-        if (!queue->Super.Control.Commit) {
+        if (!queue->Super.Control.Commit)
+        {
           queue->Super.Control.Objid = link->Intern.SelectObjid;
           if (co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW)
             queue->Super.Control.Operation = pwr_eDataQCtlEnum_MoveBackward;
@@ -479,12 +520,16 @@ void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
     /* Noone responded, selection remains */
     link->Intern.SelectOrder = 0;
 
-  if (link && link->Intern.DoSelectNext) {
-    for (i = 0; i < num; i++) {
-      if (co->Select[i]) {
-        if (((i == num - 1 && co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW)
-                || (i == 0 && co->Config.SelDirection != DATAQ_DISP_DIRECT_FORW))
-            && !(co->Config.Number == 1 && link->Intern.MaxDispNumber == 1)) {
+  if (link && link->Intern.DoSelectNext)
+  {
+    for (i = 0; i < num; i++)
+    {
+      if (co->Select[i])
+      {
+        if (((i == num - 1 && co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW) ||
+             (i == 0 && co->Config.SelDirection != DATAQ_DISP_DIRECT_FORW)) &&
+            !(co->Config.Number == 1 && link->Intern.MaxDispNumber == 1))
+        {
           /* Transfer selection to next queue */
           if (co->Config.Number != link->Intern.MaxDispNumber)
             link->Intern.SelectOrderNumber = co->Config.Number + 1;
@@ -493,26 +538,37 @@ void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
           link->Intern.SelectOrderType = DATAQ_DISP_ORDERTYPE_NEXT;
           link->Intern.SelectOrder = 1;
           link->Intern.SelectOrderOwner = co->Config.Number;
-        } else {
+        }
+        else
+        {
           /* Move selection in the queue */
           co->Select[i] = 0;
           co->Intern.OldSelect[i] = 0;
-          if (co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW) {
-            if (i != num - 1) {
+          if (co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW)
+          {
+            if (i != num - 1)
+            {
               co->Select[i + 1] = 1;
               co->Intern.OldSelect[i + 1] = 1;
               link->Intern.SelectObjid = co->Objid[i + 1];
-            } else {
+            }
+            else
+            {
               co->Select[0] = 1;
               co->Intern.OldSelect[0] = 1;
               link->Intern.SelectObjid = co->Objid[0];
             }
-          } else {
-            if (i != 0) {
+          }
+          else
+          {
+            if (i != 0)
+            {
               co->Select[i - 1] = 1;
               co->Intern.OldSelect[i - 1] = 1;
               link->Intern.SelectObjid = co->Objid[i - 1];
-            } else {
+            }
+            else
+            {
               co->Select[num - 1] = 1;
               co->Intern.OldSelect[num - 1] = 1;
               link->Intern.SelectObjid = co->Objid[num - 1];
@@ -524,12 +580,16 @@ void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
     }
   }
 
-  if (link && link->Intern.DoSelectPrevious) {
-    for (i = 0; i < num; i++) {
-      if (co->Select[i]) {
-        if (((i == num - 1 && co->Config.SelDirection != DATAQ_DISP_DIRECT_FORW)
-                || (i == 0 && co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW))
-            && !(co->Config.Number == 1 && link->Intern.MaxDispNumber == 1)) {
+  if (link && link->Intern.DoSelectPrevious)
+  {
+    for (i = 0; i < num; i++)
+    {
+      if (co->Select[i])
+      {
+        if (((i == num - 1 && co->Config.SelDirection != DATAQ_DISP_DIRECT_FORW) ||
+             (i == 0 && co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW)) &&
+            !(co->Config.Number == 1 && link->Intern.MaxDispNumber == 1))
+        {
           /* Transfer selection to next queue */
           if (co->Config.Number != 1)
             link->Intern.SelectOrderNumber = co->Config.Number - 1;
@@ -538,26 +598,37 @@ void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
           link->Intern.SelectOrderType = DATAQ_DISP_ORDERTYPE_PREV;
           link->Intern.SelectOrder = 1;
           link->Intern.SelectOrderOwner = co->Config.Number;
-        } else {
+        }
+        else
+        {
           /* Move selection in the queue */
           co->Select[i] = 0;
           co->Intern.OldSelect[i] = 0;
-          if (co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW) {
-            if (i != 0) {
+          if (co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW)
+          {
+            if (i != 0)
+            {
               co->Select[i - 1] = 1;
               co->Intern.OldSelect[i - 1] = 1;
               link->Intern.SelectObjid = co->Objid[i - 1];
-            } else {
+            }
+            else
+            {
               co->Select[num - 1] = 1;
               co->Intern.OldSelect[num - 1] = 1;
               link->Intern.SelectObjid = co->Objid[num - 1];
             }
-          } else {
-            if (i != num - 1) {
+          }
+          else
+          {
+            if (i != num - 1)
+            {
               co->Select[i + 1] = 1;
               co->Intern.OldSelect[i + 1] = 1;
               link->Intern.SelectObjid = co->Objid[i + 1];
-            } else {
+            }
+            else
+            {
               co->Select[0] = 1;
               co->Intern.OldSelect[0] = 1;
               link->Intern.SelectObjid = co->Objid[0];
@@ -569,29 +640,40 @@ void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
     }
   }
 
-  if (link && link->Intern.SelectOrder && link->Intern.SelectOrderNumber == co->Config.Number) {
-    if (link->Intern.SelectOrderType == DATAQ_DISP_ORDERTYPE_NEXT) {
-      if (num == 0) {
-        if (co->Config.Number != link->Intern.MaxDispNumber) {
+  if (link && link->Intern.SelectOrder && link->Intern.SelectOrderNumber == co->Config.Number)
+  {
+    if (link->Intern.SelectOrderType == DATAQ_DISP_ORDERTYPE_NEXT)
+    {
+      if (num == 0)
+      {
+        if (co->Config.Number != link->Intern.MaxDispNumber)
+        {
           /* Transfer to next */
           link->Intern.SelectOrderNumber = co->Config.Number + 1;
           link->Intern.SelectOrderType = DATAQ_DISP_ORDERTYPE_NEXT;
           link->Intern.SelectOrder = 1;
           link->Intern.SelectOrderOwner = co->Config.Number;
-        } else {
+        }
+        else
+        {
           /* Transfer to next */
           link->Intern.SelectOrderNumber = 1;
           link->Intern.SelectOrderType = DATAQ_DISP_ORDERTYPE_NEXT;
           link->Intern.SelectOrder = 1;
           link->Intern.SelectOrderOwner = co->Config.Number;
         }
-      } else {
-        if (co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW) {
+      }
+      else
+      {
+        if (co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW)
+        {
           /* Select first */
           co->Select[0] = 1;
           co->Intern.OldSelect[0] = 1;
           link->Intern.SelectObjid = co->Objid[0];
-        } else {
+        }
+        else
+        {
           /* Select last */
           co->Select[num - 1] = 1;
           co->Intern.OldSelect[num - 1] = 1;
@@ -601,28 +683,38 @@ void QDisplayFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFo* o)
       }
     }
 
-    if (link->Intern.SelectOrderType == DATAQ_DISP_ORDERTYPE_PREV) {
-      if (num == 0) {
-        if (co->Config.Number != 1) {
+    if (link->Intern.SelectOrderType == DATAQ_DISP_ORDERTYPE_PREV)
+    {
+      if (num == 0)
+      {
+        if (co->Config.Number != 1)
+        {
           /* Transfer to previous */
           link->Intern.SelectOrderNumber = co->Config.Number - 1;
           link->Intern.SelectOrderType = DATAQ_DISP_ORDERTYPE_PREV;
           link->Intern.SelectOrder = 1;
           link->Intern.SelectOrderOwner = co->Config.Number;
-        } else {
+        }
+        else
+        {
           /* Transfer to last */
           link->Intern.SelectOrderNumber = link->Intern.MaxDispNumber;
           link->Intern.SelectOrderType = DATAQ_DISP_ORDERTYPE_PREV;
           link->Intern.SelectOrder = 1;
           link->Intern.SelectOrderOwner = co->Config.Number;
         }
-      } else {
-        if (co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW) {
+      }
+      else
+      {
+        if (co->Config.SelDirection == DATAQ_DISP_DIRECT_FORW)
+        {
           /* Select last */
           co->Select[num - 1] = 1;
           co->Intern.OldSelect[num - 1] = 1;
           link->Intern.SelectObjid = co->Objid[num - 1];
-        } else {
+        }
+        else
+        {
           /* Select first */
           co->Select[0] = 1;
           co->Intern.OldSelect[0] = 1;
@@ -640,9 +732,9 @@ void QDisplayLinkFo_init(pwr_sClass_QDisplayLinkFo* o)
   pwr_tStatus sts;
   pwr_tDlid dlid;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
-  if (EVEN(sts)) {
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  if (EVEN(sts))
+  {
     o->PlcConnectP = 0;
     return;
   }
@@ -657,8 +749,7 @@ void QDisplayLinkFo_exec(plc_sThread* tp, pwr_sClass_QDisplayLinkFo* o)
   if (!co->Intern.SelectExist)
     co->Intern.ResetData = 1;
 
-  if (co->Intern.SelectOrder
-      && co->Intern.SelectOrderOwner == DATAQ_DISP_ORDEROWNER_LINK)
+  if (co->Intern.SelectOrder && co->Intern.SelectOrderOwner == DATAQ_DISP_ORDEROWNER_LINK)
     co->Intern.SelectOrder = 0;
 
   co->Intern.DoRemove = 0;
@@ -667,37 +758,46 @@ void QDisplayLinkFo_exec(plc_sThread* tp, pwr_sClass_QDisplayLinkFo* o)
   co->Intern.DoSelectNext = 0;
   co->Intern.DoSelectPrevious = 0;
 
-  if (co->Control.Remove) {
+  if (co->Control.Remove)
+  {
     co->Intern.DoRemove = 1;
     co->Control.Remove = 0;
   }
-  if (co->Control.MoveForward) {
+  if (co->Control.MoveForward)
+  {
     co->Intern.DoMoveForward = 1;
     co->Control.MoveForward = 0;
   }
-  if (co->Control.MoveBackward) {
+  if (co->Control.MoveBackward)
+  {
     co->Intern.DoMoveBackward = 1;
     co->Control.MoveBackward = 0;
   }
-  if (co->Control.SelectNext) {
-    if (!co->Intern.SelectExist) {
+  if (co->Control.SelectNext)
+  {
+    if (!co->Intern.SelectExist)
+    {
       /* Give an order to first cell */
       co->Intern.SelectOrderNumber = 1;
       co->Intern.SelectOrderType = DATAQ_DISP_ORDERTYPE_NEXT;
       co->Intern.SelectOrder = 1;
       co->Intern.SelectOrderOwner = DATAQ_DISP_ORDEROWNER_LINK;
-    } else
+    }
+    else
       co->Intern.DoSelectNext = 1;
     co->Control.SelectNext = 0;
   }
-  if (co->Control.SelectPrevious) {
-    if (!co->Intern.SelectExist) {
+  if (co->Control.SelectPrevious)
+  {
+    if (!co->Intern.SelectExist)
+    {
       /* Give an order to last cell */
       co->Intern.SelectOrderNumber = co->Intern.MaxDispNumber;
       co->Intern.SelectOrderType = DATAQ_DISP_ORDERTYPE_PREV;
       co->Intern.SelectOrder = 1;
       co->Intern.SelectOrderOwner = DATAQ_DISP_ORDEROWNER_LINK;
-    } else
+    }
+    else
       co->Intern.DoSelectPrevious = 1;
     co->Control.SelectPrevious = 0;
   }
@@ -720,19 +820,20 @@ void QDisplayFixFo_init(pwr_sClass_QDisplayFixFo* o)
   pwr_sClass_QDisplayFix* co;
   pwr_tDlid dlid;
 
-  sts = gdh_DLRefObjectInfoAttrref(
-      &o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
-  if (EVEN(sts)) {
+  sts = gdh_DLRefObjectInfoAttrref(&o->PlcConnect, (void**)&o->PlcConnectP, &dlid);
+  if (EVEN(sts))
+  {
     o->PlcConnectP = 0;
     return;
   }
   co = (pwr_sClass_QDisplayFix*)o->PlcConnectP;
 
   /* Get size of data objects */
-  sts = gdh_ObjidToName(cdh_ClassIdToObjid(co->Config.DataClass), classname,
-      sizeof(classname), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(cdh_ClassIdToObjid(co->Config.DataClass), classname, sizeof(classname),
+                        cdh_mName_volumeStrict);
 
-  if (ODD(sts)) {
+  if (ODD(sts))
+  {
     strcat(classname, "-RtBody");
     sts = gdh_NameToObjid(classname, &rtbody_objid);
   }
@@ -740,7 +841,8 @@ void QDisplayFixFo_init(pwr_sClass_QDisplayFixFo* o)
   if (ODD(sts))
     sts = gdh_ObjidToPointer(rtbody_objid, (void*)&bodyp);
 
-  if (EVEN(sts)) {
+  if (EVEN(sts))
+  {
     errh_CErrLog(DATAQ__DISPCLASS, errh_ErrArgMsg(sts), NULL);
     co->Intern.DataSize = 0;
     return;
@@ -749,62 +851,76 @@ void QDisplayFixFo_init(pwr_sClass_QDisplayFixFo* o)
   co->Intern.DataSize = bodyp->Size;
 
   /* Get offset for the attributes */
-  for (i = 0; i < 5; i++) {
-    if (co->Config.FloatAttr[i][0] != 0) {
+  for (i = 0; i < 5; i++)
+  {
+    if (co->Config.FloatAttr[i][0] != 0)
+    {
       strcpy(attr_str, ".");
       strcat(attr_str, co->Config.FloatAttr[i]);
       sts = gdh_ClassAttrToAttrref(co->Config.DataClass, attr_str, &attr_ref);
       if (ODD(sts))
         co->Intern.FloatAttrOffs[i] = attr_ref.Offset;
-      else {
+      else
+      {
         co->Intern.FloatAttrOffs[i] = -1;
         errh_CErrLog(DATAQ__DISPFATTR, errh_ErrArgMsg(sts), NULL);
       }
-    } else
+    }
+    else
       co->Intern.FloatAttrOffs[i] = -1;
   }
-  for (i = 0; i < 5; i++) {
-    if (co->Config.BooleanAttr[i][0] != 0) {
+  for (i = 0; i < 5; i++)
+  {
+    if (co->Config.BooleanAttr[i][0] != 0)
+    {
       strcpy(attr_str, ".");
       strcat(attr_str, co->Config.BooleanAttr[i]);
       sts = gdh_ClassAttrToAttrref(co->Config.DataClass, attr_str, &attr_ref);
       if (ODD(sts))
         co->Intern.BooleanAttrOffs[i] = attr_ref.Offset;
-      else {
+      else
+      {
         co->Intern.BooleanAttrOffs[i] = -1;
         errh_CErrLog(DATAQ__DISPBATTR, errh_ErrArgMsg(sts), NULL);
       }
-    } else
+    }
+    else
       co->Intern.BooleanAttrOffs[i] = -1;
   }
-  for (i = 0; i < 5; i++) {
-    if (co->Config.IntAttr[i][0] != 0) {
+  for (i = 0; i < 5; i++)
+  {
+    if (co->Config.IntAttr[i][0] != 0)
+    {
       int b16 = 0;
       char* s;
 
       strcpy(attr_str, ".");
       strcat(attr_str, co->Config.IntAttr[i]);
-      if ((s = strchr(attr_str, '#'))) {
+      if ((s = strchr(attr_str, '#')))
+      {
         if (str_NoCaseStrcmp(s, "##int16") == 0)
           b16 = 1;
         *s = 0;
       }
       sts = gdh_ClassAttrToAttrref(co->Config.DataClass, attr_str, &attr_ref);
-      if (ODD(sts)) {
+      if (ODD(sts))
+      {
         co->Intern.IntAttrOffs[i] = attr_ref.Offset;
         if (b16)
           co->Intern.IntAttrOffs[i] |= (1 << 31);
-      } else {
+      }
+      else
+      {
         co->Intern.IntAttrOffs[i] = -1;
         errh_CErrLog(DATAQ__DISPIATTR, errh_ErrArgMsg(sts), NULL);
       }
-    } else
+    }
+    else
       co->Intern.IntAttrOffs[i] = -1;
   }
   if (co->Config.MaxSize == 0)
     co->Config.MaxSize = DATAQ_DISP_SIZE;
 }
-
 
 void QDisplayFixFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFixFo* o)
 {
@@ -829,8 +945,10 @@ void QDisplayFixFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFixFo* o)
 
   /* Check that the queue is initialized */
   queuep = (dataq_sQueueInput*)&o->Queue1P;
-  for (j = 0; j < DATAQ_DISP_QUEUENUM; j++) {
-    if (queuep->QueueP != &queuep->Queue) {
+  for (j = 0; j < DATAQ_DISP_QUEUENUM; j++)
+  {
+    if (queuep->QueueP != &queuep->Queue)
+    {
       queue = (pwr_sClass_DataQ1*)*(queuep->QueueP);
 
       if (!(queue->Super.Intern.ReloadDone & pwr_mDataQBackupMask_BackupInitialized))
@@ -839,161 +957,184 @@ void QDisplayFixFo_exec(plc_sThread* tp, pwr_sClass_QDisplayFixFo* o)
     }
   }
 
-  
   /* Erase removed data */
-  for (k = 0; k < max_size; k++) {
-    if (co->Occupied[k]) {
+  for (k = 0; k < max_size; k++)
+  {
+    if (co->Occupied[k])
+    {
       found = 0;
       queuep = (dataq_sQueueInput*)&o->Queue1P;
-      for (j = 0; j < DATAQ_DISP_QUEUENUM; j++) {
-	if (queuep->QueueP != &queuep->Queue) {
-	  queue = (pwr_sClass_DataQ1*)*(queuep->QueueP);
-	  for (i = 0; i < queue->DataSize; i++) {
-	    if (cdh_ObjidIsEqual(co->Objid[k], queue->Data[i].Data.Aref.Objid)) {
-	      found = 1;
-	      break;
-	    }
-	  }
-	  if (found)
-	    break;
-	}
-	queuep++;
-      }	      
-      if (!found) {
-	co->Occupied[k] = 0;
-	co->Objid[k] = pwr_cNOid;
-	if (co->Intern.FloatAttrOffs[0] >= 0)
-	  co->F1[k] = 0;
-	if (co->Intern.FloatAttrOffs[1] >= 0)
-	  co->F2[k] = 0;
-	if (co->Intern.FloatAttrOffs[2] >= 0)
-	  co->F3[k] = 0;
-	if (co->Intern.FloatAttrOffs[3] >= 0)
-	  co->F4[k] = 0;
-	if (co->Intern.FloatAttrOffs[4] >= 0)
-	  co->F5[k] = 0;
-	if (co->Intern.BooleanAttrOffs[0] >= 0)
-	  co->B1[k] = 0;
-	if (co->Intern.BooleanAttrOffs[1] >= 0)
-	  co->B2[k] = 0;
-	if (co->Intern.BooleanAttrOffs[2] >= 0)
-	  co->B3[k] = 0;
-	if (co->Intern.BooleanAttrOffs[3] >= 0)
-	  co->B4[k] = 0;
-	if (co->Intern.BooleanAttrOffs[4] >= 0)
-	  co->B5[k] = 0;
-	if (co->Intern.IntAttrOffs[0] != -1)
-	  co->I1[k] = 0x3fffffff;
-	if (co->Intern.IntAttrOffs[1] != -1)
-	  co->I2[k] = 0x3fffffff;
-	if (co->Intern.IntAttrOffs[2] != -1)
-	  co->I3[k] = 0x3fffffff;
-	if (co->Intern.IntAttrOffs[3] != -1)
-	  co->I4[k] = 0x3fffffff;
-	if (co->Intern.IntAttrOffs[4] != -1)
-	  co->I5[k] = 0x3fffffff;
+      for (j = 0; j < DATAQ_DISP_QUEUENUM; j++)
+      {
+        if (queuep->QueueP != &queuep->Queue)
+        {
+          queue = (pwr_sClass_DataQ1*)*(queuep->QueueP);
+          for (i = 0; i < queue->DataSize; i++)
+          {
+            if (cdh_ObjidIsEqual(co->Objid[k], queue->Data[i].Data.Aref.Objid))
+            {
+              found = 1;
+              break;
+            }
+          }
+          if (found)
+            break;
+        }
+        queuep++;
+      }
+      if (!found)
+      {
+        co->Occupied[k] = 0;
+        co->Objid[k] = pwr_cNOid;
+        if (co->Intern.FloatAttrOffs[0] >= 0)
+          co->F1[k] = 0;
+        if (co->Intern.FloatAttrOffs[1] >= 0)
+          co->F2[k] = 0;
+        if (co->Intern.FloatAttrOffs[2] >= 0)
+          co->F3[k] = 0;
+        if (co->Intern.FloatAttrOffs[3] >= 0)
+          co->F4[k] = 0;
+        if (co->Intern.FloatAttrOffs[4] >= 0)
+          co->F5[k] = 0;
+        if (co->Intern.BooleanAttrOffs[0] >= 0)
+          co->B1[k] = 0;
+        if (co->Intern.BooleanAttrOffs[1] >= 0)
+          co->B2[k] = 0;
+        if (co->Intern.BooleanAttrOffs[2] >= 0)
+          co->B3[k] = 0;
+        if (co->Intern.BooleanAttrOffs[3] >= 0)
+          co->B4[k] = 0;
+        if (co->Intern.BooleanAttrOffs[4] >= 0)
+          co->B5[k] = 0;
+        if (co->Intern.IntAttrOffs[0] != -1)
+          co->I1[k] = 0x3fffffff;
+        if (co->Intern.IntAttrOffs[1] != -1)
+          co->I2[k] = 0x3fffffff;
+        if (co->Intern.IntAttrOffs[2] != -1)
+          co->I3[k] = 0x3fffffff;
+        if (co->Intern.IntAttrOffs[3] != -1)
+          co->I4[k] = 0x3fffffff;
+        if (co->Intern.IntAttrOffs[4] != -1)
+          co->I5[k] = 0x3fffffff;
       }
     }
   }
 
   /* Insert new data */
   queuep = (dataq_sQueueInput*)&o->Queue1P;
-  for (j = 0; j < DATAQ_DISP_QUEUENUM; j++) {
-    if (queuep->QueueP != &queuep->Queue) {
+  for (j = 0; j < DATAQ_DISP_QUEUENUM; j++)
+  {
+    if (queuep->QueueP != &queuep->Queue)
+    {
       queue = (pwr_sClass_DataQ1*)*(queuep->QueueP);
-      for (i = 0; i < queue->DataSize; i++) {
-	found = 0;
-	for (k = 0; k < max_size; k++) {
-	  if (co->Occupied[k] && 
-	      cdh_ObjidIsEqual(co->Objid[k], queue->Data[i].Data.Aref.Objid)) {
-	    found = 1;
-	    break;
-	  }
-	}
-	if (!found) {
-	  /* Insert */
-	  for (k = 0; k < max_size; k++) {
-	    if (!co->Occupied[k]) {
-	      co->Objid[k] = queue->Data[i].Data.Aref.Objid;
-	      co->Occupied[k] = 1;
-	      break;
-	    }
-	  }
-	}
+      for (i = 0; i < queue->DataSize; i++)
+      {
+        found = 0;
+        for (k = 0; k < max_size; k++)
+        {
+          if (co->Occupied[k] && cdh_ObjidIsEqual(co->Objid[k], queue->Data[i].Data.Aref.Objid))
+          {
+            found = 1;
+            break;
+          }
+        }
+        if (!found)
+        {
+          /* Insert */
+          for (k = 0; k < max_size; k++)
+          {
+            if (!co->Occupied[k])
+            {
+              co->Objid[k] = queue->Data[i].Data.Aref.Objid;
+              co->Occupied[k] = 1;
+              break;
+            }
+          }
+        }
       }
     }
     queuep++;
   }
 
   /* Update data */
-  for (k = 0; k < max_size; k++) {
-    if (co->Occupied[k]) {
+  for (k = 0; k < max_size; k++)
+  {
+    if (co->Occupied[k])
+    {
       queuep = (dataq_sQueueInput*)&o->Queue1P;
-      for (j = 0; j < DATAQ_DISP_QUEUENUM; j++) {
-	if (queuep->QueueP != &queuep->Queue) {
-	  queue = (pwr_sClass_DataQ1*)*(queuep->QueueP);
-	  for (i = 0; i < queue->DataSize; i++) {
-	    if (cdh_ObjidIsEqual(co->Objid[k], queue->Data[i].Data.Aref.Objid)) {
-	      datap = (char*)queue->Data[i].Data.Ptr;
-	      if (datap) {
-		if (co->Intern.FloatAttrOffs[0] >= 0)
-		  co->F1[k] = *(pwr_tFloat32*)(datap + co->Intern.FloatAttrOffs[0]);
-		if (co->Intern.FloatAttrOffs[1] >= 0)
-		  co->F2[k] = *(pwr_tFloat32*)(datap + co->Intern.FloatAttrOffs[1]);
-		if (co->Intern.FloatAttrOffs[2] >= 0)
-		  co->F3[k] = *(pwr_tFloat32*)(datap + co->Intern.FloatAttrOffs[2]);
-		if (co->Intern.FloatAttrOffs[3] >= 0)
-		  co->F4[k] = *(pwr_tFloat32*)(datap + co->Intern.FloatAttrOffs[3]);
-		if (co->Intern.FloatAttrOffs[4] >= 0)
-		  co->F5[k] = *(pwr_tFloat32*)(datap + co->Intern.FloatAttrOffs[4]);
-		if (co->Intern.BooleanAttrOffs[0] >= 0)
-		  co->B1[k] = *(pwr_tBoolean*)(datap + co->Intern.BooleanAttrOffs[0]);
-		if (co->Intern.BooleanAttrOffs[1] >= 0)
-		  co->B2[k] = *(pwr_tBoolean*)(datap + co->Intern.BooleanAttrOffs[1]);
-		if (co->Intern.BooleanAttrOffs[2] >= 0)
-		  co->B3[k] = *(pwr_tBoolean*)(datap + co->Intern.BooleanAttrOffs[2]);
-		if (co->Intern.BooleanAttrOffs[3] >= 0)
-		  co->B4[k] = *(pwr_tBoolean*)(datap + co->Intern.BooleanAttrOffs[3]);
-		if (co->Intern.BooleanAttrOffs[4] >= 0)
-		  co->B5[k] = *(pwr_tBoolean*)(datap + co->Intern.BooleanAttrOffs[4]);
-		if (co->Intern.IntAttrOffs[0] != -1) {
-		  if (co->Intern.IntAttrOffs[0] & (1 << 31))
-		    co->I1[k] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[0] & 0x3fffffff));
-		  else
-		    co->I1[k] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[0] & 0x3fffffff));
-		}
-		if (co->Intern.IntAttrOffs[1] != -1) {
-		  if (co->Intern.IntAttrOffs[1] & (1 << 31))
-		    co->I2[k] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[1] & 0x3fffffff));
-		  else
-		    co->I2[k] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[1] & 0x3fffffff));
-		}
-		if (co->Intern.IntAttrOffs[2] != -1) {
-		  if (co->Intern.IntAttrOffs[2] & (1 << 31))
-		    co->I3[k] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[2] & 0x3fffffff));
-		  else
-		    co->I3[k] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[2] & 0x3fffffff));
-		}
-		if (co->Intern.IntAttrOffs[3] != -1) {
-		  if (co->Intern.IntAttrOffs[3] & (1 << 31))
-		    co->I4[k] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[3] & 0x3fffffff));
-		  else
-		    co->I4[k] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[3] & 0x3fffffff));
-		}
-		if (co->Intern.IntAttrOffs[4] != -1) {
-		  if (co->Intern.IntAttrOffs[4] & (1 << 31))
-		    co->I5[k] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[4] & 0x3fffffff));
-		  else
-		    co->I5[k] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[4] & 0x3fffffff));
-		}
-	      }
-	    }
-	  }
-	}
-	queuep++;
+      for (j = 0; j < DATAQ_DISP_QUEUENUM; j++)
+      {
+        if (queuep->QueueP != &queuep->Queue)
+        {
+          queue = (pwr_sClass_DataQ1*)*(queuep->QueueP);
+          for (i = 0; i < queue->DataSize; i++)
+          {
+            if (cdh_ObjidIsEqual(co->Objid[k], queue->Data[i].Data.Aref.Objid))
+            {
+              datap = (char*)queue->Data[i].Data.Ptr;
+              if (datap)
+              {
+                if (co->Intern.FloatAttrOffs[0] >= 0)
+                  co->F1[k] = *(pwr_tFloat32*)(datap + co->Intern.FloatAttrOffs[0]);
+                if (co->Intern.FloatAttrOffs[1] >= 0)
+                  co->F2[k] = *(pwr_tFloat32*)(datap + co->Intern.FloatAttrOffs[1]);
+                if (co->Intern.FloatAttrOffs[2] >= 0)
+                  co->F3[k] = *(pwr_tFloat32*)(datap + co->Intern.FloatAttrOffs[2]);
+                if (co->Intern.FloatAttrOffs[3] >= 0)
+                  co->F4[k] = *(pwr_tFloat32*)(datap + co->Intern.FloatAttrOffs[3]);
+                if (co->Intern.FloatAttrOffs[4] >= 0)
+                  co->F5[k] = *(pwr_tFloat32*)(datap + co->Intern.FloatAttrOffs[4]);
+                if (co->Intern.BooleanAttrOffs[0] >= 0)
+                  co->B1[k] = *(pwr_tBoolean*)(datap + co->Intern.BooleanAttrOffs[0]);
+                if (co->Intern.BooleanAttrOffs[1] >= 0)
+                  co->B2[k] = *(pwr_tBoolean*)(datap + co->Intern.BooleanAttrOffs[1]);
+                if (co->Intern.BooleanAttrOffs[2] >= 0)
+                  co->B3[k] = *(pwr_tBoolean*)(datap + co->Intern.BooleanAttrOffs[2]);
+                if (co->Intern.BooleanAttrOffs[3] >= 0)
+                  co->B4[k] = *(pwr_tBoolean*)(datap + co->Intern.BooleanAttrOffs[3]);
+                if (co->Intern.BooleanAttrOffs[4] >= 0)
+                  co->B5[k] = *(pwr_tBoolean*)(datap + co->Intern.BooleanAttrOffs[4]);
+                if (co->Intern.IntAttrOffs[0] != -1)
+                {
+                  if (co->Intern.IntAttrOffs[0] & (1 << 31))
+                    co->I1[k] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[0] & 0x3fffffff));
+                  else
+                    co->I1[k] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[0] & 0x3fffffff));
+                }
+                if (co->Intern.IntAttrOffs[1] != -1)
+                {
+                  if (co->Intern.IntAttrOffs[1] & (1 << 31))
+                    co->I2[k] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[1] & 0x3fffffff));
+                  else
+                    co->I2[k] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[1] & 0x3fffffff));
+                }
+                if (co->Intern.IntAttrOffs[2] != -1)
+                {
+                  if (co->Intern.IntAttrOffs[2] & (1 << 31))
+                    co->I3[k] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[2] & 0x3fffffff));
+                  else
+                    co->I3[k] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[2] & 0x3fffffff));
+                }
+                if (co->Intern.IntAttrOffs[3] != -1)
+                {
+                  if (co->Intern.IntAttrOffs[3] & (1 << 31))
+                    co->I4[k] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[3] & 0x3fffffff));
+                  else
+                    co->I4[k] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[3] & 0x3fffffff));
+                }
+                if (co->Intern.IntAttrOffs[4] != -1)
+                {
+                  if (co->Intern.IntAttrOffs[4] & (1 << 31))
+                    co->I5[k] = *(pwr_tInt16*)(datap + (co->Intern.IntAttrOffs[4] & 0x3fffffff));
+                  else
+                    co->I5[k] = *(pwr_tInt32*)(datap + (co->Intern.IntAttrOffs[4] & 0x3fffffff));
+                }
+              }
+            }
+          }
+        }
+        queuep++;
       }
     }
   }
-
 }
-

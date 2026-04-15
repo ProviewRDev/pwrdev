@@ -65,7 +65,8 @@ wb_merep::~wb_merep()
 {
   pwr_tStatus sts;
 
-  for (mvrep_iterator it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++) {
+  for (mvrep_iterator it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++)
+  {
     if (it->second != m_vrep)
       it->second->unref();
   }
@@ -86,13 +87,17 @@ wb_merep::wb_merep(const char* dirName, wb_erep* erep, wb_vrep* vrep)
 
   dirp = opendir(dirName);
 
-  while (dirp) {
+  while (dirp)
+  {
     errno = 0;
-    if ((dp = readdir(dirp)) != NULL) {
-      if ((pos = strstr(dp->d_name, ".dbs")) != 0) {
+    if ((dp = readdir(dirp)) != NULL)
+    {
+      if ((pos = strstr(dp->d_name, ".dbs")) != 0)
+      {
         ipos = (int)(pos - dp->d_name);
         ilen = strlen(dp->d_name);
-        if ((ilen - ipos) == (sizeof(".dbs") - 1)) {
+        if ((ilen - ipos) == (sizeof(".dbs") - 1))
+        {
           dbs_sEnv env;
           dbs_sVolume volume;
           pwr_tStatus sts;
@@ -105,26 +110,32 @@ wb_merep::wb_merep(const char* dirName, wb_erep* erep, wb_vrep* vrep)
           *rindex(dp->d_name, '.') = '\0';
           str_ToLower(dp->d_name, dp->d_name);
           dbs_Close(&sts, ep);
-          if (streq(dp->d_name, vname)) {
-            try {
-              wb_vrepdbs* vrep = new wb_vrepdbs(
-                  erep, this, fileName, vp->name, vp->vid, vp->cid);
+          if (streq(dp->d_name, vname))
+          {
+            try
+            {
+              wb_vrepdbs* vrep = new wb_vrepdbs(erep, this, fileName, vp->name, vp->vid, vp->cid);
               vrep->load();
               addDbs(&sts, (wb_mvrep*)vrep);
               char buff[350];
-              sprintf(buff, "Local class volume \"%s\" loaded from \"%s\", in "
-                            "data base %s",
-                  vp->name, fileName, dirName);
+              sprintf(buff,
+                      "Local class volume \"%s\" loaded from \"%s\", in "
+                      "data base %s",
+                      vp->name, fileName, dirName);
               MsgWindow::message('O', buff);
-            } catch (wb_error& e) {
-              MsgWindow::message('E', "Unable to open local class volume",
-                  fileName, e.what().c_str());
+            }
+            catch (wb_error& e)
+            {
+              MsgWindow::message('E', "Unable to open local class volume", fileName, e.what().c_str());
             }
           }
         }
       }
-    } else {
-      if (errno == 0) {
+    }
+    else
+    {
+      if (errno == 0)
+      {
         closedir(dirp);
         break;
       }
@@ -138,7 +149,8 @@ wb_merep::wb_merep(const char* dirName, wb_erep* erep, wb_vrep* vrep)
 wb_mvrep* wb_merep::volume(pwr_tStatus* sts)
 {
   mvrep_iterator it = m_mvrepdbs.begin();
-  if (it == m_mvrepdbs.end()) {
+  if (it == m_mvrepdbs.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return 0;
   }
@@ -149,7 +161,8 @@ wb_mvrep* wb_merep::volume(pwr_tStatus* sts)
 wb_mvrep* wb_merep::volume(pwr_tStatus* sts, pwr_tVid vid)
 {
   mvrep_iterator it = m_mvrepdbs.find(vid);
-  if (it == m_mvrepdbs.end()) {
+  if (it == m_mvrepdbs.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return 0;
   }
@@ -160,8 +173,10 @@ wb_mvrep* wb_merep::volume(pwr_tStatus* sts, pwr_tVid vid)
 wb_mvrep* wb_merep::volume(pwr_tStatus* sts, const char* name)
 {
   mvrep_iterator it;
-  for (it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++) {
-    if (str_NoCaseStrcmp(it->second->name(), name) == 0) {
+  for (it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++)
+  {
+    if (str_NoCaseStrcmp(it->second->name(), name) == 0)
+    {
       *sts = LDH__SUCCESS;
       return it->second;
     }
@@ -173,7 +188,8 @@ wb_mvrep* wb_merep::volume(pwr_tStatus* sts, const char* name)
 void wb_merep::copyFiles(const char* dirName)
 {
   mvrep_iterator it;
-  for (it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++) {
+  for (it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++)
+  {
     wb_vrepdbs* dp = (wb_vrepdbs*)it->second;
     char cmd[512];
     sprintf(cmd, "cp %s %s", dp->fileName(), dirName);
@@ -185,27 +201,29 @@ void wb_merep::copyFiles(const char* dirName, wb_merep* merep)
 {
   mvrep_iterator it;
 
-  for (it = merep->m_mvrepdbs.begin(); it != merep->m_mvrepdbs.end(); it++) {
+  for (it = merep->m_mvrepdbs.begin(); it != merep->m_mvrepdbs.end(); it++)
+  {
     wb_vrepdbs* e_dp = (wb_vrepdbs*)it->second;
 
     mvrep_iterator i_it = m_mvrepdbs.find(e_dp->vid());
 
-    if (i_it == m_mvrepdbs.end()) {
+    if (i_it == m_mvrepdbs.end())
+    {
       char cmd[512];
       sprintf(cmd, "cp %s %s", e_dp->fileName(), dirName);
 
       system(cmd);
       char buff[256];
       char e_timbuf[32];
-      time_AtoAscii(&e_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime,
-          e_timbuf, sizeof(e_timbuf));
-      sprintf(buff,
-          "Global class volume \"%s\" [%s](%s), was copied to data base \"%s\"",
-          e_dp->dbsenv()->vp->name, e_timbuf, e_dp->fileName(), dirName);
+      time_AtoAscii(&e_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime, e_timbuf, sizeof(e_timbuf));
+      sprintf(buff, "Global class volume \"%s\" [%s](%s), was copied to data base \"%s\"",
+              e_dp->dbsenv()->vp->name, e_timbuf, e_dp->fileName(), dirName);
       MsgWindow::message('I', buff);
 
       continue;
-    } else {
+    }
+    else
+    {
       wb_vrepdbs* i_dp = (wb_vrepdbs*)i_it->second;
 
       if (time_Acomp(&i_dp->dbsenv()->vp->time, &e_dp->dbsenv()->vp->time) == 0)
@@ -219,14 +237,13 @@ void wb_merep::copyFiles(const char* dirName, wb_merep* merep)
       char e_timbuf[32];
       char i_timbuf[32];
 
-      time_AtoAscii(&i_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime,
-          i_timbuf, sizeof(i_timbuf));
-      time_AtoAscii(&e_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime,
-          e_timbuf, sizeof(e_timbuf));
+      time_AtoAscii(&i_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime, i_timbuf, sizeof(i_timbuf));
+      time_AtoAscii(&e_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime, e_timbuf, sizeof(e_timbuf));
 
-      sprintf(buff, "Local class volume \"%s\" [%s], in data base \"%s\", was "
-                    "updated [%s]",
-          i_dp->dbsenv()->vp->name, i_timbuf, dirName, e_timbuf);
+      sprintf(buff,
+              "Local class volume \"%s\" [%s], in data base \"%s\", was "
+              "updated [%s]",
+              i_dp->dbsenv()->vp->name, i_timbuf, dirName, e_timbuf);
       MsgWindow::message('I', buff);
     }
   }
@@ -237,7 +254,8 @@ bool wb_merep::compareMeta(const char* dbName, wb_merep* merep)
   mvrep_iterator it;
   int need_update = 0;
 
-  for (it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++) {
+  for (it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++)
+  {
     wb_vrepdbs* i_dp = (wb_vrepdbs*)it->second;
     char i_timbuf[32];
     char e_timbuf[32];
@@ -245,12 +263,13 @@ bool wb_merep::compareMeta(const char* dbName, wb_merep* merep)
 
     mvrep_iterator e_it = merep->m_mvrepdbs.find(i_dp->vid());
 
-    if (e_it == merep->m_mvrepdbs.end()) {
-      time_AtoAscii(&i_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime,
-          i_timbuf, sizeof(i_timbuf));
-      sprintf(buff, "Local class volume \"%s\" [%s] (%s), in data base \"%s\", "
-                    "does not exist in global scope",
-          i_dp->dbsenv()->vp->name, i_timbuf, i_dp->fileName(), dbName);
+    if (e_it == merep->m_mvrepdbs.end())
+    {
+      time_AtoAscii(&i_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime, i_timbuf, sizeof(i_timbuf));
+      sprintf(buff,
+              "Local class volume \"%s\" [%s] (%s), in data base \"%s\", "
+              "does not exist in global scope",
+              i_dp->dbsenv()->vp->name, i_timbuf, i_dp->fileName(), dbName);
       MsgWindow::message('W', buff);
       continue;
     }
@@ -260,36 +279,34 @@ bool wb_merep::compareMeta(const char* dbName, wb_merep* merep)
     if (time_Acomp(&i_dp->dbsenv()->vp->time, &e_dp->dbsenv()->vp->time) == 0)
       continue;
 
-    time_AtoAscii(&i_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime,
-        i_timbuf, sizeof(i_timbuf));
-    time_AtoAscii(&e_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime,
-        e_timbuf, sizeof(e_timbuf));
+    time_AtoAscii(&i_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime, i_timbuf, sizeof(i_timbuf));
+    time_AtoAscii(&e_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime, e_timbuf, sizeof(e_timbuf));
 
-    sprintf(buff, "Local class volume \"%s\" [%s] (%s), in data base \"%s\", "
-                  "can be updated [%s]",
-        i_dp->dbsenv()->vp->name, i_timbuf, i_dp->fileName(), dbName, e_timbuf);
+    sprintf(buff,
+            "Local class volume \"%s\" [%s] (%s), in data base \"%s\", "
+            "can be updated [%s]",
+            i_dp->dbsenv()->vp->name, i_timbuf, i_dp->fileName(), dbName, e_timbuf);
     MsgWindow::message('W', buff, msgw_ePop_No);
     need_update++;
   }
 
-  for (it = merep->m_mvrepdbs.begin(); it != merep->m_mvrepdbs.end(); it++) {
+  for (it = merep->m_mvrepdbs.begin(); it != merep->m_mvrepdbs.end(); it++)
+  {
     wb_vrepdbs* e_dp = (wb_vrepdbs*)it->second;
     mvrep_iterator i_it = m_mvrepdbs.find(e_dp->vid());
 
-    if (i_it == m_mvrepdbs.end()) {
+    if (i_it == m_mvrepdbs.end())
+    {
       char buff[256];
       char e_timbuf[32];
-      time_AtoAscii(&e_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime,
-          e_timbuf, sizeof(e_timbuf));
-      sprintf(buff,
-          "Global class volume \"%s\" [%s], does not exist in data base \"%s\"",
-          e_dp->dbsenv()->vp->name, e_timbuf, dbName);
+      time_AtoAscii(&e_dp->dbsenv()->vp->time, time_eFormat_NumDateAndTime, e_timbuf, sizeof(e_timbuf));
+      sprintf(buff, "Global class volume \"%s\" [%s], does not exist in data base \"%s\"",
+              e_dp->dbsenv()->vp->name, e_timbuf, dbName);
       MsgWindow::message('W', buff);
     }
   }
   if (need_update)
-    MsgWindow::message(
-        'W', "Classvolumes need update, execute 'Function->UpdateClasses'");
+    MsgWindow::message('W', "Classvolumes need update, execute 'Function->UpdateClasses'");
 
   return true;
 }
@@ -306,14 +323,17 @@ wb_orep* wb_merep::object(pwr_tStatus* sts, pwr_tOid oid)
 void wb_merep::addDbs(pwr_tStatus* sts, wb_mvrep* mvrep)
 {
   mvrep_iterator it = m_mvrepdbs.find(mvrep->vid());
-  if (it == m_mvrepdbs.end()) {
+  if (it == m_mvrepdbs.end())
+  {
     // Look for vrep in erep list... TODO
 
     m_mvrepdbs[mvrep->vid()] = mvrep;
     if (mvrep != m_vrep)
       mvrep->ref();
     *sts = LDH__SUCCESS;
-  } else {
+  }
+  else
+  {
     *sts = LDH__VOLIDALREXI;
   }
 }
@@ -321,7 +341,8 @@ void wb_merep::addDbs(pwr_tStatus* sts, wb_mvrep* mvrep)
 void wb_merep::removeDbs(pwr_tStatus* sts, wb_mvrep* mvrep)
 {
   mvrep_iterator it = m_mvrepdbs.find(mvrep->vid());
-  if (it == m_mvrepdbs.end()) {
+  if (it == m_mvrepdbs.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return;
   }
@@ -335,7 +356,8 @@ wb_cdrep* wb_merep::cdrep(pwr_tStatus* sts, const wb_orep& o)
 {
   pwr_tVid vid = cdh_CidToVid(o.cid());
   mvrep_iterator it = m_mvrepdbs.find(vid);
-  if (it == m_mvrepdbs.end()) {
+  if (it == m_mvrepdbs.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return 0;
   }
@@ -348,16 +370,20 @@ wb_cdrep* wb_merep::cdrep(pwr_tStatus* sts, const wb_orep& o)
 wb_cdrep* wb_merep::cdrep(pwr_tStatus* sts, pwr_tCid cid)
 {
   mvrep_iterator it = m_mvrepdbs.find(cdh_CidToVid(cid));
-  if (it == m_mvrepdbs.end()) {
+  if (it == m_mvrepdbs.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return 0;
   }
-  try {
+  try
+  {
     *sts = LDH__SUCCESS;
     wb_cdrep* cd = it->second->cdrep(cid);
     cd->merep(this);
     return cd;
-  } catch (wb_error& e) {
+  }
+  catch (wb_error& e)
+  {
     *sts = e.sts();
     return 0;
   }
@@ -367,27 +393,37 @@ wb_cdrep* wb_merep::cdrep(pwr_tStatus* sts, wb_name name)
 {
   wb_cdrep* cdrep;
 
-  if (name.hasVolume()) {
+  if (name.hasVolume())
+  {
     wb_mvrep* mvrep = volume(sts, name.volume());
     if (EVEN(*sts))
       return 0;
-    try {
+    try
+    {
       cdrep = new wb_cdrep(mvrep, name);
       cdrep->merep(this);
       *sts = LDH__SUCCESS;
       return cdrep;
-    } catch (wb_error& e) {
+    }
+    catch (wb_error& e)
+    {
       *sts = e.sts();
       return 0;
     }
-  } else {
-    for (mvrep_iterator it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++) {
-      try {
+  }
+  else
+  {
+    for (mvrep_iterator it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++)
+    {
+      try
+      {
         cdrep = new wb_cdrep(it->second, name);
         cdrep->merep(this);
         *sts = LDH__SUCCESS;
         return cdrep;
-      } catch (wb_error&) {
+      }
+      catch (wb_error&)
+      {
         // Not found in this volume, try next
       }
     }
@@ -403,9 +439,9 @@ wb_tdrep* wb_merep::tdrep(pwr_tStatus* sts, const wb_adrep& a)
     // Fetch from other meta environment
     return m_erep->tdrep(sts, a);
 
-  std::map<pwr_tVid, wb_mvrep*>::iterator it
-      = m_mvrepdbs.find(cdh_TidToVid(a.type()));
-  if (it == m_mvrepdbs.end()) {
+  std::map<pwr_tVid, wb_mvrep*>::iterator it = m_mvrepdbs.find(cdh_TidToVid(a.type()));
+  if (it == m_mvrepdbs.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return 0;
   }
@@ -415,9 +451,9 @@ wb_tdrep* wb_merep::tdrep(pwr_tStatus* sts, const wb_adrep& a)
 
 wb_tdrep* wb_merep::tdrep(pwr_tStatus* sts, pwr_tTid tid)
 {
-  std::map<pwr_tVid, wb_mvrep*>::iterator it
-      = m_mvrepdbs.find(cdh_TidToVid(tid));
-  if (it == m_mvrepdbs.end()) {
+  std::map<pwr_tVid, wb_mvrep*>::iterator it = m_mvrepdbs.find(cdh_TidToVid(tid));
+  if (it == m_mvrepdbs.end())
+  {
     *sts = LDH__NOSUCHVOL;
     return 0;
   }
@@ -429,26 +465,36 @@ wb_tdrep* wb_merep::tdrep(pwr_tStatus* sts, wb_name name)
 {
   wb_tdrep* tdrep;
 
-  if (name.hasVolume()) {
+  if (name.hasVolume())
+  {
     wb_mvrep* mvrep = volume(sts, name.volume());
     if (EVEN(*sts))
       return 0;
 
-    try {
+    try
+    {
       tdrep = new wb_tdrep(mvrep, name);
       *sts = LDH__SUCCESS;
       return tdrep;
-    } catch (wb_error& e) {
+    }
+    catch (wb_error& e)
+    {
       *sts = e.sts();
       return 0;
     }
-  } else {
-    for (mvrep_iterator it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++) {
-      try {
+  }
+  else
+  {
+    for (mvrep_iterator it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++)
+    {
+      try
+      {
         tdrep = new wb_tdrep(it->second, name);
         *sts = LDH__SUCCESS;
         return tdrep;
-      } catch (wb_error&) {
+      }
+      catch (wb_error&)
+      {
         // Not found in this volume, try next
       }
     }
@@ -459,9 +505,8 @@ wb_tdrep* wb_merep::tdrep(pwr_tStatus* sts, wb_name name)
   return 0;
 }
 
-int wb_merep::getAttrInfoRec(wb_attrname* attr, pwr_eBix bix, pwr_tCid cid,
-    size_t* size, size_t* offset, pwr_tTid* tid, int* elements, pwr_eType* type,
-    int* flags, int level)
+int wb_merep::getAttrInfoRec(wb_attrname* attr, pwr_eBix bix, pwr_tCid cid, size_t* size, size_t* offset,
+                             pwr_tTid* tid, int* elements, pwr_eType* type, int* flags, int level)
 {
   pwr_tStatus sts;
 
@@ -474,35 +519,43 @@ int wb_merep::getAttrInfoRec(wb_attrname* attr, pwr_eBix bix, pwr_tCid cid,
 
   wb_adrep* adrep;
   wb_bdrep* bd = 0;
-  if (bix == 0) {
+  if (bix == 0)
+  {
     // Search in all bodies
     adrep = cd->adrep(&sts, attr->attributesAllTrue(level));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       delete cd;
       return 0;
     }
-  } else {
+  }
+  else
+  {
     // Search in specified body
     bd = cd->bdrep(&sts, bix);
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       delete cd;
       return 0;
     }
 
     adrep = bd->adrep(&sts, attr->attributesAllTrue(level));
-    if (EVEN(sts)) {
+    if (EVEN(sts))
+    {
       delete cd;
       delete bd;
       return 0;
     }
   }
 
-  if (attr->hasAttrIndex(attr->attributes() - 1)) {
+  if (attr->hasAttrIndex(attr->attributes() - 1))
+  {
     *size = adrep->size() / adrep->nElement();
-    *offset
-        += adrep->offset() + attr->attrIndex(attr->attributes() - 1) * *size;
+    *offset += adrep->offset() + attr->attrIndex(attr->attributes() - 1) * *size;
     *elements = 1;
-  } else {
+  }
+  else
+  {
     *offset += adrep->offset();
     *size = adrep->size();
     *elements = adrep->nElement();
@@ -518,8 +571,7 @@ int wb_merep::getAttrInfoRec(wb_attrname* attr, pwr_eBix bix, pwr_tCid cid,
   return 1;
 }
 
-void wb_merep::classDependency(pwr_tStatus* sts, pwr_tCid cid, pwr_tCid** lst,
-    pwr_sAttrRef** arlst, int* cnt)
+void wb_merep::classDependency(pwr_tStatus* sts, pwr_tCid cid, pwr_tCid** lst, pwr_sAttrRef** arlst, int* cnt)
 {
   *lst = 0;
   *arlst = 0;
@@ -530,11 +582,13 @@ void wb_merep::classDependency(pwr_tStatus* sts, pwr_tCid cid, pwr_tCid** lst,
     return;
 
   wb_bdrep* bd = cd->bdrep(sts, pwr_eBix_rt);
-  if (!bd) {
+  if (!bd)
+  {
     delete cd;
     return;
   }
-  if (bd->nAttribute() == 0) {
+  if (bd->nAttribute() == 0)
+  {
     delete cd;
     delete bd;
     return;
@@ -545,8 +599,10 @@ void wb_merep::classDependency(pwr_tStatus* sts, pwr_tCid cid, pwr_tCid** lst,
 
   *cnt = 0;
   wb_adrep *ad, *oad;
-  for (ad = bd->adrep(sts); ad;) {
-    if (cdh_tidIsCid(ad->tid())) {
+  for (ad = bd->adrep(sts); ad;)
+  {
+    if (cdh_tidIsCid(ad->tid()))
+    {
       (*lst)[*cnt] = ad->tid();
       (*arlst)[*cnt] = ad->aref();
       (*cnt)++;
@@ -566,7 +622,8 @@ void wb_merep::classVersion(pwr_tStatus* sts, pwr_tCid cid, pwr_tTime* time)
   if (!cd)
     return;
 
-  if (cd->vtype() == ldh_eVolRep_Dbs) {
+  if (cd->vtype() == ldh_eVolRep_Dbs)
+  {
     // ohTime contains class version for a class in vrepdbs
     pwr_tTime ohtime = cd->ohTime();
     if (time_Acomp(&ohtime, time) == 1)
@@ -577,11 +634,13 @@ void wb_merep::classVersion(pwr_tStatus* sts, pwr_tCid cid, pwr_tTime* time)
   }
 
   wb_bdrep* bd = cd->bdrep(sts, pwr_eBix_rt);
-  if (!bd) {
+  if (!bd)
+  {
     delete cd;
     return;
   }
-  if (bd->nAttribute() == 0) {
+  if (bd->nAttribute() == 0)
+  {
     delete cd;
     delete bd;
     return;
@@ -590,8 +649,10 @@ void wb_merep::classVersion(pwr_tStatus* sts, pwr_tCid cid, pwr_tTime* time)
   *time = cd->structModTime();
 
   wb_adrep *ad, *oad;
-  for (ad = bd->adrep(sts); ad;) {
-    if (cdh_tidIsCid(ad->tid())) {
+  for (ad = bd->adrep(sts); ad;)
+  {
+    if (cdh_tidIsCid(ad->tid()))
+    {
       pwr_tTime t = pwr_cNTime;
       classVersion(sts, ad->tid(), &t);
       if (EVEN(*sts))
@@ -609,8 +670,7 @@ void wb_merep::classVersion(pwr_tStatus* sts, pwr_tCid cid, pwr_tTime* time)
   *sts = LDH__SUCCESS;
 }
 
-void wb_merep::insertCattObject(
-    pwr_tStatus* sts, pwr_tCid cid, wb_adrep* adp, int offset, int disableattr)
+void wb_merep::insertCattObject(pwr_tStatus* sts, pwr_tCid cid, wb_adrep* adp, int offset, int disableattr)
 {
   merep_sClassAttrKey key;
   merep_sClassAttr* item;
@@ -618,12 +678,13 @@ void wb_merep::insertCattObject(
   int j;
 
   wb_cdrep* cd = cdrep(sts, adp->tid());
-  if (EVEN(*sts)) {
+  if (EVEN(*sts))
+  {
     char msg[200];
     wb_cdrep* cp = cdrep(sts, cid);
     sprintf(msg, "Attribute type error, %s.%s", cp->name(), adp->name());
     throw wb_error_str(msg);
-    //throw wb_error(*sts);
+    // throw wb_error(*sts);
   }
 
   // Find a tree node with free offsets
@@ -633,20 +694,25 @@ void wb_merep::insertCattObject(
   item0 = (merep_sClassAttr*)tree_Find(sts, m_catt_tt, &key);
   if (EVEN(*sts))
     item0 = (merep_sClassAttr*)tree_Insert(sts, m_catt_tt, &key);
-  
+
   if (item0->numIdx == 0)
     item = item0;
-  else {
+  else
+  {
     key.idx = item0->numIdx;
-    item = (merep_sClassAttr*)tree_Find(sts, m_catt_tt, &key);    
+    item = (merep_sClassAttr*)tree_Find(sts, m_catt_tt, &key);
   }
 
-  if (!(adp->flags() & PWR_MASK_ARRAY)) {
-    if (item->numOffset < merep_cCattOffsetSize) {
+  if (!(adp->flags() & PWR_MASK_ARRAY))
+  {
+    if (item->numOffset < merep_cCattOffsetSize)
+    {
       // Insert in found item
       item->offset[item->numOffset] = offset + adp->offset();
       item->flags[item->numOffset++] = adp->flags() | disableattr;
-    } else {
+    }
+    else
+    {
       // Insert a new item
       key.idx++;
       item0->numIdx = key.idx;
@@ -657,60 +723,66 @@ void wb_merep::insertCattObject(
 
     // Look for class attributes in this class
     wb_bdrep* bd = cd->bdrep(sts, pwr_eBix_rt);
-    if (EVEN(*sts)) {
+    if (EVEN(*sts))
+    {
       delete cd;
       *sts = LDH__SUCCESS;
       return;
     }
 
     wb_adrep *ad, *adnext;
-    for (ad = bd->adrep(sts); ODD(*sts);
-         adnext = ad->next(sts), delete ad, ad = adnext) {
-      if (ad->flags() & PWR_MASK_CLASS && cdh_tidIsCid(ad->tid())) {
-	if (ad->flags() & PWR_MASK_SUPERCLASS)
-	  insertCattObject(sts, cid, ad, offset + adp->offset(), 
-			   disableattr);
-	else
-	  insertCattObject(sts, cid, ad, offset + adp->offset(), 
-			   ad->flags() & PWR_MASK_DISABLEATTR);
+    for (ad = bd->adrep(sts); ODD(*sts); adnext = ad->next(sts), delete ad, ad = adnext)
+    {
+      if (ad->flags() & PWR_MASK_CLASS && cdh_tidIsCid(ad->tid()))
+      {
+        if (ad->flags() & PWR_MASK_SUPERCLASS)
+          insertCattObject(sts, cid, ad, offset + adp->offset(), disableattr);
+        else
+          insertCattObject(sts, cid, ad, offset + adp->offset(), ad->flags() & PWR_MASK_DISABLEATTR);
         if (EVEN(*sts))
           return;
       }
     }
     delete bd;
-  } else {
+  }
+  else
+  {
     // Insert all offsets in the array
     pwr_tStatus tsts = 1;
-    for (j = 0; j < adp->nElement(); j++) {
-      if (ODD(tsts) && item->numOffset < merep_cCattOffsetSize) {
+    for (j = 0; j < adp->nElement(); j++)
+    {
+      if (ODD(tsts) && item->numOffset < merep_cCattOffsetSize)
+      {
         // Insert in current item
-        item->offset[item->numOffset]
-            = offset + adp->offset() + j * adp->size() / adp->nElement();
+        item->offset[item->numOffset] = offset + adp->offset() + j * adp->size() / adp->nElement();
         item->flags[item->numOffset++] = adp->flags();
-      } else {
+      }
+      else
+      {
         // Insert a new item
-	key.idx++;
-	item0->numIdx = key.idx;
+        key.idx++;
+        item0->numIdx = key.idx;
         item = (merep_sClassAttr*)tree_Insert(&tsts, m_catt_tt, &key);
-        item->offset[item->numOffset]
-            = offset + adp->offset() + j * adp->size() / adp->nElement();
+        item->offset[item->numOffset] = offset + adp->offset() + j * adp->size() / adp->nElement();
         item->flags[item->numOffset++] = adp->flags();
       }
 
       // Look for class attributes in this class
       wb_bdrep* bd = cd->bdrep(sts, pwr_eBix_rt);
-      if (EVEN(*sts)) {
+      if (EVEN(*sts))
+      {
         delete cd;
         *sts = LDH__SUCCESS;
         return;
       }
 
       wb_adrep *ad, *adnext;
-      for (ad = bd->adrep(sts); ODD(*sts);
-           adnext = ad->next(sts), delete ad, ad = adnext) {
-        if (ad->flags() & PWR_MASK_CLASS && cdh_tidIsCid(ad->tid())) {
-          insertCattObject(sts, cid, ad,
-	      offset + adp->offset() + j * adp->size() / adp->nElement(), ad->flags() & PWR_MASK_DISABLEATTR);
+      for (ad = bd->adrep(sts); ODD(*sts); adnext = ad->next(sts), delete ad, ad = adnext)
+      {
+        if (ad->flags() & PWR_MASK_CLASS && cdh_tidIsCid(ad->tid()))
+        {
+          insertCattObject(sts, cid, ad, offset + adp->offset() + j * adp->size() / adp->nElement(),
+                           ad->flags() & PWR_MASK_DISABLEATTR);
           if (EVEN(*sts))
             return;
         }
@@ -748,24 +820,26 @@ tree_PrintTable(sts, m_catt_tt, printNode, printKey);
 
 tree_sTable* wb_merep::buildCatt(pwr_tStatus* sts)
 {
-  if (m_catt_tt) {
+  if (m_catt_tt)
+  {
     // Already built
     *sts = LDH__SUCCESS;
     return m_catt_tt;
   }
 
-  m_catt_tt = tree_CreateTable(sts, sizeof(merep_sClassAttrKey),
-      offsetof(merep_sClassAttr, key), sizeof(merep_sClassAttr), 100, compCatt);
+  m_catt_tt = tree_CreateTable(sts, sizeof(merep_sClassAttrKey), offsetof(merep_sClassAttr, key),
+                               sizeof(merep_sClassAttr), 100, compCatt);
 
   // Loop through all $ClassDef objects
-  for (mvrep_iterator it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++) {
+  for (mvrep_iterator it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++)
+  {
     wb_vrepdbs* vrep = (wb_vrepdbs*)it->second;
     wb_orep *o, *onext;
     wb_adrep *ad, *adnext;
     pwr_tCid cid;
 
-    for (o = vrep->object(sts, pwr_eClass_ClassDef); ODD(*sts);
-         onext = o->next(sts), o->unref(), o = onext) {
+    for (o = vrep->object(sts, pwr_eClass_ClassDef); ODD(*sts); onext = o->next(sts), o->unref(), o = onext)
+    {
       o->ref();
 
       cid = cdh_ClassObjidToId(o->oid());
@@ -774,16 +848,17 @@ tree_sTable* wb_merep::buildCatt(pwr_tStatus* sts)
         throw wb_error(*sts);
 
       wb_bdrep* bd = cd->bdrep(sts, pwr_eBix_rt);
-      if (EVEN(*sts)) {
+      if (EVEN(*sts))
+      {
         delete cd;
         continue;
       }
 
-      for (ad = bd->adrep(sts); ODD(*sts);
-           adnext = ad->next(sts), delete ad, ad = adnext) {
-        if (ad->flags() & PWR_MASK_CLASS && cdh_tidIsCid(ad->tid())) {
-          insertCattObject(sts, cid, ad, 0, 
-			   ad->flags() & PWR_MASK_DISABLEATTR);
+      for (ad = bd->adrep(sts); ODD(*sts); adnext = ad->next(sts), delete ad, ad = adnext)
+      {
+        if (ad->flags() & PWR_MASK_CLASS && cdh_tidIsCid(ad->tid()))
+        {
+          insertCattObject(sts, cid, ad, 0, ad->flags() & PWR_MASK_DISABLEATTR);
           if (EVEN(*sts))
             throw wb_error(*sts);
         }
@@ -794,15 +869,15 @@ tree_sTable* wb_merep::buildCatt(pwr_tStatus* sts)
   }
 
   // If the current volume is a class volume, add objects from this also
-  if (m_vrep && m_vrep->type() == ldh_eVolRep_Mem
-      && m_vrep->cid() == pwr_eClass_ClassVolume) {
+  if (m_vrep && m_vrep->type() == ldh_eVolRep_Mem && m_vrep->cid() == pwr_eClass_ClassVolume)
+  {
     wb_vrep* vrep = m_vrep;
     wb_orep *o, *onext;
     wb_adrep *ad, *adnext;
     pwr_tCid cid;
 
-    for (o = vrep->object(sts, pwr_eClass_ClassDef); ODD(*sts);
-         onext = o->next(sts), o->unref(), o = onext) {
+    for (o = vrep->object(sts, pwr_eClass_ClassDef); ODD(*sts); onext = o->next(sts), o->unref(), o = onext)
+    {
       o->ref();
 
       cid = cdh_ClassObjidToId(o->oid());
@@ -811,16 +886,17 @@ tree_sTable* wb_merep::buildCatt(pwr_tStatus* sts)
         throw wb_error(*sts);
 
       wb_bdrep* bd = cd->bdrep(sts, pwr_eBix_rt);
-      if (EVEN(*sts)) {
+      if (EVEN(*sts))
+      {
         delete cd;
         continue;
       }
 
-      for (ad = bd->adrep(sts); ODD(*sts);
-           adnext = ad->next(sts), delete ad, ad = adnext) {
-        if (ad->flags() & PWR_MASK_CLASS && cdh_tidIsCid(ad->tid())) {
-          insertCattObject(sts, cid, ad, 0, 
-			   ad->flags() & PWR_MASK_DISABLEATTR);
+      for (ad = bd->adrep(sts); ODD(*sts); adnext = ad->next(sts), delete ad, ad = adnext)
+      {
+        if (ad->flags() & PWR_MASK_CLASS && cdh_tidIsCid(ad->tid()))
+        {
+          insertCattObject(sts, cid, ad, 0, ad->flags() & PWR_MASK_DISABLEATTR);
           if (EVEN(*sts))
             throw wb_error(*sts);
         }
@@ -841,38 +917,42 @@ static int compCatt(tree_sTable* tp, tree_sNode* x, tree_sNode* y)
   merep_sClassAttrKey* xKey = (merep_sClassAttrKey*)(tp->keyOffset + (char*)x);
   merep_sClassAttrKey* yKey = (merep_sClassAttrKey*)(tp->keyOffset + (char*)y);
 
-  if (xKey->subCid == yKey->subCid) {
-    if (xKey->hostCid == yKey->hostCid) {
+  if (xKey->subCid == yKey->subCid)
+  {
+    if (xKey->hostCid == yKey->hostCid)
+    {
       if (xKey->idx == yKey->idx)
         return 0;
       else if (xKey->idx < yKey->idx)
         return -1;
       else
         return 1;
-    } else if (xKey->hostCid < yKey->hostCid)
+    }
+    else if (xKey->hostCid < yKey->hostCid)
       return -1;
     else
       return 1;
-  } else if (xKey->subCid < yKey->subCid)
+  }
+  else if (xKey->subCid < yKey->subCid)
     return -1;
   else
     return 1;
 }
 
-void wb_merep::subClass(
-    pwr_tCid supercid, pwr_tCid subcid, pwr_tCid* nextsubcid, pwr_tStatus* sts)
+void wb_merep::subClass(pwr_tCid supercid, pwr_tCid subcid, pwr_tCid* nextsubcid, pwr_tStatus* sts)
 {
   bool prev_found = false;
 
   // Loop through all $ClassDef objects
-  for (mvrep_iterator it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++) {
+  for (mvrep_iterator it = m_mvrepdbs.begin(); it != m_mvrepdbs.end(); it++)
+  {
     wb_vrepdbs* vrep = (wb_vrepdbs*)it->second;
     wb_orep *o, *onext;
     wb_adrep* ad;
     pwr_tCid cid;
 
-    for (o = vrep->object(sts, pwr_eClass_ClassDef); ODD(*sts);
-         onext = o->next(sts), o->unref(), o = onext) {
+    for (o = vrep->object(sts, pwr_eClass_ClassDef); ODD(*sts); onext = o->next(sts), o->unref(), o = onext)
+    {
       o->ref();
 
       cid = cdh_ClassObjidToId(o->oid());
@@ -881,20 +961,23 @@ void wb_merep::subClass(
         throw wb_error(*sts);
 
       wb_bdrep* bd = cd->bdrep(sts, pwr_eBix_rt);
-      if (EVEN(*sts)) {
+      if (EVEN(*sts))
+      {
         delete cd;
         continue;
       }
 
       ad = bd->adrep(sts);
-      if (ODD(*sts) && ad->flags() & PWR_MASK_SUPERCLASS
-          && ad->tid() == supercid) {
-        if (subcid == pwr_cNCid || prev_found) {
+      if (ODD(*sts) && ad->flags() & PWR_MASK_SUPERCLASS && ad->tid() == supercid)
+      {
+        if (subcid == pwr_cNCid || prev_found)
+        {
           *nextsubcid = cid;
           delete bd;
           delete cd;
           return;
-        } else if (subcid == cid)
+        }
+        else if (subcid == cid)
           prev_found = true;
       }
       delete bd;
@@ -908,9 +991,11 @@ wb_mvrep* wb_merep::nextVolume(pwr_tStatus* sts, pwr_tVid vid)
 {
   // Search in dbs
   mvrep_iterator it = m_mvrepdbs.find(vid);
-  if (it != m_mvrepdbs.end()) {
+  if (it != m_mvrepdbs.end())
+  {
     it++;
-    if (it != m_mvrepdbs.end()) {
+    if (it != m_mvrepdbs.end())
+    {
       *sts = LDH__SUCCESS;
       return it->second;
     }

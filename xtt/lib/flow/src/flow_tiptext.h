@@ -59,15 +59,15 @@ class FlowArrayElem;
   The text is visible until the remove_text() or remove() function are called.
 */
 
-class FlowTipText {
+class FlowTipText
+{
 public:
   //! Constructor
   /*!
     \param gctx		Flow context.
   */
   FlowTipText(FlowCtx* gctx)
-      : ctx(gctx), text_object(0), tiptext_rows(0), active(false), timer_id(0),
-        text_size(2)
+      : ctx(gctx), text_object(0), tiptext_rows(0), active(false), timer_id(0), text_size(2)
   {
   }
 
@@ -76,19 +76,19 @@ public:
    */
   ~FlowTipText();
 
-  FlowCtx* ctx; //!< Flow context.
-  int text_x; //!< x coordinate in pixels for text.
-  int text_y; //!< y coordinate in pixels for text.
-  int text_width; //!< Text width in pixels.
-  int text_height; //!< Text height in pixels.
-  int text_descent; //!< Text descent in pixels.
-  FlowArrayElem* text_object; //!< Object that activated the current tip text.
-  int tiptext_rows; //!< Number of rows in current tiptext.
+  FlowCtx* ctx;                    //!< Flow context.
+  int text_x;                      //!< x coordinate in pixels for text.
+  int text_y;                      //!< y coordinate in pixels for text.
+  int text_width;                  //!< Text width in pixels.
+  int text_height;                 //!< Text height in pixels.
+  int text_descent;                //!< Text descent in pixels.
+  FlowArrayElem* text_object;      //!< Object that activated the current tip text.
+  int tiptext_rows;                //!< Number of rows in current tiptext.
   char tiptext[TIPTEXT_ROWS][256]; //!< Current tip text.
-  bool active; //!< Tip text is active, i.e. timer is running or text is
+  bool active;                     //!< Tip text is active, i.e. timer is running or text is
   //! displayed.
   void* timer_id; //!< Timer id.
-  int text_size; //!< Text size.
+  int text_size;  //!< Text size.
 
   //! Activate tooltip.
   /*!

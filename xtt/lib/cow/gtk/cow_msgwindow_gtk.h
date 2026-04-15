@@ -42,10 +42,10 @@
 #include "cow_msgwindow.h"
 #include "cow_wow_gtk.h"
 
-class MsgWindowGtk : public MsgWindow {
+class MsgWindowGtk : public MsgWindow
+{
 public:
-  MsgWindowGtk(void* msg_parent_ctx, GtkWidget* msg_parent_wid,
-      const char* msg_name, pwr_tStatus* status);
+  MsgWindowGtk(void* msg_parent_ctx, GtkWidget* msg_parent_wid, const char* msg_name, pwr_tStatus* status);
   ~MsgWindowGtk();
 
   GtkWidget* parent_wid;
@@ -59,8 +59,7 @@ public:
   void unmap();
   void print();
 
-  static gboolean action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void activate_exit(GtkWidget* w, gpointer data);
   static void activate_print(GtkWidget* w, gpointer data);
   static void activate_clear(GtkWidget* w, gpointer data);

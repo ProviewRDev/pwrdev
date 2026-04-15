@@ -46,9 +46,9 @@
 #include "rt_mh_appl.h"
 #include "rt_mh_outunit.h"
 
-#define mh_cScanRate 10 /* Tenths of seconds between scans of sup objects */
+#define mh_cScanRate 10     /* Tenths of seconds between scans of sup objects */
 #define mh_cMaxApplAlarm 50 /* Default value*/
-#define mh_cMaxEvents 100 /* Default value*/
+#define mh_cMaxEvents 100   /* Default value*/
 #define mh_cDetectTimer 1.0
 #define mh_cMessageTimer 1.0
 
@@ -58,10 +58,11 @@ typedef union mhu_ApplReply mh_uApplReply;
 typedef struct mhs_ProcLink mh_sProcLink;
 
 /*------------------------------------------------------------------------------
-* Enumerations
-*/
+ * Enumerations
+ */
 
-typedef enum {
+typedef enum
+{
   mh_eAgent__ = 0,
   mh_eAgent_None = 1,
   mh_eAgent_MH = 2,
@@ -70,7 +71,8 @@ typedef enum {
   mh_eAgent_
 } mh_eAgent;
 
-typedef enum {
+typedef enum
+{
   mh_eApplState__ = 0,
   mh_eApplState_Aborted = 1,
   mh_eApplState_Connected = 2,
@@ -81,10 +83,11 @@ typedef enum {
 } mh_eApplState;
 
 /*------------------------------------------------------------------------------
-* Structs
-*/
+ * Structs
+ */
 
-struct mhs_ApplConnect {
+struct mhs_ApplConnect
+{
   pwr_tObjid ApplObject;
   qcom_sQid Qid;
   mh_mApplFlags Flags;
@@ -95,29 +98,35 @@ struct mhs_ApplConnect {
   pwr_tString80 AbortEventText;
 };
 
-struct mhs_ApplContext {
+struct mhs_ApplContext
+{
   mh_sHead Head;
   qcom_sQid Handler;
   mh_eApplState State;
 };
 
-union mhu_ApplReply {
+union mhu_ApplReply
+{
   pwr_tUInt32 Sts;
-  struct {
+  struct
+  {
     pwr_tUInt32 Sts;
     pwr_tUInt32 NoOfActMessages;
   } Connect;
-  struct {
+  struct
+  {
     pwr_tUInt32 Sts;
     pwr_tUInt32 Idx;
   } Message;
-  struct {
+  struct
+  {
     pwr_tUInt32 Sts;
     mh_sApplMessage Message;
   } Info;
 };
 
-struct mhs_ApplReturn {
+struct mhs_ApplReturn
+{
   pwr_tUInt32 TargetIdx;
   mh_eEvent ReturnType;
   pwr_tString80 ReturnText;

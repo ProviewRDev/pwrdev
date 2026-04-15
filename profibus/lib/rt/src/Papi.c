@@ -112,9 +112,8 @@ HANDLE hServiceReadDevice = 0;          // Handle for Service device
 HANDLE hServiceWriteDevice = (HANDLE)0; // Handle for Service device
 HANDLE hDpDataDevice = (HANDLE)0;       // Handle for DP-Data device
 
-HANDLE hDpsInputDataDevice = (HANDLE)0; // Handle for DP-Slave Input-Data device
-HANDLE hDpsOutputDataDevice =
-    (HANDLE)0; // Handle for DP-Slave Output-Data device
+HANDLE hDpsInputDataDevice = (HANDLE)0;  // Handle for DP-Slave Input-Data device
+HANDLE hDpsOutputDataDevice = (HANDLE)0; // Handle for DP-Slave Output-Data device
 
 USIGN8 CurrentBoardNumber = 0;
 USIGN16 last_error = 0;
@@ -199,8 +198,8 @@ Possible return values:
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN16) || defined(_WIN16)
 
-FUNCTION GLOBAL HANDLE CALL_CONV profi_open_basic_management(
-    IN USIGN8 Board, IN USIGN8 Channel, IN INT32 DesiredAccess)
+FUNCTION GLOBAL HANDLE CALL_CONV profi_open_basic_management(IN USIGN8 Board, IN USIGN8 Channel,
+                                                             IN INT32 DesiredAccess)
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
 
@@ -229,11 +228,9 @@ Possible return values:
   Channel = 0; // for future use
 
   // --- open basic management device
-  sprintf(DeviceName, "\\\\.\\PROFIBUS\\Board%u\\Pb%u\\Management", Board,
-          Channel);
+  sprintf(DeviceName, "\\\\.\\PROFIBUS\\Board%u\\Pb%u\\Management", Board, Channel);
 
-  return (CreateFile(DeviceName, DesiredAccess,
-                     FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
+  return (CreateFile(DeviceName, DesiredAccess, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
                      FILE_ATTRIBUTE_NORMAL, NULL));
 }
 
@@ -241,9 +238,7 @@ Possible return values:
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN16) || defined(_WIN16)
 
-FUNCTION GLOBAL HANDLE CALL_CONV profi_open(IN HANDLE hBasicMgmtDevice,
-                                            IN INT32 DeviceType,
-                                            IN USIGN32 Index,
+FUNCTION GLOBAL HANDLE CALL_CONV profi_open(IN HANDLE hBasicMgmtDevice, IN INT32 DeviceType, IN USIGN32 Index,
                                             IN INT32 DesiredAccess)
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -324,16 +319,14 @@ Possible return values:
   }
 
   // --- get device name
-  if (!DeviceIoControl((HANDLE)hBasicMgmtDevice, (DWORD)IOControlCode,
-                       (LPVOID)&Index, (DWORD)sizeof(ULONG), (LPVOID)DeviceName,
-                       (DWORD)128, (LPDWORD)&BytesReturned, NULL))
+  if (!DeviceIoControl((HANDLE)hBasicMgmtDevice, (DWORD)IOControlCode, (LPVOID)&Index, (DWORD)sizeof(ULONG),
+                       (LPVOID)DeviceName, (DWORD)128, (LPDWORD)&BytesReturned, NULL))
   {
     return (INVALID_HANDLE_VALUE);
   }
 
   // --- open device
-  return (CreateFile(DeviceName, DesiredAccess,
-                     FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS,
+  return (CreateFile(DeviceName, DesiredAccess, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS,
                      FILE_ATTRIBUTE_NORMAL, NULL));
 }
 
@@ -369,9 +362,8 @@ Possible return values:
 
 #endif
 
-FUNCTION GLOBAL INT16 CALL_CONV
-profi_read_service(IN HANDLE hDevice, OUT T_PROFI_SERVICE_DESCR* pSdb,
-                   OUT VOID* pData, INOUT USIGN16* pDataLength)
+FUNCTION GLOBAL INT16 CALL_CONV profi_read_service(IN HANDLE hDevice, OUT T_PROFI_SERVICE_DESCR* pSdb,
+                                                   OUT VOID* pData, INOUT USIGN16* pDataLength)
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
 
@@ -413,9 +405,7 @@ received
     return (E_IF_OS_ERROR);
   }
 
-  while ((BytesRead =
-              read(hDevice, pSdbData,
-                   (int)(*pDataLength + sizeof(T_PROFI_SERVICE_DESCR)))) < 0)
+  while ((BytesRead = read(hDevice, pSdbData, (int)(*pDataLength + sizeof(T_PROFI_SERVICE_DESCR)))) < 0)
   {
 
     if (errno != EAGAIN)
@@ -469,8 +459,8 @@ received
   return (CON_IND_RECEIVED);
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV profi_write_service(
-    IN HANDLE hDevice, IN T_PROFI_SERVICE_DESCR* pSdb, IN VOID* pData)
+FUNCTION GLOBAL INT16 CALL_CONV profi_write_service(IN HANDLE hDevice, IN T_PROFI_SERVICE_DESCR* pSdb,
+                                                    IN VOID* pData)
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
 
@@ -535,33 +525,27 @@ RES
   switch (pSdb->layer)
   {
   case FMS:
-    RetVal = fmsgdl_get_data_len(pSdb->result, pSdb->service, pSdb->primitive,
-                                 pData, &DataLength);
+    RetVal = fmsgdl_get_data_len(pSdb->result, pSdb->service, pSdb->primitive, pData, &DataLength);
     break;
 
   case FM7:
-    RetVal = fm7gdl_get_data_len(pSdb->result, pSdb->service, pSdb->primitive,
-                                 pData, &DataLength);
+    RetVal = fm7gdl_get_data_len(pSdb->result, pSdb->service, pSdb->primitive, pData, &DataLength);
     break;
 
   case FDLIF:
-    RetVal = fdlgdl_get_data_len(pSdb->result, pSdb->service, pSdb->primitive,
-                                 pData, &DataLength);
+    RetVal = fdlgdl_get_data_len(pSdb->result, pSdb->service, pSdb->primitive, pData, &DataLength);
     break;
 
   case DP:
-    RetVal = dpgdl_get_data_len(pSdb->result, pSdb->service, pSdb->primitive,
-                                pData, &DataLength);
+    RetVal = dpgdl_get_data_len(pSdb->result, pSdb->service, pSdb->primitive, pData, &DataLength);
     break;
 
   case FMB:
-    RetVal = fmbgdl_get_data_len(pSdb->result, pSdb->service, pSdb->primitive,
-                                 pData, &DataLength);
+    RetVal = fmbgdl_get_data_len(pSdb->result, pSdb->service, pSdb->primitive, pData, &DataLength);
     break;
 
   case DPS:
-    RetVal = dpsgdl_get_data_len(pSdb->result, pSdb->service, pSdb->primitive,
-                                 pData, &DataLength);
+    RetVal = dpsgdl_get_data_len(pSdb->result, pSdb->service, pSdb->primitive, pData, &DataLength);
     break;
 
   default:
@@ -572,8 +556,7 @@ RES
   if (RetVal == E_OK)
   {
     // allocate memory for SDB and DATABLOCK
-    if (!(pSdbData =
-              (USIGN8*)malloc((DataLength + sizeof(T_PROFI_SERVICE_DESCR)))))
+    if (!(pSdbData = (USIGN8*)malloc((DataLength + sizeof(T_PROFI_SERVICE_DESCR)))))
     {
       return (E_IF_OS_ERROR);
     }
@@ -584,14 +567,12 @@ RES
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN16) || defined(_WIN16)
     // write SDB and DATABLOCK
-    if (!WriteFile((HANDLE)hDevice, (LPVOID)pSdbData,
-                   (DWORD)(DataLength + sizeof(T_PROFI_SERVICE_DESCR)),
+    if (!WriteFile((HANDLE)hDevice, (LPVOID)pSdbData, (DWORD)(DataLength + sizeof(T_PROFI_SERVICE_DESCR)),
                    (LPDWORD)&BytesWritten, NULL))
 #endif
 
 #ifdef _LINUX
-      if ((write(hDevice, pSdbData,
-                 DataLength + sizeof(T_PROFI_SERVICE_DESCR))) < 0)
+      if ((write(hDevice, pSdbData, DataLength + sizeof(T_PROFI_SERVICE_DESCR))) < 0)
 #endif
       {
         free(pSdbData);
@@ -607,9 +588,9 @@ RES
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN16) || defined(_WIN16)
 
-FUNCTION GLOBAL INT16 CALL_CONV profi_read_multi(
-    OUT T_PROFI_SERVICE_DESCR* pSdb, OUT VOID* pData,
-    INOUT USIGN16* pDataLength, IN USIGN16 NrOfHandles, IN HANDLE* phDevices)
+FUNCTION GLOBAL INT16 CALL_CONV profi_read_multi(OUT T_PROFI_SERVICE_DESCR* pSdb, OUT VOID* pData,
+                                                 INOUT USIGN16* pDataLength, IN USIGN16 NrOfHandles,
+                                                 IN HANDLE* phDevices)
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
 
@@ -652,11 +633,9 @@ received
   }
 
   // --- read service data from device
-  if (!DeviceIoControl((HANDLE)*phDevices, (DWORD)IOCTL_PROFI_READ_MULTI,
-                       (LPVOID)phDevices, (DWORD)NrOfHandles * sizeof(HANDLE),
-                       (LPVOID)pSdbData,
-                       (DWORD)(*pDataLength + sizeof(T_PROFI_SERVICE_DESCR)),
-                       (LPDWORD)&BytesRead, NULL))
+  if (!DeviceIoControl((HANDLE)*phDevices, (DWORD)IOCTL_PROFI_READ_MULTI, (LPVOID)phDevices,
+                       (DWORD)NrOfHandles * sizeof(HANDLE), (LPVOID)pSdbData,
+                       (DWORD)(*pDataLength + sizeof(T_PROFI_SERVICE_DESCR)), (LPDWORD)&BytesRead, NULL))
   {
     free(pSdbData);
     return (papi_get_last_error());
@@ -691,10 +670,8 @@ received
 
 #endif
 
-FUNCTION GLOBAL INT16 CALL_CONV profi_read_dps_data(IN HANDLE hDevice,
-                                                    OUT USIGN8* pData,
-                                                    INOUT USIGN8* pDataLength,
-                                                    OUT USIGN8* pState)
+FUNCTION GLOBAL INT16 CALL_CONV profi_read_dps_data(IN HANDLE hDevice, OUT USIGN8* pData,
+                                                    INOUT USIGN8* pDataLength, OUT USIGN8* pState)
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
 
@@ -736,8 +713,7 @@ Possible return values:
 #if defined(WIN32) || defined(_WIN32) || defined(WIN16) || defined(_WIN16)
 
   // --- read DPS input/output data and status
-  if (ReadFile(hDevice, (LPVOID)DataBuffer, (DWORD)(*pDataLength + 1),
-               (LPDWORD)&BytesRead, NULL))
+  if (ReadFile(hDevice, (LPVOID)DataBuffer, (DWORD)(*pDataLength + 1), (LPDWORD)&BytesRead, NULL))
 #endif
 
 #ifdef _LINUX
@@ -756,10 +732,8 @@ Possible return values:
     }
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV profi_write_dps_data(IN HANDLE hDevice,
-                                                     IN USIGN8* pData,
-                                                     IN USIGN8 DataLength,
-                                                     OUT USIGN8* pState)
+FUNCTION GLOBAL INT16 CALL_CONV profi_write_dps_data(IN HANDLE hDevice, IN USIGN8* pData,
+                                                     IN USIGN8 DataLength, OUT USIGN8* pState)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -796,9 +770,8 @@ data size
 #if defined(WIN32) || defined(_WIN32) || defined(WIN16) || defined(_WIN16)
 
   // --- write DPS input data and read status
-  if (!DeviceIoControl((HANDLE)hDevice, (DWORD)IOCTL_PROFI_SET_DPS_DATA,
-                       (LPVOID)pData, (DWORD)DataLength, (LPVOID)pState,
-                       (DWORD)sizeof(USIGN8), (LPDWORD)&BytesReturned, NULL))
+  if (!DeviceIoControl((HANDLE)hDevice, (DWORD)IOCTL_PROFI_SET_DPS_DATA, (LPVOID)pData, (DWORD)DataLength,
+                       (LPVOID)pState, (DWORD)sizeof(USIGN8), (LPDWORD)&BytesReturned, NULL))
 #endif
 
 #ifdef _LINUX
@@ -841,9 +814,7 @@ data size
 // ***************************************************************************
 // ***************************************************************************
 
-FUNCTION GLOBAL INT16 CALL_CONV profi_set_default(IN USIGN8 Board,
-                                                  IN USIGN8 Channel,
-                                                  IN USIGN32 ReadTimeout,
+FUNCTION GLOBAL INT16 CALL_CONV profi_set_default(IN USIGN8 Board, IN USIGN8 Channel, IN USIGN32 ReadTimeout,
                                                   IN USIGN32 WriteTimeout)
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -871,11 +842,10 @@ version
 {
   LOCAL_VARIABLES
 
-  char DeviceName[64];    
-  #if defined(WIN32) || defined(_WIN32) || defined(WIN16) || defined(_WIN16)
+  char DeviceName[64];
+#if defined(WIN32) || defined(_WIN32) || defined(WIN16) || defined(_WIN16)
   USIGN32 ReadWriteTimeout[2];
-  #endif
-  
+#endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN16) || defined(_WIN16)
 
@@ -897,13 +867,11 @@ version
   }
 
   // get service device name
-  sprintf(DeviceName, "\\\\.\\PROFIBUS\\Board%u\\Pb%u\\Service", Board,
-          Channel);
+  sprintf(DeviceName, "\\\\.\\PROFIBUS\\Board%u\\Pb%u\\Service", Board, Channel);
 
   // Open service device for read access
-  hServiceReadDevice =
-      CreateFile(DeviceName, GENERIC_READ | GENERIC_WRITE, 0, NULL,
-                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  hServiceReadDevice = CreateFile(DeviceName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+                                  FILE_ATTRIBUTE_NORMAL, NULL);
 
   if (hServiceReadDevice == INVALID_HANDLE_VALUE)
   {
@@ -912,8 +880,8 @@ version
   }
 
   // Open service device for write access
-  hServiceWriteDevice = CreateFile(DeviceName, GENERIC_WRITE, 0, NULL,
-                                   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  hServiceWriteDevice =
+      CreateFile(DeviceName, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
   if (hServiceWriteDevice == INVALID_HANDLE_VALUE)
   {
@@ -926,12 +894,10 @@ version
   if (OperationMode == FMS_DPV1_MASTER_MODE)
   {
     // --- get DP-Master's Data device name
-    sprintf(DeviceName, "\\\\.\\PROFIBUS\\Board%u\\Pb%u\\DpData", Board,
-            Channel);
+    sprintf(DeviceName, "\\\\.\\PROFIBUS\\Board%u\\Pb%u\\DpData", Board, Channel);
 
-    hDpDataDevice =
-        CreateFile(DeviceName, GENERIC_READ | GENERIC_WRITE, 0, NULL,
-                   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    hDpDataDevice = CreateFile(DeviceName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+                               FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (hDpDataDevice == INVALID_HANDLE_VALUE)
     {
@@ -946,12 +912,10 @@ version
   else
   {
     // get DP-Slave Input-Data device name
-    sprintf(DeviceName, "\\\\.\\PROFIBUS\\Board%u\\Pb%u\\DpSlaveInputData",
-            Board, Channel);
+    sprintf(DeviceName, "\\\\.\\PROFIBUS\\Board%u\\Pb%u\\DpSlaveInputData", Board, Channel);
 
-    hDpsInputDataDevice =
-        CreateFile(DeviceName, GENERIC_READ | GENERIC_WRITE, 0, NULL,
-                   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    hDpsInputDataDevice = CreateFile(DeviceName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+                                     FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (hDpsInputDataDevice == INVALID_HANDLE_VALUE)
     {
@@ -964,12 +928,10 @@ version
     }
 
     // get DP-Slave Output-Data device name
-    sprintf(DeviceName, "\\\\.\\PROFIBUS\\Board%u\\Pb%u\\DpSlaveOutputData",
-            Board, Channel);
+    sprintf(DeviceName, "\\\\.\\PROFIBUS\\Board%u\\Pb%u\\DpSlaveOutputData", Board, Channel);
 
-    hDpsOutputDataDevice =
-        CreateFile(DeviceName, GENERIC_READ | GENERIC_WRITE, 0, NULL,
-                   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    hDpsOutputDataDevice = CreateFile(DeviceName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+                                      FILE_ATTRIBUTE_NORMAL, NULL);
 
     if (hDpsOutputDataDevice == INVALID_HANDLE_VALUE)
     {
@@ -987,10 +949,8 @@ version
   ReadWriteTimeout[0] = ReadTimeout;
   ReadWriteTimeout[1] = WriteTimeout;
 
-  if (!DeviceIoControl((HANDLE)hServiceReadDevice,
-                       (DWORD)IOCTL_PROFI_SET_TIMEOUT, (LPVOID)ReadWriteTimeout,
-                       (DWORD)2 * sizeof(USIGN32), (LPVOID)NULL, (DWORD)0,
-                       (LPDWORD)&BytesReturned, NULL))
+  if (!DeviceIoControl((HANDLE)hServiceReadDevice, (DWORD)IOCTL_PROFI_SET_TIMEOUT, (LPVOID)ReadWriteTimeout,
+                       (DWORD)2 * sizeof(USIGN32), (LPVOID)NULL, (DWORD)0, (LPDWORD)&BytesReturned, NULL))
   {
     CloseHandle(hServiceReadDevice);
     CloseHandle(hServiceWriteDevice);
@@ -1047,8 +1007,7 @@ version
 
   hDpsOutputDataDevice = open(DeviceName, O_RDWR | O_NONBLOCK);
 
-  if ((hDpDataDevice == INVALID_HANDLE_VALUE) &&
-      (hDpsInputDataDevice == INVALID_HANDLE_VALUE) &&
+  if ((hDpDataDevice == INVALID_HANDLE_VALUE) && (hDpsInputDataDevice == INVALID_HANDLE_VALUE) &&
       (hDpsOutputDataDevice == INVALID_HANDLE_VALUE))
   {
     close(hServiceReadDevice);
@@ -1071,9 +1030,7 @@ version
   return (E_OK);
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV profi_init(IN USIGN8 Board,
-                                           IN USIGN32 ReadTimeout,
-                                           IN USIGN32 WriteTimeout)
+FUNCTION GLOBAL INT16 CALL_CONV profi_init(IN USIGN8 Board, IN USIGN32 ReadTimeout, IN USIGN32 WriteTimeout)
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
 
@@ -1114,9 +1071,7 @@ version
   }
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV init_profibus(IN USIGN32 DprAdress,
-                                              IN USIGN16 IoPortAdress,
-                                              IN PB_BOOL Dummy)
+FUNCTION GLOBAL INT16 CALL_CONV init_profibus(IN USIGN32 DprAdress, IN USIGN16 IoPortAdress, IN PB_BOOL Dummy)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -1245,8 +1200,8 @@ Possible return values:
   return (E_OK);
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV profi_snd_req_res(
-    IN T_PROFI_SERVICE_DESCR* pSdb, IN VOID* pData, IN PB_BOOL dummy)
+FUNCTION GLOBAL INT16 CALL_CONV profi_snd_req_res(IN T_PROFI_SERVICE_DESCR* pSdb, IN VOID* pData,
+                                                  IN PB_BOOL dummy)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -1291,9 +1246,8 @@ RES
   return (profi_write_service(hServiceWriteDevice, pSdb, pData));
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV
-profi_rcv_con_ind(OUT T_PROFI_SERVICE_DESCR* pSdb, OUT VOID* pData,
-                  INOUT USIGN16* pDataLength)
+FUNCTION GLOBAL INT16 CALL_CONV profi_rcv_con_ind(OUT T_PROFI_SERVICE_DESCR* pSdb, OUT VOID* pData,
+                                                  INOUT USIGN16* pDataLength)
 
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -1327,9 +1281,7 @@ Possible return values:
   return (profi_read_service(hServiceReadDevice, pSdb, pData, pDataLength));
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV profi_set_data(IN USIGN8 DataId,
-                                               IN USIGN16 Offset,
-                                               IN USIGN16 DataLength,
+FUNCTION GLOBAL INT16 CALL_CONV profi_set_data(IN USIGN8 DataId, IN USIGN16 Offset, IN USIGN16 DataLength,
                                                IN VOID* pData)
 
 /*-----------------------------------------------------------------------------
@@ -1398,10 +1350,8 @@ possible return values:
   return (E_OK);
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV profi_get_data(IN USIGN8 DataId,
-                                               IN USIGN16 Offset,
-                                               INOUT USIGN16* pDataLength,
-                                               OUT VOID* pData)
+FUNCTION GLOBAL INT16 CALL_CONV profi_get_data(IN USIGN8 DataId, IN USIGN16 Offset,
+                                               INOUT USIGN16* pDataLength, OUT VOID* pData)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -1531,8 +1481,7 @@ possible return values:
     //                 DataImageDescr.Length,
     //                 sizeof(DataImageDescr));
 
-    if (ioctl((int)hDpDataDevice, (int)IOCTL_PROFI_GET_DATA_IMAGE,
-              &DataImageDescr) == -1)
+    if (ioctl((int)hDpDataDevice, (int)IOCTL_PROFI_GET_DATA_IMAGE, &DataImageDescr) == -1)
     {
       BytesRead = 0;
       RetVal = papi_get_last_error();
@@ -1555,8 +1504,7 @@ possible return values:
   }
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV profi_set_dps_input_data(IN USIGN8* pData,
-                                                         IN USIGN8 DataLength,
+FUNCTION GLOBAL INT16 CALL_CONV profi_set_dps_input_data(IN USIGN8* pData, IN USIGN8 DataLength,
                                                          OUT USIGN8* pState)
 
 /*-----------------------------------------------------------------------------
@@ -1590,8 +1538,8 @@ data size
   return (profi_write_dps_data(hDpsInputDataDevice, pData, DataLength, pState));
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV profi_get_dps_input_data(
-    OUT USIGN8* pData, INOUT USIGN8* pDataLength, OUT USIGN8* pState)
+FUNCTION GLOBAL INT16 CALL_CONV profi_get_dps_input_data(OUT USIGN8* pData, INOUT USIGN8* pDataLength,
+                                                         OUT USIGN8* pState)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -1621,8 +1569,8 @@ possible return values:
   return (profi_read_dps_data(hDpsInputDataDevice, pData, pDataLength, pState));
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV profi_get_dps_output_data(
-    OUT USIGN8* pData, INOUT USIGN8* pDataLength, OUT USIGN8* pState)
+FUNCTION GLOBAL INT16 CALL_CONV profi_get_dps_output_data(OUT USIGN8* pData, INOUT USIGN8* pDataLength,
+                                                          OUT USIGN8* pState)
 
 /*-----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
@@ -1651,12 +1599,10 @@ possible return values:
     return (E_IF_PAPI_NOT_INITIALIZED);
   }
 
-  return (
-      profi_read_dps_data(hDpsOutputDataDevice, pData, pDataLength, pState));
+  return (profi_read_dps_data(hDpsOutputDataDevice, pData, pDataLength, pState));
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV
-profi_get_versions(OUT CSTRING* pPapiVersion, OUT CSTRING* pFirmwareVersion)
+FUNCTION GLOBAL INT16 CALL_CONV profi_get_versions(OUT CSTRING* pPapiVersion, OUT CSTRING* pFirmwareVersion)
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
 
@@ -1694,8 +1640,7 @@ Possible return values:
 
   // --- get PROFIBUS firmware version
   DataLength = (USIGN16)VERSION_STRING_LENGTH;
-  if (profi_get_data(ID_FW_VERS_IMAGE, 0, &DataLength, pFirmwareVersion) !=
-      E_OK)
+  if (profi_get_data(ID_FW_VERS_IMAGE, 0, &DataLength, pFirmwareVersion) != E_OK)
   {
     strcpy(pFirmwareVersion, (CSTRING*)"controller not initialized");
   }
@@ -1714,8 +1659,7 @@ Possible return values:
   return (E_OK);
 }
 
-FUNCTION GLOBAL INT16 CALL_CONV
-profi_get_serial_device_number(OUT USIGN32* pSerialDeviceNumber)
+FUNCTION GLOBAL INT16 CALL_CONV profi_get_serial_device_number(OUT USIGN32* pSerialDeviceNumber)
 /*----------------------------------------------------------------------------
 FUNCTIONAL_DESCRIPTION
 
@@ -1739,8 +1683,7 @@ Possible return values:
   DataLength = (USIGN16)sizeof(USIGN32);
 
   // --- get serial device number
-  return (profi_get_data(ID_SERIAL_DEVICE_NUMBER, 0, &DataLength,
-                         pSerialDeviceNumber));
+  return (profi_get_data(ID_SERIAL_DEVICE_NUMBER, 0, &DataLength, pSerialDeviceNumber));
 }
 
 FUNCTION GLOBAL INT16 CALL_CONV profi_get_last_error(VOID)

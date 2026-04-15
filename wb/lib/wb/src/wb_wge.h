@@ -41,7 +41,8 @@
 
 class Graph;
 
-class WGe {
+class WGe
+{
 public:
   void* parent_ctx;
   pwr_tAName name;
@@ -64,17 +65,12 @@ public:
   int terminated;
   int subwindow_release;
 
-  WGe(void* parent_ctx, char* name, char* filename, int scrollbar, int menu,
-      int navigator, int width, int height, int x, int y, char* object_name,
-      int modal);
+  WGe(void* parent_ctx, char* name, char* filename, int scrollbar, int menu, int navigator, int width,
+      int height, int x, int y, char* object_name, int modal);
   virtual ~WGe();
 
-  virtual void pop()
-  {
-  }
-  virtual void set_size(int width, int height)
-  {
-  }
+  virtual void pop() {}
+  virtual void set_size(int width, int height) {}
   virtual void set_subwindow_release();
 
   int set_object_focus(char* name, int empty);
@@ -84,7 +80,7 @@ public:
 
   static void graph_init_cb(void* client_data);
   static int graph_close_cb(void* client_data);
-  static int wge_command_cb(void* ge_ctx, char* command, char* script, char *scriptargs);
+  static int wge_command_cb(void* ge_ctx, char* command, char* script, char* scriptargs);
   static int wge_is_authorized_cb(void* ge_ctx, unsigned int access);
   static void message(void* ctx, char severity, const char* message);
 };

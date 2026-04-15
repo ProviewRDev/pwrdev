@@ -44,39 +44,35 @@
 #include "glow_dashboard.h"
 #include "glow_msg.h"
 
-GrowDashCell::GrowDashCell(
-    GrowCtx* glow_ctx, const char* name, double x, double y, double w, double h, 
-    glow_eDrawType border_color, int nodraw)
-  : GrowGroup(glow_ctx, name), cell_rows(1), cell_columns(1)
+GrowDashCell::GrowDashCell(GrowCtx* glow_ctx, const char* name, double x, double y, double w, double h,
+                           glow_eDrawType border_color, int nodraw)
+    : GrowGroup(glow_ctx, name), cell_rows(1), cell_columns(1)
 {
   if (ctx->dashboard)
     ctx->dash->find_grid(x - 0.5 * ctx->dash_cell_width, y - 0.5 * ctx->dash_cell_height, &x, &y);
 
   object_type = glow_eObjectType_GrowDashCell;
   nc = new GlowNodeGroup(glow_ctx, name);
-  frame = new GrowRect(glow_ctx, "R1", x, y, w, h, 
-      border_color, 1, 0, glow_mDisplayLevel_1, 0, 1,
-      0, glow_eCtColor_ButtonFillcolor, nodraw);
+  frame = new GrowRect(glow_ctx, "R1", x, y, w, h, border_color, 1, 0, glow_mDisplayLevel_1, 0, 1, 0,
+                       glow_eCtColor_ButtonFillcolor, nodraw);
   get_node_borders();
   cell_rows_old = cell_rows;
   cell_columns_old = cell_columns;
 }
 
 GrowDashCell::GrowDashCell(GrowCtx* glow_ctx, const char* name)
-  : GrowGroup(glow_ctx, name), cell_rows(1), cell_columns(1)
+    : GrowGroup(glow_ctx, name), cell_rows(1), cell_columns(1)
 {
   object_type = glow_eObjectType_GrowDashCell;
 }
 
-GrowDashCell::~GrowDashCell()
-{
-  delete frame;
-}
+GrowDashCell::~GrowDashCell() { delete frame; }
 
 void GrowDashCell::copy_from(const GrowDashCell& n)
 {
-  memcpy((void *)this, (void *)&n, sizeof(n));
-  if (n.dynamicsize) {
+  memcpy((void*)this, (void*)&n, sizeof(n));
+  if (n.dynamicsize)
+  {
     dynamic = (char*)calloc(1, n.dynamicsize);
     memcpy(dynamic, n.nc->dynamic, n.dynamicsize);
   }
@@ -87,8 +83,7 @@ void GrowDashCell::copy_from(const GrowDashCell& n)
   nc->a.set_parent(this);
 
   if (ctx->userdata_copy_callback)
-    (ctx->userdata_copy_callback)(
-        this, user_data, &user_data, glow_eUserdataCbType_Node);
+    (ctx->userdata_copy_callback)(this, user_data, &user_data, glow_eUserdataCbType_Node);
   frame = new GrowRect(*n.frame);
 }
 
@@ -116,15 +111,18 @@ void GrowDashCell::open(std::ifstream& fp)
   int end_found = 0;
   char dummy[40];
 
-  for (;;) {
-    if (!fp.good()) {
+  for (;;)
+  {
+    if (!fp.good())
+    {
       fp.clear();
       fp.getline(dummy, sizeof(dummy));
       printf("** Read error GrowDashCell: \"%d %s\"\n", type, dummy);
     }
 
     fp >> type;
-    switch (type) {
+    switch (type)
+    {
     case glow_eSave_GrowDashCell:
       break;
     case glow_eSave_GrowDashCell_cell_rows:
@@ -162,22 +160,21 @@ void GrowDashCell::open(std::ifstream& fp)
 
 void GrowDashCell::update_attributes()
 {
-  if (cell_rows != cell_rows_old || cell_columns != cell_columns_old) {
+  if (cell_rows != cell_rows_old || cell_columns != cell_columns_old)
+  {
     frame->ur.x = frame->ll.x + cell_columns * ctx->dash_cell_width;
     frame->ur.y = frame->ll.y + cell_rows * ctx->dash_cell_height;
     cell_rows_old = cell_rows;
     cell_columns_old = cell_columns;
     get_node_borders();
-    ctx->draw(&ctx->mw,
-        x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
-        y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
-        x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
-        y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
-    ctx->draw(&ctx->navw,
-        x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
-        y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
-        x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
-        y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
+    ctx->draw(&ctx->mw, x_left * ctx->mw.zoom_factor_x - ctx->mw.offset_x - DRAW_MP,
+              y_low * ctx->mw.zoom_factor_y - ctx->mw.offset_y - DRAW_MP,
+              x_right * ctx->mw.zoom_factor_x - ctx->mw.offset_x + DRAW_MP,
+              y_high * ctx->mw.zoom_factor_y - ctx->mw.offset_y + DRAW_MP);
+    ctx->draw(&ctx->navw, x_left * ctx->navw.zoom_factor_x - ctx->navw.offset_x - 1,
+              y_low * ctx->navw.zoom_factor_y - ctx->navw.offset_y - 1,
+              x_right * ctx->navw.zoom_factor_x - ctx->navw.offset_x + 1,
+              y_high * ctx->navw.zoom_factor_y - ctx->navw.offset_y + 1);
   }
 }
 
@@ -188,20 +185,23 @@ void GrowDashCell::get_node_borders()
   get_borders(0, &x_right, &x_left, &y_high, &y_low);
 }
 
-void GrowDashCell::get_borders(GlowTransform* t, double* x1_right, double* x1_left,
-    double* y1_high, double* y1_low)
+void GrowDashCell::get_borders(GlowTransform* t, double* x1_right, double* x1_left, double* y1_high,
+                               double* y1_low)
 {
-  if (t) {
+  if (t)
+  {
     GlowTransform t2 = *t * trf;
     frame->get_borders(&t2, x1_right, x1_left, y1_high, y1_low);
-  } else
+  }
+  else
     frame->get_borders(&trf, x1_right, x1_left, y1_high, y1_low);
 }
 
-void GrowDashCell::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
-    void* node, void* colornode, void *transpnode)
+void GrowDashCell::draw(GlowWind* w, GlowTransform* t, int highlight, int hot, void* node, void* colornode,
+                        void* transpnode)
 {
-  if (w == &ctx->navw) {
+  if (w == &ctx->navw)
+  {
     if (ctx->no_nav)
       return;
     hot = 0;
@@ -214,30 +214,33 @@ void GrowDashCell::draw(GlowWind* w, GlowTransform* t, int highlight, int hot,
     node = (void*)this;
   if (!colornode)
     colornode = (void*)this;
-  else if (((GrowNode*)colornode)->fill_drawtype == glow_eDrawType_No
-      && ((GrowNode*)colornode)->color_tone == glow_eDrawTone_No)
+  else if (((GrowNode*)colornode)->fill_drawtype == glow_eDrawType_No &&
+           ((GrowNode*)colornode)->color_tone == glow_eDrawTone_No)
     colornode = (void*)this;
 
-  if (t) {
+  if (t)
+  {
     GlowTransform t2 = *t * trf;
     frame->draw(w, &t2, highlight, hot, node, colornode, transpnode);
-  } else
+  }
+  else
     frame->draw(w, &trf, highlight, hot, node, colornode, transpnode);
-
 }
 
 int GrowDashCell::local_event_handler(glow_eEvent event, double x, double y)
 {
-  if (frame->ll.x <= x && x <= frame->ur.x && frame->ll.y <= y && y <= frame->ur.y) {
+  if (frame->ll.x <= x && x <= frame->ur.x && frame->ll.y <= y && y <= frame->ur.y)
+  {
     return 1;
-  } else
+  }
+  else
     return 0;
 }
 
-int GrowDashCell::event_handler(
-    GlowWind* w, glow_eEvent event, double fx, double fy)
+int GrowDashCell::event_handler(GlowWind* w, glow_eEvent event, double fx, double fy)
 {
-  if (ctx->environment == glow_eEnv_Development) {
+  if (ctx->environment == glow_eEnv_Development)
+  {
     double x, y;
 
     trf.reverse(fx, fy, &x, &y);
@@ -247,24 +250,25 @@ int GrowDashCell::event_handler(
     return GrowGroup::event_handler(w, event, fx, fy);
 }
 
-int GrowDashCell::event_handler(
-    GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
+int GrowDashCell::event_handler(GlowWind* w, glow_eEvent event, int x, int y, double fx, double fy)
 {
-  if (ctx->trace_started) {
+  if (ctx->trace_started)
+  {
     int sts;
 
     nc->recursive_trace = 1;
     sts = GrowNode::event_handler(w, event, x, y, fx, fy);
-    if (sts && ctx->callback_object && 
-	ctx->callback_object->type() == glow_eObjectType_GrowSlider) {
+    if (sts && ctx->callback_object && ctx->callback_object->type() == glow_eObjectType_GrowSlider)
+    {
       ctx->move_insert(ctx->callback_object);
-      ((GrowNode *)ctx->callback_object)->store_position();
+      ((GrowNode*)ctx->callback_object)->store_position();
       ctx->callback_object = 0;
       ctx->callback_object_type = (glow_eObjectType)0;
     }
     return sts;
   }
-  if (ctx->environment == glow_eEnv_Development) {
+  if (ctx->environment == glow_eEnv_Development)
+  {
     int sts;
     double rx, ry;
 
@@ -272,40 +276,46 @@ int GrowDashCell::event_handler(
     trf.reverse(fx, fy, &rx, &ry);
 
     sts = 0;
-    if (event == ctx->event_move_node) {
+    if (event == ctx->event_move_node)
+    {
       sts = local_event_handler(event, rx, ry);
-      if (sts) {
-	/* Register node for potential movement */
-	ctx->move_insert(this);
+      if (sts)
+      {
+        /* Register node for potential movement */
+        ctx->move_insert(this);
       }
       return sts;
     }
 
     // Check if any menue is active
-    if (nc->a.a_size && nc->a[nc->a.a_size - 1]->type() == glow_eObjectType_GrowMenu) {
-      for (int i = nc->a.a_size - 1; i >= 0; i--) {
-	if (nc->a[i]->type() != glow_eObjectType_GrowMenu)
-	  break;
-	switch (event) {
-	case glow_eEvent_CursorMotion:
-	  sts = nc->a[i]->event_handler(&ctx->mw, event, x, y, fx, fy);
-	  break;
-	default:;
-	}
+    if (nc->a.a_size && nc->a[nc->a.a_size - 1]->type() == glow_eObjectType_GrowMenu)
+    {
+      for (int i = nc->a.a_size - 1; i >= 0; i--)
+      {
+        if (nc->a[i]->type() != glow_eObjectType_GrowMenu)
+          break;
+        switch (event)
+        {
+        case glow_eEvent_CursorMotion:
+          sts = nc->a[i]->event_handler(&ctx->mw, event, x, y, fx, fy);
+          break;
+        default:;
+        }
       }
-      switch (event) {
+      switch (event)
+      {
       case glow_eEvent_CursorMotion:
-	return 1;
+        return 1;
       case glow_eEvent_MB1Down:
       case glow_eEvent_MB1Up:
       case glow_eEvent_MB1Click:
       case glow_eEvent_Key_Return:
-	sts = nc->a[nc->a.a_size - 1]->event_handler(&ctx->mw, event, x, y, fx, fy);
-	if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
-	  return sts;
-	else if (sts)
-	  return 1;
-	break;
+        sts = nc->a[nc->a.a_size - 1]->event_handler(&ctx->mw, event, x, y, fx, fy);
+        if (sts == GLOW__TERMINATED || sts == GLOW__DESTROYED)
+          return sts;
+        else if (sts)
+          return 1;
+        break;
       case glow_eEvent_Key_Right:
       case glow_eEvent_Key_Left:
       case glow_eEvent_Key_Up:
@@ -316,44 +326,48 @@ int GrowDashCell::event_handler(
       case glow_eEvent_Key_Escape:
       case glow_eEvent_Key_Ascii:
       case glow_eEvent_Exposure:
-	break;
+        break;
       default:;
-	return 0;
+        return 0;
       }
     }
 
-
-    switch (event) {
-    case glow_eEvent_CursorMotion: {
+    switch (event)
+    {
+    case glow_eEvent_CursorMotion:
+    {
       int redraw = 0;
-      
+
       if (ctx->hot_mode == glow_eHotMode_TraceAction)
-	sts = 0;
+        sts = 0;
       else if (ctx->hot_found)
-	sts = 0;
-      else {
-	sts = local_event_handler(event, rx, ry);
-	if (sts)
-	  ctx->hot_found = 1;
+        sts = 0;
+      else
+      {
+        sts = local_event_handler(event, rx, ry);
+        if (sts)
+          ctx->hot_found = 1;
       }
-      if (sts && !hot
-	  && !(ctx->node_movement_active || ctx->node_movement_paste_active)
-	  && ctx->hot_mode != glow_eHotMode_Disabled) {
-	ctx->gdraw->set_cursor(w, glow_eDrawCursor_CrossHair);
-	hot = 1;
-	redraw = 1;
+      if (sts && !hot && !(ctx->node_movement_active || ctx->node_movement_paste_active) &&
+          ctx->hot_mode != glow_eHotMode_Disabled)
+      {
+        ctx->gdraw->set_cursor(w, glow_eDrawCursor_CrossHair);
+        hot = 1;
+        redraw = 1;
       }
-      if (!sts && hot) {
-	if (!ctx->hot_found)
-	  ctx->gdraw->set_cursor(w, glow_eDrawCursor_Normal);
-	hot = 0;
-	redraw = 1;
+      if (!sts && hot)
+      {
+        if (!ctx->hot_found)
+          ctx->gdraw->set_cursor(w, glow_eDrawCursor_Normal);
+        hot = 0;
+        redraw = 1;
       }
-      if (redraw) {
-	ctx->draw(w, x_left * w->zoom_factor_x - w->offset_x - DRAW_MP,
-		  y_low * w->zoom_factor_y - w->offset_y - DRAW_MP,
-		  x_right * w->zoom_factor_x - w->offset_x + DRAW_MP,
-		  y_high * w->zoom_factor_y - w->offset_y + DRAW_MP);
+      if (redraw)
+      {
+        ctx->draw(w, x_left * w->zoom_factor_x - w->offset_x - DRAW_MP,
+                  y_low * w->zoom_factor_y - w->offset_y - DRAW_MP,
+                  x_right * w->zoom_factor_x - w->offset_x + DRAW_MP,
+                  y_high * w->zoom_factor_y - w->offset_y + DRAW_MP);
       }
       break;
     }
@@ -368,7 +382,7 @@ int GrowDashCell::event_handler(
     return GrowGroup::event_handler(w, event, x, y, fx, fy);
 }
 
-void GrowDashCell::get_info(int *rows, int *columns)
+void GrowDashCell::get_info(int* rows, int* columns)
 {
   *rows = cell_rows;
   *columns = cell_columns;
@@ -379,10 +393,10 @@ int GrowDashCell::insert(GlowArrayElem* element)
   int sts;
   GlowTransform t;
   trf.pos_inverse(&t);
-  //element->dash_insert(&t);
+  // element->dash_insert(&t);
   element->set_transform(&t);
   ctx->a.remove(element);
-  
+
   sts = nc->a.insert(element);
   if (ODD(sts))
     element->parent = this;
@@ -397,10 +411,11 @@ int GrowDashCell::trace_init()
 
 void GrowDashCell::convert(glow_eConvert version)
 {
-  switch (version) {
-  case glow_eConvert_V34: {
+  switch (version)
+  {
+  case glow_eConvert_V34:
+  {
     break;
   }
   }
 }
-

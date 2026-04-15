@@ -53,8 +53,7 @@ static pwr_tStatus OpenTrace(xmenu_sMenuCall* ip)
   // foe_Open (ip->EditorContext, ip->WindowContext, ip->PointedSession,
   //  ip->Pointed.Objid);
 
-  sts = gdh_ObjidToName(
-      ip->Pointed.Objid, name, sizeof(name), cdh_mName_volumeStrict);
+  sts = gdh_ObjidToName(ip->Pointed.Objid, name, sizeof(name), cdh_mName_volumeStrict);
   if (EVEN(sts))
     return sts;
 
@@ -79,8 +78,7 @@ static pwr_tStatus SetScan(xmenu_sMenuCall* ip)
 
   if (streq("Enable", ip->ItemList[ip->ChosenItem].MethodArguments[0]))
     value = 0;
-  else if (strcmp("Disable", ip->ItemList[ip->ChosenItem].MethodArguments[0])
-      == 0)
+  else if (strcmp("Disable", ip->ItemList[ip->ChosenItem].MethodArguments[0]) == 0)
     value = 1;
   else
     return XNAV__SUCCESS;
@@ -103,12 +101,14 @@ static pwr_tStatus SetScan(xmenu_sMenuCall* ip)
     return 0;
 
   sts = gdh_GetChild(ip->Pointed.Objid, &child);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(child, &classid);
     if (EVEN(sts))
       return sts;
 
-    if (classid == pwr_cClass_windowplc) {
+    if (classid == pwr_cClass_windowplc)
+    {
       sts = gdh_ObjidToName(child, name, sizeof(name), cdh_mName_volumeStrict);
       if (EVEN(sts))
         return sts;
@@ -141,8 +141,7 @@ static pwr_tStatus SetScanFilter(xmenu_sMenuCall* ip)
 
   if (streq("Enable", ip->ItemList[ip->ChosenItem].FilterArguments[0]))
     enable = 1;
-  else if (strcmp("Disable", ip->ItemList[ip->ChosenItem].FilterArguments[0])
-      == 0)
+  else if (strcmp("Disable", ip->ItemList[ip->ChosenItem].FilterArguments[0]) == 0)
     enable = 0;
   else
     return XNAV__SUCCESS;
@@ -165,12 +164,14 @@ static pwr_tStatus SetScanFilter(xmenu_sMenuCall* ip)
     return XNAV__INSENSITIVE;
 
   sts = gdh_GetChild(ip->Pointed.Objid, &child);
-  while (ODD(sts)) {
+  while (ODD(sts))
+  {
     sts = gdh_GetObjectClass(child, &classid);
     if (EVEN(sts))
       return sts;
 
-    if (classid == pwr_cClass_windowplc) {
+    if (classid == pwr_cClass_windowplc)
+    {
       sts = gdh_ObjidToPointer(child, (void**)&window_p);
       if (EVEN(sts))
         return sts;
@@ -209,6 +210,6 @@ static pwr_tStatus SimulateOn(xmenu_sMenuCall* ip)
   Every method to be exported to xtt should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindXttMethods(PlcPgm) = { pwr_BindXttMethod(OpenTrace),
-  pwr_BindXttMethod(SetScan), pwr_BindXttMethod(SetScanFilter),
-  pwr_BindXttMethod(SimulateOn), pwr_NullMethod };
+pwr_dExport pwr_BindXttMethods(PlcPgm) = {pwr_BindXttMethod(OpenTrace), pwr_BindXttMethod(SetScan),
+                                          pwr_BindXttMethod(SetScanFilter), pwr_BindXttMethod(SimulateOn),
+                                          pwr_NullMethod};

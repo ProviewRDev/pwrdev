@@ -41,12 +41,12 @@
 
 #include "xtt_eveve.h"
 
-class EvEveGtk : public EvEve {
+class EvEveGtk : public EvEve
+{
 public:
-  EvEveGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name,
-      pwr_tObjid ev_user, int ev_eventname_seg, int ev_width, int ev_height,
-      int ev_x, int ev_y, pwr_tObjid ev_view, unsigned int ev_options,
-      void* widget, pwr_tStatus* status);
+  EvEveGtk(void* ev_parent_ctx, GtkWidget* ev_parent_wid, char* eve_name, pwr_tObjid ev_user,
+           int ev_eventname_seg, int ev_width, int ev_height, int ev_x, int ev_y, pwr_tObjid ev_view,
+           unsigned int ev_options, void* widget, pwr_tStatus* status);
   ~EvEveGtk();
 
   GtkWidget* parent_wid;
@@ -59,13 +59,9 @@ public:
   void map_ala();
   void unmap_ala();
   void set_title_ala(char* title);
-  GtkWidget* get_widget()
-  {
-    return eve_vbox;
-  }
+  GtkWidget* get_widget() { return eve_vbox; }
 
-  static gboolean eve_action_inputfocus(
-      GtkWidget* w, GdkEvent* event, gpointer data);
+  static gboolean eve_action_inputfocus(GtkWidget* w, GdkEvent* event, gpointer data);
   static void eve_activate_exit(GtkWidget* w, gpointer data);
   static void eve_activate_print(GtkWidget* w, gpointer data);
   static void eve_activate_zoom_in(GtkWidget* w, gpointer data);

@@ -51,7 +51,8 @@ class XttMethodToolbar;
 
 void signal_handler(int);
 
-class Xtt {
+class Xtt
+{
 public:
   void* parent_ctx;
   char name[80];
@@ -76,8 +77,8 @@ public:
   Xtt(int* argc, char** argv[], int* return_sts);
   virtual ~Xtt();
   virtual void message(char severity, const char* msg);
-  virtual void open_input_dialog(const char* text, const char* title,
-      const char* init_text, void (*ok_cb)(Xtt*, char*));
+  virtual void open_input_dialog(const char* text, const char* title, const char* init_text,
+                                 void (*ok_cb)(Xtt*, char*));
   virtual void set_prompt(const char* prompt);
   virtual void open_change_value();
   virtual void print();
@@ -89,7 +90,7 @@ public:
   static void hotkey_activate_toggledig(char* namep);
   static void hotkey_activate_setdig(char* namep);
   static void hotkey_activate_resetdig(char* namep);
-  static void hotkey_activate_setvalue(char* namep, char *valuep);
+  static void hotkey_activate_setvalue(char* namep, char* valuep);
 
   static void open_URL_cb(void* ctx, char* url);
   static void qcom_events(void* data);

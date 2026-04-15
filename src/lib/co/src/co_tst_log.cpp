@@ -41,8 +41,7 @@
 #include "co_time.h"
 #include "co_tst_log.h"
 
-
-void tst_log::log(const char severity, const char *text, pwr_tStatus status)
+void tst_log::log(const char severity, const char* text, pwr_tStatus status)
 {
   if (!m_fp)
     return;
@@ -54,7 +53,7 @@ void tst_log::log(const char severity, const char *text, pwr_tStatus status)
 
   if (status != 0xffffffff)
     msg_GetMsg(status, msg, sizeof(msg));
-  
+
   if (text && strcmp(msg, "") != 0)
     fprintf(m_fp, "%c %s %s, %s: %s\n", severity, timstr, m_category, text, msg);
   else if (text)
@@ -65,8 +64,7 @@ void tst_log::log(const char severity, const char *text, pwr_tStatus status)
     fprintf(m_fp, "%c %s %s\n", severity, timstr, m_category);
 }
 
-void tst_log::log(const char severity, const char *text1, 
-		  const char *text2, pwr_tStatus status)
+void tst_log::log(const char severity, const char* text1, const char* text2, pwr_tStatus status)
 {
   if (!m_fp)
     return;
@@ -78,14 +76,14 @@ void tst_log::log(const char severity, const char *text1,
 
   if (status != 0xffffffff)
     msg_GetMsg(status, msg, sizeof(msg));
-  
+
   if (strcmp(msg, "") != 0)
     fprintf(m_fp, "%c %s %s, %s, %s: %s\n", severity, timstr, m_category, text1, text2, msg);
   else
     fprintf(m_fp, "%c %s %s, %s, %s\n", severity, timstr, m_category, text1, text2);
 }
 
-void tst_log::vlog(const char severity, const char *format, ...)
+void tst_log::vlog(const char severity, const char* format, ...)
 {
   if (!m_fp)
     return;
@@ -103,7 +101,7 @@ void tst_log::vlog(const char severity, const char *format, ...)
   fprintf(m_fp, "%c %s %s, %s\n", severity, timstr, m_category, msg);
 }
 
-tst_log::tst_log(pwr_tStatus *sts, const char *category, const char *filename) : m_fp(0)
+tst_log::tst_log(pwr_tStatus* sts, const char* category, const char* filename) : m_fp(0)
 {
   *sts = TST__SUCCESS;
   strncpy(m_category, category, sizeof(m_category));
@@ -118,4 +116,3 @@ tst_log::~tst_log()
   if (m_fp)
     fclose(m_fp);
 }
-

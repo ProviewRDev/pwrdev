@@ -45,10 +45,10 @@
 
 class CoLogWQtWidget;
 
-class CoLogWQt : public CoLogW {
+class CoLogWQt : public CoLogW
+{
 public:
-  CoLogWQt(void* msg_parent_ctx, const char* msg_name, int l_show_item,
-      pwr_tStatus* status);
+  CoLogWQt(void* msg_parent_ctx, const char* msg_name, int l_show_item, pwr_tStatus* status);
   ~CoLogWQt();
 
   QWidget* nav_widget;
@@ -60,7 +60,8 @@ private:
   CoLogWQtWidget* toplevel;
 };
 
-class CoLogWQtWidget : public QWidget {
+class CoLogWQtWidget : public QWidget
+{
   Q_OBJECT
 
 public:

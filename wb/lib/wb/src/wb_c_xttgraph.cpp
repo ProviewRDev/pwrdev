@@ -56,14 +56,14 @@ static pwr_tStatus OpenGraph(ldh_sMenuCall* ip)
   int size;
   char graph_name[80];
 
-  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody",
-      "Action", &action, &size);
+  sts = ldh_GetObjectPar(ip->PointedSession, ip->Pointed.Objid, "RtBody", "Action", &action, &size);
   if (EVEN(sts))
     return sts;
 
   str_ToLower(graph_name, action);
   free((char*)action);
-  if (strstr(graph_name, ".pwg")) {
+  if (strstr(graph_name, ".pwg"))
+  {
     Ge* gectx = ip->wtt->ge_new(graph_name);
     ip->wtt->register_utility(gectx, wb_eUtility_Ge);
     return 1;
@@ -94,17 +94,16 @@ static pwr_tStatus PostRename(ldh_tSesContext Session, pwr_tOid Object)
   if (EVEN(sts))
     return sts;
 
-  if (streq(action, "")) {
-    sts = ldh_ObjidToName(
-        Session, Object, ldh_eName_Object, name, sizeof(name), &size);
+  if (streq(action, ""))
+  {
+    sts = ldh_ObjidToName(Session, Object, ldh_eName_Object, name, sizeof(name), &size);
     if (EVEN(sts))
       return sts;
 
     str_ToLower(name, name);
     strcat(name, ".pwg");
 
-    sts = ldh_SetObjectPar(
-        Session, Object, "RtBody", "Action", name, sizeof(name));
+    sts = ldh_SetObjectPar(Session, Object, "RtBody", "Action", name, sizeof(name));
     if (EVEN(sts))
       return sts;
   }
@@ -117,5 +116,5 @@ static pwr_tStatus PostRename(ldh_tSesContext Session, pwr_tOid Object)
   Every method to be exported to the workbench should be registred here.
 \*----------------------------------------------------------------------------*/
 
-pwr_dExport pwr_BindMethods(XttGraph) = { pwr_BindMethod(OpenGraph),
-  pwr_BindMethod(Build), pwr_BindMethod(PostRename), pwr_NullMethod };
+pwr_dExport pwr_BindMethods(XttGraph) = {pwr_BindMethod(OpenGraph), pwr_BindMethod(Build),
+                                         pwr_BindMethod(PostRename), pwr_NullMethod};

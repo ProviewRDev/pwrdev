@@ -44,7 +44,8 @@
 
 bool wb_object::check(std::string str)
 {
-  if (m_orep == 0) {
+  if (m_orep == 0)
+  {
     m_sts = LDH__NOSUCHOBJ; // LDH__NOOBJECT;
     throw wb_error_str(m_sts, str);
   }
@@ -53,17 +54,15 @@ bool wb_object::check(std::string str)
 
 bool wb_object::check()
 {
-  if (m_orep == 0) {
+  if (m_orep == 0)
+  {
     m_sts = LDH__NOSUCHOBJ; // LDH__NOOBJECT;
     throw wb_error(m_sts);
   }
   return true;
 }
 
-wb_destination wb_object::destination(ldh_eDest dest)
-{
-  return wb_destination(*this, dest);
-}
+wb_destination wb_object::destination(ldh_eDest dest) { return wb_destination(*this, dest); }
 
 wb_object::wb_object(wb_orep* orep) : wb_status(LDH__SUCCESS), m_orep(orep)
 {
@@ -73,16 +72,13 @@ wb_object::wb_object(wb_orep* orep) : wb_status(LDH__SUCCESS), m_orep(orep)
     m_orep->ref();
 }
 
-wb_object::wb_object(pwr_tStatus sts, wb_orep* orep)
-    : wb_status(sts), m_orep(orep)
+wb_object::wb_object(pwr_tStatus sts, wb_orep* orep) : wb_status(sts), m_orep(orep)
 {
   if (m_orep != 0)
     m_orep = orep->ref();
 }
 
-wb_object::wb_object() : wb_status(LDH__NOSUCHOBJ), m_orep(0)
-{
-}
+wb_object::wb_object() : wb_status(LDH__NOSUCHOBJ), m_orep(0) {}
 
 wb_object::wb_object(const wb_object& x) : wb_status(x.sts()), m_orep(x.m_orep)
 {
@@ -110,15 +106,9 @@ wb_object& wb_object::operator=(const wb_object& x)
   return *this;
 }
 
-wb_object::operator bool() const
-{
-  return (m_orep != 0);
-}
+wb_object::operator bool() const { return (m_orep != 0); }
 
-wb_object::operator wb_orep*() const
-{
-  return m_orep;
-}
+wb_object::operator wb_orep*() const { return m_orep; }
 
 const char* wb_object::name()
 {

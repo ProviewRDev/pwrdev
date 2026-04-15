@@ -35,42 +35,41 @@
  */
 
 /*************************************************************************
-*
-* Filename:             remio_utils.h
-*
-*                       Date    Pgm.    Read.   Remark
-* Modified
-*
-* Description:		Remote I/O utilities
-*
-*************************************************************************/
+ *
+ * Filename:             remio_utils.h
+ *
+ *                       Date    Pgm.    Read.   Remark
+ * Modified
+ *
+ * Description:		Remote I/O utilities
+ *
+ *************************************************************************/
 
 #if defined __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/*_function prototypes__________________________________________________*/
+  /*_function prototypes__________________________________________________*/
 
-pwr_tFloat32 ConvAItoAct(pwr_tInt16 raw, pwr_sClass_RemChan_Ai* body);
-pwr_tFloat32 ConvAOtoAct(pwr_tInt16 raw, pwr_sClass_RemChan_Ao* body);
-pwr_tInt16 ConvAOtoRaw(pwr_tFloat32 act, pwr_sClass_RemChan_Ao* body);
+  pwr_tFloat32 ConvAItoAct(pwr_tInt16 raw, pwr_sClass_RemChan_Ai* body);
+  pwr_tFloat32 ConvAOtoAct(pwr_tInt16 raw, pwr_sClass_RemChan_Ao* body);
+  pwr_tInt16 ConvAOtoRaw(pwr_tFloat32 act, pwr_sClass_RemChan_Ao* body);
 
-pwr_tStatus RemIO_Init_ALCM(remnode_item* remnode);
-pwr_tStatus RemIO_Stall_ALCM(remnode_item* remnode);
-pwr_tStatus RemIO_Receive_ALCM(
-    remnode_item* remnode, bsp_buffer* buffer, int size);
-pwr_tStatus RemIO_Cyclic_ALCM(remnode_item* remnode,
-    void (*send_pollbuff)(remnode_item* remnode, pssupd_buffer* buf));
+  pwr_tStatus RemIO_Init_ALCM(remnode_item* remnode);
+  pwr_tStatus RemIO_Stall_ALCM(remnode_item* remnode);
+  pwr_tStatus RemIO_Receive_ALCM(remnode_item* remnode, bsp_buffer* buffer, int size);
+  pwr_tStatus RemIO_Cyclic_ALCM(remnode_item* remnode,
+                                void (*send_pollbuff)(remnode_item* remnode, pssupd_buffer* buf));
 
-pwr_tStatus RemIO_Init_3964R(remnode_item* remnode);
+  pwr_tStatus RemIO_Init_3964R(remnode_item* remnode);
 
-pwr_tStatus RemIO_Stall_3964R(remnode_item* remnode, int stall_action);
+  pwr_tStatus RemIO_Stall_3964R(remnode_item* remnode, int stall_action);
 
-pwr_tStatus RemIO_Receive_3964R(
-    remnode_item* remnode, unsigned char* buffer, int size);
+  pwr_tStatus RemIO_Receive_3964R(remnode_item* remnode, unsigned char* buffer, int size);
 
-pwr_tStatus RemIO_Cyclic_3964R(remnode_item* remnode,
-    void (*send_pollbuff)(remnode_item* remnode, pssupd_buffer_vnet* buf));
+  pwr_tStatus RemIO_Cyclic_3964R(remnode_item* remnode,
+                                 void (*send_pollbuff)(remnode_item* remnode, pssupd_buffer_vnet* buf));
 
 #if defined __cplusplus
 }
