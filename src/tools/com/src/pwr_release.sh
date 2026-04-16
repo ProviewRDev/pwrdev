@@ -63,6 +63,7 @@ readonly UPGRADE_SH="$ROOT/src/exp/com/src/upgrade.sh"
 readonly PKG_DIR="$ROOT/src/tools/pkg"
 readonly DOC_PRM_DOXYFILE="$ROOT/src/doc/prm/src/Doxyfile"
 readonly DOC_DOX_DOXYFILE="$ROOT/src/doc/dox/src/Doxyfile"
+readonly DOC_UPGRADE_MENU="$ROOT/src/doc/web/en_us/doc_menu.html"
 
 # Documentation files that are version-stamped for each release.
 # Keep this list explicit so we don't rewrite historical manuals whose
@@ -259,6 +260,18 @@ update_versioned_docs() {
   done
   echo ""
 
+  echo "  -- Web documentation upgrade menu --"
+  if [ ! -f "$DOC_UPGRADE_MENU" ]; then
+    relpath="${DOC_UPGRADE_MENU#"$ROOT"/}"
+    warn "$relpath: missing, skipping"
+  else
+    relpath="${DOC_UPGRADE_MENU#"$ROOT"/}"
+    do_sed "$relpath: upgrade menu -> $DOC_UPGRADE_PDF / $DOC_UPGRADE_VERSION" \
+      "s|href=\"upgrade[0-9][0-9]*\\.pdf\" target=\"right\">Upgrading from V[0-9][0-9]*\\.[0-9][0-9]*</a>|href=\"${DOC_UPGRADE_PDF}\" target=\"right\">Upgrading from ${DOC_UPGRADE_VERSION}</a>|" \
+      "$DOC_UPGRADE_MENU"
+  fi
+  echo ""
+
   echo "  -- Documentation Doxyfiles --"
   for doxyfile in "${DOC_DOXYFILES[@]}"; do
     relpath="${doxyfile#"$ROOT"/}"
@@ -383,6 +396,8 @@ VER_MINOR="${BASH_REMATCH[2]}"
 VER_PATCH="${BASH_REMATCH[3]}"
 VER_SHORT="V${VER_MAJOR}"    # e.g. V7 (for pwr_version.h / wbdb paths)
 PKG_SHORT=""                  # Package names are versionless; Version carries V/M/m.
+DOC_UPGRADE_VERSION="V${VER_MAJOR}.${VER_MINOR}"
+DOC_UPGRADE_PDF="upgrade${VER_MAJOR}${VER_MINOR}.pdf"
 
 # Known versioned package base names (longest first to avoid partial matches)
 PKG_BASES="pwrrpi64 pwrdemo pwrrpi pwr"
