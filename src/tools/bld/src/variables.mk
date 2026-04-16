@@ -158,10 +158,13 @@ warnings := -Wall -Wextra -Wno-unused-parameter -Wno-unused-but-set-parameter -W
 # but these fields are copied by size, not as C strings. Audited 2026-04.
 warnings += -Wno-stringop-truncation
 
+# -g is included in release builds to emit debug symbols for core dump / crash
+# analysis. It does not affect optimization or runtime performance — only
+# increases binary size with DWARF sections.
 ifeq ($(pwre_btype),rls)
-  cflags	:= $(cross_compile) -c -O3 -D_GNU_SOURCE -DPWR_NDEBUG -D_REENTRANT -fPIC $(warnings)
-  linkflags	:= $(cross_compile) -O3 -lstdc++ -L$(lib_dir)
-  elinkflags	:= $(cross_compile) -O3 -lstdc++ -L$(lib_dir) -L$(elib_dir)
+  cflags	:= $(cross_compile) -c -g -O3 -D_GNU_SOURCE -DPWR_NDEBUG -D_REENTRANT -fPIC $(warnings)
+  linkflags	:= $(cross_compile) -g -O3 -lstdc++ -L$(lib_dir)
+  elinkflags	:= $(cross_compile) -g -O3 -lstdc++ -L$(lib_dir) -L$(elib_dir)
 else
   cflags	:= $(cross_compile) -c -g -D_GNU_SOURCE -D_REENTRANT -fPIC $(warnings)
   linkflags	:= $(cross_compile) -g -lstdc++ -L$(lib_dir)
