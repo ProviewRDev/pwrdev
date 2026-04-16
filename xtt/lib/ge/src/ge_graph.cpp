@@ -4063,6 +4063,7 @@ static void graph_userdata_close_cb(void* object, void* data, glow_eUserdataCbTy
   case glow_eUserdataCbType_NodeClass:
   case glow_eUserdataCbType_Node:
   {
+    grow_SetUserData(object, 0);
     if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
       delete (GeDash*)data;
     else
@@ -7652,7 +7653,10 @@ static void graph_free_dyn(grow_tObject object)
 
     grow_GetUserData(object, (void**)&dyn);
     if (dyn)
+    {
+      grow_SetUserData(object, 0);
       delete dyn;
+    }
   }
   else if (grow_GetObjectType(object) == glow_eObjectType_GrowDashCell)
   {
@@ -7660,7 +7664,10 @@ static void graph_free_dyn(grow_tObject object)
 
     grow_GetUserData(object, (void**)&dash);
     if (dash)
+    {
+      grow_SetUserData(object, 0);
       delete dash;
+    }
   }
 }
 
