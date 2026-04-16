@@ -88,7 +88,7 @@ void GrowAxis::configure()
   increment = (max_value - min_value) / (lines - 1);
 }
 
-void GrowAxis::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowAxis::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowAxis) << '\n';
   fp << int(glow_eSave_GrowAxis_max_value) << FSPACE << max_value << '\n';
@@ -110,7 +110,7 @@ void GrowAxis::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowAxis::open(std::ifstream& fp)
+void GrowAxis::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -781,7 +781,7 @@ void GrowAxis::set_range(double minval, double maxval, int keep_settings)
 }
 
 void GrowAxis::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                               int node_cnt, int in_nc, std::ofstream& fp)
+                               int node_cnt, int in_nc, std::ostream& fp)
 {
   int i;
   int draw_text = (fabs(increment) > DBL_EPSILON);

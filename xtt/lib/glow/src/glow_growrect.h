@@ -37,6 +37,8 @@
 #ifndef glow_growrect_h
 #define glow_growrect_h
 
+#include <iosfwd>
+
 #include "glow_rect.h"
 
 class GlowExportFlow;
@@ -171,14 +173,14 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void save_flow(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void save_flow(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Draw the objects if any part is inside the drawing area.
   /*!
@@ -607,7 +609,7 @@ public:
     java code for the shape.
   */
   void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                       int in_nc, std::ofstream& fp);
+                       int in_nc, std::ostream& fp);
 
   //! Register the name of the last group
   /*!

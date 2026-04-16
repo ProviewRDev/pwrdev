@@ -110,7 +110,7 @@ void GrowToolbar::ungroup()
   ((GlowNodeGroup*)nc)->ungroup(&trf);
 }
 
-void GrowToolbar::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowToolbar::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowToolbar) << '\n';
   fp << int(glow_eSave_GrowToolbar_grownode_part) << '\n';
@@ -120,7 +120,7 @@ void GrowToolbar::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowToolbar::open(std::ifstream& fp)
+void GrowToolbar::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

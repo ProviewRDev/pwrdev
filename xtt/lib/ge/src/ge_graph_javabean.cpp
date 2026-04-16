@@ -1471,7 +1471,7 @@ int Graph::export_javabean(char* filename, char* bean_name)
   return 1;
 }
 
-int Graph::export_gejava_nodeclass(std::ofstream& fp, grow_tNodeClass nodeclass)
+int Graph::export_gejava_nodeclass(std::ostream& fp, grow_tNodeClass nodeclass)
 {
   char bean_name[40];
   double x0, x1, y0, y1;
@@ -2087,7 +2087,7 @@ int Graph::export_gejava(char* filename, char* bean_name, int applet, int html)
   return GE__SUCCESS;
 }
 
-int Graph::export_ObjectTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_ObjectTraceAttr(std::ostream& fp, grow_tObject object, int cnt)
 {
   int dyn_type1;
   int dyn_type2;
@@ -2238,7 +2238,7 @@ int Graph::export_ObjectTraceAttr(std::ofstream& fp, grow_tObject object, int cn
   return 1;
 }
 
-int Graph::export_GejavaObjectTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_GejavaObjectTraceAttr(std::ostream& fp, grow_tObject object, int cnt)
 {
   char class_name[40];
   char var_name[40];
@@ -2291,7 +2291,7 @@ int Graph::export_GejavaObjectTraceAttr(std::ofstream& fp, grow_tObject object, 
   return 1;
 }
 
-int Graph::export_TableTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_TableTraceAttr(std::ostream& fp, grow_tObject object, int cnt)
 {
   GeDyn* dyn;
   char class_name[] = "GeTable";
@@ -2307,7 +2307,7 @@ int Graph::export_TableTraceAttr(std::ofstream& fp, grow_tObject object, int cnt
   return 1;
 }
 
-int Graph::export_BarTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_BarTraceAttr(std::ostream& fp, grow_tObject object, int cnt)
 {
   GeDyn* dyn;
   char class_name[] = "JopBar";
@@ -2343,7 +2343,7 @@ int Graph::export_BarTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
   return 1;
 }
 
-int Graph::export_TrendTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_TrendTraceAttr(std::ostream& fp, grow_tObject object, int cnt)
 {
   GeDyn* dyn;
   char class_name[] = "JopTrend";
@@ -2385,7 +2385,7 @@ int Graph::export_TrendTraceAttr(std::ofstream& fp, grow_tObject object, int cnt
   return 1;
 }
 
-int Graph::export_PieTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_PieTraceAttr(std::ostream& fp, grow_tObject object, int cnt)
 {
   GeDyn* dyn;
   char class_name[] = "JopPie";
@@ -2428,7 +2428,7 @@ int Graph::export_PieTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
   return 1;
 }
 
-int Graph::export_BarChartTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_BarChartTraceAttr(std::ostream& fp, grow_tObject object, int cnt)
 {
   GeDyn* dyn;
   char class_name[] = "JopBarChart";
@@ -2470,7 +2470,7 @@ int Graph::export_BarChartTraceAttr(std::ofstream& fp, grow_tObject object, int 
   return 1;
 }
 
-int Graph::export_SliderTraceAttr(std::ofstream& fp, grow_tObject object, int cnt)
+int Graph::export_SliderTraceAttr(std::ostream& fp, grow_tObject object, int cnt)
 {
   glow_sTraceData* trace_data;
   char class_name[40];
@@ -2495,16 +2495,16 @@ int Graph::export_SliderTraceAttr(std::ofstream& fp, grow_tObject object, int cn
 #else
 
 int Graph::export_javabean(char* filename, char* bean_name) { return 1; }
-int Graph::export_gejava_nodeclass(std::ofstream& fp, grow_tNodeClass nodeclass) { return 1; }
+int Graph::export_gejava_nodeclass(std::ostream& fp, grow_tNodeClass nodeclass) { return 1; }
 int Graph::export_javaframe(char* filename, char* bean_name, int applet, int html) { return 1; }
 int Graph::export_gejava(char* filename, char* bean_name, int applet, int html) { return 1; }
-int Graph::export_ObjectTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
-int Graph::export_GejavaObjectTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
-int Graph::export_BarTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
-int Graph::export_TrendTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
-int Graph::export_PieTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
-int Graph::export_BarChartTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
-int Graph::export_TableTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
-int Graph::export_SliderTraceAttr(std::ofstream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_ObjectTraceAttr(std::ostream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_GejavaObjectTraceAttr(std::ostream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_BarTraceAttr(std::ostream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_TrendTraceAttr(std::ostream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_PieTraceAttr(std::ostream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_BarChartTraceAttr(std::ostream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_TableTraceAttr(std::ostream& fp, grow_tObject object, int cnt) { return 1; }
+int Graph::export_SliderTraceAttr(std::ostream& fp, grow_tObject object, int cnt) { return 1; }
 
 #endif

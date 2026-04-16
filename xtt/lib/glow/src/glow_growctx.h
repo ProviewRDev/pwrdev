@@ -37,6 +37,8 @@
 #ifndef glow_growctx_h
 #define glow_growctx_h
 
+#include <iosfwd>
+
 #include "glow_ctx.h"
 #include "glow_exportjbean.h"
 #include "glow_customcolors.h"
@@ -180,7 +182,7 @@ public:
   /*!
     \param filename	Name of file to save in.
   */
-  int export_script(char* filename, int (*userdata_cb)(void*, void*, std::ofstream&, char*));
+  int export_script(char* filename, int (*userdata_cb)(void*, void*, std::ostream&, char*));
 
   //! Open and load a subgraph from file.
   /*!
@@ -201,13 +203,13 @@ public:
     \param fp		Output file.
     \param mode		Save mode.
   */
-  void save_grow(std::ofstream& fp, glow_eSaveMode mode);
+  void save_grow(std::ostream& fp, glow_eSaveMode mode);
 
   //! Open the grow part of the context.
   /*! \param fp		Input file. */
-  void open_grow(std::ifstream& fp);
+  void open_grow(std::istream& fp);
 
-  void save_meta(std::ofstream& fp, glow_eSaveMode mode);
+  void save_meta(std::ostream& fp, glow_eSaveMode mode);
 
   //! Find an object by name.
   /*!
@@ -619,7 +621,7 @@ public:
     \param components	0: Paint. 1: Declare components. 2: Set component
     attributes.
   */
-  void export_javabean(std::ofstream& fp, int components);
+  void export_javabean(std::ostream& fp, int components);
 
   //! Export a nodeclass as javabean.
   /*!
@@ -628,7 +630,7 @@ public:
     \param components	0: Paint. 1: Declare components. 2: Set component
     attributes.
   */
-  void export_nodeclass_javabean(GlowArrayElem* nc, std::ofstream& fp, int components);
+  void export_nodeclass_javabean(GlowArrayElem* nc, std::ostream& fp, int components);
 
   //! Export annotation fonts in a nodeclass.
   /*!
@@ -637,7 +639,7 @@ public:
     \param components	0: Paint. 1: Declare components. 2: Set component
     attributes.
   */
-  void export_nc_javabean_font(GlowArrayElem* nc, std::ofstream& fp, int components);
+  void export_nc_javabean_font(GlowArrayElem* nc, std::ostream& fp, int components);
 
   //! Set java name of the context.
   /*! \param name 	Name of java class for the graph. */
@@ -902,7 +904,7 @@ public:
   int is_visible(GlowArrayElem* element, glow_eVisible type);
 
   //! Read object from file. */
-  void read_object(std::ifstream& fp, GlowArrayElem** o);
+  void read_object(std::istream& fp, GlowArrayElem** o);
 
   //! Order object. */
   int order_object(GlowArrayElem* o, GlowArrayElem* dest, glow_eDest code) { return a.move(o, dest, code); }

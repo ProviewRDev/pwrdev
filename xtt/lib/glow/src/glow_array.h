@@ -37,6 +37,8 @@
 #ifndef glow_array_h
 #define glow_array_h
 
+#include <iosfwd>
+
 #include "glow_array_elem.h"
 
 /*! \file glow_array.h
@@ -153,8 +155,8 @@ public:
   void nav_zoom();
   void print_zoom();
   void print(void* pos, void* node);
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(GrowCtx* ctx, std::ifstream& fp);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(GrowCtx* ctx, std::istream& fp);
   void draw();
   void draw(GlowWind* w, void* pos, int highlight, int hot, void* node);
   // void erase(GlowWind* w, void* pos, int hot, void* node);

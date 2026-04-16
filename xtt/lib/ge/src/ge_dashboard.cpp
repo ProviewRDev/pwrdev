@@ -437,7 +437,7 @@ int GeDash::connect(grow_tObject o, int idx, char* attr, pwr_tTypeId atype)
   return GE__SUCCESS;
 }
 
-void GeDash::save(std::ofstream& fp)
+void GeDash::save(std::ostream& fp)
 {
   fp << int(dash_eSave_Dash) << '\n';
   fp << int(dash_eSave_Dash_type) << FSPACE << int(type) << '\n';
@@ -452,7 +452,7 @@ void GeDash::save(std::ofstream& fp)
   fp << int(dash_eSave_End) << '\n';
 }
 
-void GeDash::open(std::ifstream& fp)
+void GeDash::open(std::istream& fp)
 {
   int stype = 0;
   int end_found = 0;
@@ -665,7 +665,7 @@ void GeDashAnalog::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDashAnalog::save(std::ofstream& fp)
+void GeDashAnalog::save(std::ostream& fp)
 {
   fp << int(dash_eSave_Analog) << '\n';
   fp << int(dash_eSave_Analog_attribute) << FSPACE << attribute << '\n';
@@ -676,7 +676,7 @@ void GeDashAnalog::save(std::ofstream& fp)
   fp << int(dash_eSave_End) << '\n';
 }
 
-void GeDashAnalog::open(std::ifstream& fp)
+void GeDashAnalog::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -876,7 +876,7 @@ void GeDashDigital::replace_attribute(char* from, char* to, int* cnt, int strict
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDashDigital::save(std::ofstream& fp)
+void GeDashDigital::save(std::ostream& fp)
 {
   fp << int(dash_eSave_Digital) << '\n';
   fp << int(dash_eSave_Digital_attribute) << FSPACE << attribute << '\n';
@@ -886,7 +886,7 @@ void GeDashDigital::save(std::ofstream& fp)
   fp << int(dash_eSave_End) << '\n';
 }
 
-void GeDashDigital::open(std::ifstream& fp)
+void GeDashDigital::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -1027,7 +1027,7 @@ void GeDashObject::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(object, sizeof(object), from, to, cnt, strict);
 }
 
-void GeDashObject::save(std::ofstream& fp)
+void GeDashObject::save(std::ostream& fp)
 {
   fp << int(dash_eSave_Object) << '\n';
   fp << int(dash_eSave_Object_object) << FSPACE << object << '\n';
@@ -1037,7 +1037,7 @@ void GeDashObject::save(std::ofstream& fp)
   fp << int(dash_eSave_End) << '\n';
 }
 
-void GeDashObject::open(std::ifstream& fp)
+void GeDashObject::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

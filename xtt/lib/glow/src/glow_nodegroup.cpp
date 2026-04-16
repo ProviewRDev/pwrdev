@@ -87,7 +87,7 @@ void GlowNodeGroup::ungroup(GlowTransform* t)
   a.clear();
 }
 
-void GlowNodeGroup::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowNodeGroup::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_NodeGroup) << '\n';
   fp << int(glow_eSave_NodeGroup_nodeclass_part) << '\n';
@@ -96,7 +96,7 @@ void GlowNodeGroup::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowNodeGroup::open(std::ifstream& fp)
+void GlowNodeGroup::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

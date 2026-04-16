@@ -1057,7 +1057,7 @@ int GraphJournal::undo_delete_select()
     if (layer != active_layer)
       grow_LayerSetActive(layer, 1);
 
-    grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &o);
+    grow_ObjectRead(graph->grow->ctx, fp, &o);
     if (!o)
     {
       grow_ResetNodraw(graph->grow->ctx);
@@ -1124,7 +1124,7 @@ int GraphJournal::store_undo_delete_select()
     }
     else
       fp << '\n';
-    grow_ObjectSave(sel_list[i], (std::ofstream&)fp, glow_eSaveMode_Edit);
+    grow_ObjectSave(sel_list[i], fp, glow_eSaveMode_Edit);
   }
   fp << journal_cTag_End << '\n';
   return GE__SUCCESS;
@@ -1196,7 +1196,7 @@ int GraphJournal::undo_delete_object()
 
   read_str(journal_cTag_Object, name_prev, sizeof(name_prev));
 
-  grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &o);
+  grow_ObjectRead(graph->grow->ctx, fp, &o);
   grow_Redraw(graph->grow->ctx);
 
   if (streq(name_prev, ""))
@@ -1236,7 +1236,7 @@ int GraphJournal::store_undo_delete_object(grow_tObject o)
   else
     fp << '\n';
 
-  grow_ObjectSave(o, (std::ofstream&)fp, glow_eSaveMode_Edit);
+  grow_ObjectSave(o, fp, glow_eSaveMode_Edit);
   return GE__SUCCESS;
 }
 
@@ -1304,7 +1304,7 @@ int GraphJournal::redo_create_object()
 
   log_debug("redo_create_object\n");
 
-  grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &o);
+  grow_ObjectRead(graph->grow->ctx, fp, &o);
   if (!o)
     return GE__SUCCESS;
 
@@ -1317,7 +1317,7 @@ int GraphJournal::store_redo_create_object(grow_tObject o)
 {
   log_debug("store_redo_create_object\n");
 
-  grow_ObjectSave(o, (std::ofstream&)fp, glow_eSaveMode_Edit);
+  grow_ObjectSave(o, fp, glow_eSaveMode_Edit);
   return GE__SUCCESS;
 }
 
@@ -1339,7 +1339,7 @@ int GraphJournal::undo_properties_select()
 
     sts = grow_FindObjectByName(graph->grow->ctx, name, &o);
     if (ODD(sts))
-      grow_ObjectOpen(o, (std::ifstream&)fp);
+      grow_ObjectOpen(o, fp);
 
     fp.get();
     fp.getline(line, sizeof(line));
@@ -1368,7 +1368,7 @@ int GraphJournal::store_properties_select()
 
     fp << journal_cTag_Object << '\n';
     fp << name << '\n';
-    grow_ObjectSave(sel_list[i], (std::ofstream&)fp, glow_eSaveMode_Edit);
+    grow_ObjectSave(sel_list[i], fp, glow_eSaveMode_Edit);
   }
   fp << journal_cTag_End << '\n';
   return GE__SUCCESS;
@@ -1395,7 +1395,7 @@ int GraphJournal::undo_properties_object()
   if (EVEN(sts))
     return GE__SUCCESS;
 
-  grow_ObjectOpen(o, (std::ifstream&)fp);
+  grow_ObjectOpen(o, fp);
 
   fp.get();
   fp.getline(line, sizeof(line));
@@ -1419,7 +1419,7 @@ int GraphJournal::store_properties_object(grow_tObject o)
 
   fp << journal_cTag_Object << '\n';
   fp << name << '\n';
-  grow_ObjectSave(o, (std::ofstream&)fp, glow_eSaveMode_Edit);
+  grow_ObjectSave(o, fp, glow_eSaveMode_Edit);
   fp << journal_cTag_End << '\n';
   return GE__SUCCESS;
 }
@@ -1776,7 +1776,7 @@ int GraphJournal::redo_paste()
   sscanf(line, "%d", &tag);
   while (tag == journal_cTag_Object)
   {
-    grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &o);
+    grow_ObjectRead(graph->grow->ctx, fp, &o);
     if (!o)
       return GE__SUCCESS;
 
@@ -1800,7 +1800,7 @@ int GraphJournal::store_redo_paste()
   for (int i = 0; i < (int)pastelist.size(); i++)
   {
     fp << journal_cTag_Object << '\n';
-    grow_ObjectSave(pastelist[i], (std::ofstream&)fp, glow_eSaveMode_Edit);
+    grow_ObjectSave(pastelist[i], fp, glow_eSaveMode_Edit);
   }
   fp << journal_cTag_End << '\n';
   grow_ResetNodraw(graph->grow->ctx);
@@ -3237,7 +3237,7 @@ int GraphJournal::undo_merge_all_layers()
       throw co_error(GE__JOURNAL_DISORDER);
 
     read_tag(journal_cTag_Layer);
-    grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &layer);
+    grow_ObjectRead(graph->grow->ctx, fp, &layer);
     if (!layer)
       return GE__SUCCESS;
 
@@ -3313,7 +3313,7 @@ int GraphJournal::store_undo_merge_all_layers()
         fp << name << '\n';
       }
       fp << journal_cTag_Layer << '\n';
-      grow_LayerSave(list[i], 1, (std::ofstream&)fp, glow_eSaveMode_Edit);
+      grow_LayerSave(list[i], 1, fp, glow_eSaveMode_Edit);
 
       grow_GetLayerObjectList(list[i], &layer_list, &layer_list_count);
       fp << journal_cTag_Size << '\n';
@@ -3373,7 +3373,7 @@ int GraphJournal::undo_merge_visible_layers_to_bg()
   sscanf(line, "%d", &tag);
   while (tag == journal_cTag_Layer)
   {
-    grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &layer);
+    grow_ObjectRead(graph->grow->ctx, fp, &layer);
     if (!layer)
       return GE__SUCCESS;
 
@@ -3428,7 +3428,7 @@ int GraphJournal::store_undo_merge_visible_layers_to_bg()
         grow_GetObjectVisibility(list[i]) == glow_eVis_Visible)
     {
       fp << journal_cTag_Layer << '\n';
-      grow_LayerSave(list[i], 1, (std::ofstream&)fp, glow_eSaveMode_Edit);
+      grow_LayerSave(list[i], 1, fp, glow_eSaveMode_Edit);
 
       grow_GetLayerObjectList(list[i], &layer_list, &layer_list_count);
       fp << journal_cTag_Size << '\n';
@@ -3502,7 +3502,7 @@ int GraphJournal::undo_merge_visible_layers()
   sscanf(line, "%d", &tag);
   while (tag == journal_cTag_Layer)
   {
-    grow_ObjectRead(graph->grow->ctx, (std::ifstream&)fp, &layer);
+    grow_ObjectRead(graph->grow->ctx, fp, &layer);
     if (!layer)
       return GE__SUCCESS;
 
@@ -3605,7 +3605,7 @@ int GraphJournal::store_undo_merge_visible_layers()
       else
       {
         fp << journal_cTag_Layer << '\n';
-        grow_LayerSave(list[i], 1, (std::ofstream&)fp, glow_eSaveMode_Edit);
+        grow_LayerSave(list[i], 1, fp, glow_eSaveMode_Edit);
 
         grow_GetLayerObjectList(list[i], &layer_list, &layer_list_count);
         fp << journal_cTag_Size << '\n';

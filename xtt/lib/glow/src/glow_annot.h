@@ -37,6 +37,8 @@
 #ifndef glow_annot_h
 #define glow_annot_h
 
+#include <iosfwd>
+
 #include "glow_growctx.h"
 
 class GlowAnnot : public GlowArrayElem
@@ -52,8 +54,8 @@ public:
         font(glow_eFont_Helvetica), protect(0)
   {
   }
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(std::istream& fp);
   void traverse(int x, int y) { p.traverse(x, y); }
 
   int number;

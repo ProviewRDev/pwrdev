@@ -65,7 +65,7 @@ void GlowRect::traverse(int x, int y)
   ur.traverse(x, y);
 }
 
-void GlowRect::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowRect::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_Rect) << '\n';
   fp << int(glow_eSave_Rect_draw_type) << FSPACE << int(draw_type) << '\n';
@@ -79,7 +79,7 @@ void GlowRect::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowRect::open(std::ifstream& fp)
+void GlowRect::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

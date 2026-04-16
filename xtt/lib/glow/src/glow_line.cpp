@@ -65,7 +65,7 @@ void GlowLine::traverse(int x, int y)
   p2.traverse(x, y);
 }
 
-void GlowLine::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowLine::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_Line) << '\n';
   fp << int(glow_eSave_Line_draw_type) << FSPACE << int(draw_type) << '\n';
@@ -77,7 +77,7 @@ void GlowLine::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowLine::open(std::ifstream& fp)
+void GlowLine::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -372,7 +372,7 @@ void GlowLine::shift(void* pos, double delta_x, double delta_y, int highlight, i
 }
 
 void GlowLine::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                               int node_cnt, int in_nc, std::ofstream& fp)
+                               int node_cnt, int in_nc, std::ostream& fp)
 {
   if (p1.z_x == p2.z_x && p1.z_y == p2.z_y)
     return;
@@ -385,7 +385,7 @@ void GlowLine::export_javabean(GlowTransform* t, void* node, glow_eExportPass pa
 }
 
 void GlowLine::export_javabean_shadow(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                      int node_cnt, int in_nc, std::ofstream& fp, int shadow, int border)
+                                      int node_cnt, int in_nc, std::ostream& fp, int shadow, int border)
 {
   if (p1.z_x == p2.z_x && p1.z_y == p2.z_y)
     return;

@@ -37,6 +37,8 @@
 #ifndef glow_growconpoint_h
 #define glow_growconpoint_h
 
+#include <iosfwd>
+
 #include "glow_conpoint.h"
 #include "glow_arc.h"
 
@@ -154,13 +156,13 @@ public:
     If the mode is glow_eSaveMode_Subgraph only the GlowConPoint part of the
     conpoint is saved.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Draw the objects if any part is inside the drawing area.
   /*!

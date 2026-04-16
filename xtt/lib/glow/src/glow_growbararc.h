@@ -37,6 +37,8 @@
 #ifndef glow_growbararc_h
 #define glow_growbararc_h
 
+#include <iosfwd>
+
 #include "glow_growarc.h"
 
 /*! \file glow_growbararc.h
@@ -83,13 +85,13 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Draw the objects if any part is inside the drawing area.
   /*!
@@ -224,7 +226,7 @@ public:
     java code for the bean.
   */
   void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                       int in_nc, std::ofstream& fp);
+                       int in_nc, std::ostream& fp);
 
   //! Scan trace
   /*! Calls the trace scan callback for the object.

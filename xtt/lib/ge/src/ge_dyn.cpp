@@ -936,7 +936,7 @@ GeDyn::~GeDyn()
   }
 }
 
-void GeDyn::save(std::ofstream& fp)
+void GeDyn::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Dyn) << '\n';
   fp << int(ge_eSave_Dyn_dyn_type1) << FSPACE << int(dyn_type1) << '\n';
@@ -953,7 +953,7 @@ void GeDyn::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDyn::open(std::ifstream& fp)
+void GeDyn::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -2728,7 +2728,7 @@ int GeDyn::change_value(grow_tObject object, char* text)
   return 1;
 }
 
-int GeDyn::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDyn::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (dyn_type1 != ge_mDynType1_Inherit)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DynType1\"," << dyn_type1 << ");" << '\n';
@@ -2750,7 +2750,7 @@ int GeDyn::export_script(grow_tObject o, std::ofstream& fp, char* indentation, c
   return 1;
 }
 
-void GeDyn::export_java(grow_tObject object, std::ofstream& fp, char* var_name)
+void GeDyn::export_java(grow_tObject object, std::ostream& fp, char* var_name)
 {
   int inherit_dyn_type1, inherit_action_type1;
   int inherit_dyn_type2, inherit_action_type2;
@@ -2816,7 +2816,7 @@ void GeDyn::export_java(grow_tObject object, std::ofstream& fp, char* var_name)
   }
 }
 
-void GeDyn::export_java_object(grow_tObject object, std::ofstream& fp, char* var_name)
+void GeDyn::export_java_object(grow_tObject object, std::ostream& fp, char* var_name)
 {
   fp << "    new GeDyn(" << var_name << "," << dyn_type1 << "," << action_type1 << "," << access << ","
      << "new GeDynElemIfc[] {\n";
@@ -3098,7 +3098,7 @@ int GeDigLowColor::set_color(grow_tObject object, glow_eDrawType color)
   return 1;
 }
 
-void GeDigLowColor::save(std::ofstream& fp)
+void GeDigLowColor::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigLowColor) << '\n';
   fp << int(ge_eSave_DigLowColor_attribute) << FSPACE << attribute << '\n';
@@ -3106,7 +3106,7 @@ void GeDigLowColor::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigLowColor::open(std::ifstream& fp)
+void GeDigLowColor::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -3262,7 +3262,7 @@ void GeDigLowColor::reset(grow_tObject object)
   old_value = 0;
 }
 
-int GeDigLowColor::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigLowColor::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   glow_eDrawType jcolor = dyn->get_color1(object, color);
   if (first)
@@ -3273,7 +3273,7 @@ int GeDigLowColor::export_java(grow_tObject object, std::ofstream& fp, bool firs
   return 1;
 }
 
-int GeDigLowColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigLowColor::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
   if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
@@ -3479,7 +3479,7 @@ int GeDigColor::set_color(grow_tObject object, glow_eDrawType color)
   return 1;
 }
 
-void GeDigColor::save(std::ofstream& fp)
+void GeDigColor::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigColor) << '\n';
   fp << int(ge_eSave_DigColor_attribute) << FSPACE << attribute << '\n';
@@ -3489,7 +3489,7 @@ void GeDigColor::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigColor::open(std::ifstream& fp)
+void GeDigColor::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -3668,7 +3668,7 @@ void GeDigColor::reset(grow_tObject object)
   old_value = 0;
 }
 
-int GeDigColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigColor::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
   if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
@@ -3705,7 +3705,7 @@ int GeDigColor::export_script(grow_tObject o, std::ofstream& fp, char* indentati
   return 1;
 }
 
-int GeDigColor::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigColor::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   glow_eDrawType jcolor = dyn->get_color2(object, color);
   if (first)
@@ -3791,7 +3791,7 @@ void GeDigWarning::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDigWarning::save(std::ofstream& fp)
+void GeDigWarning::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigWarning) << '\n';
   fp << int(ge_eSave_DigWarning_attribute) << FSPACE << attribute << '\n';
@@ -3799,7 +3799,7 @@ void GeDigWarning::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigWarning::open(std::ifstream& fp)
+void GeDigWarning::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -3929,7 +3929,7 @@ int GeDigWarning::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigWarning::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigWarning::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigWarning.Attribute\",\"" << attribute
@@ -3940,7 +3940,7 @@ int GeDigWarning::export_script(grow_tObject o, std::ofstream& fp, char* indenta
   return 1;
 }
 
-int GeDigWarning::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigWarning::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -4013,7 +4013,7 @@ void GeDigError::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDigError::save(std::ofstream& fp)
+void GeDigError::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigError) << '\n';
   fp << int(ge_eSave_DigError_attribute) << FSPACE << attribute << '\n';
@@ -4021,7 +4021,7 @@ void GeDigError::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigError::open(std::ifstream& fp)
+void GeDigError::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -4151,7 +4151,7 @@ int GeDigError::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigError::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigError::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigError.Attribute\",\"" << attribute
@@ -4162,7 +4162,7 @@ int GeDigError::export_script(grow_tObject o, std::ofstream& fp, char* indentati
   return 1;
 }
 
-int GeDigError::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigError::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -4278,7 +4278,7 @@ int GeDigFlash::set_color(grow_tObject object, glow_eDrawType color)
   return 1;
 }
 
-void GeDigFlash::save(std::ofstream& fp)
+void GeDigFlash::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigFlash) << '\n';
   fp << int(ge_eSave_DigFlash_attribute) << FSPACE << attribute << '\n';
@@ -4287,7 +4287,7 @@ void GeDigFlash::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigFlash::open(std::ifstream& fp)
+void GeDigFlash::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -4474,7 +4474,7 @@ int GeDigFlash::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigFlash::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigFlash::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFlash.Attribute\",\"" << attribute
@@ -4500,7 +4500,7 @@ int GeDigFlash::export_script(grow_tObject o, std::ofstream& fp, char* indentati
   return 1;
 }
 
-int GeDigFlash::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigFlash::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   glow_eDrawType jcolor = dyn->get_color1(object, color);
 
@@ -4633,7 +4633,7 @@ void GeInvisible::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeInvisible::save(std::ofstream& fp)
+void GeInvisible::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Invisible) << '\n';
   fp << int(ge_eSave_Invisible_attribute) << FSPACE << attribute << '\n';
@@ -4644,7 +4644,7 @@ void GeInvisible::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeInvisible::open(std::ifstream& fp)
+void GeInvisible::open(std::istream& fp)
 {
   int type = 0;
   int tmp;
@@ -4824,7 +4824,7 @@ int GeInvisible::scan(grow_tObject object)
   return 1;
 }
 
-int GeInvisible::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeInvisible::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
@@ -4858,7 +4858,7 @@ int GeInvisible::export_script(grow_tObject o, std::ofstream& fp, char* indentat
   return 1;
 }
 
-int GeInvisible::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeInvisible::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -4931,7 +4931,7 @@ void GeDigTextColor::replace_attribute(char* from, char* to, int* cnt, int stric
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDigTextColor::save(std::ofstream& fp)
+void GeDigTextColor::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigTextColor) << '\n';
   fp << int(ge_eSave_DigTextColor_attribute) << FSPACE << attribute << '\n';
@@ -4939,7 +4939,7 @@ void GeDigTextColor::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigTextColor::open(std::ifstream& fp)
+void GeDigTextColor::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -5057,7 +5057,7 @@ int GeDigTextColor::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigTextColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigTextColor::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTextColor.Attribute\",\"" << attribute
@@ -5068,7 +5068,7 @@ int GeDigTextColor::export_script(grow_tObject o, std::ofstream& fp, char* inden
   return 1;
 }
 
-int GeDigTextColor::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigTextColor::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   return 1;
 }
@@ -5142,7 +5142,7 @@ void GeDigBorder::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDigBorder::save(std::ofstream& fp)
+void GeDigBorder::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigBorder) << '\n';
   fp << int(ge_eSave_DigBorder_attribute) << FSPACE << attribute << '\n';
@@ -5150,7 +5150,7 @@ void GeDigBorder::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigBorder::open(std::ifstream& fp)
+void GeDigBorder::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -5268,7 +5268,7 @@ int GeDigBorder::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigBorder::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigBorder::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigBorder.Attribute\",\"" << attribute
@@ -5279,7 +5279,7 @@ int GeDigBorder::export_script(grow_tObject o, std::ofstream& fp, char* indentat
   return 1;
 }
 
-int GeDigBorder::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigBorder::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   glow_eDrawType jcolor = dyn->get_color1(object, color);
 
@@ -5408,7 +5408,7 @@ void GeDigText::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDigText::save(std::ofstream& fp)
+void GeDigText::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigText) << '\n';
   fp << int(ge_eSave_DigText_attribute) << FSPACE << attribute << '\n';
@@ -5418,7 +5418,7 @@ void GeDigText::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigText::open(std::ifstream& fp)
+void GeDigText::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -5569,7 +5569,7 @@ int GeDigText::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigText::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigText::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
@@ -5606,7 +5606,7 @@ int GeDigText::export_script(grow_tObject o, std::ofstream& fp, char* indentatio
   return 1;
 }
 
-int GeDigText::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigText::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -5777,7 +5777,7 @@ void GeValue::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(decimals_attr, sizeof(decimals_attr), from, to, cnt, strict);
 }
 
-void GeValue::save(std::ofstream& fp)
+void GeValue::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Value) << '\n';
   fp << int(ge_eSave_Value_attribute) << FSPACE << attribute << '\n';
@@ -5790,7 +5790,7 @@ void GeValue::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeValue::open(std::ifstream& fp)
+void GeValue::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -6558,7 +6558,7 @@ void GeValue::reset(grow_tObject object)
   memset(&old_value, 0, sizeof(old_value));
 }
 
-int GeValue::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeValue::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
@@ -6597,7 +6597,7 @@ int GeValue::export_script(grow_tObject o, std::ofstream& fp, char* indentation,
   return 1;
 }
 
-int GeValue::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeValue::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -6757,7 +6757,7 @@ void GeValueInput::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(maxvalue_attr, sizeof(maxvalue_attr), from, to, cnt, strict);
 }
 
-void GeValueInput::save(std::ofstream& fp)
+void GeValueInput::save(std::ostream& fp)
 {
   fp << int(ge_eSave_ValueInput) << '\n';
   fp << int(ge_eSave_ValueInput_min_value) << FSPACE << min_value << '\n';
@@ -6773,7 +6773,7 @@ void GeValueInput::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeValueInput::open(std::ifstream& fp)
+void GeValueInput::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -7183,7 +7183,7 @@ int GeValueInput::change_value(grow_tObject object, char* text)
   return 1;
 }
 
-int GeValueInput::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeValueInput::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (min_value != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ValueInput.MinValue\"," << dtostr(min_value)
@@ -7218,7 +7218,7 @@ int GeValueInput::export_script(grow_tObject o, std::ofstream& fp, char* indenta
   return 1;
 }
 
-int GeValueInput::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeValueInput::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   int class_dyn_type1, class_action_type1;
   int class_dyn_type2, class_action_type2;
@@ -7560,7 +7560,7 @@ int GeAnalogColor::set_color(grow_tObject object, glow_eDrawType color)
   return 1;
 }
 
-void GeAnalogColor::save(std::ofstream& fp)
+void GeAnalogColor::save(std::ostream& fp)
 {
   fp << int(ge_eSave_AnalogColor) << '\n';
   fp << int(ge_eSave_AnalogColor_attribute) << FSPACE << attribute << '\n';
@@ -7576,7 +7576,7 @@ void GeAnalogColor::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeAnalogColor::open(std::ifstream& fp)
+void GeAnalogColor::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -7885,7 +7885,7 @@ int GeAnalogColor::scan(grow_tObject object)
   return 1;
 }
 
-int GeAnalogColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeAnalogColor::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
   int e_common_attr = 0;
@@ -7936,7 +7936,7 @@ int GeAnalogColor::export_script(grow_tObject o, std::ofstream& fp, char* indent
   return 1;
 }
 
-int GeAnalogColor::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeAnalogColor::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -8042,7 +8042,7 @@ void GeRotate::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeRotate::save(std::ofstream& fp)
+void GeRotate::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Rotate) << '\n';
   fp << int(ge_eSave_Rotate_attribute) << FSPACE << attribute << '\n';
@@ -8055,7 +8055,7 @@ void GeRotate::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeRotate::open(std::ifstream& fp)
+void GeRotate::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -8183,7 +8183,7 @@ int GeRotate::scan(grow_tObject object)
   return 1;
 }
 
-int GeRotate::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeRotate::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Rotate.Attribute\",\"" << attribute
@@ -8207,7 +8207,7 @@ int GeRotate::export_script(grow_tObject o, std::ofstream& fp, char* indentation
   return 1;
 }
 
-int GeRotate::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeRotate::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   double x1, x2, y1, y2;
   double rotation_x, rotation_y;
@@ -8375,7 +8375,7 @@ void GeMove::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(scale_y_attribute, sizeof(scale_y_attribute), from, to, cnt, strict);
 }
 
-void GeMove::save(std::ofstream& fp)
+void GeMove::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Move) << '\n';
   fp << int(ge_eSave_Move_move_x_attribute) << FSPACE << move_x_attribute << '\n';
@@ -8392,7 +8392,7 @@ void GeMove::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeMove::open(std::ifstream& fp)
+void GeMove::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -8780,7 +8780,7 @@ int GeMove::scan(grow_tObject object)
   return 1;
 }
 
-int GeMove::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeMove::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(move_x_attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Move.XAttribute\",\"" << move_x_attribute
@@ -8818,7 +8818,7 @@ int GeMove::export_script(grow_tObject o, std::ofstream& fp, char* indentation, 
   return 1;
 }
 
-int GeMove::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeMove::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   double zoom_factor;
 
@@ -8903,14 +8903,14 @@ void GeAnalogShift::replace_attribute(char* from, char* to, int* cnt, int strict
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeAnalogShift::save(std::ofstream& fp)
+void GeAnalogShift::save(std::ostream& fp)
 {
   fp << int(ge_eSave_AnalogShift) << '\n';
   fp << int(ge_eSave_AnalogShift_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeAnalogShift::open(std::ifstream& fp)
+void GeAnalogShift::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -9048,7 +9048,7 @@ int GeAnalogShift::scan(grow_tObject object)
   return 1;
 }
 
-int GeAnalogShift::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeAnalogShift::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogShift.Attribute\",\"" << attribute
@@ -9056,7 +9056,7 @@ int GeAnalogShift::export_script(grow_tObject o, std::ofstream& fp, char* indent
   return 1;
 }
 
-int GeAnalogShift::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeAnalogShift::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -9120,14 +9120,14 @@ void GeDigShift::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDigShift::save(std::ofstream& fp)
+void GeDigShift::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigShift) << '\n';
   fp << int(ge_eSave_DigShift_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigShift::open(std::ifstream& fp)
+void GeDigShift::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -9244,7 +9244,7 @@ int GeDigShift::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigShift::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigShift::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigShift.Attribute\",\"" << attribute
@@ -9252,7 +9252,7 @@ int GeDigShift::export_script(grow_tObject o, std::ofstream& fp, char* indentati
   return 1;
 }
 
-int GeDigShift::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigShift::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -9317,14 +9317,14 @@ void GeDigLowShift::replace_attribute(char* from, char* to, int* cnt, int strict
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDigLowShift::save(std::ofstream& fp)
+void GeDigLowShift::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigLowShift) << '\n';
   fp << int(ge_eSave_DigLowShift_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigLowShift::open(std::ifstream& fp)
+void GeDigLowShift::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -9441,7 +9441,7 @@ int GeDigLowShift::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigLowShift::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigLowShift::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigLowShift.Attribute\",\"" << attribute
@@ -9520,7 +9520,7 @@ void GeDigFourShift::replace_attribute(char* from, char* to, int* cnt, int stric
   GeDyn::replace_attribute(attribute3, sizeof(attribute3), from, to, cnt, strict);
 }
 
-void GeDigFourShift::save(std::ofstream& fp)
+void GeDigFourShift::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigFourShift) << '\n';
   fp << int(ge_eSave_DigFourShift_attribute1) << FSPACE << attribute1 << '\n';
@@ -9529,7 +9529,7 @@ void GeDigFourShift::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigFourShift::open(std::ifstream& fp)
+void GeDigFourShift::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -9738,7 +9738,7 @@ int GeDigFourShift::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigFourShift::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigFourShift::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute1, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigFourShift.Attribute1\",\"" << attribute1
@@ -9752,7 +9752,7 @@ int GeDigFourShift::export_script(grow_tObject o, std::ofstream& fp, char* inden
   return 1;
 }
 
-int GeDigFourShift::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigFourShift::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   return 1;
 }
@@ -9839,7 +9839,7 @@ void GeScrollingText::replace_attribute(char* from, char* to, int* cnt, int stri
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeScrollingText::save(std::ofstream& fp)
+void GeScrollingText::save(std::ostream& fp)
 {
   fp << int(ge_eSave_ScrollingText) << '\n';
   fp << int(ge_eSave_ScrollingText_attribute) << FSPACE << attribute << '\n';
@@ -9849,7 +9849,7 @@ void GeScrollingText::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeScrollingText::open(std::ifstream& fp)
+void GeScrollingText::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -10072,7 +10072,7 @@ int GeScrollingText::scan(grow_tObject object)
   return 1;
 }
 
-int GeScrollingText::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeScrollingText::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ScrollingText.Attribute\",\"" << attribute
@@ -10089,7 +10089,7 @@ int GeScrollingText::export_script(grow_tObject o, std::ofstream& fp, char* inde
   return 1;
 }
 
-int GeScrollingText::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeScrollingText::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   return 1;
 }
@@ -10110,13 +10110,13 @@ void GeColorThemeLightness::set_attribute(grow_tObject object, const char* attr_
 
 void GeColorThemeLightness::replace_attribute(char* from, char* to, int* cnt, int strict) {}
 
-void GeColorThemeLightness::save(std::ofstream& fp)
+void GeColorThemeLightness::save(std::ostream& fp)
 {
   fp << int(ge_eSave_ColorThemeLightness) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeColorThemeLightness::open(std::ifstream& fp)
+void GeColorThemeLightness::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -10163,7 +10163,7 @@ int GeColorThemeLightness::scan(grow_tObject object)
   return 1;
 }
 
-int GeColorThemeLightness::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeColorThemeLightness::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   return 1;
 }
@@ -10273,7 +10273,7 @@ int GeDigBackgroundColor::set_color(grow_tObject object, glow_eDrawType color)
   return 1;
 }
 
-void GeDigBackgroundColor::save(std::ofstream& fp)
+void GeDigBackgroundColor::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigBackgroundColor) << '\n';
   fp << int(ge_eSave_DigBackgroundColor_attribute) << FSPACE << attribute << '\n';
@@ -10283,7 +10283,7 @@ void GeDigBackgroundColor::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigBackgroundColor::open(std::ifstream& fp)
+void GeDigBackgroundColor::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -10415,7 +10415,7 @@ int GeDigBackgroundColor::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigBackgroundColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigBackgroundColor::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
@@ -10446,7 +10446,7 @@ int GeDigBackgroundColor::export_script(grow_tObject o, std::ofstream& fp, char*
   return 1;
 }
 
-int GeDigBackgroundColor::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigBackgroundColor::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   return 1;
 }
@@ -10533,7 +10533,7 @@ void GeDigSwap::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDigSwap::save(std::ofstream& fp)
+void GeDigSwap::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigSwap) << '\n';
   fp << int(ge_eSave_DigSwap_attribute) << FSPACE << attribute << '\n';
@@ -10541,7 +10541,7 @@ void GeDigSwap::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigSwap::open(std::ifstream& fp)
+void GeDigSwap::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -10703,7 +10703,7 @@ int GeDigSwap::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigSwap::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigSwap::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigSwap.Attribute\",\"" << attribute
@@ -10714,7 +10714,7 @@ int GeDigSwap::export_script(grow_tObject o, std::ofstream& fp, char* indentatio
   return 1;
 }
 
-int GeDigSwap::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 1; }
+int GeDigSwap::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name) { return 1; }
 
 int GeDigSwap::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
@@ -10758,7 +10758,7 @@ void GeAnimation::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeAnimation::save(std::ofstream& fp)
+void GeAnimation::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Animation) << '\n';
   fp << int(ge_eSave_Animation_attribute) << FSPACE << attribute << '\n';
@@ -10785,7 +10785,7 @@ void GeAnimation::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeAnimation::open(std::ifstream& fp)
+void GeAnimation::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -11036,7 +11036,7 @@ int GeAnimation::scan(grow_tObject object)
   return 1;
 }
 
-int GeAnimation::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeAnimation::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Animation.Attribute\",\"" << attribute
@@ -11047,7 +11047,7 @@ int GeAnimation::export_script(grow_tObject o, std::ofstream& fp, char* indentat
   return 1;
 }
 
-int GeAnimation::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeAnimation::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   int seq, attr2;
 
@@ -11075,13 +11075,13 @@ int GeAnimation::syntax_check(grow_tObject object, int* error_cnt, int* warning_
   return 1;
 }
 
-void GeVideo::save(std::ofstream& fp)
+void GeVideo::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Video) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeVideo::open(std::ifstream& fp)
+void GeVideo::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -11232,7 +11232,7 @@ void GeBar::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeBar::save(std::ofstream& fp)
+void GeBar::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Bar) << '\n';
   fp << int(ge_eSave_Bar_attribute) << FSPACE << attribute << '\n';
@@ -11241,7 +11241,7 @@ void GeBar::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeBar::open(std::ifstream& fp)
+void GeBar::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -11454,7 +11454,7 @@ int GeBar::scan(grow_tObject object)
   return 1;
 }
 
-int GeBar::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeBar::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Bar.Attribute\",\"" << attribute << "\");"
@@ -11619,7 +11619,7 @@ void GeTrend::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(mark2_attr, sizeof(mark2_attr), from, to, cnt, strict);
 }
 
-void GeTrend::save(std::ofstream& fp)
+void GeTrend::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Trend) << '\n';
   fp << int(ge_eSave_Trend_attribute1) << FSPACE << attribute1 << '\n';
@@ -11637,7 +11637,7 @@ void GeTrend::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeTrend::open(std::ifstream& fp)
+void GeTrend::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -12160,7 +12160,7 @@ int GeTrend::scan(grow_tObject object)
   return 1;
 }
 
-int GeTrend::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeTrend::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute1, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Trend.Attribute1\",\"" << attribute1
@@ -12560,7 +12560,7 @@ void GeXY_Curve::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(y_mark2_attr, sizeof(y_mark2_attr), from, to, cnt, strict);
 }
 
-void GeXY_Curve::save(std::ofstream& fp)
+void GeXY_Curve::save(std::ostream& fp)
 {
   fp << int(ge_eSave_XY_Curve) << '\n';
   fp << int(ge_eSave_XY_Curve_x_attr) << FSPACE << x_attr << '\n';
@@ -12591,7 +12591,7 @@ void GeXY_Curve::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeXY_Curve::open(std::ifstream& fp)
+void GeXY_Curve::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -13262,7 +13262,7 @@ int GeXY_Curve::scan(grow_tObject object)
   return 1;
 }
 
-int GeXY_Curve::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeXY_Curve::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
@@ -13355,7 +13355,7 @@ int GeXY_Curve::export_script(grow_tObject o, std::ofstream& fp, char* indentati
   return 1;
 }
 
-int GeXY_Curve::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeXY_Curve::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   glow_eDrawType ccolor = curve_color;
   glow_eDrawType fcolor = fill_color;
@@ -13659,7 +13659,7 @@ void GeTable::replace_attribute(char* from, char* to, int* cnt, int strict)
     GeDyn::replace_attribute(attribute[i], sizeof(attribute[0]), from, to, cnt, strict);
 }
 
-void GeTable::save(std::ofstream& fp)
+void GeTable::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Table) << '\n';
   for (int i = 0; i < TABLE_MAX_COL; i++)
@@ -13671,7 +13671,7 @@ void GeTable::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeTable::open(std::ifstream& fp)
+void GeTable::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -14565,7 +14565,7 @@ int GeTable::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeTable::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeTable::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute[0], ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Column1.Attribute\",\"" << attribute[0]
@@ -14678,7 +14678,7 @@ int GeTable::export_script(grow_tObject o, std::ofstream& fp, char* indentation,
   return 1;
 }
 
-int GeTable::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeTable::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   glow_sTableInfo info;
 
@@ -14860,7 +14860,7 @@ int GeStatusColor::set_color(grow_tObject object, glow_eDrawType color)
   return 1;
 }
 
-void GeStatusColor::save(std::ofstream& fp)
+void GeStatusColor::save(std::ostream& fp)
 {
   fp << int(ge_eSave_StatusColor) << '\n';
   fp << int(ge_eSave_StatusColor_attribute) << FSPACE << attribute << '\n';
@@ -14869,7 +14869,7 @@ void GeStatusColor::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeStatusColor::open(std::ifstream& fp)
+void GeStatusColor::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -15076,7 +15076,7 @@ int GeStatusColor::scan(grow_tObject object)
   return 1;
 }
 
-int GeStatusColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeStatusColor::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
   if (dyn->total_dyn_type1 & ge_mDynType1_Tone)
@@ -15102,7 +15102,7 @@ int GeStatusColor::export_script(grow_tObject o, std::ofstream& fp, char* indent
   return 1;
 }
 
-int GeStatusColor::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeStatusColor::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   glow_eDrawType jcolor = dyn->get_color1(object, nostatus_color);
   if (first)
@@ -15183,7 +15183,7 @@ void GePie::replace_attribute(char* from, char* to, int* cnt, int strict)
     GeDyn::replace_attribute(attribute[i], sizeof(attribute[0]), from, to, cnt, strict);
 }
 
-void GePie::save(std::ofstream& fp)
+void GePie::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Pie) << '\n';
   fp << int(ge_eSave_Pie_fix_range) << FSPACE << fix_range << '\n';
@@ -15192,7 +15192,7 @@ void GePie::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GePie::open(std::ifstream& fp)
+void GePie::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -15403,7 +15403,7 @@ int GePie::scan(grow_tObject object)
   return 1;
 }
 
-int GePie::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GePie::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   for (int j = 0; j < PIE_MAX_SECTORS; j++)
   {
@@ -15417,7 +15417,7 @@ int GePie::export_script(grow_tObject o, std::ofstream& fp, char* indentation, c
   return 1;
 }
 
-int GePie::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 1; }
+int GePie::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name) { return 1; }
 
 int GePie::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
@@ -15495,7 +15495,7 @@ void GeBarChart::replace_attribute(char* from, char* to, int* cnt, int strict)
     GeDyn::replace_attribute(attribute[i], sizeof(attribute[0]), from, to, cnt, strict);
 }
 
-void GeBarChart::save(std::ofstream& fp)
+void GeBarChart::save(std::ostream& fp)
 {
   fp << int(ge_eSave_BarChart) << '\n';
   fp << int(ge_eSave_BarChart_fix_range) << FSPACE << fix_range << '\n';
@@ -15504,7 +15504,7 @@ void GeBarChart::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeBarChart::open(std::ifstream& fp)
+void GeBarChart::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -15700,7 +15700,7 @@ int GeBarChart::scan(grow_tObject object)
   return 1;
 }
 
-int GeBarChart::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeBarChart::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   for (int j = 0; j < BARCHART_MAX_BARSEGMENTS; j++)
   {
@@ -15714,7 +15714,7 @@ int GeBarChart::export_script(grow_tObject o, std::ofstream& fp, char* indentati
   return 1;
 }
 
-int GeBarChart::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 1; }
+int GeBarChart::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name) { return 1; }
 
 int GeBarChart::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
@@ -15781,7 +15781,7 @@ void GeAxis::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(maxvalue_attr, sizeof(maxvalue_attr), from, to, cnt, strict);
 }
 
-void GeAxis::save(std::ofstream& fp)
+void GeAxis::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Axis) << '\n';
   fp << int(ge_eSave_Axis_minvalue_attr) << FSPACE << minvalue_attr << '\n';
@@ -15790,7 +15790,7 @@ void GeAxis::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeAxis::open(std::ifstream& fp)
+void GeAxis::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -16038,7 +16038,7 @@ int GeAxis::scan(grow_tObject object)
   return 1;
 }
 
-int GeAxis::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeAxis::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(minvalue_attr, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Axis.MinValueAttr\",\"" << minvalue_attr
@@ -16052,7 +16052,7 @@ int GeAxis::export_script(grow_tObject o, std::ofstream& fp, char* indentation, 
   return 1;
 }
 
-int GeAxis::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 1; }
+int GeAxis::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name) { return 1; }
 
 int GeAxis::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
@@ -16083,7 +16083,7 @@ void GeTimeoutColor::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeTimeoutColor::save(std::ofstream& fp)
+void GeTimeoutColor::save(std::ostream& fp)
 {
   fp << int(ge_eSave_TimeoutColor) << '\n';
   fp << int(ge_eSave_TimeoutColor_time) << FSPACE << time << '\n';
@@ -16091,7 +16091,7 @@ void GeTimeoutColor::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeTimeoutColor::open(std::ifstream& fp)
+void GeTimeoutColor::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -16398,7 +16398,7 @@ int GeTimeoutColor::scan(grow_tObject object)
   return 1;
 }
 
-int GeTimeoutColor::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeTimeoutColor::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!feq(time, 5.0))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "TimeoutColor.Time\"," << dtostr(time)
@@ -16533,14 +16533,14 @@ void GeHostObject::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(hostobject, sizeof(hostobject), from, to, cnt, strict);
 }
 
-void GeHostObject::save(std::ofstream& fp)
+void GeHostObject::save(std::ostream& fp)
 {
   fp << int(ge_eSave_HostObject) << '\n';
   fp << int(ge_eSave_HostObject_object) << FSPACE << hostobject << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeHostObject::open(std::ifstream& fp)
+void GeHostObject::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -16604,7 +16604,7 @@ int GeHostObject::connect(grow_tObject object, glow_sTraceData* trace_data, bool
   return 1;
 }
 
-int GeHostObject::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeHostObject::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(hostobject, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "HostObject.Object\",\"" << hostobject
@@ -16612,7 +16612,7 @@ int GeHostObject::export_script(grow_tObject o, std::ofstream& fp, char* indenta
   return 1;
 }
 
-int GeHostObject::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeHostObject::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   GeDyn* nodeclass_dyn;
 
@@ -16786,7 +16786,7 @@ void GeDigSound::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDigSound::save(std::ofstream& fp)
+void GeDigSound::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigSound) << '\n';
   fp << int(ge_eSave_DigSound_attribute) << FSPACE << attribute << '\n';
@@ -16798,7 +16798,7 @@ void GeDigSound::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigSound::open(std::ifstream& fp)
+void GeDigSound::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -17072,7 +17072,7 @@ void GeFillLevel::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeFillLevel::save(std::ofstream& fp)
+void GeFillLevel::save(std::ostream& fp)
 {
   fp << int(ge_eSave_FillLevel) << '\n';
   fp << int(ge_eSave_FillLevel_attribute) << FSPACE << attribute << '\n';
@@ -17085,7 +17085,7 @@ void GeFillLevel::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeFillLevel::open(std::ifstream& fp)
+void GeFillLevel::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -17292,7 +17292,7 @@ int GeFillLevel::scan(grow_tObject object)
   return 1;
 }
 
-int GeFillLevel::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeFillLevel::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "FillLevel.Attribute\",\"" << attribute
@@ -17325,7 +17325,7 @@ int GeFillLevel::export_script(grow_tObject o, std::ofstream& fp, char* indentat
   return 1;
 }
 
-int GeFillLevel::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeFillLevel::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   glow_eDrawType jcolor = dyn->get_color2(object, color);
   int sts;
@@ -17484,7 +17484,7 @@ void GeDigCommand::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDigCommand::save(std::ofstream& fp)
+void GeDigCommand::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigCommand) << '\n';
   fp << int(ge_eSave_DigCommand_attribute) << FSPACE << attribute << '\n';
@@ -17495,7 +17495,7 @@ void GeDigCommand::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigCommand::open(std::ifstream& fp)
+void GeDigCommand::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -17618,7 +17618,7 @@ int GeDigCommand::scan(grow_tObject object)
   return sts;
 }
 
-int GeDigCommand::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigCommand::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
@@ -17659,7 +17659,7 @@ int GeDigCommand::export_script(grow_tObject o, std::ofstream& fp, char* indenta
   return 1;
 }
 
-int GeDigCommand::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeDigCommand::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   return 1;
 }
@@ -17750,7 +17750,7 @@ void GeDigScript::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDigScript::save(std::ofstream& fp)
+void GeDigScript::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigScript) << '\n';
   fp << int(ge_eSave_DigScript_attribute) << FSPACE << attribute << '\n';
@@ -17769,7 +17769,7 @@ void GeDigScript::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigScript::open(std::ifstream& fp)
+void GeDigScript::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -17919,7 +17919,7 @@ int GeDigScript::scan(grow_tObject object)
   return sts;
 }
 
-int GeDigScript::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigScript::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigScript.Attribute\",\"" << attribute
@@ -17944,7 +17944,7 @@ int GeDigScript::export_script(grow_tObject o, std::ofstream& fp, char* indentat
   return 1;
 }
 
-int GeDigScript::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 1; }
+int GeDigScript::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name) { return 1; }
 
 int GeDigScript::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
@@ -18017,7 +18017,7 @@ void GeRefUpdate::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeRefUpdate::save(std::ofstream& fp)
+void GeRefUpdate::save(std::ostream& fp)
 {
   fp << int(ge_eSave_RefUpdate) << '\n';
   fp << int(ge_eSave_RefUpdate_attribute) << FSPACE << attribute << '\n';
@@ -18025,7 +18025,7 @@ void GeRefUpdate::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeRefUpdate::open(std::ifstream& fp)
+void GeRefUpdate::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -18333,7 +18333,7 @@ int GeRefUpdate::scan(grow_tObject object)
   return 1;
 }
 
-int GeRefUpdate::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeRefUpdate::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "RefUpdate.Attribute\",\"" << attribute
@@ -18344,7 +18344,7 @@ int GeRefUpdate::export_script(grow_tObject o, std::ofstream& fp, char* indentat
   return 1;
 }
 
-int GeRefUpdate::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 1; }
+int GeRefUpdate::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name) { return 1; }
 
 int GeRefUpdate::syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt)
 {
@@ -18408,14 +18408,14 @@ void GePopupMenu::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(ref_object, sizeof(ref_object), from, to, cnt, strict);
 }
 
-void GePopupMenu::save(std::ofstream& fp)
+void GePopupMenu::save(std::ostream& fp)
 {
   fp << int(ge_eSave_PopupMenu) << '\n';
   fp << int(ge_eSave_PopupMenu_ref_object) << FSPACE << ref_object << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GePopupMenu::open(std::ifstream& fp)
+void GePopupMenu::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -18630,7 +18630,7 @@ int GePopupMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GePopupMenu::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GePopupMenu::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(ref_object, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "PopupMenu.ReferenceObject\",\""
@@ -18638,7 +18638,7 @@ int GePopupMenu::export_script(grow_tObject o, std::ofstream& fp, char* indentat
   return 1;
 }
 
-int GePopupMenu::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GePopupMenu::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -18838,7 +18838,7 @@ void GeContextMenu::replace_attribute(char* from, char* to, int* cnt, int strict
   GeDyn::replace_attribute(mdata.item_action[4], sizeof(mdata.item_action[0]), from, to, cnt, strict);
 }
 
-void GeContextMenu::save(std::ofstream& fp)
+void GeContextMenu::save(std::ostream& fp)
 {
   fp << int(ge_eSave_ContextMenu) << '\n';
   fp << int(ge_eSave_ContextMenu_item_text1) << FSPACE << mdata.item_text[0] << '\n';
@@ -18864,7 +18864,7 @@ void GeContextMenu::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeContextMenu::open(std::ifstream& fp)
+void GeContextMenu::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -19004,7 +19004,7 @@ int GeContextMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeContextMenu::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeContextMenu::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   for (int i = 0; i < int(sizeof(mdata.item_text) / sizeof(mdata.item_text[0])); i++)
   {
@@ -19119,7 +19119,7 @@ void GeSetDig::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeSetDig::save(std::ofstream& fp)
+void GeSetDig::save(std::ostream& fp)
 {
   fp << int(ge_eSave_SetDig) << '\n';
   fp << int(ge_eSave_SetDig_attribute) << FSPACE << attribute << '\n';
@@ -19128,7 +19128,7 @@ void GeSetDig::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeSetDig::open(std::ifstream& fp)
+void GeSetDig::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -19287,7 +19287,7 @@ int GeSetDig::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeSetDig::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeSetDig::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
@@ -19315,7 +19315,7 @@ int GeSetDig::export_script(grow_tObject o, std::ofstream& fp, char* indentation
   return 1;
 }
 
-int GeSetDig::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeSetDig::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -19419,7 +19419,7 @@ void GeResetDig::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeResetDig::save(std::ofstream& fp)
+void GeResetDig::save(std::ostream& fp)
 {
   fp << int(ge_eSave_ResetDig) << '\n';
   fp << int(ge_eSave_ResetDig_attribute) << FSPACE << attribute << '\n';
@@ -19428,7 +19428,7 @@ void GeResetDig::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeResetDig::open(std::ifstream& fp)
+void GeResetDig::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -19563,7 +19563,7 @@ int GeResetDig::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeResetDig::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeResetDig::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
@@ -19591,7 +19591,7 @@ int GeResetDig::export_script(grow_tObject o, std::ofstream& fp, char* indentati
   return 1;
 }
 
-int GeResetDig::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeResetDig::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -19665,14 +19665,14 @@ void GeToggleDig::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeToggleDig::save(std::ofstream& fp)
+void GeToggleDig::save(std::ostream& fp)
 {
   fp << int(ge_eSave_ToggleDig) << '\n';
   fp << int(ge_eSave_ToggleDig_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeToggleDig::open(std::ifstream& fp)
+void GeToggleDig::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -19844,7 +19844,7 @@ int GeToggleDig::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeToggleDig::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeToggleDig::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ToggleDig.Attribute\",\"" << attribute
@@ -19852,7 +19852,7 @@ int GeToggleDig::export_script(grow_tObject o, std::ofstream& fp, char* indentat
   return 1;
 }
 
-int GeToggleDig::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeToggleDig::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -19926,14 +19926,14 @@ void GeStoDig::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeStoDig::save(std::ofstream& fp)
+void GeStoDig::save(std::ostream& fp)
 {
   fp << int(ge_eSave_StoDig) << '\n';
   fp << int(ge_eSave_StoDig_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeStoDig::open(std::ifstream& fp)
+void GeStoDig::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -20013,7 +20013,7 @@ int GeStoDig::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeStoDig::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeStoDig::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "StoDig.Attribute\",\"" << attribute
@@ -20021,7 +20021,7 @@ int GeStoDig::export_script(grow_tObject o, std::ofstream& fp, char* indentation
   return 1;
 }
 
-int GeStoDig::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeStoDig::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -20081,14 +20081,14 @@ void GeCommand::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(command, sizeof(command), from, to, cnt, strict);
 }
 
-void GeCommand::save(std::ofstream& fp)
+void GeCommand::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Command) << '\n';
   fp << int(ge_eSave_Command_command) << FSPACE << command << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeCommand::open(std::ifstream& fp)
+void GeCommand::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -20159,7 +20159,7 @@ int GeCommand::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeCommand::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeCommand::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(command, ""))
   {
@@ -20175,7 +20175,7 @@ int GeCommand::export_script(grow_tObject o, std::ofstream& fp, char* indentatio
   return 1;
 }
 
-int GeCommand::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeCommand::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -20234,14 +20234,14 @@ void GeCommandDoubleClick::replace_attribute(char* from, char* to, int* cnt, int
   GeDyn::replace_attribute(command, sizeof(command), from, to, cnt, strict);
 }
 
-void GeCommandDoubleClick::save(std::ofstream& fp)
+void GeCommandDoubleClick::save(std::ostream& fp)
 {
   fp << int(ge_eSave_CommandDC) << '\n';
   fp << int(ge_eSave_CommandDC_command) << FSPACE << command << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeCommandDoubleClick::open(std::ifstream& fp)
+void GeCommandDoubleClick::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -20307,7 +20307,7 @@ int GeCommandDoubleClick::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeCommandDoubleClick::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeCommandDoubleClick::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(command, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "CommandDoubleClick.Command\",\"" << command
@@ -20380,7 +20380,7 @@ void GeScript::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(script, sizeof(script), from, to, cnt, strict);
 }
 
-void GeScript::save(std::ofstream& fp)
+void GeScript::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Script) << '\n';
   fp << int(ge_eSave_Script_trigger_event) << FSPACE << trigger_event << '\n';
@@ -20398,7 +20398,7 @@ void GeScript::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeScript::open(std::ifstream& fp)
+void GeScript::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -20541,7 +20541,7 @@ int GeScript::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeScript::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeScript::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (trigger_event != ge_eScriptTriggerEvent_ClickMB1)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Script.TriggerEvent\"," << trigger_event
@@ -20611,7 +20611,7 @@ void GeConfirm::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeConfirm::save(std::ofstream& fp)
+void GeConfirm::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Confirm) << '\n';
   fp << int(ge_eSave_Confirm_text) << FSPACE << text << '\n';
@@ -20620,7 +20620,7 @@ void GeConfirm::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeConfirm::open(std::ifstream& fp)
+void GeConfirm::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -20738,7 +20738,7 @@ int GeConfirm::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeConfirm::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeConfirm::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(text, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Confirm.Text\",\"" << text << "\");"
@@ -20751,7 +20751,7 @@ int GeConfirm::export_script(grow_tObject o, std::ofstream& fp, char* indentatio
   return 1;
 }
 
-int GeConfirm::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeConfirm::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -20833,7 +20833,7 @@ void GeIncrAnalog::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeIncrAnalog::save(std::ofstream& fp)
+void GeIncrAnalog::save(std::ostream& fp)
 {
   fp << int(ge_eSave_IncrAnalog) << '\n';
   fp << int(ge_eSave_IncrAnalog_attribute) << FSPACE << attribute << '\n';
@@ -20843,7 +20843,7 @@ void GeIncrAnalog::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeIncrAnalog::open(std::ifstream& fp)
+void GeIncrAnalog::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -20966,7 +20966,7 @@ int GeIncrAnalog::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeIncrAnalog::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeIncrAnalog::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "IncrAnalog.Attribute\",\"" << attribute
@@ -20983,7 +20983,7 @@ int GeIncrAnalog::export_script(grow_tObject o, std::ofstream& fp, char* indenta
   return 1;
 }
 
-int GeIncrAnalog::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeIncrAnalog::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -21048,14 +21048,14 @@ void GeRadioButton::replace_attribute(char* from, char* to, int* cnt, int strict
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeRadioButton::save(std::ofstream& fp)
+void GeRadioButton::save(std::ostream& fp)
 {
   fp << int(ge_eSave_RadioButton) << '\n';
   fp << int(ge_eSave_RadioButton_attribute) << FSPACE << attribute << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeRadioButton::open(std::ifstream& fp)
+void GeRadioButton::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -21253,7 +21253,7 @@ int GeRadioButton::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeRadioButton::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeRadioButton::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "RadioButton.Attribute\",\"" << attribute
@@ -21261,7 +21261,7 @@ int GeRadioButton::export_script(grow_tObject o, std::ofstream& fp, char* indent
   return 1;
 }
 
-int GeRadioButton::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeRadioButton::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -21315,14 +21315,14 @@ void GeTipText::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeTipText::save(std::ofstream& fp)
+void GeTipText::save(std::ostream& fp)
 {
   fp << int(ge_eSave_TipText) << '\n';
   fp << int(ge_eSave_TipText_text) << FSPACE << text << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeTipText::open(std::ifstream& fp)
+void GeTipText::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -21443,7 +21443,7 @@ int GeTipText::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeTipText::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeTipText::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(text, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "ToolTip.Text\",\"" << text << "\");"
@@ -21451,7 +21451,7 @@ int GeTipText::export_script(grow_tObject o, std::ofstream& fp, char* indentatio
   return 1;
 }
 
-int GeTipText::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeTipText::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -21515,7 +21515,7 @@ int GeHelp::get_transtab(char** tt)
   return 0;
 }
 
-void GeHelp::save(std::ofstream& fp)
+void GeHelp::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Help) << '\n';
   fp << int(ge_eSave_Help_topic) << FSPACE << topic << '\n';
@@ -21523,7 +21523,7 @@ void GeHelp::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeHelp::open(std::ifstream& fp)
+void GeHelp::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -21601,7 +21601,7 @@ int GeHelp::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeHelp::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeHelp::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(topic, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Help.Topic\",\"" << topic << "\");" << '\n';
@@ -21611,7 +21611,7 @@ int GeHelp::export_script(grow_tObject o, std::ofstream& fp, char* indentation, 
   return 1;
 }
 
-int GeHelp::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeHelp::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   char command[200];
 
@@ -21694,14 +21694,14 @@ void GeOpenGraph::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(graph_object, sizeof(graph_object), from, to, cnt, strict);
 }
 
-void GeOpenGraph::save(std::ofstream& fp)
+void GeOpenGraph::save(std::ostream& fp)
 {
   fp << int(ge_eSave_OpenGraph) << '\n';
   fp << int(ge_eSave_OpenGraph_graph_object) << FSPACE << graph_object << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeOpenGraph::open(std::ifstream& fp)
+void GeOpenGraph::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -21802,7 +21802,7 @@ int GeOpenGraph::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeOpenGraph::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeOpenGraph::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(graph_object, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OpenGraph.GraphObject\",\"" << graph_object
@@ -21810,7 +21810,7 @@ int GeOpenGraph::export_script(grow_tObject o, std::ofstream& fp, char* indentat
   return 1;
 }
 
-int GeOpenGraph::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeOpenGraph::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   char command[200];
 
@@ -21903,14 +21903,14 @@ int GeOpenURL::get_transtab(char** tt)
   return 0;
 }
 
-void GeOpenURL::save(std::ofstream& fp)
+void GeOpenURL::save(std::ostream& fp)
 {
   fp << int(ge_eSave_OpenURL) << '\n';
   fp << int(ge_eSave_OpenURL_url) << FSPACE << url << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeOpenURL::open(std::ifstream& fp)
+void GeOpenURL::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -21981,14 +21981,14 @@ int GeOpenURL::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeOpenURL::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeOpenURL::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(url, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OpenURL.URL\",\"" << url << "\");" << '\n';
   return 1;
 }
 
-int GeOpenURL::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeOpenURL::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   char command[220];
   sprintf(command, "open url \"%s\"", url);
@@ -22057,7 +22057,7 @@ void GeInputFocus::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeInputFocus::save(std::ofstream& fp)
+void GeInputFocus::save(std::ostream& fp)
 {
   fp << int(ge_eSave_InputFocus) << '\n';
   fp << int(ge_eSave_InputFocus_initial_focus) << FSPACE << initial_focus << '\n';
@@ -22067,7 +22067,7 @@ void GeInputFocus::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeInputFocus::open(std::ifstream& fp)
+void GeInputFocus::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -22466,7 +22466,7 @@ int GeInputFocus::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeInputFocus::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeInputFocus::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (initial_focus != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "InputFocus.InitialFocus\"," << initial_focus
@@ -22530,13 +22530,13 @@ void GeCloseGraph::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeCloseGraph::save(std::ofstream& fp)
+void GeCloseGraph::save(std::ostream& fp)
 {
   fp << int(ge_eSave_CloseGraph) << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeCloseGraph::open(std::ifstream& fp)
+void GeCloseGraph::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -22599,7 +22599,7 @@ int GeCloseGraph::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeCloseGraph::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeCloseGraph::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -22688,7 +22688,7 @@ void GeSlider::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(release_attr, sizeof(release_attr), from, to, cnt, strict);
 }
 
-void GeSlider::save(std::ofstream& fp)
+void GeSlider::save(std::ostream& fp)
 {
   fp << int(ge_eSave_Slider) << '\n';
   fp << int(ge_eSave_Slider_attribute) << FSPACE << attribute << '\n';
@@ -22699,7 +22699,7 @@ void GeSlider::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeSlider::open(std::ifstream& fp)
+void GeSlider::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -23164,7 +23164,7 @@ int GeSlider::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeSlider::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeSlider::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "Slider.Attribute\",\"" << attribute
@@ -23184,7 +23184,7 @@ int GeSlider::export_script(grow_tObject o, std::ofstream& fp, char* indentation
   return 1;
 }
 
-int GeSlider::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeSlider::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   double min_pos, max_pos, min_value, max_value;
@@ -23309,7 +23309,7 @@ void GeFastCurve::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(fast_object, sizeof(fast_object), from, to, cnt, strict);
 }
 
-void GeFastCurve::save(std::ofstream& fp)
+void GeFastCurve::save(std::ostream& fp)
 {
   fp << int(ge_eSave_FastCurve) << '\n';
   fp << int(ge_eSave_FastCurve_fast_object) << FSPACE << fast_object << '\n';
@@ -23318,7 +23318,7 @@ void GeFastCurve::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeFastCurve::open(std::ifstream& fp)
+void GeFastCurve::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -23853,7 +23853,7 @@ void GeDsTrend::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(mark2_attr, sizeof(mark2_attr), from, to, cnt, strict);
 }
 
-void GeDsTrend::save(std::ofstream& fp)
+void GeDsTrend::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DsTrend) << '\n';
   fp << int(ge_eSave_DsTrend_dstrend_object1) << FSPACE << dstrend_object1 << '\n';
@@ -23870,7 +23870,7 @@ void GeDsTrend::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDsTrend::open(std::ifstream& fp)
+void GeDsTrend::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -24538,7 +24538,7 @@ void GeDsTrendCurve::replace_attribute(char* from, char* to, int* cnt, int stric
   GeDyn::replace_attribute(mark2_attr, sizeof(mark2_attr), from, to, cnt, strict);
 }
 
-void GeDsTrendCurve::save(std::ofstream& fp)
+void GeDsTrendCurve::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DsTrendCurve) << '\n';
   fp << int(ge_eSave_DsTrendCurve_dstrend_object) << FSPACE << dstrend_object << '\n';
@@ -24554,7 +24554,7 @@ void GeDsTrendCurve::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDsTrendCurve::open(std::ifstream& fp)
+void GeDsTrendCurve::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -25200,7 +25200,7 @@ void GeSevHist::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(mark2_attr, sizeof(mark2_attr), from, to, cnt, strict);
 }
 
-void GeSevHist::save(std::ofstream& fp)
+void GeSevHist::save(std::ostream& fp)
 {
   fp << int(ge_eSave_SevHist) << '\n';
   fp << int(ge_eSave_SevHist_sevhist_object1) << FSPACE << sevhist_object1 << '\n';
@@ -25224,7 +25224,7 @@ void GeSevHist::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeSevHist::open(std::ifstream& fp)
+void GeSevHist::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -26010,7 +26010,7 @@ void GeDigTransparency::replace_attribute(char* from, char* to, int* cnt, int st
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeDigTransparency::save(std::ofstream& fp)
+void GeDigTransparency::save(std::ostream& fp)
 {
   fp << int(ge_eSave_DigTransparency) << '\n';
   fp << int(ge_eSave_DigTransparency_attribute) << FSPACE << attribute << '\n';
@@ -26020,7 +26020,7 @@ void GeDigTransparency::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeDigTransparency::open(std::ifstream& fp)
+void GeDigTransparency::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -26164,7 +26164,7 @@ int GeDigTransparency::scan(grow_tObject object)
   return 1;
 }
 
-int GeDigTransparency::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeDigTransparency::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "DigTransparency.Attribute\",\"" << attribute
@@ -26244,7 +26244,7 @@ void GeAnalogTransparency::replace_attribute(char* from, char* to, int* cnt, int
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeAnalogTransparency::save(std::ofstream& fp)
+void GeAnalogTransparency::save(std::ostream& fp)
 {
   fp << int(ge_eSave_AnalogTransparency) << '\n';
   fp << int(ge_eSave_AnalogTransparency_attribute) << FSPACE << attribute << '\n';
@@ -26253,7 +26253,7 @@ void GeAnalogTransparency::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeAnalogTransparency::open(std::ifstream& fp)
+void GeAnalogTransparency::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -26351,7 +26351,7 @@ int GeAnalogTransparency::scan(grow_tObject object)
   return 1;
 }
 
-int GeAnalogTransparency::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeAnalogTransparency::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogTransparency.Attribute\",\""
@@ -26419,7 +26419,7 @@ int GeUnitConvert::get_transtab(char** tt)
   return 0;
 }
 
-void GeUnitConvert::save(std::ofstream& fp)
+void GeUnitConvert::save(std::ostream& fp)
 {
   fp << int(ge_eSave_UnitConvert) << '\n';
   fp << int(ge_eSave_UnitConvert_entity) << FSPACE << entity << '\n';
@@ -26428,7 +26428,7 @@ void GeUnitConvert::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeUnitConvert::open(std::ifstream& fp)
+void GeUnitConvert::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -26470,7 +26470,7 @@ void GeUnitConvert::open(std::ifstream& fp)
   }
 }
 
-int GeUnitConvert::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeUnitConvert::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (entity != 0)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "UnitConvert.Entity\"," << entity << ");"
@@ -26568,7 +26568,7 @@ int GePulldownMenu::get_transtab(char** tt)
   return 0;
 }
 
-void GePulldownMenu::save(std::ofstream& fp)
+void GePulldownMenu::save(std::ostream& fp)
 {
   int b_mask = ge_mInstance_1;
 
@@ -26589,7 +26589,7 @@ void GePulldownMenu::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GePulldownMenu::open(std::ifstream& fp)
+void GePulldownMenu::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -27471,7 +27471,7 @@ int GePulldownMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GePulldownMenu::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GePulldownMenu::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char pref[200];
 
@@ -27498,7 +27498,7 @@ int GePulldownMenu::export_script(grow_tObject o, std::ofstream& fp, char* inden
   return 1;
 }
 
-int GePulldownMenu::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GePulldownMenu::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -27660,7 +27660,7 @@ void GeOptionMenu::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeOptionMenu::save(std::ofstream& fp)
+void GeOptionMenu::save(std::ostream& fp)
 {
   fp << int(ge_eSave_OptionMenu) << '\n';
   fp << int(ge_eSave_OptionMenu_attribute) << FSPACE << attribute << '\n';
@@ -27682,7 +27682,7 @@ void GeOptionMenu::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeOptionMenu::open(std::ifstream& fp)
+void GeOptionMenu::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -28458,7 +28458,7 @@ int GeOptionMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeOptionMenu::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeOptionMenu::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (optionmenu_type != ge_eOptionMenuType_Static)
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "OptionMenu.Type\"," << optionmenu_type
@@ -28506,7 +28506,7 @@ int GeOptionMenu::export_script(grow_tObject o, std::ofstream& fp, char* indenta
   return 1;
 }
 
-int GeOptionMenu::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeOptionMenu::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -28638,7 +28638,7 @@ void GeAnalogText::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeAnalogText::save(std::ofstream& fp)
+void GeAnalogText::save(std::ostream& fp)
 {
   fp << int(ge_eSave_AnalogText) << '\n';
   fp << int(ge_eSave_AnalogText_super) << '\n';
@@ -28646,7 +28646,7 @@ void GeAnalogText::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeAnalogText::open(std::ifstream& fp)
+void GeAnalogText::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -28682,7 +28682,7 @@ void GeAnalogText::open(std::ifstream& fp)
   }
 }
 
-int GeAnalogText::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeAnalogText::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(attribute, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "AnalogText.Attribute\",\"" << attribute
@@ -28709,7 +28709,7 @@ int GeAnalogText::export_script(grow_tObject o, std::ofstream& fp, char* indenta
   return 1;
 }
 
-int GeAnalogText::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeAnalogText::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -28832,7 +28832,7 @@ void GeSetValue::replace_attribute(char* from, char* to, int* cnt, int strict)
   GeDyn::replace_attribute(attribute, sizeof(attribute), from, to, cnt, strict);
 }
 
-void GeSetValue::save(std::ofstream& fp)
+void GeSetValue::save(std::ostream& fp)
 {
   fp << int(ge_eSave_SetValue) << '\n';
   fp << int(ge_eSave_SetValue_attribute) << FSPACE << attribute << '\n';
@@ -28842,7 +28842,7 @@ void GeSetValue::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeSetValue::open(std::ifstream& fp)
+void GeSetValue::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -28961,7 +28961,7 @@ int GeSetValue::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeSetValue::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeSetValue::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   char name[80];
 
@@ -28991,7 +28991,7 @@ int GeSetValue::export_script(grow_tObject o, std::ofstream& fp, char* indentati
   return 1;
 }
 
-int GeSetValue::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeSetValue::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   if (first)
     fp << "      ";
@@ -29078,7 +29078,7 @@ void GeMethodToolbar::replace_attribute(char* from, char* to, int* cnt, int stri
   GeDyn::replace_attribute(method_object, sizeof(method_object), from, to, cnt, strict);
 }
 
-void GeMethodToolbar::save(std::ofstream& fp)
+void GeMethodToolbar::save(std::ostream& fp)
 {
   fp << int(ge_eSave_MethodToolbar) << '\n';
   fp << int(ge_eSave_MethodToolbar_method_object) << FSPACE << method_object << '\n';
@@ -29086,7 +29086,7 @@ void GeMethodToolbar::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeMethodToolbar::open(std::ifstream& fp)
+void GeMethodToolbar::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -29250,7 +29250,7 @@ int GeMethodToolbar::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeMethodToolbar::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeMethodToolbar::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(method_object, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodToolbar.Object\",\"" << method_object
@@ -29261,7 +29261,7 @@ int GeMethodToolbar::export_script(grow_tObject o, std::ofstream& fp, char* inde
   return 1;
 }
 
-int GeMethodToolbar::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeMethodToolbar::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   return 1;
 }
@@ -29324,7 +29324,7 @@ void GeMethodPulldownMenu::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeMethodPulldownMenu::save(std::ofstream& fp)
+void GeMethodPulldownMenu::save(std::ostream& fp)
 {
   fp << int(ge_eSave_MethodPulldownMenu) << '\n';
   fp << int(ge_eSave_MethodPulldownMenu_method_object) << FSPACE << method_object << '\n';
@@ -29332,7 +29332,7 @@ void GeMethodPulldownMenu::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeMethodPulldownMenu::open(std::ifstream& fp)
+void GeMethodPulldownMenu::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -29702,7 +29702,7 @@ int GeMethodPulldownMenu::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeMethodPulldownMenu::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeMethodPulldownMenu::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(method_object, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "MethodPulldownMenu.Object\",\""
@@ -29713,7 +29713,7 @@ int GeMethodPulldownMenu::export_script(grow_tObject o, std::ofstream& fp, char*
   return 1;
 }
 
-int GeMethodPulldownMenu::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeMethodPulldownMenu::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   return 1;
 }
@@ -29768,14 +29768,14 @@ void GeCatchSignal::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeCatchSignal::save(std::ofstream& fp)
+void GeCatchSignal::save(std::ostream& fp)
 {
   fp << int(ge_eSave_CatchSignal) << '\n';
   fp << int(ge_eSave_CatchSignal_signal_name) << FSPACE << signal_name << '\n';
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeCatchSignal::open(std::ifstream& fp)
+void GeCatchSignal::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -29841,7 +29841,7 @@ int GeCatchSignal::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeCatchSignal::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeCatchSignal::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(signal_name, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "CatchSignal.SignalName\",\"" << signal_name
@@ -29849,7 +29849,7 @@ int GeCatchSignal::export_script(grow_tObject o, std::ofstream& fp, char* indent
   return 1;
 }
 
-int GeCatchSignal::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeCatchSignal::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   return 1;
 }
@@ -29895,7 +29895,7 @@ void GeEmitSignal::get_attributes(attr_sItem* attrinfo, int* item_count)
   *item_count = i;
 }
 
-void GeEmitSignal::save(std::ofstream& fp)
+void GeEmitSignal::save(std::ostream& fp)
 {
   fp << int(ge_eSave_EmitSignal) << '\n';
   fp << int(ge_eSave_EmitSignal_signal_name) << FSPACE << signal_name << '\n';
@@ -29903,7 +29903,7 @@ void GeEmitSignal::save(std::ofstream& fp)
   fp << int(ge_eSave_End) << '\n';
 }
 
-void GeEmitSignal::open(std::ifstream& fp)
+void GeEmitSignal::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -29980,7 +29980,7 @@ int GeEmitSignal::action(grow_tObject object, glow_tEvent event)
   return 1;
 }
 
-int GeEmitSignal::export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix)
+int GeEmitSignal::export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix)
 {
   if (!streq(signal_name, ""))
     fp << indentation << "SetObjectAttribute(id,\"" << prefix << "EmitSignal.SignalName\",\"" << signal_name
@@ -29991,7 +29991,7 @@ int GeEmitSignal::export_script(grow_tObject o, std::ofstream& fp, char* indenta
   return 1;
 }
 
-int GeEmitSignal::export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name)
+int GeEmitSignal::export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name)
 {
   return 1;
 }

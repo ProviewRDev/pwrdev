@@ -66,7 +66,7 @@ GrowScriptModule::GrowScriptModule(GrowCtx* glow_ctx, const char* name, double x
 
 GrowScriptModule::~GrowScriptModule() {}
 
-void GrowScriptModule::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowScriptModule::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowScriptModule) << '\n';
   fp << int(glow_eSave_GrowScriptModule_module_index) << FSPACE << module_index << '\n';
@@ -108,7 +108,7 @@ void GrowScriptModule::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowScriptModule::open(std::ifstream& fp)
+void GrowScriptModule::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

@@ -37,6 +37,8 @@
 #ifndef ge_graph_h
 #define ge_graph_h
 
+#include <iosfwd>
+
 /* ge_graph.h -- Simple graphic editor */
 
 #include "co_lng.h"
@@ -1179,11 +1181,11 @@ public:
     \param object	Object.
     \param cnt		Index for javabean name.
   */
-  int export_GejavaObjectTraceAttr(std::ofstream& fp, grow_tObject object, int cnt);
+  int export_GejavaObjectTraceAttr(std::ostream& fp, grow_tObject object, int cnt);
 
   //! Export java code for an object's dynamics and annotations in a java frame.
   //! Needs update.
-  int export_ObjectTraceAttr(std::ofstream& fp, grow_tObject object, int cnt);
+  int export_ObjectTraceAttr(std::ostream& fp, grow_tObject object, int cnt);
 
   //! Export java code for dynamics of a bar object.
   /*!
@@ -1191,7 +1193,7 @@ public:
     \param object	Object.
     \param cnt		Index for javabean name.
   */
-  int export_BarTraceAttr(std::ofstream& fp, grow_tObject object, int cnt);
+  int export_BarTraceAttr(std::ostream& fp, grow_tObject object, int cnt);
 
   //! Export java code for dynamics of a trend object.
   /*!
@@ -1199,7 +1201,7 @@ public:
     \param object	Object.
     \param cnt		Index for javabean name.
   */
-  int export_TrendTraceAttr(std::ofstream& fp, grow_tObject object, int cnt);
+  int export_TrendTraceAttr(std::ostream& fp, grow_tObject object, int cnt);
 
   //! Export java code for dynamics of a pie object.
   /*!
@@ -1207,7 +1209,7 @@ public:
     \param object	Object.
     \param cnt		Index for javabean name.
   */
-  int export_PieTraceAttr(std::ofstream& fp, grow_tObject object, int cnt);
+  int export_PieTraceAttr(std::ostream& fp, grow_tObject object, int cnt);
 
   //! Export java code for dynamics of a barchart object.
   /*!
@@ -1215,7 +1217,7 @@ public:
     \param object	Object.
     \param cnt		Index for javabean name.
   */
-  int export_BarChartTraceAttr(std::ofstream& fp, grow_tObject object, int cnt);
+  int export_BarChartTraceAttr(std::ostream& fp, grow_tObject object, int cnt);
 
   //! Export java code for dynamics of a table object.
   /*!
@@ -1223,7 +1225,7 @@ public:
     \param object	Object.
     \param cnt		Index for javabean name.
   */
-  int export_TableTraceAttr(std::ofstream& fp, grow_tObject object, int cnt);
+  int export_TableTraceAttr(std::ostream& fp, grow_tObject object, int cnt);
 
   //! Export java code for dynamics of a slider object.
   /*!
@@ -1231,7 +1233,7 @@ public:
     \param object	Object.
     \param cnt		Index for javabean name.
   */
-  int export_SliderTraceAttr(std::ofstream& fp, grow_tObject object, int cnt);
+  int export_SliderTraceAttr(std::ostream& fp, grow_tObject object, int cnt);
 
   //! Export java for a ge graph.
   /*!
@@ -1247,7 +1249,7 @@ public:
     \param fp		Output file.
     \param nodeclass	Nodeclass to export.
   */
-  int export_gejava_nodeclass(std::ofstream& fp, grow_tNodeClass nodeclass);
+  int export_gejava_nodeclass(std::ostream& fp, grow_tNodeClass nodeclass);
 
   //! Set java class name for the graph
   /*! \param name	Java class name. */

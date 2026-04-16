@@ -109,7 +109,7 @@ void GlowArrow::nav_zoom()
   p2.nav_zoom();
 }
 
-void GlowArrow::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowArrow::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_Arrow) << '\n';
   fp << int(glow_eSave_Arrow_arrow_width) << FSPACE << arrow_width << '\n';
@@ -125,7 +125,7 @@ void GlowArrow::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowArrow::open(std::ifstream& fp)
+void GlowArrow::open(std::istream& fp)
 {
   int type;
   int end_found = 0;

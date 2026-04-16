@@ -61,9 +61,9 @@ GrowScrollBar::~GrowScrollBar()
   draw();
 }
 
-void GrowScrollBar::save(std::ofstream& fp, glow_eSaveMode mode) {}
+void GrowScrollBar::save(std::ostream& fp, glow_eSaveMode mode) {}
 
-void GrowScrollBar::open(std::ifstream& fp) {}
+void GrowScrollBar::open(std::istream& fp) {}
 
 void GrowScrollBar::set_highlight(int on)
 {
@@ -202,7 +202,7 @@ void GrowScrollBar::set_range(double min, double max)
 }
 
 void GrowScrollBar::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                    int node_cnt, int in_nc, std::ofstream& fp)
+                                    int node_cnt, int in_nc, std::ostream& fp)
 {
 }
 

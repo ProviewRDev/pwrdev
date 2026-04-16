@@ -37,6 +37,8 @@
 #ifndef ge_dyn_h
 #define ge_dyn_h
 
+#include <iosfwd>
+
 /* ge_dyn.h -- Ge predefined dynamics and actions */
 
 #include "glow_keyboardapi.h"
@@ -1032,10 +1034,10 @@ public:
   int scan(grow_tObject object);
 
   //! Save dynamic data to file.
-  void save(std::ofstream& fp);
+  void save(std::ostream& fp);
 
   //! Open dynamic data from file.
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Execute action for an event.
   int action(grow_tObject object, glow_tEvent event);
@@ -1067,9 +1069,9 @@ public:
   void* get_p();
   void set_p(grow_tObject object, void* p);
   void update();
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  void export_java(grow_tObject object, std::ofstream& fp, char* var_name);
-  void export_java_object(grow_tObject object, std::ofstream& fp, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  void export_java(grow_tObject object, std::ostream& fp, char* var_name);
+  void export_java_object(grow_tObject object, std::ostream& fp, char* var_name);
   GeDynElem* create_dyn1_element(int mask, int instance);
   GeDynElem* create_dyn2_element(int mask, int instance);
   GeDynElem* create_action1_element(int mask, int instance);
@@ -1162,11 +1164,11 @@ public:
 
   //! Save dynamic data to file.
   /*! \param fp		Output file. */
-  virtual void save(std::ofstream& fp) {}
+  virtual void save(std::ostream& fp) {}
 
   //! Open dynamic data from file.
   /*! \param fp		Input file. */
-  virtual void open(std::ifstream& fp) {}
+  virtual void open(std::istream& fp) {}
 
   //! Execute action for an event.
   /*!
@@ -1200,7 +1202,7 @@ public:
 
   virtual void update() {}
 
-  virtual int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix) { return 1; }
+  virtual int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix) { return 1; }
 
   //! Export java code for the dynamic element.
   /*!
@@ -1209,7 +1211,7 @@ public:
     \param first	First element in element list.
     \param var_name	Name of objects java variable name.
   */
-  virtual int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name) { return 0; }
+  virtual int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name) { return 0; }
 
   //! Replace an attribute string
   /*!
@@ -1247,8 +1249,8 @@ public:
   GeDigLowColor(GeDyn* e_dyn);
   GeDigLowColor(const GeDigLowColor& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
@@ -1256,8 +1258,8 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1281,8 +1283,8 @@ public:
   GeDigColor(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeDigColor(const GeDigColor& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
@@ -1290,8 +1292,8 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1315,16 +1317,16 @@ public:
   GeDigBackgroundColor(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeDigBackgroundColor(const GeDigBackgroundColor& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1348,15 +1350,15 @@ public:
   GeDigWarning(GeDyn* e_dyn);
   GeDigWarning(const GeDigWarning& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1380,15 +1382,15 @@ public:
   GeDigError(GeDyn* e_dyn);
   GeDigError(const GeDigError& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1414,16 +1416,16 @@ public:
   GeDigFlash(GeDyn* e_dyn);
   GeDigFlash(const GeDigFlash& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1448,15 +1450,15 @@ public:
   GeInvisible(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeInvisible(const GeInvisible& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1480,15 +1482,15 @@ public:
   GeDigBorder(GeDyn* e_dyn);
   GeDigBorder(const GeDigBorder& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1512,15 +1514,15 @@ public:
   GeDigTextColor(GeDyn* e_dyn);
   GeDigTextColor(const GeDigTextColor& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1546,15 +1548,15 @@ public:
   GeDigText(const GeDigText& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1585,16 +1587,16 @@ public:
   GeValue(const GeValue& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void reset(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1620,14 +1622,14 @@ public:
   GeValueInput(GeDyn* e_dyn);
   GeValueInput(const GeValueInput& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int action(grow_tObject object, glow_tEvent event);
   int change_value(grow_tObject object, char* text);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
@@ -1657,16 +1659,16 @@ public:
   GeAnalogColor(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeAnalogColor(const GeAnalogColor& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1693,15 +1695,15 @@ public:
   GeRotate(GeDyn* e_dyn);
   GeRotate(const GeRotate& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1754,15 +1756,15 @@ public:
   GeMove(GeDyn* e_dyn);
   GeMove(const GeMove& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1784,15 +1786,15 @@ public:
   GeAnalogShift(GeDyn* e_dyn);
   GeAnalogShift(const GeAnalogShift& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1815,15 +1817,15 @@ public:
   GeDigShift(GeDyn* e_dyn);
   GeDigShift(const GeDigShift& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1846,14 +1848,14 @@ public:
   GeDigLowShift(GeDyn* e_dyn);
   GeDigLowShift(const GeDigLowShift& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1894,15 +1896,15 @@ public:
   GeDigFourShift(GeDyn* e_dyn);
   GeDigFourShift(const GeDigFourShift& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1929,15 +1931,15 @@ public:
   GeScrollingText(GeDyn* e_dyn);
   GeScrollingText(const GeScrollingText& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1963,15 +1965,15 @@ public:
   GeAnimation(GeDyn* e_dyn);
   GeAnimation(const GeAnimation& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -1988,8 +1990,8 @@ public:
       : GeDynElem(x.dyn, x.dyn_type1, x.dyn_type2, x.action_type1, x.action_type2, x.prio)
   {
   }
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
@@ -2017,16 +2019,16 @@ public:
   GeStatusColor(GeDyn* e_dyn);
   GeStatusColor(const GeStatusColor& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int set_color(grow_tObject object, glow_eDrawType color);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2059,15 +2061,15 @@ public:
   GeFillLevel(GeDyn* e_dyn);
   GeFillLevel(const GeFillLevel& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2080,13 +2082,13 @@ public:
   GeHostObject(GeDyn* e_dyn);
   GeHostObject(const GeHostObject& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2114,11 +2116,11 @@ public:
   GeDigSound(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeDigSound(const GeDigSound& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
+  void save(std::ostream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
@@ -2138,14 +2140,14 @@ public:
   {
   }
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
 };
 
 //! Set the supplied backgroundcolor when the value is high.
@@ -2169,15 +2171,15 @@ public:
   GeDigSwap(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeDigSwap(const GeDigSwap& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2190,13 +2192,13 @@ public:
   GePopupMenu(GeDyn* e_dyn);
   GePopupMenu(const GePopupMenu& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2209,12 +2211,12 @@ public:
   GeContextMenu(GeDyn* e_dyn);
   GeContextMenu(const GeContextMenu& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2228,13 +2230,13 @@ public:
   GeSetDig(const GeSetDig& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2248,13 +2250,13 @@ public:
   GeResetDig(const GeResetDig& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2268,13 +2270,13 @@ public:
   GeToggleDig(const GeToggleDig& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2288,13 +2290,13 @@ public:
   GeStoDig(const GeStoDig& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2308,12 +2310,12 @@ public:
   GeCommand(const GeCommand& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2327,11 +2329,11 @@ public:
   GeCommandDoubleClick(const GeCommandDoubleClick& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2348,11 +2350,11 @@ public:
   GeScript(const GeScript& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2367,11 +2369,11 @@ public:
   GeConfirm(GeDyn* e_dyn);
   GeConfirm(const GeConfirm& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2387,13 +2389,13 @@ public:
   GeIncrAnalog(GeDyn* e_dyn);
   GeIncrAnalog(const GeIncrAnalog& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2414,16 +2416,16 @@ public:
   GeRadioButton(GeDyn* e_dyn);
   GeRadioButton(const GeRadioButton& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2436,11 +2438,11 @@ public:
   GeTipText(GeDyn* e_dyn);
   GeTipText(const GeTipText& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2455,11 +2457,11 @@ public:
   GeHelp(const GeHelp& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2473,13 +2475,13 @@ public:
   GeOpenGraph(const GeOpenGraph& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2493,11 +2495,11 @@ public:
   GeOpenURL(const GeOpenURL& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2514,10 +2516,10 @@ public:
   GeInputFocus(GeDyn* e_dyn);
   GeInputFocus(const GeInputFocus& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2535,10 +2537,10 @@ public:
   {
   }
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
 };
 
 //! Dynamics for a slider object.
@@ -2577,8 +2579,8 @@ public:
   GeSlider(GeDyn* e_dyn);
   GeSlider(const GeSlider& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
@@ -2586,8 +2588,8 @@ public:
   void update() { first_scan = true; }
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2618,15 +2620,15 @@ public:
   GeBar(GeDyn* e_dyn);
   GeBar(const GeBar& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   void configure(grow_tObject object);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2696,14 +2698,14 @@ public:
   GeTrend(GeDyn* e_dyn);
   GeTrend(const GeTrend& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2776,15 +2778,15 @@ public:
   GeXY_Curve(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeXY_Curve(const GeXY_Curve& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -2842,8 +2844,8 @@ public:
   GeDsTrend(GeDyn* e_dyn);
   GeDsTrend(const GeDsTrend& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
@@ -2909,8 +2911,8 @@ public:
   GeDsTrendCurve(GeDyn* e_dyn);
   GeDsTrendCurve(const GeDsTrendCurve& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
@@ -2986,8 +2988,8 @@ public:
   GeSevHist(GeDyn* e_dyn);
   GeSevHist(const GeSevHist& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
@@ -3019,14 +3021,14 @@ public:
   GeDigTransparency(GeDyn* e_dyn);
   GeDigTransparency(const GeDigTransparency& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3048,14 +3050,14 @@ public:
   GeAnalogTransparency(GeDyn* e_dyn);
   GeAnalogTransparency(const GeAnalogTransparency& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3071,9 +3073,9 @@ public:
   GeUnitConvert(const GeUnitConvert& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
   int get_transtab(char** tt);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3098,15 +3100,15 @@ public:
   GeDigCommand(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeDigCommand(const GeDigCommand& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3134,15 +3136,15 @@ public:
   GeDigScript(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeDigScript(const GeDigScript& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3179,15 +3181,15 @@ public:
   GeRefUpdate(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeRefUpdate(const GeRefUpdate& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 
   int connect(grow_tObject object, int level);
@@ -3227,8 +3229,8 @@ public:
   GeFastCurve(GeDyn* e_dyn);
   GeFastCurve(const GeFastCurve& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
@@ -3268,16 +3270,16 @@ public:
   GeTable(GeDyn* e_dyn);
   GeTable(const GeTable& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3303,15 +3305,15 @@ public:
   GePie(GeDyn* e_dyn);
   GePie(const GePie& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3339,15 +3341,15 @@ public:
   GeBarChart(GeDyn* e_dyn);
   GeBarChart(const GeBarChart& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3365,12 +3367,12 @@ public:
   GePulldownMenu(const GePulldownMenu& x);
   ~GePulldownMenu();
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   int get_transtab(char** tt);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
 };
 
 //! Options menu.
@@ -3403,8 +3405,8 @@ public:
   GeOptionMenu(GeDyn* e_dyn);
   GeOptionMenu(const GeOptionMenu& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
@@ -3412,8 +3414,8 @@ public:
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
   int get_transtab(char** tt);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   virtual int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3430,13 +3432,13 @@ public:
 
   GeAnalogText(const GeAnalogText& x) : GeOptionMenu(x) {}
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event) { return 1; }
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
 };
 
 //! Set a value
@@ -3449,13 +3451,13 @@ public:
   GeSetValue(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeSetValue(const GeSetValue& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3472,14 +3474,14 @@ public:
   GeMethodToolbar(GeDyn* e_dyn, ge_mInstance e_instance = ge_mInstance_1);
   GeMethodToolbar(const GeMethodToolbar& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int action(grow_tObject object, glow_tEvent event);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3497,11 +3499,11 @@ public:
   GeMethodPulldownMenu(GeDyn* e_dyn);
   GeMethodPulldownMenu(const GeMethodPulldownMenu& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3532,15 +3534,15 @@ public:
   GeAxis(GeDyn* e_dyn);
   GeAxis(const GeAxis& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
   void set_attribute(grow_tObject object, const char* attr_name, int* cnt);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3572,12 +3574,12 @@ public:
   {
   }
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int connect(grow_tObject object, glow_sTraceData* trace_data, bool now);
   int disconnect(grow_tObject object);
   int scan(grow_tObject object);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3590,11 +3592,11 @@ public:
   GeCatchSignal(GeDyn* e_dyn);
   GeCatchSignal(const GeCatchSignal& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 
@@ -3608,11 +3610,11 @@ public:
   GeEmitSignal(GeDyn* e_dyn);
   GeEmitSignal(const GeEmitSignal& x);
   void get_attributes(attr_sItem* attrinfo, int* item_count);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   int action(grow_tObject object, glow_tEvent event);
-  int export_script(grow_tObject o, std::ofstream& fp, char* indentation, char* prefix);
-  int export_java(grow_tObject object, std::ofstream& fp, bool first, char* var_name);
+  int export_script(grow_tObject o, std::ostream& fp, char* indentation, char* prefix);
+  int export_java(grow_tObject object, std::ostream& fp, bool first, char* var_name);
   int syntax_check(grow_tObject object, int* error_cnt, int* warning_cnt);
 };
 

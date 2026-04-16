@@ -211,7 +211,7 @@ int GrowConPoint::event_handler(GlowWind* w, glow_eEvent event, int x, int y, do
   return sts;
 }
 
-void GrowConPoint::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowConPoint::save(std::ostream& fp, glow_eSaveMode mode)
 {
   if (mode == glow_eSaveMode_SubGraph)
     GlowConPoint::save(fp, mode);
@@ -231,7 +231,7 @@ void GrowConPoint::save(std::ofstream& fp, glow_eSaveMode mode)
   }
 }
 
-void GrowConPoint::open(std::ifstream& fp)
+void GrowConPoint::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

@@ -252,7 +252,7 @@ int GrowLine::event_handler(GlowWind* w, glow_eEvent event, int x, int y, double
   return sts;
 }
 
-void GrowLine::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowLine::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowLine) << '\n';
   fp << int(glow_eSave_GrowLine_n_name) << FSPACE << n_name << '\n';
@@ -270,7 +270,7 @@ void GrowLine::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowLine::open(std::ifstream& fp)
+void GrowLine::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -756,7 +756,7 @@ void GrowLine::align(double x, double y, glow_eAlignDirection direction)
 }
 
 void GrowLine::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                               int node_cnt, int in_nc, std::ofstream& fp)
+                               int node_cnt, int in_nc, std::ostream& fp)
 {
   int idx;
   if (node && ((GrowNode*)node)->line_width)

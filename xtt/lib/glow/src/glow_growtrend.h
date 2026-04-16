@@ -37,6 +37,8 @@
 #ifndef glow_growtrend_h
 #define glow_growtrend_h
 
+#include <iosfwd>
+
 #include "glow_growrect.h"
 #include "glow_growpolyline.h"
 
@@ -67,9 +69,9 @@ public:
 
   ~GrowTrend();
 
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   void draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
 
@@ -175,7 +177,7 @@ public:
   void set_trend_info(glow_sTrendInfo* info);
 
   void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                       int in_nc, std::ofstream& fp);
+                       int in_nc, std::ostream& fp);
 
   int export_script(GlowExportScript* es, void* o, void* m);
 

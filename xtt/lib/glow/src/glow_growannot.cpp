@@ -46,7 +46,7 @@
 static char stars[] = "********************************************************"
                       "***********************";
 
-void GrowAnnot::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowAnnot::save(std::ostream& fp, glow_eSaveMode mode)
 {
   if (mode == glow_eSaveMode_SubGraph)
     GlowAnnot::save(fp, mode);
@@ -62,7 +62,7 @@ void GrowAnnot::save(std::ofstream& fp, glow_eSaveMode mode)
   }
 }
 
-void GrowAnnot::open(std::ifstream& fp)
+void GrowAnnot::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -453,7 +453,7 @@ void GrowAnnot::get_borders(GlowTransform* t, double* x_right, double* x_left, d
 }
 
 void GrowAnnot::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                int node_cnt, int in_nc, std::ofstream& fp)
+                                int node_cnt, int in_nc, std::ostream& fp)
 {
   int x1, y1;
   int bold;
@@ -483,7 +483,7 @@ void GrowAnnot::export_javabean(GlowTransform* t, void* node, glow_eExportPass p
   //  (*shape_cnt)++;
 }
 
-void GrowAnnot::export_javabean_font(GlowTransform* t, void* node, glow_eExportPass pass, std::ofstream& fp)
+void GrowAnnot::export_javabean_font(GlowTransform* t, void* node, glow_eExportPass pass, std::ostream& fp)
 {
   int bold;
   glow_eDrawType background;

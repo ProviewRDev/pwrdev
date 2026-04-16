@@ -37,6 +37,8 @@
 #ifndef glow_point_h
 #define glow_point_h
 
+#include <iosfwd>
+
 #include <ostream>
 #include "glow_array_elem.h"
 
@@ -58,8 +60,8 @@ public:
   void traverse(int x, int y);
   void posit(double x, double y);
   void posit_z(int x, int y);
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(std::istream& fp);
   glow_eObjectType type() { return glow_eObjectType_Point; }
   double x;
   double y;

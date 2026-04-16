@@ -87,7 +87,7 @@ void GrowDashCell::copy_from(const GrowDashCell& n)
   frame = new GrowRect(*n.frame);
 }
 
-void GrowDashCell::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowDashCell::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowDashCell) << '\n';
   fp << int(glow_eSave_GrowDashCell_cell_rows) << FSPACE << cell_rows << '\n';
@@ -105,7 +105,7 @@ void GrowDashCell::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowDashCell::open(std::ifstream& fp)
+void GrowDashCell::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

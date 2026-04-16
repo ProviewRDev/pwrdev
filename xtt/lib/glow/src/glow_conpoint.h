@@ -37,6 +37,8 @@
 #ifndef glow_conpoint_h
 #define glow_conpoint_h
 
+#include <iosfwd>
+
 #include "glow_growctx.h"
 
 class GlowConPoint : public GlowArrayElem
@@ -53,8 +55,8 @@ public:
   void conpoint_select(void* pos, int x, int y, double* distance, void** cp);
   void conpoint_select(GlowTransform* t, int x, int y, double* distance, void** cp, int* pix_x, int* pix_y);
   void print(void* pos, void* node) {}
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(std::istream& fp);
   void draw(void* pos, int highlight, int hot, void* node) {}
   void erase(void* pos, int hot, void* node) {}
   void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,

@@ -37,6 +37,8 @@
 #ifndef glow_con_h
 #define glow_con_h
 
+#include <iosfwd>
+
 #include "glow_node.h"
 #include "glow_conclass.h"
 #include "glow_line.h"
@@ -128,13 +130,13 @@ public:
     \param fp	Ouput file.
     \param mode	Save as graph or subgraph.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
   void draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
   void draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y);
   void draw();
@@ -264,7 +266,7 @@ public:
   int is_connected_to(GlowNode* node) { return source_node == node || dest_node == node; }
   void change_conclass(GlowConClass* conclass);
   void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                       int in_nc, std::ofstream& fp);
+                       int in_nc, std::ostream& fp);
   void convert(glow_eConvert version);
   void set_border(int borderval);
   void set_shadow(int shadowval);

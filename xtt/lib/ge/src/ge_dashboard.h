@@ -37,6 +37,8 @@
 #ifndef ge_dashboard_h
 #define ge_dashboard_h
 
+#include <iosfwd>
+
 /* ge_dashboard.h -- Ge dashboard */
 
 #include "ge_graph.h"
@@ -174,11 +176,11 @@ public:
 
   //! Save dash data to file.
   /*! \param fp		Output file. */
-  void save(std::ofstream& fp);
+  void save(std::ostream& fp);
 
   //! Open dash data from file.
   /*! \param fp		Input file. */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Update after edit.
   void update_elem(grow_tObject o);
@@ -235,11 +237,11 @@ public:
 
   //! Save dash element data to file.
   /*! \param fp		Output file. */
-  virtual void save(std::ofstream& fp) {}
+  virtual void save(std::ostream& fp) {}
 
   //! Open dash element data from file.
   /*! \param fp		Input file. */
-  virtual void open(std::ifstream& fp) {}
+  virtual void open(std::istream& fp) {}
 
   //! Destructor
   virtual ~GeDashElem() {}
@@ -270,8 +272,8 @@ public:
   void get_attributes(attr_sItem* attrinfo, int* item_count, char* name, unsigned int attr_mask, int num);
   void set_attribute(grow_tObject object, const char* attr_name, int second);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
 };
 
 class GeDashDigital : public GeDashElem
@@ -296,8 +298,8 @@ public:
   void get_attributes(attr_sItem* attrinfo, int* item_count, char* name, unsigned int attr_mask, int num);
   void set_attribute(grow_tObject object, const char* attr_name, int second);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
 };
 
 class GeDashObject : public GeDashElem
@@ -322,8 +324,8 @@ public:
   void get_attributes(attr_sItem* attrinfo, int* item_count, char* name, unsigned int attr_mask, int num);
   void set_attribute(grow_tObject object, const char* attr_name, int second);
   void replace_attribute(char* from, char* to, int* cnt, int strict);
-  void save(std::ofstream& fp);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp);
+  void open(std::istream& fp);
   char* script_filename();
 };
 

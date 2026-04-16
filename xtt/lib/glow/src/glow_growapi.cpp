@@ -5165,17 +5165,17 @@ void grow_MeasureNodeClassJavaBean(grow_tNodeClass nodeclass, double* x_right, d
   ((GlowNodeClass*)nodeclass)->measure_javabean(x_right, x_left, y_high, y_low);
 }
 
-void grow_ExportJavaBean(grow_tCtx ctx, std::ofstream& fp, int components)
+void grow_ExportJavaBean(grow_tCtx ctx, std::ostream& fp, int components)
 {
   ctx->export_javabean(fp, components);
 }
 
-void grow_ExportNodeClassJavaBean(grow_tCtx ctx, grow_tNodeClass nc, std::ofstream& fp, int components)
+void grow_ExportNodeClassJavaBean(grow_tCtx ctx, grow_tNodeClass nc, std::ostream& fp, int components)
 {
   ctx->export_nodeclass_javabean((GlowArrayElem*)nc, fp, components);
 }
 
-void grow_ExportNcJavaBeanFont(grow_tCtx ctx, grow_tNodeClass nc, std::ofstream& fp, int components)
+void grow_ExportNcJavaBeanFont(grow_tCtx ctx, grow_tNodeClass nc, std::ostream& fp, int components)
 {
   ctx->export_nc_javabean_font((GlowArrayElem*)nc, fp, components);
 }
@@ -5712,19 +5712,19 @@ int grow_IsVisible(grow_tCtx ctx, grow_tObject object, glow_eVisible type)
 int grow_ExportFlow(grow_tCtx ctx, char* filename) { return ctx->export_flow(filename); }
 
 int grow_ExportScript(grow_tCtx ctx, char* filename,
-                      int (*userdata_cb)(void*, grow_tObject, std::ofstream&, char*))
+                      int (*userdata_cb)(void*, grow_tObject, std::ostream&, char*))
 {
   return ctx->export_script(filename, userdata_cb);
 }
 
-void grow_ObjectSave(grow_tObject object, std::ofstream& fp, glow_eSaveMode mode)
+void grow_ObjectSave(grow_tObject object, std::ostream& fp, glow_eSaveMode mode)
 {
   ((GlowArrayElem*)object)->save(fp, mode);
 }
 
-void grow_ObjectOpen(grow_tObject object, std::ifstream& fp) { ((GlowArrayElem*)object)->open(fp); }
+void grow_ObjectOpen(grow_tObject object, std::istream& fp) { ((GlowArrayElem*)object)->open(fp); }
 
-void grow_ObjectRead(grow_tCtx ctx, std::ifstream& fp, grow_tObject* object)
+void grow_ObjectRead(grow_tCtx ctx, std::istream& fp, grow_tObject* object)
 {
   ctx->read_object(fp, (GlowArrayElem**)object);
 }
@@ -6014,7 +6014,7 @@ int grow_LayerIsEmpty(grow_tObject layer) { return ((GrowLayer*)layer)->is_empty
 
 int grow_LayerActive(grow_tCtx ctx) { return ((GrowCtx*)ctx)->layer_active(); }
 
-void grow_LayerSave(grow_tObject object, int nochildren, std::ofstream& fp, glow_eSaveMode mode)
+void grow_LayerSave(grow_tObject object, int nochildren, std::ostream& fp, glow_eSaveMode mode)
 {
   ((GrowLayer*)object)->save(nochildren, fp, mode);
 }

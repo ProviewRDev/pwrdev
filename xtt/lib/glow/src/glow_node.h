@@ -37,6 +37,8 @@
 #ifndef glow_node_h
 #define glow_node_h
 
+#include <iosfwd>
+
 #include "glow_point.h"
 #include "glow_nodeclass.h"
 
@@ -119,13 +121,13 @@ public:
     \param fp	Ouput file.
     \param mode	Save as graph or subgraph.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   void store_position() { stored_pos = pos; }
   void restore_position() { pos = stored_pos; }

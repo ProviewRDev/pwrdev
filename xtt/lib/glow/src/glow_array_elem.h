@@ -37,6 +37,8 @@
 #ifndef glow_array_elem_h
 #define glow_array_elem_h
 
+#include <iosfwd>
+
 #include "glow_tracedata.h"
 #include "glow_transform.h"
 
@@ -92,8 +94,8 @@ public:
   virtual int event_handler(GlowWind* w, glow_eEvent event, double fx, double fy) { return 0; }
   virtual int event_handler(GlowWind* w, void* pos, glow_eEvent event, int x, int y, void* node) { return 0; }
   virtual void print(double ll_x, double ll_y, double ur_x, double ur_y) {}
-  virtual void save(std::ofstream& fp, glow_eSaveMode mode) {}
-  virtual void open(std::ifstream& fp) {}
+  virtual void save(std::ostream& fp, glow_eSaveMode mode) {}
+  virtual void open(std::istream& fp) {}
   virtual void print(void* pos, void* node) {}
   virtual void draw() {}
   virtual void draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y) {}
@@ -222,7 +224,7 @@ public:
   virtual void align(double x, double y, glow_eAlignDirection direction) {}
   virtual void measure(double* ll_x, double* ll_y, double* ur_x, double* ur_y) {}
   virtual void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                               int node_cnt, int in_nc, std::ofstream& fp)
+                               int node_cnt, int in_nc, std::ostream& fp)
   {
   }
   virtual int find_nc(GlowArrayElem* nc) { return 0; }

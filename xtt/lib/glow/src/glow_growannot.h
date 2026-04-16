@@ -37,6 +37,8 @@
 #ifndef glow_growannot_h
 #define glow_growannot_h
 
+#include <iosfwd>
+
 #include "glow_annot.h"
 #include "glow_text.h"
 
@@ -90,13 +92,13 @@ public:
     If the mode is glow_eSaveMode_Subgraph only the GlowAnnot part of the
     annoation is saved.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Get the object type
   /*!
@@ -163,7 +165,7 @@ public:
     java code for the shape.
   */
   void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                       int in_nc, std::ofstream& fp);
+                       int in_nc, std::ostream& fp);
 
   //! Export the font as java code.
   /*!
@@ -174,7 +176,7 @@ public:
 
     GlowExortJBean is used to generate code for the font.
   */
-  void export_javabean_font(GlowTransform* t, void* node, glow_eExportPass pass, std::ofstream& fp);
+  void export_javabean_font(GlowTransform* t, void* node, glow_eExportPass pass, std::ostream& fp);
 
   //! Conversion between different versions of Glow
   /*!

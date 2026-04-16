@@ -59,7 +59,7 @@ void GlowText::print_zoom() { p.print_zoom(); }
 
 void GlowText::traverse(int x, int y) { p.traverse(x, y); }
 
-void GlowText::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowText::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_Text) << '\n';
   fp << int(glow_eSave_Text_text_size) << FSPACE << text_size << '\n';
@@ -71,7 +71,7 @@ void GlowText::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowText::open(std::ifstream& fp)
+void GlowText::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

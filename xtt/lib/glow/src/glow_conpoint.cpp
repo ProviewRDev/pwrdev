@@ -55,7 +55,7 @@ void GlowConPoint::nav_zoom() { p.nav_zoom(); }
 
 void GlowConPoint::print_zoom() { p.print_zoom(); }
 
-void GlowConPoint::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowConPoint::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_ConPoint) << '\n';
   fp << int(glow_eSave_ConPoint_number) << FSPACE << number << '\n';
@@ -69,7 +69,7 @@ void GlowConPoint::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowConPoint::open(std::ifstream& fp)
+void GlowConPoint::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

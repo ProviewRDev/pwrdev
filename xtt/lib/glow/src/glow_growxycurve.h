@@ -37,6 +37,8 @@
 #ifndef glow_growxycurve_h
 #define glow_growxycurve_h
 
+#include <iosfwd>
+
 #include "glow_growtrend.h"
 
 /*! \file glow_growcurve.h
@@ -80,8 +82,8 @@ public:
   */
   glow_eObjectType type() { return glow_eObjectType_GrowXYCurve; }
 
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(std::istream& fp);
 
   void set_xy_range_x(int curve, double min, double max);
   void set_xy_range_y(int curve, double min, double max);
@@ -92,7 +94,7 @@ public:
   void set_xy_curve_color(int curve, glow_eDrawType curve_color, glow_eDrawType fill_color);
   void set_xy_data(double* y_data, double* x_data, int curve_idx, int data_points);
   void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                       int in_nc, std::ofstream& fp);
+                       int in_nc, std::ostream& fp);
   int get_java_name(char* name);
 };
 

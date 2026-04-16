@@ -82,7 +82,7 @@ GrowWindow::~GrowWindow()
     delete h_scrollbar;
 }
 
-void GrowWindow::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowWindow::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowWindow) << '\n';
   fp << int(glow_eSave_GrowWindow_file_name) << FSPACE << file_name << '\n';
@@ -103,7 +103,7 @@ void GrowWindow::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowWindow::open(std::ifstream& fp)
+void GrowWindow::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -528,7 +528,7 @@ void GrowWindow::align(double x, double y, glow_eAlignDirection direction)
 }
 
 void GrowWindow::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                 int node_cnt, int in_nc, std::ofstream& fp)
+                                 int node_cnt, int in_nc, std::ostream& fp)
 {
   double x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
 

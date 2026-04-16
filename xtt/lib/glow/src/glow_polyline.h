@@ -37,6 +37,8 @@
 #ifndef glow_polyline_h
 #define glow_polyline_h
 
+#include <iosfwd>
+
 #include "glow_growctx.h"
 #include "glow_draw.h"
 
@@ -54,8 +56,8 @@ public:
   void zoom();
   void nav_zoom();
   void print_zoom();
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(std::istream& fp);
   void get_borders(double pos_x, double pos_y, double* x_right, double* x_left, double* y_high, double* y_low,
                    void* node);
   glow_eObjectType type() { return glow_eObjectType_PolyLine; }

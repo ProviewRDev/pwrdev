@@ -233,7 +233,7 @@ int GrowSubAnnot::event_handler(GlowWind* w, glow_eEvent event, int x, int y, do
   return sts;
 }
 
-void GrowSubAnnot::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowSubAnnot::save(std::ostream& fp, glow_eSaveMode mode)
 {
   if (mode == glow_eSaveMode_SubGraph)
   {
@@ -267,7 +267,7 @@ void GrowSubAnnot::save(std::ofstream& fp, glow_eSaveMode mode)
   }
 }
 
-void GrowSubAnnot::open(std::ifstream& fp)
+void GrowSubAnnot::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -530,7 +530,7 @@ void GrowSubAnnot::align(double x, double y, glow_eAlignDirection direction)
 }
 
 void GrowSubAnnot::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                   int node_cnt, int in_nc, std::ofstream& fp)
+                                   int node_cnt, int in_nc, std::ostream& fp)
 {
   int x1, y1;
   int bold;

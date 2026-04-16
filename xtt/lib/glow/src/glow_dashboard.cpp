@@ -148,7 +148,7 @@ void GrowDashboard::find_grid(double x, double y, double* x_grid, double* y_grid
     *y_grid = y1 + grid_size_y;
 }
 
-void GrowDashboard::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowDashboard::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowDashboard) << '\n';
   fp << int(glow_eSave_GrowDashboard_dash_columns) << FSPACE << dash_columns << '\n';
@@ -156,7 +156,7 @@ void GrowDashboard::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowDashboard::open(std::ifstream& fp)
+void GrowDashboard::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

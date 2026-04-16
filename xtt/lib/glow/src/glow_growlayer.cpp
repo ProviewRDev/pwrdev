@@ -85,7 +85,7 @@ GrowLayer::~GrowLayer()
   ctx->redraw();
 }
 
-void GrowLayer::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowLayer::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowLayer) << '\n';
   fp << int(glow_eSave_GrowLayer_array_part) << '\n';
@@ -95,7 +95,7 @@ void GrowLayer::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowLayer::save(int nochildren, std::ofstream& fp, glow_eSaveMode mode)
+void GrowLayer::save(int nochildren, std::ostream& fp, glow_eSaveMode mode)
 {
   int size;
 
@@ -111,7 +111,7 @@ void GrowLayer::save(int nochildren, std::ofstream& fp, glow_eSaveMode mode)
     a.a_size = size;
 }
 
-void GrowLayer::open(std::ifstream& fp)
+void GrowLayer::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

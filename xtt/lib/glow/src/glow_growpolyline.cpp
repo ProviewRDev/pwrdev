@@ -846,7 +846,7 @@ int GrowPolyLine::event_handler(GlowWind* w, glow_eEvent event, int x, int y, do
   return sts;
 }
 
-void GrowPolyLine::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowPolyLine::save(std::ostream& fp, glow_eSaveMode mode)
 {
   char* s;
 
@@ -901,7 +901,7 @@ void GrowPolyLine::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowPolyLine::open(std::ifstream& fp)
+void GrowPolyLine::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -1546,7 +1546,7 @@ void GrowPolyLine::align(double x, double y, glow_eAlignDirection direction)
 }
 
 void GrowPolyLine::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                   int node_cnt, int in_nc, std::ofstream& fp)
+                                   int node_cnt, int in_nc, std::ostream& fp)
 {
   int i;
   int idx;

@@ -88,7 +88,7 @@ void GrowAxisArc::configure()
   increment = (max_value - min_value) / (lines - 1);
 }
 
-void GrowAxisArc::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowAxisArc::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowAxisArc) << '\n';
   fp << int(glow_eSave_GrowAxisArc_max_value) << FSPACE << max_value << '\n';
@@ -111,7 +111,7 @@ void GrowAxisArc::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowAxisArc::open(std::ifstream& fp)
+void GrowAxisArc::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -591,7 +591,7 @@ void GrowAxisArc::set_range(double minval, double maxval, int keep_settings)
 }
 
 void GrowAxisArc::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                  int node_cnt, int in_nc, std::ofstream& fp)
+                                  int node_cnt, int in_nc, std::ostream& fp)
 {
   double x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
   double rotation;

@@ -37,6 +37,8 @@
 #ifndef glow_conclass_h
 #define glow_conclass_h
 
+#include <iosfwd>
+
 #include "glow_rect.h"
 
 /*! \file glow_conclass.h
@@ -89,13 +91,13 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
   void draw(GlowPoint* pos, int highlight, int hot, void* node) {}
   void nav_draw(GlowPoint* pos, int highlight, void* node) {}
   void erase(GlowPoint* pos, int hot, void* node) {}

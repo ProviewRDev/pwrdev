@@ -185,7 +185,7 @@ void GrowTrend::configure_curves()
   \param fp	Ouput file.
   \param mode	Not used.
 */
-void GrowTrend::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowTrend::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowTrend) << '\n';
   fp << int(glow_eSave_GrowTrend_y_max_value_0) << FSPACE << y_max_value[0] << '\n';
@@ -236,7 +236,7 @@ void GrowTrend::save(std::ofstream& fp, glow_eSaveMode mode)
 /*!
   \param fp	Input file.
 */
-void GrowTrend::open(std::ifstream& fp)
+void GrowTrend::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -988,7 +988,7 @@ void GrowTrend::set_range_y(int curve, double min, double max)
   java code for the bean.
 */
 void GrowTrend::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                int node_cnt, int in_nc, std::ofstream& fp)
+                                int node_cnt, int in_nc, std::ostream& fp)
 {
   double x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
   double rotation;

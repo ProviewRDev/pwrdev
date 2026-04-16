@@ -54,7 +54,7 @@ GlowConClass::GlowConClass(GrowCtx* glow_ctx, const char* name, glow_eConType co
   zero.print_zoom();
 }
 
-void GlowConClass::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowConClass::save(std::ostream& fp, glow_eSaveMode mode)
 {
   if ((mode == glow_eSaveMode_Trace && group != glow_eConGroup_Trace) ||
       (mode == glow_eSaveMode_Edit && group == glow_eConGroup_Trace))
@@ -72,7 +72,7 @@ void GlowConClass::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowConClass::open(std::ifstream& fp)
+void GlowConClass::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

@@ -250,7 +250,7 @@ int GrowArc::event_handler(GlowWind* w, glow_eEvent event, int x, int y, double 
   return sts;
 }
 
-void GrowArc::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowArc::save(std::ostream& fp, glow_eSaveMode mode)
 {
   char* s;
 
@@ -301,7 +301,7 @@ void GrowArc::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowArc::open(std::ifstream& fp)
+void GrowArc::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -1055,7 +1055,7 @@ void GrowArc::align(double x, double y, glow_eAlignDirection direction)
 }
 
 void GrowArc::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                              int node_cnt, int in_nc, std::ofstream& fp)
+                              int node_cnt, int in_nc, std::ostream& fp)
 {
   int idx;
   int gc1, gc2;

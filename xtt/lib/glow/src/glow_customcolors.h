@@ -61,8 +61,8 @@ public:
       colors[i][0] = colors[i][1] = colors[i][2] = 1;
   }
 
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(std::istream& fp);
   int get_color(glow_eDrawType dtype, double* r, double* g, double* b);
   int set_color(glow_eDrawType dtype, double r, double g, double b);
   void reset_colors();

@@ -256,7 +256,7 @@ int GrowRectRounded::event_handler(GlowWind* w, glow_eEvent event, int x, int y,
   return sts;
 }
 
-void GrowRectRounded::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowRectRounded::save(std::ostream& fp, glow_eSaveMode mode)
 {
   char* s;
 
@@ -305,7 +305,7 @@ void GrowRectRounded::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowRectRounded::open(std::ifstream& fp)
+void GrowRectRounded::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -1099,7 +1099,7 @@ void GrowRectRounded::align(double x, double y, glow_eAlignDirection direction)
 }
 
 void GrowRectRounded::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                      int node_cnt, int in_nc, std::ofstream& fp)
+                                      int node_cnt, int in_nc, std::ostream& fp)
 {
   if (!(display_level & ctx->display_level))
     return;

@@ -37,6 +37,8 @@
 #ifndef glow_dashboard_h
 #define glow_dashboard_h
 
+#include <iosfwd>
+
 #include "glow_growctx.h"
 
 /*! \file glow_dashboard.h
@@ -55,8 +57,8 @@ public:
   void position(double x, double y);
   void find_grid(double x, double y, double* x_grid, double* y_grid);
   int get_next_free(int start_row, int start_col, int rows, int cols, double* x, double* y);
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(std::istream& fp);
 };
 
 /*@}*/

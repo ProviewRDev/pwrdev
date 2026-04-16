@@ -84,7 +84,7 @@ void GlowPoint::print_zoom()
 
 void GlowPoint::traverse(int x, int y) {}
 
-void GlowPoint::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowPoint::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_Point) << '\n';
   fp << int(glow_eSave_Point_x) << FSPACE << x << '\n';
@@ -92,7 +92,7 @@ void GlowPoint::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowPoint::open(std::ifstream& fp)
+void GlowPoint::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

@@ -109,7 +109,7 @@ int GlowCustomColors::is_empty()
   return 1;
 }
 
-void GlowCustomColors::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowCustomColors::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_CustomColors) << '\n';
   fp << int(glow_eSave_CustomColors_colortheme_lightness) << FSPACE << colortheme_lightness << '\n';
@@ -121,7 +121,7 @@ void GlowCustomColors::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowCustomColors::open(std::ifstream& fp)
+void GlowCustomColors::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

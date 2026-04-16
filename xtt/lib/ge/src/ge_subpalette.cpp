@@ -797,7 +797,7 @@ void SubPalette::menu_tree_build(char* filename)
   fp.close();
 }
 
-subpalette_sMenu* SubPalette::menu_tree_build_children(std::ifstream* fp, int* line_cnt, char* filename,
+subpalette_sMenu* SubPalette::menu_tree_build_children(std::istream* fp, int* line_cnt, char* filename,
                                                        subpalette_sMenu* parent)
 {
   subpalette_sMenu *menu_p = NULL, *prev = NULL;

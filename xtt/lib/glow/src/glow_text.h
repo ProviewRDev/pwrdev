@@ -37,6 +37,8 @@
 #ifndef glow_text_h
 #define glow_text_h
 
+#include <iosfwd>
+
 #include "glow_growctx.h"
 
 /*! \file glow_text.h
@@ -103,13 +105,13 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Draw the object.
   /*!

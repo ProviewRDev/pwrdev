@@ -47,7 +47,7 @@
 
 static char* str_cnv(char* instr);
 
-void GlowExportJBean::growctx(glow_eExportPass pass, std::ofstream& fp)
+void GlowExportJBean::growctx(glow_eExportPass pass, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
 
@@ -243,7 +243,7 @@ void GlowExportJBean::growctx(glow_eExportPass pass, std::ofstream& fp)
   }
 }
 
-void GlowExportJBean::nodeclass(GlowNodeClass* nc, glow_eExportPass pass, std::ofstream& fp, int page,
+void GlowExportJBean::nodeclass(GlowNodeClass* nc, glow_eExportPass pass, std::ostream& fp, int page,
                                 int pages)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
@@ -465,7 +465,7 @@ void GlowExportJBean::polyline(glow_sPoint* points, int point_cnt, int fill, int
                                int fill_eq_border, int fill_eq_light, int fill_eq_shadow, int line_width,
                                int print_shadow, int shadow, int drawtype_incr, glow_sShadowInfo* sp,
                                int sp_num, int fixcolor, glow_eGradient gradient, int gc1, int gc2,
-                               glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
+                               glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ostream& fp)
 {
   int i;
   double dim_x0, dim_x1, dim_y0, dim_y1;
@@ -1060,7 +1060,7 @@ void GlowExportJBean::polyline(glow_sPoint* points, int point_cnt, int fill, int
 
 void GlowExportJBean::line(double x1, double y1, double x2, double y2, glow_eDrawType border_drawtype,
                            int line_width, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                           std::ofstream& fp)
+                           std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
 
@@ -1113,7 +1113,7 @@ void GlowExportJBean::rect(double x0, double y0, double width, double height, in
                            glow_eDrawType fill_drawtype, glow_eDrawType border_drawtype, int line_width,
                            double shadow_width, int shadow, int drawtype_incr, int fixcolor,
                            glow_eGradient gradient, int gc1, int gc2, glow_eExportPass pass, int* shape_cnt,
-                           int node_cnt, std::ofstream& fp)
+                           int node_cnt, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
 
@@ -1491,7 +1491,7 @@ void GlowExportJBean::rectrounded(double x0, double y0, double width, double hei
                                   glow_eDrawType fill_drawtype, glow_eDrawType border_drawtype,
                                   int line_width, double roundamount, double shadow_width, int shadow,
                                   int drawtype_incr, glow_eGradient gradient, int gc1, int gc2,
-                                  glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
+                                  glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   int fixcolor = 0;
@@ -1968,7 +1968,7 @@ void GlowExportJBean::arc(double x0, double y0, double width, double height, dou
                           int fill, int border, glow_eDrawType fill_drawtype, glow_eDrawType border_drawtype,
                           int line_width, double shadow_width, int shadow, int drawtype_incr, int fixcolor,
                           glow_eGradient gradient, int gc1, int gc2, glow_eExportPass pass, int* shape_cnt,
-                          int node_cnt, std::ofstream& fp)
+                          int node_cnt, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char arc_type_str[20];
@@ -2572,7 +2572,7 @@ void GlowExportJBean::arc(double x0, double y0, double width, double height, dou
 
 void GlowExportJBean::text(int x0, int y0, char* text, glow_eDrawType drawtype, glow_eDrawType color_drawtype,
                            int bold, int idx, int rotate, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                           std::ofstream& fp)
+                           std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
 
@@ -2675,7 +2675,7 @@ void GlowExportJBean::text(int x0, int y0, char* text, glow_eDrawType drawtype, 
 
 void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype, glow_eDrawType text_drawtype,
                             int bold, glow_eAdjustment adjustment, int idx, glow_eExportPass pass,
-                            int* shape_cnt, int node_cnt, std::ofstream& fp)
+                            int* shape_cnt, int node_cnt, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   int antialiasing_on = 0;
@@ -2926,7 +2926,7 @@ void GlowExportJBean::annot(int x0, int y0, int number, glow_eDrawType drawtype,
 }
 
 void GlowExportJBean::annot_font(int number, glow_eDrawType drawtype, glow_eDrawType background, int bold,
-                                 int idx, glow_eExportPass pass, std::ofstream& fp)
+                                 int idx, glow_eExportPass pass, std::ostream& fp)
 {
   switch (pass)
   {
@@ -2986,7 +2986,7 @@ void GlowExportJBean::node(double x1, double y1, double x2, double y2, char* cla
                            glow_eDrawType text_drawtype, glow_eDrawTone color_tone, int color_lightness,
                            int color_intensity, int color_shift, int line_width, double rotate, int shadow,
                            glow_eGradient gradient, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                           int in_nc, std::ofstream& fp)
+                           int in_nc, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3067,7 +3067,7 @@ void GlowExportJBean::node(double x1, double y1, double x2, double y2, char* cla
 void GlowExportJBean::image(double x1, double y1, double x2, double y2, char* filename, int transparent,
                             glow_eDrawTone color_tone, int color_lightness, int color_intensity,
                             int color_shift, double rotate, glow_eExportPass pass, int* shape_cnt,
-                            int node_cnt, int in_nc, std::ofstream& fp)
+                            int node_cnt, int in_nc, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3144,7 +3144,7 @@ void GlowExportJBean::bar(double x1, double y1, double x2, double y2, glow_eDraw
                           glow_eDrawType fill_drawtype, glow_eDrawType bar_drawtype,
                           glow_eDrawType bar_bordercolor, int fill, int border, double min_value,
                           double max_value, int bar_border_width, int line_width, double rotate,
-                          glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
+                          glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3210,7 +3210,7 @@ void GlowExportJBean::trend(double x1, double y1, double x2, double y2, glow_eDr
                             double max_value1, double min_value2, double max_value2, int curve_width,
                             int no_of_points, double scan_time, int horizontal_lines, int vertical_lines,
                             int line_width, double rotate, glow_eExportPass pass, int* shape_cnt,
-                            int node_cnt, std::ofstream& fp)
+                            int node_cnt, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3282,7 +3282,7 @@ void GlowExportJBean::xycurve(double x1, double y1, double x2, double y2, glow_e
                               glow_eDrawType fill_drawtype, int fill, int border, int curve_width,
                               int no_of_points, int horizontal_lines, int vertical_lines, int line_width,
                               double rotate, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                              std::ofstream& fp)
+                              std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3342,7 +3342,7 @@ void GlowExportJBean::axis(double x1, double y1, double x2, double y2, glow_eDra
                            glow_eDrawType text_drawtype, double min_value, double max_value, int lines,
                            int longquotient, int valuequotient, int line_length, int line_width,
                            double rotate, int bold, int text_idx, char* format, glow_eExportPass pass,
-                           int* shape_cnt, int node_cnt, std::ofstream& fp)
+                           int* shape_cnt, int node_cnt, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3448,7 +3448,7 @@ void GlowExportJBean::axisarc(double x1, double y1, double x2, double y2, double
                               double max_value, int lines, int longquotient, int valuequotient,
                               double line_length, int line_width, double rotate, int bold, int text_idx,
                               char* format, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                              std::ofstream& fp)
+                              std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3556,7 +3556,7 @@ void GlowExportJBean::pie(double x1, double y1, double x2, double y2, int angle1
                           int sectors, glow_eDrawType* sector_colors, double min_value, double max_value,
                           int line_width, double rotate, double shadow_width, int shadow,
                           glow_eGradient gradient, int gc1, int gc2, glow_eExportPass pass, int* shape_cnt,
-                          int node_cnt, std::ofstream& fp)
+                          int node_cnt, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3630,7 +3630,7 @@ void GlowExportJBean::barchart(double x1, double y1, double x2, double y2, glow_
                                double rotate, double shadow_width, int shadow, glow_eGradient gradient,
                                int gc1, int gc2, int vertical_lines, int horizontal_lines,
                                glow_eDrawType line_color, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                               std::ofstream& fp)
+                               std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3704,7 +3704,7 @@ void GlowExportJBean::barchart(double x1, double y1, double x2, double y2, glow_
 
 void GlowExportJBean::window(double x1, double y1, double x2, double y2, char* filename,
                              int vertical_scrollbar, int horizontal_scrollbar, char* owner,
-                             glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
+                             glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3769,7 +3769,7 @@ void GlowExportJBean::window(double x1, double y1, double x2, double y2, char* f
 
 void GlowExportJBean::folder(double x1, double y1, double x2, double y2, int folders, char* folder_file_names,
                              char* folder_text, int* folder_v_scrollbar, int* folder_h_scrollbar, char* owner,
-                             glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ofstream& fp)
+                             glow_eExportPass pass, int* shape_cnt, int node_cnt, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3851,7 +3851,7 @@ void GlowExportJBean::table(double x1, double y1, double x2, double y2, glow_eDr
                             int fill, int rows, int columns, int header_row, int header_column, int text_idx,
                             glow_eDrawType text_drawtype, double header_row_height, double row_height,
                             double* column_width, char* header_text, glow_eExportPass pass, int* shape_cnt,
-                            int node_cnt, std::ofstream& fp)
+                            int node_cnt, std::ostream& fp)
 {
   double dim_x0, dim_x1, dim_y0, dim_y1;
   char var_name[40];
@@ -3943,7 +3943,7 @@ void GlowExportJBean::slider(double x1, double y1, double x2, double y2, char* c
                              glow_eDrawType text_drawtype, glow_eDrawTone color_tone, int color_lightness,
                              int color_intensity, int color_shift, int line_width, double rotate, int shadow,
                              glow_eGradient gradient, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                             int in_nc, std::ofstream& fp)
+                             int in_nc, std::ostream& fp)
 {
   node(x1, y1, x2, y2, class_name, border_drawtype, fill_drawtype, text_drawtype, color_tone, color_lightness,
        color_intensity, color_shift, line_width, rotate, shadow, gradient, pass, shape_cnt, node_cnt, in_nc,
@@ -3952,7 +3952,7 @@ void GlowExportJBean::slider(double x1, double y1, double x2, double y2, char* c
 
 void GlowExportJBean::gradient_paint(glow_eGradient gradient, int gc1, int gc2, double x0, double y0,
                                      double w, double h, int fixcolor, glow_eDrawType fill_drawtype,
-                                     std::ofstream& fp)
+                                     std::ostream& fp)
 {
   float gx0 = 0.0, gy0 = 0.0, gx1 = 0.0, gy1 = 0.0, gr = 0.0;
   double dim_x1, dim_x0, dim_y1, dim_y0;

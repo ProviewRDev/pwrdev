@@ -200,7 +200,7 @@ double GlowTransform::vertical_scale(GlowTransform* t)
   return sqrt(tmp.a12 * tmp.a12 + tmp.a22 * tmp.a22);
 }
 
-void GlowTransform::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowTransform::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_Transform) << '\n';
   fp << int(glow_eSave_Transform_a11) << FSPACE << a11 << '\n';
@@ -213,7 +213,7 @@ void GlowTransform::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowTransform::open(std::ifstream& fp)
+void GlowTransform::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

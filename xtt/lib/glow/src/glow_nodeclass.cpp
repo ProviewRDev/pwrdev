@@ -104,7 +104,7 @@ void GlowNodeClass::print(GlowPoint* pos, void* node)
   }
 }
 
-void GlowNodeClass::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowNodeClass::save(std::ostream& fp, glow_eSaveMode mode)
 {
   char* s;
   int i;
@@ -181,7 +181,7 @@ void GlowNodeClass::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowNodeClass::open(std::ifstream& fp)
+void GlowNodeClass::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

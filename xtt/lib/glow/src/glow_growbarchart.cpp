@@ -66,7 +66,7 @@ GrowBarChart::GrowBarChart(GrowCtx* glow_ctx, const char* name, double x, double
 
 GrowBarChart::~GrowBarChart() {}
 
-void GrowBarChart::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowBarChart::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowBarChart) << '\n';
   fp << int(glow_eSave_GrowBarChart_rect_part) << '\n';
@@ -88,7 +88,7 @@ void GrowBarChart::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowBarChart::open(std::ifstream& fp)
+void GrowBarChart::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -718,7 +718,7 @@ void GrowBarChart::align(double x, double y, glow_eAlignDirection direction)
 }
 
 void GrowBarChart::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                   int node_cnt, int in_nc, std::ofstream& fp)
+                                   int node_cnt, int in_nc, std::ostream& fp)
 {
   double x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
   double rotation;

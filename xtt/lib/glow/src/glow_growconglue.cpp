@@ -241,7 +241,7 @@ void GrowConGlue::configure(GlowCon* con)
   line_width_left = lw_left;
 }
 
-void GrowConGlue::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowConGlue::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowConGlue) << '\n';
   fp << int(glow_eSave_GrowConGlue_line_width_up) << FSPACE << line_width_up << '\n';
@@ -254,7 +254,7 @@ void GrowConGlue::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowConGlue::open(std::ifstream& fp)
+void GrowConGlue::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -1312,7 +1312,7 @@ void GrowConGlue::align(double x, double y, glow_eAlignDirection direction)
 }
 
 void GrowConGlue::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                  int node_cnt, int in_nc, std::ofstream& fp)
+                                  int node_cnt, int in_nc, std::ostream& fp)
 {
   double x1, y1, x2, y2;
   double ll_x, ll_y, ur_x, ur_y, m_x, m_y;

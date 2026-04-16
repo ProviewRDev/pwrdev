@@ -164,7 +164,7 @@ int GlowExportScript::scriptmodule_count()
   return cnt;
 }
 
-int GlowExportScript::export_script(char* filename, int (*userdata_cb)(void*, void*, std::ofstream&, char*))
+int GlowExportScript::export_script(char* filename, int (*userdata_cb)(void*, void*, std::ostream&, char*))
 {
   char nc_name[80];
   int is_toolbar;

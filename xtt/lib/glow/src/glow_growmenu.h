@@ -37,6 +37,8 @@
 #ifndef glow_growmenu_h
 #define glow_growmenu_h
 
+#include <iosfwd>
+
 #include "glow_growrect.h"
 
 /*! \file glow_growmenu.h
@@ -89,8 +91,8 @@ public:
    */
   ~GrowMenu();
 
-  void save(std::ofstream& fp, glow_eSaveMode mode) {}
-  void open(std::ifstream& fp) {}
+  void save(std::ostream& fp, glow_eSaveMode mode) {}
+  void open(std::istream& fp) {}
 
   //! Draw the objects if any part is inside the drawing area.
   /*!
@@ -157,7 +159,7 @@ public:
   void draw();
 
   void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                       int in_nc, std::ofstream& fp)
+                       int in_nc, std::ostream& fp)
   {
   }
 

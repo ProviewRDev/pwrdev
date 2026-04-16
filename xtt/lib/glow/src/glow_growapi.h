@@ -60,6 +60,8 @@ typedef struct
 typedef void* GlowCtx;
 #endif
 #else
+#include <iosfwd>
+
 #include "glow_tracedata.h"
 typedef GlowTraceData glow_sTraceData;
 #endif
@@ -2586,7 +2588,7 @@ extern "C"
     \param components	0: Paint. 1: Declare components. 2: Set component
     attributes.
   */
-  void grow_ExportJavaBean(grow_tCtx ctx, std::ofstream& fp, int components);
+  void grow_ExportJavaBean(grow_tCtx ctx, std::ostream& fp, int components);
 
   //! Export a nodeclass as javabean.
   /*!
@@ -2596,7 +2598,7 @@ extern "C"
     \param components	0: Paint. 1: Declare components. 2: Set component
     attributes.
   */
-  void grow_ExportNodeClassJavaBean(grow_tCtx ctx, grow_tNodeClass nc, std::ofstream& fp, int components);
+  void grow_ExportNodeClassJavaBean(grow_tCtx ctx, grow_tNodeClass nc, std::ostream& fp, int components);
 
   //! Export annotation fonts in a nodeclass.
   /*!
@@ -2606,7 +2608,7 @@ extern "C"
     \param components	0: Paint. 1: Declare components. 2: Set component
     attributes.
   */
-  void grow_ExportNcJavaBeanFont(grow_tCtx ctx, grow_tNodeClass nc, std::ofstream& fp, int components);
+  void grow_ExportNcJavaBeanFont(grow_tCtx ctx, grow_tNodeClass nc, std::ostream& fp, int components);
 
   //! Set java name of the context.
   /*!
@@ -3293,10 +3295,10 @@ extern "C"
   int grow_IsVisible(grow_tCtx ctx, grow_tObject object, glow_eVisible type);
   int grow_ExportFlow(grow_tCtx ctx, char* filename);
   int grow_ExportScript(grow_tCtx ctx, char* filename,
-                        int (*userdata_cb)(void*, grow_tObject, std::ofstream&, char*));
-  void grow_ObjectSave(grow_tObject object, std::ofstream& fp, glow_eSaveMode mode);
-  void grow_ObjectOpen(grow_tObject object, std::ifstream& fp);
-  void grow_ObjectRead(grow_tCtx ctx, std::ifstream& fp, grow_tObject* object);
+                        int (*userdata_cb)(void*, grow_tObject, std::ostream&, char*));
+  void grow_ObjectSave(grow_tObject object, std::ostream& fp, glow_eSaveMode mode);
+  void grow_ObjectOpen(grow_tObject object, std::istream& fp);
+  void grow_ObjectRead(grow_tCtx ctx, std::istream& fp, grow_tObject* object);
   int grow_GetDimension(char* filename, int* width, int* height);
   void grow_SetTextCoding(grow_tCtx ctx, glow_eTextCoding coding);
   void grow_EventExec(grow_tCtx ctx, void* event, unsigned int size);
@@ -3371,7 +3373,7 @@ extern "C"
   int grow_LayerRemove(grow_tObject layer, grow_tObject o);
   int grow_LayerIsEmpty(grow_tObject layer);
   int grow_LayerActive(grow_tCtx ctx);
-  void grow_LayerSave(grow_tObject object, int nochildren, std::ofstream& fp, glow_eSaveMode mode);
+  void grow_LayerSave(grow_tObject object, int nochildren, std::ostream& fp, glow_eSaveMode mode);
   grow_tObject grow_GetBackgroundLayer(grow_tCtx ctx);
   int grow_FindLayerByName(grow_tCtx ctx, const char* name, grow_tObject* object);
 

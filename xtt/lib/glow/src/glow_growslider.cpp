@@ -71,7 +71,7 @@ void GrowSlider::copy_from(const GrowSlider& n)
   //  nc = new GlowNodeClass( *nc);
 }
 
-void GrowSlider::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowSlider::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowSlider) << '\n';
   fp << int(glow_eSave_GrowSlider_direction) << FSPACE << int(direction) << '\n';
@@ -84,7 +84,7 @@ void GrowSlider::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowSlider::open(std::ifstream& fp)
+void GrowSlider::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -252,7 +252,7 @@ void GrowSlider::set_range(double min_val, double max_val)
 }
 
 void GrowSlider::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                 int node_cnt, int in_nc, std::ofstream& fp)
+                                 int node_cnt, int in_nc, std::ostream& fp)
 {
   double x1, y1, x2, y2, rot;
   char java_name[40];

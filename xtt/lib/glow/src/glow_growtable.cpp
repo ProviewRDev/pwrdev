@@ -129,7 +129,7 @@ GrowTable::~GrowTable()
     free(cell_value);
 }
 
-void GrowTable::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowTable::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowTable) << '\n';
   fp << int(glow_eSave_GrowTable_scrollbar_width) << FSPACE << scrollbar_width << '\n';
@@ -170,7 +170,7 @@ void GrowTable::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowTable::open(std::ifstream& fp)
+void GrowTable::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -1047,7 +1047,7 @@ void GrowTable::align(double x, double y, glow_eAlignDirection direction)
 }
 
 void GrowTable::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                int node_cnt, int in_nc, std::ofstream& fp)
+                                int node_cnt, int in_nc, std::ostream& fp)
 {
   double x1, y1, x2, y2, ll_x, ll_y, ur_x, ur_y;
   double cwidth[TABLE_MAX_COL];

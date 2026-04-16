@@ -148,7 +148,7 @@ void GlowNode::measure(double* ll_x, double* ll_y, double* ur_x, double* ur_y)
   }
 }
 
-void GlowNode::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowNode::save(std::ostream& fp, glow_eSaveMode mode)
 {
   int i;
   char* s;
@@ -210,7 +210,7 @@ void GlowNode::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowNode::open(std::ifstream& fp)
+void GlowNode::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

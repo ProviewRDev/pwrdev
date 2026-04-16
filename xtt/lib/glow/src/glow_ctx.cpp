@@ -228,7 +228,7 @@ int GlowCtx::save(char* filename, glow_eSaveMode mode)
   return 1;
 }
 
-int GlowCtx::open_comment(std::ifstream& fp)
+int GlowCtx::open_comment(std::istream& fp)
 {
   char line[200];
   int incomment = 0;
@@ -259,7 +259,7 @@ int GlowCtx::open_comment(std::ifstream& fp)
   return 1;
 }
 
-void GlowCtx::save_comment(std::ofstream& fp)
+void GlowCtx::save_comment(std::ostream& fp)
 {
   bool last_blank = false;
 

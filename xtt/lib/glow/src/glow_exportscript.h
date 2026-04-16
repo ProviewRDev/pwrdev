@@ -37,6 +37,8 @@
 #ifndef glow_exportscript_h
 #define glow_exportscript_h
 
+#include <iosfwd>
+
 #include "glow_ctx.h"
 
 class GrowCtx;
@@ -67,7 +69,7 @@ public:
     strcpy(ind, "");
     strcpy(cind, "# ");
   }
-  int export_script(char* filename, int (*userdata_cb)(void*, void*, std::ofstream&, char*));
+  int export_script(char* filename, int (*userdata_cb)(void*, void*, std::ostream&, char*));
   int array(GlowArray* o, void* e, void* m);
   int rect(GrowRect* o, void* e, void* m);
   int rectrounded(GrowRectRounded* o, void* e, void* m);
@@ -107,7 +109,7 @@ public:
 
   std::ofstream fp;
   GrowCtx* ctx;
-  int (*userdata_script_cb)(void*, void*, std::ofstream&, char*);
+  int (*userdata_script_cb)(void*, void*, std::ostream&, char*);
   char ind[80];
   char cind[80];
 };

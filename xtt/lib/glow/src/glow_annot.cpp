@@ -43,7 +43,7 @@
 #include "glow_draw.h"
 #include "glow_browctx.h"
 
-void GlowAnnot::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowAnnot::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_Annot) << '\n';
   fp << int(glow_eSave_Annot_number) << FSPACE << number << '\n';
@@ -59,7 +59,7 @@ void GlowAnnot::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowAnnot::open(std::ifstream& fp)
+void GlowAnnot::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

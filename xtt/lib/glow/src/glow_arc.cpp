@@ -60,7 +60,7 @@ void GlowArc::traverse(int x, int y)
   ur.traverse(x, y);
 }
 
-void GlowArc::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowArc::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_Arc) << '\n';
   fp << int(glow_eSave_Arc_draw_type) << FSPACE << int(draw_type) << '\n';
@@ -75,7 +75,7 @@ void GlowArc::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowArc::open(std::ifstream& fp)
+void GlowArc::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -389,7 +389,7 @@ void GlowArc::shift(void* pos, double delta_x, double delta_y, int highlight, in
 }
 
 void GlowArc::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                              int node_cnt, int in_nc, std::ofstream& fp)
+                              int node_cnt, int in_nc, std::ostream& fp)
 {
   int idx = int(ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * line_width - 1);
   idx = MAX(0, idx);
@@ -401,7 +401,7 @@ void GlowArc::export_javabean(GlowTransform* t, void* node, glow_eExportPass pas
 }
 
 void GlowArc::export_javabean_shadow(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                                     int node_cnt, int in_nc, std::ofstream& fp, int border, int shadow)
+                                     int node_cnt, int in_nc, std::ostream& fp, int border, int shadow)
 {
   int idx = int(ctx->mw.zoom_factor_y / ctx->mw.base_zoom_factor * line_width - 1);
   idx = MAX(0, idx);

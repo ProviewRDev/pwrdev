@@ -67,8 +67,8 @@ public:
   double x(GlowTransform* t, double x1, double y1);
   double y(GlowTransform* t, double x1, double y1);
   bool reverse(double x, double y, double* rx, double* ry);
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(std::istream& fp);
   double rot(GlowTransform* t) { return t->rotation + rotation; }
   double rot() { return rotation; }
   void store()

@@ -37,6 +37,8 @@
 #ifndef ge_subpalette_h
 #define ge_subpalette_h
 
+#include <iosfwd>
+
 #include "flow_browapi.h"
 
 /*! \file ge_subpalette.h
@@ -123,7 +125,7 @@ public:
   int object_attr();
   int get_select(char* text, char* filename);
   void menu_tree_build(char* filename);
-  subpalette_sMenu* menu_tree_build_children(std::ifstream* fp, int* line_cnt, char* filename,
+  subpalette_sMenu* menu_tree_build_children(std::istream* fp, int* line_cnt, char* filename,
                                              subpalette_sMenu* parent);
   void menu_tree_free();
   void menu_tree_free_children(subpalette_sMenu* first_child);

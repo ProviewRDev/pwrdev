@@ -37,6 +37,8 @@
 #ifndef glow_growgroup_h
 #define glow_growgroup_h
 
+#include <iosfwd>
+
 #include "glow_grownode.h"
 
 /*! \file glow_growgroup.h
@@ -79,13 +81,13 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Dissolve the group.
   /*! Add the transform of the group to the transformation of all members, and

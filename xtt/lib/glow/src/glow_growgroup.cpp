@@ -97,7 +97,7 @@ void GrowGroup::ungroup()
   ((GlowNodeGroup*)nc)->ungroup(&trf);
 }
 
-void GrowGroup::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowGroup::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_GrowGroup) << '\n';
   fp << int(glow_eSave_GrowGroup_grownode_part) << '\n';
@@ -107,7 +107,7 @@ void GrowGroup::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowGroup::open(std::ifstream& fp)
+void GrowGroup::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

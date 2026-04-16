@@ -75,7 +75,7 @@ void GlowPolyLine::print_zoom() { a_points.print_zoom(); }
 
 void GlowPolyLine::traverse(int x, int y) { a_points.traverse(x, y); }
 
-void GlowPolyLine::save(std::ofstream& fp, glow_eSaveMode mode)
+void GlowPolyLine::save(std::ostream& fp, glow_eSaveMode mode)
 {
   fp << int(glow_eSave_PolyLine) << '\n';
   fp << int(glow_eSave_PolyLine_draw_type) << FSPACE << int(draw_type) << '\n';
@@ -87,7 +87,7 @@ void GlowPolyLine::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GlowPolyLine::open(std::ifstream& fp)
+void GlowPolyLine::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;

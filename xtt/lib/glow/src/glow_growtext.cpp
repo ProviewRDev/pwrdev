@@ -243,7 +243,7 @@ int GrowText::event_handler(GlowWind* w, glow_eEvent event, int x, int y, double
   return sts;
 }
 
-void GrowText::save(std::ofstream& fp, glow_eSaveMode mode)
+void GrowText::save(std::ostream& fp, glow_eSaveMode mode)
 {
   char* s;
 
@@ -277,7 +277,7 @@ void GrowText::save(std::ofstream& fp, glow_eSaveMode mode)
   fp << int(glow_eSave_End) << '\n';
 }
 
-void GrowText::open(std::ifstream& fp)
+void GrowText::open(std::istream& fp)
 {
   int type = 0;
   int end_found = 0;
@@ -936,7 +936,7 @@ void GrowText::set_textfont(glow_eFont textfont)
 }
 
 void GrowText::export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt,
-                               int node_cnt, int in_nc, std::ofstream& fp)
+                               int node_cnt, int in_nc, std::ostream& fp)
 {
   int x1, y1;
   int z_width, z_height, z_descent;

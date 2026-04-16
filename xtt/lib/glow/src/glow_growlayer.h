@@ -37,6 +37,8 @@
 #ifndef glow_growlayer_h
 #define glow_growlayer_h
 
+#include <iosfwd>
+
 #include "glow_grownode.h"
 
 /*! \file glow_growlayer.h
@@ -66,14 +68,14 @@ public:
     \param fp	Ouput file.
     \param mode	Not used.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void save(int nochildren, std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void save(int nochildren, std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   int is_active() { return active; }
   int is_empty() { return a.a_size == 0 ? 1 : 0; }

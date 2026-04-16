@@ -37,6 +37,8 @@
 #ifndef glow_ctx_h
 #define glow_ctx_h
 
+#include <iosfwd>
+
 #include "glow_pscript.h"
 #include "glow_array.h"
 #include "glow_tiptext.h"
@@ -103,8 +105,8 @@ typedef struct
   int offset_y;      //!< Offset from workarea border to displayed window.
 } glow_sScroll;
 
-typedef void (*glow_tUserDataSaveCb)(std::ofstream*, void*, glow_eUserdataCbType);
-typedef void (*glow_tUserDataOpenCb)(std::ifstream*, void*, glow_eUserdataCbType);
+typedef void (*glow_tUserDataSaveCb)(std::ostream*, void*, glow_eUserdataCbType);
+typedef void (*glow_tUserDataOpenCb)(std::istream*, void*, glow_eUserdataCbType);
 typedef void (*glow_tUserDataCopyCb)(void*, void*, void**, glow_eUserdataCbType);
 typedef void (*glow_tUserDataCloseCb)(void*, void*, glow_eUserdataCbType);
 typedef void (*glow_tEventLogCb)(void*, void*, unsigned int);
@@ -168,8 +170,8 @@ public:
   */
   int open(char* filename, glow_eSaveMode mode);
 
-  int open_comment(std::ifstream& fp);
-  void save_comment(std::ofstream& fp);
+  int open_comment(std::istream& fp);
+  void save_comment(std::ostream& fp);
 
   //! Insert an object.
   /*!

@@ -3898,7 +3898,7 @@ void graph_keyboard_cb(void* ctx, int action, int type)
 
 void graph_userdata_save_cb(void* f, void* object, glow_eUserdataCbType utype)
 {
-  std::ofstream* fp = (std::ofstream*)f;
+  std::ostream* fp = (std::ostream*)f;
 
   switch (utype)
   {
@@ -3962,7 +3962,7 @@ static void graph_scriptexec_cb(void* ctx, char* filename)
 
 static void graph_userdata_open_cb(void* f, void* object, glow_eUserdataCbType utype)
 {
-  std::ifstream* fp = (std::ifstream*)f;
+  std::istream* fp = (std::istream*)f;
   Graph* graph;
 
   switch (utype)
@@ -5408,7 +5408,7 @@ int Graph::sound(pwr_tAttrRef* aref)
 
 int Graph::export_plcfo(char* filename) { return grow_ExportFlow(grow->ctx, filename); }
 
-static int script_dyn_cb(void* dyn, grow_tObject o, std::ofstream& fp, char* indentation)
+static int script_dyn_cb(void* dyn, grow_tObject o, std::ostream& fp, char* indentation)
 {
   char prefix[80] = "";
 

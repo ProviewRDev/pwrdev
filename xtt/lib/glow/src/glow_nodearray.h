@@ -37,6 +37,8 @@
 #ifndef glow_array_h
 #define glow_array_h
 
+#include <iosfwd>
+
 #include "glow_array_elem.h"
 
 typedef void* glow_tAddress;

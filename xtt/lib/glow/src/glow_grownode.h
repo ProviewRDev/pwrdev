@@ -37,6 +37,8 @@
 #ifndef glow_grownode_h
 #define glow_grownode_h
 
+#include <iosfwd>
+
 #include "glow_node.h"
 
 class GlowExportScript;
@@ -114,13 +116,13 @@ public:
     \param fp	Ouput file.
     \param mode	Save as graph or subgraph.
   */
-  void save(std::ofstream& fp, glow_eSaveMode mode);
+  void save(std::ostream& fp, glow_eSaveMode mode);
 
   //! Read the content of the object from file.
   /*!
     \param fp	Input file.
   */
-  void open(std::ifstream& fp);
+  void open(std::istream& fp);
 
   //! Move the object.
   /*!
@@ -862,7 +864,7 @@ public:
     java code for the java bean.
   */
   void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                       int in_nc, std::ofstream& fp);
+                       int in_nc, std::ostream& fp);
 
   //! Get next page to the current page.
   /*! \return Returns 1 if there is a next page, else 0. */

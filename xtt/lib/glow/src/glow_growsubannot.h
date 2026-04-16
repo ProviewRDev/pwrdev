@@ -37,6 +37,8 @@
 #ifndef glow_growsubannot_h
 #define glow_growsubannot_h
 
+#include <iosfwd>
+
 #include "glow_annot.h"
 #include "glow_rect.h"
 #include "glow_text.h"
@@ -64,8 +66,8 @@ public:
   void print(double ll_x, double ll_y, double ur_x, double ur_y) {}
   void zoom();
   void nav_zoom();
-  void save(std::ofstream& fp, glow_eSaveMode mode);
-  void open(std::ifstream& fp);
+  void save(std::ostream& fp, glow_eSaveMode mode);
+  void open(std::istream& fp);
   void draw(GlowWind* w, int ll_x, int ll_y, int ur_x, int ur_y);
   void draw(GlowWind* w, int* ll_x, int* ll_y, int* ur_x, int* ur_y);
   void move(double delta_x, double delta_y, int grid);
@@ -111,7 +113,7 @@ public:
   void get_ctx(void** c) { *c = (void*)ctx; }
   void align(double x, double y, glow_eAlignDirection direction);
   void export_javabean(GlowTransform* t, void* node, glow_eExportPass pass, int* shape_cnt, int node_cnt,
-                       int in_nc, std::ofstream& fp);
+                       int in_nc, std::ostream& fp);
   void convert(glow_eConvert version);
   void set_original_text_color(glow_eDrawType drawtype)
   {
