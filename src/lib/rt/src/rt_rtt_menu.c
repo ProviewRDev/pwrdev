@@ -6358,7 +6358,7 @@ int rtt_object_parameters(menu_ctx parent_ctx, pwr_tObjid objid, void* arg1, voi
         if (parameter_ptr != 0)
           if (j != 0)
             parameter_ptr += bd[i].attr->Param.Info.Size / elements;
-        sprintf(nr, "%d", j);
+        snprintf(nr, sizeof(nr), "%d", j);
         strcat(parnameindex, "[");
         strcat(parnameindex, nr);
         strcat(parnameindex, "]");

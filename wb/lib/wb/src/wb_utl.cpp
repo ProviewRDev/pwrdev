@@ -5553,7 +5553,7 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses, char* pa
       {
         objdid_name[0] = '\0';
       }
-      sprintf(logstrptr + strlen(logstr), "( %s ) ", objdid_name);
+      snprintf(logstrptr + strlen(logstr), sizeof(logstr) - strlen(logstr), "( %s ) ", objdid_name);
       if (str_StartsWith(valuestr, "_O"))
         sts = cdh_StringToObjid(valuestr, p_ObjDId);
       else
@@ -5568,7 +5568,7 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses, char* pa
       {
         objdid_name[0] = '\0';
       }
-      sprintf(logstrptr + strlen(logstr), "%s", objdid_name);
+      snprintf(logstrptr + strlen(logstr), sizeof(logstr) - strlen(logstr), "%s", objdid_name);
       break;
     }
     case pwr_eType_AttrRef:
@@ -5583,7 +5583,7 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses, char* pa
         objdid_name[0] = '\0';
       else
         strcpy(objdid_name, objdid_name_p);
-      sprintf(logstrptr + strlen(logstr), "( %s ) ", objdid_name);
+      snprintf(logstrptr + strlen(logstr), sizeof(logstr) - strlen(logstr), "( %s ) ", objdid_name);
       sts = ldh_NameToAttrRef(ldhses, valuestr, p_AttrRef);
       if (EVEN(sts))
       {
@@ -5595,7 +5595,7 @@ static int utl_set_parameter(pwr_sAttrRef* arp, ldh_tSesContext ldhses, char* pa
         objdid_name[0] = '\0';
       else
         strcpy(objdid_name, objdid_name_p);
-      sprintf(logstrptr + strlen(logstr), "%s", objdid_name);
+      snprintf(logstrptr + strlen(logstr), sizeof(logstr) - strlen(logstr), "%s", objdid_name);
       break;
     }
     default:

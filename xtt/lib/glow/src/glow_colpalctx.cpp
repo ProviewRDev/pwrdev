@@ -1189,7 +1189,7 @@ char* ColPalCtx::color_idx_to_text(int idx)
     tone = idx / 30 - 1;
     intensity = (idx / 10) % 3;
     lightness = idx % 10 + 1;
-    sprintf(str, "%s%s%d", tonestr[tone], intensitystr[intensity], lightness);
+    snprintf(str, sizeof(str), "%s%s%d", tonestr[tone], intensitystr[intensity], lightness);
     return str;
   }
   strcpy(str, "");

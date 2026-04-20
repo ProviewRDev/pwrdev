@@ -3202,7 +3202,7 @@ ItemBlockAttrArrayElem::ItemBlockAttrArrayElem(XNavBrow* brow, pwr_tObjid item_o
     annot++;
   else
     annot = name;
-  sprintf(attr, "%s[%d]", annot, element);
+  snprintf(attr, sizeof(attr), "%s[%d]", annot, element);
   brow_SetAnnotation(node, 0, attr, strlen(attr));
 
   memset(old_value, 0, sizeof(old_value));

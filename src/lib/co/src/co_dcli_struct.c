@@ -295,7 +295,7 @@ static int process_struct(t_ctx ctx, t_filectx filectx, char* struct_line,
           for (j = 0; j < count; j++)
           {
             strcpy(tmp, element_p->name);
-            sprintf(element_p->name, "%s[%d].%s", name, i, tmp);
+            snprintf(element_p->name, sizeof(element_p->name), "%s[%d].%s", name, i, tmp);
             element_p = element_p->next;
           }
         }
@@ -332,7 +332,7 @@ static int process_struct(t_ctx ctx, t_filectx filectx, char* struct_line,
             for (j = 0; j < count; j++)
             {
               strcpy(tmp, element_p->name);
-              sprintf(element_p->name, "%s[%d][%d].%s", name, i, k, tmp);
+              snprintf(element_p->name, sizeof(element_p->name), "%s[%d][%d].%s", name, i, k, tmp);
               element_p = element_p->next;
             }
           }
